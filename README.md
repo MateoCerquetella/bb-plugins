@@ -11,6 +11,7 @@
 <p align="center">
   <a href="https://github.com/MateoCerquetella/bb-plugins/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/MateoCerquetella/bb-plugins/ci.yml?branch=main&style=flat-square&label=CI" alt="CI status" /></a>
   <a href="https://www.npmjs.com/package/bb-plugin-taskboard"><img src="https://img.shields.io/npm/v/bb-plugin-taskboard?style=flat-square&label=Taskboard" alt="Taskboard npm version" /></a>
+  <a href="https://www.npmjs.com/package/bb-plugin-usage-tracker"><img src="https://img.shields.io/npm/v/bb-plugin-usage-tracker?style=flat-square&label=Usage%20Tracker" alt="Usage Tracker npm version" /></a>
   <img src="https://img.shields.io/badge/BB-%E2%89%A5%200.36-7c3aed?style=flat-square" alt="BB 0.36 or newer" />
   <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-16a34a?style=flat-square" alt="MIT license" /></a>
 </p>
@@ -22,7 +23,7 @@
 | | Plugin | Install | What it does |
 | --- | --- | --- | --- |
 | <img src="./plugins/taskboard/assets/icon.svg" width="28" height="28" alt="" /> | [Taskboard](./plugins/taskboard) | `bb plugin install npm:bb-plugin-taskboard` | Brings each BB project's GitHub, Linear, or Jira tasks into one focused List or Kanban board. |
-| <img src="./plugins/usage-tracker/assets/icon.svg" width="28" height="28" alt="" /> | [Usage Tracker](./plugins/usage-tracker) | `bb plugin install ./plugins/usage-tracker` | Shows compact Codex and Claude Code 5-hour and weekly limits directly in the sidebar footer. |
+| <img src="./plugins/usage-tracker/assets/icon.svg" width="28" height="28" alt="" /> | [Usage Tracker](./plugins/usage-tracker) | `bb plugin install npm:bb-plugin-usage-tracker` | Shows compact Codex and Claude Code 5-hour and weekly limits directly in the sidebar footer. |
 
 ## Taskboard quick start
 
@@ -50,15 +51,23 @@ bb plugin remove taskboard
 
 ## Usage Tracker quick start
 
-Install it from a local checkout:
+Install the public package:
 
 ```sh
-bb plugin install ./plugins/usage-tracker
+bb plugin install npm:bb-plugin-usage-tracker
 ```
 
 Usage Tracker mounts in BB's native sidebar footer beside the existing utility
 icons. It shows compact provider usage at a glance; select a provider to reveal
 its five-hour and weekly limits without leaving the current thread.
+
+Update or remove it with BB:
+
+```sh
+bb plugin outdated
+bb plugin update usage-tracker
+bb plugin remove usage-tracker
+```
 
 ## Build from source
 

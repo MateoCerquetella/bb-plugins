@@ -22,8 +22,11 @@ footer, removes everything on reload/disable, and runs alongside t3sidebar.
 ## Install
 
 ```sh
-bb plugin install ./plugins/usage-tracker
+bb plugin install npm:bb-plugin-usage-tracker
 ```
+
+Update or remove it with `bb plugin update usage-tracker` or
+`bb plugin remove usage-tracker`.
 
 ## Develop
 
