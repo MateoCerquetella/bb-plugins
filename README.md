@@ -22,6 +22,7 @@
 | | Plugin | Install | What it does |
 | --- | --- | --- | --- |
 | <img src="./plugins/taskboard/assets/icon.svg" width="28" height="28" alt="" /> | [Taskboard](./plugins/taskboard) | `bb plugin install npm:bb-plugin-taskboard` | Brings each BB project's GitHub, Linear, or Jira tasks into one focused List or Kanban board. |
+| <img src="./plugins/usage-tracker/assets/icon.svg" width="28" height="28" alt="" /> | [Usage Tracker](./plugins/usage-tracker) | `bb plugin install ./plugins/usage-tracker` | Shows compact Codex and Claude Code 5-hour and weekly limits directly in the sidebar footer. |
 
 ## Taskboard quick start
 
@@ -47,10 +48,22 @@ bb plugin update taskboard
 bb plugin remove taskboard
 ```
 
+## Usage Tracker quick start
+
+Install it from a local checkout:
+
+```sh
+bb plugin install ./plugins/usage-tracker
+```
+
+Usage Tracker mounts in BB's native sidebar footer beside the existing utility
+icons. It shows compact provider usage at a glance; select a provider to reveal
+its five-hour and weekly limits without leaving the current thread.
+
 ## Build from source
 
 Each plugin is an independent BB package under `plugins/<id>`. Clone the
-workspace once, install the shared dependencies, and register the plugin as a
+workspace once, install the shared dependencies, and register a plugin as a
 local-path source:
 
 ```sh
@@ -59,6 +72,7 @@ cd bb-plugins
 npm install
 npm run build
 bb plugin install ./plugins/taskboard
+bb plugin install ./plugins/usage-tracker
 ```
 
 BB reads local-path plugins in place, so the development loop stays short:
@@ -68,6 +82,7 @@ git pull
 npm install
 npm run build
 bb plugin reload taskboard
+bb plugin reload usage-tracker
 ```
 
 Direct `bb plugin install git:...` installation targets a repository-root

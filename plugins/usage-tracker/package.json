@@ -1,0 +1,84 @@
+{
+  "name": "bb-plugin-usage-tracker",
+  "version": "0.1.0",
+  "description": "Compact Codex and Claude usage limits in bb's sidebar footer.",
+  "license": "MIT",
+  "author": "Mateo Cerquetella",
+  "homepage": "https://github.com/MateoCerquetella/bb-plugins/tree/main/plugins/usage-tracker#readme",
+  "bugs": {
+    "url": "https://github.com/MateoCerquetella/bb-plugins/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MateoCerquetella/bb-plugins.git",
+    "directory": "plugins/usage-tracker"
+  },
+  "keywords": [
+    "bb",
+    "bb-plugin",
+    "agents",
+    "usage",
+    "quota",
+    "codex",
+    "claude-code",
+    "cursor"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "engines": {
+    "bb": ">=0.36",
+    "bbPluginSdk": "^0.4.1"
+  },
+  "bb": {
+    "name": "Usage Tracker",
+    "description": "Compact Codex and Claude usage limits in the sidebar footer.",
+    "branding": {
+      "icon": "./assets/icon.svg",
+      "logo": {
+        "light": "./assets/logo.svg",
+        "dark": "./assets/logo-dark.svg"
+      }
+    },
+    "server": "./server.ts",
+    "app": "./app.tsx",
+    "skills": []
+  },
+  "files": [
+    "dist/server.js",
+    "dist/server.meta.json",
+    "dist/app.js",
+    "dist/app.meta.json",
+    "dist/app.css",
+    "assets/",
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md",
+    "server.ts",
+    "app.tsx",
+    "app.css",
+    "lib/",
+    "types/",
+    "tsconfig.json"
+  ],
+  "dependencies": {
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "bb-app": "^0.36.0",
+    "typescript": "^5.7.0"
+  },
+  "scripts": {
+    "build": "env -u BB_CLI bb plugin build .",
+    "dev": "bb plugin dev .",
+    "typecheck": "tsc --noEmit",
+    "types:check": "env -u BB_CLI bb plugin types --check .",
+    "types:refresh": "env -u BB_CLI bb plugin types .",
+    "test": "node --test --experimental-strip-types test/*.test.ts",
+    "check": "npm run types:check && npm run typecheck && npm test && npm run build",
+    "prepack": "npm run check"
+  }
+}
