@@ -18,6 +18,8 @@ Usage Tracker adds one compact, live strip beside BB's existing sidebar
 utility icons. Claude Code and Codex each show a progress bar and their current
 usage reading, without adding a navigation item or a separate plugin page.
 
+![Usage Tracker expanded in BB's sidebar](./assets/usage-tracker-sidebar.png)
+
 ## Features
 
 - Shows Codex and Claude Code subscription usage in BB's sidebar footer.
