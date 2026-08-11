@@ -23,7 +23,7 @@
 | | Plugin | Install | What it does |
 | --- | --- | --- | --- |
 | <img src="./plugins/taskboard/assets/icon.svg" width="28" height="28" alt="" /> | [Taskboard](./plugins/taskboard) | `bb plugin install npm:bb-plugin-taskboard` | Brings each BB project's GitHub, Linear, or Jira tasks into one focused List or Kanban board. |
-| <img src="./plugins/usage-tracker/assets/icon.svg" width="28" height="28" alt="" /> | [Usage Tracker](./plugins/usage-tracker) | `bb plugin install npm:bb-plugin-usage-tracker` | Shows compact Codex and Claude Code 5-hour and weekly limits directly in the sidebar footer. |
+| <img src="./plugins/usage-tracker/assets/icon.svg" width="28" height="28" alt="" /> | [Usage Tracker](./plugins/usage-tracker) | `bb plugin install npm:bb-plugin-usage-tracker` | Keeps Codex and Claude Code 5-hour and weekly limits beside BB's sidebar utility icons. |
 
 ## Taskboard quick start
 
@@ -58,8 +58,17 @@ bb plugin install npm:bb-plugin-usage-tracker
 ```
 
 Usage Tracker mounts in BB's native sidebar footer beside the existing utility
-icons. It shows compact provider usage at a glance; select a provider to reveal
-its five-hour and weekly limits without leaving the current thread.
+icons. Each provider gets a compact progress bar and current usage reading.
+Select Codex or Claude Code to expand its five-hour and weekly limits, reset
+times, and session status without leaving the current thread. There is no
+separate plugin page to manage.
+
+The strip refreshes automatically every five minutes, refreshes when a stale BB
+window becomes active again, and includes a manual refresh control. If a
+provider is briefly unavailable or rate-limited, the last known limit windows
+remain visible with the current status. See the
+[Usage Tracker README](./plugins/usage-tracker) for requirements, behavior, and
+development details.
 
 Update or remove it with BB:
 
