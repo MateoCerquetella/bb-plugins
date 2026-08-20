@@ -2,6 +2,13 @@
 
 All notable changes to Usage Tracker are documented here.
 
+## Unreleased
+
+### Added
+
+- A Compact limit setting chooses whether the collapsed percentage and
+  progress bar show weekly or five-hour usage. Weekly is the default.
+
 ## 0.1.2 - 2026-08-17
 
 ### Changed

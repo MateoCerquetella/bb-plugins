@@ -3,6 +3,7 @@ import {
   type ProviderUsage,
   type UsageWindow,
 } from "./usage.ts";
+import type { CompactLimitOption } from "./preferences.ts";
 
 export interface SidebarUsageWindows {
   fiveHour: UsageWindow | null;
@@ -49,9 +50,21 @@ export function sidebarUsageSummary(provider: ProviderUsage): string {
   return `${fiveHourValue}% 5h · ${weeklyValue}% wk`;
 }
 
-export function sidebarUsagePrimarySummary(provider: ProviderUsage): string {
+export function sidebarUsagePrimaryWindow(
+  provider: ProviderUsage,
+  compactLimit: CompactLimitOption,
+): UsageWindow | null {
   const { fiveHour, weekly } = sidebarUsageWindows(provider);
-  const primary = fiveHour ?? weekly;
+  return compactLimit === "Weekly"
+    ? weekly ?? fiveHour
+    : fiveHour ?? weekly;
+}
+
+export function sidebarUsagePrimarySummary(
+  provider: ProviderUsage,
+  compactLimit: CompactLimitOption,
+): string {
+  const primary = sidebarUsagePrimaryWindow(provider, compactLimit);
   return primary === null ? "—%" : `${formatUsedPercent(primary.usedPercent)}%`;
 }
 

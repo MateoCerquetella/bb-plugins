@@ -25,6 +25,8 @@ usage reading, without adding a navigation item or a separate plugin page.
 - Shows Codex and Claude Code subscription usage in BB's sidebar footer.
 - Lets you show or hide Codex and Claude Code independently; the strip
   compacts for one provider and disappears when both are disabled.
+- Lets you choose whether the compact percentage and progress bar show the
+  weekly or five-hour limit. Weekly is the default.
 - Expands either provider to show its five-hour and weekly percentages.
 - Includes reset timing and provider session status in the expanded view.
 - Refreshes automatically every five minutes and whenever a stale BB window
@@ -45,7 +47,8 @@ bb plugin install npm:bb-plugin-usage-tracker
 
 The strip appears in the bottom of the sidebar as soon as the plugin loads.
 Both providers are enabled by default. Change them independently under
-**Settings → Plugins → Usage Tracker**.
+**Settings → Plugins → Usage Tracker**. The same page lets you choose
+between the weekly and five-hour limit for the compact reading.
 
 The provider CLIs must be installed and signed in for BB to report their usage:
 

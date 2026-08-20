@@ -7,13 +7,16 @@ import {
   type UsageWindow,
 } from "./usage.ts";
 import {
+  normalizeCompactLimitOption,
   SIDEBAR_PROVIDER_IDS,
+  type CompactLimitOption,
   type SidebarProviderId,
 } from "./preferences.ts";
 import { providerMark } from "./provider-marks.ts";
 import {
   mergeLastKnownWindows,
   sidebarUsagePrimarySummary,
+  sidebarUsagePrimaryWindow,
   sidebarUsageSummary,
   sidebarUsageWindows,
 } from "./sidebar-usage.ts";
@@ -21,6 +24,7 @@ import {
 const ROOT_ATTRIBUTE = "data-usage-tracker-sidebar";
 const CACHE_KEY = "bb:usage-tracker:sidebar:last-known";
 const PREFERENCES_CACHE_KEY = "bb:usage-tracker:sidebar:enabled-providers";
+const COMPACT_LIMIT_CACHE_KEY = "bb:usage-tracker:sidebar:compact-limit";
 const AUTO_REFRESH_MS = 5 * 60_000;
 const PREFERENCES_REFRESH_MS = 5_000;
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
@@ -33,6 +37,7 @@ interface RpcEnvelope<T> {
 
 interface PreferencesResult {
   enabledProviderIds: SidebarProviderId[];
+  compactLimit: CompactLimitOption;
 }
 
 function element<K extends keyof HTMLElementTagNameMap>(
@@ -159,6 +164,25 @@ function cacheProviderIds(providerIds: readonly SidebarProviderId[]): void {
   }
 }
 
+function readCachedCompactLimit(): CompactLimitOption {
+  try {
+    const value: unknown = JSON.parse(
+      localStorage.getItem(COMPACT_LIMIT_CACHE_KEY) ?? "null",
+    );
+    return normalizeCompactLimitOption(value);
+  } catch {
+    return "Weekly";
+  }
+}
+
+function cacheCompactLimit(compactLimit: CompactLimitOption): void {
+  try {
+    localStorage.setItem(COMPACT_LIMIT_CACHE_KEY, JSON.stringify(compactLimit));
+  } catch {
+    // Storage is an optimization. Preferences are still refreshed live.
+  }
+}
+
 function mergeSnapshot(
   current: UsageSnapshot,
   previous: UsageSnapshot | null,
@@ -277,6 +301,7 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
   let root: HTMLLIElement | null = null;
   let snapshot = readCachedSnapshot();
   let enabledProviderIds = readCachedProviderIds();
+  let compactLimit = readCachedCompactLimit();
   let selectedProviderId: SidebarProviderId | null = null;
   let isLoading = false;
   let isLoadingPreferences = false;
@@ -317,7 +342,6 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
 
     for (const providerId of enabledProviderIds) {
       const provider = providerFor(providerId);
-      const pair = sidebarUsageWindows(provider);
       const button = element("button", "usage-tracker-sidebar__provider");
       button.type = "button";
       button.dataset.provider = providerId;
@@ -331,11 +355,13 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
 
       const mark = element("span", "usage-tracker-sidebar__mark");
       mark.append(providerGlyph(providerId));
-      const primaryWindow = pair.fiveHour ?? pair.weekly;
+      const primaryWindow = sidebarUsagePrimaryWindow(provider, compactLimit);
       const reading = element(
         "span",
         "usage-tracker-sidebar__reading",
-        isLoading && snapshot === null ? "…" : sidebarUsagePrimarySummary(provider),
+        isLoading && snapshot === null
+          ? "…"
+          : sidebarUsagePrimarySummary(provider, compactLimit),
       );
       button.append(mark, progressRail(primaryWindow), reading);
       button.addEventListener("click", () => {
@@ -451,10 +477,14 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
       const nextProviderIds = SIDEBAR_PROVIDER_IDS.filter((providerId) =>
         payload.result?.enabledProviderIds.includes(providerId),
       );
+      const nextCompactLimit = normalizeCompactLimitOption(
+        payload.result.compactLimit,
+      );
       const newlyEnabled = nextProviderIds.some(
         (providerId) => !enabledProviderIds.includes(providerId),
       );
       const changed =
+        nextCompactLimit !== compactLimit ||
         nextProviderIds.length !== enabledProviderIds.length ||
         nextProviderIds.some(
           (providerId, index) => providerId !== enabledProviderIds[index],
@@ -462,6 +492,7 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
       if (!changed) return;
 
       enabledProviderIds = nextProviderIds;
+      compactLimit = nextCompactLimit;
       if (
         selectedProviderId !== null &&
         !enabledProviderIds.includes(selectedProviderId)
@@ -469,6 +500,7 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
         selectedProviderId = null;
       }
       cacheProviderIds(enabledProviderIds);
+      cacheCompactLimit(compactLimit);
       render();
       if (newlyEnabled) void load();
     } catch {
