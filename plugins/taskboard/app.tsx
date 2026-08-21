@@ -61,20 +61,25 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip';
-import type {
-  ProjectConfigMutation,
-  ProjectConfigView,
-  ProjectCredentialsInteractionResponse,
-  CreateIssueContext,
-  IssueDraftRecord,
-  SecretMutation,
-  TrackerProject,
-  WorkItem,
-  WorkItemDetail,
-  WorkSource,
-  WorkStateCategory,
-  WorkStatusOption,
-  TaskboardRpcContract
+import {
+  ACROSS_PROJECTS_SCOPE_ID,
+  ALL_SOURCES_FILTER,
+  boardFilterStateFingerprint,
+  filterStateScopeId,
+  type BoardFilterState,
+  type ProjectConfigMutation,
+  type ProjectConfigView,
+  type ProjectCredentialsInteractionResponse,
+  type CreateIssueContext,
+  type IssueDraftRecord,
+  type SecretMutation,
+  type TrackerProject,
+  type WorkItem,
+  type WorkItemDetail,
+  type WorkSource,
+  type WorkStateCategory,
+  type WorkStatusOption,
+  type TaskboardRpcContract
 } from './contract.js';
 import {
   defaultProjectBoardSettings,
@@ -115,7 +120,7 @@ import './app.css';
 
 const PANEL_PATH = 'tasks';
 const THREAD_PANEL_ACTION_ID = 'taskboard-panel';
-const ALL_SOURCES = 'all';
+const ALL_SOURCES = ALL_SOURCES_FILTER;
 const RIGHT_PANEL_PINNED_STORAGE_KEY = 'bb-taskboard:right-panel-pinned';
 const RIGHT_PANEL_PIN_EVENT = 'bb-taskboard:right-panel-pin-changed';
 const SIDEBAR_COLLAPSED_STORAGE_KEY = 'bb-taskboard:sidebar-collapsed';
@@ -2926,7 +2931,7 @@ function TrackerList({
   const rpc = useRpc<TaskboardRpcContract>();
   const [items, setItems] = useState<WorkItem[] | undefined>();
   const [boardSettings, setBoardSettings] = useState<ProjectBoardSettings>(() =>
-    defaultProjectBoardSettings(projectId ?? 'proj_across_projects')
+    defaultProjectBoardSettings(projectId ?? ACROSS_PROJECTS_SCOPE_ID)
   );
   const [boardSettingsReady, setBoardSettingsReady] = useState(
     projectId === null
@@ -2963,34 +2968,78 @@ function TrackerList({
   );
   const [error, setError] = useState<string | null>(null);
   const requestRevisionRef = useRef(0);
+  // initialPreferences seeds useState at mount. It must NOT drive the load
+  // effect: the parent re-reads it from a mutable Map on every render, so its
+  // identity flips as soon as this component records its own preferences,
+  // which re-ran the load, cancelled the in-flight fetch, and then skipped
+  // applying the saved state. Capture it once instead.
+  const initialPreferencesRef = useRef(initialPreferences);
+  const savedFingerprintRef = useRef<string | null>(null);
+  const filterStateLoadedRef = useRef(false);
+  const saveRevisionRef = useRef(0);
+  const savePromiseRef = useRef<Promise<unknown>>(Promise.resolve());
   const stateFilterEnabled = boardSettings.enabledFilters.includes('state');
 
+  const storageScopeId = filterStateScopeId(preferenceScope);
+
   useEffect(() => {
-    if (projectId === null) {
-      setBoardSettings(defaultProjectBoardSettings('proj_across_projects'));
-      setBoardSettingsReady(true);
-      return;
-    }
     let cancelled = false;
     setBoardSettingsReady(false);
-    void rpc
-      .call('getProjectBoardSettings', { projectId })
-      .then(result => {
+    filterStateLoadedRef.current = false;
+    const settingsProjectId = projectId ?? ACROSS_PROJECTS_SCOPE_ID;
+    const loadSettings =
+      projectId === null
+        ? Promise.resolve({
+            settings: defaultProjectBoardSettings(settingsProjectId)
+          })
+        : rpc.call('getProjectBoardSettings', { projectId });
+
+    void Promise.all([
+      loadSettings,
+      rpc.call('getBoardFilterState', { projectId: storageScopeId })
+    ])
+      .then(([settingsResult, stateResult]) => {
         if (cancelled) return;
-        setBoardSettings(result.settings);
-        if (!initialPreferences) setView(result.settings.defaultView);
+        setBoardSettings(settingsResult.settings);
+        // Only a successful load may open this gate. A failed load (below,
+        // in .catch()) must NOT set this: the save effect would then be
+        // free to write the still-default in-memory state over a saved row
+        // it never actually read, destroying data it merely failed to
+        // fetch. Every path from here on is a load we positively trust
+        // (either "keep in-memory preferences" or "we know what's saved,
+        // including that nothing is saved"), so it is safe to set once,
+        // up front, rather than at each return below.
+        filterStateLoadedRef.current = true;
+        if (initialPreferencesRef.current) return;
+        const saved = stateResult.state;
+        if (!saved) {
+          setView(settingsResult.settings.defaultView);
+          return;
+        }
+        setSource(projectId === null ? saved.source : ALL_SOURCES);
+        setStateCategories(saved.stateCategories);
+        setStatuses(saved.statuses);
+        setAssignees(saved.assignees);
+        setPriorities(saved.priorities);
+        setExternalProjects(saved.externalProjects);
+        setLabels(saved.labels);
+        setQuery(saved.query);
+        setCommittedQuery(saved.query);
+        setView(saved.view);
+        savedFingerprintRef.current = boardFilterStateFingerprint(saved);
       })
       .catch(() => {
         if (cancelled) return;
-        setBoardSettings(defaultProjectBoardSettings(projectId));
+        setBoardSettings(defaultProjectBoardSettings(settingsProjectId));
       })
       .finally(() => {
-        if (!cancelled) setBoardSettingsReady(true);
+        if (cancelled) return;
+        setBoardSettingsReady(true);
       });
     return () => {
       cancelled = true;
     };
-  }, [initialPreferences, projectId, rpc]);
+  }, [projectId, rpc, storageScopeId]);
 
   const loadItems = useCallback(async () => {
     const requestRevision = ++requestRevisionRef.current;
@@ -3035,6 +3084,11 @@ function TrackerList({
     return () => window.clearTimeout(timeout);
   }, [query]);
   useEffect(() => {
+    // Do not cache a snapshot before the load has resolved. The parent uses
+    // this map to seed a later mount, and an empty pre-load placeholder would
+    // make that mount look like it had real in-session state, suppressing the
+    // saved filters entirely.
+    if (!filterStateLoadedRef.current) return;
     onPreferencesChange(preferenceScope, {
       source,
       stateCategories,
@@ -3059,6 +3113,75 @@ function TrackerList({
     source,
     stateCategories,
     statuses,
+    view
+  ]);
+  useEffect(() => {
+    if (!filterStateLoadedRef.current) return;
+    const state: BoardFilterState = {
+      source,
+      stateCategories,
+      statuses,
+      assignees,
+      priorities,
+      externalProjects,
+      labels,
+      query,
+      view
+    };
+    const fingerprint = boardFilterStateFingerprint(state);
+    if (fingerprint === savedFingerprintRef.current) return;
+    const timeout = window.setTimeout(() => {
+      savedFingerprintRef.current = fingerprint;
+      const saveRevision = ++saveRevisionRef.current;
+      // The transport gives no ordering guarantee -- each rpc.call is an
+      // independent request, and the server handler awaits a
+      // variable-latency project lookup before its write -- so two saves
+      // fired close together could otherwise commit out of edit order.
+      // Chaining onto savePromiseRef serializes them: the next save's
+      // request is only issued once the previous one has fully settled,
+      // so the server always commits in the order the user made the
+      // edits. The leading .catch(() => {}) is not a swallowed error --
+      // it stops one failed save from poisoning the chain and skipping
+      // every save queued after it.
+      //
+      // The fingerprint above is set optimistically, before the request
+      // is issued, so it reads as "saved" for the duration of the call.
+      // Nothing outside this effect reads it, so the worst case is one
+      // redundant re-send.
+      //
+      // Known limitation: rpc.call takes no abort signal, so a request
+      // that never settles stalls the chain and silently stops
+      // persisting until this component remounts. Racing it against a
+      // timeout would not help -- it cannot cancel the request, so a
+      // second save would go out while the first is still in flight and
+      // reintroduce the out-of-order commit this chain exists to
+      // prevent.
+      savePromiseRef.current = savePromiseRef.current
+        .catch(() => {})
+        .then(() =>
+          rpc.call('saveBoardFilterState', { projectId: storageScopeId, state })
+        )
+        .catch(nextError => {
+          // Deliberately no toast: a filter save is incidental to what
+          // the user is doing. Log it anyway, so a schema or contract
+          // bug is distinguishable from a transient network failure.
+          console.warn('Taskboard: filter state save failed', nextError);
+          if (saveRevision !== saveRevisionRef.current) return;
+          savedFingerprintRef.current = null;
+        });
+    }, 500);
+    return () => window.clearTimeout(timeout);
+  }, [
+    assignees,
+    externalProjects,
+    labels,
+    priorities,
+    query,
+    rpc,
+    source,
+    stateCategories,
+    statuses,
+    storageScopeId,
     view
   ]);
   useEffect(

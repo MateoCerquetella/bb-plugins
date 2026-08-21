@@ -1,5 +1,6 @@
 import type { BbPluginApi, PluginRpcHandlers } from '@get-bb/plugin-sdk';
 import {
+  ACROSS_PROJECTS_SCOPE_ID,
   bbProjectIdSchema,
   formatWorkItemContext,
   issueDraftRecordSchema,
@@ -591,6 +592,11 @@ export default async function plugin(bb: BbPluginApi) {
 
   async function assertProjectExists(projectId: string): Promise<void> {
     await projectById(projectId);
+  }
+
+  async function assertFilterScopeExists(scopeId: string): Promise<void> {
+    if (scopeId === ACROSS_PROJECTS_SCOPE_ID) return;
+    await assertProjectExists(scopeId);
   }
 
   async function fallbackGithubRepos(projectId: string): Promise<string[]> {
@@ -1728,6 +1734,16 @@ export default async function plugin(bb: BbPluginApi) {
         source: null
       });
       return { settings };
+    },
+    async getBoardFilterState(input) {
+      await assertFilterScopeExists(input.projectId);
+      return { state: store.boardFilterState(input.projectId) };
+    },
+    async saveBoardFilterState(input) {
+      await assertFilterScopeExists(input.projectId);
+      return {
+        state: store.saveBoardFilterState(input.projectId, input.state)
+      };
     }
   };
   bb.rpc.register(taskboardRpcContract, handlers);

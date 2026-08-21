@@ -64,11 +64,13 @@
     "create-issue.ts",
     "credential-contract.ts",
     "credentials.ts",
+    "filter-state.ts",
     "issue-draft.ts",
     "project-selection.ts",
     "server.ts",
     "store.ts",
-    "tsconfig.json"
+    "tsconfig.json",
+    "work-schemas.ts"
   ],
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.1.3",

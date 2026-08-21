@@ -34,6 +34,10 @@ task to an agent without rebuilding context by hand.
   the default List or Kanban layout, and the exact provider status order.
   Provider-native workflow groups, drag-and-drop, and keyboard status moves
   remain available without repetitive provider chips on every task.
+- **Filters that stay put** — each project remembers its own filter chips,
+  search text, and List or Kanban choice. They come back on reload and follow
+  you between the board and a thread's Taskboard panel, because they are saved
+  per project rather than per surface. "Clear filters" resets them.
 - **Live task details** — cached summaries keep browsing fast; opening a task
   fetches its current description, labels, assignee, and comments.
 - **Pinned beside every chat** — open Taskboard from the thread-header button,

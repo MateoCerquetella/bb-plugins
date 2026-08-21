@@ -1,9 +1,13 @@
 import type { BbPluginApi } from '@get-bb/plugin-sdk';
 import {
+  bbProjectIdSchema,
+  boardFilterStateSchema,
   defaultProjectBoardSettings,
+  normalizeBoardFilterState,
   projectBoardSettingsSchema,
   projectSourceConfigSchema,
   workItemSchema,
+  type BoardFilterState,
   type ProjectBoardSettings,
   type ProjectSourceConfig,
   type WorkItem,
@@ -53,6 +57,11 @@ interface ProjectBoardSettingsRow {
   default_view: string;
   enabled_filters_json: string;
   status_order_json: string;
+}
+
+interface ProjectFilterStateRow {
+  bb_project_id: string;
+  filters_json: string;
 }
 
 export interface StoredSyncState {
@@ -120,6 +129,14 @@ function boardSettingsFromRow(
 
 function escapeLike(value: string): string {
   return value.replace(/[\\%_]/gu, character => `\\${character}`);
+}
+
+function parseJsonSafely(value: string): unknown {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return undefined;
+  }
 }
 
 export function createWorkItemStore(bb: BbPluginApi) {
@@ -323,6 +340,13 @@ export function createWorkItemStore(bb: BbPluginApi) {
         status_order_json TEXT NOT NULL,
         updated_at TEXT NOT NULL
       );
+    `,
+    `
+      CREATE TABLE project_filter_state (
+        bb_project_id TEXT PRIMARY KEY,
+        filters_json TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
     `
   ]);
 
@@ -430,6 +454,12 @@ export function createWorkItemStore(bb: BbPluginApi) {
       enabled_filters_json,
       status_order_json
     FROM project_board_settings
+    WHERE bb_project_id = ?
+  `);
+
+  const readProjectFilterState = db.prepare<[string], ProjectFilterStateRow>(`
+    SELECT bb_project_id, filters_json
+    FROM project_filter_state
     WHERE bb_project_id = ?
   `);
 
@@ -682,6 +712,39 @@ export function createWorkItemStore(bb: BbPluginApi) {
       return boardSettingsFromRow(
         readProjectBoardSettings.get(settings.projectId)!
       );
+    },
+    boardFilterState(projectId: string): BoardFilterState | null {
+      bbProjectIdSchema.parse(projectId);
+      const row = readProjectFilterState.get(projectId);
+      if (!row) return null;
+      // A row whose JSON is malformed or no longer matches the schema
+      // returns null rather than throwing, so a corrupt write or a future
+      // schema change degrades to "no saved filters" instead of breaking
+      // the board.
+      const raw = parseJsonSafely(row.filters_json);
+      if (raw === undefined) return null;
+      const parsed = boardFilterStateSchema.safeParse(raw);
+      return parsed.success ? normalizeBoardFilterState(parsed.data) : null;
+    },
+    saveBoardFilterState(
+      projectId: string,
+      input: BoardFilterState
+    ): BoardFilterState {
+      bbProjectIdSchema.parse(projectId);
+      const state = normalizeBoardFilterState(
+        boardFilterStateSchema.parse(input)
+      );
+      db.prepare<[string, string, string]>(
+        `
+        INSERT INTO project_filter_state (
+          bb_project_id, filters_json, updated_at
+        ) VALUES (?, ?, ?)
+        ON CONFLICT(bb_project_id) DO UPDATE SET
+          filters_json = excluded.filters_json,
+          updated_at = excluded.updated_at
+      `
+      ).run(projectId, JSON.stringify(state), new Date().toISOString());
+      return state;
     },
     configuredProjectIds(): string[] {
       return db
