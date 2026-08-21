@@ -34,6 +34,15 @@ task to an agent without rebuilding context by hand.
   the default List or Kanban layout, and the exact provider status order.
   Provider-native workflow groups, drag-and-drop, and keyboard status moves
   remain available without repetitive provider chips on every task.
+- **Filters that stay put** — each project remembers its own filter chips,
+  search text, and List or Kanban choice. They come back on reload and follow
+  you between the board and a thread's Taskboard panel, because they are saved
+  per project rather than per surface. "Clear filters" resets them.
+- **Filter presets** — save the current filters under a name and reapply them
+  from the Presets menu in one click. Rename, reorder, and delete them in
+  **Manage → Board preferences**. Presets are per project, and none is ever
+  applied automatically: sticky filters already decide what the board opens
+  with, so a "default preset" would only compete with them.
 - **Live task details** — cached summaries keep browsing fast; opening a task
   fetches its current description, labels, assignee, and comments.
 - **Pinned beside every chat** — open Taskboard from the thread-header button,
@@ -145,10 +154,14 @@ bb taskboard status [--project <proj_id>] [--json]
 bb taskboard config [--project <proj_id>] [--source linear|github|jira] [provider fields] [--json]
 bb taskboard credentials [--project <proj_id>] [--json]
 bb taskboard refresh [linear|github|jira] [--project <proj_id>] [--json]
-bb taskboard list [--project <proj_id>] [--source linear|github|jira] [--query <text>] [--cached] [--json]
+bb taskboard list [--project <proj_id>] [--source linear|github|jira] [--query <text>] [--preset <name>] [--cached] [--json]
 bb taskboard show <linear|github|jira> <locator> [--project <proj_id>] [--json]
 bb taskboard transitions <linear|github|jira> <locator> [--project <proj_id>] [--json]
 bb taskboard move <linear|github|jira> <locator> --status <id> [--project <proj_id>] [--json]
+bb taskboard presets list [--project <proj_id>] [--json]
+bb taskboard presets save <name> --from-state <json> [--project <proj_id>] [--json]
+bb taskboard presets rename <name> <new-name> [--project <proj_id>] [--json]
+bb taskboard presets delete <name> [--project <proj_id>] [--json]
 ```
 
 An explicit source must match the tracker selected for that project. Taskboard

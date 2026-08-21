@@ -8,6 +8,21 @@ import {
   secretMutationSchema
 } from './credential-contract.js';
 import { projectBoardSettingsSchema } from './board-settings.js';
+import { boardFilterStateSchema } from './filter-state.js';
+import {
+  filterPresetNameSchema,
+  filterPresetSchema
+} from './filter-presets.js';
+import {
+  workSourceSchema,
+  workStateCategorySchema,
+  type WorkSource
+} from './work-schemas.js';
+export {
+  workSourceSchema,
+  workStateCategorySchema
+} from './work-schemas.js';
+export type { WorkSource, WorkStateCategory } from './work-schemas.js';
 export {
   DEFAULT_WORK_ITEM_FILTER_FIELDS,
   DEFAULT_WORKFLOW_STATUS_ORDER,
@@ -22,6 +37,28 @@ export type {
   WorkItemFilterField
 } from './board-settings.js';
 export {
+  ACROSS_PROJECTS_SCOPE_ID,
+  ALL_SOURCES_FILTER,
+  boardFilterStateFingerprint,
+  boardFilterStateSchema,
+  defaultBoardFilterState,
+  filterStateScopeId,
+  normalizeBoardFilterState,
+  sourceFilterSchema
+} from './filter-state.js';
+export type {
+  BoardFilterState,
+  SourceFilterValue
+} from './filter-state.js';
+export {
+  PRESET_NAME_MAX_LENGTH,
+  filterPresetNameSchema,
+  filterPresetSchema,
+  normalizePresetName,
+  resolvePresetOrder
+} from './filter-presets.js';
+export type { FilterPreset } from './filter-presets.js';
+export {
   bbProjectIdSchema,
   jiraBaseUrlSchema,
   projectCredentialsInteractionPayloadSchema,
@@ -33,9 +70,6 @@ export type {
   ProjectCredentialsInteractionResponse,
   SecretMutation
 } from './credential-contract.js';
-
-export const workSourceSchema = z.enum(['linear', 'github', 'jira']);
-export type WorkSource = z.infer<typeof workSourceSchema>;
 
 export const trackerProjectSchema = z
   .object({
@@ -82,15 +116,6 @@ export const projectConfigMutationSchema = projectSourceConfigSchema
     }
   });
 export type ProjectConfigMutation = z.infer<typeof projectConfigMutationSchema>;
-
-export const workStateCategorySchema = z.enum([
-  'backlog',
-  'todo',
-  'in_progress',
-  'done',
-  'canceled'
-]);
-export type WorkStateCategory = z.infer<typeof workStateCategorySchema>;
 
 export const workStatusOptionSchema = z
   .object({
@@ -353,6 +378,54 @@ export const taskboardRpcContract = defineRpcContract({
   saveProjectBoardSettings: {
     input: projectBoardSettingsSchema,
     output: z.object({ settings: projectBoardSettingsSchema }).strict()
+  },
+  getBoardFilterState: {
+    input: z.object({ projectId: bbProjectIdSchema }).strict(),
+    output: z.object({ state: boardFilterStateSchema.nullable() }).strict()
+  },
+  saveBoardFilterState: {
+    input: z
+      .object({
+        projectId: bbProjectIdSchema,
+        state: boardFilterStateSchema
+      })
+      .strict(),
+    output: z.object({ state: boardFilterStateSchema }).strict()
+  },
+  listFilterPresets: {
+    input: z.object({ projectId: bbProjectIdSchema }).strict(),
+    output: z.object({ presets: z.array(filterPresetSchema) }).strict()
+  },
+  saveFilterPreset: {
+    input: z
+      .object({
+        projectId: bbProjectIdSchema,
+        id: z.string().min(1).optional(),
+        name: filterPresetNameSchema,
+        state: boardFilterStateSchema
+      })
+      .strict(),
+    output: z
+      .object({
+        preset: filterPresetSchema,
+        presets: z.array(filterPresetSchema)
+      })
+      .strict()
+  },
+  deleteFilterPreset: {
+    input: z
+      .object({ projectId: bbProjectIdSchema, id: z.string().min(1) })
+      .strict(),
+    output: z.object({ presets: z.array(filterPresetSchema) }).strict()
+  },
+  reorderFilterPresets: {
+    input: z
+      .object({
+        projectId: bbProjectIdSchema,
+        ids: z.array(z.string().min(1))
+      })
+      .strict(),
+    output: z.object({ presets: z.array(filterPresetSchema) }).strict()
   }
 });
 

@@ -1,10 +1,10 @@
 import { z } from 'zod';
 import { bbProjectIdSchema } from './credential-contract.js';
 import { DEFAULT_WORKFLOW_STATUS_ORDER } from './browse.js';
+import { trackerViewSchema } from './work-schemas.js';
 export { DEFAULT_WORKFLOW_STATUS_ORDER } from './browse.js';
-
-export const trackerViewSchema = z.enum(['list', 'kanban']);
-export type TrackerView = z.infer<typeof trackerViewSchema>;
+export { trackerViewSchema } from './work-schemas.js';
+export type { TrackerView } from './work-schemas.js';
 
 export const workItemFilterFieldSchema = z.enum([
   'state',
