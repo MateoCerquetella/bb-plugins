@@ -300,6 +300,7 @@ function detailWindowRow(
 function detailsCard(
   provider: ProviderUsage,
   onClose: () => void,
+  refresh: HTMLButtonElement,
 ): HTMLDivElement {
   const card = element("div", "usage-tracker-sidebar__details");
   card.id = detailsId(provider.id);
@@ -329,7 +330,11 @@ function detailsCard(
   close.setAttribute("aria-label", "Close usage details");
   close.append(closeGlyph());
   close.addEventListener("click", onClose);
-  header.append(identity, close);
+  // The strip drops its own refresh button on a narrow sidebar, so the card
+  // carries one and keeps the action reachable at any width.
+  const actions = element("div", "usage-tracker-sidebar__details-actions");
+  actions.append(refresh, close);
+  header.append(identity, actions);
 
   const windows = element("div", "usage-tracker-sidebar__windows");
   windows.tabIndex = 0;
@@ -389,6 +394,22 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
     ) ??
     emptyProvider(providerId);
 
+  const refreshButton = (): HTMLButtonElement => {
+    const refresh = element("button", "usage-tracker-sidebar__refresh");
+    refresh.type = "button";
+    refresh.setAttribute("aria-disabled", String(isLoading));
+    refresh.dataset.loading = String(isLoading);
+    if (lastError !== null) refresh.dataset.error = "true";
+    refresh.setAttribute(
+      "aria-label",
+      isLoading ? "Refreshing agent usage" : "Refresh agent usage",
+    );
+    refresh.title = lastError ?? "Refresh agent usage";
+    refresh.append(refreshGlyph());
+    refresh.addEventListener("click", () => void load());
+    return refresh;
+  };
+
   const render = (): void => {
     if (root === null) return;
     const focusTarget = requestedFocus ?? activeSidebarFocusTarget(root);
@@ -415,11 +436,15 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
     if (selectedProviderId !== null) {
       const providerId = selectedProviderId;
       content.push(
-        detailsCard(providerFor(providerId), () => {
-          selectedProviderId = null;
-          requestedFocus = { kind: "provider", providerId };
-          render();
-        }),
+        detailsCard(
+          providerFor(providerId),
+          () => {
+            selectedProviderId = null;
+            requestedFocus = { kind: "provider", providerId };
+            render();
+          },
+          refreshButton(),
+        ),
       );
     }
 
@@ -478,19 +503,7 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
       strip.append(button);
     }
 
-    const refresh = element("button", "usage-tracker-sidebar__refresh");
-    refresh.type = "button";
-    refresh.setAttribute("aria-disabled", String(isLoading));
-    refresh.dataset.loading = String(isLoading);
-    if (lastError !== null) refresh.dataset.error = "true";
-    refresh.setAttribute(
-      "aria-label",
-      isLoading ? "Refreshing agent usage" : "Refresh agent usage",
-    );
-    refresh.title = lastError ?? "Refresh agent usage";
-    refresh.append(refreshGlyph());
-    refresh.addEventListener("click", () => void load());
-    strip.append(refresh);
+    strip.append(refreshButton());
     content.push(strip);
     root.replaceChildren(...content);
     const nextWindows = root.querySelector<HTMLElement>(
