@@ -155,21 +155,14 @@ repositories, Linear uses the configured team, and Jira infers project keys
 from simple `project = KEY` or `project in (...)` JQL scopes (with a project-key
 field when the scope cannot be inferred).
 
-The icon opens a review modal immediately while a hidden, Plan-only BB helper
-uses the project's repository context to turn the rough prompt into a natural
-title and a standalone description with requested changes and acceptance
-criteria. Starting this optional helper consumes model usage from the project's
-selected provider. Taskboard stops the helper without approving its proposed
-Plan; provider metadata can load for the review form, but no external issue is
-created or mutated until you click **Create issue**. If the helper or selected
-provider cannot produce a Plan-only draft, the original prompt remains editable
-as a visible fallback. You can also choose **Use original prompt** immediately
-instead of waiting, then retry the repository-aware draft from the same modal.
+The icon opens the review modal immediately and copies the original prompt into
+editable title and description fields. Review or rewrite either field while
+Taskboard loads the selected provider's creation options. No external issue is
+created or mutated until you click **Create issue**.
 
 From a project board, choose **New issue** to open the same validated provider
-form with a blank editable title and description. Direct capture skips the
-repository drafting helper. It loads provider metadata for review but never
-creates or mutates an issue until you confirm creation.
+form with a blank editable title and description. It loads provider metadata for
+review but never creates or mutates an issue until you confirm creation.
 
 ![Live task detail](https://raw.githubusercontent.com/MateoCerquetella/bb-plugins/main/docs/media/task-detail.png)
 

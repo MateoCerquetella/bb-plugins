@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "sequence": 1,
+  "previousDigest": "sha256:961f482af3aff97c6c58a00b12f74d1a6774f50e50f30f9dc9b792ea2f911880",
+  "actor": "empirical-start",
+  "type": "transition",
+  "summary": "Started disable-taskboard-ai-drafting-for-v0-3-3",
+  "createdAt": "2026-08-31T15:41:46.388Z",
+  "stateBeforeDigest": "sha256:74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+  "stateAfterDigest": "sha256:86da4b0f4d30292f4d332cfaa0830015bf0a1bd23c1bfa408500041803741d47",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 1,
+    "activeFeature": "disable-taskboard-ai-drafting-for-v0-3-3",
+    "request": "Disable Taskboard repository-aware AI drafting for v0.3.3: never spawn a helper thread or invoke a model; open composer capture with the editable original prompt and separate issue confirmation; remove obsolete drafting RPC lifecycle, model-usage documentation, tests, and marketplace claims; retain the released Ticket icon, clean Git install fix, GitHub CLI containment, committed-only release verification, and ^0.3.3 marketplace result; verify locally; and do not push, tag, publish, comment, or mutate remote state without separate exact approval.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": null,
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:199b3f8d3770479e1874e535fd0194c357e62cb5c9047ebe3e8d09adcc6ab2cd",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": null,
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-08-31T15:41:46.388Z"
+  },
+  "digest": "sha256:18e11eea67a728a8fa673a08bb39ac8a5b41c64fa7f4c591cec70d1a7942491a"
+}

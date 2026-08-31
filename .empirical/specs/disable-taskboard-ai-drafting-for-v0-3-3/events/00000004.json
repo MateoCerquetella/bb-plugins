@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "sequence": 4,
+  "previousDigest": "sha256:4894115726654858ab5e6669decd56449eaa96a226e8cf5ac1bd2431e677566f",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Designed synchronous no-AI composer capture, one-time editable prompt initialization, complete visible form states, total helper/RPC/storage deletion, honest docs/marketplace copy, retained release fixes, and committed-only release verification; incorporated the UI advisory.",
+  "createdAt": "2026-08-31T15:49:28.156Z",
+  "stateBeforeDigest": "sha256:ebfdb8e63b3d0d0e6b92d56ef6e37b3813df0f80f907c4d5d3c082ccb9930324",
+  "stateAfterDigest": "sha256:0cc17937c6a7aee654f604e6e5e83af81584df642787b9dd7dbd6db05623a037",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 4,
+    "activeFeature": "disable-taskboard-ai-drafting-for-v0-3-3",
+    "request": "Disable Taskboard repository-aware AI drafting for v0.3.3: never spawn a helper thread or invoke a model; open composer capture with the editable original prompt and separate issue confirmation; remove obsolete drafting RPC lifecycle, model-usage documentation, tests, and marketplace claims; retain the released Ticket icon, clean Git install fix, GitHub CLI containment, committed-only release verification, and ^0.3.3 marketplace result; verify locally; and do not push, tag, publish, comment, or mutate remote state without separate exact approval.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "plan",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Designed synchronous no-AI composer capture, one-time editable prompt initialization, complete visible form states, total helper/RPC/storage deletion, honest docs/marketplace copy, retained release fixes, and committed-only release verification; incorporated the UI advisory.",
+    "implementationActor": null,
+    "workStartedAt": "2026-08-31T15:41:46.440Z",
+    "specDigest": "sha256:7d9e7e7856c8d92b7addbb74c4efb41be10de9527e0e83b5d5e70c537558ec90",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:8fc19717dbe57324329755fdee8008f8d57f6d42d4fd9f805f7ddcbc02e50b0a",
+    "impactDigest": "sha256:412e18e8fd9f779522e80a3c3b68f2d76ca789b3d58061822c1caddcbccad283",
+    "capabilityClaimId": "disable-taskboard-ai-drafting-for-v0-3-3-7f50be59c81f",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-08-31T15:49:28.156Z"
+  },
+  "digest": "sha256:0c42c36a0b881989d1816216511e432b0651619f42f7d03deddc6389afe615a7"
+}

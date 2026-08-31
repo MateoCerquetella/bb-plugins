@@ -36,6 +36,14 @@ const taskboardContract = await readFile(
   new URL('../contract.ts', import.meta.url),
   'utf8'
 );
+const taskboardApp = await readFile(
+  new URL('../app.tsx', import.meta.url),
+  'utf8'
+);
+const taskboardServer = await readFile(
+  new URL('../server.ts', import.meta.url),
+  'utf8'
+);
 const taskboardSdkRootValueImports: string[] = [];
 for (const path of await taskboardProductSources()) {
   const source = await readFile(path, 'utf8');
@@ -58,6 +66,13 @@ const usageManifest = JSON.parse(
 );
 const rootManifest = JSON.parse(
   await readFile(new URL('../../../package.json', import.meta.url), 'utf8')
+);
+const taskboardReleaseVerifier = await readFile(
+  new URL(
+    '../../../scripts/verify-taskboard-release-candidate.mjs',
+    import.meta.url
+  ),
+  'utf8'
 );
 const rootLockfile = JSON.parse(
   await readFile(new URL('../../../package-lock.json', import.meta.url), 'utf8')
@@ -115,6 +130,10 @@ test('keeps Taskboard private and Git-buildable without npm publication hooks', 
   for (const script of ['build', 'check', 'test', 'typecheck']) {
     assert.equal(typeof rootManifest.scripts[script], 'string');
   }
+  assert.equal(
+    rootManifest.scripts.ci,
+    'node scripts/verify-taskboard-release-candidate.mjs'
+  );
   assert.equal(taskboardManifest.name, 'bb-plugin-taskboard');
   assert.equal(taskboardManifest.version, '0.3.3');
   assert.equal(taskboardManifest.private, true);
@@ -163,6 +182,62 @@ test('keeps Taskboard private and Git-buildable without npm publication hooks', 
   );
   assert.doesNotMatch(taskboardContract, /\bdefineRpcContract\b/u);
   assert.deepEqual(taskboardSdkRootValueImports, []);
+});
+
+test('keeps composer capture manual with no AI helper execution surface', async () => {
+  for (const path of [
+    'issue-draft.ts',
+    'test/issue-draft.test.ts',
+    'test/issue-draft-server.test.ts'
+  ]) {
+    await assert.rejects(
+      readFile(new URL(`../${path}`, import.meta.url), 'utf8'),
+      /ENOENT/u
+    );
+  }
+  for (const source of [
+    taskboardApp,
+    taskboardContract,
+    taskboardServer,
+    taskboardReadme
+  ]) {
+    assert.doesNotMatch(
+      source,
+      /startIssueDraft|getIssueDraft|cancelIssueDraft|threads\.spawn|Plan-only|repository-aware|model usage/iu
+    );
+  }
+  assert.match(
+    taskboardApp,
+    /setTitle\(assisted \? titleFromPrompt\(initialPrompt\) : ''\)/u
+  );
+  assert.match(
+    taskboardApp,
+    /setDescription\(assisted \? initialPrompt\.trim\(\) : ''\)/u
+  );
+  assert.match(taskboardApp, /Your prompt was copied into these editable fields/u);
+  assert.match(
+    taskboardApp,
+    /nothing\s+is\s+created until you select Create/iu
+  );
+});
+
+test('makes the committed Taskboard tree the authoritative release input', () => {
+  assert.match(
+    taskboardReleaseVerifier,
+    /cliArguments\[0\] === '--allow-working-tree'/u
+  );
+  assert.match(
+    taskboardReleaseVerifier,
+    /Committed-only Taskboard release verification refuses tracked or untracked product changes/u
+  );
+  assert.match(taskboardReleaseVerifier, /HEAD\^\{commit\}/u);
+  assert.match(taskboardReleaseVerifier, /HEAD\^\{tree\}/u);
+  assert.match(taskboardReleaseVerifier, /cloneCommit !== headCommit/u);
+  assert.match(taskboardReleaseVerifier, /cloneTree !== headTree/u);
+  assert.match(
+    taskboardReleaseVerifier,
+    /Verified committed Taskboard consumer/u
+  );
 });
 
 test('documents only BB Community and direct Git installation for Taskboard', () => {

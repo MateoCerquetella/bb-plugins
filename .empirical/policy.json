@@ -42,7 +42,8 @@
           "AC-MKT-1",
           "AC-MKT-2",
           "AC-8",
-          "AC-9"
+          "AC-9",
+          "AC-10"
         ]
       },
       {
@@ -52,10 +53,9 @@
           "--test",
           "--experimental-strip-types",
           "plugins/taskboard/test/contract.test.ts",
+          "plugins/taskboard/test/create-metadata.test.ts",
           "plugins/taskboard/test/distribution.test.ts",
           "plugins/taskboard/test/github-environment.test.ts",
-          "plugins/taskboard/test/issue-draft.test.ts",
-          "plugins/taskboard/test/issue-draft-server.test.ts",
           "plugins/taskboard/test/app-ui.test.ts"
         ],
         "cwd": ".",
@@ -79,6 +79,7 @@
           "AC-7",
           "AC-8",
           "AC-9",
+          "AC-10",
           "AC-UI-1"
         ]
       },
@@ -109,6 +110,7 @@
           "AC-7",
           "AC-8",
           "AC-9",
+          "AC-10",
           "AC-UI-1"
         ]
       },
@@ -139,6 +141,7 @@
           "AC-7",
           "AC-8",
           "AC-9",
+          "AC-10",
           "AC-UI-1"
         ]
       },
@@ -168,6 +171,7 @@
           "AC-7",
           "AC-8",
           "AC-9",
+          "AC-10",
           "AC-UI-1"
         ]
       }

@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "board-capture",
+    "taskboard-distribution"
+  ],
+  "surfaces": [
+    "distribution",
+    "plugin-runtime",
+    "thread-ui"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:412e18e8fd9f779522e80a3c3b68f2d76ca789b3d58061822c1caddcbccad283"
+}
