@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "sequence": 9,
+  "previousDigest": "sha256:1e3578af9c1f3bd558f13234c44e2cc66b3971b2f1f242f13970fbc4d242e138",
+  "actor": "human",
+  "type": "transition",
+  "summary": "Resumed workflow",
+  "createdAt": "2026-08-31T14:07:27.562Z",
+  "stateBeforeDigest": "sha256:63bb1fb13862e502ca2c94437f9ee9135282127d5f5618042f6fe936a41f4415",
+  "stateAfterDigest": "sha256:39c62c2c6c9676d8b73a57e59372365cb4de28873a932cfd5318a8302914e2e8",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 9,
+    "activeFeature": "finish-get-bb-marketplace-pr-129-locally-from-the-current",
+    "request": "Finish get-bb marketplace PR 129 locally from the current origin/main tree: prepare Taskboard 0.3.2 by replacing the runtime SDK-root RPC identity import with an equivalent type-only contract constraint so production-only subdirectory installs build while the exact SDK remains dev-only; replace the hidden auto-approved issue-drafting worker with a capability-preflighted structured native Plan-mode worker using accept-edits, consume the proposed plan as the draft, stop before archive, and never approve or resolve it; allowlist the gh child environment; add focused tests and documentation; verify root and clean production-only builds; and prepare the existing marketplace PR branch on current upstream with its vendored icon, a ^0.3.2 source floor, AI/model-usage disclosure, and the unchanged ready Usage Tracker entry. Do not commit, push, tag, publish, force-update, comment, or otherwise mutate remote state without a separate exact approval.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "review",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": null,
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:c05f073bf9e56285b3e8b44cb4bc3e6faf29ab3c6894c235d9accda056f78abe",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:e202c3bf26f7bf9e22e4c3b7f6b2dfe0818c3f58dfe18c3fd792edaefc8f5338",
+    "impactDigest": "sha256:116f8515db8707537da9f9b1d9df4b1677d9544afa7aa3dbdf2d6e61b3a87631",
+    "capabilityClaimId": "finish-get-bb-marketplace-pr-129-locally-from-the-current-53b37a020578",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "qa-e59f4d76bc3a93209f34e758",
+      "qa-679a30ba3ff123faeee01b1c",
+      "qa-f0fcd29bff4c996a60f396e1",
+      "qa-c5a254d43b9a7952f29cb80e",
+      "qa-1188f408d873986c6d482daf"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": true,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "verified",
+      "reasons": {
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-08-31T14:07:27.562Z"
+  },
+  "digest": "sha256:adfabfff2771a7be4e4c4db2bea684ec93029f31d315ad7c6a58e796d8e3a58b"
+}

@@ -1,22 +1,18 @@
 # Security Consult
 
-specialist: security
-verdict: advisory
+- Specialist: security
+- Verdict: advisory
 
-## Findings
+## Finding SEC-001: Repository text can poison a schema-valid draft
 
-### Repository text can poison an otherwise valid draft
+- Severity: medium
+- Category: prompt injection / unintended disclosure
+- Location: `design.md` native Plan-only issue drafting; `deltas/board-capture.md` repository-content scenario
+- Recommendation: Continue treating every returned field as untrusted text, enforce conservative length and control-character validation, render the complete draft safely, and retain separate explicit confirmation with no automatic issue mutation. Native Plan mode prevents implementation but does not make generated content trustworthy.
 
-- severity: medium
-- category: prompt injection / unintended disclosure
-- location: `design.md` → “Strict native Plan-only issue drafting”; `deltas/board-capture.md` → “Repository content attempts to redirect the helper”
-- exploit: Malicious repository text can steer the model to place deceptive links, control characters, or sensitive repository snippets inside a schema-valid tagged draft. Native Plan mode prevents implementation, but it does not make generated content trustworthy; disclosure occurs only if the user later confirms the visible draft.
-- recommendation: Treat every returned field as untrusted text, enforce conservative length and control-character validation, render the complete draft safely, and retain the separate explicit confirmation with no automatic issue mutation.
+## Finding SEC-002: Forwarded proxy and CA values remain trusted routing input
 
-### Forwarded proxy and CA values remain trusted routing input
-
-- severity: low
-- category: credential transport / configuration trust
-- location: `design.md` → “GitHub CLI child environment”; `deltas/taskboard-github-cli.md` → “Authenticate through supported GitHub CLI state”
-- exploit: An attacker who can alter the plugin server's allowlisted proxy and CA variables together can route authenticated `gh` traffic through a trusted-by-configuration interception point. The narrowed child environment prevents unrelated secret leakage but cannot establish that inherited network settings are benign.
-- recommendation: Document proxy and custom-CA variables as trusted administrator-controlled inputs, preserve TLS verification, and never fall back to broader proxy or certificate variables. The fixed absolute non-project executable resolver and omission of `PATH`/`PATHEXT` should remain regression-tested.
+- Severity: low
+- Category: credential transport / configuration trust
+- Location: `design.md` GitHub CLI child environment; `deltas/taskboard-github-cli.md` authenticated CLI scenario
+- Recommendation: Keep proxy and custom-CA variables documented as administrator-controlled inputs, preserve TLS verification, and never broaden the allowlist. Retain the fixed absolute non-project executable resolver and regression coverage excluding `PATH`, `PATHEXT`, unrelated secrets, loader hooks, debug, editor, and pager controls.

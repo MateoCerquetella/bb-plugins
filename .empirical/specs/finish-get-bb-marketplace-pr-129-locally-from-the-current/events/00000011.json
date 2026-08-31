@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sequence": 11,
+  "previousDigest": "sha256:75310611b26acdc7bde864438ac1efbe5dd6e247bf9d89a6b154d00ee79b5575",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Retained the amended clean-tree release verifier and the complete Taskboard review fixes at committed HEAD ab88e08; current-tree focused and root checks pass.",
+  "createdAt": "2026-08-31T14:26:34.918Z",
+  "stateBeforeDigest": "sha256:694bf9c9de7edd6db4a95a05bf5ac4ae1d777fa51aec340a60bb4a8f661a3683",
+  "stateAfterDigest": "sha256:7c409bddbaa675122ebcda43a578cb6c7b9b6e5cbee845b697b57eab92053219",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 11,
+    "activeFeature": "finish-get-bb-marketplace-pr-129-locally-from-the-current",
+    "request": "Finish get-bb marketplace PR 129 locally from the current origin/main tree: prepare Taskboard 0.3.2 by replacing the runtime SDK-root RPC identity import with an equivalent type-only contract constraint so production-only subdirectory installs build while the exact SDK remains dev-only; replace the hidden auto-approved issue-drafting worker with a capability-preflighted structured native Plan-mode worker using accept-edits, consume the proposed plan as the draft, stop before archive, and never approve or resolve it; allowlist the gh child environment; add focused tests and documentation; verify root and clean production-only builds; and prepare the existing marketplace PR branch on current upstream with its vendored icon, a ^0.3.2 source floor, AI/model-usage disclosure, and the unchanged ready Usage Tracker entry. Do not commit, push, tag, publish, force-update, comment, or otherwise mutate remote state without a separate exact approval.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "context",
+    "status": "waiting",
+    "repairAttempts": 1,
+    "message": "Retained the amended clean-tree release verifier and the complete Taskboard review fixes at committed HEAD ab88e08; current-tree focused and root checks pass.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:c05f073bf9e56285b3e8b44cb4bc3e6faf29ab3c6894c235d9accda056f78abe",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:e202c3bf26f7bf9e22e4c3b7f6b2dfe0818c3f58dfe18c3fd792edaefc8f5338",
+    "impactDigest": "sha256:116f8515db8707537da9f9b1d9df4b1677d9544afa7aa3dbdf2d6e61b3a87631",
+    "capabilityClaimId": "finish-get-bb-marketplace-pr-129-locally-from-the-current-53b37a020578",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-08-31T14:26:34.918Z"
+  },
+  "digest": "sha256:bba1a82d40f96127221765879c8a44507c2feacc17892edf3d30642f857ffd21"
+}

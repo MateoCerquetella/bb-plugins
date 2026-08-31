@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 8,
+  "revision": 13,
   "activeFeature": "finish-get-bb-marketplace-pr-129-locally-from-the-current",
   "request": "Finish get-bb marketplace PR 129 locally from the current origin/main tree: prepare Taskboard 0.3.2 by replacing the runtime SDK-root RPC identity import with an equivalent type-only contract constraint so production-only subdirectory installs build while the exact SDK remains dev-only; replace the hidden auto-approved issue-drafting worker with a capability-preflighted structured native Plan-mode worker using accept-edits, consume the proposed plan as the draft, stop before archive, and never approve or resolve it; allowlist the gh child environment; add focused tests and documentation; verify root and clean production-only builds; and prepare the existing marketplace PR branch on current upstream with its vendored icon, a ^0.3.2 source floor, AI/model-usage disclosure, and the unchanged ready Usage Tracker entry. Do not commit, push, tag, publish, force-update, comment, or otherwise mutate remote state without a separate exact approval.",
   "profile": "complex",
   "workflow": "complex",
-  "mode": "yolo",
-  "phase": "review",
-  "status": "awaiting_human",
-  "repairAttempts": 0,
-  "message": "YOLO authorization ceiling verified reached",
+  "mode": "normal",
+  "phase": "verify",
+  "status": "blocked",
+  "repairAttempts": 1,
+  "message": "Public taskboard/v0.3.2 now resolves sibling 2d90bd3 rather than the reviewed candidate, so AC-8 cannot pass. Preserve the immutable tag and supersede this workflow with Taskboard v0.3.3.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:c05f073bf9e56285b3e8b44cb4bc3e6faf29ab3c6894c235d9accda056f78abe",
@@ -18,28 +18,23 @@
   "capabilityDeltaDigest": "sha256:e202c3bf26f7bf9e22e4c3b7f6b2dfe0818c3f58dfe18c3fd792edaefc8f5338",
   "impactDigest": "sha256:116f8515db8707537da9f9b1d9df4b1677d9544afa7aa3dbdf2d6e61b3a87631",
   "capabilityClaimId": "finish-get-bb-marketplace-pr-129-locally-from-the-current-53b37a020578",
-  "authorizationDigest": "sha256:5654515d05a8af239eac83c4e6da66ebf4e7bdc6362f562ab06c642d1c6de7cc",
+  "authorizationDigest": null,
   "evidence": [],
-  "evidenceReceiptIds": [
-    "qa-e59f4d76bc3a93209f34e758",
-    "qa-679a30ba3ff123faeee01b1c",
-    "qa-f0fcd29bff4c996a60f396e1",
-    "qa-c5a254d43b9a7952f29cb80e",
-    "qa-1188f408d873986c6d482daf"
-  ],
+  "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
     "implemented": true,
-    "verified": true,
+    "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "verified",
+    "highest": "implemented",
     "reasons": {
+      "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-08-31T02:45:08.627Z"
+  "updatedAt": "2026-08-31T14:40:21.598Z"
 }

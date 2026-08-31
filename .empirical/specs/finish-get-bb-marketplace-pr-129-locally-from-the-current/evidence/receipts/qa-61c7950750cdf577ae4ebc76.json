@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-61c7950750cdf577ae4ebc76",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8",
+    "AC-9"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "POSIX and Windows fixed executable and exact GitHub CLI environment contracts passed.",
+  "passed": true,
+  "startedAt": "2026-08-31T14:24:19.857Z",
+  "completedAt": "2026-08-31T14:24:20.014Z",
+  "provenance": {
+    "repositoryId": "sha256:90af4c195eb07525399dc79718817b19b1bf3ebfcf5082ae35ecca3361842a3f",
+    "feature": "finish-get-bb-marketplace-pr-129-locally-from-the-current",
+    "specRevision": 3,
+    "specDigest": "sha256:c05f073bf9e56285b3e8b44cb4bc3e6faf29ab3c6894c235d9accda056f78abe",
+    "treeDigest": "sha256:593d7358c1e214d1c7737137f2c03324add33128a5a37d73e34d472e11319436",
+    "policyDigest": "sha256:97838412fe9499da6bf54aa9865408a1b5eb658b964ac1695ae9741f5e32714f",
+    "workflowRevision": 9,
+    "gitCommit": "ab88e08d02d3b002dbe997ce66fc219393d9bb0f"
+  },
+  "digest": "sha256:449056c15789c51321fffde3f6f0645d017ae85d2c50324b009fcbe2d51361f5",
+  "kind": "qa",
+  "matrixDigest": "sha256:ca5da6ab3c904a7f1ac3460ab0d58e2fd1db16e32124fdabde5de63b2f939eb2",
+  "check": {
+    "id": "qa-cross-platform",
+    "kind": "cross-platform"
+  },
+  "coveredChecks": [
+    "cross-platform"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "POSIX and Windows fixed executable and exact GitHub CLI environment contracts passed.",
+      "startedAt": "2026-08-31T14:24:19.857Z",
+      "completedAt": "2026-08-31T14:24:20.014Z",
+      "durationMs": 157,
+      "collector": null,
+      "command": {
+        "argv": [
+          "node",
+          "--test",
+          "--experimental-strip-types",
+          "test/github-environment.test.ts"
+        ],
+        "cwd": "plugins/taskboard",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "NO_COLOR",
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:237de548fcde498c516e3ed17574baa74d4acbb8562326c36e936c750308799c",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "TAP version 13\n# Subtest: builds the exact GitHub CLI environment without executable search state\nok 1 - builds the exact GitHub CLI environment without executable search state\n  ---\n  duration_ms: 0.943569\n  type: 'test'\n  ...\n# Subtest: never forwards PATH or PATHEXT into the authenticated child\nok 2 - never forwards PATH or PATHEXT into the authenticated child\n  ---\n  duration_ms: 0.18117\n  type: 'test'\n  ...\n# Subtest: ignores PATH and resolves only fixed non-project POSIX candidates\nok 3 - ignores PATH and resolves only fixed non-project POSIX candidates\n  ---\n  duration_ms: 0.203711\n  type: 'test'\n  ...\n# Subtest: uses fixed Windows install roots and excludes PATH/project candidates\nok 4 - uses fixed Windows install roots and excludes PATH/project candidates\n  ---\n  duration_ms: 0.231893\n  type: 'test'\n  ...\n# Subtest: excludes unrelated credentials, runtime hooks, and CLI controls\nok 5 - excludes unrelated credentials, runtime hooks, and CLI controls\n  ---\n  duration_ms: 0.134706\n  type: 'test'\n  ...\n1..5\n# tests 5\n# suites 0\n# pass 5\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 130.699034\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:593d7358c1e214d1c7737137f2c03324add33128a5a37d73e34d472e11319436",
+      "sourceTreeAfter": "sha256:593d7358c1e214d1c7737137f2c03324add33128a5a37d73e34d472e11319436",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}
