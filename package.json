@@ -11,7 +11,8 @@
     "build": "npm run build --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
-    "check": "npm run check --workspaces --if-present"
+    "check": "npm run check --workspaces --if-present",
+    "ci": "node scripts/verify-taskboard-release-candidate.mjs"
   },
   "engines": {
     "node": ">=22.19.0"

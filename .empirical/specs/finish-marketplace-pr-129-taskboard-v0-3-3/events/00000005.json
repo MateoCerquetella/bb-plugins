@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "sequence": 5,
+  "previousDigest": "sha256:6093cc32978da85eaaaacd9d9837225ffc20907a4bcb3b8035d8bf8e70a90ccb",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Planned the focused source overlay, v0.3.3/icon alignment, containment checks, clean consumer validation, local commits, marketplace three-file update, review, and final exact remote approval gate.",
+  "createdAt": "2026-08-31T14:47:27.768Z",
+  "stateBeforeDigest": "sha256:83fe3691592243253392216c5fd0ea5b6c8617c834ee3d8f50f9e60648761be3",
+  "stateAfterDigest": "sha256:d4d28ad101ef332e42720f1763cc44dd11c4de5c3282e541ac8401228c0ce887",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 5,
+    "activeFeature": "finish-marketplace-pr-129-taskboard-v0-3-3",
+    "request": "Finish get-bb marketplace PR 129 locally with Taskboard 0.3.3: preserve the immutable published Taskboard 0.3.2 tag and carry forward its ticket-icon change; apply the already verified production-install, native Plan-mode drafting, GitHub CLI environment, tests, documentation, and marketplace disclosure fixes; prepare the marketplace source floor at ^0.3.3 with the unchanged Usage Tracker entry; verify source and marketplace candidates; and do not push, tag, publish, comment, or mutate remote state without separate exact approval.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Planned the focused source overlay, v0.3.3/icon alignment, containment checks, clean consumer validation, local commits, marketplace three-file update, review, and final exact remote approval gate.",
+    "implementationActor": null,
+    "workStartedAt": "2026-08-31T13:58:18.812Z",
+    "specDigest": "sha256:57f2c875516a3efe80e004001589ddfd5d43b2a28fcbc3ec36ca14b06c5bd0b0",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:ee12d57a28b334968202e6e7eb6288d02e0645dd9007773e3a3bd057176b062e",
+    "impactDigest": "sha256:2994260bfb3ab1e501b94cd7894f0cee48ce23b453c575775ff305e185151696",
+    "capabilityClaimId": "finish-marketplace-pr-129-taskboard-v0-3-3-206d1bbb53a4",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-08-31T14:47:27.768Z"
+  },
+  "digest": "sha256:e721f13a8c19df69485f9f3791a101ce04d3af7699afb8f551ce180108c80403"
+}

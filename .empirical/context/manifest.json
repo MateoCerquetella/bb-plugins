@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "generator": "empirical-0.28.0",
-  "sourceDigest": "sha256:14d1a380b5aa09307fd426c7cd7a3f649dd1b4ac6898597942a4c212c5ad89af",
+  "generator": "empirical-0.29.0",
+  "sourceDigest": "sha256:0021dbdeaf5dd34f3e7aedd60505f3efd973bcd6f2e776c78bc210b812d55d8a",
   "files": [
     {
       "path": ".agents/skills/empirical/SKILL.md",
@@ -81,7 +81,7 @@
     {
       "path": "README.md",
       "size": 7510,
-      "digest": "sha256:859ea09c0f0edcf4508fa0ebcc0a2d82b4b3e118f9a865d6374025715c52b91b"
+      "digest": "sha256:29fc6335a1e2fd8511d2cfea4ba3c95bd5fa596422c9bd5c92632fc07589055e"
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -96,7 +96,7 @@
     {
       "path": "package-lock.json",
       "size": 277983,
-      "digest": "sha256:44e47af3f2798d7a9b266e23cbfad969710d8164c606b169762a51ed8b7ac105"
+      "digest": "sha256:251a8366c6ab8712a303851f41f239beedc6991a33d840e847813ff955b67bee"
     },
     {
       "path": "package.json",
@@ -355,8 +355,8 @@
     },
     {
       "path": "plugins/taskboard/README.md",
-      "size": 11791,
-      "digest": "sha256:6084bc303278079cc04eb20a8e73f44c9ee0708670d1fb3a5ec91fbd5a8248db"
+      "size": 11984,
+      "digest": "sha256:87289202fcd342d1940635b457dec4544747c552145eb273c69e61f4f95c9aad"
     },
     {
       "path": "plugins/taskboard/THIRD_PARTY_NOTICES.md",
@@ -370,8 +370,8 @@
     },
     {
       "path": "plugins/taskboard/app.tsx",
-      "size": 246184,
-      "digest": "sha256:46be0443e5037aacd66f379b6c0499231e57ab107712a7688d58bf795aa01205"
+      "size": 246180,
+      "digest": "sha256:2116acb5e9ab2e2961263e66556b959521af8f8df66a61c6629337afbb27189d"
     },
     {
       "path": "plugins/taskboard/assets/icon.svg",
@@ -495,8 +495,8 @@
     },
     {
       "path": "plugins/taskboard/contract.ts",
-      "size": 18552,
-      "digest": "sha256:c284a8cab0d839baf35698b13943c029f305d38206f4e9fce8f8b61e1cd0c1f4"
+      "size": 18566,
+      "digest": "sha256:07e763ffbee407ad8542ed74d8dcbdbdd2b5f12cd336cca943a473be214ab5c1"
     },
     {
       "path": "plugins/taskboard/create-issue.ts",
@@ -515,8 +515,8 @@
     },
     {
       "path": "plugins/taskboard/issue-draft.ts",
-      "size": 3175,
-      "digest": "sha256:b25c1dd0d169026a42313dcdc7589bd3db4c5a7d2646bcb42d7e2a22c63ce774"
+      "size": 8216,
+      "digest": "sha256:1742e126ede1c4a39b5215cb9336fd7ba8a589deb8b0715ab9f93c6c60333249"
     },
     {
       "path": "plugins/taskboard/lib/portal-scope.ts",
@@ -531,7 +531,7 @@
     {
       "path": "plugins/taskboard/package.json",
       "size": 2292,
-      "digest": "sha256:9e8baf16c8ec46d1ef6c2a51e2b30d1ac802ad77ef7ed2e94e940dd025ab42b6"
+      "digest": "sha256:9599b3c0bca8e61345445b59585e03a49a59c4f20aea75e93b0ad0d2d963d2fa"
     },
     {
       "path": "plugins/taskboard/project-selection.ts",
@@ -545,13 +545,13 @@
     },
     {
       "path": "plugins/taskboard/server.ts",
-      "size": 93686,
-      "digest": "sha256:2d5cd743428680e5843b31cd3ed7356edce927ae31bf5de16393b43455fc3af2"
+      "size": 96938,
+      "digest": "sha256:0ae2a3d515e2f4ceaedcb9cc02e3fd5545497426f52196469d07cad1a411f8f2"
     },
     {
       "path": "plugins/taskboard/sources/github.ts",
-      "size": 17116,
-      "digest": "sha256:b187d990a7ad8b4fe3791ae4158b49d1501d307951ae0566d77c23b1f95ef6ac"
+      "size": 20693,
+      "digest": "sha256:7d29cea852404105e7c7d4a6f81eb2f5bb20c34977380102f4a6105d272b3e76"
     },
     {
       "path": "plugins/taskboard/sources/jira-scope.ts",
@@ -580,8 +580,8 @@
     },
     {
       "path": "plugins/taskboard/test/app-ui.test.ts",
-      "size": 9155,
-      "digest": "sha256:839986b40692441946a3d4212b394df9a819d3263bd49207ed410216ea7821ac"
+      "size": 9670,
+      "digest": "sha256:0103a560c93f186a24c8ef7d6ac1c2fd2c121c37fe41a053bd0d5351d34385ba"
     },
     {
       "path": "plugins/taskboard/test/browse-preferences.test.ts",
@@ -605,8 +605,8 @@
     },
     {
       "path": "plugins/taskboard/test/distribution.test.ts",
-      "size": 6759,
-      "digest": "sha256:e9cff84c45590206e684c83cada8569f13b1939bfc6b7894a13281bb8bc0e877"
+      "size": 9574,
+      "digest": "sha256:dc7cfadb02c52e41ed023bf101e28464f5498f6c98c72372460a9d8733c69802"
     },
     {
       "path": "plugins/taskboard/test/filter-presets-backend.test.ts",
@@ -619,9 +619,19 @@
       "digest": "sha256:acfd2867b81df3b3991f2395c01925cebde79d46800202303a1eb7e768442d38"
     },
     {
+      "path": "plugins/taskboard/test/github-environment.test.ts",
+      "size": 5076,
+      "digest": "sha256:e7559f69e51f5d35fa1a764248667644897e1b7f0fba094faddadb54d0bbf60d"
+    },
+    {
+      "path": "plugins/taskboard/test/issue-draft-server.test.ts",
+      "size": 9730,
+      "digest": "sha256:e789b519a62621e222d1fbc2ddfb5e23f18ca8ee1b0b9c7b721f0e684373030d"
+    },
+    {
       "path": "plugins/taskboard/test/issue-draft.test.ts",
-      "size": 1787,
-      "digest": "sha256:0b074d4310021579148eb67518c7f1a41b736eaecea84df894f6aa06cd5e6caa"
+      "size": 6948,
+      "digest": "sha256:daf97e12b4fd16021474002c0d3a9f323eb74b8d23833f505a881f6318a21cc6"
     },
     {
       "path": "plugins/taskboard/test/project-selection.test.ts",
@@ -742,12 +752,17 @@
       "path": "plugins/usage-tracker/types/css-modules.d.ts",
       "size": 24,
       "digest": "sha256:35d26ea66c86da9701e4f4b467913481ffeae910761cea34c775c5dacb7f8eaa"
+    },
+    {
+      "path": "scripts/verify-taskboard-release-candidate.mjs",
+      "size": 3107,
+      "digest": "sha256:9bde2e0c73aec4d70287c7493a440c77b27c06f5201b27bd40c0f8492c088683"
     }
   ],
   "pages": [
     {
       "path": ".empirical/context/index.md",
-      "generator": "empirical-0.28.0",
+      "generator": "empirical-0.29.0",
       "managed": false,
       "dependencies": [
         ".agents/skills/empirical/SKILL.md",
@@ -873,6 +888,8 @@
         "plugins/taskboard/test/distribution.test.ts",
         "plugins/taskboard/test/filter-presets-backend.test.ts",
         "plugins/taskboard/test/filter-presets.test.ts",
+        "plugins/taskboard/test/github-environment.test.ts",
+        "plugins/taskboard/test/issue-draft-server.test.ts",
         "plugins/taskboard/test/issue-draft.test.ts",
         "plugins/taskboard/test/project-selection.test.ts",
         "plugins/taskboard/test/source-types.test.ts",
@@ -897,15 +914,16 @@
         "plugins/usage-tracker/server.ts",
         "plugins/usage-tracker/test/usage.test.ts",
         "plugins/usage-tracker/tsconfig.json",
-        "plugins/usage-tracker/types/css-modules.d.ts"
+        "plugins/usage-tracker/types/css-modules.d.ts",
+        "scripts/verify-taskboard-release-candidate.mjs"
       ],
-      "sourceDigest": "sha256:14d1a380b5aa09307fd426c7cd7a3f649dd1b4ac6898597942a4c212c5ad89af",
+      "sourceDigest": "sha256:0021dbdeaf5dd34f3e7aedd60505f3efd973bcd6f2e776c78bc210b812d55d8a",
       "digest": "sha256:10082cd6b7a30aaa42f0ae037b0a59f8aa211cf8f0f34f233f78132307c899e9",
       "freshness": "fresh"
     },
     {
       "path": ".empirical/context/overview.md",
-      "generator": "empirical-0.28.0",
+      "generator": "empirical-0.29.0",
       "managed": false,
       "dependencies": [
         "README.md",
@@ -919,13 +937,13 @@
         "plugins/usage-tracker/README.md",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:4a9e1eb2a1c2066596c9b921aafd2672177cbac5adece0fce6144e59f18b7723",
+      "sourceDigest": "sha256:1dd7b61e85c00e48cd858a228968763868d24d948f173b3540a30853f847cc03",
       "digest": "sha256:67162c51b3ff088759f391b657e163a87f044470f114b6cd8b172b17ef05c00f",
       "freshness": "fresh"
     },
     {
       "path": ".empirical/context/architecture.md",
-      "generator": "empirical-0.28.0",
+      "generator": "empirical-0.29.0",
       "managed": false,
       "dependencies": [
         "package.json",
@@ -933,28 +951,29 @@
         "plugins/taskboard/package.json",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:d9de9a0b119eb364a09cd50d148905f86d54598bf69cd5dc1a8ca6f436c4bc65",
+      "sourceDigest": "sha256:c803b97eb27edf027728f303614e3d9a5b1cdfd9d542211852d826e8683a2fd1",
       "digest": "sha256:a4a57ffee4400c9ea75cfff5dc430a8998edde1ea57b51498d87f5b1acda74ce",
       "freshness": "fresh"
     },
     {
       "path": ".empirical/context/commands.md",
-      "generator": "empirical-0.28.0",
+      "generator": "empirical-0.29.0",
       "managed": false,
       "dependencies": [
         ".github/workflows/ci.yml",
         "package.json",
         "plugins/host-monitor/package.json",
         "plugins/taskboard/package.json",
-        "plugins/usage-tracker/package.json"
+        "plugins/usage-tracker/package.json",
+        "scripts/verify-taskboard-release-candidate.mjs"
       ],
-      "sourceDigest": "sha256:5c90b38a16bfaa958679b09cf3d057309ce9c2e132ef0ab10f49042d378b7460",
+      "sourceDigest": "sha256:ca2d6c3671410bbecfe2a8597cd8f6a77819111c939190e542bdca959ed1f921",
       "digest": "sha256:725594a7a297df9c291124b48fa7bf836e609bc105f70a4c3ce9b30db32d5808",
       "freshness": "fresh"
     },
     {
       "path": ".empirical/context/conventions.md",
-      "generator": "empirical-0.28.0",
+      "generator": "empirical-0.29.0",
       "managed": false,
       "dependencies": [
         "AGENTS.md",
@@ -968,5 +987,5 @@
     }
   ],
   "truncated": false,
-  "digest": "sha256:bf2af34f3e443d3076eedcf437d9b4c5a0893c7ddc841374b5dec95377e12192"
+  "digest": "sha256:2782024b6c8a328ab59425b90caa7530b1fa07f3a75eabd2153a4fe218e4b413"
 }

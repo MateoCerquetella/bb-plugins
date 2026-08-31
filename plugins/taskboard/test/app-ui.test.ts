@@ -4,6 +4,16 @@ import { test } from 'node:test';
 
 const app = await readFile(new URL('../app.tsx', import.meta.url), 'utf8');
 
+test('uses the Taskboard icon for the thread-header pin action', () => {
+  const headerAction = app.match(
+    /function TaskboardThreadHeaderAction[\s\S]*?\nfunction ProjectCredentialsInteractionForm/u
+  )?.[0];
+  assert.ok(headerAction, 'Missing TaskboardThreadHeaderAction implementation');
+  assert.match(headerAction, /aria-label="Pin Taskboard on the right"/u);
+  assert.match(headerAction, /<Icon name="Ticket" className="size-4" \/>/u);
+  assert.doesNotMatch(headerAction, /<Icon name="PanelRight"/u);
+});
+
 test('shares durable project preferences between full and constrained surfaces', () => {
   assert.match(app, /useSyncExternalStore\(/u);
   assert.match(app, /browsePreferenceStore\.subscribe/u);

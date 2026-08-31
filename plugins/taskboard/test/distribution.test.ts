@@ -1,10 +1,55 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
+import { join, relative } from 'node:path';
 import { test } from 'node:test';
+import { fileURLToPath } from 'node:url';
+
+const taskboardRoot = fileURLToPath(new URL('../', import.meta.url));
+
+async function taskboardProductSources(directory = taskboardRoot): Promise<string[]> {
+  const sources: string[] = [];
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    if (
+      entry.isDirectory() &&
+      ['dist', 'node_modules', 'scripts', 'test'].includes(entry.name)
+    ) {
+      continue;
+    }
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) {
+      sources.push(...(await taskboardProductSources(path)));
+    } else if (
+      entry.isFile() &&
+      /\.tsx?$/u.test(entry.name) &&
+      relative(taskboardRoot, path) !== 'server.ts'
+    ) {
+      sources.push(path);
+    }
+  }
+  return sources.sort();
+}
 
 const taskboardManifest = JSON.parse(
   await readFile(new URL('../package.json', import.meta.url), 'utf8')
 );
+const taskboardContract = await readFile(
+  new URL('../contract.ts', import.meta.url),
+  'utf8'
+);
+const taskboardSdkRootValueImports: string[] = [];
+for (const path of await taskboardProductSources()) {
+  const source = await readFile(path, 'utf8');
+  for (const match of source.matchAll(
+    /^\s*import\s+([^;]+?)\s+from\s+['"]@get-bb\/plugin-sdk['"]\s*;/gmu
+  )) {
+    if (!match[1]?.trimStart().startsWith('type ')) {
+      taskboardSdkRootValueImports.push(relative(taskboardRoot, path));
+    }
+  }
+  if (/^\s*import\s*['"]@get-bb\/plugin-sdk['"]\s*;/mu.test(source)) {
+    taskboardSdkRootValueImports.push(relative(taskboardRoot, path));
+  }
+}
 const usageManifest = JSON.parse(
   await readFile(
     new URL('../../usage-tracker/package.json', import.meta.url),
@@ -13,6 +58,9 @@ const usageManifest = JSON.parse(
 );
 const rootManifest = JSON.parse(
   await readFile(new URL('../../../package.json', import.meta.url), 'utf8')
+);
+const rootLockfile = JSON.parse(
+  await readFile(new URL('../../../package-lock.json', import.meta.url), 'utf8')
 );
 const taskboardReadme = await readFile(
   new URL('../README.md', import.meta.url),
@@ -58,7 +106,7 @@ const activeContext = await Promise.all([
 ]);
 
 const directGitInstall =
-  'bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.0 --subdirectory plugins/taskboard --tag-prefix taskboard/';
+  'bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.3 --subdirectory plugins/taskboard --tag-prefix taskboard/';
 const usageGitInstall =
   'bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.3 --subdirectory plugins/usage-tracker --tag-prefix usage-tracker/';
 
@@ -68,7 +116,7 @@ test('keeps Taskboard private and Git-buildable without npm publication hooks', 
     assert.equal(typeof rootManifest.scripts[script], 'string');
   }
   assert.equal(taskboardManifest.name, 'bb-plugin-taskboard');
-  assert.equal(taskboardManifest.version, '0.3.1');
+  assert.equal(taskboardManifest.version, '0.3.3');
   assert.equal(taskboardManifest.private, true);
   assert.equal('publishConfig' in taskboardManifest, false);
   assert.equal('files' in taskboardManifest, false);
@@ -79,6 +127,42 @@ test('keeps Taskboard private and Git-buildable without npm publication hooks', 
     assert.equal(typeof taskboardManifest.scripts[script], 'string');
   }
   assert.ok(Object.keys(taskboardManifest.dependencies).length > 0);
+  assert.equal(
+    Object.hasOwn(taskboardManifest.dependencies, '@get-bb/plugin-sdk'),
+    false
+  );
+  assert.equal(
+    taskboardManifest.devDependencies['@get-bb/plugin-sdk'],
+    '0.4.6'
+  );
+
+  const taskboardLockManifest = rootLockfile.packages['plugins/taskboard'];
+  assert.equal(taskboardLockManifest.version, '0.3.3');
+  assert.equal(
+    Object.hasOwn(taskboardLockManifest.dependencies, '@get-bb/plugin-sdk'),
+    false
+  );
+  assert.equal(
+    taskboardLockManifest.devDependencies['@get-bb/plugin-sdk'],
+    '0.4.6'
+  );
+  const sdkLockPackage = rootLockfile.packages['node_modules/@get-bb/plugin-sdk'];
+  assert.equal(sdkLockPackage.version, '0.4.6');
+  assert.equal(sdkLockPackage.dev, true);
+
+  const sdkRootImports = Array.from(
+    taskboardContract.matchAll(
+      /\bimport\s+([^;]+?)\s+from\s+['"]@get-bb\/plugin-sdk['"]\s*;/gu
+    ),
+    match => match[1].replace(/\s+/gu, ' ').trim()
+  );
+  assert.deepEqual(sdkRootImports, ['type { PluginRpcContract }']);
+  assert.doesNotMatch(
+    taskboardContract,
+    /\bimport\s*['"]@get-bb\/plugin-sdk['"]\s*;/u
+  );
+  assert.doesNotMatch(taskboardContract, /\bdefineRpcContract\b/u);
+  assert.deepEqual(taskboardSdkRootValueImports, []);
 });
 
 test('documents only BB Community and direct Git installation for Taskboard', () => {

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "board-capture",
+    "taskboard-browser",
+    "taskboard-distribution",
+    "taskboard-github-cli"
+  ],
+  "surfaces": [
+    "distribution",
+    "plugin-runtime",
+    "provider-integration",
+    "thread-ui"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:2994260bfb3ab1e501b94cd7894f0cee48ce23b453c575775ff305e185151696"
+}

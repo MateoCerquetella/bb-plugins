@@ -7082,7 +7082,7 @@ function TaskboardThreadHeaderAction({
               openTaskboard(true);
             }}
           >
-            <Icon name="PanelRight" className="size-4" />
+            <Icon name="Ticket" className="size-4" />
           </Button>
         </TooltipTrigger>
         <TooltipContent>Pin Taskboard on the right</TooltipContent>

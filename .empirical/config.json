@@ -21,5 +21,9 @@
     "questions": "concise"
   },
   "setupComplete": true,
-  "legacySource": null
+  "legacySource": null,
+  "review": {
+    "mode": "fresh-context",
+    "reviewerTokenEnv": "EMPIRICAL_REVIEWER_TOKEN"
+  }
 }
