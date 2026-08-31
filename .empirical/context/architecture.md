@@ -6,8 +6,8 @@
   leaf plugins while keeping one lockfile and dependency installation.
 - `plugins/taskboard/server.ts` is the backend composition root. It wires typed
   RPC handlers, project-scoped configuration and credentials, the local cache,
-  provider adapters, background sync, mentions, CLI commands, and hidden helper
-  threads used for issue drafting.
+  provider adapters, background sync, mentions, and CLI commands. Taskboard has
+  no model or helper-thread execution path.
 - `plugins/taskboard/app.tsx` owns the BB frontend registrations and Taskboard
   UI: nav panel, full/right-panel boards, project management, List/Kanban,
   detail, composer creation, pending credential interaction, and realtime
@@ -43,9 +43,10 @@
 4. Linear/Jira secrets are stored outside RPC-visible configuration in
    owner-only project credential files. The authenticated pending-interaction
    form is the human credential entry surface.
-5. Issue creation loads provider-native metadata, sends one validated create
-   request, caches the returned item, and inserts a Taskboard mention into the
-   BB composer. The external provider is never written before confirmation.
+5. Composer capture copies the user's prompt into editable title/description
+   fields locally. Issue creation then loads provider-native metadata, sends one
+   validated create request only after confirmation, caches the returned item,
+   and inserts a Taskboard mention into the BB composer.
 6. A background service refreshes configured projects; the external tracker
    remains authoritative when cache and live state differ.
 7. Named presets never auto-apply. UI application provider-checks a preset,

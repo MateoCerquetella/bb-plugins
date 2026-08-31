@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-c354a6384a0b8d2d813a14be",
+  "criteria": [
+    "AC-1",
+    "AC-10",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8",
+    "AC-9",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Manual capture, RPC deletion, provider creation, distribution, UI, and GitHub boundary tests passed.",
+  "passed": true,
+  "startedAt": "2026-08-31T16:32:40.476Z",
+  "completedAt": "2026-08-31T16:32:40.846Z",
+  "provenance": {
+    "repositoryId": "sha256:90af4c195eb07525399dc79718817b19b1bf3ebfcf5082ae35ecca3361842a3f",
+    "feature": "disable-taskboard-ai-drafting-for-v0-3-3",
+    "specRevision": 3,
+    "specDigest": "sha256:7d9e7e7856c8d92b7addbb74c4efb41be10de9527e0e83b5d5e70c537558ec90",
+    "treeDigest": "sha256:f74f3e24d795874ddce5d91dd391d0948e4499081928dddb3678f527a7b8b311",
+    "policyDigest": "sha256:52b420c1a057efff255e5ec0c6c878332d88bb69d29998b7261fa397cdfa5f22",
+    "workflowRevision": 7,
+    "gitCommit": "2d958e8aa8ae86e6d9071559fa04a75f6eec673c"
+  },
+  "digest": "sha256:7a4cbb3b5898a1e39d1fc02608c47859a5ed6b20bb6735a46a05642bee432818",
+  "kind": "qa",
+  "matrixDigest": "sha256:01f708a41cadfe9224d0ae2867053b81af4da9fc598a86644977e465a43d235c",
+  "check": {
+    "id": "qa-integration",
+    "kind": "integration"
+  },
+  "coveredChecks": [
+    "adapter-contract",
+    "fault-injection",
+    "integration"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Manual capture, RPC deletion, provider creation, distribution, UI, and GitHub boundary tests passed.",
+      "startedAt": "2026-08-31T16:32:40.476Z",
+      "completedAt": "2026-08-31T16:32:40.846Z",
+      "durationMs": 370,
+      "collector": null,
+      "command": {
+        "argv": [
+          "node",
+          "--test",
+          "--experimental-strip-types",
+          "plugins/taskboard/test/contract.test.ts",
+          "plugins/taskboard/test/create-metadata.test.ts",
+          "plugins/taskboard/test/distribution.test.ts",
+          "plugins/taskboard/test/github-environment.test.ts",
+          "plugins/taskboard/test/app-ui.test.ts"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "NO_COLOR",
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:976b86c2570a26449322ffcf7a5df64d8a5d16f4f273b3de8659541bc2d59bd2",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "ments as one conversation rail\n  ---\n  duration_ms: 0.253262\n  type: 'test'\n  ...\n# Subtest: reconciles provider identity from the cached-list response\nok 16 - reconciles provider identity from the cached-list response\n  ---\n  duration_ms: 0.258752\n  type: 'test'\n  ...\n# Subtest: delimits useful issue facts as untrusted external tracker data\nok 17 - delimits useful issue facts as untrusted external tracker data\n  ---\n  duration_ms: 1.025008\n  type: 'test'\n  ...\n# Subtest: keeps instruction-like issue text inside the untrusted boundary\nok 18 - keeps instruction-like issue text inside the untrusted boundary\n  ---\n  duration_ms: 0.611795\n  type: 'test'\n  ...\n# Subtest: prefixes control-character line separators inside external data\nok 19 - prefixes control-character line separators inside external data\n  ---\n  duration_ms: 0.235529\n  type: 'test'\n  ...\n# Subtest: visibly escapes every C1 and bidirectional control inside ordered boundaries\nok 20 - visibly escapes every C1 and bidirectional control inside ordered boundaries\n  ---\n  duration_ms: 0.901884\n  type: 'test'\n  ...\n# Subtest: visibly escapes every C0 control in inline CLI fields\nok 21 - visibly escapes every C0 control in inline CLI fields\n  ---\n  duration_ms: 0.264772\n  type: 'test'\n  ...\n# Subtest: keeps JSON CLI output readable around external controls\nok 22 - keeps JSON CLI output readable around external controls\n  ---\n  duration_ms: 0.171372\n  type: 'test'\n  ...\n# Subtest: keeps detail handoff intent trusted while issue text stays inside the boundary\nok 23 - keeps detail handoff intent trusted while issue text stays inside the boundary\n  ---\n  duration_ms: 0.200566\n  type: 'test'\n  ...\n# Subtest: defaults optional provider-native issue creation properties\nok 24 - defaults optional provider-native issue creation properties\n  ---\n  duration_ms: 2.563052\n  type: 'test'\n  ...\n# Subtest: validates expanded provider-native issue creation properties\nok 25 - validates expanded provider-native issue creation properties\n  ---\n  duration_ms: 1.116966\n  type: 'test'\n  ...\n# Subtest: validates creation metadata and warning-bearing RPC results\nok 26 - validates creation metadata and warning-bearing RPC results\n  ---\n  duration_ms: 3.70337\n  type: 'test'\n  ...\n# Subtest: returns authoritative provider identity with cached list results\nok 27 - returns authoritative provider identity with cached list results\n  ---\n  duration_ms: 0.366558\n  type: 'test'\n  ...\n# Subtest: Linear maps native metadata and sends it in IssueCreateInput\nok 28 - Linear maps native metadata and sends it in IssueCreateInput\n  ---\n  duration_ms: 24.60291\n  type: 'test'\n  ...\n# Subtest: Linear paginates create options independently and preserves the native default state\nok 29 - Linear paginates create options independently and preserves the native default state\n  ---\n  duration_ms: 5.749218\n  type: 'test'\n  ...\n# Subtest: Linear rejects invalid creation metadata cursors\nok 30 - Linear rejects invalid creation metadata cursors\n  ---\n  duration_ms: 2.27658\n  type: 'test'\n  ...\n# Subtest: Linear keeps explicit create rejection retryable without the uncertain marker\nok 31 - Linear keeps explicit create rejection retryable without the uncertain marker\n  ---\n  duration_ms: 7.246888\n  type: 'test'\n  ...\n# Subtest: Linear marks malformed or lost post-dispatch create responses uncertain\nok 32 - Linear marks malformed or lost post-dispatch create responses uncertain\n  ---\n  duration_ms: 12.187763\n  type: 'test'\n  ...\n# Subtest: Jira derives native fields from createmeta and forwards selections\nok 33 - Jira derives native fields from createmeta and forwards selections\n  ---\n  duration_ms: 4.851442\n  type: 'test'\n  ...\n# Subtest: Jira marks ambiguous create acknowledgement and detail failures uncertain\nok 34 - Jira marks ambiguous create acknowledgement and detail failures uncertain\n  ---\n  duration_ms: 3.30849\n  type: 'test'\n  ...\n# Subtest: Jira paginates create metadata and canonicalizes issue types to native IDs\nok 35 - Jira paginates create metadata and canonicalizes issue types to native IDs\n  ---\n  duration_ms: 1.430647\n  type: 'test'\n  ...\n# Subtest: Jira exposes only priorities allowed for the selected project and issue type\nok 36 - Jira exposes only priorities allowed for the selected project and issue type\n  ---\n  duration_ms: 0.752702\n  type: 'test'\n  ...\n# Subtest: GitHub loads native metadata and reports partially applied fields\nok 37 - GitHub loads native metadata and reports partially applied fields\n  ---\n  duration_ms: 2.09595\n  type: 'test'\n  ...\n# Subtest: GitHub confirms the submitted assignee from native response membership\nok 38 - GitHub confirms the submitted assignee from native response membership\n  ---\n  duration_ms: 0.766086\n  type: 'test'\n  ...\n# Subtest: GitHub paginates and deduplicates every create metadata collection\nok 39 - GitHub paginates and deduplicates every create metadata collection\n  ---\n  duration_ms: 1.718582\n  type: 'test'\n  ...\n# Subtest: GitHub queues a fresh reconciliation after an overlapping pre-create refresh\nok 40 - GitHub queues a fresh reconciliation after an overlapping pre-create refresh\n  ---\n  duration_ms: 0.738346\n  type: 'test'\n  ...\n# Subtest: GitHub queues a post-write refresh when issue confirmation is ambiguous\nok 41 - GitHub queues a post-write refresh when issue confirmation is ambiguous\n  ---\n  duration_ms: 0.365466\n  type: 'test'\n  ...\n# Subtest: GitHub forced reconciliation refreshes before listing only project-scoped repos\nok 42 - GitHub forced reconciliation refreshes before listing only project-scoped repos\n  ---\n  duration_ms: 0.195516\n  type: 'test'\n  ...\n# Subtest: keeps Taskboard private and Git-buildable without npm publication hooks\nok 43 - keeps Taskboard private and Git-buildable without npm publication hooks\n  ---\n  duration_ms: 1.276306\n  type: 'test'\n  ...\n# Subtest: keeps composer capture manual with no AI helper execution surface\nok 44 - keeps composer capture manual with no AI helper execution surface\n  ---\n  duration_ms: 4.399178\n  type: 'test'\n  ...\n# Subtest: makes the committed Taskboard tree the authoritative release input\nok 45 - makes the committed Taskboard tree the authoritative release input\n  ---\n  duration_ms: 0.213329\n  type: 'test'\n  ...\n# Subtest: documents only BB Community and direct Git installation for Taskboard\nok 46 - documents only BB Community and direct Git installation for Taskboard\n  ---\n  duration_ms: 0.433039\n  type: 'test'\n  ...\n# Subtest: keeps Usage Tracker private and documents its Git release too\nok 47 - keeps Usage Tracker private and documents its Git release too\n  ---\n  duration_ms: 1.249358\n  type: 'test'\n  ...\n# Subtest: has no active registry publication automation or credential path\nok 48 - has no active registry publication automation or credential path\n  ---\n  duration_ms: 0.370065\n  type: 'test'\n  ...\n# Subtest: credits merged contributors without reviving superseded filter storage\nok 49 - credits merged contributors without reviving superseded filter storage\n  ---\n  duration_ms: 4.559159\n  type: 'test'\n  ...\n# Subtest: builds the exact GitHub CLI environment without executable search state\nok 50 - builds the exact GitHub CLI environment without executable search state\n  ---\n  duration_ms: 1.187394\n  type: 'test'\n  ...\n# Subtest: never forwards PATH or PATHEXT into the authenticated child\nok 51 - never forwards PATH or PATHEXT into the authenticated child\n  ---\n  duration_ms: 2.873207\n  type: 'test'\n  ...\n# Subtest: ignores PATH and resolves only fixed non-project POSIX candidates\nok 52 - ignores PATH and resolves only fixed non-project POSIX candidates\n  ---\n  duration_ms: 0.333649\n  type: 'test'\n  ...\n# Subtest: uses fixed Windows install roots and excludes PATH/project candidates\nok 53 - uses fixed Windows install roots and excludes PATH/project candidates\n  ---\n  duration_ms: 0.306639\n  type: 'test'\n  ...\n# Subtest: excludes unrelated credentials, runtime hooks, and CLI controls\nok 54 - excludes unrelated credentials, runtime hooks, and CLI controls\n  ---\n  duration_ms: 0.199103\n  type: 'test'\n  ...\n1..54\n# tests 54\n# suites 0\n# pass 54\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 320.915452\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:f74f3e24d795874ddce5d91dd391d0948e4499081928dddb3678f527a7b8b311",
+      "sourceTreeAfter": "sha256:f74f3e24d795874ddce5d91dd391d0948e4499081928dddb3678f527a7b8b311",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

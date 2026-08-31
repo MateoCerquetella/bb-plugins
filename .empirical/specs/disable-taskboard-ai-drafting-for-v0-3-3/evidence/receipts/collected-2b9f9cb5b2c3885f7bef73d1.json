@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-2b9f9cb5b2c3885f7bef73d1",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Live BB verified synchronous editable manual prompt capture with no model/helper UI and the retained Taskboard Ticket header identity.",
+  "passed": true,
+  "startedAt": "2026-08-31T16:28:39.348Z",
+  "completedAt": "2026-08-31T16:28:39.348Z",
+  "provenance": {
+    "repositoryId": "sha256:90af4c195eb07525399dc79718817b19b1bf3ebfcf5082ae35ecca3361842a3f",
+    "feature": "disable-taskboard-ai-drafting-for-v0-3-3",
+    "specRevision": 3,
+    "specDigest": "sha256:7d9e7e7856c8d92b7addbb74c4efb41be10de9527e0e83b5d5e70c537558ec90",
+    "treeDigest": "sha256:79391a500d1c548b34c1327dea30a0a4e0715cc231bd1b3cfe1e6fd9a9bfed7b",
+    "policyDigest": "sha256:52b420c1a057efff255e5ec0c6c878332d88bb69d29998b7261fa397cdfa5f22"
+  },
+  "digest": "sha256:e36b8b99bb396aa670817e272e99470d25a233cbde98b571c0f5aff3e6ea7365",
+  "kind": "collected",
+  "collector": "codex-browser-live",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/disable-taskboard-ai-drafting-for-v0-3-3/evidence/browser-evidence.md",
+      "mediaType": "text/markdown",
+      "bytes": 1474,
+      "digest": "sha256:31e6585359205e39fa86955eafa070b08e9627c9543e9ce0bbb53121da72147f"
+    },
+    {
+      "path": ".empirical/specs/disable-taskboard-ai-drafting-for-v0-3-3/evidence/manual-capture-v0.3.3.png",
+      "mediaType": "image/png",
+      "bytes": 73415,
+      "digest": "sha256:b49b1136480755d482cbd0585d7d3aad9f0efdea78de721bcaaa9f7ddf284c93"
+    },
+    {
+      "path": ".empirical/specs/disable-taskboard-ai-drafting-for-v0-3-3/evidence/taskboard-header-no-ai-v0.3.3.png",
+      "mediaType": "image/png",
+      "bytes": 55393,
+      "digest": "sha256:971819de39ed81a917ea416396f8cb8cf15f516c257c27aab0c83f46881f6304"
+    }
+  ]
+}
