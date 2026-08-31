@@ -23,6 +23,9 @@
         "evidenceKinds": [
           "test"
         ],
+        "checks": [
+          "unit"
+        ],
         "criteria": [
           "AC-1",
           "AC-2",
@@ -38,6 +41,99 @@
           "AC-7",
           "AC-MKT-1",
           "AC-MKT-2",
+          "AC-8",
+          "AC-9"
+        ]
+      },
+      {
+        "id": "taskboard-boundary-check",
+        "argv": [
+          "node",
+          "--test",
+          "--experimental-strip-types",
+          "plugins/taskboard/test/contract.test.ts",
+          "plugins/taskboard/test/distribution.test.ts",
+          "plugins/taskboard/test/github-environment.test.ts",
+          "plugins/taskboard/test/issue-draft.test.ts",
+          "plugins/taskboard/test/issue-draft-server.test.ts"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "evidenceKinds": [
+          "test"
+        ],
+        "checks": [
+          "integration",
+          "adapter-contract",
+          "fault-injection"
+        ],
+        "criteria": [
+          "AC-1",
+          "AC-2",
+          "AC-3",
+          "AC-4",
+          "AC-5",
+          "AC-6",
+          "AC-7",
+          "AC-8",
+          "AC-9"
+        ]
+      },
+      {
+        "id": "taskboard-production-consumer",
+        "argv": [
+          "node",
+          "scripts/verify-taskboard-release-candidate.mjs"
+        ],
+        "cwd": ".",
+        "timeoutMs": 900000,
+        "maxOutputBytes": 1048576,
+        "evidenceKinds": [
+          "test"
+        ],
+        "checks": [
+          "package-consumer",
+          "clean-clone",
+          "end-to-end"
+        ],
+        "criteria": [
+          "AC-1",
+          "AC-2",
+          "AC-3",
+          "AC-4",
+          "AC-5",
+          "AC-6",
+          "AC-7",
+          "AC-8",
+          "AC-9"
+        ]
+      },
+      {
+        "id": "taskboard-cross-platform-contract",
+        "argv": [
+          "node",
+          "--test",
+          "--experimental-strip-types",
+          "test/github-environment.test.ts"
+        ],
+        "cwd": "plugins/taskboard",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 262144,
+        "evidenceKinds": [
+          "test"
+        ],
+        "checks": [
+          "cross-platform"
+        ],
+        "criteria": [
+          "AC-1",
+          "AC-2",
+          "AC-3",
+          "AC-4",
+          "AC-5",
+          "AC-6",
+          "AC-7",
           "AC-8",
           "AC-9"
         ]

@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-e59f4d76bc3a93209f34e758",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8",
+    "AC-9"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "An independent fresh-context agent revalidated all nine local acceptance and control gates after the security repairs, including 122 tests, clean consumer build, exact marketplace tree, and absence of remote mutations.",
+  "passed": true,
+  "startedAt": "2026-08-31T02:43:11.484Z",
+  "completedAt": "2026-08-31T02:43:11.484Z",
+  "provenance": {
+    "repositoryId": "sha256:90af4c195eb07525399dc79718817b19b1bf3ebfcf5082ae35ecca3361842a3f",
+    "feature": "finish-get-bb-marketplace-pr-129-locally-from-the-current",
+    "specRevision": 3,
+    "specDigest": "sha256:c05f073bf9e56285b3e8b44cb4bc3e6faf29ab3c6894c235d9accda056f78abe",
+    "treeDigest": "sha256:5676240d90f3aeda3201154fa977bd8b4bb51748c15c71bba12a3d2dd6d61d07",
+    "policyDigest": "sha256:97838412fe9499da6bf54aa9865408a1b5eb658b964ac1695ae9741f5e32714f",
+    "workflowRevision": 7,
+    "gitCommit": "203f910676d6ba9d1f1da1d58affc8f9d307645e"
+  },
+  "digest": "sha256:c631a187f579ebee33fd21d9513bb997fb167ff2291a8df1b4b3cc90f7de98f2",
+  "kind": "qa",
+  "matrixDigest": "sha256:ca5da6ab3c904a7f1ac3460ab0d58e2fd1db16e32124fdabde5de63b2f939eb2",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "An independent fresh-context agent revalidated all nine local acceptance and control gates after the security repairs, including 122 tests, clean consumer build, exact marketplace tree, and absence of remote mutations.",
+      "startedAt": "2026-08-31T02:43:11.484Z",
+      "completedAt": "2026-08-31T02:43:11.484Z",
+      "durationMs": 0,
+      "collector": "fresh-context-agent:/root/fresh_context_qa",
+      "command": null,
+      "result": null,
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:5676240d90f3aeda3201154fa977bd8b4bb51748c15c71bba12a3d2dd6d61d07",
+      "sourceTreeAfter": "sha256:5676240d90f3aeda3201154fa977bd8b4bb51748c15c71bba12a3d2dd6d61d07",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/finish-get-bb-marketplace-pr-129-locally-from-the-current/evidence/fresh-context.txt",
+          "mediaType": "text/plain",
+          "bytes": 2858,
+          "digest": "sha256:ac2a452ea33ccfe7e5c061bfb5dc1172b004d167969495bd1ce9af887ae0aa02"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}

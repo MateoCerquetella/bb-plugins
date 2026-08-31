@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-1188f408d873986c6d482daf",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8",
+    "AC-9"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Final POSIX and Windows contracts passed for fixed absolute gh discovery, PATH/project candidate rejection, child search-state omission, auth/config/keyring/proxy/CA preservation, SYSTEMROOT, fixed policy/locale, and secret/injection exclusions.",
+  "passed": true,
+  "startedAt": "2026-08-31T02:44:54.488Z",
+  "completedAt": "2026-08-31T02:44:54.648Z",
+  "provenance": {
+    "repositoryId": "sha256:90af4c195eb07525399dc79718817b19b1bf3ebfcf5082ae35ecca3361842a3f",
+    "feature": "finish-get-bb-marketplace-pr-129-locally-from-the-current",
+    "specRevision": 3,
+    "specDigest": "sha256:c05f073bf9e56285b3e8b44cb4bc3e6faf29ab3c6894c235d9accda056f78abe",
+    "treeDigest": "sha256:5676240d90f3aeda3201154fa977bd8b4bb51748c15c71bba12a3d2dd6d61d07",
+    "policyDigest": "sha256:97838412fe9499da6bf54aa9865408a1b5eb658b964ac1695ae9741f5e32714f",
+    "workflowRevision": 7,
+    "gitCommit": "203f910676d6ba9d1f1da1d58affc8f9d307645e"
+  },
+  "digest": "sha256:fee033961ca9f6fb3702b88c35b11e0ae7d604ae47cfacf8430ceff4692150c6",
+  "kind": "qa",
+  "matrixDigest": "sha256:ca5da6ab3c904a7f1ac3460ab0d58e2fd1db16e32124fdabde5de63b2f939eb2",
+  "check": {
+    "id": "qa-cross-platform",
+    "kind": "cross-platform"
+  },
+  "coveredChecks": [
+    "cross-platform"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Final POSIX and Windows contracts passed for fixed absolute gh discovery, PATH/project candidate rejection, child search-state omission, auth/config/keyring/proxy/CA preservation, SYSTEMROOT, fixed policy/locale, and secret/injection exclusions.",
+      "startedAt": "2026-08-31T02:44:54.488Z",
+      "completedAt": "2026-08-31T02:44:54.648Z",
+      "durationMs": 160,
+      "collector": null,
+      "command": {
+        "argv": [
+          "node",
+          "--test",
+          "--experimental-strip-types",
+          "test/github-environment.test.ts"
+        ],
+        "cwd": "plugins/taskboard",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "NO_COLOR",
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:6a81ce5712e99fcb1d7b29b64825e5b069cec33e9d42c8794bea4b29eb9af875",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "TAP version 13\n# Subtest: builds the exact GitHub CLI environment without executable search state\nok 1 - builds the exact GitHub CLI environment without executable search state\n  ---\n  duration_ms: 3.047995\n  type: 'test'\n  ...\n# Subtest: never forwards PATH or PATHEXT into the authenticated child\nok 2 - never forwards PATH or PATHEXT into the authenticated child\n  ---\n  duration_ms: 0.170561\n  type: 'test'\n  ...\n# Subtest: ignores PATH and resolves only fixed non-project POSIX candidates\nok 3 - ignores PATH and resolves only fixed non-project POSIX candidates\n  ---\n  duration_ms: 0.179187\n  type: 'test'\n  ...\n# Subtest: uses fixed Windows install roots and excludes PATH/project candidates\nok 4 - uses fixed Windows install roots and excludes PATH/project candidates\n  ---\n  duration_ms: 0.189215\n  type: 'test'\n  ...\n# Subtest: excludes unrelated credentials, runtime hooks, and CLI controls\nok 5 - excludes unrelated credentials, runtime hooks, and CLI controls\n  ---\n  duration_ms: 0.106294\n  type: 'test'\n  ...\n1..5\n# tests 5\n# suites 0\n# pass 5\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 133.80997\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:5676240d90f3aeda3201154fa977bd8b4bb51748c15c71bba12a3d2dd6d61d07",
+      "sourceTreeAfter": "sha256:5676240d90f3aeda3201154fa977bd8b4bb51748c15c71bba12a3d2dd6d61d07",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

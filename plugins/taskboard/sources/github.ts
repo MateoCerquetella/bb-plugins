@@ -1,4 +1,7 @@
 import { execFile } from 'node:child_process';
+import { constants as fsConstants } from 'node:fs';
+import { access, stat } from 'node:fs/promises';
+import { posix, win32 } from 'node:path';
 import type { BbPluginApi } from '@get-bb/plugin-sdk';
 import { z } from 'zod';
 import { CREATE_OUTCOME_UNCERTAIN_MARKER } from '../contract.js';
@@ -120,6 +123,143 @@ const githubMutationRevisions = new WeakMap<BbPluginApi, number>();
 const activeRefreshes = new WeakMap<BbPluginApi, ActiveGithubRefresh>();
 let resolvedGhPath: string | null = null;
 
+const githubCliEnvironmentVariables = [
+  'GH_TOKEN',
+  'GITHUB_TOKEN',
+  'GH_ENTERPRISE_TOKEN',
+  'GITHUB_ENTERPRISE_TOKEN',
+  'GH_HOST',
+  'GH_CONFIG_DIR',
+  'XDG_CONFIG_HOME',
+  'HOME',
+  'APPDATA',
+  'USERPROFILE',
+  'DBUS_SESSION_BUS_ADDRESS',
+  'HTTP_PROXY',
+  'HTTPS_PROXY',
+  'NO_PROXY',
+  'http_proxy',
+  'https_proxy',
+  'no_proxy',
+  'SSL_CERT_FILE',
+  'SSL_CERT_DIR'
+] as const;
+
+function copyEnvironmentVariable(
+  target: NodeJS.ProcessEnv,
+  source: NodeJS.ProcessEnv,
+  name: string
+): void {
+  const value = source[name];
+  if (value !== undefined) target[name] = value;
+}
+
+export function githubCliEnvironment(
+  source: NodeJS.ProcessEnv = process.env,
+  platform: NodeJS.Platform = process.platform
+): NodeJS.ProcessEnv {
+  const environment: NodeJS.ProcessEnv = {
+    GH_PROMPT_DISABLED: '1',
+    GH_NO_UPDATE_NOTIFIER: '1',
+    GH_TELEMETRY: '0',
+    LANG: 'C',
+    LC_ALL: 'C'
+  };
+
+  for (const name of githubCliEnvironmentVariables) {
+    copyEnvironmentVariable(environment, source, name);
+  }
+
+  if (platform === 'win32') {
+    copyEnvironmentVariable(environment, source, 'SYSTEMROOT');
+  }
+
+  return environment;
+}
+
+function isInsideDirectory(
+  candidate: string,
+  root: string,
+  pathApi: typeof posix | typeof win32
+): boolean {
+  const relative = pathApi.relative(root, candidate);
+  return (
+    relative === '' ||
+    (relative !== '..' &&
+      !relative.startsWith(`..${pathApi.sep}`) &&
+      !pathApi.isAbsolute(relative))
+  );
+}
+
+export function githubCliSearchCandidates(
+  source: NodeJS.ProcessEnv = process.env,
+  platform: NodeJS.Platform = process.platform,
+  excludedRoots: readonly string[] = [process.cwd()]
+): string[] {
+  const pathApi = platform === 'win32' ? win32 : posix;
+  const executableName = platform === 'win32' ? 'gh.exe' : 'gh';
+  const commonCandidates =
+    platform === 'win32'
+      ? [
+          source.PROGRAMFILES
+            ? pathApi.join(
+                source.PROGRAMFILES,
+                'GitHub CLI',
+                executableName
+              )
+            : null,
+          source.LOCALAPPDATA
+            ? pathApi.join(
+                source.LOCALAPPDATA,
+                'Programs',
+                'GitHub CLI',
+                executableName
+              )
+            : null
+        ]
+      : [
+          '/opt/homebrew/bin/gh',
+          '/usr/local/bin/gh',
+          '/usr/bin/gh'
+        ];
+  const normalizedExcludedRoots = excludedRoots.filter(root =>
+    pathApi.isAbsolute(root)
+  );
+  const seen = new Set<string>();
+
+  return commonCandidates
+    .filter((candidate): candidate is string => candidate !== null)
+    .filter(candidate => pathApi.isAbsolute(candidate))
+    .filter(
+      candidate =>
+        !normalizedExcludedRoots.some(root =>
+          isInsideDirectory(candidate, root, pathApi)
+        )
+    )
+    .filter(candidate => {
+      const identity = platform === 'win32' ? candidate.toLowerCase() : candidate;
+      if (seen.has(identity)) return false;
+      seen.add(identity);
+      return true;
+    });
+}
+
+async function isExecutableFile(
+  file: string,
+  platform: NodeJS.Platform
+): Promise<boolean> {
+  try {
+    if (!(await stat(file)).isFile()) return false;
+    await access(
+      file,
+      platform === 'win32' ? fsConstants.F_OK : fsConstants.X_OK
+    );
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function runFile(
   file: string,
   args: string[],
@@ -129,7 +269,11 @@ function runFile(
     execFile(
       file,
       args,
-      { timeout: timeoutMs, maxBuffer: 16 * 1024 * 1024 },
+      {
+        timeout: timeoutMs,
+        maxBuffer: 16 * 1024 * 1024,
+        env: githubCliEnvironment()
+      },
       (error, stdout, stderr) => {
         if (error) {
           reject(new Error(stderr.trim() || error.message));
@@ -143,11 +287,8 @@ function runFile(
 
 async function resolveGhPath(): Promise<string> {
   if (resolvedGhPath !== null) return resolvedGhPath;
-  for (const candidate of [
-    'gh',
-    '/opt/homebrew/bin/gh',
-    '/usr/local/bin/gh'
-  ]) {
+  for (const candidate of githubCliSearchCandidates()) {
+    if (!(await isExecutableFile(candidate, process.platform))) continue;
     try {
       await runFile(candidate, ['--version'], 5_000);
       resolvedGhPath = candidate;

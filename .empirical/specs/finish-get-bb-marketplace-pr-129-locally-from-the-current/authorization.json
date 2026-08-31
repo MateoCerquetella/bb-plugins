@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "mode": "yolo",
+  "repositoryId": "sha256:90af4c195eb07525399dc79718817b19b1bf3ebfcf5082ae35ecca3361842a3f",
+  "feature": "finish-get-bb-marketplace-pr-129-locally-from-the-current",
+  "requestDigest": "sha256:b1af752d3ee2bf218c59c43d558a67e8189d6f01debd70e34b49c0569558bd60",
+  "ceiling": "verified",
+  "targetBranch": "main",
+  "allowExternalAgent": false,
+  "createdAt": "2026-08-31T01:49:22.709Z",
+  "expiresAt": null,
+  "digest": "sha256:5654515d05a8af239eac83c4e6da66ebf4e7bdc6362f562ab06c642d1c6de7cc"
+}

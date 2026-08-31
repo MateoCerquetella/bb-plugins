@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-8bcadd20d6c95eaab2a7e24a",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8",
+    "AC-9"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Focused RPC, distribution, GitHub environment, structured Plan, provider compatibility, stop-before-persist, unexpected-interaction, and idle-fallback checks passed together.",
+  "passed": true,
+  "startedAt": "2026-08-31T02:21:03.074Z",
+  "completedAt": "2026-08-31T02:21:03.340Z",
+  "provenance": {
+    "repositoryId": "sha256:90af4c195eb07525399dc79718817b19b1bf3ebfcf5082ae35ecca3361842a3f",
+    "feature": "finish-get-bb-marketplace-pr-129-locally-from-the-current",
+    "specRevision": 3,
+    "specDigest": "sha256:c05f073bf9e56285b3e8b44cb4bc3e6faf29ab3c6894c235d9accda056f78abe",
+    "treeDigest": "sha256:d16a2821465f2a54631bbb034225c64b2612015462e3f8a761166457ca6e1b44",
+    "policyDigest": "sha256:97838412fe9499da6bf54aa9865408a1b5eb658b964ac1695ae9741f5e32714f",
+    "workflowRevision": 7,
+    "gitCommit": "203f910676d6ba9d1f1da1d58affc8f9d307645e"
+  },
+  "digest": "sha256:3d48be78904985c2900c4e8c8221a54d0da92bfcd73cd14cf7662bf836642cb9",
+  "kind": "qa",
+  "matrixDigest": "sha256:ca5da6ab3c904a7f1ac3460ab0d58e2fd1db16e32124fdabde5de63b2f939eb2",
+  "check": {
+    "id": "qa-integration",
+    "kind": "integration"
+  },
+  "coveredChecks": [
+    "adapter-contract",
+    "fault-injection",
+    "integration"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Focused RPC, distribution, GitHub environment, structured Plan, provider compatibility, stop-before-persist, unexpected-interaction, and idle-fallback checks passed together.",
+      "startedAt": "2026-08-31T02:21:03.074Z",
+      "completedAt": "2026-08-31T02:21:03.340Z",
+      "durationMs": 266,
+      "collector": null,
+      "command": {
+        "argv": [
+          "node",
+          "--test",
+          "--experimental-strip-types",
+          "plugins/taskboard/test/contract.test.ts",
+          "plugins/taskboard/test/distribution.test.ts",
+          "plugins/taskboard/test/github-environment.test.ts",
+          "plugins/taskboard/test/issue-draft.test.ts",
+          "plugins/taskboard/test/issue-draft-server.test.ts"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "NO_COLOR",
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:e066ba48d16dccff46e7bbced29e4e5e3ea9848d9e094cc2e022e2467b03672f",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "TAP version 13\n# Subtest: delimits useful issue facts as untrusted external tracker data\nok 1 - delimits useful issue facts as untrusted external tracker data\n  ---\n  duration_ms: 1.332678\n  type: 'test'\n  ...\n# Subtest: keeps instruction-like issue text inside the untrusted boundary\nok 2 - keeps instruction-like issue text inside the untrusted boundary\n  ---\n  duration_ms: 2.960094\n  type: 'test'\n  ...\n# Subtest: prefixes control-character line separators inside external data\nok 3 - prefixes control-character line separators inside external data\n  ---\n  duration_ms: 0.298864\n  type: 'test'\n  ...\n# Subtest: visibly escapes every C1 and bidirectional control inside ordered boundaries\nok 4 - visibly escapes every C1 and bidirectional control inside ordered boundaries\n  ---\n  duration_ms: 0.893729\n  type: 'test'\n  ...\n# Subtest: visibly escapes every C0 control in inline CLI fields\nok 5 - visibly escapes every C0 control in inline CLI fields\n  ---\n  duration_ms: 0.31267\n  type: 'test'\n  ...\n# Subtest: keeps JSON CLI output readable around external controls\nok 6 - keeps JSON CLI output readable around external controls\n  ---\n  duration_ms: 0.228617\n  type: 'test'\n  ...\n# Subtest: keeps detail handoff intent trusted while issue text stays inside the boundary\nok 7 - keeps detail handoff intent trusted while issue text stays inside the boundary\n  ---\n  duration_ms: 0.30727\n  type: 'test'\n  ...\n# Subtest: defaults optional provider-native issue creation properties\nok 8 - defaults optional provider-native issue creation properties\n  ---\n  duration_ms: 1.866531\n  type: 'test'\n  ...\n# Subtest: validates expanded provider-native issue creation properties\nok 9 - validates expanded provider-native issue creation properties\n  ---\n  duration_ms: 1.402616\n  type: 'test'\n  ...\n# Subtest: validates creation metadata and warning-bearing RPC results\nok 10 - validates creation metadata and warning-bearing RPC results\n  ---\n  duration_ms: 2.74351\n  type: 'test'\n  ...\n# Subtest: returns authoritative provider identity with cached list results\nok 11 - returns authoritative provider identity with cached list results\n  ---\n  duration_ms: 0.273849\n  type: 'test'\n  ...\n# Subtest: keeps Taskboard private and Git-buildable without npm publication hooks\nok 12 - keeps Taskboard private and Git-buildable without npm publication hooks\n  ---\n  duration_ms: 1.722819\n  type: 'test'\n  ...\n# Subtest: documents only BB Community and direct Git installation for Taskboard\nok 13 - documents only BB Community and direct Git installation for Taskboard\n  ---\n  duration_ms: 0.709203\n  type: 'test'\n  ...\n# Subtest: keeps Usage Tracker private and documents its Git release too\nok 14 - keeps Usage Tracker private and documents its Git release too\n  ---\n  duration_ms: 4.68606\n  type: 'test'\n  ...\n# Subtest: has no active registry publication automation or credential path\nok 15 - has no active registry publication automation or credential path\n  ---\n  duration_ms: 0.435303\n  type: 'test'\n  ...\n# Subtest: credits merged contributors without reviving superseded filter storage\nok 16 - credits merged contributors without reviving superseded filter storage\n  ---\n  duration_ms: 7.313067\n  type: 'test'\n  ...\n# Subtest: builds the exact GitHub CLI environment for a bare executable\nok 17 - builds the exact GitHub CLI environment for a bare executable\n  ---\n  duration_ms: 1.072314\n  type: 'test'\n  ...\n# Subtest: omits PATH for absolute and relative executable paths\nok 18 - omits PATH for absolute and relative executable paths\n  ---\n  duration_ms: 0.301539\n  type: 'test'\n  ...\n# Subtest: preserves Windows process lookup variables only on Windows\nok 19 - preserves Windows process lookup variables only on Windows\n  ---\n  duration_ms: 0.147198\n  type: 'test'\n  ...\n# Subtest: excludes unrelated credentials, runtime hooks, and CLI controls\nok 20 - excludes unrelated credentials, runtime hooks, and CLI controls\n  ---\n  duration_ms: 0.107646\n  type: 'test'\n  ...\n# Subtest: spawns native Plan input and stops before persisting the proposed Plan\nok 21 - spawns native Plan input and stops before persisting the proposed Plan\n  ---\n  duration_ms: 10.689931\n  type: 'test'\n  ...\n# Subtest: stops and fails closed on an unexpected pending interaction\nok 22 - stops and fails closed on an unexpected pending interaction\n  ---\n  duration_ms: 2.551149\n  type: 'test'\n  ...\n# Subtest: preserves the idle output fallback while stopping before persistence\nok 23 - preserves the idle output fallback while stopping before persistence\n  ---\n  duration_ms: 2.13983\n  type: 'test'\n  ...\n# Subtest: does not spawn when the project provider lacks native Plan support\nok 24 - does not spawn when the project provider lacks native Plan support\n  ---\n  duration_ms: 2.111187\n  type: 'test'\n  ...\n# Subtest: parses a tagged model response into a ticket draft\nok 25 - parses a tagged model response into a ticket draft\n  ---\n  duration_ms: 1.626604\n  type: 'test'\n  ...\n# Subtest: rejects malformed or incomplete model output\nok 26 - rejects malformed or incomplete model output\n  ---\n  duration_ms: 0.891044\n  type: 'test'\n  ...\n# Subtest: builds a Plan-only repository-aware worker prompt\nok 27 - builds a Plan-only repository-aware worker prompt\n  ---\n  duration_ms: 0.272817\n  type: 'test'\n  ...\n# Subtest: selects only the project default provider with strict Plan capabilities\nok 28 - selects only the project default provider with strict Plan capabilities\n  ---\n  duration_ms: 0.801521\n  type: 'test'\n  ...\n# Subtest: builds exact structured initial Plan input\nok 29 - builds exact structured initial Plan input\n  ---\n  duration_ms: 0.300247\n  type: 'test'\n  ...\n# Subtest: classifies only one pending Plan from the expected provider\nok 30 - classifies only one pending Plan from the expected provider\n  ---\n  duration_ms: 0.339037\n  type: 'test'\n  ...\n# Subtest: keeps the original prompt as an editable fallback\nok 31 - keeps the original prompt as an editable fallback\n  ---\n  duration_ms: 0.219109\n  type: 'test'\n  ...\n1..31\n# tests 31\n# suites 0\n# pass 31\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 236.804006\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:d16a2821465f2a54631bbb034225c64b2612015462e3f8a761166457ca6e1b44",
+      "sourceTreeAfter": "sha256:d16a2821465f2a54631bbb034225c64b2612015462e3f8a761166457ca6e1b44",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

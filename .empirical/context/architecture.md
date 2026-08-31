@@ -7,13 +7,17 @@
 - `plugins/taskboard/server.ts` is the backend composition root. It wires typed
   RPC handlers, project-scoped configuration and credentials, the local cache,
   provider adapters, background sync, mentions, CLI commands, and hidden helper
-  threads used for issue drafting.
+  threads used for issue drafting. Draft helpers are provider-preflighted,
+  structured native Plan turns; the server reads pending Plan text, stops the
+  runtime before persistence, and archives without resolving the interaction.
 - `plugins/taskboard/app.tsx` owns the BB frontend registrations and Taskboard
   UI: nav panel, full/right-panel boards, project management, List/Kanban,
   detail, composer creation, pending credential interaction, and realtime
   reconciliation.
 - `plugins/taskboard/contract.ts` and companion schemas define the strict JSON
-  wire model. `store.ts` owns append-only SQLite migrations and cached work.
+  wire model. The contract uses a type-only SDK-root constraint so a
+  production-only Git subdirectory install has no frontend SDK-root runtime
+  dependency. `store.ts` owns append-only SQLite migrations and cached work.
   `sources/` contains the GitHub, Linear, and Jira adapters behind one interface.
 - `browse-preferences.ts` owns the observable device-local current view;
   `filter-presets.ts` validates complete named snapshots while `store.ts` owns
@@ -46,12 +50,16 @@
 5. Issue creation loads provider-native metadata, sends one validated create
    request, caches the returned item, and inserts a Taskboard mention into the
    BB composer. The external provider is never written before confirmation.
-6. A background service refreshes configured projects; the external tracker
+6. Composer-assisted issue drafting resolves the project's default provider,
+   requires advertised Plan plus `accept-edits`, sends exact structured Plan
+   input, and stops before recording a validated tagged draft. Unsupported or
+   unexpected interactions fall back to the original editable prompt.
+7. A background service refreshes configured projects; the external tracker
    remains authoritative when cache and live state differ.
-7. Named presets never auto-apply. UI application provider-checks a preset,
+8. Named presets never auto-apply. UI application provider-checks a preset,
    atomically replaces the current project `BrowsePreferences`, and lets the
    existing observable store synchronize full/right-panel surfaces.
-8. Host Monitor asks BB for enrolled hosts, samples only connected targets via
+9. Host Monitor asks BB for enrolled hosts, samples only connected targets via
    the authenticated host-worker boundary, validates every response, and keeps
    the last good reading when a target becomes stale, fails, or disconnects.
    Process lists are fetched only for the explicitly opened host and stop
@@ -63,8 +71,11 @@
   storage, agent, CLI, and testing contracts.
 - Taskboard uses Zod for runtime validation, better-sqlite3 through BB storage,
   BB-vendored UI source, Radix overlay primitives, Sonner, and Hugeicons.
-- GitHub access reuses BB's official GitHub integration and the `gh` CLI;
-  Linear and Jira use project-isolated API credentials.
+- GitHub access reuses BB's official GitHub integration and the `gh` CLI. Every
+  `gh` executable is resolved only from fixed common absolute non-project paths
+  and verified before use. Its child receives an explicit cross-platform
+  environment allowlist without PATH/PATHEXT plus noninteractive deterministic
+  policy. Linear and Jira use project-isolated API credentials.
 - Runtime imports belong in leaf `dependencies`; types, test harnesses, and
   pinned build tooling belong in `devDependencies`.
 - Host Monitor deliberately carries BB 0.40 / SDK 0.4.21 tooling in its own

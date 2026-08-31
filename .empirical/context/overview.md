@@ -22,12 +22,19 @@
 - Taskboard selects exactly one external tracker per BB project. Provider APIs
   remain authoritative; Taskboard stores project configuration, credentials,
   cached summaries, sync state, and board preferences.
+- Composer-assisted issue drafting is optional and consumes the selected
+  provider's model usage. Taskboard preflights native Plan support, sends a
+  structured initial Plan command, stops the helper before persisting the
+  proposed ticket, and never approves or resolves the Plan interaction.
 - Taskboard's current browse state stays versioned and device-local; named
   project presets store validated snapshots in the plugin database and apply
   explicitly through that same browse store.
 - Taskboard, Usage Tracker, and Host Monitor are private/non-publishable
   workspaces. They release through immutable plugin-specific Git tags plus the
   BB Community marketplace.
+- Taskboard GitHub CLI subprocesses receive only named GitHub auth/config,
+  config/keyring, proxy/TLS, executable/runtime lookup, and fixed policy/locale
+  environment values; unrelated server variables are excluded.
 - Generated `dist/` and `node_modules/` are build/install products, not authored
   source and are not committed.
 - Empirical tracker integration is explicitly disabled in this checkout, so

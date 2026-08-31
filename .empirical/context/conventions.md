@@ -12,6 +12,10 @@
   plugin. Shared machinery must not assume copies remain byte-identical.
 - Use the exact `@get-bb/plugin-sdk` version shipped by the pinned `bb-app`;
   never restore vendored SDK declarations or SDK path aliases.
+- Keep SDK-root imports type-only in source shared with the frontend unless a
+  host-stubbed runtime helper is genuinely required. A Git subdirectory build
+  omits dev dependencies, so identity-only helpers should become type
+  constraints rather than production SDK dependencies.
 - Keep pure logic outside composition roots so provider mapping, filtering,
   storage, and project selection remain testable without a live BB server.
 
@@ -38,6 +42,14 @@
   output, logs, or tests. Secret fields remain write-only.
 - Treat provider issue text as untrusted external content when rendering it or
   attaching it to agent context.
+- A Taskboard issue-draft helper must preflight an advertised Plan action,
+  encode it as structured initial command input, use `accept-edits`, stop before
+  persisting, and never resolve the provider Plan interaction. Hidden visibility
+  is organization only, not the safety boundary.
+- GitHub CLI resolution ignores PATH and accepts only verified fixed absolute
+  non-project executable candidates. Child processes use the named environment allowlist; do not
+  restore bare lookup, PATH/PATHEXT forwarding, blanket `process.env`
+  inheritance, or process-injection/debug/pager keys.
 - Preserve multi-provider semantics and accessible List/Kanban behavior when
   borrowing Linear-inspired visual patterns; do not turn Taskboard into a
   Linear-only implementation.

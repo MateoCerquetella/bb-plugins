@@ -1,0 +1,39 @@
+Fresh-context acceptance QA — 2026-08-31
+
+Verdict: AC-1 through AC-9 pass as local verification and control gates. This is not release authorization; no commit, tag, push, release, force-update, PR comment, or merge occurred.
+
+Source candidate
+- Local branch: release/taskboard-v0.3.2
+- Parent and live origin/main: 203f910676d6ba9d1f1da1d58affc8f9d307645e
+- Package/version: bb-plugin-taskboard 0.3.2
+- Planned immutable tag: taskboard/v0.3.2 (currently absent)
+- SDK root is type-only in the frontend graph; exact SDK 0.4.6 remains dev-only.
+- Native Plan drafting is provider-preflighted and version-aware, uses structured initial input and accept-edits, stops, archives, then persists, and never resolves the provider interaction.
+- Archive failures retain the running record/mapping and are retryable; raw and fenced untagged JSON are rejected.
+- gh discovery ignores PATH, verifies only fixed absolute non-project candidates, and the authenticated child receives neither PATH nor PATHEXT nor unrelated secrets/injection controls.
+
+Final source verification
+- 122/122 Taskboard tests pass.
+- Taskboard typecheck and SDK types check pass.
+- Root workspace check passes.
+- git diff HEAD --check passes.
+- A disposable independent clone with no root node_modules passes the root check, production-only Taskboard subdirectory install, explicit absence of a production SDK package, BB 0.40 build, and artifact metadata verification.
+
+Marketplace candidate
+- Prepared HEAD and live upstream/main: e937f462a47180aef8725c5e71af6898da5ccfdd
+- Live PR #129 head remains unchanged: 1361c0383c09480c4729afe63e9ad412ec41000c
+- Exact candidate tree contains only:
+  - entries/taskboard.json — c51fd31552401b4448282d67f8f654f7b40b5411fd7cc0f6f4194c220220102a
+  - entries/usage-tracker.json — 7bf35cc64451a6e8ad9380e14786212763c1072caf2523514d29d491b143a792
+  - icons/taskboard-0b77950c.svg — 0b77950cec05ed35134dcc8d0c8ff96460c806106cb8e28cedeb15903ccd08ef
+- Usage Tracker is byte-identical to PR-head content and remains ^0.1.3.
+- Taskboard uses ^0.3.2 and discloses Plan-only repository-aware AI/model usage before user-confirmed creation.
+- Marketplace dependency install, build, schema/icon validation, check, and diff audit pass. The check script only proves a tag family exists, so exact ^0.3.2 public resolution remains an explicit post-tag verification.
+
+Approval control
+- Authenticated account: MateoCerquetella
+- Source repository: https://github.com/MateoCerquetella/bb-plugins.git
+- Marketplace fork: https://github.com/MateoCerquetella/marketplace.git
+- Upstream marketplace: https://github.com/get-bb/marketplace.git
+- No remote release branch or taskboard/v0.3.2 tag exists.
+- The complete local-commit packet is prepared for the user. Exact remote commands remain blocked until local commit SHAs exist and receive a separate release approval.

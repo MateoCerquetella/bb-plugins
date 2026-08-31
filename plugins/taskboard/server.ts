@@ -41,8 +41,11 @@ import {
 } from './contract.js';
 import { filterWorkItemsByAttributes } from './browse.js';
 import {
+  buildIssueDraftPlanInput,
   buildIssueDraftPrompt,
+  classifyIssueDraftPendingInteractions,
   parseIssueDraftOutput,
+  resolveIssueDraftPlanSelection,
   type ParsedIssueDraft
 } from './issue-draft.js';
 import {
@@ -440,6 +443,7 @@ export default async function plugin(bb: BbPluginApi) {
     Promise<{ requestId: string; helperThreadId: string }>
   >();
   const issueDraftReconciliations = new Map<string, Promise<void>>();
+  const issueDraftReconciliationRevisions = new Map<string, number>();
 
   async function liveProjects() {
     return bb.sdk.projects.list({ includePersonal: true });
@@ -501,24 +505,29 @@ export default async function plugin(bb: BbPluginApi) {
 
   async function releaseIssueDraftHelper(threadId: string): Promise<void> {
     try {
-      await bb.sdk.threads.archive({ threadId });
-    } catch (error) {
-      bb.log.warn(
-        `Could not archive Taskboard issue-draft helper ${threadId}: ${errorMessage(error)}`
-      );
-    }
-    try {
       await bb.sdk.threads.stop({ threadId });
     } catch (error) {
       bb.log.warn(
         `Could not stop Taskboard issue-draft helper ${threadId}: ${errorMessage(error)}`
       );
     }
+    try {
+      await bb.sdk.threads.archive({ threadId });
+    } catch (error) {
+      bb.log.warn(
+        `Could not archive Taskboard issue-draft helper ${threadId}: ${errorMessage(error)}`
+      );
+    }
+  }
+
+  async function archiveIssueDraftHelper(threadId: string): Promise<void> {
+    await bb.sdk.threads.archive({ threadId });
   }
 
   async function finishIssueDraft(
     threadId: string,
-    result: ParsedIssueDraft | { error: string }
+    result: ParsedIssueDraft | { error: string },
+    options: { helperStopped?: boolean } = {}
   ): Promise<void> {
     const requestId = await bb.storage.kv.get<string>(
       issueDraftThreadKey(threadId)
@@ -526,6 +535,16 @@ export default async function plugin(bb: BbPluginApi) {
     if (requestId === undefined) return;
     const current = await readIssueDraftRecord(requestId);
     if (current === null || current.status !== 'running') return;
+
+    if (await issueDraftCancellationRequested(requestId)) return;
+    if (!options.helperStopped) {
+      await bb.sdk.threads.stop({ threadId });
+    }
+    if (await issueDraftCancellationRequested(requestId)) {
+      await archiveIssueDraftHelper(threadId);
+      await clearIssueDraftRequest(requestId, threadId);
+      return;
+    }
 
     const completedAt = Date.now();
     const next: IssueDraftRecord =
@@ -539,21 +558,24 @@ export default async function plugin(bb: BbPluginApi) {
             completedAt
           };
 
-    if (await issueDraftCancellationRequested(requestId)) return;
+    await archiveIssueDraftHelper(threadId);
+    if (await issueDraftCancellationRequested(requestId)) {
+      await clearIssueDraftRequest(requestId, threadId);
+      return;
+    }
     await writeIssueDraftRecord(next);
     if (await issueDraftCancellationRequested(requestId)) {
       await clearIssueDraftRequest(requestId, threadId);
-      await releaseIssueDraftHelper(threadId);
       return;
     }
     await bb.storage.kv.delete(issueDraftThreadKey(threadId));
     bb.realtime.publish('taskboard:issue-draft-changed', { requestId });
-    await releaseIssueDraftHelper(threadId);
   }
 
   async function finishIssueDraftFromOutput(
     threadId: string,
-    assistantText: string | null
+    assistantText: string | null,
+    options: { helperStopped?: boolean } = {}
   ): Promise<void> {
     const draft = parseIssueDraftOutput(assistantText ?? '');
     await finishIssueDraft(
@@ -561,13 +583,39 @@ export default async function plugin(bb: BbPluginApi) {
       draft ?? {
         error:
           'The drafting model did not return a usable title and description.'
-      }
+      },
+      options
     );
   }
 
   async function reconcileIssueDraftOnce(threadId: string): Promise<void> {
+    const requestId = await bb.storage.kv.get<string>(
+      issueDraftThreadKey(threadId)
+    );
+    if (requestId === undefined) return;
+
+    const interactions = await bb.sdk.threads.interactions.list({ threadId });
     const thread = await bb.sdk.threads.get({ threadId });
-    if (thread.status === 'idle') {
+    const pending = classifyIssueDraftPendingInteractions(
+      interactions,
+      thread.providerId
+    );
+    if (pending.kind === 'plan') {
+      await bb.sdk.threads.stop({ threadId });
+      await finishIssueDraftFromOutput(threadId, pending.text, {
+        helperStopped: true
+      });
+    } else if (pending.kind === 'unexpected') {
+      await bb.sdk.threads.stop({ threadId });
+      await finishIssueDraft(
+        threadId,
+        {
+          error:
+            'The drafting model requested an unexpected interaction and was stopped without approval.'
+        },
+        { helperStopped: true }
+      );
+    } else if (thread.status === 'idle') {
       const { output } = await bb.sdk.threads.output({ threadId });
       await finishIssueDraftFromOutput(threadId, output);
     } else if (thread.status === 'error') {
@@ -578,20 +626,37 @@ export default async function plugin(bb: BbPluginApi) {
   }
 
   function reconcileIssueDraft(threadId: string): Promise<void> {
+    issueDraftReconciliationRevisions.set(
+      threadId,
+      (issueDraftReconciliationRevisions.get(threadId) ?? 0) + 1
+    );
     const pending = issueDraftReconciliations.get(threadId);
     if (pending) return pending;
+    let completedRevision = 0;
     const request = (async () => {
-      try {
-        await reconcileIssueDraftOnce(threadId);
-      } catch {
-        await new Promise(resolve =>
-          setTimeout(resolve, ISSUE_DRAFT_RECONCILIATION_RETRY_MS)
-        );
-        await reconcileIssueDraftOnce(threadId);
+      while (
+        completedRevision <
+        (issueDraftReconciliationRevisions.get(threadId) ?? 0)
+      ) {
+        completedRevision =
+          issueDraftReconciliationRevisions.get(threadId) ?? 0;
+        try {
+          await reconcileIssueDraftOnce(threadId);
+        } catch {
+          await new Promise(resolve =>
+            setTimeout(resolve, ISSUE_DRAFT_RECONCILIATION_RETRY_MS)
+          );
+          await reconcileIssueDraftOnce(threadId);
+        }
       }
     })().finally(() => {
       if (issueDraftReconciliations.get(threadId) === request) {
         issueDraftReconciliations.delete(threadId);
+      }
+      if (
+        issueDraftReconciliationRevisions.get(threadId) === completedRevision
+      ) {
+        issueDraftReconciliationRevisions.delete(threadId);
       }
     });
     issueDraftReconciliations.set(threadId, request);
@@ -618,15 +683,33 @@ export default async function plugin(bb: BbPluginApi) {
 
       const project = await projectById(input.projectId);
       const source = projectConfig(input.projectId, true).source;
+      const [executionDefaults, providers, runtime] = await Promise.all([
+        bb.sdk.projects.defaultExecutionOptions({
+          projectId: input.projectId
+        }),
+        bb.sdk.providers.list(),
+        bb.sdk.system.version()
+      ]);
+      const planSelection = resolveIssueDraftPlanSelection(
+        executionDefaults,
+        providers,
+        runtime
+      );
+      const draftingPrompt = buildIssueDraftPrompt({
+        prompt: input.prompt,
+        projectName: project.name,
+        source
+      });
       const helper = await bb.sdk.threads.spawn({
         projectId: input.projectId,
+        providerId: planSelection.providerId,
         environment: { type: 'project-default' },
-        prompt: buildIssueDraftPrompt({
-          prompt: input.prompt,
-          projectName: project.name,
-          source
-        }),
-        permissionMode: 'auto',
+        input: buildIssueDraftPlanInput(planSelection, draftingPrompt),
+        permissionMode: 'accept-edits',
+        executionInputSources: {
+          providerId: 'explicit',
+          permissionMode: 'explicit'
+        },
         visibility: 'hidden',
         title: 'Draft Taskboard issue'
       });
@@ -2044,14 +2127,31 @@ export default async function plugin(bb: BbPluginApi) {
   };
   bb.rpc.register(taskboardRpcContract, handlers);
 
-  bb.events.on('thread.idle', ({ thread, lastAssistantText }) =>
-    finishIssueDraftFromOutput(thread.id, lastAssistantText)
+  bb.events.on('thread.idle', ({ thread }) =>
+    reconcileIssueDraft(thread.id)
   );
   bb.events.on('thread.failed', ({ thread, error }) =>
     finishIssueDraft(thread.id, {
       error: error?.trim() || 'The drafting model failed.'
     })
   );
+  const unsubscribeIssueDraftChanges = bb.sdk.subscribe({
+    event: 'thread:changed',
+    callback(event) {
+      if (
+        event.id === undefined ||
+        !event.changes.includes('interactions-changed')
+      ) {
+        return;
+      }
+      void reconcileIssueDraft(event.id).catch(error => {
+        bb.log.warn(
+          `Could not reconcile Taskboard issue draft ${event.id}: ${errorMessage(error)}`
+        );
+      });
+    }
+  });
+  bb.onDispose(unsubscribeIssueDraftChanges);
 
   const issueDraftCleanupNow = Date.now();
   for (const key of await bb.storage.kv.list(ISSUE_DRAFT_REQUEST_PREFIX)) {

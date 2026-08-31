@@ -8,7 +8,7 @@ Commands below are verified from workspace and plugin manifests.
   or dependency/lockfile change.
 - `bb plugin install ./plugins/taskboard` — register the local Taskboard path in
   BB for live verification.
-- `bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.0 --subdirectory plugins/taskboard --tag-prefix taskboard/`
+- `bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.2 --subdirectory plugins/taskboard --tag-prefix taskboard/`
   — install the released Taskboard Git range directly.
 - `bb plugin install ./plugins/usage-tracker` — register Usage Tracker locally.
 - `bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.3 --subdirectory plugins/usage-tracker --tag-prefix usage-tracker/`
@@ -29,6 +29,10 @@ Commands below are verified from workspace and plugin manifests.
   `npm test --workspace bb-plugin-taskboard` — focused Taskboard iteration.
 - `npm run check --workspace bb-plugin-taskboard` — Taskboard SDK-type check,
   typecheck, tests, build, and build-metadata verification.
+- `NODE_ENV=production npm install --prefix plugins/taskboard --ignore-scripts
+  --omit=dev --omit=optional` in a clean clone, followed by
+  `bb plugin build plugins/taskboard` — prove the Git subdirectory source builds
+  without root modules or a production SDK package.
 - `npm run dev --workspace bb-plugin-host-monitor` — Host Monitor
   watch/build/reload loop after local-path installation.
 - `npm run check --workspace bb-plugin-host-monitor` — Host Monitor SDK-type

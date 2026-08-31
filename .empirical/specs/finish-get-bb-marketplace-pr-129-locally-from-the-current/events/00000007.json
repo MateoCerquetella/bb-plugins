@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sequence": 7,
+  "previousDigest": "sha256:b6bc2dfe6d8f7d940e2d5739371bfe434286ecca711c6cbbb349d6e71142c1af",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Refreshed all five repository knowledge pages from the final implementation, documented the type-only production build boundary, version-aware native Plan lifecycle, stop-before-persist rule, gh environment allowlist, Taskboard 0.3.2 commands, and verified every page is custom, fresh, and free of managed/refinement markers.",
+  "createdAt": "2026-08-31T02:16:26.072Z",
+  "stateBeforeDigest": "sha256:cb7feb4293a6bdd3f095f57b9d3262798b4ac26cf550c29a38f646774e74c8fd",
+  "stateAfterDigest": "sha256:6b95bf813a54526fc40734a90d067287de9563b708a36ac0a36f1c2d17afae24",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 7,
+    "activeFeature": "finish-get-bb-marketplace-pr-129-locally-from-the-current",
+    "request": "Finish get-bb marketplace PR 129 locally from the current origin/main tree: prepare Taskboard 0.3.2 by replacing the runtime SDK-root RPC identity import with an equivalent type-only contract constraint so production-only subdirectory installs build while the exact SDK remains dev-only; replace the hidden auto-approved issue-drafting worker with a capability-preflighted structured native Plan-mode worker using accept-edits, consume the proposed plan as the draft, stop before archive, and never approve or resolve it; allowlist the gh child environment; add focused tests and documentation; verify root and clean production-only builds; and prepare the existing marketplace PR branch on current upstream with its vendored icon, a ^0.3.2 source floor, AI/model-usage disclosure, and the unchanged ready Usage Tracker entry. Do not commit, push, tag, publish, force-update, comment, or otherwise mutate remote state without a separate exact approval.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "yolo",
+    "phase": "verify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Refreshed all five repository knowledge pages from the final implementation, documented the type-only production build boundary, version-aware native Plan lifecycle, stop-before-persist rule, gh environment allowlist, Taskboard 0.3.2 commands, and verified every page is custom, fresh, and free of managed/refinement markers.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:c05f073bf9e56285b3e8b44cb4bc3e6faf29ab3c6894c235d9accda056f78abe",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:e202c3bf26f7bf9e22e4c3b7f6b2dfe0818c3f58dfe18c3fd792edaefc8f5338",
+    "impactDigest": "sha256:116f8515db8707537da9f9b1d9df4b1677d9544afa7aa3dbdf2d6e61b3a87631",
+    "capabilityClaimId": "finish-get-bb-marketplace-pr-129-locally-from-the-current-53b37a020578",
+    "authorizationDigest": "sha256:5654515d05a8af239eac83c4e6da66ebf4e7bdc6362f562ab06c642d1c6de7cc",
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-08-31T02:16:26.072Z"
+  },
+  "digest": "sha256:8f671d9d5c2930a03c35e1bb58531e35426ae01de8045de9feffc6a9432caac4"
+}
