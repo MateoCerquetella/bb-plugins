@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 7,
+  "revision": 8,
   "activeFeature": "finish-marketplace-pr-129-taskboard-v0-3-3",
   "request": "Finish get-bb marketplace PR 129 locally with Taskboard 0.3.3: preserve the immutable published Taskboard 0.3.2 tag and carry forward its ticket-icon change; apply the already verified production-install, native Plan-mode drafting, GitHub CLI environment, tests, documentation, and marketplace disclosure fixes; prepare the marketplace source floor at ^0.3.3 with the unchanged Usage Tracker entry; verify source and marketplace candidates; and do not push, tag, publish, comment, or mutate remote state without separate exact approval.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
   "phase": "verify",
-  "status": "waiting",
+  "status": "blocked",
   "repairAttempts": 0,
-  "message": "Refreshed repository knowledge for the committed v0.3.3 tree; context reports no stale, missing, invalid, or refinement-required paths.",
+  "message": "Security review proved BB exposes no genuinely read-only or tool/network-restricted plugin worker. The user chose to disable repository-aware AI drafting, which supersedes AC-3 through AC-5 and requires a new specification rather than weakening this approved contract.",
   "implementationActor": "agent",
   "workStartedAt": "2026-08-31T13:58:18.812Z",
   "specDigest": "sha256:57f2c875516a3efe80e004001589ddfd5d43b2a28fcbc3ec36ca14b06c5bd0b0",
@@ -36,5 +36,5 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-08-31T14:52:51.377Z"
+  "updatedAt": "2026-08-31T15:39:04.450Z"
 }

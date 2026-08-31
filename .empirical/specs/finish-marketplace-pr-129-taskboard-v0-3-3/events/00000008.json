@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sequence": 8,
+  "previousDigest": "sha256:184c9a266d94b3967ed22a64d99b234826b6ee35c14954b233d7ed8d06617cfa",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Security review proved BB exposes no genuinely read-only or tool/network-restricted plugin worker. The user chose to disable repository-aware AI drafting, which supersedes AC-3 through AC-5 and requires a new specification rather than weakening this approved contract.",
+  "createdAt": "2026-08-31T15:39:04.450Z",
+  "stateBeforeDigest": "sha256:b87b211f3d4f4c3f281c9e07fcb72a23a878326de074d605b246ce1d9c5c8df4",
+  "stateAfterDigest": "sha256:928273e7b969b8b67f548ab7ad4b1c038c52178e3bf12bfe947d212f66b776ee",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 8,
+    "activeFeature": "finish-marketplace-pr-129-taskboard-v0-3-3",
+    "request": "Finish get-bb marketplace PR 129 locally with Taskboard 0.3.3: preserve the immutable published Taskboard 0.3.2 tag and carry forward its ticket-icon change; apply the already verified production-install, native Plan-mode drafting, GitHub CLI environment, tests, documentation, and marketplace disclosure fixes; prepare the marketplace source floor at ^0.3.3 with the unchanged Usage Tracker entry; verify source and marketplace candidates; and do not push, tag, publish, comment, or mutate remote state without separate exact approval.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "verify",
+    "status": "blocked",
+    "repairAttempts": 0,
+    "message": "Security review proved BB exposes no genuinely read-only or tool/network-restricted plugin worker. The user chose to disable repository-aware AI drafting, which supersedes AC-3 through AC-5 and requires a new specification rather than weakening this approved contract.",
+    "implementationActor": "agent",
+    "workStartedAt": "2026-08-31T13:58:18.812Z",
+    "specDigest": "sha256:57f2c875516a3efe80e004001589ddfd5d43b2a28fcbc3ec36ca14b06c5bd0b0",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:ee12d57a28b334968202e6e7eb6288d02e0645dd9007773e3a3bd057176b062e",
+    "impactDigest": "sha256:2994260bfb3ab1e501b94cd7894f0cee48ce23b453c575775ff305e185151696",
+    "capabilityClaimId": "finish-marketplace-pr-129-taskboard-v0-3-3-206d1bbb53a4",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-08-31T15:39:04.450Z"
+  },
+  "digest": "sha256:078b429f2320f513c2859d8f2d5cd766f4940bcefd5727b01bd415edc1319548"
+}
