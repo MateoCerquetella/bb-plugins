@@ -1,7 +1,7 @@
 {
   "name": "bb-plugin-action-topbar",
   "version": "0.1.0",
-  "description": "An Orca-style thread action strip with drag-to-pane launching for bb.",
+  "description": "An Orca-style main thread topbar for BB panel tabs and Actions.",
   "license": "MIT",
   "author": "Mateo Cerquetella",
   "homepage": "https://github.com/mateocerquetella/bb-plugins/tree/main/plugins/action-topbar",
@@ -27,11 +27,11 @@
   },
   "engines": {
     "bb": ">=0.40",
-    "bbPluginSdk": "^0.4.21"
+    "bbPluginSdk": ">=0.4.33"
   },
   "bb": {
     "name": "Action Topbar",
-    "description": "Keep thread panel actions in an Orca-style topbar and drag them onto a split pane.",
+    "description": "Mirror open thread-panel tabs in an Orca-style topbar with a searchable + launcher.",
     "branding": {
       "icon": "./assets/icon.svg"
     },
@@ -54,7 +54,9 @@
     "app.css",
     "lib/"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "zod": "^4.3.6"
+  },
   "devDependencies": {
     "@get-bb/plugin-sdk": "0.4.21",
     "@pierre/diffs": "^1.2.9",

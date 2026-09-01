@@ -53,7 +53,7 @@
 <tr>
 <td align="center" width="60"><img src="plugins/action-topbar/assets/icon.svg" width="40" height="40" alt="" /></td>
 <td align="center"><a href="plugins/action-topbar/"><b>Action Topbar</b></a></td>
-<td>Keeps thread-panel actions in an Orca-style topbar and lets you drag an action onto a split pane.</td>
+<td>Mirrors BB's native panel tabs into an Orca-style topbar and lets Actions drag from its searchable <b>+</b> menu into main-workspace splits.</td>
 </tr>
 <tr>
 <td align="center" width="60"><picture><source media="(prefers-color-scheme: dark)" srcset="plugins/host-monitor/assets/logo-dark.svg" /><img src="plugins/host-monitor/assets/logo.svg" width="40" height="40" alt="" /></picture></td>

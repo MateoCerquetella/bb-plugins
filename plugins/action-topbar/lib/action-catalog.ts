@@ -15,6 +15,7 @@ export const SEEDED_ACTIONS: readonly ActionDescriptor[] = [
   { id: "file-search-result-start-terminal", label: "Start terminal" },
   { id: "plugin-action:bb-recap:recap", label: "Recap" },
   { id: "plugin-action:file-manager:file-manager", label: "File Manager" },
+  { id: "plugin-action:filetree:files", label: "Files" },
   { id: "plugin-action:git-history:history", label: "Git History" },
   { id: "plugin-action:side-chat:side-chat", label: "Start side chat" },
   { id: "plugin-action:taskboard:taskboard-panel", label: "Taskboard" },
@@ -113,7 +114,12 @@ export function actionKind(action: ActionDescriptor): ActionKind {
   if (haystack.includes("browser")) return "browser";
   if (haystack.includes("terminal")) return "terminal";
   if (haystack.includes("recap")) return "recap";
-  if (haystack.includes("file-manager") || haystack.includes("file manager")) {
+  if (
+    haystack.includes("file-manager") ||
+    haystack.includes("file manager") ||
+    haystack.includes("filetree") ||
+    /\bfiles\b/.test(haystack)
+  ) {
     return "files";
   }
   if (haystack.includes("git-history") || haystack.includes("git history")) {

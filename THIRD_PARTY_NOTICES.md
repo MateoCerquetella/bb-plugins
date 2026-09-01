@@ -61,6 +61,17 @@ Source: <https://github.com/hugeicons/hugeicons-react>
 
 ---
 
+## zod
+
+Zod is MIT licensed, Copyright (c) 2025 Colin McDonnell. It validates runtime
+contracts in several plugins, including Action Topbar, and is bundled into
+their server artifacts. The MIT permission and warranty text reproduced in
+the bb section above applies with this copyright notice.
+
+Source: <https://github.com/colinhacks/zod>
+
+---
+
 ## Trademarks and brand marks
 
 Two files carry third-party brand artwork. **No licence above grants trademark

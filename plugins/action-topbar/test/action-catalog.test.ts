@@ -21,6 +21,7 @@ test("starts with the action set shown in the BB right-panel launcher", () => {
       "terminal",
       "Recap",
       "File Manager",
+      "Files",
       "Git History",
       "side chat",
       "Taskboard",
@@ -75,6 +76,7 @@ test("classifies known and third-party action labels for compact glyphs", () => 
   assert.equal(actionKind({ id: "x", label: "Open browser" }), "browser");
   assert.equal(actionKind({ id: "x", label: "Start terminal" }), "terminal");
   assert.equal(actionKind({ id: "plugin-action:file-manager:x", label: "Files" }), "files");
+  assert.equal(actionKind({ id: "plugin-action:filetree:files", label: "Files" }), "files");
   assert.equal(actionKind({ id: "plugin-action:demo:x", label: "Custom" }), "generic");
   assert.notEqual(
     catalogFingerprint([{ id: "x", label: "First" }]),

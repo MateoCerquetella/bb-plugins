@@ -5,6 +5,22 @@ import "./app.css";
 export default definePluginApp((app) => {
   app.contentScripts.register({
     id: "action-topbar",
-    mount: ({ signal }) => mountActionTopbar(signal),
+    mount: (context) => {
+      const splitContext = context as typeof context & {
+        experimental_beginThreadActionSplitDrag?: (
+          request: {
+            actionId: string;
+            threadId: string;
+            source: HTMLElement;
+            startX: number;
+            startY: number;
+          },
+        ) => boolean;
+      };
+      return mountActionTopbar(
+        context.signal,
+        splitContext.experimental_beginThreadActionSplitDrag,
+      );
+    },
   });
 });
