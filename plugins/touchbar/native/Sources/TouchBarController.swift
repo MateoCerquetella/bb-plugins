@@ -187,13 +187,7 @@ private final class GroupDividerView: NSButton {
     }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        let local = convert(point, from: superview)
-        return bounds.contains(local) ? self : nil
-    }
-
-    override func mouseDown(with event: NSEvent) {
-        guard isEnabled, let action else { return }
-        NSApp.sendAction(action, to: target, from: self)
+        bounds.contains(point) ? self : nil
     }
 
     func setSelected(_ selected: Bool) {
@@ -413,18 +407,7 @@ private final class HostMetricView: NSButton {
     override var intrinsicContentSize: NSSize { NSSize(width: measuredWidth, height: 30) }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        let local = convert(point, from: superview)
-        return bounds.contains(local) ? self : nil
-    }
-
-    override func mouseDown(with event: NSEvent) {
-        guard isEnabled, let action else { return }
-        let resting = layer?.backgroundColor
-        layer?.backgroundColor = NSColor(white: 0.16, alpha: 1).cgColor
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { [weak self] in
-            self?.layer?.backgroundColor = resting
-        }
-        NSApp.sendAction(action, to: target, from: self)
+        bounds.contains(point) ? self : nil
     }
 
     override func layout() {
@@ -625,13 +608,7 @@ private final class SettingsControlButton: NSButton {
     }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        let local = convert(point, from: superview)
-        return bounds.contains(local) ? self : nil
-    }
-
-    override func mouseDown(with event: NSEvent) {
-        guard isEnabled, let action else { return }
-        NSApp.sendAction(action, to: target, from: self)
+        bounds.contains(point) ? self : nil
     }
 
     override func draw(_ dirtyRect: NSRect) {
@@ -679,13 +656,7 @@ private final class CompactNativeButton: NSButton {
     override var intrinsicContentSize: NSSize { NSSize(width: fixedWidth, height: 30) }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        let local = convert(point, from: superview)
-        return bounds.contains(local) ? self : nil
-    }
-
-    override func mouseDown(with event: NSEvent) {
-        guard isEnabled, let action else { return }
-        NSApp.sendAction(action, to: target, from: self)
+        bounds.contains(point) ? self : nil
     }
 }
 
@@ -694,7 +665,6 @@ private final class SettingsGroupView: NSView {
     private let sectionTitleWidth: CGFloat
     private let controls: [SettingsControlButton]
     private let measuredWidth: CGFloat
-    private var extraWidth: CGFloat = 0
 
     init(title: String, controls: [SettingsControlButton]) {
         sectionTitle = title
@@ -720,24 +690,13 @@ private final class SettingsGroupView: NSView {
 
     required init?(coder: NSCoder) { fatalError("init(coder:) is unsupported") }
 
-    func addWidth(_ extra: CGFloat) {
-        extraWidth += extra
-        invalidateIntrinsicContentSize()
-        needsLayout = true
-    }
-
-    override var intrinsicContentSize: NSSize {
-        NSSize(width: measuredWidth + extraWidth, height: 30)
-    }
+    override var intrinsicContentSize: NSSize { NSSize(width: measuredWidth, height: 30) }
 
     override func layout() {
         super.layout()
-        let bonus = controls.isEmpty
-            ? 0
-            : extraWidth / CGFloat(controls.count)
         var x = sectionTitleWidth + 4
         for control in controls {
-            let width = control.intrinsicContentSize.width + bonus
+            let width = control.intrinsicContentSize.width
             control.frame = NSRect(x: x, y: 0, width: width, height: 30)
             x += width + 3
         }
@@ -861,13 +820,7 @@ private final class AgentButton: NSButton {
     }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        let local = convert(point, from: superview)
-        return bounds.contains(local) ? self : nil
-    }
-
-    override func mouseDown(with event: NSEvent) {
-        guard isEnabled, let action else { return }
-        NSApp.sendAction(action, to: target, from: self)
+        bounds.contains(point) ? self : nil
     }
 
     func setGrouped(_ value: Bool) {

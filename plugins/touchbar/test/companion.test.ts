@@ -172,8 +172,9 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(controller, /compactWidth/u);
   assert.match(controller, /compactWidth = projectFirst\s*\? 32/su);
   assert.match(controller, /action: #selector\(agentTapped/u);
-  assert.match(controller, /bounds\.contains\((?:point|local)\) \? self : nil/u);
-  assert.match(controller, /NSApp\.sendAction\(action, to: target, from: self\)/u);
+  assert.match(controller, /bounds\.contains\(point\) \? self : nil/u);
+  assert.doesNotMatch(controller, /convert\(point, from: superview\)/u);
+  assert.doesNotMatch(controller, /override func mouseDown/u);
   assert.match(controller, /close control tapped/u);
   assert.match(controller, /projectInitials/u);
   assert.match(controller, /provider == "cursor" \|\| provider == "acp-cursor"/u);
@@ -242,7 +243,6 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(scrollViewSource, /override func scrollWheel/u);
   assert.doesNotMatch(scrollViewSource, /override func hitTest|override func mouseDown/u);
   assert.match(controller, /bar\.defaultItemIdentifiers = panelIdentifiers\(\)/u);
-  assert.match(controller, /override func mouseDown\(with event: NSEvent\)/u);
   assert.match(controller, /configurationVisible \? \.bbSettingsPanel : \.bbList/u);
   assert.match(controller, /settingsPanelItem\.view = scrollContainer\(groups\)/u);
   assert.match(controller, /title: "FILTERS"/u);
@@ -275,7 +275,7 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(controller, /statusPill\.update/u);
   assert.match(controller, /floor\(\(bounds\.height - size\.height\) \/ 2\)/u);
   assert.doesNotMatch(controller, /accentLayer/u);
-  assert.match(controller, /bounds\.contains\((?:point|local)\) \? self : nil/u);
+  assert.match(controller, /bounds\.contains\(point\) \? self : nil/u);
   assert.doesNotMatch(controller, /statusIconView/u);
   assert.match(controller, /hostMonitorTapped/u);
   assert.match(controller, /hostViewVisible\.toggle\(\)/u);

@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sequence": 25,
+  "previousDigest": "sha256:ac27cfd41afe33f1d6b8a66fe51c8a0c9c2b451d73b666ed28d751941d4550e1",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Corrected the finger-scroll input boundary: all custom button hit tests now use receiver-local points, all controller mouseDown overrides were removed so AppKit can distinguish swipe from completed tap, unused settings stretch machinery was removed, regression tests were strengthened, and the corrected Intel-Mac build installed successfully.",
+  "createdAt": "2026-09-02T23:33:22.913Z",
+  "stateBeforeDigest": "sha256:dbb5c4ac009340a3765347006b34dfedc765a357008cef5b5d77119fceee3e0f",
+  "stateAfterDigest": "sha256:df0f49d8a37283a944b01a4cf7f2d3ed49ea635e0d75c0f4c9625930f991d0a4",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 25,
+    "activeFeature": "implement-a-new-independently-installable-bb-touch-bar-plugin-for",
+    "request": "Implement a new independently installable BB Touch Bar plugin for Intel MacBook Pro Touch Bar machines, plus a BetterTouchTool companion/preset that can remain visible across all apps. The BB plugin should expose live compact thread/agent status and safe actions, integrate with BB host/server APIs, include clear setup documentation, tests, and repository catalog updates. Target an MVP that is usable without private macOS APIs, with BetterTouchTool as the persistence layer.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "context",
+    "status": "waiting",
+    "repairAttempts": 4,
+    "message": "Corrected the finger-scroll input boundary: all custom button hit tests now use receiver-local points, all controller mouseDown overrides were removed so AppKit can distinguish swipe from completed tap, unused settings stretch machinery was removed, regression tests were strengthened, and the corrected Intel-Mac build installed successfully.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:2cb81eb836af98d280d0660ae933e1f9672f2d1932631e43bef9d4f04b55ef08",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:2d251c63e1f2227d81443dd718e85b841fde132f94fd5c4dd03547b021236868",
+    "impactDigest": "sha256:5178c9dbca346cb25eddd79dfb6d3635dbd55440808ce4a1c8e9fdfdc7bf30fd",
+    "capabilityClaimId": "implement-a-new-independently-installable-bb-touch-bar-plugin-for-21366fe98a02",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-02T23:33:22.913Z"
+  },
+  "digest": "sha256:09c3edd89bf929aa86aada002956ebde5e5fe21bebdde30855b7935e3b8a3c5e"
+}

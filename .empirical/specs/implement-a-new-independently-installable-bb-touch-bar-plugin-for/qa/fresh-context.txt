@@ -26,5 +26,8 @@ The native panel was opened through `native/run.sh open` after installation.
 The post-repair Mac log records a physical tap on `thr_axt3ycmenc`, the sixth
 card in the contemporaneous snapshot and therefore beyond the first visible
 screen; reaching and opening it verifies both horizontal finger scrolling and
-the preserved tap path. The original screenshot remains the failed pre-repair
-observation.
+the preserved tap path. The final follow-up build then removed every controller
+`mouseDown` override and restored receiver-local `hitTest` checks before compiling
+and reinstalling successfully on the same Intel Mac, so AppKit can cancel a click
+when that touch becomes a swipe. The original screenshot remains the failed
+pre-repair observation.

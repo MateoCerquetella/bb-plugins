@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:67e7bd84665cc71bde4672f8400602d8b6202d033a2becdaa3942a2bdb5adcfd",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "b627bb0d43d8fac89e9777b0669700fa6f7e68ef",
+  "headCommit": "0aa993edcd17d7cc95f17c3c441d3d38a9e063a0",
+  "diffDigest": "sha256:779c18e6f5218e640bbe4fbdcd7b338f037911b08e15592028c909efdbab44a7",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "isolated-reviewer",
+  "reviewerInvocationId": "/root/finger_scroll_review",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- PASS AC-1: Bounded snapshot and aggregate counts remain correct.\n- PASS AC-2: Cards retain the stable bounded public projection.\n- PASS AC-3: Exact-id open and guarded stop remain correct.\n- FAIL AC-4: Five button hitTest overrides reconvert receiver-local points, and AgentButton dispatches during mouseDown before a swipe can resolve.\n- PASS AC-5: Both companion paths and CLI dispatch remain packaged.\n- PASS AC-6: Documentation now covers native and BTT paths and their boundaries.\n- PASS AC-7: Checks pass but regex tests fail to detect child-coordinate and premature mouseDown defects.\n- PASS AC-8: Independent packaging remains correct.\n\n## Security / correctness\n\nArgument-array CLI dispatch and bounds remain safe; correctness requires standard local hit-testing and completed-click dispatch.\n\n## Design / maintainability\n\nDelegate child hit testing/button tracking to AppKit so horizontal gestures can cancel clicks, strengthen tests, and remove unused settings width machinery.",
+  "bodyDigest": "sha256:725dd0c85e0bfc656a8caa844bfc74aa475758ae8a40220145afde6551f291b3",
+  "digest": "sha256:8d432e468560db9838d2c2bd24f2cc40f7a7482f0dabd670a2e1e79e3412c50a"
+}

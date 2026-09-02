@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "packetDigest": "sha256:ce234acecfd352f1c93907f0b8c6fbff83532b3b86864e3e211c2c4955fffcee",
-  "resultPath": ".empirical/specs/implement-a-new-independently-installable-bb-touch-bar-plugin-for/reviews/41542b11eb664c2e9a716a7b.json",
-  "resultDigest": "sha256:41542b11eb664c2e9a716a7b0ac7cff7a2aa057e634ce88cca27971e0ca989f2",
-  "receiptId": "collected-ae4d160ee3169b0bffbe3057"
+  "packetDigest": "sha256:67e7bd84665cc71bde4672f8400602d8b6202d033a2becdaa3942a2bdb5adcfd",
+  "resultPath": ".empirical/specs/implement-a-new-independently-installable-bb-touch-bar-plugin-for/reviews/8d432e468560db9838d2c2bd.json",
+  "resultDigest": "sha256:8d432e468560db9838d2c2bd24f2cc40f7a7482f0dabd670a2e1e79e3412c50a",
+  "receiptId": "collected-14ee5fe4bb55a461ddc73165"
 }

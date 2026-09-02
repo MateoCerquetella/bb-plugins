@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 22,
+  "revision": 27,
   "activeFeature": "implement-a-new-independently-installable-bb-touch-bar-plugin-for",
   "request": "Implement a new independently installable BB Touch Bar plugin for Intel MacBook Pro Touch Bar machines, plus a BetterTouchTool companion/preset that can remain visible across all apps. The BB plugin should expose live compact thread/agent status and safe actions, integrate with BB host/server APIs, include clear setup documentation, tests, and repository catalog updates. Target an MVP that is usable without private macOS APIs, with BetterTouchTool as the persistence layer.",
   "profile": "complex",
@@ -8,8 +8,8 @@
   "mode": "normal",
   "phase": "review",
   "status": "waiting",
-  "repairAttempts": 3,
-  "message": "Verified the no-arrow finger-scroll repair with a passing root workspace check, all matrix automation, and human Intel-Mac hardware evidence showing a beyond-first-screen card was reached and opened.",
+  "repairAttempts": 4,
+  "message": "Verified the final standard-AppKit finger-scroll repair with full workspace, matrix automation, Intel-Mac compilation/installation, and human hardware evidence.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:2cb81eb836af98d280d0660ae933e1f9672f2d1932631e43bef9d4f04b55ef08",
@@ -21,15 +21,15 @@
   "authorizationDigest": null,
   "evidence": [],
   "evidenceReceiptIds": [
-    "qa-8b465cd0924924fbf53fca4a",
-    "qa-1d635495706f79bb059c6c7b",
-    "qa-8ef47b0ae774f93227dfafcd",
-    "qa-76f8c89a90d802329dc65f76",
-    "qa-bc9b750706a212ab9a21c91f",
-    "qa-7091723d345b67ff03678cdb",
-    "qa-8949c684ac550f73744b96ff",
-    "qa-f32bcf5caf952c3bf4be61c9",
-    "qa-6e2106bf3fc5cebff0895dd4"
+    "qa-d5075ffb947a8f6753979341",
+    "qa-c25c0324895e876167d4b612",
+    "qa-9f5cbb036d905d8917f52278",
+    "qa-2f2a25d2832530a2f8328c99",
+    "qa-ce0f09ccf06275fcb9ec7983",
+    "qa-ad3c1dc1d9a87051c21edba6",
+    "qa-cf594f42d3ae89668c141fd5",
+    "qa-f006c0aad90c4dfa8b1f1896",
+    "qa-731a7d3135dca1232369dec8"
   ],
   "legacyEvidenceCount": 0,
   "completion": {
@@ -45,5 +45,5 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-02T23:26:28.739Z"
+  "updatedAt": "2026-09-02T23:38:05.981Z"
 }

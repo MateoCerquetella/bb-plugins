@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-cf594f42d3ae89668c141fd5",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Verify qa-end-to-end for the final standard-AppKit finger-scroll repair.",
+  "passed": true,
+  "startedAt": "2026-09-02T23:36:17.354Z",
+  "completedAt": "2026-09-02T23:36:17.597Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "implement-a-new-independently-installable-bb-touch-bar-plugin-for",
+    "specRevision": 2,
+    "specDigest": "sha256:2cb81eb836af98d280d0660ae933e1f9672f2d1932631e43bef9d4f04b55ef08",
+    "treeDigest": "sha256:a35d212da521a16ae9934d4a946e6296d3cee90adce7a56416cfda5fd560c419",
+    "policyDigest": "sha256:dddc072c4f4908581e6e359608fe9aec39894c5258cd821ec894bbd59a67fbb7",
+    "workflowRevision": 26,
+    "gitCommit": "0aa993edcd17d7cc95f17c3c441d3d38a9e063a0"
+  },
+  "digest": "sha256:a9313fbfdc6c9a07f0c991d4f291a447abc1f5e2bfb2404f59e7da8b8e9863d9",
+  "kind": "qa",
+  "matrixDigest": "sha256:3bbeb09a66034cf8e41fabf21fe6d09bfba95f48085330e8df608de57704028b",
+  "check": {
+    "id": "qa-end-to-end",
+    "kind": "end-to-end"
+  },
+  "coveredChecks": [
+    "end-to-end"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Verify qa-end-to-end for the final standard-AppKit finger-scroll repair.",
+      "startedAt": "2026-09-02T23:36:17.354Z",
+      "completedAt": "2026-09-02T23:36:17.597Z",
+      "durationMs": 243,
+      "collector": null,
+      "command": {
+        "argv": [
+          "node",
+          ".empirical/specs/adapt-github-pr-1964-into-a-new-independently-installable-bb/qa/system.mjs"
+        ],
+        "cwd": ".",
+        "timeoutMs": 60000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:dae475d2e416e6b110c84e7c886f02ec44cdce29cb5b507fe3ed92b13134aaf5",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "Save My Model system check passed: bounded host/provider persistence, exact legacy fallback, settings inspect/clear screenshot, package/docs alignment, and running plugin.\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:a35d212da521a16ae9934d4a946e6296d3cee90adce7a56416cfda5fd560c419",
+      "sourceTreeAfter": "sha256:a35d212da521a16ae9934d4a946e6296d3cee90adce7a56416cfda5fd560c419",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}
