@@ -71,7 +71,7 @@ Taskboard is a full-trust BB plugin. Review the source, then install its trackin
 Git release directly from this monorepo:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.0 --subdirectory plugins/taskboard --tag-prefix taskboard/
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.3 --subdirectory plugins/taskboard --tag-prefix taskboard/
 ```
 
 After [the BB Community entry](https://github.com/get-bb/marketplace/pull/129)
@@ -143,17 +143,6 @@ stop reopening it. The right panel follows the BB project selected for each
 thread, while **Open full Taskboard** keeps the larger workspace available when
 you need filters or board management.
 
-On BB's root **New thread** screen, open the right panel (`Ctrl+J`), choose
-**New tab → Actions → Taskboard**, and select a project in the composer. The
-panel follows that project without creating a thread.
-
-With Taskboard beside an existing thread or **New thread**, drag a ticket from
-the constrained List or Kanban board onto the prompt editor to add its live
-Taskboard mention. The existing draft and attachments stay in place and BB
-does not submit automatically. For a keyboard-accessible equivalent, open the
-ticket and choose **Add to chat**. Kanban drops onto status lanes continue to
-move the provider ticket; drops onto the composer copy its reference only.
-
 In List view, click the shaped status glyph on a task row to choose another
 provider status. The same control appears as a labeled status pill at the top
 of task details. Changes update optimistically and roll back if GitHub, Linear,
@@ -166,19 +155,14 @@ repositories, Linear uses the configured team, and Jira infers project keys
 from simple `project = KEY` or `project in (...)` JQL scopes (with a project-key
 field when the scope cannot be inferred).
 
-The icon opens a review modal immediately while a hidden, read-only helper uses
-the BB project's repository context to turn the rough prompt into a natural
-title and a standalone description with requested changes and acceptance
-criteria. Provider metadata can load for the review form, but no issue is
-created or mutated until you click **Create issue**. If the helper cannot produce a draft, the original
-prompt remains editable as a visible fallback. You can also choose **Use
-original prompt** immediately instead of waiting, then retry the
-repository-aware draft from the same modal.
+The icon opens the review modal immediately and copies the original prompt into
+editable title and description fields. Review or rewrite either field while
+Taskboard loads the selected provider's creation options. No external issue is
+created or mutated until you click **Create issue**.
 
 From a project board, choose **New issue** to open the same validated provider
-form with a blank editable title and description. Direct capture skips the
-repository drafting helper. It loads provider metadata for review but never
-creates or mutates an issue until you confirm creation.
+form with a blank editable title and description. It loads provider metadata for
+review but never creates or mutates an issue until you confirm creation.
 
 ![Live task detail](https://raw.githubusercontent.com/MateoCerquetella/bb-plugins/main/docs/media/task-detail.png)
 
