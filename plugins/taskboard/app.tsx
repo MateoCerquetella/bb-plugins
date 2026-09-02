@@ -23,6 +23,7 @@ import {
   type PluginNavPanelProps,
   type PluginNewThreadPanelProps,
   type PluginPendingInteractionProps,
+  type PluginComposerMention,
   type PluginThreadHeaderActionProps,
   type PluginThreadPanelProps
 } from '@get-bb/plugin-sdk/app';
@@ -140,6 +141,14 @@ import {
   type NavigationEntryLike,
   type ProjectRouteContext
 } from './project-selection.js';
+import {
+  TASKBOARD_COMPOSER_MIME,
+  hasTaskboardComposerDragType,
+  parseTaskboardComposerMention,
+  serializeTaskboardComposerMention,
+  taskboardComposerMention,
+  writeTaskboardComposerDrag
+} from './composer-handoff.js';
 import './app.css';
 
 const PANEL_PATH = 'tasks';
@@ -156,6 +165,21 @@ const SIDEBAR_MIN_WIDTH = 180;
 const SIDEBAR_MAX_WIDTH = 340;
 const CREATE_METADATA_NETWORK_ERROR =
   'Taskboard could not load issue creation options. Check the connection and try again.';
+const COMPOSER_DROP_CUE_TEXT = 'Drop to add ticket to chat';
+
+interface ComposerDropTarget {
+  editor: HTMLElement;
+  form: HTMLFormElement;
+}
+
+function composerDropTarget(target: EventTarget | null): ComposerDropTarget | null {
+  const element = target instanceof Element ? target : null;
+  const editor = element?.closest<HTMLElement>(
+    '[contenteditable="true"][role="textbox"]'
+  );
+  const form = editor?.closest<HTMLFormElement>('form') ?? null;
+  return editor && form ? { editor, form } : null;
+}
 
 const STATE_CATEGORY_ORDER: readonly WorkStateCategory[] = [
   'in_progress',
@@ -3391,12 +3415,14 @@ function WorkItemRow({
   item,
   project,
   showProject,
+  composerDragEnabled,
   onMove,
   onOpen
 }: {
   item: WorkItem;
   project: TrackerProject | undefined;
   showProject: boolean;
+  composerDragEnabled: boolean;
   onMove: (item: WorkItem, option: WorkStatusOption) => Promise<void>;
   onOpen: () => void;
 }) {
@@ -3406,14 +3432,35 @@ function WorkItemRow({
     <div
       data-state-category={item.stateCategory}
       data-status-tone={workflowStatusTone(item.status, item.stateCategory)}
+      data-composer-drag={composerDragEnabled ? 'true' : undefined}
       className="tb-item-row group relative grid min-h-9 w-full items-center gap-x-2 border-b border-border-hairline px-2.5 py-1 text-left"
     >
       <button
         type="button"
+        draggable={composerDragEnabled}
         aria-label={`Open ${item.key}: ${item.title}.${priority ? ` Priority ${priority}.` : ''}${assignee ? ` Assigned to ${assignee}.` : ''}`}
+        onDragStart={event => {
+          if (
+            !composerDragEnabled ||
+            !writeTaskboardComposerDrag(event.dataTransfer, item, 'copy')
+          ) {
+            event.preventDefault();
+          }
+        }}
         onClick={onOpen}
-        className="absolute inset-0 z-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring"
+        className={cn(
+          'absolute inset-0 z-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring',
+          composerDragEnabled && 'cursor-grab active:cursor-grabbing'
+        )}
       />
+      {composerDragEnabled ? (
+        <span
+          aria-hidden="true"
+          className="tb-composer-drag-grip pointer-events-none relative z-[1] flex items-center justify-center text-muted-foreground"
+        >
+          <Icon name="DragDropVertical" className="size-3.5" />
+        </span>
+      ) : null}
       <span className="relative z-10 flex items-center justify-center">
         <WorkItemStatusMenu item={item} variant="row" onMove={onMove} />
       </span>
@@ -3444,6 +3491,7 @@ function ListStateGroups({
   statusOrder,
   projectsById,
   showProject,
+  composerDragEnabled,
   idPrefix,
   nested = false,
   collapsedGroups,
@@ -3456,6 +3504,7 @@ function ListStateGroups({
   statusOrder: readonly string[];
   projectsById: ReadonlyMap<string, TrackerProject>;
   showProject: boolean;
+  composerDragEnabled: boolean;
   idPrefix: string;
   nested?: boolean;
   collapsedGroups: Readonly<Record<string, boolean>>;
@@ -3519,6 +3568,7 @@ function ListStateGroups({
               item={item}
               project={projectsById.get(item.bbProjectId)}
               showProject={showProject}
+              composerDragEnabled={composerDragEnabled}
               onMove={onMove}
               onOpen={() => onOpen(item)}
             />
@@ -3670,6 +3720,7 @@ function KanbanCard({
   pickedUp,
   pending,
   moveDisabled,
+  composerDragEnabled,
   onOpen,
   onPrepare,
   onDragStart,
@@ -3680,6 +3731,7 @@ function KanbanCard({
   pickedUp: boolean;
   pending: boolean;
   moveDisabled: boolean;
+  composerDragEnabled: boolean;
   onOpen: () => void;
   onPrepare: () => void;
   onDragStart: (event: ReactDragEvent<HTMLButtonElement>) => void;
@@ -3705,13 +3757,17 @@ function KanbanCard({
       data-picked-up={pickedUp ? 'true' : 'false'}
       data-pending={pending ? 'true' : 'false'}
       data-move-disabled={moveDisabled ? 'true' : 'false'}
+      data-composer-drag={composerDragEnabled ? 'true' : undefined}
       onPointerDown={onPrepare}
       onFocus={onPrepare}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       onKeyDown={onKeyDown}
       onClick={onOpen}
-      className="tb-kanban-card group w-full rounded-md px-3 py-2.5 text-left transition-[border-color,background-color,opacity,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className={cn(
+        'tb-kanban-card group w-full rounded-md px-3 py-2.5 text-left transition-[border-color,background-color,opacity,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        composerDragEnabled && 'cursor-grab active:cursor-grabbing'
+      )}
     >
       <span className="flex items-center gap-2 text-xs">
         <span className="tb-priority-slot flex size-4 items-center justify-center">
@@ -3720,6 +3776,14 @@ function KanbanCard({
         <span className="tb-key min-w-0 truncate font-medium tabular-nums">
           {item.key}
         </span>
+        {composerDragEnabled ? (
+          <span
+            aria-hidden="true"
+            className="tb-composer-drag-grip ml-auto flex items-center justify-center text-muted-foreground"
+          >
+            <Icon name="DragDropVertical" className="size-3.5" />
+          </span>
+        ) : null}
       </span>
       <span className="mt-1.5 flex items-start gap-1.5">
         <span className="mt-1 flex shrink-0">
@@ -3762,12 +3826,14 @@ function KanbanBoard({
   items,
   workflowItems,
   statusOrder,
+  composerDragEnabled,
   onOpen,
   onMove
 }: {
   items: readonly WorkItem[];
   workflowItems: readonly WorkItem[];
   statusOrder: readonly string[];
+  composerDragEnabled: boolean;
   onOpen: (item: WorkItem) => void;
   onMove: (item: WorkItem, option: WorkStatusOption) => Promise<void>;
 }) {
@@ -4090,6 +4156,7 @@ function KanbanBoard({
                           }
                           pending={pending === itemId}
                           moveDisabled={!workflowReady}
+                          composerDragEnabled={composerDragEnabled}
                           onPrepare={() => {
                             void loadOptions(item).catch(() => undefined);
                           }}
@@ -4098,8 +4165,17 @@ function KanbanBoard({
                               event.preventDefault();
                               return;
                             }
-                            event.dataTransfer.effectAllowed = 'move';
+                            event.dataTransfer.effectAllowed = composerDragEnabled
+                              ? 'copyMove'
+                              : 'move';
                             event.dataTransfer.setData('text/plain', itemId);
+                            if (composerDragEnabled) {
+                              writeTaskboardComposerDrag(
+                                event.dataTransfer,
+                                item,
+                                'copyMove'
+                              );
+                            }
                             draggedItemRef.current = item;
                             suppressOpenRef.current = itemId;
                             void beginPickup(item, 'pointer');
@@ -4760,6 +4836,7 @@ function TrackerList({
               items={visibleItems}
               workflowItems={items}
               statusOrder={boardSettings.statusOrder}
+              composerDragEnabled={surfaceMode === 'constrained'}
               onOpen={onOpen}
               onMove={moveItemStatus}
             />
@@ -4795,6 +4872,7 @@ function TrackerList({
                     statusOrder={boardSettings.statusOrder}
                     projectsById={projectsById}
                     showProject={false}
+                    composerDragEnabled={surfaceMode === 'constrained'}
                     idPrefix={project.id}
                     nested
                     collapsedGroups={collapsedGroups}
@@ -4813,6 +4891,7 @@ function TrackerList({
                 statusOrder={boardSettings.statusOrder}
                 projectsById={projectsById}
                 showProject={false}
+                composerDragEnabled={surfaceMode === 'constrained'}
                 idPrefix={projectId ?? 'selected-project'}
                 collapsedGroups={collapsedGroups}
                 searchActive={committedQuery.trim() !== ''}
@@ -4938,10 +5017,12 @@ function DetailMetadata({
 
 function TrackerDetail({
   route,
-  refreshGeneration
+  refreshGeneration,
+  onAddToComposer
 }: {
   route: Extract<TrackerRoute, { kind: 'item' }>;
   refreshGeneration: number;
+  onAddToComposer?: (item: WorkItem) => void;
 }) {
   const rpc = useRpc<TaskboardRpcContract>();
   const navigate = useBbNavigate();
@@ -5068,6 +5149,17 @@ function TrackerDetail({
                   Open
                 </a>
               </Button>
+              {onAddToComposer ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onAddToComposer(item)}
+                >
+                  <Icon name="MessageCirclePlus" className="size-3.5" />
+                  Add to chat
+                </Button>
+              ) : null}
               <Button
                 size="sm"
                 onClick={() =>
@@ -6791,6 +6883,89 @@ function TaskboardPanel({ subPath }: PluginNavPanelProps) {
   );
 }
 
+function useTaskboardComposerDrop(
+  onMention: (mention: PluginComposerMention) => void
+) {
+  useEffect(() => {
+    let activeForm: HTMLFormElement | null = null;
+    let cue: HTMLDivElement | null = null;
+
+    const clearTarget = () => {
+      if (activeForm?.dataset.taskboardComposerDropTarget === 'active') {
+        delete activeForm.dataset.taskboardComposerDropTarget;
+      }
+      cue?.remove();
+      activeForm = null;
+      cue = null;
+    };
+
+    const showTarget = (form: HTMLFormElement) => {
+      if (activeForm === form) return;
+      clearTarget();
+      activeForm = form;
+      form.dataset.taskboardComposerDropTarget = 'active';
+      cue = document.createElement('div');
+      cue.className = 'tb-composer-drop-cue';
+      cue.setAttribute('aria-hidden', 'true');
+      cue.textContent = COMPOSER_DROP_CUE_TEXT;
+      form.append(cue);
+    };
+
+    const onDragOver = (event: DragEvent) => {
+      const transfer = event.dataTransfer;
+      if (
+        !transfer ||
+        !hasTaskboardComposerDragType(transfer.types)
+      ) {
+        clearTarget();
+        return;
+      }
+      const target = composerDropTarget(event.target);
+      if (target === null) {
+        clearTarget();
+        return;
+      }
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      transfer.dropEffect = 'copy';
+      showTarget(target.form);
+    };
+
+    const onDrop = (event: DragEvent) => {
+      const transfer = event.dataTransfer;
+      const target = composerDropTarget(event.target);
+      if (
+        !transfer ||
+        target === null ||
+        !hasTaskboardComposerDragType(transfer.types)
+      ) {
+        clearTarget();
+        return;
+      }
+      const mention = parseTaskboardComposerMention(
+        transfer.getData(TASKBOARD_COMPOSER_MIME)
+      );
+      clearTarget();
+      if (mention === null) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      onMention(mention);
+    };
+
+    document.addEventListener('dragover', onDragOver, true);
+    document.addEventListener('drop', onDrop, true);
+    document.addEventListener('dragend', clearTarget, true);
+    window.addEventListener('blur', clearTarget);
+    return () => {
+      document.removeEventListener('dragover', onDragOver, true);
+      document.removeEventListener('drop', onDrop, true);
+      document.removeEventListener('dragend', clearTarget, true);
+      window.removeEventListener('blur', clearTarget);
+      clearTarget();
+    };
+  }, [onMention]);
+}
+
 function TaskboardRightPanel({
   projectId
 }: {
@@ -6798,6 +6973,7 @@ function TaskboardRightPanel({
 }) {
   const rpc = useRpc<TaskboardRpcContract>();
   const navigate = useBbNavigate();
+  const composer = useComposer();
   const [itemRoute, setItemRoute] = useState<Extract<
     TrackerRoute,
     { kind: 'item' }
@@ -6806,6 +6982,30 @@ function TaskboardRightPanel({
   const [refreshError, setRefreshError] = useState<string | null>(null);
   const [refreshGeneration, setRefreshGeneration] = useState(0);
   const [pinned, setPinned] = useState(loadRightPanelPinned);
+  const [composerAnnouncement, setComposerAnnouncement] = useState('');
+
+  const insertComposerMention = useCallback(
+    (mention: PluginComposerMention) => {
+      const payload = serializeTaskboardComposerMention(mention);
+      const safeMention = payload
+        ? parseTaskboardComposerMention(payload)
+        : null;
+      if (safeMention === null) {
+        toast.error('This ticket could not be added to chat.');
+        return;
+      }
+      setComposerAnnouncement(`Added ${safeMention.label} to chat`);
+      composer.insertMention(safeMention);
+      composer.focus();
+      toast.success(`Added ${safeMention.label} to chat`);
+    },
+    [composer]
+  );
+  const addItemToComposer = useCallback(
+    (item: WorkItem) => insertComposerMention(taskboardComposerMention(item)),
+    [insertComposerMention]
+  );
+  useTaskboardComposerDrop(insertComposerMention);
 
   useEffect(() => {
     setItemRoute(null);
@@ -6852,6 +7052,14 @@ function TaskboardRightPanel({
         data-taskboard-right-panel
         className="tb-linear flex h-full min-h-0 flex-col text-foreground"
       >
+        <p
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          className="sr-only"
+        >
+          {composerAnnouncement}
+        </p>
         <header className="tb-topbar flex h-11 shrink-0 items-center gap-2 border-b px-2.5">
           {activeItemRoute ? (
             <Button
@@ -6977,6 +7185,7 @@ function TaskboardRightPanel({
             <TrackerDetail
               route={activeItemRoute}
               refreshGeneration={refreshGeneration}
+              onAddToComposer={addItemToComposer}
             />
           ) : (
             <TrackerList

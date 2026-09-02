@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-819926331dc14728ca092a8b",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Matrix-bound real-browser QA passed on BB 0.41 for root New Thread and the current existing thread. Screenshots show accepted-drop feedback and the preserved draft with inserted mention; command output confirms both routes and submitted=false.",
+  "passed": true,
+  "startedAt": "2026-09-02T23:13:58.431Z",
+  "completedAt": "2026-09-02T23:13:58.431Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "taskboard-new-thread-drag-to-composer",
+    "specRevision": 2,
+    "specDigest": "sha256:1160f7f4d7ad0ec46be9753497ef99fa76a7f5b5b59379f1bce0a6b795ea49a4",
+    "treeDigest": "sha256:77ba2e60aca627bc91616f39b1134d40cd603ea4abd0b7d5fedfd5b8f74cb3eb",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf"
+  },
+  "digest": "sha256:b9b4a90338ebf513429de336a5cb46a23fa4c987db971c3eaa0df112002b4e01",
+  "kind": "collected",
+  "collector": "matrix-taskboard-browser",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/taskboard-new-thread-drag-to-composer/qa/new-thread-drag-active.png",
+      "mediaType": "image/png",
+      "bytes": 143324,
+      "digest": "sha256:50dd967623a396ff4236d22d990b6db0530739f7849816e23d17cf999b35a4f1"
+    },
+    {
+      "path": ".empirical/specs/taskboard-new-thread-drag-to-composer/qa/new-thread-drop.png",
+      "mediaType": "image/png",
+      "bytes": 74823,
+      "digest": "sha256:cfc6ce4be110d6d64b28ae202dede705b3b31bd8174510df66fbd2e95fd69e83"
+    }
+  ]
+}

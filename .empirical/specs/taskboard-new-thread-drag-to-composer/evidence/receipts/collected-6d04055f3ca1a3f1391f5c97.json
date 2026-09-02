@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-6d04055f3ca1a3f1391f5c97",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-4",
+    "AC-5",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Real Chromium against the running BB 0.41 app opened an isolated plugin through the root New Thread right-panel Actions list and an existing-thread panel. Dragging a ticket produced the visible composer cue, preserved prefilled draft text, inserted a live mention pill, focused the composer, emitted polite success status, and did not submit.",
+  "passed": true,
+  "startedAt": "2026-09-02T23:06:25.558Z",
+  "completedAt": "2026-09-02T23:06:25.558Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "taskboard-new-thread-drag-to-composer",
+    "specRevision": 2,
+    "specDigest": "sha256:1160f7f4d7ad0ec46be9753497ef99fa76a7f5b5b59379f1bce0a6b795ea49a4",
+    "treeDigest": "sha256:77ba2e60aca627bc91616f39b1134d40cd603ea4abd0b7d5fedfd5b8f74cb3eb",
+    "policyDigest": "sha256:dddc072c4f4908581e6e359608fe9aec39894c5258cd821ec894bbd59a67fbb7"
+  },
+  "digest": "sha256:b1d7622185937efeced22e9ef353378a2cb7e3cc419f7245592e1fec12c03dba",
+  "kind": "collected",
+  "collector": "playwright-live-bb-preview",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/taskboard-new-thread-drag-to-composer/qa/new-thread-drag-active.png",
+      "mediaType": "image/png",
+      "bytes": 75095,
+      "digest": "sha256:57f17074b2b02df34f9fe34eedd484eb3343378bf2bc8e1a3ddfa1e178a58a15"
+    },
+    {
+      "path": ".empirical/specs/taskboard-new-thread-drag-to-composer/qa/new-thread-drop.png",
+      "mediaType": "image/png",
+      "bytes": 75408,
+      "digest": "sha256:f9b5b702163db0b58ef356807d1855feede2768472082951469936e13b1e6a5e"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "external-task-context",
+    "taskboard-browser"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:8b5e653b2ef533df4fb4f48b4614947114c6ae7b1f7172f1d584eb99dd2c91a5"
+}

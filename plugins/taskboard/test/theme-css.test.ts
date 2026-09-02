@@ -109,3 +109,25 @@ test('keeps assignee avatars compact with six theme-safe identity tones', () => 
     /@container \(max-width: 36rem\)[\s\S]*?\.tb-item-row \.tb-assignee-mark\s*\{\s*display:\s*none;/u
   );
 });
+
+test('shows restrained composer drop feedback and discoverable drag grips', () => {
+  const dropTarget = ruleBody(
+    /form\[data-taskboard-composer-drop-target='active'\]\s*\{([^}]*)\}/s,
+    'composer drop target'
+  );
+  const cue = ruleBody(/\.tb-composer-drop-cue\s*\{([^}]*)\}/s, 'drop cue');
+
+  assert.match(dropTarget, /outline:\s*2px dashed var\(--input\)/u);
+  assert.match(cue, /pointer-events:\s*none/u);
+  assert.match(cue, /background:\s*var\(--canvas\)/u);
+  assert.match(cue, /color:\s*var\(--ink\)/u);
+  assert.match(stylesheet, /\.tb-composer-drag-grip/u);
+  assert.match(
+    stylesheet,
+    /\.tb-item-row\[data-composer-drag='true'\][\s\S]*?grid-template-columns/u
+  );
+  assert.match(
+    stylesheet,
+    /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.tb-composer-drag-grip/u
+  );
+});

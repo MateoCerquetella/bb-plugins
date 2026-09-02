@@ -143,6 +143,17 @@ stop reopening it. The right panel follows the BB project selected for each
 thread, while **Open full Taskboard** keeps the larger workspace available when
 you need filters or board management.
 
+On BB's root **New thread** screen, open the right panel (`Ctrl+J`), choose
+**New tab → Actions → Taskboard**, and select a project in the composer. The
+panel follows that project without creating a thread.
+
+With Taskboard beside an existing thread or **New thread**, drag a ticket from
+the constrained List or Kanban board onto the prompt editor to add its live
+Taskboard mention. The existing draft and attachments stay in place and BB
+does not submit automatically. For a keyboard-accessible equivalent, open the
+ticket and choose **Add to chat**. Kanban drops onto status lanes continue to
+move the provider ticket; drops onto the composer copy its reference only.
+
 In List view, click the shaped status glyph on a task row to choose another
 provider status. The same control appears as a labeled status pill at the top
 of task details. Changes update optimistically and roll back if GitHub, Linear,

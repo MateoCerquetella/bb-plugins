@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "sequence": 1,
+  "previousDigest": "sha256:17a450bc4d0a625d7e89e72b7134a3bd9f8f17ac4ca05e33ff4d1ec7670d8cef",
+  "actor": "empirical-start",
+  "type": "transition",
+  "summary": "Started taskboard-new-thread-drag-to-composer",
+  "createdAt": "2026-09-02T22:40:47.145Z",
+  "stateBeforeDigest": "sha256:74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+  "stateAfterDigest": "sha256:4baf2340840895850d9c139a52153138bb6cb4742c66f4a3bbabdef06e780d3d",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 1,
+    "activeFeature": "taskboard-new-thread-drag-to-composer",
+    "request": "Fix Taskboard on BB's root New Thread surface so users can reliably open Taskboard in the right panel instead of landing on an unavailable panel view. Add an explicit Taskboard affordance on New Thread if the current SDK supports it without fragile DOM coupling. Allow dragging a Taskboard ticket from the right panel into the currently visible composer—existing thread or New Thread—to insert the ticket as Taskboard's live external-work-item mention, focus the composer, preserve any existing draft and attachments, and never submit automatically. Preserve Kanban status drag behavior and provide an accessible non-drag equivalent. Add focused tests, build the plugin, install or move the local path installation to this checkout, reload it, and verify both existing-thread and New Thread flows live without publishing.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": null,
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:f08d4a2a22a6abf39d919d3e03f8e1d3f0161351f16de88f7ce5a9e379beae60",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": null,
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-02T22:40:47.145Z"
+  },
+  "digest": "sha256:e4befb446f97d034d3c32f43be9773f34df9ea07d622d0fb5941c50af4a7eb51"
+}

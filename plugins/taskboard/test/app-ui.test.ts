@@ -4,6 +4,63 @@ import { test } from 'node:test';
 
 const app = await readFile(new URL('../app.tsx', import.meta.url), 'utf8');
 
+test('registers Taskboard for existing-thread and New Thread right panels', () => {
+  assert.match(app, /app\.slots\.threadPanelAction\(\{[\s\S]*?id: THREAD_PANEL_ACTION_ID[\s\S]*?component: TaskboardThreadPanel[\s\S]*?layout: 'flush'/u);
+  assert.match(app, /app\.slots\.experimental_newThreadPanelAction\(\{[\s\S]*?id: 'taskboard-new-thread-panel'[\s\S]*?component: TaskboardNewThreadPanel[\s\S]*?layout: 'flush'/u);
+  assert.match(app, /function TaskboardNewThreadPanel\(\{ projectId \}[\s\S]*?<TaskboardRightPanel projectId=\{projectId\}/u);
+  assert.match(app, /surfaceMode="constrained"/u);
+});
+
+test('accepts bounded Taskboard drops only on the visible composer textbox', () => {
+  const dropHook = app.match(
+    /function useTaskboardComposerDrop[\s\S]*?\nfunction TaskboardRightPanel/u
+  )?.[0];
+  assert.ok(dropHook, 'Missing useTaskboardComposerDrop');
+  assert.match(dropHook, /hasTaskboardComposerDragType\(transfer\.types\)/u);
+  assert.match(app, /\[contenteditable="true"\]\[role="textbox"\]/u);
+  assert.match(dropHook, /parseTaskboardComposerMention/u);
+  assert.match(dropHook, /event\.preventDefault\(\)/u);
+  assert.match(dropHook, /event\.stopImmediatePropagation\(\)/u);
+  assert.match(dropHook, /transfer\.dropEffect = 'copy'/u);
+  assert.match(dropHook, /COMPOSER_DROP_CUE_TEXT/u);
+  assert.match(dropHook, /clearTarget\(\)/u);
+
+  const insertion = app.match(
+    /const insertComposerMention = useCallback[\s\S]*?useTaskboardComposerDrop\(insertComposerMention\)/u
+  )?.[0];
+  assert.ok(insertion, 'Missing route-bound composer insertion');
+  assert.match(insertion, /serializeTaskboardComposerMention/u);
+  assert.match(insertion, /composer\.insertMention\(safeMention\)/u);
+  assert.match(insertion, /composer\.focus\(\)/u);
+  assert.match(insertion, /setComposerAnnouncement\(`Added/u);
+  assert.doesNotMatch(insertion, /toCompose|spawn|submit|send|queue|steer/u);
+});
+
+test('makes constrained List and Kanban tickets composer drag sources', () => {
+  const row = app.match(/function WorkItemRow[\s\S]*?\nfunction ListStateGroups/u)?.[0];
+  assert.ok(row, 'Missing WorkItemRow');
+  assert.match(row, /draggable=\{composerDragEnabled\}/u);
+  assert.match(row, /writeTaskboardComposerDrag\(event\.dataTransfer, item, 'copy'\)/u);
+  assert.match(row, /name="DragDropVertical"/u);
+  assert.match(app, /composerDragEnabled=\{surfaceMode === 'constrained'\}/u);
+
+  const kanban = app.match(/function KanbanBoard[\s\S]*?\nfunction TrackerList/u)?.[0];
+  assert.ok(kanban, 'Missing KanbanBoard');
+  assert.match(kanban, /event\.dataTransfer\.effectAllowed = composerDragEnabled[\s\S]*?'copyMove'[\s\S]*?: 'move'/u);
+  assert.match(kanban, /event\.dataTransfer\.setData\('text\/plain', itemId\)/u);
+  assert.match(kanban, /writeTaskboardComposerDrag\([\s\S]*?'copyMove'/u);
+  assert.match(kanban, /void commitMove\(item, lane\.key/u);
+});
+
+test('offers an accessible non-drag Add to chat detail action', () => {
+  const detail = app.match(/function TrackerDetail[\s\S]*?\nfunction configFingerprint/u)?.[0];
+  assert.ok(detail, 'Missing TrackerDetail');
+  assert.match(detail, /type="button"[\s\S]*?variant="outline"[\s\S]*?onClick=\{\(\) => onAddToComposer\(item\)\}/u);
+  assert.match(detail, /MessageCirclePlus/u);
+  assert.match(detail, /Add to chat/u);
+  assert.match(app, /role="status"[\s\S]*?aria-live="polite"[\s\S]*?\{composerAnnouncement\}/u);
+});
+
 test('shares durable project preferences between full and constrained surfaces', () => {
   assert.match(app, /useSyncExternalStore\(/u);
   assert.match(app, /browsePreferenceStore\.subscribe/u);

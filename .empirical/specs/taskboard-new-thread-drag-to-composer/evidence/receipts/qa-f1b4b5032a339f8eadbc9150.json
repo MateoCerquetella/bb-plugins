@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-f1b4b5032a339f8eadbc9150",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Clean real-browser run after validating the QA environment fallback; verify both New Thread and existing-thread composer drops, screenshots, draft preservation, and no submission.",
+  "passed": true,
+  "startedAt": "2026-09-02T23:09:14.966Z",
+  "completedAt": "2026-09-02T23:09:21.293Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "taskboard-new-thread-drag-to-composer",
+    "specRevision": 2,
+    "specDigest": "sha256:1160f7f4d7ad0ec46be9753497ef99fa76a7f5b5b59379f1bce0a6b795ea49a4",
+    "treeDigest": "sha256:77ba2e60aca627bc91616f39b1134d40cd603ea4abd0b7d5fedfd5b8f74cb3eb",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf",
+    "workflowRevision": 6,
+    "gitCommit": "b627bb0d43d8fac89e9777b0669700fa6f7e68ef"
+  },
+  "digest": "sha256:6a42c44884e5527c5cf929fb5759f6ae54f196048623a2dd91b2e24df80b965e",
+  "kind": "qa",
+  "matrixDigest": "sha256:c35749317b90ccc960dc896c06bf925361e7b28bceb1c14621b95b033003810b",
+  "check": {
+    "id": "qa-end-to-end",
+    "kind": "end-to-end"
+  },
+  "coveredChecks": [
+    "end-to-end"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Clean real-browser run after validating the QA environment fallback; verify both New Thread and existing-thread composer drops, screenshots, draft preservation, and no submission.",
+      "startedAt": "2026-09-02T23:09:14.966Z",
+      "completedAt": "2026-09-02T23:09:21.293Z",
+      "durationMs": 6327,
+      "collector": null,
+      "command": {
+        "argv": [
+          "node",
+          ".empirical/specs/taskboard-new-thread-drag-to-composer/qa/browser.mjs"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:84fa4e00f18c96f64eca7053b10117ed10e017727ac6dda2dceba92117007379",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "{\"newThread\":\"Keep this draft \\nTEST-1\\n \",\"existingThread\":\"Existing thread draft \\nTEST-1\\n \",\"submitted\":false}\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:77ba2e60aca627bc91616f39b1134d40cd603ea4abd0b7d5fedfd5b8f74cb3eb",
+      "sourceTreeAfter": "sha256:77ba2e60aca627bc91616f39b1134d40cd603ea4abd0b7d5fedfd5b8f74cb3eb",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/taskboard-new-thread-drag-to-composer/qa/new-thread-drag-active.png",
+          "mediaType": "image/png",
+          "bytes": 143324,
+          "digest": "sha256:50dd967623a396ff4236d22d990b6db0530739f7849816e23d17cf999b35a4f1"
+        },
+        {
+          "path": ".empirical/specs/taskboard-new-thread-drag-to-composer/qa/new-thread-drop.png",
+          "mediaType": "image/png",
+          "bytes": 74823,
+          "digest": "sha256:cfc6ce4be110d6d64b28ae202dede705b3b31bd8174510df66fbd2e95fd69e83"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}
