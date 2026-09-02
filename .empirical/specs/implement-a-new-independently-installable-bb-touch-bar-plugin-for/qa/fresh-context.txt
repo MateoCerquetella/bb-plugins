@@ -1,23 +1,26 @@
-Fresh-context acceptance QA — 2026-08-31
+Fresh-context acceptance QA — 2026-09-02
 
-- AC-1/2/4: live `bb touchbar snapshot --pretty` returned schemaVersion 1,
-  bounded summary counts, three projected rows, normalized status/project fields,
-  and no prompt/message/path/tool output.
-- AC-3: direct and slot open targeted thr_ng93azwsxr; an unknown stop returned
-  nonzero. Harness tests prove idle/unknown stops make no stop SDK call and an
-  active stop targets exactly one id.
-- AC-5: the preset parses as four global type-642 widgets with Always Show and
-  two-second refresh; every tap action is open-card and none contains stop. The
-  wrapper and installer parse as POSIX shell. The optional Swift source uses a
-  direct Process executable plus argument array and contains no shell/private
-  Touch Bar API.
-- AC-6: plugin README documents Intel/BTT setup, All Apps behavior, privacy,
-  limitations, the slot race, Control Strip boundary, removal, and sources.
-- AC-7: 16 focused tests and the full root workspace check pass.
-- AC-8: local install/reload reports touchbar@0.1.0 running. The 13-file packed
-  consumer contains server metadata, companion, assets, license and docs, with
-  no node_modules or source maps. An isolated source copy completed npm ci and
-  the focused check successfully.
+- AC-1/2/4: live Linux-server and Intel-Mac `bb touchbar snapshot --pretty`
+  calls returned schemaVersion 1 and bounded thread cards. Acknowledged Naranja
+  failures no longer appear as current red alerts; active cards remain.
+- AC-3: `bb touchbar open thr_i47f5uua6r` ran on the Mac, returned exit 0, and
+  reported that the exact thread opened. Unit tests cover unknown and ineligible
+  IDs without mutation.
+- AC-5: the native source no longer contains an `NSScrollView`; paged rows use
+  direct native controls and the panel has initial item identifiers. The Intel
+  Mac compiled and installed the new executable at
+  `~/Applications/BBTouchBar.app`, and the running log identifies the
+  `paged-ui 2026-09-02` build.
+- AC-6: the README now explains native paging and acknowledged-error behavior,
+  along with installation, privacy, limitations, and removal.
+- AC-7: the focused Touch Bar suite passes 19/19, including phantom-error
+  filtering and native interaction contracts. The complete root `npm run check`
+  also passes.
+- AC-8: `touchbar@0.1.0` is installed from the local package and reports
+  running. Matrix-authorized package-consumer, clean-clone, integration,
+  adapter-contract, end-to-end, and cross-platform checks pass.
 
-Physical BTT import/rendering remains target-hardware acceptance because this
-execution host is Linux and has no enrolled Intel Touch Bar Mac.
+The native panel was opened through `native/run.sh open` after installation.
+The original user screenshot remains the failed pre-repair observation; this
+note records the post-repair command and installation evidence without claiming
+an automated physical-finger event.

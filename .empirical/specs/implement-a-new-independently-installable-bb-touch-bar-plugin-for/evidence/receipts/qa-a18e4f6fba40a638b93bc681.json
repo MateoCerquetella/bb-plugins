@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-a18e4f6fba40a638b93bc681",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "Fresh-context acceptance passed on the running Intel Mac and the server: the rebuilt paged UI is installed, bounded snapshots exclude acknowledged failures, exact-id open succeeds, and focused/root/package verification is green.",
+  "passed": true,
+  "startedAt": "2026-09-02T23:05:25.592Z",
+  "completedAt": "2026-09-02T23:05:25.592Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "implement-a-new-independently-installable-bb-touch-bar-plugin-for",
+    "specRevision": 2,
+    "specDigest": "sha256:2cb81eb836af98d280d0660ae933e1f9672f2d1932631e43bef9d4f04b55ef08",
+    "treeDigest": "sha256:f93586a2af73209493a5015ad1a0ac747d2e3381d6dff01749c4a01e9d6b081f",
+    "policyDigest": "sha256:dddc072c4f4908581e6e359608fe9aec39894c5258cd821ec894bbd59a67fbb7",
+    "workflowRevision": 16,
+    "gitCommit": "b627bb0d43d8fac89e9777b0669700fa6f7e68ef"
+  },
+  "digest": "sha256:af8acca7127750541748225b2dc26c04796e2e9b5475705b7ab44c148948d88e",
+  "kind": "qa",
+  "matrixDigest": "sha256:3bbeb09a66034cf8e41fabf21fe6d09bfba95f48085330e8df608de57704028b",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Fresh-context acceptance passed on the running Intel Mac and the server: the rebuilt paged UI is installed, bounded snapshots exclude acknowledged failures, exact-id open succeeds, and focused/root/package verification is green.",
+      "startedAt": "2026-09-02T23:05:25.592Z",
+      "completedAt": "2026-09-02T23:05:25.592Z",
+      "durationMs": 0,
+      "collector": "codex-fresh-context",
+      "command": null,
+      "result": null,
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:f93586a2af73209493a5015ad1a0ac747d2e3381d6dff01749c4a01e9d6b081f",
+      "sourceTreeAfter": "sha256:f93586a2af73209493a5015ad1a0ac747d2e3381d6dff01749c4a01e9d6b081f",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/implement-a-new-independently-installable-bb-touch-bar-plugin-for/qa/fresh-context.txt",
+          "mediaType": "text/plain",
+          "bytes": 1557,
+          "digest": "sha256:68e6b29fec1f5eedabde6ed1b7d43e0d6af0e0d50b1c45b05378ca394cc90f7a"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}

@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 13,
+  "revision": 17,
   "activeFeature": "implement-a-new-independently-installable-bb-touch-bar-plugin-for",
   "request": "Implement a new independently installable BB Touch Bar plugin for Intel MacBook Pro Touch Bar machines, plus a BetterTouchTool companion/preset that can remain visible across all apps. The BB plugin should expose live compact thread/agent status and safe actions, integrate with BB host/server APIs, include clear setup documentation, tests, and repository catalog updates. Target an MVP that is usable without private macOS APIs, with BetterTouchTool as the persistence layer.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "verify",
+  "phase": "review",
   "status": "waiting",
-  "repairAttempts": 1,
-  "message": "Refreshed repository context after the Touch Bar plugin implementation; index, overview, architecture, commands, and conventions are present with no stale, missing, invalid, or refinement-required paths.",
+  "repairAttempts": 2,
+  "message": "Verified the Touch Bar repair with the full root check, focused 19-test suite, matrix integration/contract/fault/package/clean-clone/end-to-end/cross-platform checks, and fresh-context evidence from the installed Intel Mac.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:2cb81eb836af98d280d0660ae933e1f9672f2d1932631e43bef9d4f04b55ef08",
@@ -20,21 +20,30 @@
   "capabilityClaimId": "implement-a-new-independently-installable-bb-touch-bar-plugin-for-21366fe98a02",
   "authorizationDigest": null,
   "evidence": [],
-  "evidenceReceiptIds": [],
+  "evidenceReceiptIds": [
+    "qa-e716d07329f270cf7cc0ef05",
+    "qa-ec32aa870c1a7dac2c750bfe",
+    "qa-11c540e78e23324c99e07d58",
+    "qa-caa5f43d6d9eaa8384a67573",
+    "qa-d2ca6e59f7e2ab214d03f171",
+    "qa-716c2ffa4449ca8591ad8589",
+    "qa-3ea071e3e789807120f41815",
+    "qa-02925e5143dd0c2afb269ab5",
+    "qa-a18e4f6fba40a638b93bc681"
+  ],
   "legacyEvidenceCount": 0,
   "completion": {
     "implemented": true,
-    "verified": false,
+    "verified": true,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "implemented",
+    "highest": "verified",
     "reasons": {
-      "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-01T16:38:10.629Z"
+  "updatedAt": "2026-09-02T23:05:36.879Z"
 }

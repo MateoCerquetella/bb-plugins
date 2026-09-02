@@ -7,7 +7,7 @@ The BB plugin owns the bounded thread snapshot and guarded commands. A small
 Swift/AppKit background app owns the physical Touch Bar:
 
 - an always-present BB badge in the Control Strip;
-- tap the badge to expand a fullscreen, horizontally scrollable agent panel;
+- tap the badge to expand a fullscreen, paginated agent panel;
 - one outlined two-line card per thread with provider, project, status colour,
   badge and activity spinner;
 - tap a card to open that exact BB thread;
@@ -129,8 +129,11 @@ Host CPU, RAM, and disk rings use Host Monitor's current configurable yellow
 and red thresholds. Changing those settings automatically changes Touch Bar
 gauge colors on the next sample; download remains red and upload blue.
 
-Trackpad or finger horizontal scrolling moves the card lane; paging arrows are
-intentionally omitted to preserve card space.
+When the cards do not fit, native ‹ and › controls page through the lane without
+placing the thread and settings buttons inside a gesture-swallowing scroll view.
+Errors whose BB attention has already been read stay available in BB but are
+removed from the compact lane, so old failures do not remain pinned as new red
+alerts.
 
 ## Controls
 

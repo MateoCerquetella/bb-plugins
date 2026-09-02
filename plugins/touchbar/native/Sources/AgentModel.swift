@@ -244,9 +244,16 @@ final class AgentStore {
 
     static func focus(_ entry: AgentEntry) {
         DispatchQueue.global(qos: .userInitiated).async {
-            _ = BBCommand.run(["touchbar", "open", entry.id])
+            let opened = BBCommand.run(
+                ["touchbar", "open", entry.id], timeout: 5
+            ) != nil
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                activateBB()
+                if opened {
+                    NativeLog.info("opened thread \(entry.id) in BB")
+                    activateBB()
+                } else {
+                    NativeLog.error("could not open thread \(entry.id)")
+                }
             }
         }
     }
@@ -319,7 +326,7 @@ enum BBCommand {
         }
         var timedOut = false
         if process.isRunning {
-            NativeLog.error("bb snapshot timed out")
+            NativeLog.error("bb command timed out: \(arguments.first ?? "unknown")")
             timedOut = true
             process.terminate()
         }

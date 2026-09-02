@@ -189,7 +189,8 @@ private final class GroupDividerView: NSButton {
     }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        bounds.contains(point) ? self : nil
+        let local = convert(point, from: superview)
+        return bounds.contains(local) ? self : nil
     }
 
     override func mouseDown(with event: NSEvent) {
@@ -414,7 +415,8 @@ private final class HostMetricView: NSButton {
     override var intrinsicContentSize: NSSize { NSSize(width: measuredWidth, height: 30) }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        bounds.contains(point) ? self : nil
+        let local = convert(point, from: superview)
+        return bounds.contains(local) ? self : nil
     }
 
     override func mouseDown(with event: NSEvent) {
@@ -625,7 +627,8 @@ private final class SettingsControlButton: NSButton {
     }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        bounds.contains(point) ? self : nil
+        let local = convert(point, from: superview)
+        return bounds.contains(local) ? self : nil
     }
 
     override func mouseDown(with event: NSEvent) {
@@ -678,7 +681,8 @@ private final class CompactNativeButton: NSButton {
     override var intrinsicContentSize: NSSize { NSSize(width: fixedWidth, height: 30) }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        bounds.contains(point) ? self : nil
+        let local = convert(point, from: superview)
+        return bounds.contains(local) ? self : nil
     }
 
     override func mouseDown(with event: NSEvent) {
@@ -692,13 +696,14 @@ private final class SettingsGroupView: NSView {
     private let sectionTitleWidth: CGFloat
     private let controls: [SettingsControlButton]
     private let measuredWidth: CGFloat
+    private var extraWidth: CGFloat = 0
 
     init(title: String, controls: [SettingsControlButton]) {
         sectionTitle = title
-        let titleFont = NSFont.monospacedSystemFont(ofSize: 5.8, weight: .bold)
+        let titleFont = NSFont.monospacedSystemFont(ofSize: 7, weight: .bold)
         let titleWidth = max(
-            38,
-            ceil((title as NSString).size(withAttributes: [.font: titleFont]).width) + 12
+            44,
+            ceil((title as NSString).size(withAttributes: [.font: titleFont]).width) + 14
         )
         sectionTitleWidth = titleWidth
         self.controls = controls
@@ -716,36 +721,34 @@ private final class SettingsGroupView: NSView {
     }
 
     required init?(coder: NSCoder) { fatalError("init(coder:) is unsupported") }
-    override var intrinsicContentSize: NSSize { NSSize(width: measuredWidth, height: 30) }
+
+    func addWidth(_ extra: CGFloat) {
+        extraWidth += extra
+        invalidateIntrinsicContentSize()
+        needsLayout = true
+    }
+
+    override var intrinsicContentSize: NSSize {
+        NSSize(width: measuredWidth + extraWidth, height: 30)
+    }
 
     override func layout() {
         super.layout()
+        let bonus = controls.isEmpty
+            ? 0
+            : extraWidth / CGFloat(controls.count)
         var x = sectionTitleWidth + 4
         for control in controls {
-            let width = control.intrinsicContentSize.width
+            let width = control.intrinsicContentSize.width + bonus
             control.frame = NSRect(x: x, y: 0, width: width, height: 30)
             x += width + 3
         }
     }
 
-    override func hitTest(_ point: NSPoint) -> NSView? {
-        bounds.contains(point) ? self : nil
-    }
-
-    override func mouseDown(with event: NSEvent) {
-        let point = convert(event.locationInWindow, from: nil)
-        guard let control = controls.first(where: {
-            !$0.isHidden && $0.frame.contains(point)
-        }) else { return }
-        guard let action = control.action else { return }
-        NativeLog.info("settings control tapped \(sectionTitle)")
-        NSApp.sendAction(action, to: control.target, from: control)
-    }
-
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
         let attributes: [NSAttributedString.Key: Any] = [
-            .font: NSFont.monospacedSystemFont(ofSize: 5.8, weight: .bold),
+            .font: NSFont.monospacedSystemFont(ofSize: 7, weight: .bold),
             .foregroundColor: NSColor(white: 0.68, alpha: 1),
         ]
         let string = sectionTitle as NSString
@@ -760,27 +763,40 @@ private final class SettingsGroupView: NSView {
     }
 }
 
-private final class TouchBarScrollView: NSScrollView {
-    override func hitTest(_ point: NSPoint) -> NSView? {
-        bounds.contains(point) ? self : nil
+private final class PagedRowView: NSView {
+    private let rowWidth: CGFloat
+
+    init(views: [NSView], width: CGFloat) {
+        rowWidth = max(width, 32)
+        super.init(frame: NSRect(x: 0, y: 0, width: rowWidth, height: 30))
+        var x: CGFloat = 0
+        for view in views {
+            let width = max(view.fittingSize.width, 1)
+            view.frame = NSRect(x: x, y: 0, width: width, height: 30)
+            addSubview(view)
+            x += width + 5
+        }
     }
 
+    required init?(coder: NSCoder) { fatalError("init(coder:) is unsupported") }
+    override var intrinsicContentSize: NSSize { NSSize(width: rowWidth, height: 30) }
+
     override func mouseDown(with event: NSEvent) {
-        guard let documentView else { return }
-        let point = documentView.convert(event.locationInWindow, from: nil)
-        guard let button = deepestButton(in: documentView, at: point),
+        // Fallback dispatch for taps that no control claimed directly.
+        let point = convert(event.locationInWindow, from: nil)
+        guard let button = deepestButton(at: point), button.isEnabled,
               let action = button.action else { return }
-        NativeLog.info("touch dispatch (button.identifier?.rawValue ?? \"button\")")
+        NativeLog.info("panel tap \(button.identifier?.rawValue ?? "button")")
         NSApp.sendAction(action, to: button.target, from: button)
     }
 
-    private func deepestButton(in root: NSView, at point: NSPoint) -> NSButton? {
+    private func deepestButton(at point: NSPoint) -> NSButton? {
         var match: NSButton?
         var matchArea = CGFloat.greatestFiniteMagnitude
         func visit(_ view: NSView) {
             guard !view.isHidden, view.alphaValue > 0 else { return }
             if let button = view as? NSButton, button.isEnabled {
-                let frame = button.convert(button.bounds, to: root)
+                let frame = button.convert(button.bounds, to: self)
                 if frame.contains(point), frame.width * frame.height < matchArea {
                     match = button
                     matchArea = frame.width * frame.height
@@ -788,32 +804,8 @@ private final class TouchBarScrollView: NSScrollView {
             }
             for child in view.subviews { visit(child) }
         }
-        visit(root)
+        visit(self)
         return match
-    }
-
-    func scrollPage(_ direction: Int) {
-        let distance = max(contentView.bounds.width * 0.72, 140)
-        scrollHorizontally(by: CGFloat(direction) * distance)
-    }
-
-    override func scrollWheel(with event: NSEvent) {
-        let horizontal = abs(event.scrollingDeltaX) >= abs(event.scrollingDeltaY)
-            ? event.scrollingDeltaX
-            : event.scrollingDeltaY
-        guard horizontal != 0 else {
-            super.scrollWheel(with: event)
-            return
-        }
-        scrollHorizontally(by: -horizontal * 2)
-    }
-
-    private func scrollHorizontally(by delta: CGFloat) {
-        guard let documentView else { return }
-        let maximum = max(0, documentView.bounds.width - contentView.bounds.width)
-        let target = min(max(0, contentView.bounds.origin.x + delta), maximum)
-        contentView.scroll(to: NSPoint(x: target, y: 0))
-        reflectScrolledClipView(contentView)
     }
 }
 
@@ -896,7 +888,13 @@ private final class AgentButton: NSButton {
     }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        bounds.contains(point) ? self : nil
+        let local = convert(point, from: superview)
+        return bounds.contains(local) ? self : nil
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        guard isEnabled, let action else { return }
+        NSApp.sendAction(action, to: target, from: self)
     }
 
     func setGrouped(_ value: Bool) {
@@ -967,8 +965,8 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
     private let projectButton = SettingsControlButton(title: "PROJECT", width: 48)
     private let dockButton = SettingsControlButton(title: "DOCK", width: 36)
     private let carouselButton = SettingsControlButton(title: "CAROUSEL", width: 54)
-    private let previousProjectButton = NSButton(title: "‹", target: nil, action: nil)
-    private let nextProjectButton = NSButton(title: "›", target: nil, action: nil)
+    private let previousProjectButton = CompactNativeButton(title: "‹", width: 30)
+    private let nextProjectButton = CompactNativeButton(title: "›", width: 30)
     private let usageIconsView = UsageIconStripView()
     private let hostMonitorButton = CompactNativeButton(title: "", width: 34)
     private let usageToggleButton = SettingsControlButton(title: "SHOW", width: 38)
@@ -978,7 +976,9 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
     private let cursorToggleButton = SettingsControlButton(title: "", width: 25)
     private let closeButton = CompactNativeButton(title: "✕", width: 34)
     private var panelTouchBar: NSTouchBar?
-    private weak var panelScrollView: TouchBarScrollView?
+    private var panelPage = 0
+    private var panelPageCount = 1
+    private var pagersVisible = false
     private var panelVisible = false
     private var agentButtons: [String: AgentButton] = [:]
     private var onScreenOrder: [String] = []
@@ -1008,6 +1008,9 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
     }()
 
     private static let barHeight: CGFloat = 30
+    private static let contentWidth: CGFloat = 850
+    private static let contentWidthPaged: CGFloat = 790
+    private static let rowSpacing: CGFloat = 5
 
     func menuState() -> TouchBarMenuState {
         TouchBarMenuState(
@@ -1090,7 +1093,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         store.onChange = { [weak self] snapshot in self?.apply(snapshot) }
         store.start()
         apply(store.snapshot)
-        NativeLog.info("native Control Strip item installed")
+        NativeLog.info("native Control Strip item installed (paged-ui 2026-09-02)")
     }
 
     private func configurePanelControls() {
@@ -1124,10 +1127,12 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         carouselButton.font = .monospacedSystemFont(ofSize: 5.8, weight: .bold)
         previousProjectButton.target = self
         previousProjectButton.action = #selector(previousProjectTapped(_:))
-        previousProjectButton.font = .systemFont(ofSize: 17, weight: .bold)
+        previousProjectButton.font = .systemFont(ofSize: 15, weight: .bold)
+        previousProjectButton.bezelColor = NSColor(white: 0.18, alpha: 1)
         nextProjectButton.target = self
         nextProjectButton.action = #selector(nextProjectTapped(_:))
-        nextProjectButton.font = .systemFont(ofSize: 17, weight: .bold)
+        nextProjectButton.font = .systemFont(ofSize: 15, weight: .bold)
+        nextProjectButton.bezelColor = NSColor(white: 0.18, alpha: 1)
         hostMonitorButton.target = self
         hostMonitorButton.action = #selector(hostMonitorTapped(_:))
         hostMonitorButton.setAccessibilityLabel("Show Host Monitor metrics")
@@ -1180,12 +1185,8 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     private func updateControlColors() {
-        previousProjectButton.setAccessibilityLabel(
-            sortMode == .carousel ? "Previous project" : "Scroll left"
-        )
-        nextProjectButton.setAccessibilityLabel(
-            sortMode == .carousel ? "Next project" : "Scroll right"
-        )
+        previousProjectButton.setAccessibilityLabel("Previous page")
+        nextProjectButton.setAccessibilityLabel("Next page")
         settingsButton.bezelColor = configurationVisible
             ? .systemIndigo
             : NSColor(white: 0.18, alpha: 1)
@@ -1327,6 +1328,9 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     @objc private func openPanel() {
+        panelPage = 0
+        panelPageCount = 1
+        pagersVisible = false
         let bar = NSTouchBar()
         bar.delegate = self
         bar.defaultItemIdentifiers = panelIdentifiers()
@@ -1343,9 +1347,10 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     private func panelIdentifiers() -> [NSTouchBarItem.Identifier] {
-        var identifiers: [NSTouchBarItem.Identifier] = [
-            configurationVisible ? .bbSettingsPanel : .bbList,
-        ]
+        var identifiers: [NSTouchBarItem.Identifier] = []
+        if pagersVisible { identifiers.append(.bbPreviousProject) }
+        identifiers.append(configurationVisible ? .bbSettingsPanel : .bbList)
+        if pagersVisible { identifiers.append(.bbNextProject) }
         identifiers.append(.flexibleSpace)
         if !configurationVisible {
             if showUsage { identifiers.append(.bbUsage) }
@@ -1448,13 +1453,23 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     @objc private func previousProjectTapped(_ sender: NSButton) {
-        if sortMode == .carousel { moveProject(by: -1) }
-        else { panelScrollView?.scrollPage(-1) }
+        NativeLog.info("pager previous tapped")
+        if sortMode == .carousel {
+            moveProject(by: -1)
+        } else if panelPage > 0 {
+            panelPage -= 1
+            schedulePanelRender()
+        }
     }
 
     @objc private func nextProjectTapped(_ sender: NSButton) {
-        if sortMode == .carousel { moveProject(by: 1) }
-        else { panelScrollView?.scrollPage(1) }
+        NativeLog.info("pager next tapped")
+        if sortMode == .carousel {
+            moveProject(by: 1)
+        } else if panelPage < panelPageCount - 1 {
+            panelPage += 1
+            schedulePanelRender()
+        }
     }
 
     @objc private func projectDockTapped(_ sender: NSButton) {
@@ -1494,6 +1509,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
     @objc private func agentTapped(_ sender: NSButton) {
         guard let id = sender.identifier?.rawValue,
               let entry = store.snapshot.agents.first(where: { $0.id == id }) else { return }
+        NativeLog.info("thread card tapped \(id)")
         AgentStore.focus(entry)
     }
 
@@ -1529,12 +1545,27 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         onScreenOrder = entries.map(\.id)
 
         if configurationVisible {
-            settingsPanelItem.view = scrollContainer(settingsGroups())
+            let groups = settingsGroups()
+            let totalWidth = groups.reduce(CGFloat(0)) {
+                $0 + $1.intrinsicContentSize.width
+            } + CGFloat(max(groups.count - 1, 0)) * Self.rowSpacing
+            if totalWidth < Self.contentWidth {
+                let slack = Self.contentWidth - totalWidth
+                let perGroup = slack / CGFloat(groups.count)
+                for case let group as SettingsGroupView in groups {
+                    group.addWidth(perGroup)
+                }
+            }
+            settingsPanelItem.view = PagedRowView(views: groups, width: Self.contentWidth)
+            panelPageCount = 1
+            panelPage = 0
+            updatePagers(visible: false, carousel: false)
             return
         }
 
+        var views: [NSView] = []
         if hostViewVisible {
-            let views: [NSView] = snapshot.hosts.isEmpty
+            views = snapshot.hosts.isEmpty
                 ? [message("Host metrics are loading…")]
                 : snapshot.hosts.map {
                     HostMetricView(
@@ -1543,12 +1574,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
                         action: #selector(hostTapped(_:))
                     )
                 }
-            panelItem.view = scrollContainer(views)
-            return
-        }
-
-        var views: [NSView] = []
-        if entries.isEmpty {
+        } else if entries.isEmpty {
             views.append(message(snapshot.connected ? "No BB threads" : "BB is offline"))
         } else {
             if !snapshot.connected {
@@ -1593,32 +1619,86 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
                 views.append(contentsOf: projectEntries.map { button(for: $0) })
             }
         }
-        panelItem.view = scrollContainer(views)
+        renderPaged(views)
+    }
+
+    private func paginate(_ views: [NSView], limit: CGFloat) -> [[NSView]] {
+        var pages: [[NSView]] = [[]]
+        var used: CGFloat = 0
+        for view in views {
+            let width = max(view.fittingSize.width, 1)
+            let needed = (pages[pages.count - 1].isEmpty ? 0 : Self.rowSpacing) + width
+            if used + needed > limit, !pages[pages.count - 1].isEmpty {
+                pages.append([view])
+                used = width
+            } else {
+                pages[pages.count - 1].append(view)
+                used += needed
+            }
+        }
+        return pages
+    }
+
+    private func renderPaged(_ views: [NSView]) {
+        let carouselProjects = !hostViewVisible && sortMode == .carousel
+            ? orderedProjects(in: organized(store.snapshot.agents))
+            : []
+        var pages = paginate(views, limit: Self.contentWidth)
+        let showPagers = pages.count > 1 || carouselProjects.count > 1
+        if showPagers {
+            pages = paginate(views, limit: Self.contentWidthPaged)
+        }
+        panelPageCount = pages.count
+        panelPage = min(max(panelPage, 0), panelPageCount - 1)
+        let pageViews = pages[panelPage]
+        let rowWidth = max(
+            pageViews.reduce(CGFloat(0)) { $0 + max($1.fittingSize.width, 1) } +
+                CGFloat(max(pageViews.count - 1, 0)) * Self.rowSpacing,
+            100
+        )
+        panelItem.view = PagedRowView(views: pageViews, width: rowWidth)
+        updatePagers(visible: showPagers, carousel: carouselProjects.count > 1)
+    }
+
+    private func updatePagers(visible show: Bool, carousel: Bool) {
+        if carousel {
+            previousProjectButton.isEnabled = true
+            nextProjectButton.isEnabled = true
+        } else {
+            previousProjectButton.isEnabled = panelPage > 0
+            nextProjectButton.isEnabled = panelPage < panelPageCount - 1
+        }
+        previousProjectButton.alphaValue = previousProjectButton.isEnabled ? 1 : 0.35
+        nextProjectButton.alphaValue = nextProjectButton.isEnabled ? 1 : 0.35
+        if show != pagersVisible {
+            pagersVisible = show
+            panelTouchBar?.defaultItemIdentifiers = panelIdentifiers()
+        }
     }
 
     private func settingsGroups() -> [NSView] {
         let priority = settingControl(
-            title: "PRIORITY", width: 58,
+            title: "PRIORITY", width: 74,
             action: #selector(priorityTapped(_:)),
             selected: sortMode == .status, color: .systemBlue
         )
         let project = settingControl(
-            title: "PROJECT", width: 54,
+            title: "PROJECT", width: 72,
             action: #selector(projectTapped(_:)),
             selected: sortMode == .project, color: .systemOrange
         )
         let dock = settingControl(
-            title: "DOCK", width: 42,
+            title: "DOCK", width: 56,
             action: #selector(dockTapped(_:)),
             selected: sortMode == .dock, color: .systemTeal
         )
         let carousel = settingControl(
-            title: "CAROUSEL", width: 60,
+            title: "CAROUSEL", width: 84,
             action: #selector(carouselTapped(_:)),
             selected: sortMode == .carousel, color: .systemPurple
         )
         let usage = settingControl(
-            title: showUsage ? "ON" : "OFF", width: 42,
+            title: showUsage ? "ON" : "OFF", width: 56,
             action: #selector(usageVisibilityTapped(_:)),
             selected: showUsage, color: .systemBlue
         )
@@ -1638,10 +1718,17 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
             color: .systemPurple
         )
         let host = settingControl(
-            title: showHostMonitor ? "ON" : "OFF", width: 42,
+            title: showHostMonitor ? "ON" : "OFF", width: 56,
             action: #selector(hostVisibilityTapped(_:)),
             selected: showHostMonitor, color: .systemGreen
         )
+        let close = settingControl(
+            title: "✕", width: 64,
+            action: #selector(closeTapped(_:)),
+            selected: true, color: .systemRed
+        )
+        close.font = .systemFont(ofSize: 15, weight: .bold)
+        close.setAccessibilityLabel("Close settings and panel")
         return [
             SettingsGroupView(
                 title: "FILTERS",
@@ -1654,6 +1741,10 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
             SettingsGroupView(
                 title: "HOST MONITOR",
                 controls: [host]
+            ),
+            SettingsGroupView(
+                title: "PANEL",
+                controls: [close]
             ),
         ]
     }
@@ -1668,7 +1759,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         let button = SettingsControlButton(title: title, width: width)
         button.target = self
         button.action = action
-        button.font = .monospacedSystemFont(ofSize: 6.8, weight: .bold)
+        button.font = .monospacedSystemFont(ofSize: 9, weight: .bold)
         button.bezelColor = selected
             ? color
             : NSColor(white: 0.18, alpha: 1)
@@ -1799,35 +1890,4 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         ])
     }
 
-    private func scrollContainer(_ views: [NSView]) -> NSView {
-        let stack = NSStackView(views: views)
-        stack.orientation = .horizontal
-        stack.spacing = 5
-        stack.alignment = .centerY
-        stack.translatesAutoresizingMaskIntoConstraints = true
-
-        let fitting = stack.fittingSize
-        let visible = min(max(fitting.width, 100), 850)
-        stack.frame = NSRect(
-            x: 0,
-            y: 0,
-            width: max(fitting.width, visible),
-            height: Self.barHeight
-        )
-
-        let scroll = TouchBarScrollView(frame: NSRect(
-            x: 0,
-            y: 0,
-            width: visible,
-            height: Self.barHeight
-        ))
-        scroll.drawsBackground = false
-        scroll.hasHorizontalScroller = false
-        scroll.hasVerticalScroller = false
-        scroll.horizontalScrollElasticity = .allowed
-        scroll.verticalScrollElasticity = .none
-        scroll.documentView = stack
-        panelScrollView = scroll
-        return scroll
-    }
 }

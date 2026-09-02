@@ -178,6 +178,16 @@ export function buildSnapshot(
         attention: attentionKind(thread, status),
       };
     })
+    // BB keeps a failed thread in the error lifecycle after its attention has
+    // been read. Those acknowledged failures remain available in BB itself,
+    // but keeping them pinned red on the Touch Bar makes them look like new,
+    // actionable failures forever.
+    .filter(
+      (thread) =>
+        thread.status !== "error" ||
+        thread.unread ||
+        thread.attention === "input",
+    )
     .sort(
       (left, right) =>
         priority(left) - priority(right) ||
