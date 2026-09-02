@@ -1,25 +1,21 @@
 {
   "schemaVersion": 1,
-  "sequence": 27,
-  "previousDigest": "sha256:b974d335762547f505b09094e583269421cd6888ba6f689732849f619c9d76d6",
-  "actor": "codex",
-  "type": "transition",
-  "summary": "Verified the final standard-AppKit finger-scroll repair with full workspace, matrix automation, Intel-Mac compilation/installation, and human hardware evidence.",
-  "createdAt": "2026-09-02T23:38:05.981Z",
-  "stateBeforeDigest": "sha256:692ae16eec2eb18f0eed9bccd69264556437fb14f4bb83c9cd4f838bc4785e1d",
-  "stateAfterDigest": "sha256:be5477887ae1b94f2e0a40918118d45fb674ec827fcfe0298079fabff0922672",
+  "feature": "implement-a-new-independently-installable-bb-touch-bar-plugin-for",
+  "lastSequence": 29,
+  "lastEventDigest": "sha256:c39320a47e22db07bbb3b7935e1dcdeb68e9bd5486f4eef094e6ef3d640f9212",
+  "stateDigest": "sha256:d7b45acec2780cccfbbd9d8c1284136e0892a05aa8318d490d95d9fdc856a7f9",
   "state": {
     "schemaVersion": 5,
-    "revision": 27,
+    "revision": 29,
     "activeFeature": "implement-a-new-independently-installable-bb-touch-bar-plugin-for",
     "request": "Implement a new independently installable BB Touch Bar plugin for Intel MacBook Pro Touch Bar machines, plus a BetterTouchTool companion/preset that can remain visible across all apps. The BB plugin should expose live compact thread/agent status and safe actions, integrate with BB host/server APIs, include clear setup documentation, tests, and repository catalog updates. Target an MVP that is usable without private macOS APIs, with BetterTouchTool as the persistence layer.",
     "profile": "complex",
     "workflow": "complex",
     "mode": "normal",
-    "phase": "review",
-    "status": "waiting",
-    "repairAttempts": 4,
-    "message": "Verified the final standard-AppKit finger-scroll repair with full workspace, matrix automation, Intel-Mac compilation/installation, and human hardware evidence.",
+    "phase": "done",
+    "status": "done",
+    "repairAttempts": 0,
+    "message": "Integrated capability changes: touchbar-agent-monitor",
     "implementationActor": "agent",
     "workStartedAt": null,
     "specDigest": "sha256:2cb81eb836af98d280d0660ae933e1f9672f2d1932631e43bef9d4f04b55ef08",
@@ -39,23 +35,25 @@
       "qa-ad3c1dc1d9a87051c21edba6",
       "qa-cf594f42d3ae89668c141fd5",
       "qa-f006c0aad90c4dfa8b1f1896",
-      "qa-731a7d3135dca1232369dec8"
+      "qa-731a7d3135dca1232369dec8",
+      "collected-fbe6c34fc49191f48a3e3796",
+      "qa-c6e0a90aca9cd46d7a0d85e5"
     ],
     "legacyEvidenceCount": 0,
     "completion": {
       "implemented": true,
       "verified": true,
-      "integrated": false,
+      "integrated": true,
       "delivered": false,
       "published": false,
-      "highest": "verified",
+      "highest": "integrated",
       "reasons": {
-        "integrated": "integrated has not been proven by a durable receipt.",
         "delivered": "delivered has not been proven by a durable receipt.",
         "published": "published has not been proven by a durable receipt."
       }
     },
-    "updatedAt": "2026-09-02T23:38:05.981Z"
+    "updatedAt": "2026-09-02T23:50:56.045Z"
   },
-  "digest": "sha256:80aa15c15c8b65dab2273b49394caac4d748b34dc5fd05469d79b480a86b6793"
+  "compactedAt": "2026-09-02T23:50:56.095Z",
+  "digest": "sha256:f723bd894fdf828856963740c058fe95a70f5b37e7368ffd6b17b25e0f1e44cc"
 }

@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 28,
+  "revision": 29,
   "activeFeature": "implement-a-new-independently-installable-bb-touch-bar-plugin-for",
   "request": "Implement a new independently installable BB Touch Bar plugin for Intel MacBook Pro Touch Bar machines, plus a BetterTouchTool companion/preset that can remain visible across all apps. The BB plugin should expose live compact thread/agent status and safe actions, integrate with BB host/server APIs, include clear setup documentation, tests, and repository catalog updates. Target an MVP that is usable without private macOS APIs, with BetterTouchTool as the persistence layer.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "integrate",
-  "status": "waiting",
-  "repairAttempts": 4,
-  "message": "Independent fresh-context reviewer approved all eight criteria and the final finger-scroll, local-hit-test, completed-click design.",
+  "phase": "done",
+  "status": "done",
+  "repairAttempts": 0,
+  "message": "Integrated capability changes: touchbar-agent-monitor",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:2cb81eb836af98d280d0660ae933e1f9672f2d1932631e43bef9d4f04b55ef08",
@@ -30,21 +30,21 @@
     "qa-cf594f42d3ae89668c141fd5",
     "qa-f006c0aad90c4dfa8b1f1896",
     "qa-731a7d3135dca1232369dec8",
-    "collected-fbe6c34fc49191f48a3e3796"
+    "collected-fbe6c34fc49191f48a3e3796",
+    "qa-c6e0a90aca9cd46d7a0d85e5"
   ],
   "legacyEvidenceCount": 0,
   "completion": {
     "implemented": true,
     "verified": true,
-    "integrated": false,
+    "integrated": true,
     "delivered": false,
     "published": false,
-    "highest": "verified",
+    "highest": "integrated",
     "reasons": {
-      "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-02T23:40:46.579Z"
+  "updatedAt": "2026-09-02T23:50:56.045Z"
 }

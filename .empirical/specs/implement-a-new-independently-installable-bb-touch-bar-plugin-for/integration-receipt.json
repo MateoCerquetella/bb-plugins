@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "feature": "implement-a-new-independently-installable-bb-touch-bar-plugin-for",
+  "claimId": "implement-a-new-independently-installable-bb-touch-bar-plugin-for-21366fe98a02",
+  "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+  "baseCommit": "e489e53ef52e7e9e282619d18a3e3e8e02efc367",
+  "baseTree": "ff52fc709214ad1511dcdce819ed2ce68a72b4f4",
+  "featureTree": "sha256:20927a73c0757fa9036043f7a971dab10943e558c7755893f9ad1149b382d542",
+  "targetCommit": "c3ab1d88b602d7ee8578f1d8969f12a32a255c61",
+  "targetTree": "0ce2cea3bab1493068efa4701783dfa04616c14e",
+  "capabilityBaseDigests": {
+    "touchbar-agent-monitor": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "deltaDigest": "sha256:ac6580103dac8acecb77d99259479d36eb4638cd095e31e84216a204d4efdb66",
+  "resultDigests": {
+    "touchbar-agent-monitor": "sha256:f422459d2759212f7d05628b18eb090e2bf3151d75ba3e0c1d3ed7524d3321c6"
+  },
+  "verificationReceiptDigests": [
+    "sha256:08468f29988e74f2a57d82ce068562840090941b9bba70104a82a1a367cd4320",
+    "sha256:226f40d7fc14174ce35725c248cdaa2a8fff2b28c209d3ef30abcb1d201b4a81",
+    "sha256:27b0f27639bc3ceac87ebc4a8508a29d0495fd0f84bbe7a7891eb8a181b2e85e",
+    "sha256:3960c00b3adfaec51a468a456ddc2783954cce997c481ae785026aa24afe8f87",
+    "sha256:486510b4fa2d0766eeb1e3c6e174abf37009a74493147011703274cc6d0be970",
+    "sha256:52afd60f99bfa663e087c8dabe895cb13a7914a35d2af40bc86d29484a5bb9cb",
+    "sha256:7683b17051f9592c1db20af7595bd50831d1bc0126993590c265d29fb346f7a9",
+    "sha256:7f65aac3b9d19d0993157b0e590a2079645439eb018510928702e2400f7d2f3f",
+    "sha256:96de08fc61a119a9987b46a7742b53e6ce429726037fd4e0f5015fccd25150bf",
+    "sha256:aa51d6a15f560db323cc3af5cd1fc916a8950432b9d05a395c34d9c26cc62500",
+    "sha256:b073d4b574c785dbd3df30c4d0aabed5be9e979e3da2e0947d02ee406ae46f34",
+    "sha256:e55b247faebb30380f1f36c2860794e8bb63d1036008acab5ede822ef76bf2fe",
+    "sha256:f2e38e3e924b3dcf16ed2103c3cab1fa30e0053fae7c9ba6cb96bc5c73f2980c"
+  ],
+  "integratedAt": "2026-09-02T23:50:56.016Z",
+  "digest": "sha256:1464d572dcbca14f475cf92fc3834d269000cb8b4171a0c1db48203fcd0991ac"
+}
