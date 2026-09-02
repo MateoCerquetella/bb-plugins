@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:b17e4ff06f75ab7b0bdb5b50e86c34c216cac7de7ff7d0ac6620c1abe69daaf5",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "b627bb0d43d8fac89e9777b0669700fa6f7e68ef",
+  "headCommit": "b73e7951ab994dc4a6b6090258497d21681f620d",
+  "diffDigest": "sha256:55c325dc240ddbfd660f9d3de9db6fb7d16cdc68b8e125e515df11f6ef296034",
+  "verdict": "APPROVED",
+  "reviewerActor": "isolated-reviewer",
+  "reviewerInvocationId": "/root/final_touchbar_review",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: Snapshot is bounded by row/card/payload limits and compact rendering.\n- PASS AC-2: Cards expose only stable bounded public fields with no sensitive content.\n- PASS AC-3: Physical cards invoke exact-id open and stop remains guarded CLI only.\n- PASS AC-4: Ordering, limits, hidden defaults, and acknowledged-error filtering are deterministic.\n- PASS AC-5: Package retains BTT preset/source/helpers and safe CLI tap actions.\n- PASS AC-6: Docs cover Intel, BTT All Apps, both install paths, privacy, limitations, ownership, and removal.\n- PASS AC-7: Tests and committed verification cover snapshots, packaging, actions, and native interaction contracts.\n- PASS AC-8: Independent package boundaries and generated-output exclusions remain correct.\n\n## Security / correctness\n\nApproved: BB remains authoritative, subprocess arguments are structured, identifiers are validated, output is bounded, and physical stop is absent.\n\n## Design / maintainability\n\nApproved: D-006 supersedes stale decisions; no arrows or premature mouse dispatch remain; child hit tests use local points; the scroll view owns only horizontal scrolling; tests guard the regressions.",
+  "bodyDigest": "sha256:39becd5654741b622b0a572f4fd988c4170680122aca96cf09a50de5d99ce607",
+  "digest": "sha256:5179286821b7d3d95b688d9244545ec6301ab5c617c7635d3c9b79e44ec58218"
+}

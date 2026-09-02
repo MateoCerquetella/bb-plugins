@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "sequence": 28,
+  "previousDigest": "sha256:80aa15c15c8b65dab2273b49394caac4d748b34dc5fd05469d79b480a86b6793",
+  "actor": "codex",
+  "type": "transition",
+  "summary": "Independent fresh-context reviewer approved all eight criteria and the final finger-scroll, local-hit-test, completed-click design.",
+  "createdAt": "2026-09-02T23:40:46.579Z",
+  "stateBeforeDigest": "sha256:be5477887ae1b94f2e0a40918118d45fb674ec827fcfe0298079fabff0922672",
+  "stateAfterDigest": "sha256:e10b0383dd11042ecb59efbd1c87c6edef410cf0e2a22db8ef2799c4c6c1d881",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 28,
+    "activeFeature": "implement-a-new-independently-installable-bb-touch-bar-plugin-for",
+    "request": "Implement a new independently installable BB Touch Bar plugin for Intel MacBook Pro Touch Bar machines, plus a BetterTouchTool companion/preset that can remain visible across all apps. The BB plugin should expose live compact thread/agent status and safe actions, integrate with BB host/server APIs, include clear setup documentation, tests, and repository catalog updates. Target an MVP that is usable without private macOS APIs, with BetterTouchTool as the persistence layer.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "integrate",
+    "status": "waiting",
+    "repairAttempts": 4,
+    "message": "Independent fresh-context reviewer approved all eight criteria and the final finger-scroll, local-hit-test, completed-click design.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:2cb81eb836af98d280d0660ae933e1f9672f2d1932631e43bef9d4f04b55ef08",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:2d251c63e1f2227d81443dd718e85b841fde132f94fd5c4dd03547b021236868",
+    "impactDigest": "sha256:5178c9dbca346cb25eddd79dfb6d3635dbd55440808ce4a1c8e9fdfdc7bf30fd",
+    "capabilityClaimId": "implement-a-new-independently-installable-bb-touch-bar-plugin-for-21366fe98a02",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "qa-d5075ffb947a8f6753979341",
+      "qa-c25c0324895e876167d4b612",
+      "qa-9f5cbb036d905d8917f52278",
+      "qa-2f2a25d2832530a2f8328c99",
+      "qa-ce0f09ccf06275fcb9ec7983",
+      "qa-ad3c1dc1d9a87051c21edba6",
+      "qa-cf594f42d3ae89668c141fd5",
+      "qa-f006c0aad90c4dfa8b1f1896",
+      "qa-731a7d3135dca1232369dec8",
+      "collected-fbe6c34fc49191f48a3e3796"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": true,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "verified",
+      "reasons": {
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-02T23:40:46.579Z"
+  },
+  "digest": "sha256:cedc0fd637a0e5b88b5322e25254d265d3d8e725d12d04ebbf575d2841745179"
+}
