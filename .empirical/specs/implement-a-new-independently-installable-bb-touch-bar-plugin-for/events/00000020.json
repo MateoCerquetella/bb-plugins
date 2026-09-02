@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sequence": 20,
+  "previousDigest": "sha256:12ba65bd9408cacfbfac796345e6bd96106f5d8cf10189b9f34db794f5b0e7d5",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Replaced arrow pagination with native finger scrolling that leaves scroll-view hit-testing and mouse handling to child controls; removed all arrow identifiers/actions; made carousel expose all projects in one scrollable lane; retained direct tap/open behavior, larger settings, red in-settings close, and phantom-error filtering; documented BTT and superseded stale decisions; rebuilt and installed successfully on the Intel Mac where a physical card tap opened BB.",
+  "createdAt": "2026-09-02T23:21:44.588Z",
+  "stateBeforeDigest": "sha256:da061cbde6218ba4a5e7e7d9289f633b153fb488c0869662944065361c1a1b33",
+  "stateAfterDigest": "sha256:dc83e41c0d485ae7187a9159b38e4fcad7359d7f035cf023663dbb1fc79d556d",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 20,
+    "activeFeature": "implement-a-new-independently-installable-bb-touch-bar-plugin-for",
+    "request": "Implement a new independently installable BB Touch Bar plugin for Intel MacBook Pro Touch Bar machines, plus a BetterTouchTool companion/preset that can remain visible across all apps. The BB plugin should expose live compact thread/agent status and safe actions, integrate with BB host/server APIs, include clear setup documentation, tests, and repository catalog updates. Target an MVP that is usable without private macOS APIs, with BetterTouchTool as the persistence layer.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "context",
+    "status": "waiting",
+    "repairAttempts": 3,
+    "message": "Replaced arrow pagination with native finger scrolling that leaves scroll-view hit-testing and mouse handling to child controls; removed all arrow identifiers/actions; made carousel expose all projects in one scrollable lane; retained direct tap/open behavior, larger settings, red in-settings close, and phantom-error filtering; documented BTT and superseded stale decisions; rebuilt and installed successfully on the Intel Mac where a physical card tap opened BB.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:2cb81eb836af98d280d0660ae933e1f9672f2d1932631e43bef9d4f04b55ef08",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:2d251c63e1f2227d81443dd718e85b841fde132f94fd5c4dd03547b021236868",
+    "impactDigest": "sha256:5178c9dbca346cb25eddd79dfb6d3635dbd55440808ce4a1c8e9fdfdc7bf30fd",
+    "capabilityClaimId": "implement-a-new-independently-installable-bb-touch-bar-plugin-for-21366fe98a02",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-02T23:21:44.588Z"
+  },
+  "digest": "sha256:fef7885d541dd80d81ea5274a1f8c0a3ecc6529f27884bd4fc55033b2cb3123b"
+}

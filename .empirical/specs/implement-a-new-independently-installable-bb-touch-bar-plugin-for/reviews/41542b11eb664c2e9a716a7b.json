@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:ce234acecfd352f1c93907f0b8c6fbff83532b3b86864e3e211c2c4955fffcee",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "b627bb0d43d8fac89e9777b0669700fa6f7e68ef",
+  "headCommit": "f908646a6c6bf185f44eb05f1604c698e324fef1",
+  "diffDigest": "sha256:e15ea6480ca981f1258081c2ebd2a7a6a39bbf3a95de6af5803b71d190c36320",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "isolated-reviewer",
+  "reviewerInvocationId": "/root/touchbar_review",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- PASS AC-1: The committed snapshot path remains bounded and reports active, attention, and visible aggregates; the acknowledged-error filter is covered.\n- PASS AC-2: The projection still exposes only bounded public card fields and adds no private thread data.\n- PASS AC-3: Native activation passes the exact thread id as a Process argument and activates BB only after success.\n- PASS AC-4: Deterministic ordering, bounding, compaction, and hidden-thread defaults remain intact.\n- PASS AC-5: The package retains its preset, wrapper, installer, and auditable Swift source.\n- FAIL AC-6: README and native path contradict the older accepted BTT-only/private-API decision.\n- PASS AC-7: Root checks and focused tests pass, though some matrix receipts use generic repository checks.\n- PASS AC-8: The plugin remains independently packaged and generated outputs are not tracked.\n\n## Security / correctness\n\nNo command-injection regression is visible, but the native private-API path conflicts with the older accepted decision and its documented support boundary.\n\n## Design / maintainability\n\nThe pager has a reachability defect in carousel mode and conflicts with the requested finger-scroll interaction; replace it with a scroll implementation that keeps direct button taps.",
+  "bodyDigest": "sha256:591db250ab59121cd3f7436edc2cec2035dfd191e7f6f720930a25b92abea067",
+  "digest": "sha256:41542b11eb664c2e9a716a7b0ac7cff7a2aa057e634ce88cca27971e0ca989f2"
+}

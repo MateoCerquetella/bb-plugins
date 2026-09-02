@@ -6,13 +6,15 @@ Fresh-context acceptance QA — 2026-09-02
 - AC-3: `bb touchbar open thr_i47f5uua6r` ran on the Mac, returned exit 0, and
   reported that the exact thread opened. Unit tests cover unknown and ineligible
   IDs without mutation.
-- AC-5: the native source no longer contains an `NSScrollView`; paged rows use
-  direct native controls and the panel has initial item identifiers. The Intel
-  Mac compiled and installed the new executable at
+- AC-5: the native source uses an `NSScrollView` for finger scrolling without
+  overriding its hit-test or mouse-down path; child controls dispatch taps
+  directly and no paging arrows remain. The Intel Mac compiled and installed it at
   `~/Applications/BBTouchBar.app`, and the running log identifies the
-  `paged-ui 2026-09-02` build.
-- AC-6: the README now explains native paging and acknowledged-error behavior,
-  along with installation, privacy, limitations, and removal.
+  `finger-scroll-ui 2026-09-02` build. Its log then recorded a physical thread
+  card tap and successful exact-id BB open.
+- AC-6: the README explains native finger scrolling, acknowledged-error
+  behavior, the BetterTouchTool All Apps alternative, installation, privacy,
+  limitations, and removal.
 - AC-7: the focused Touch Bar suite passes 19/19, including phantom-error
   filtering and native interaction contracts. The complete root `npm run check`
   also passes.
@@ -21,6 +23,8 @@ Fresh-context acceptance QA — 2026-09-02
   adapter-contract, end-to-end, and cross-platform checks pass.
 
 The native panel was opened through `native/run.sh open` after installation.
-The original user screenshot remains the failed pre-repair observation; this
-note records the post-repair command and installation evidence without claiming
-an automated physical-finger event.
+The post-repair Mac log records a physical tap on `thr_axt3ycmenc`, the sixth
+card in the contemporaneous snapshot and therefore beyond the first visible
+screen; reaching and opening it verifies both horizontal finger scrolling and
+the preserved tap path. The original screenshot remains the failed pre-repair
+observation.

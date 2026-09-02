@@ -7,7 +7,7 @@ The BB plugin owns the bounded thread snapshot and guarded commands. A small
 Swift/AppKit background app owns the physical Touch Bar:
 
 - an always-present BB badge in the Control Strip;
-- tap the badge to expand a fullscreen, paginated agent panel;
+- tap the badge to expand a fullscreen, horizontally finger-scrollable agent panel;
 - one outlined two-line card per thread with provider, project, status colour,
   badge and activity spinner;
 - tap a card to open that exact BB thread;
@@ -33,6 +33,23 @@ The persistent Control Strip and fullscreen system-modal modes rely on Apple's
 private `DFRFoundation` Touch Bar entry points. They are not App Store APIs and
 may require adaptation after a macOS update. The app tears down modal state
 before termination so it does not strand a black Touch Bar.
+
+## BetterTouchTool alternative
+
+If you prefer the public Touch Bar extension path, install BetterTouchTool and
+use the included All Apps companion instead of the standalone native app:
+
+```sh
+cd ~/Downloads/touchbar
+chmod +x companion/*.sh
+./companion/install.sh
+```
+
+Approve **Compile & Load** in BetterTouchTool, then open **All Apps → Touch
+Bar** and add one **BB Agent Monitor** plugin widget. To import the text-only
+fallback preset directly, run `./companion/install.sh --preset`. The BTT path
+keeps the monitor visible across applications without linking DFRFoundation;
+it requires BetterTouchTool and Xcode Command Line Tools on the Intel Mac.
 
 ## Install the BB plugin
 
@@ -129,8 +146,9 @@ Host CPU, RAM, and disk rings use Host Monitor's current configurable yellow
 and red thresholds. Changing those settings automatically changes Touch Bar
 gauge colors on the next sample; download remains red and upload blue.
 
-When the cards do not fit, native ‹ and › controls page through the lane without
-placing the thread and settings buttons inside a gesture-swallowing scroll view.
+Swipe directly across the card or settings lane to move it horizontally. The
+scroll container leaves hit-testing to its native child controls, so a short tap
+opens a thread or setting while a drag scrolls; no paging arrows consume space.
 Errors whose BB attention has already been read stay available in BB but are
 removed from the compact lane, so old failures do not remain pinned as new red
 alerts.

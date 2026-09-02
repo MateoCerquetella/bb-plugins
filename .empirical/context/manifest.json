@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "generator": "empirical-0.30.0",
-  "sourceDigest": "sha256:2a798005331b7eebfa0ed7c7ad9585c52f72777af517559224903f18347888c0",
+  "sourceDigest": "sha256:f325897835a8c8fd59db0866e7d769c88574b6d3abe650a8ec1ec16a7a193885",
   "files": [
     {
       "path": ".agents/skills/empirical/SKILL.md",
@@ -1155,8 +1155,8 @@
     },
     {
       "path": "plugins/touchbar/README.md",
-      "size": 8710,
-      "digest": "sha256:d09fd7c9748a2bd6320257d118a7290d7dfb9b23a162e8b3151d79cfdadcedd8"
+      "size": 9458,
+      "digest": "sha256:a19a090ce6d53be75e62f1c4f8eba85330193a1121a5401622dc5041197339c6"
     },
     {
       "path": "plugins/touchbar/assets/icon.svg",
@@ -1255,8 +1255,8 @@
     },
     {
       "path": "plugins/touchbar/native/Sources/TouchBarController.swift",
-      "size": 73032,
-      "digest": "sha256:007edeba55e5cc816f265356b3592361c122fa2a5ca51a7dba441410985cb606"
+      "size": 67429,
+      "digest": "sha256:110caf1201b2eab01ff25f74f85e492afc640e87f3bff04a262b20d26356f5aa"
     },
     {
       "path": "plugins/touchbar/native/Sources/main.swift",
@@ -1320,8 +1320,8 @@
     },
     {
       "path": "plugins/touchbar/test/companion.test.ts",
-      "size": 17599,
-      "digest": "sha256:fc636c4d8ac295d15fc9d62f47b6986cb2d2133703c3b54c6d53012e931e1338"
+      "size": 17833,
+      "digest": "sha256:5b9bdc2c9122ccad52196c305d0d5ceee1805b3ed4e0d7df8a9303fd47fce2dc"
     },
     {
       "path": "plugins/touchbar/test/live-smoke.mjs",
@@ -1793,7 +1793,7 @@
         "touchbar-ui-concepts-v2.html",
         "touchbar-ui-exploration-v3.html"
       ],
-      "sourceDigest": "sha256:2a798005331b7eebfa0ed7c7ad9585c52f72777af517559224903f18347888c0",
+      "sourceDigest": "sha256:f325897835a8c8fd59db0866e7d769c88574b6d3abe650a8ec1ec16a7a193885",
       "digest": "sha256:eed9cfd95fdecbf70535c9b9bfdb204011bdad5af0a5418d4d923f3a99f354f2",
       "freshness": "fresh"
     },
@@ -1828,7 +1828,7 @@
         "plugins/usage-tracker/README.md",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:10609dc4ebe345c90c3462d43f27455464f7efc4706fb7793ab995566ad97e3f",
+      "sourceDigest": "sha256:7a8a2ac4ff868d85ecf93f6c013fe1afccb78150d61e9186f20027708d00620f",
       "digest": "sha256:37f1b782a0e88dee101030bf6ac6aa2742c329ca37daf764d5022e793ce6bc15",
       "freshness": "fresh"
     },
@@ -1889,5 +1889,5 @@
     }
   ],
   "truncated": false,
-  "digest": "sha256:6122620a5e46c31ddcfbcc9871bf2d6e72bbfa0745ff25fb8cc37c28d15d92a5"
+  "digest": "sha256:69c07a4134efdfe606f177d55c4e0d95b77d9e524e3283aa4c33edf6dd00238e"
 }

@@ -136,7 +136,8 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(controller, /dismissSystemModalTouchBar/u);
   assert.match(controller, /minimizeSystemModalTouchBar/u);
   assert.doesNotMatch(controller, /SummaryButton|labelWithString: "BB"/u);
-  assert.doesNotMatch(controller, /NSScrollView|hasHorizontalScroller/u);
+  assert.match(controller, /private final class TouchBarScrollView: NSScrollView/u);
+  assert.match(controller, /hasHorizontalScroller = false/u);
   assert.match(controller, /GroupDividerView/u);
   assert.match(controller, /projectEntries\.map/u);
   assert.match(controller, /project\.localizedCaseInsensitiveCompare/u);
@@ -159,8 +160,8 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(controller, /projectTapped/u);
   assert.match(controller, /dockTapped/u);
   assert.match(controller, /carouselTapped/u);
-  assert.match(controller, /previousProjectTapped/u);
-  assert.match(controller, /nextProjectTapped/u);
+  assert.doesNotMatch(controller, /bbPreviousProject|bbNextProject/u);
+  assert.doesNotMatch(controller, /title: "[‹›]"/u);
   assert.match(controller, /projectDockTapped/u);
   assert.match(controller, /BBTouchBarSelectedProject/u);
   assert.match(controller, /private final class GroupDividerView: NSButton/u);
@@ -234,15 +235,16 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(controller, /control\.frame = NSRect\(x: x, y: 0, width: width, height: 30\)/u);
   assert.match(controller, /private func settingsGroups\(\)/u);
   assert.match(controller, /override func hitTest\(_ point: NSPoint\) -> NSView\?/u);
-  assert.match(controller, /private final class PagedRowView/u);
-  assert.match(controller, /private func paginate\(_ views: \[NSView\], limit: CGFloat\)/u);
+  const scrollViewSource = controller.slice(
+    controller.indexOf("private final class TouchBarScrollView"),
+    controller.indexOf("private final class AgentStatusPill"),
+  );
+  assert.match(scrollViewSource, /override func scrollWheel/u);
+  assert.doesNotMatch(scrollViewSource, /override func hitTest|override func mouseDown/u);
   assert.match(controller, /bar\.defaultItemIdentifiers = panelIdentifiers\(\)/u);
   assert.match(controller, /override func mouseDown\(with event: NSEvent\)/u);
-  assert.match(controller, /private func deepestButton\(at point: NSPoint\)/u);
-  assert.ok(controller.includes('panel tap \\(button.identifier?.rawValue ?? "button")'));
-  assert.match(controller, /NSApp\.sendAction\(action, to: button\.target, from: button\)/u);
   assert.match(controller, /configurationVisible \? \.bbSettingsPanel : \.bbList/u);
-  assert.match(controller, /settingsPanelItem\.view = PagedRowView\(views: groups/u);
+  assert.match(controller, /settingsPanelItem\.view = scrollContainer\(groups\)/u);
   assert.match(controller, /title: "FILTERS"/u);
   assert.match(controller, /title: "SUBSCRIPTIONS"/u);
   assert.match(controller, /title: "HOST MONITOR"/u);
@@ -250,7 +252,10 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(controller, /appendArc/u);
   assert.match(controller, /progress\.lineCapStyle = \.round/u);
   assert.match(controller, /usageItem\.view = usageIconsView/u);
-  assert.doesNotMatch(controller, /scrollContainer/u);
+  assert.match(controller, /private func scrollContainer\(_ views: \[NSView\]\)/u);
+  assert.match(controller, /scroll\.documentView = stack/u);
+  assert.match(controller, /else if sortMode == \.carousel/u);
+  assert.match(controller, /for name in orderedProjects\(in: entries\)/u);
   assert.match(controller, /title: "PANEL"/u);
   assert.match(controller, /selected: true, color: \.systemRed/u);
   assert.doesNotMatch(controller, /usageButton\.title/u);

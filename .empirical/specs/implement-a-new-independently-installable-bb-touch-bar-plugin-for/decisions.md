@@ -2,7 +2,9 @@
 
 ## D-001: Use BetterTouchTool for cross-application persistence
 
-Status: Accepted
+Status: Superseded
+
+Superseded by: D-006
 
 ### Evidence
 
@@ -28,7 +30,9 @@ Contract tests and one documented physical All Apps setup on an Intel Mac.
 
 ## D-002: Ship a Swift Source Plugin, not preset JSON or a binary bundle
 
-Status: Accepted
+Status: Superseded
+
+Superseded by: D-006
 
 ### Evidence
 
@@ -104,7 +108,9 @@ Source and behavior tests prove physical buttons dispatch only open.
 
 ## D-005: Verify UI contract without pretending Linux CI has Touch Bar hardware
 
-Status: Accepted
+Status: Superseded
+
+Superseded by: D-006
 
 ### Evidence
 
@@ -126,3 +132,46 @@ Automated evidence proves integration structure, not pixels on
 ### Verification
 
 Automated source/fixture checks and a documented physical verification checklist.
+
+## D-006: Support native finger scrolling with BTT as the public-API alternative
+
+Status: Accepted
+
+Supersedes: D-001, D-002, D-005
+
+### Evidence
+
+- The user explicitly approved the native repair on 2026-09-02 and required
+  finger scrolling without paging arrows.
+- The enrolled Intel Mac compiled and installed the source-built app, and its
+  runtime log recorded a physical card tap followed by a successful exact-id BB
+  open.
+- The package still includes the BetterTouchTool Swift plugin, installer, and
+  All Apps preset as the non-private compatibility path.
+
+### Options
+
+1. Remove the native companion and require BetterTouchTool.
+2. Keep pager arrows in the native companion.
+3. Keep both companions, document the private-API boundary, and use a native
+   horizontal scroll view that delegates taps to its child controls.
+
+### Chosen approach
+
+Choose option 3. The native companion is the direct, no-BTT path requested by
+the user; BetterTouchTool remains the supported public-API alternative. The
+native lane must be finger-scrollable, show no pager arrows, and must not
+override the scroll view's hit-test or mouse-down path.
+
+### Trade-offs and risks
+
+The direct companion depends on private DFRFoundation APIs and may need changes
+after macOS updates. The BTT alternative avoids that dependency but requires a
+third-party application. Both paths keep BB authoritative through argument-array
+CLI calls.
+
+### Verification
+
+Build and install on the enrolled Intel Mac, confirm the runtime identifies the
+finger-scroll build, physically swipe the lane and tap a thread card, and retain
+contract tests that reject pager arrows and scroll-view input interception.

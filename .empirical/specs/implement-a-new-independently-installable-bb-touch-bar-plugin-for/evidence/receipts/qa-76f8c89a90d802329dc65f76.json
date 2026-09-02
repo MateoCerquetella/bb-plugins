@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-76f8c89a90d802329dc65f76",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Validate deterministic focused and failure-path behavior.",
+  "passed": true,
+  "startedAt": "2026-09-02T23:23:30.316Z",
+  "completedAt": "2026-09-02T23:23:30.566Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "implement-a-new-independently-installable-bb-touch-bar-plugin-for",
+    "specRevision": 2,
+    "specDigest": "sha256:2cb81eb836af98d280d0660ae933e1f9672f2d1932631e43bef9d4f04b55ef08",
+    "treeDigest": "sha256:c71574740d0816a8dc07f0aa0f5c05389109ece9a7863e3257b2b476ad2eba56",
+    "policyDigest": "sha256:dddc072c4f4908581e6e359608fe9aec39894c5258cd821ec894bbd59a67fbb7",
+    "workflowRevision": 21,
+    "gitCommit": "f908646a6c6bf185f44eb05f1604c698e324fef1"
+  },
+  "digest": "sha256:7f056203b7578ae46e24b7ff7e0bb4b4469adf4367d89972aa95e8b0f4f261d8",
+  "kind": "qa",
+  "matrixDigest": "sha256:3bbeb09a66034cf8e41fabf21fe6d09bfba95f48085330e8df608de57704028b",
+  "check": {
+    "id": "qa-fault-injection",
+    "kind": "fault-injection"
+  },
+  "coveredChecks": [
+    "fault-injection",
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Validate deterministic focused and failure-path behavior.",
+      "startedAt": "2026-09-02T23:23:30.316Z",
+      "completedAt": "2026-09-02T23:23:30.566Z",
+      "durationMs": 250,
+      "collector": null,
+      "command": {
+        "argv": [
+          "npm",
+          "run",
+          "test",
+          "--workspace=bb-plugin-action-topbar"
+        ],
+        "cwd": ".",
+        "timeoutMs": 60000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:1586166046956a7c4e811d1d801fe46b77da60c4e6f49cf11770ca0e5586a270",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "\n> bb-plugin-action-topbar@0.1.0 test\n> node --test --experimental-strip-types test/*.test.ts\n\nTAP version 13\n# Subtest: starts with the action set shown in the BB right-panel launcher\nok 1 - starts with the action set shown in the BB right-panel launcher\n  ---\n  duration_ms: 0.929515\n  type: 'test'\n  ...\n# Subtest: normalizes, bounds, and deduplicates a discovered action catalog\nok 2 - normalizes, bounds, and deduplicates a discovered action catalog\n  ---\n  duration_ms: 0.197329\n  type: 'test'\n  ...\n# Subtest: round-trips valid storage and rejects unknown storage versions\nok 3 - round-trips valid storage and rejects unknown storage versions\n  ---\n  duration_ms: 0.238444\n  type: 'test'\n  ...\n# Subtest: a visible launcher replaces the seed while an absent launcher preserves it\nok 4 - a visible launcher replaces the seed while an absent launcher preserves it\n  ---\n  duration_ms: 0.112565\n  type: 'test'\n  ...\n# Subtest: classifies known and third-party action labels for compact glyphs\nok 5 - classifies known and third-party action labels for compact glyphs\n  ---\n  duration_ms: 0.176922\n  type: 'test'\n  ...\n# Subtest: mounts the owned strip in the thread-header center and leaves native plus alone\nok 6 - mounts the owned strip in the thread-header center and leaves native plus alone\n  ---\n  duration_ms: 0.684517\n  type: 'test'\n  ...\n# Subtest: keeps Action lookup scoped to BB's native launcher\nok 7 - keeps Action lookup scoped to BB's native launcher\n  ---\n  duration_ms: 0.115471\n  type: 'test'\n  ...\n# Subtest: keeps lifecycle and drag work event-driven and reversible\nok 8 - keeps lifecycle and drag work event-driven and reversible\n  ---\n  duration_ms: 0.205484\n  type: 'test'\n  ...\n# Subtest: preserves keyboard focus and the bounded cross-pane relaunch path\nok 9 - preserves keyboard focus and the bounded cross-pane relaunch path\n  ---\n  duration_ms: 0.139815\n  type: 'test'\n  ...\n# Subtest: focuses main Action panes without opening the right panel\nok 10 - focuses main Action panes without opening the right panel\n  ---\n  duration_ms: 0.144433\n  type: 'test'\n  ...\n# Subtest: places close controls on the left and closes through persisted tab state\nok 11 - places close controls on the left and closes through persisted tab state\n  ---\n  duration_ms: 0.273098\n  type: 'test'\n  ...\n# Subtest: makes Actions drag-only instead of opening them from click or Enter\nok 12 - makes Actions drag-only instead of opening them from click or Enter\n  ---\n  duration_ms: 0.13745\n  type: 'test'\n  ...\n# Subtest: projects BB tab state into the compact frontend RPC model\nok 13 - projects BB tab state into the compact frontend RPC model\n  ---\n  duration_ms: 4.801895\n  type: 'test'\n  ...\n# Subtest: persists a topbar drag reorder through BB's tab revision API\nok 14 - persists a topbar drag reorder through BB's tab revision API\n  ---\n  duration_ms: 0.907354\n  type: 'test'\n  ...\n# Subtest: closes a topbar tab through BB's tab revision API\nok 15 - closes a topbar tab through BB's tab revision API\n  ---\n  duration_ms: 0.834992\n  type: 'test'\n  ...\n# Subtest: closes a main-pane terminal without a persisted panel tab\nok 16 - closes a main-pane terminal without a persisted panel tab\n  ---\n  duration_ms: 0.722407\n  type: 'test'\n  ...\n# Subtest: does not close a main-pane terminal owned by another thread\nok 17 - does not close a main-pane terminal owned by another thread\n  ---\n  duration_ms: 0.656026\n  type: 'test'\n  ...\n# Subtest: bounds host-provided tab labels before returning the RPC projection\nok 18 - bounds host-provided tab labels before returning the RPC projection\n  ---\n  duration_ms: 0.488731\n  type: 'test'\n  ...\n# Subtest: shows only real content tabs in the mirrored strip\nok 19 - shows only real content tabs in the mirrored strip\n  ---\n  duration_ms: 0.875777\n  type: 'test'\n  ...\n# Subtest: keeps the empty combobox action-only and ranks open tabs while searching\nok 20 - keeps the empty combobox action-only and ranks open tabs while searching\n  ---\n  duration_ms: 0.402724\n  type: 'test'\n  ...\n# Subtest: ranks an equivalent open tab before its Action even when titles differ\nok 21 - ranks an equivalent open tab before its Action even when titles differ\n  ---\n  duration_ms: 0.154712\n  type: 'test'\n  ...\n# Subtest: never positionally pairs a stale New Tab snapshot with a new Action tab\nok 22 - never positionally pairs a stale New Tab snapshot with a new Action tab\n  ---\n  duration_ms: 0.114839\n  type: 'test'\n  ...\n# Subtest: uses one bounded normalization for server and native tab identities\nok 23 - uses one bounded normalization for server and native tab identities\n  ---\n  duration_ms: 0.107837\n  type: 'test'\n  ...\n# Subtest: validates RPC snapshots before the content script renders them\nok 24 - validates RPC snapshots before the content script renders them\n  ---\n  duration_ms: 0.233586\n  type: 'test'\n  ...\n1..24\n# tests 24\n# suites 0\n# pass 24\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 145.840955\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:c71574740d0816a8dc07f0aa0f5c05389109ece9a7863e3257b2b476ad2eba56",
+      "sourceTreeAfter": "sha256:c71574740d0816a8dc07f0aa0f5c05389109ece9a7863e3257b2b476ad2eba56",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

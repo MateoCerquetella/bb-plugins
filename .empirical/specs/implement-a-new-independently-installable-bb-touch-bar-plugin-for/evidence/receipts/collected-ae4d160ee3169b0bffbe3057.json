@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-ae4d160ee3169b0bffbe3057",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review requested changes to the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-09-02T23:10:38.882Z",
+  "completedAt": "2026-09-02T23:10:38.882Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "implement-a-new-independently-installable-bb-touch-bar-plugin-for",
+    "specRevision": 2,
+    "specDigest": "sha256:2cb81eb836af98d280d0660ae933e1f9672f2d1932631e43bef9d4f04b55ef08",
+    "treeDigest": "sha256:f93586a2af73209493a5015ad1a0ac747d2e3381d6dff01749c4a01e9d6b081f",
+    "policyDigest": "sha256:dddc072c4f4908581e6e359608fe9aec39894c5258cd821ec894bbd59a67fbb7"
+  },
+  "digest": "sha256:e2a20b00306677ab15db9e622c443f2d7e6c9d3baf7073fb0e9d756493993c0c",
+  "kind": "collected",
+  "collector": "empirical-review:isolated-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/implement-a-new-independently-installable-bb-touch-bar-plugin-for/reviews/41542b11eb664c2e9a716a7b.json",
+      "mediaType": "application/json",
+      "bytes": 2034,
+      "digest": "sha256:7cd4bd5429b43cf95261219828ef2a6e3570d867521855e0480bfd06b2aabe5e"
+    },
+    {
+      "path": ".empirical/specs/implement-a-new-independently-installable-bb-touch-bar-plugin-for/reviews/41542b11eb664c2e9a716a7b.md",
+      "mediaType": "text/markdown",
+      "bytes": 1299,
+      "digest": "sha256:eea52ab168ca3129e0e497873561cd181ccd65329fb7448752b89e7c22dbc1a8"
+    }
+  ]
+}
