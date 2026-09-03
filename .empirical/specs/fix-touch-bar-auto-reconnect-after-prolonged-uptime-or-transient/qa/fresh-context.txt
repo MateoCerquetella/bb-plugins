@@ -1,0 +1,10 @@
+Fresh-context QA — 2026-09-03
+
+Inspected committed reconnect repair at 3f86a9d. AgentStore has one polling loop,
+retains the last good snapshot while disconnected, enters reconnecting after
+three failures, retries with bounded 2–30 second backoff, and logs recovery.
+Timed-out BB commands terminate and close the output pipe so polling cannot
+deadlock. Existing direct Touch Bar delivery, finger scrolling, settings and
+thread taps, exact-id actions, and acknowledged-error filtering remain covered
+by the companion test suite. Native installer completed on the enrolled Intel
+Mac (marker __TB_RECONNECT_INSTALL__:0).
