@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:1e102dd28c903f9e36eea4624879ec9144f7ad6ac7b007258ddcd1be18afdb3f",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "a6391be14058735b3aebe1769edb313f20100014",
+  "headCommit": "16cf44c6598b7205f15933453562bdc28b5b2a39",
+  "diffDigest": "sha256:024892cb283d03aec62b264cde078f0e9ff54b762a9f2a40f68109d22eb2b199",
+  "verdict": "APPROVED",
+  "reviewerActor": "codex:/root/grafana_fleet_rereview",
+  "reviewerInvocationId": "01a068a3-f2cd-70a3-b918-1cf5430de5c9",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: All enrolled hosts are projected; connected calls are bounded and independent with fresh/stale/sampling/error/offline states.\n- PASS AC-2: Telemetry-only host contract covers all required metrics and exposes no IP or process controls.\n- PASS AC-3: Server receipt timestamps, 30-day retention, five ranges, relative buckets, 720 cap, and explicit gaps make history clock-safe.\n- PASS AC-UI-1: Fleet totals, search, bounded cards, explicit statuses, and dense theme-safe panels are present.\n- PASS AC-UI-2: Same-page selection/current stats/charts and responsive 390px behavior pass; host/range guards prevent old data.\n- PASS AC-UI-3: Stable branded nav entry has a neutral presentational connected/total accessory without popup/floating UI.\n- PASS AC-4: Notification, alert, badge, IP, process, content-script, popup, and floating surfaces are absent; failures are inline.\n- PASS AC-5: Thresholds are passive; host calls coalesce and fleet refresh emits only sampling/completion invalidations.\n- PASS AC-6: Identity, version, route/title, assets, coordinates, compatibility, SDK pin, and host artifact remain stable.\n- PASS AC-7: SDK/type/23 tests/builds and live four-host desktop/mobile evidence pass; history refresh and labeled summaries are covered.\n\n## Security / correctness\n\nAPPROVED: telemetry-only RPC, server-owned observation time, and bounded calls/history prevent privacy and remote-clock correctness issues.\n\n## Design / maintainability\n\nAPPROVED: split RPCs, isolated store, append-only migrations, request/range guards, and coalesced invalidations are clear and maintainable.",
+  "bodyDigest": "sha256:1cfba1f561feb54453687e44b7badca8c3c41836ddd6d1bcf79ddfa749ca132e",
+  "digest": "sha256:2b0da9b35aea5c8c70970d54521d7334247b376f634f5a7b1e8bc5ded7093ea5"
+}

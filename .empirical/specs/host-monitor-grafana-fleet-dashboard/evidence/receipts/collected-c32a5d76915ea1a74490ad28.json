@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-c32a5d76915ea1a74490ad28",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-09-03T21:21:38.042Z",
+  "completedAt": "2026-09-03T21:21:38.042Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-grafana-fleet-dashboard",
+    "specRevision": 2,
+    "specDigest": "sha256:b68039cc56e374ac530c1d4ee1f57640d396e07bbb1b09684dcf0a38e345ecf3",
+    "treeDigest": "sha256:49c53573922276069530dedc79c7370706847c77a2a012792ccab95f2cd2812e",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf"
+  },
+  "digest": "sha256:e6429dace227afd4398b9266c57f82c88eaeb87de1fbad049edb4baa51682d68",
+  "kind": "collected",
+  "collector": "empirical-review:codex:/root/grafana_fleet_rereview",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/host-monitor-grafana-fleet-dashboard/reviews/2b0da9b35aea5c8c70970d54.json",
+      "mediaType": "application/json",
+      "bytes": 2387,
+      "digest": "sha256:8d4b55e34b0e08e289cc9941843d96b703f6ab244f9397f84a1d077aee3b5612"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-grafana-fleet-dashboard/reviews/2b0da9b35aea5c8c70970d54.md",
+      "mediaType": "text/markdown",
+      "bytes": 1627,
+      "digest": "sha256:45143979d9e708dece83b4682e43dd16b28db6237a54e8787036fbd070f82863"
+    }
+  ]
+}

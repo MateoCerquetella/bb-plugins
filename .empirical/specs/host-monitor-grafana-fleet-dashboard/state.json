@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 11,
+  "revision": 12,
   "activeFeature": "host-monitor-grafana-fleet-dashboard",
   "request": "Rework Host Monitor into a Grafana-style in-page fleet dashboard. Restore the Host Monitor sidebar accessory icon as a compact quick-access/status control, but keep the full monitoring interface inside the Host Monitor page rather than a popup or floating overlay. Monitor and display every enrolled BB machine, with per-machine CPU, RAM, disk, load, uptime, network and historical panels where available. Preserve notification-free behavior: no toast, desktop/browser notification, alert banner, or warning badge.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "review",
+  "phase": "integrate",
   "status": "waiting",
   "repairAttempts": 1,
-  "message": "Post-review verification passes with workspace checks, configured E2E, repaired Playwright browser/screenshots, and fresh-context QA covering server-owned time, live history refresh, range isolation, series labels, all four machines, sidebar accessory, and notification-free behavior.",
+  "message": "Final isolated review approved all ten criteria and found no blocking security, privacy, correctness, or maintainability issue after the clock-safe history and live-refresh repairs.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:b68039cc56e374ac530c1d4ee1f57640d396e07bbb1b09684dcf0a38e345ecf3",
@@ -24,7 +24,8 @@
     "qa-e1fe1d1b48dc8f96cdd750b2",
     "qa-03742e68a5ebd95bc025c8e2",
     "qa-a5e194dd536d9800b570db3c",
-    "collected-16616691c28835ed8e1a3457"
+    "collected-16616691c28835ed8e1a3457",
+    "collected-c32a5d76915ea1a74490ad28"
   ],
   "legacyEvidenceCount": 0,
   "completion": {
@@ -40,5 +41,5 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-03T21:17:49.777Z"
+  "updatedAt": "2026-09-03T21:21:48.693Z"
 }
