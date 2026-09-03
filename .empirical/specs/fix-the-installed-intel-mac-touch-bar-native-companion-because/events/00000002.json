@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "sequence": 2,
+  "previousDigest": "sha256:89e3b3db47e8e885a3e30357e35982b8ce2666abd7c918f6fa069639a3d84e66",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Refined the repair contract with observable tap, swipe, local-hit-test, completed-click, hardware-install, preservation, and verification criteria; accepted the AppKit approach and added the capability delta.",
+  "createdAt": "2026-09-03T00:06:31.063Z",
+  "stateBeforeDigest": "sha256:001253dc34f23adbdd6292a3c2326f3ed5a9b343afd4dec2c7d453658124913e",
+  "stateAfterDigest": "sha256:6f8b0a36257f40dceca16644de6cbce563397d72afe5e6e49ed56cc42daad4e1",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 2,
+    "activeFeature": "fix-the-installed-intel-mac-touch-bar-native-companion-because",
+    "request": "Fix the installed Intel Mac Touch Bar native companion because physical touch still does not activate thread cards or any settings controls. Reproduce on the enrolled Mac, identify the actual Touch Bar event-routing failure, and implement a reliable finger-scrollable lane where completed taps activate threads/settings and horizontal swipes scroll without triggering taps. Preserve the acknowledged-error filtering, red settings close control, larger controls, exact-id BB actions, BTT alternative, tests, and documentation. Rebuild and install the corrected app on the Mac, run focused/root verification, and record human hardware evidence.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "design",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Refined the repair contract with observable tap, swipe, local-hit-test, completed-click, hardware-install, preservation, and verification criteria; accepted the AppKit approach and added the capability delta.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:0dc24ec3cc3f8465d5b95eb78b6fd7972a24e55d371a849d78630edfa7047a92",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:69123bfda421cf0dca9aad293a22254042c66b4f2e422e697012b16daf14ee74",
+    "impactDigest": "sha256:5178c9dbca346cb25eddd79dfb6d3635dbd55440808ce4a1c8e9fdfdc7bf30fd",
+    "capabilityClaimId": "fix-the-installed-intel-mac-touch-bar-native-companion-because-21366fe98a02",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-03T00:06:31.063Z"
+  },
+  "digest": "sha256:98b203e7c0c64b58f042323308750c528b88ee9b29b4fe86296e3671fd4a3ffd"
+}

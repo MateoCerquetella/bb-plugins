@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "generator": "empirical-0.30.0",
-  "sourceDigest": "sha256:35b2b49782e72e2063f66885d0649dbb331f21cb9d82650a2e7187a971ee8968",
+  "sourceDigest": "sha256:ff6d695161469ea313965074903aa1bd02a5e82c24eb27c6daa93b48335a8d02",
   "files": [
     {
       "path": ".agents/skills/empirical/SKILL.md",
@@ -1255,8 +1255,8 @@
     },
     {
       "path": "plugins/touchbar/native/Sources/TouchBarController.swift",
-      "size": 65723,
-      "digest": "sha256:29d0672fcabf69433bbacbd6176ecbaa85b52bf4d209bcad6403a5772e9c56df"
+      "size": 66018,
+      "digest": "sha256:ca1cae1ec379ffec1a8b17d18dcc030a39f5d6e728d83c56ab1303c4e02463ff"
     },
     {
       "path": "plugins/touchbar/native/Sources/main.swift",
@@ -1320,8 +1320,8 @@
     },
     {
       "path": "plugins/touchbar/test/companion.test.ts",
-      "size": 17786,
-      "digest": "sha256:f60eca8e97750f88b4fbd88b1d3fbaa72fdf6e2398d7ff453a4e816ae4644588"
+      "size": 17804,
+      "digest": "sha256:9119bdab89a18ab05b10a8f5e3e2ef676abbbc4af0688ff44196a2bdc5bdd4ad"
     },
     {
       "path": "plugins/touchbar/test/live-smoke.mjs",
@@ -1793,7 +1793,7 @@
         "touchbar-ui-concepts-v2.html",
         "touchbar-ui-exploration-v3.html"
       ],
-      "sourceDigest": "sha256:35b2b49782e72e2063f66885d0649dbb331f21cb9d82650a2e7187a971ee8968",
+      "sourceDigest": "sha256:ff6d695161469ea313965074903aa1bd02a5e82c24eb27c6daa93b48335a8d02",
       "digest": "sha256:eed9cfd95fdecbf70535c9b9bfdb204011bdad5af0a5418d4d923f3a99f354f2",
       "freshness": "fresh"
     },
@@ -1889,5 +1889,5 @@
     }
   ],
   "truncated": false,
-  "digest": "sha256:202f070bde36cab4125bcbd42ff16d25c6497d7e9584feee44d499a444b2800e"
+  "digest": "sha256:66bc079246a08ea82fe89a2ea9c88f03401f0bc93fea7c0259f91b192880d0fc"
 }

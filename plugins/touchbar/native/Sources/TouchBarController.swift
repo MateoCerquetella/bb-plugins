@@ -187,7 +187,8 @@ private final class GroupDividerView: NSButton {
     }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        bounds.contains(point) ? self : nil
+        let local = convert(point, from: superview)
+        return bounds.contains(local) ? self : nil
     }
 
     func setSelected(_ selected: Bool) {
@@ -230,6 +231,8 @@ private final class ProjectGroupView: NSView {
         stack = nestedStack
         measuredWidth = nestedStack.fittingSize.width + 8
         super.init(frame: .zero)
+        allowedTouchTypes = .direct
+        nestedStack.allowedTouchTypes = .direct
         wantsLayer = true
         layer?.cornerRadius = 6
         layer?.borderWidth = 1
@@ -407,7 +410,8 @@ private final class HostMetricView: NSButton {
     override var intrinsicContentSize: NSSize { NSSize(width: measuredWidth, height: 30) }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        bounds.contains(point) ? self : nil
+        let local = convert(point, from: superview)
+        return bounds.contains(local) ? self : nil
     }
 
     override func layout() {
@@ -608,7 +612,8 @@ private final class SettingsControlButton: NSButton {
     }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        bounds.contains(point) ? self : nil
+        let local = convert(point, from: superview)
+        return bounds.contains(local) ? self : nil
     }
 
     override func draw(_ dirtyRect: NSRect) {
@@ -656,7 +661,8 @@ private final class CompactNativeButton: NSButton {
     override var intrinsicContentSize: NSSize { NSSize(width: fixedWidth, height: 30) }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        bounds.contains(point) ? self : nil
+        let local = convert(point, from: superview)
+        return bounds.contains(local) ? self : nil
     }
 }
 
@@ -679,6 +685,7 @@ private final class SettingsGroupView: NSView {
             controls.reduce(CGFloat(8)) { $0 + $1.intrinsicContentSize.width } +
             CGFloat(max(controls.count - 1, 0) * 3)
         super.init(frame: .zero)
+        allowedTouchTypes = .direct
         wantsLayer = true
         layer?.cornerRadius = 6
         layer?.borderWidth = 1
@@ -820,7 +827,8 @@ private final class AgentButton: NSButton {
     }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        bounds.contains(point) ? self : nil
+        let local = convert(point, from: superview)
+        return bounds.contains(local) ? self : nil
     }
 
     func setGrouped(_ value: Bool) {
@@ -1290,22 +1298,27 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     @objc private func priorityTapped(_ sender: NSButton) {
+        NativeLog.info("settings priority tapped")
         selectSortMode(.status)
     }
 
     @objc private func projectTapped(_ sender: NSButton) {
+        NativeLog.info("settings project tapped")
         selectSortMode(.project)
     }
 
     @objc private func dockTapped(_ sender: NSButton) {
+        NativeLog.info("settings dock tapped")
         selectSortMode(.dock)
     }
 
     @objc private func carouselTapped(_ sender: NSButton) {
+        NativeLog.info("settings carousel tapped")
         selectSortMode(.carousel)
     }
 
     @objc private func hostMonitorTapped(_ sender: NSButton) {
+        NativeLog.info("settings host monitor tapped")
         hostViewVisible.toggle()
         updateControlColors()
         schedulePanelRender()
@@ -1329,22 +1342,27 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     @objc private func usageVisibilityTapped(_ sender: NSButton) {
+        NativeLog.info("settings usage visibility tapped")
         setUsageVisibilityFromMenu(!showUsage)
     }
 
     @objc private func hostVisibilityTapped(_ sender: NSButton) {
+        NativeLog.info("settings host visibility tapped")
         setHostVisibilityFromMenu(!showHostMonitor)
     }
 
     @objc private func codexVisibilityTapped(_ sender: NSButton) {
+        NativeLog.info("settings codex visibility tapped")
         toggleUsageProvider("codex")
     }
 
     @objc private func claudeVisibilityTapped(_ sender: NSButton) {
+        NativeLog.info("settings claude visibility tapped")
         toggleUsageProvider("claudeCode")
     }
 
     @objc private func cursorVisibilityTapped(_ sender: NSButton) {
+        NativeLog.info("settings cursor visibility tapped")
         toggleUsageProvider("cursor")
     }
 
@@ -1355,6 +1373,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
 
     @objc private func projectDockTapped(_ sender: NSButton) {
         guard let project = sender.identifier?.rawValue else { return }
+        NativeLog.info("settings project dock tapped \(project)")
         selectedProject = project
         UserDefaults.standard.set(project, forKey: "BBTouchBarSelectedProject")
         schedulePanelRender()
@@ -1701,6 +1720,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         stack.spacing = 5
         stack.alignment = .centerY
         stack.translatesAutoresizingMaskIntoConstraints = true
+        stack.allowedTouchTypes = .direct
 
         let fitting = stack.fittingSize
         let visible = min(max(fitting.width, 100), Self.contentWidth)
@@ -1718,6 +1738,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
             height: Self.barHeight
         ))
         scroll.drawsBackground = false
+        scroll.allowedTouchTypes = .direct
         scroll.hasHorizontalScroller = false
         scroll.hasVerticalScroller = false
         scroll.horizontalScrollElasticity = .allowed
