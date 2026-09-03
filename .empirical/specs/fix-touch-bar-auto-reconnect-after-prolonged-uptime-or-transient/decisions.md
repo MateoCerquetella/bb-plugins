@@ -40,6 +40,26 @@ backoff bounds, one loop, and connected recovery. Verify on the enrolled Mac.
 
 Status: Accepted
 
+### Evidence
+
 The independent review identified that AppKit supplies `hitTest` points in the
-receiver's local coordinate space. The five custom controls now test
-`bounds.contains(point)` directly; no superview conversion is performed.
+receiver's local coordinate space.
+
+### Options
+
+1. Convert from the superview again.
+2. Test the supplied point directly in the receiver bounds.
+
+### Chosen approach
+
+Choose option 2. All five custom controls use `bounds.contains(point)` directly.
+
+### Trade-offs and risks
+
+This relies on AppKit's documented hit-test contract and avoids double
+conversion that can reject non-origin controls.
+
+### Verification
+
+The companion test asserts five direct bounds checks and zero superview
+conversions; the native source was rebuilt for the enrolled Mac.
