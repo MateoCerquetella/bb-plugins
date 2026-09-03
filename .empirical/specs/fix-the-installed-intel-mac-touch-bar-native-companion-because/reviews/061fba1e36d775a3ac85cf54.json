@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:9e429da39ca0c1ae9109529156f576e9519e85694fdc306b0c602fbad4e13066",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "b627bb0d43d8fac89e9777b0669700fa6f7e68ef",
+  "headCommit": "216c5d334fa615f03dbe8a9bdbf1d1828640c807",
+  "diffDigest": "sha256:60ff178fa2211a2fe80804772ffd01af30a25376a75e4a0c0f94cb08a3ed2c08",
+  "verdict": "APPROVED",
+  "reviewerActor": "isolated-reviewer",
+  "reviewerInvocationId": "/root/input_fix_review",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: Thread taps retain exact snapshot-id guards and activate BB only after successful open.\n- PASS AC-2: All settings/provider/panel controls retain action wiring and update or close the panel.\n- PASS AC-3: Horizontal scrolling remains and AppKit can cancel clicks during drags.\n- PASS AC-4: All five custom hit tests convert superview coordinates exactly once to local coordinates.\n- PASS AC-5: No mouseDown overrides remain; NSButton uses completed AppKit tracking.\n- PASS AC-6: Intel installation and direct-touch runtime marker are evidenced.\n- PASS AC-7: Filtering, guards, BTT, red close, larger settings, tests and docs remain.\n\n## Security / correctness\n\nPASS: guarded current identifiers, BB CLI validation, no broad command execution.\n\n## Design / maintainability\n\nPASS: cohesive native scrolling repair with standard AppKit tracking and documented rationale.",
+  "bodyDigest": "sha256:421e67ab5db2f7ac4f2b0fb37a7edd87b9f63f618dd0854abbbc188678027a0a",
+  "digest": "sha256:061fba1e36d775a3ac85cf54c4c16b52a99d430c62b740917020d03452dd299a"
+}

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:9e429da39ca0c1ae9109529156f576e9519e85694fdc306b0c602fbad4e13066",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "b627bb0d43d8fac89e9777b0669700fa6f7e68ef",
+  "headCommit": "216c5d334fa615f03dbe8a9bdbf1d1828640c807",
+  "diffDigest": "sha256:60ff178fa2211a2fe80804772ffd01af30a25376a75e4a0c0f94cb08a3ed2c08",
+  "verdict": "APPROVED",
+  "reviewerActor": "isolated-reviewer",
+  "reviewerInvocationId": "/root/input_fix_review",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: Exact thread tap remains guarded and opens only after success.\n- PASS AC-2: All settings controls retain action wiring.\n- PASS AC-3: Horizontal scrolling remains and AppKit can cancel drag clicks.\n- PASS AC-4: Five custom hit tests convert superview points exactly once.\n- PASS AC-5: No native mouseDown overrides remain.\n- PASS AC-6: Intel installation and direct-touch marker are evidenced.\n- PASS AC-7: Existing filtering, guards, BTT, close, larger settings, tests and docs remain.\n\n## Security / correctness\n\nPASS: bounded, argument-array, exact-id actions.\n\n## Design / maintainability\n\nPASS: cohesive direct-touch scroll and AppKit tracking repair.",
+  "bodyDigest": "sha256:ab683cc1ef02194851df3fabe23062d02c00f9016efed21d05aa134f2c1e4479",
+  "digest": "sha256:3f0c6c4f236804a89f4c8f545f4348810837d6504fa77324da2891fe3e71149b"
+}
