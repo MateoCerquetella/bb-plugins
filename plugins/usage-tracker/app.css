@@ -223,6 +223,34 @@
   }
 }
 
+/* Ultra-compact tier for 3 providers on a minimum-width sidebar:
+ * tighten gap, icon size, font size, and provider padding so all 3
+ * readings remain completely visible without truncation or wrapping. */
+@container usage-strip (max-width: 9.75rem) {
+  .usage-tracker-sidebar__strip[data-provider-count="3"] {
+    gap: 0.125rem;
+  }
+
+  .usage-tracker-sidebar__strip[data-provider-count="3"]
+    .usage-tracker-sidebar__provider {
+    gap: 0.125rem;
+    padding: 0 0.0625rem;
+  }
+
+  .usage-tracker-sidebar__strip[data-provider-count="3"]
+    .usage-tracker-sidebar__mark {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+
+  .usage-tracker-sidebar__strip[data-provider-count="3"]
+    .usage-tracker-sidebar__reading {
+    font-size: 0.625rem;
+    letter-spacing: -0.03em;
+  }
+}
+
+
 @container usage-strip (max-width: 8.5rem) {
   .usage-tracker-sidebar__strip[data-provider-count="2"]
     .usage-tracker-sidebar__refresh {
