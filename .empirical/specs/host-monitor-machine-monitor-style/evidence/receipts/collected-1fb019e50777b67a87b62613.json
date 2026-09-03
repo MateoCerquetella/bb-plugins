@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-1fb019e50777b67a87b62613",
+  "criteria": [
+    "AC-3",
+    "AC-4",
+    "AC-5"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Captured the locally installed Host Monitor panel at 1440x1000 and 390x1000, confirming the responsive reference-style layout, Host Monitor identity, live telemetry, and absence of notification UI.",
+  "passed": true,
+  "startedAt": "2026-09-03T19:29:42.936Z",
+  "completedAt": "2026-09-03T19:29:42.936Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-machine-monitor-style",
+    "specRevision": 2,
+    "specDigest": "sha256:e93d798af92707dbfb81e5dd055f8d2a24061485a8c0bd1147a92cf8b1f8359f",
+    "treeDigest": "sha256:3ed6b554c70d6090642feb196f88362e6bc421bdb87d25c032d1fce81a05be6b",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf"
+  },
+  "digest": "sha256:d32067b212bee3e8f410da3604202220471025240c304e9655d3d450d37297c7",
+  "kind": "collected",
+  "collector": "chromium-headless-live-bb",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/host-monitor-machine-monitor-style/qa/host-monitor-desktop.png",
+      "mediaType": "image/png",
+      "bytes": 150116,
+      "digest": "sha256:681b00e47fb084e7fe6c0583878c866866fcc1261cd9d5bb20ab96e7c43e2b17"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-machine-monitor-style/qa/host-monitor-mobile.png",
+      "mediaType": "image/png",
+      "bytes": 50428,
+      "digest": "sha256:c9a850a4541c42139b7e95434d53ff95080bfeca34b8ca3dd9928b087efa0c1f"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { bucketSizeFor, collectDirectorySamples, collectMemoryDiagnostics, cpuPercent, describeProcessWorkload, memoryPressureActive, MONITORED_DIRECTORIES, parseCpuCounters, parseMeminfo, parseMemoryPressure, parseProcessStat, parseVmstat, SAMPLE_INTERVAL_MS } from "../monitor.ts";
+import { bucketSizeFor, collectDirectorySamples, collectMemoryDiagnostics, cpuPercent, describeProcessWorkload, memoryPressureActive, MONITORED_DIRECTORIES, parseCpuCounters, parseDuBytes, parseMeminfo, parseMemoryPressure, parseProcessStat, parseVmstat, SAMPLE_INTERVAL_MS } from "../monitor.ts";
 
 test("parses Linux memory facts", () => {
   assert.deepEqual(parseMeminfo("MemTotal:       1024 kB\nMemAvailable:    256 kB\n"), { total: 1_048_576, available: 262_144 });
@@ -21,6 +21,11 @@ test("uses bounded history buckets", () => {
 
 test("includes the requested local directory breakdown", () => {
   assert.deepEqual(MONITORED_DIRECTORIES.map((entry) => entry.id), ["go", "rust", "bun", "pnpm", "npm", "tmp", "bb"]);
+});
+
+test("keeps usable directory totals from a partial du result", () => {
+  assert.equal(parseDuBytes("1024\t/tmp\n512\t/home/test/.cache\n"), 1_572_864);
+  assert.equal(parseDuBytes("du: permission denied\n"), null);
 });
 
 test("parses bounded memory-pressure and process diagnostics", () => {

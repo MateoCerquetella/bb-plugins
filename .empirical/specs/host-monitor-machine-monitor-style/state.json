@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 11,
+  "revision": 15,
   "activeFeature": "host-monitor-machine-monitor-style",
   "request": "Update the existing plugins/host-monitor plugin so its user interface and interaction model match the referenced phosphorco machine-monitor plugin at https://github.com/phosphorco/bb-community-plugins/tree/main/plugins/machine-monitor, while preserving Host Monitor identity and removing all notification functionality and notification UI.",
   "profile": "complex",
@@ -8,8 +8,8 @@
   "mode": "normal",
   "phase": "review",
   "status": "waiting",
-  "repairAttempts": 1,
-  "message": "Verified the repaired implementation with a passing full workspace check and fresh-context evidence covering the strict history cap, deterministic gaps, inline collector failures, portable process metrics, expanded tests, notification removal, and all original criteria.",
+  "repairAttempts": 2,
+  "message": "Final verification passes: complete workspace check, 23 focused Host Monitor tests, running local services, valid live snapshot data, and desktop/mobile screenshots without notification UI or false /tmp status noise.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:e93d798af92707dbfb81e5dd055f8d2a24061485a8c0bd1147a92cf8b1f8359f",
@@ -21,8 +21,8 @@
   "authorizationDigest": null,
   "evidence": [],
   "evidenceReceiptIds": [
-    "qa-748667d86b406bba32cb486f",
-    "qa-58867ae2e5abaae5ecee4c6e"
+    "qa-ef5053fac834d413367cd6be",
+    "qa-f26a3600e292514fa3dba89d"
   ],
   "legacyEvidenceCount": 0,
   "completion": {
@@ -38,5 +38,5 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-03T19:26:09.000Z"
+  "updatedAt": "2026-09-03T19:32:08.220Z"
 }

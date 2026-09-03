@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "packetDigest": "sha256:7526768270f121d809d1cb896bcab3da67160b1071b090c6d3966a96f77742d8",
-  "resultPath": ".empirical/specs/host-monitor-machine-monitor-style/reviews/d655fd16affcb0d4fc4b986a.json",
-  "resultDigest": "sha256:d655fd16affcb0d4fc4b986a086318ceac72cbb67e1c086090ac455ebe025b6f",
-  "receiptId": "collected-15a16fec4f2dea96c8d7b747"
+  "packetDigest": "sha256:04bd97272a607696eb2ba15a1bce8c9412a72cb30152c32f778a261295b3da0f",
+  "resultPath": ".empirical/specs/host-monitor-machine-monitor-style/reviews/3406d8c39b8c0ebccf04f3a1.json",
+  "resultDigest": "sha256:3406d8c39b8c0ebccf04f3a18e449ca65cfcacf1ea13df05cebc25eb7493b8df",
+  "receiptId": "collected-bc6c3bd00144152a6b32df3c"
 }

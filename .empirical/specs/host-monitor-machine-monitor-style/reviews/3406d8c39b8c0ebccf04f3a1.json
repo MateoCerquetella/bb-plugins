@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:04bd97272a607696eb2ba15a1bce8c9412a72cb30152c32f778a261295b3da0f",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "a6391be14058735b3aebe1769edb313f20100014",
+  "headCommit": "907c3915e7cab991ce89f26c088b7ca18a83c49a",
+  "diffDigest": "sha256:8295e89b0f31630f2262280876c874feb245ea4f2f992fab51061b7f86e5af36",
+  "verdict": "APPROVED",
+  "reviewerActor": "codex:/root/host_monitor_rereview",
+  "reviewerInvocationId": "host-monitor-rereview-907c3915-7f1c2e8a",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: Bounded local collectors cover CPU, MemAvailable RAM, root disk, load, uptime, fixed directories, and Linux pressure/cgroup/process diagnostics with explicit limits and portable page size.\n- PASS AC-2: All five ranges exist; range-relative SQLite buckets plus defensive slicing enforce 720 samples, and deterministic null replacement preserves the cap while marking gaps.\n- PASS AC-3: Four dense current cards, responsive SVG charts, directory growth, and memory-pressure/process diagnostics support narrow layouts and accessible scrolling.\n- PASS AC-4: Package, manifest, route/title, repository metadata, icon, and light/dark logos retain Host Monitor identity.\n- PASS AC-5: No toast, Web Notification, desktop/sidebar accessory, or alert banner remains; collector errors are inline role=status and threshold styling is passive.\n- PASS AC-6: Fleet, floating, IP, host-worker/RPC, process termination, and supporting modules are removed; manifest has no host entry.\n- PASS AC-7: Threshold settings are present; attribution defaults off, skips enumeration while disabled, and is bounded/read-only when enabled.\n- PASS AC-8: Tests cover collection/privacy, exact storage cap, deterministic gaps, service/settings/RPC registration, identity, notification absence, responsive layout, chart hover, and public SDK imports; workspace check passes.\n\n## Security / correctness\n\nAPPROVED: local bounded collection, opt-in process identity, destructive controls removed, and history/gap/error/page-size risks repaired.\n\n## Design / maintainability\n\nAPPROVED: implementation is coherently separated into collection, persistence, RPC, chart transformation, and presentation with focused boundary tests; SDK-required shim devDependencies are intentionally retained.",
+  "bodyDigest": "sha256:2862e2d54765643c0c4e1cc49bea97dbb945af43f3ff52aa5d83576f04357b48",
+  "digest": "sha256:3406d8c39b8c0ebccf04f3a18e449ca65cfcacf1ea13df05cebc25eb7493b8df"
+}

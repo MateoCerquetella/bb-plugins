@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "generator": "empirical-0.30.0",
-  "sourceDigest": "sha256:d03aab94bc153727f3d0914f22901943fd996aff97bafb562fffd06bfb9b2654",
+  "sourceDigest": "sha256:186f3a8c037f52e8e453b7798f00191f984e74629ff676385983827b6cb16938",
   "files": [
     {
       "path": ".agents/skills/empirical/SKILL.md",
@@ -610,8 +610,8 @@
     },
     {
       "path": "plugins/host-monitor/monitor.ts",
-      "size": 19098,
-      "digest": "sha256:23761d00a4233d7283c29472fce7aa045bae108dd707a8a478a33c61ec94ed2a"
+      "size": 19693,
+      "digest": "sha256:c085966b0fdedcfc1cbc87680e156a5dd44d8d16b0f4d3c4bcc02b6d6925ef1b"
     },
     {
       "path": "plugins/host-monitor/package.json",
@@ -655,8 +655,8 @@
     },
     {
       "path": "plugins/host-monitor/test/monitor.test.ts",
-      "size": 4332,
-      "digest": "sha256:e300af4386b666d671de7a4f0686ea301c3b5dd18a59ca7961f1955a6127c447"
+      "size": 4566,
+      "digest": "sha256:6430f7b01d59cffaa9931faf66f392123edd000ee61b0442276f243d7bf01da7"
     },
     {
       "path": "plugins/host-monitor/test/server-registration.test.ts",
@@ -1619,7 +1619,7 @@
         "plugins/usage-tracker/tsconfig.json",
         "plugins/usage-tracker/types/css-modules.d.ts"
       ],
-      "sourceDigest": "sha256:d03aab94bc153727f3d0914f22901943fd996aff97bafb562fffd06bfb9b2654",
+      "sourceDigest": "sha256:186f3a8c037f52e8e453b7798f00191f984e74629ff676385983827b6cb16938",
       "digest": "sha256:eed9cfd95fdecbf70535c9b9bfdb204011bdad5af0a5418d4d923f3a99f354f2",
       "freshness": "fresh"
     },
@@ -1715,5 +1715,5 @@
     }
   ],
   "truncated": false,
-  "digest": "sha256:00254960286cd8489d061a79212c20849fc682ce944cbda496f2f2f1865d1e1f"
+  "digest": "sha256:71ce229e0f9a9fc99ea1bc0215a419fb8eac5a077a2455f8832b63b0f84c9aa8"
 }

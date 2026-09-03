@@ -218,6 +218,16 @@ function throwIfAborted(signal?: AbortSignal): void {
   if (signal?.aborted) throw new DOMException("Machine monitor collection aborted", "AbortError");
 }
 
+export function parseDuBytes(stdout: string): number | null {
+  const sizes = stdout.split("\n").flatMap((line) => {
+    const kibibytes = Number(/^\s*(\d+)\s/.exec(line)?.[1]);
+    return Number.isFinite(kibibytes) ? [kibibytes] : [];
+  });
+  return sizes.length === 0
+    ? null
+    : sizes.reduce((total, kibibytes) => total + kibibytes * 1024, 0);
+}
+
 export async function collectDirectorySamples(collectedAt = Date.now(), signal?: AbortSignal): Promise<{ samples: DirectorySample[]; errors: string[] }> {
   const home = os.homedir();
   const samples: DirectorySample[] = [];
@@ -229,17 +239,24 @@ export async function collectDirectorySamples(collectedAt = Date.now(), signal?:
       try { await access(path); return path; } catch { return null; }
     }))).filter((path): path is string => path != null);
     if (existing.length === 0) continue;
+    let stdout = "";
     try {
-      const { stdout } = await execFileAsync("du", ["-sk", "--", ...existing], { timeout: 45_000, maxBuffer: 64 * 1024, signal });
-      const bytes = stdout.split("\n").reduce((total, line) => {
-        const kibibytes = Number(/^\s*(\d+)\s/.exec(line)?.[1]);
-        return Number.isFinite(kibibytes) ? total + kibibytes * 1024 : total;
-      }, 0);
-      samples.push({ collectedAt, location: location.id, bytes });
+      stdout = (await execFileAsync("du", ["-sk", "--", ...existing], { timeout: 45_000, maxBuffer: 64 * 1024, signal })).stdout;
     } catch (cause) {
       if (signal?.aborted) throw cause;
-      errors.push(`Could not measure ${location.label}.`);
+      // GNU du can return non-zero for an unreadable nested entry while still
+      // producing the requested top-level total. Keep that useful bounded
+      // result instead of turning routine /tmp permissions into panel noise.
+      stdout = typeof cause === "object" && cause != null && "stdout" in cause
+        ? String(cause.stdout)
+        : "";
     }
+    const bytes = parseDuBytes(stdout);
+    if (bytes == null) {
+      errors.push(`Could not measure ${location.label}.`);
+      continue;
+    }
+    samples.push({ collectedAt, location: location.id, bytes });
   }
   return { samples, errors };
 }

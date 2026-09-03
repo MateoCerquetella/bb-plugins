@@ -47,3 +47,14 @@ Repair verification after isolated review:
 - Backend registration/snapshot, store bounding, chart-gap, and public-SDK-only
   tests raise the focused suite to 22 passing tests. The complete workspace
   check passes after these repairs.
+
+Final live validation:
+
+- The locally installed path plugin reports running status for all three
+  services and its snapshot RPC returns live samples with no collector errors.
+- Partial GNU du output is retained when unreadable nested /tmp entries cause a
+  non-zero exit; a focused parser test distinguishes usable totals from a true
+  failure. The focused suite now passes 23 tests.
+- Fresh desktop and 390px screenshots show the dense reference-style panel,
+  live charts and directory cards without the earlier routine /tmp status or
+  any notification UI.

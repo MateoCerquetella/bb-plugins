@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sequence": 14,
+  "previousDigest": "sha256:1ad9b7f38a173dcfe4d55be5c91af78dda1a0cfc1db20445275a61b83e81b28f",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Refreshed context after the live directory-diagnostic repair; all required pages are current with no stale, missing, invalid, or refinement-required paths.",
+  "createdAt": "2026-09-03T19:30:50.081Z",
+  "stateBeforeDigest": "sha256:7b6b7821612d75a1786aa03ca71572110592173d47f9ca4c4c334b3bc5d36d09",
+  "stateAfterDigest": "sha256:1e89b6c330e1f3461aed3f6eb594e037033eeeb647985052c92d96d8ee3826c4",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 14,
+    "activeFeature": "host-monitor-machine-monitor-style",
+    "request": "Update the existing plugins/host-monitor plugin so its user interface and interaction model match the referenced phosphorco machine-monitor plugin at https://github.com/phosphorco/bb-community-plugins/tree/main/plugins/machine-monitor, while preserving Host Monitor identity and removing all notification functionality and notification UI.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "verify",
+    "status": "waiting",
+    "repairAttempts": 2,
+    "message": "Refreshed context after the live directory-diagnostic repair; all required pages are current with no stale, missing, invalid, or refinement-required paths.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:e93d798af92707dbfb81e5dd055f8d2a24061485a8c0bd1147a92cf8b1f8359f",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:af6d949025b231b743d890db0c43da24c426721ce9a10e798751c3c88145dbc0",
+    "impactDigest": "sha256:09a5455d943bc14cd22cb4709eb496ecd61ce42000fab796d863540f65c1a23a",
+    "capabilityClaimId": "host-monitor-machine-monitor-style-a89b74a33ddf",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-03T19:30:50.081Z"
+  },
+  "digest": "sha256:29bc4944d20aca2e66faee330b571f21b3b3011ce0f979ab6288bbff0eafdb75"
+}
