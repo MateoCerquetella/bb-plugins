@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 5,
+  "revision": 1,
+  "activeFeature": "fix-touch-bar-auto-reconnect-after-prolonged-uptime-or-transient",
+  "request": "Fix Touch Bar auto-reconnect: after prolonged uptime or transient BB CLI/server failures, the native companion must retry automatically with bounded backoff, recover connected state and refresh cards when BB is healthy again, and avoid permanently showing Reconnecting while commands work. First commit all currently present worktree files. Then implement and test retry/recovery behavior, rebuild/install on the enrolled Intel Mac, and record logs and verification.",
+  "profile": "complex",
+  "workflow": "complex",
+  "mode": "normal",
+  "phase": "specify",
+  "status": "waiting",
+  "repairAttempts": 0,
+  "message": null,
+  "implementationActor": null,
+  "workStartedAt": null,
+  "specDigest": "sha256:65e7f7da8975ffd8e2c7d1939d5e0e40592a2964887775224152d8b8dbe66da8",
+  "approvedSpecRevision": null,
+  "capabilityArchiveRequired": true,
+  "capabilityDeltaDigest": null,
+  "impactDigest": null,
+  "capabilityClaimId": null,
+  "authorizationDigest": null,
+  "evidence": [],
+  "evidenceReceiptIds": [],
+  "legacyEvidenceCount": 0,
+  "completion": {
+    "implemented": false,
+    "verified": false,
+    "integrated": false,
+    "delivered": false,
+    "published": false,
+    "highest": "none",
+    "reasons": {
+      "implemented": "implemented has not been proven by a durable receipt.",
+      "verified": "verified has not been proven by a durable receipt.",
+      "integrated": "integrated has not been proven by a durable receipt.",
+      "delivered": "delivered has not been proven by a durable receipt.",
+      "published": "published has not been proven by a durable receipt."
+    }
+  },
+  "updatedAt": "2026-09-03T12:56:11.701Z"
+}

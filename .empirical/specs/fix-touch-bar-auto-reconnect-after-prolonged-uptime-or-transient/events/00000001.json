@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "sequence": 1,
+  "previousDigest": "sha256:d4447ea244cab480cd14de2b636c7ebd50c3db434c6eebbe2574e1e3b9138db5",
+  "actor": "empirical-start",
+  "type": "transition",
+  "summary": "Started fix-touch-bar-auto-reconnect-after-prolonged-uptime-or-transient",
+  "createdAt": "2026-09-03T12:56:11.701Z",
+  "stateBeforeDigest": "sha256:74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+  "stateAfterDigest": "sha256:c776908aae55254bf6d01b97aae5db07002fd4c82bbec2541ca82d380f7afd69",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 1,
+    "activeFeature": "fix-touch-bar-auto-reconnect-after-prolonged-uptime-or-transient",
+    "request": "Fix Touch Bar auto-reconnect: after prolonged uptime or transient BB CLI/server failures, the native companion must retry automatically with bounded backoff, recover connected state and refresh cards when BB is healthy again, and avoid permanently showing Reconnecting while commands work. First commit all currently present worktree files. Then implement and test retry/recovery behavior, rebuild/install on the enrolled Intel Mac, and record logs and verification.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": null,
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:65e7f7da8975ffd8e2c7d1939d5e0e40592a2964887775224152d8b8dbe66da8",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": null,
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-03T12:56:11.701Z"
+  },
+  "digest": "sha256:7c93fe1483aa2a58093c13fafb177eaf45188f0c9c73c594053b64aad3bd796d"
+}

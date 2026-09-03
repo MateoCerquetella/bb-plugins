@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BB Touch Bar UI Concept</title>
+  <style>
+    :root { color-scheme: dark; --bg:#0b0d11; --panel:#13161d; --line:#2b303a; --text:#f7f8fa; --muted:#8e96a6; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; font-family:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif; background:radial-gradient(circle at 20% 0,#20283a 0,transparent 34%),var(--bg); color:var(--text); }
+    .page { max-width:1160px; margin:auto; padding:32px 24px 44px; }
+    header { display:flex; justify-content:space-between; gap:24px; align-items:end; margin-bottom:24px; }
+    h1 { margin:0 0 6px; font-size:26px; letter-spacing:-.03em; }
+    p { margin:0; color:var(--muted); font-size:14px; }
+    .mode { display:flex; padding:4px; border:1px solid var(--line); background:#0d1016; border-radius:11px; }
+    .mode button,.toolbar button { border:0; color:#99a2b2; background:transparent; border-radius:8px; padding:8px 13px; font-weight:750; cursor:pointer; }
+    .mode button.active { color:#fff; background:#2e68ef; box-shadow:0 4px 14px #1f5cdf55; }
+    .stage { padding:24px; background:linear-gradient(180deg,#191d26,#101218); border:1px solid #2e3440; border-radius:20px; box-shadow:0 24px 80px #0008; }
+    .screen-label { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; color:#858e9e; font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+    .touchbar-shell { padding:7px; border-radius:14px; background:#000; border:1px solid #333843; box-shadow:inset 0 0 0 1px #050505,0 12px 30px #000a; }
+    .touchbar { height:66px; display:flex; gap:6px; align-items:stretch; overflow:hidden; }
+    .rail { flex:1; min-width:0; display:flex; align-items:center; gap:6px; overflow-x:auto; scrollbar-width:none; scroll-behavior:smooth; }
+    .rail::-webkit-scrollbar { display:none; }
+    .fixed { display:flex; flex:none; gap:6px; align-items:stretch; }
+    .control { width:54px; min-width:54px; border:1px solid #3a404b; border-radius:10px; color:#e9ebef; background:#20242c; display:grid; place-items:center; font-size:21px; cursor:pointer; }
+    .control:hover { background:#2a303a; border-color:#586170; }
+    .control.settings.on { color:#fff; background:#4e3aac; border-color:#7760dd; }
+    .settings-menu { display:none; gap:6px; }
+    .settings-menu.open { display:flex; }
+    .sort-choice { min-width:96px; padding:0 12px; border-radius:10px; border:1px solid #39414f; background:#20242c; color:#aab2c1; font:750 11px ui-monospace,SFMono-Regular,Menlo,monospace; cursor:pointer; }
+    .sort-choice.active { color:#fff; background:#194fbd; border-color:#4281ff; }
+    .project { flex:none; height:54px; display:flex; gap:5px; align-items:center; padding:3px 4px; border:1px solid #343a45; background:#11141a; border-radius:10px; cursor:pointer; transition:.18s ease; }
+    .project:hover { border-color:#555f70; background:#171b23; }
+    .project.collapsed { padding-right:4px; }
+    .project.collapsed .threads { display:none; }
+    .project-badge { width:46px; min-width:46px; height:46px; border-radius:9px; display:grid; place-items:center; color:#fff; font:850 15px ui-monospace,SFMono-Regular,Menlo,monospace; box-shadow:inset 0 0 0 1px #ffffff22; }
+    .threads { display:flex; gap:4px; }
+    .thread { width:198px; height:46px; display:grid; grid-template-columns:32px minmax(0,1fr) auto; align-items:center; gap:7px; padding:0 7px; border-radius:8px; background:#1b1f27; border:1px solid #303641; cursor:pointer; }
+    .thread:hover { background:#242a34; }
+    .agent { width:30px; height:30px; display:grid; place-items:center; border-radius:8px; background:linear-gradient(145deg,#fff,#ccd5ff); color:#4c5dff; font:900 12px ui-monospace,monospace; }
+    .thread-title { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font:750 12px ui-monospace,SFMono-Regular,Menlo,monospace; }
+    .status { padding:4px 7px 3px; border-radius:999px; color:#fff; font:850 8px ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing:.04em; }
+    .input { background:#e13f4f; } .unread { background:#16aa69; } .active { background:#087ee9; } .wait { background:#8652da; } .idle { background:#343841; color:#d6dae0; }
+    .priority-section { height:54px; flex:none; display:flex; align-items:center; gap:4px; padding:3px; border:1px solid #343a45; border-radius:10px; background:#11141a; }
+    .section-mark { width:42px; height:46px; display:grid; place-items:center; border-radius:8px; font:900 9px ui-monospace,monospace; writing-mode:vertical-rl; transform:rotate(180deg); letter-spacing:.06em; }
+    .section-mark.need { color:#ff6472; background:#481820; } .section-mark.new { color:#45d994; background:#123d2a; } .section-mark.run { color:#55a8ff; background:#132f4d; } .section-mark.quiet { color:#aab0bc; background:#252931; }
+    .legend { margin-top:18px; display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+    .note { padding:14px; border:1px solid #2b303a; border-radius:12px; background:#10131a; }
+    .note b { display:block; margin-bottom:4px; font-size:12px; }
+    .note span { color:#8790a0; font-size:12px; line-height:1.45; }
+    .toolbar { margin-top:16px; display:flex; gap:10px; align-items:center; }
+    .toolbar label { display:flex; gap:7px; align-items:center; color:#9aa3b2; font-size:12px; }
+    .toolbar input { accent-color:#4f82ff; }
+    @media(max-width:720px){ header{align-items:start;flex-direction:column}.legend{grid-template-columns:1fr}.stage{padding:14px}.thread{width:168px}.page{padding:20px 12px} }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <div><h1>BB Touch Bar — progressive disclosure</h1><p>Interactive layout prototype only. It does not modify or connect to BB.</p></div>
+      <div class="mode" role="group" aria-label="Sort mode">
+        <button data-mode="priority">Priority</button><button class="active" data-mode="project">Project</button>
+      </div>
+    </header>
+    <section class="stage">
+      <div class="screen-label"><span>Simulated fullscreen Touch Bar</span><span id="hint">Tap a project to expand it</span></div>
+      <div class="touchbar-shell"><div class="touchbar"><div class="rail" id="rail"></div><div class="fixed"><div class="settings-menu" id="settingsMenu"><button class="sort-choice" data-choice="priority">PRIORITY</button><button class="sort-choice active" data-choice="project">PROJECT</button></div><button class="control settings" id="settings" title="Settings">☷</button><button class="control" id="close" title="Close">×</button></div></div></div>
+      <div class="toolbar"><label><input id="single" type="checkbox" checked /> Keep only one project expanded</label><label><input id="hideIdle" type="checkbox" /> Hide idle threads</label><button id="reset">Reset demo</button></div>
+      <div class="legend">
+        <div class="note"><b>Project mode</b><span>Color identifies the project only. Expand one project to reveal its nested threads.</span></div>
+        <div class="note"><b>Priority mode</b><span>Flat status lanes keep Needs You and Unread ahead of active and idle work.</span></div>
+        <div class="note"><b>Fixed controls</b><span>Settings and close remain outside horizontal scrolling at the right edge.</span></div>
+      </div>
+    </section>
+  </main>
+  <script>
+    const projects=[
+      {id:'bb',initial:'BB',color:'#1683ef',threads:[['Create action items','RUN','active'],['Support Touch Bar','IDLE','idle'],['Review package','UNREAD','unread']]},
+      {id:'empirical',initial:'E',color:'#f18a13',threads:[['Move empirical specs','UNREAD','unread'],['Allow negative positions','IDLE','idle']]},
+      {id:'naranja',initial:'N',color:'#188cf0',threads:[['Revalidate credits','RUN','active'],['Review onboarding','WAIT','wait']]},
+      {id:'freebee',initial:'F',color:'#c23dc8',threads:[['Deploy preview','INPUT','input']]}
+    ];
+    let mode='project',open='bb',settingsOpen=false;
+    const rail=document.querySelector('#rail'),hint=document.querySelector('#hint'),single=document.querySelector('#single'),hideIdle=document.querySelector('#hideIdle');
+    function threadCard(t){if(hideIdle.checked&&t[2]==='idle')return'';return `<div class="thread"><div class="agent">⌘</div><div class="thread-title">${t[0]}</div><span class="status ${t[2]}">${t[1]}</span></div>`}
+    function renderProject(){rail.innerHTML=projects.map(p=>{const collapsed=open!==p.id;const cards=p.threads.map(threadCard).join('');if(!cards&&hideIdle.checked)return'';return `<div class="project ${collapsed?'collapsed':''}" data-project="${p.id}"><div class="project-badge" style="background:${p.color}">${p.initial}</div><div class="threads">${cards}</div></div>`}).join('');hint.textContent='Tap a project badge to expand or collapse';document.querySelectorAll('[data-project]').forEach(el=>el.onclick=()=>{const id=el.dataset.project;open=open===id?null:id;if(!single.checked&&open===null)open=id;render()})}
+    function renderPriority(){const all=projects.flatMap(p=>p.threads.map(t=>({...{title:t[0],label:t[1],state:t[2]},project:p.id}))).filter(t=>!hideIdle.checked||t.state!=='idle');const lanes=[['NEEDS YOU','need',['input']],['UNREAD','new',['unread']],['ACTIVE','run',['active','wait']],['IDLE','quiet',['idle']]];rail.innerHTML=lanes.map(([name,klass,states])=>{const rows=all.filter(t=>states.includes(t.state));if(!rows.length)return'';return `<div class="priority-section"><div class="section-mark ${klass}">${name}</div>${rows.map(t=>threadCard([t.title,t.label,t.state])).join('')}</div>`}).join('');hint.textContent='Urgent and unread work stays at the left edge'}
+    function render(){mode==='project'?renderProject():renderPriority();document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));document.querySelectorAll('[data-choice]').forEach(b=>b.classList.toggle('active',b.dataset.choice===mode));document.querySelector('#settingsMenu').classList.toggle('open',settingsOpen);document.querySelector('#settings').classList.toggle('on',settingsOpen)}
+    document.querySelectorAll('[data-mode],[data-choice]').forEach(b=>b.onclick=()=>{mode=b.dataset.mode||b.dataset.choice;settingsOpen=false;render()});
+    document.querySelector('#settings').onclick=()=>{settingsOpen=!settingsOpen;render()};document.querySelector('#close').onclick=()=>{rail.style.opacity=.18;hint.textContent='Panel collapsed — click × again to restore';setTimeout(()=>rail.style.opacity=1,650)};
+    document.querySelector('#reset').onclick=()=>{mode='project';open='bb';settingsOpen=false;hideIdle.checked=false;single.checked=true;render()};hideIdle.onchange=render;single.onchange=render;render();
+  </script>
+</body>
+</html>
