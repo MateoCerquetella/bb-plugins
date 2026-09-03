@@ -32,6 +32,10 @@
   --usage-sidebar-width: 6.5rem;
 }
 
+.usage-tracker-sidebar[data-provider-count="3"] {
+  --usage-sidebar-width: 15.5rem;
+}
+
 [data-collapsible="icon"] .usage-tracker-sidebar {
   display: none;
 }
@@ -158,6 +162,14 @@
 
 /* Past the point where the rail has anything useful left to show, drop it. The
  * thresholds differ because a single-provider strip is itself narrower. */
+@container usage-strip (max-width: 15rem) {
+  .usage-tracker-sidebar__strip[data-provider-count="3"]
+    .usage-tracker-sidebar__provider
+    > .usage-tracker-sidebar__rail {
+    display: none;
+  }
+}
+
 @container usage-strip (max-width: 10.75rem) {
   .usage-tracker-sidebar__strip[data-provider-count="2"]
     .usage-tracker-sidebar__provider
@@ -204,6 +216,13 @@
 
 /* Narrowest tier: spacing and type size stay put, and the refresh button pays
  * the shortfall instead. The details card carries one of its own. */
+@container usage-strip (max-width: 12rem) {
+  .usage-tracker-sidebar__strip[data-provider-count="3"]
+    .usage-tracker-sidebar__refresh {
+    display: none;
+  }
+}
+
 @container usage-strip (max-width: 8.5rem) {
   .usage-tracker-sidebar__strip[data-provider-count="2"]
     .usage-tracker-sidebar__refresh {
