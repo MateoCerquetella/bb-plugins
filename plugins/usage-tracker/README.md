@@ -5,7 +5,7 @@
 <h1 align="center">Usage Tracker for BB</h1>
 
 <p align="center">
-  Codex and Claude Code limits, always visible in BB's sidebar footer.
+  Codex, Claude Code, and optional Antigravity limits in BB's sidebar footer.
 </p>
 
 <p align="center">
@@ -21,8 +21,9 @@ usage reading, without adding a navigation item or a separate plugin page.
 
 ## Features
 
-- Shows Codex and Claude Code subscription usage in BB's sidebar footer.
-- Lets you show or hide Codex and Claude Code independently; the strip
+- Shows Codex, Claude Code, and optionally Google Antigravity usage in BB's sidebar footer.
+- Lets you show or hide Codex and Claude Code independently, with Antigravity
+  opt-in; the strip
   compacts for one provider and disappears when both are disabled.
 - Lets you choose whether the compact percentage and progress bar show the
   weekly or five-hour limit. Weekly is the default.
@@ -57,16 +58,20 @@ bb plugin install usage-tracker
 ```
 
 The strip appears in the bottom of the sidebar as soon as the plugin loads.
-Both providers are enabled by default. Change them independently under
-**Settings → Plugins → Usage Tracker**. The same page lets you choose
-between the weekly and five-hour limit for the compact reading.
+Codex and Claude Code are enabled by default; Antigravity is opt-in. Change
+these settings under **Settings → Plugins → Usage Tracker**. The same page lets
+you choose between the weekly and five-hour limit for the compact reading.
 
 The provider CLIs must be installed and signed in for BB to report their usage:
 
 ```sh
 codex login
 claude
+agy
 ```
+
+Antigravity quota probing runs in the background from a cached snapshot, so it
+does not add its 3–4 second CLI startup time to the sidebar RPC response.
 
 If a CLI is missing, signed out, or expired, expand that provider in the strip
 to see the recovery instruction reported by BB.
