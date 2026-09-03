@@ -15,6 +15,7 @@ enum NativeConfig {
         if let configured = try? String(contentsOf: pathFile, encoding: .utf8)
             .trimmingCharacters(in: .whitespacesAndNewlines),
            !configured.isEmpty,
+           !configured.contains("/.local/state/fnm_multishells/"),
            FileManager.default.isExecutableFile(atPath: configured) {
             return configured
         }
