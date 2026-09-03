@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-86214813de842d1e5f9a9ed2",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-09-03T13:13:49.665Z",
+  "completedAt": "2026-09-03T13:13:49.665Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "fix-touch-bar-auto-reconnect-after-prolonged-uptime-or-transient",
+    "specRevision": 2,
+    "specDigest": "sha256:da3d10406bc0dd67e22aabbaa533970cc96b26a0fd8f7a4eec1de8f3f5c2c858",
+    "treeDigest": "sha256:32b0fdb9edec1d78c54991296af95f806ce6209c3596d25bc772568101ef02e9",
+    "policyDigest": "sha256:dddc072c4f4908581e6e359608fe9aec39894c5258cd821ec894bbd59a67fbb7"
+  },
+  "digest": "sha256:b1e61e68e73c3bd5613b0f742a0b59a953ad328ca7222180fe1e47d188e9f248",
+  "kind": "collected",
+  "collector": "empirical-review:reconnect_review_v2",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/fix-touch-bar-auto-reconnect-after-prolonged-uptime-or-transient/reviews/5353c508ec426c4e3d3be0ba.json",
+      "mediaType": "application/json",
+      "bytes": 1441,
+      "digest": "sha256:559aa18d37216569720c890510e134b948c44e551ec76931a95bcb6ce65c41e0"
+    },
+    {
+      "path": ".empirical/specs/fix-touch-bar-auto-reconnect-after-prolonged-uptime-or-transient/reviews/5353c508ec426c4e3d3be0ba.md",
+      "mediaType": "text/markdown",
+      "bytes": 710,
+      "digest": "sha256:f3b108a7e26a1659b1d7519522b06e932557d6e774b949b40d645f847ee2f0bd"
+    }
+  ]
+}

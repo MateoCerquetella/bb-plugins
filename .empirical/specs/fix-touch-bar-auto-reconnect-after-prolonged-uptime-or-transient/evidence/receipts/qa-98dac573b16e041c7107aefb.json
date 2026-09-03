@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-98dac573b16e041c7107aefb",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Re-run save-model-focused after receiver-local hit-test correction.",
+  "passed": true,
+  "startedAt": "2026-09-03T13:14:04.049Z",
+  "completedAt": "2026-09-03T13:14:04.217Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "fix-touch-bar-auto-reconnect-after-prolonged-uptime-or-transient",
+    "specRevision": 2,
+    "specDigest": "sha256:da3d10406bc0dd67e22aabbaa533970cc96b26a0fd8f7a4eec1de8f3f5c2c858",
+    "treeDigest": "sha256:32b0fdb9edec1d78c54991296af95f806ce6209c3596d25bc772568101ef02e9",
+    "policyDigest": "sha256:dddc072c4f4908581e6e359608fe9aec39894c5258cd821ec894bbd59a67fbb7",
+    "workflowRevision": 7,
+    "gitCommit": "fb1556112ca29a8e20c91f6bf90e8e83dac87b84"
+  },
+  "digest": "sha256:68846546a31bbcffcc3cbb257d86828ad6c61a07ad3e9555b12a94da235e4e20",
+  "kind": "qa",
+  "matrixDigest": "sha256:3781d45168654b5a369948b353e59254b4f110d176c2a6ec5faed0dbefab977d",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Re-run save-model-focused after receiver-local hit-test correction.",
+      "startedAt": "2026-09-03T13:14:04.049Z",
+      "completedAt": "2026-09-03T13:14:04.217Z",
+      "durationMs": 168,
+      "collector": null,
+      "command": {
+        "argv": [
+          "npm",
+          "test",
+          "--workspace",
+          "bb-plugin-save-my-model"
+        ],
+        "cwd": ".",
+        "timeoutMs": 60000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:96b0f2d3742842c5f1f528d35d6f55f9f918dfc7a4b7d6b13c207aa34da5afbb",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "\n> bb-plugin-save-my-model@0.1.2 test\n> node --test --experimental-strip-types test/*.test.ts\n\nTAP version 13\n# Subtest: round-trips the selected provider and its execution preference per host\nok 1 - round-trips the selected provider and its execution preference per host\n  ---\n  duration_ms: 1.071688\n  type: 'test'\n  ...\n# Subtest: isolates host and provider execution selections\nok 2 - isolates host and provider execution selections\n  ---\n  duration_ms: 0.217177\n  type: 'test'\n  ...\n# Subtest: normalizes empty and malformed hosts to one browser-wide scope\nok 3 - normalizes empty and malformed hosts to one browser-wide scope\n  ---\n  duration_ms: 0.112966\n  type: 'test'\n  ...\n# Subtest: recovers the selected provider from the legacy unscoped key\nok 4 - recovers the selected provider from the legacy unscoped key\n  ---\n  duration_ms: 0.072061\n  type: 'test'\n  ...\n# Subtest: reads provider-scoped legacy values before matching unscoped values\nok 5 - reads provider-scoped legacy values before matching unscoped values\n  ---\n  duration_ms: 0.136059\n  type: 'test'\n  ...\n# Subtest: recovers a complete unscoped legacy selection without a provider argument\nok 6 - recovers a complete unscoped legacy selection without a provider argument\n  ---\n  duration_ms: 0.08733\n  type: 'test'\n  ...\n# Subtest: uses unscoped legacy values only for their owning provider\nok 7 - uses unscoped legacy values only for their owning provider\n  ---\n  duration_ms: 0.104852\n  type: 'test'\n  ...\n# Subtest: keeps a legacy model when no reasoning was stored\nok 8 - keeps a legacy model when no reasoning was stored\n  ---\n  duration_ms: 0.080918\n  type: 'test'\n  ...\n# Subtest: changing the selected provider does not leak another provider's execution\nok 9 - changing the selected provider does not leak another provider's execution\n  ---\n  duration_ms: 0.217438\n  type: 'test'\n  ...\n# Subtest: rejects an explicitly invalid provider instead of using selected fallback\nok 10 - rejects an explicitly invalid provider instead of using selected fallback\n  ---\n  duration_ms: 0.217568\n  type: 'test'\n  ...\n# Subtest: contains malformed and oversized storage while listing\nok 11 - contains malformed and oversized storage while listing\n  ---\n  duration_ms: 2.073399\n  type: 'test'\n  ...\n# Subtest: listing never turns an invalid explicit key into provider fallback\nok 12 - listing never turns an invalid explicit key into provider fallback\n  ---\n  duration_ms: 0.135026\n  type: 'test'\n  ...\n# Subtest: bounds examined plugin records independently of valid results\nok 13 - bounds examined plugin records independently of valid results\n  ---\n  duration_ms: 3.164532\n  type: 'test'\n  ...\n# Subtest: lists and clears a selected provider even before a model is saved\nok 14 - lists and clears a selected provider even before a model is saved\n  ---\n  duration_ms: 0.15314\n  type: 'test'\n  ...\n# Subtest: ignores malformed values and clears only plugin-owned keys\nok 15 - ignores malformed values and clears only plugin-owned keys\n  ---\n  duration_ms: 0.081739\n  type: 'test'\n  ...\n1..15\n# tests 15\n# suites 0\n# pass 15\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 72.455883\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:32b0fdb9edec1d78c54991296af95f806ce6209c3596d25bc772568101ef02e9",
+      "sourceTreeAfter": "sha256:32b0fdb9edec1d78c54991296af95f806ce6209c3596d25bc772568101ef02e9",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

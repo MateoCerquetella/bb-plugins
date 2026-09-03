@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 6,
+  "revision": 8,
   "activeFeature": "fix-touch-bar-auto-reconnect-after-prolonged-uptime-or-transient",
   "request": "Fix Touch Bar auto-reconnect: after prolonged uptime or transient BB CLI/server failures, the native companion must retry automatically with bounded backoff, recover connected state and refresh cards when BB is healthy again, and avoid permanently showing Reconnecting while commands work. First commit all currently present worktree files. Then implement and test retry/recovery behavior, rebuild/install on the enrolled Intel Mac, and record logs and verification.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "verify",
+  "phase": "integrate",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Repository context refreshed with no missing, stale, invalid, or refinement-required pages.",
+  "message": "Independent reviewer approved corrected diff; refreshed focused QA receipts and review receipt cover all criteria.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:da3d10406bc0dd67e22aabbaa533970cc96b26a0fd8f7a4eec1de8f3f5c2c858",
@@ -20,21 +20,26 @@
   "capabilityClaimId": "fix-touch-bar-auto-reconnect-after-prolonged-uptime-or-transient-21366fe98a02",
   "authorizationDigest": null,
   "evidence": [],
-  "evidenceReceiptIds": [],
+  "evidenceReceiptIds": [
+    "qa-60384c46ab732288e8c66498",
+    "qa-86cc56c8616542708838156c",
+    "qa-98dac573b16e041c7107aefb",
+    "qa-0f72bfdb97b10ae237530352",
+    "collected-86214813de842d1e5f9a9ed2"
+  ],
   "legacyEvidenceCount": 0,
   "completion": {
     "implemented": true,
-    "verified": false,
+    "verified": true,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "implemented",
+    "highest": "verified",
     "reasons": {
-      "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-03T13:05:21.914Z"
+  "updatedAt": "2026-09-03T13:15:02.156Z"
 }

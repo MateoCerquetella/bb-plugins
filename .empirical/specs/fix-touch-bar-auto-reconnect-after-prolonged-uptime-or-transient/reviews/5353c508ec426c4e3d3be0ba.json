@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:9e2e235cabb4544b6aa7937f3b24a77aacded832989de5abe3957d6f26632139",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "a6391be14058735b3aebe1769edb313f20100014",
+  "headCommit": "fb1556112ca29a8e20c91f6bf90e8e83dac87b84",
+  "diffDigest": "sha256:58ad325865160348d3cdb33333303fc7a1e0339227f8ac489fa5139426ad4e13",
+  "verdict": "APPROVED",
+  "reviewerActor": "reconnect_review_v2",
+  "reviewerInvocationId": "/root/reconnect_review_v2",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: Passed independent review criterion.\n- PASS AC-2: Passed independent review criterion.\n- PASS AC-3: Passed independent review criterion.\n- PASS AC-4: Passed independent review criterion.\n- PASS AC-5: Passed independent review criterion.\n- PASS AC-6: Passed independent review criterion.\n- PASS AC-7: Passed independent review criterion.\n\n## Security / correctness\n\nApproved: BB remains authoritative, subprocess calls use argument arrays, no physical stop action, and bounded retry plus receiver-local hit testing are correct.\n\n## Design / maintainability\n\nApproved: native scrolling delegates hit testing, avoids premature dispatch, and retry behavior is bounded and logged.",
+  "bodyDigest": "sha256:8cf0fb001e56dabf544592869f05d05f72cc3c1c909cf82cb4e424624ecdb9c3",
+  "digest": "sha256:5353c508ec426c4e3d3be0ba2ded555b62047ed3f0593b664643e00e79a21302"
+}
