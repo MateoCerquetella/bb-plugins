@@ -26,8 +26,7 @@ function capacity(usagePercent: number) {
   return { totalBytes: 100, usedBytes: usagePercent, availableBytes: 100 - usagePercent, usagePercent };
 }
 
-function snapshot(cpuPercent = 25): MachineSnapshot {
-  const sampledAtMs = Date.now();
+function snapshot(cpuPercent = 25, sampledAtMs = Date.now()): MachineSnapshot {
   return {
     sampledAtMs,
     durationMs: 300,
@@ -39,7 +38,7 @@ function snapshot(cpuPercent = 25): MachineSnapshot {
       kernelRelease: "6.0",
       kernelVersion: "fixture",
       uptimeSeconds: 3_600,
-      bootedAtMs: sampledAtMs - 3_600_000,
+      bootedAtMs: Math.max(0, sampledAtMs - 3_600_000),
     },
     network: { receiveBytesPerSecond: 8_192, sendBytesPerSecond: 2_048 },
     cpu: { model: "Fixture CPU", logicalCores: 8, usagePercent: cpuPercent, loadAverage: [0.5, 0.4, 0.3] },
@@ -61,13 +60,14 @@ test("refresh represents every host, samples connected hosts, and isolates failu
     sdk: { hosts: { list: async () => machines } },
     experimental_callHostRpc: ({ hostId }) => {
       if (hostId === "host-bravo") throw new Error("fixture failure");
-      return snapshot(31);
+      return snapshot(31, 0);
     },
   });
   t.after(() => fake.harness.lifecycle.dispose());
   await plugin(fake.bb);
 
   const fleet = await fake.harness.behavior.callRpc("refresh", { hostId: null }) as Fleet;
+  assert.equal(fleet.machines[0]?.error, null, JSON.stringify(fake.harness.logEntries));
   assert.deepEqual(
     fake.harness.inspection.experimental_hostRpcCalls.map((call) => call.hostId),
     ["host-alpha", "host-bravo"],
@@ -82,8 +82,13 @@ test("refresh represents every host, samples connected hosts, and isolates failu
   );
   assert.equal(fleet.connected, 2);
   assert.equal(fleet.total, 3);
+  assert.ok((fleet.machines[0]?.receivedAtMs ?? 0) > 0);
   assert.equal("primaryIpAddress" in (fleet.machines[0]?.snapshot?.network ?? {}), false);
   assert.equal(fake.harness.inspection.realtimeSignals.at(-1)?.channel, "host-monitor-machines-changed");
+  assert.equal(fake.harness.inspection.realtimeSignals.filter((signal) => signal.channel === "host-monitor-machines-changed").length, 2);
+  const history = await fake.harness.behavior.callRpc("machineHistory", { hostId: "host-alpha", rangeHours: 1 }) as { points: Array<{ collectedAtMs: number }> };
+  assert.equal(history.points.length, 1);
+  assert.ok((history.points[0]?.collectedAtMs ?? 0) > 0);
 });
 
 test("simultaneous fleet refreshes coalesce host calls", async (t) => {

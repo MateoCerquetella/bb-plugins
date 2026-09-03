@@ -13,3 +13,12 @@ Date: 2026-09-03
   zero toast or role=alert surfaces appeared.
 - Desktop screenshot: qa/grafana-fleet-desktop.png (1440px viewport).
 - Mobile screenshot: qa/grafana-fleet-mobile.png (390px viewport).
+
+Post-review repair validation:
+
+- Server receipt timestamps now drive freshness and stored history; an epoch
+  remote sample remains fresh and appears in the current one-hour history test.
+- Realtime invalidations and Refresh all reload selected-machine history.
+- Playwright observed additional machineHistory requests after selection,
+  range change, and Refresh all, while still finding zero notification UI.
+- The latest captures show explicit per-chart `stats: <series>` labels.

@@ -32,8 +32,8 @@ function snapshot(sampledAtMs: number, cpuPercent: number): MachineSnapshot {
 test("append-only migrations upgrade the prior single-machine schema", () => {
   const db = new Database(":memory:");
   try {
-    for (const migration of hostMonitorMigrations.slice(0, 10)) db.exec(migration);
-    for (const migration of hostMonitorMigrations.slice(10)) db.exec(migration);
+    for (const migration of hostMonitorMigrations.slice(0, 9)) db.exec(migration);
+    for (const migration of hostMonitorMigrations.slice(9)) db.exec(migration);
     const tables = db.prepare("SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name").all() as Array<{ name: string }>;
     assert.ok(tables.some((table) => table.name === "machine_samples"));
     assert.ok(tables.some((table) => table.name === "fleet_samples"));
@@ -51,9 +51,9 @@ test("history is isolated per host and never exceeds 720 relative buckets", () =
     const until = since + 30 * 24 * 60 * 60_000;
     for (let index = 0; index <= 900; index += 1) {
       const at = Math.round(since + (until - since) * index / 900);
-      store.insert("host-alpha", snapshot(at, index % 100));
+      store.insert("host-alpha", snapshot(0, index % 100), at);
     }
-    store.insert("host-bravo", snapshot(until, 99));
+    store.insert("host-bravo", snapshot(0, 99), until);
 
     const alpha = store.history("host-alpha", since, until);
     const bravo = store.history("host-bravo", since, until);
@@ -61,6 +61,7 @@ test("history is isolated per host and never exceeds 720 relative buckets", () =
     assert.ok(alpha.length <= MAX_RENDER_POINTS);
     assert.ok(alpha.every((point) => point.collectedAtMs >= since));
     assert.deepEqual(bravo.map((point) => point.cpuPercent), [99]);
+    assert.equal(bravo[0]?.collectedAtMs, until);
   } finally {
     db.close();
   }

@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sequence": 9,
+  "previousDigest": "sha256:ad4ae5711949bd0bc872f0d5418bde06af92977ccfa035c1e67bcd6d86a01825",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Repaired isolated review findings: server receipt time now owns freshness, persistence, pruning, and history regardless of remote clock skew; a one-time appended cleanup migration removes pre-fix fleet timestamps; selected history reloads on realtime and Refresh all; prior-range points are suppressed; chart summaries name their series; fleet realtime publishes are coalesced; and regression/browser checks pass.",
+  "createdAt": "2026-09-03T21:16:09.710Z",
+  "stateBeforeDigest": "sha256:c8842180514c536c942588bac8108a968f9bcd0a8a9803b2c0e7cc5f95b305bb",
+  "stateAfterDigest": "sha256:b7782ea0c5b0b6cba2d0cc2706dc7ba0b414ab96b529c76e83ceb464f427e264",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 9,
+    "activeFeature": "host-monitor-grafana-fleet-dashboard",
+    "request": "Rework Host Monitor into a Grafana-style in-page fleet dashboard. Restore the Host Monitor sidebar accessory icon as a compact quick-access/status control, but keep the full monitoring interface inside the Host Monitor page rather than a popup or floating overlay. Monitor and display every enrolled BB machine, with per-machine CPU, RAM, disk, load, uptime, network and historical panels where available. Preserve notification-free behavior: no toast, desktop/browser notification, alert banner, or warning badge.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "context",
+    "status": "waiting",
+    "repairAttempts": 1,
+    "message": "Repaired isolated review findings: server receipt time now owns freshness, persistence, pruning, and history regardless of remote clock skew; a one-time appended cleanup migration removes pre-fix fleet timestamps; selected history reloads on realtime and Refresh all; prior-range points are suppressed; chart summaries name their series; fleet realtime publishes are coalesced; and regression/browser checks pass.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:b68039cc56e374ac530c1d4ee1f57640d396e07bbb1b09684dcf0a38e345ecf3",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:2561f73f015a326ca22f3cb8d709f67b032e2383df9b19b6fd41b6293dc2a045",
+    "impactDigest": "sha256:42f9862d6a78d8af4992daff81ce95cd027c5d1b40731ab9eb1da33c51191537",
+    "capabilityClaimId": "host-monitor-grafana-fleet-dashboard-a89b74a33ddf",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-03T21:16:09.710Z"
+  },
+  "digest": "sha256:a70ed7308cc2e3b182c1ba34f454ad86a8fdaa69d96fb287d1b64f6a61c1b75f"
+}

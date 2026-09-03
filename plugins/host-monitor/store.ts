@@ -55,6 +55,7 @@ export const hostMonitorMigrations = [
   )`,
   `CREATE INDEX IF NOT EXISTS fleet_samples_host_collected_at
     ON fleet_samples(host_id, collected_at)`,
+  `DELETE FROM fleet_samples`,
 ];
 
 export function bucketSizeFor(rangeMs: number): number {
@@ -71,14 +72,14 @@ export class HostMonitorStore {
     this.db = db;
   }
 
-  insert(hostId: string, snapshot: MachineSnapshot): void {
+  insert(hostId: string, snapshot: MachineSnapshot, collectedAtMs = Date.now()): void {
     this.db.prepare(`INSERT OR REPLACE INTO fleet_samples (
       host_id, collected_at, cpu_percent, memory_percent, disk_percent,
       receive_bytes_per_second, send_bytes_per_second, load1, load5, load15
     ) VALUES (
       @hostId, @collectedAtMs, @cpuPercent, @memoryPercent, @diskPercent,
       @receiveBytesPerSecond, @sendBytesPerSecond, @load1, @load5, @load15
-    )`).run(toHistoryPoint(hostId, snapshot));
+    )`).run(toHistoryPoint(hostId, snapshot, collectedAtMs));
   }
 
   prune(before: number): void {
@@ -110,10 +111,10 @@ export class HostMonitorStore {
   }
 }
 
-function toHistoryPoint(hostId: string, snapshot: MachineSnapshot): HistoryPoint & { hostId: string } {
+function toHistoryPoint(hostId: string, snapshot: MachineSnapshot, collectedAtMs: number): HistoryPoint & { hostId: string } {
   return {
     hostId,
-    collectedAtMs: snapshot.sampledAtMs,
+    collectedAtMs,
     cpuPercent: snapshot.cpu.usagePercent,
     memoryPercent: snapshot.memory.usagePercent,
     diskPercent: snapshot.disk?.usagePercent ?? null,

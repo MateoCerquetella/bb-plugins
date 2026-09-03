@@ -14,6 +14,10 @@ const output = ".empirical/specs/host-monitor-grafana-fleet-dashboard/qa";
 const browser = await chromium.launch({ headless: true });
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  let historyRequests = 0;
+  page.on("request", (request) => {
+    if (request.url().includes("/rpc/machineHistory")) historyRequests += 1;
+  });
   await page.goto(`${baseUrl}/plugins/host-monitor/host-monitor`, { waitUntil: "domcontentloaded" });
   const cards = page.locator('button[aria-label^="Open dashboard for"]');
   await cards.first().waitFor({ state: "visible", timeout: 20_000 });
@@ -28,7 +32,12 @@ try {
   await page.getByPlaceholder("Name, id, or platform").fill(filterName);
   if (await cards.count() !== 1) throw new Error("Machine search did not filter to one card");
   await page.locator(".host-monitor__toolbar select").selectOption("1");
+  const historyRequestsBeforeRefresh = historyRequests;
   await page.getByRole("button", { name: "Refresh all" }).click();
+  for (let attempt = 0; attempt < 40 && historyRequests <= historyRequestsBeforeRefresh; attempt += 1) {
+    await page.waitForTimeout(100);
+  }
+  if (historyRequests <= historyRequestsBeforeRefresh) throw new Error("Refresh all did not reload selected history");
   await page.getByRole("button", { name: "Refresh all" }).waitFor({ state: "visible", timeout: 20_000 });
   if (await page.locator('[data-sonner-toast], [role="alert"]').count() !== 0) throw new Error("Notification UI appeared");
   await page.getByPlaceholder("Name, id, or platform").fill("");
@@ -45,6 +54,7 @@ try {
     machineCards: await cards.count(),
     selectedMachine,
     historyRangeHours: 1,
+    historyRequests,
     notificationSurfaces: 0,
   }) + "\n");
 } finally {

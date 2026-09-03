@@ -102,7 +102,8 @@ Status: Accepted
 
 - `bb.storage.migrate` indexes migration statements and forbids editing shipped
   statements.
-- The locally installed plugin already created the single-machine schema.
+- The locally installed plugin already created the nine-statement
+  single-machine schema.
 
 ### Options
 
@@ -122,5 +123,34 @@ remove them without breaking existing installations.
 
 ### Verification
 
-Run migrations against both an empty database and the current ten-statement
+Run migrations against both an empty database and the current nine-statement
 schema, then test insert, prune, latest, and bounded history per host.
+
+## D-005: Own observation time on the server
+
+Status: Accepted
+
+### Evidence
+
+- Enrolled machines can have wall clocks ahead of or behind the BB server.
+- Freshness, retention, and history ranges are server-relative concerns.
+
+### Options
+
+1. Trust each remote `sampledAtMs` for storage and freshness.
+2. Reject skewed hosts.
+3. Record server receipt time while retaining remote sample time as diagnostics.
+
+### Chosen approach
+
+Choose option 3. The server receipt timestamp drives state and history.
+
+### Trade-offs and risks
+
+Network latency shifts a point by at most the bounded host-call duration, which
+is preferable to arbitrary host clock skew.
+
+### Verification
+
+Return a deliberately epoch-timestamped host sample and prove it is fresh and
+present in the current server-relative history window.

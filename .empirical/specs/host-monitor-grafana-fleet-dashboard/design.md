@@ -18,9 +18,12 @@ frontend re-fetches durable state through RPC.
 
 ## Persistence and bounded RPC
 
-Keep the existing ten plugin-database migrations byte-for-byte and append a
+Keep the existing nine plugin-database migrations byte-for-byte and append a
 `fleet_samples` table keyed by `(host_id, collected_at)`, plus its lookup index.
-Successful samples are stored for 30 days. History queries use range-relative
+The server assigns receipt timestamps for freshness, storage, pruning, and
+history so remote clock skew cannot move samples across server-relative
+windows; remote sample time remains diagnostic payload only. Successful samples
+are stored for 30 days. History queries use range-relative
 buckets, defensive slicing, and no more than 720 points.
 
 Split RPC by payload shape:
@@ -32,6 +35,10 @@ Split RPC by payload shape:
 - `refresh` accepts a nullable host id, coalesces with existing work, and returns
   the refreshed fleet.
 - `sidebarSummary` returns only connected and total counts.
+
+Realtime invalidations and manual Refresh all update both fleet state and the
+selected machine's current range. Range changes render no prior-range points,
+and chart summary labels name the first series they summarize.
 
 This represents every enrolled machine while keeping each response below host
 and RPC limits even for a large fleet.

@@ -9,7 +9,7 @@ PASS AC-2: Host contract and live payloads contain CPU, RAM, root disk,
 receive/send throughput, load 1/5/15, uptime, OS, architecture, kernel, and CPU
 model/core facts. No IP or process-control field is in the schema or payload.
 
-PASS AC-3: Prior ten migrations remain ordered and two fleet migrations append.
+PASS AC-3: Prior nine migrations remain ordered and fleet migrations append.
 In-memory SQLite coverage proves per-host isolation and <=720 points; chart
 transforms mark deterministic gaps without growing the dataset.
 
@@ -43,3 +43,14 @@ build checks. The complete workspace check and configured structural E2E gate
 pass. Local plugin status is running with machine-sampler active.
 
 No blocking UX, correctness, privacy, lifecycle, or accessibility issue found.
+
+Post-review repair QA:
+
+- Freshness, pruning, and history use server receipt time, not remote wall
+  clocks. A zero-timestamp remote fixture is fresh and included in one-hour
+  history with a positive server timestamp.
+- Realtime and manual refresh paths call both fleet and selected history loads;
+  points require matching host and range before rendering.
+- Chart summaries explicitly name the first series they summarize.
+- Fleet refresh emits one sampling and one completion invalidation rather than
+  per-host bursts; the coalescing tests continue to pass.

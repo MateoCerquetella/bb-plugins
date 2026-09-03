@@ -24,6 +24,7 @@ const STALE_AFTER_INTERVALS = 2;
 type MachineHost = MachineRow["host"];
 type MachineRecord = {
   snapshot: MachineSnapshot | null;
+  receivedAtMs: number | null;
   error: string | null;
   sampling: boolean;
 };
@@ -54,7 +55,7 @@ function projectHost(host: {
 }
 
 function emptyRecord(host: MachineHost): MachineRecord {
-  return { snapshot: null, error: null, sampling: host.status === "connected" };
+  return { snapshot: null, receivedAtMs: null, error: null, sampling: host.status === "connected" };
 }
 
 function compareHosts(left: MachineHost, right: MachineHost): number {
@@ -142,13 +143,14 @@ export default async function hostMonitorPlugin(bb: BbPluginApi): Promise<void> 
               ? "error"
               : record.snapshot === null
                 ? "sampling"
-                : now - record.snapshot.sampledAtMs > SAMPLE_INTERVAL_MS * STALE_AFTER_INTERVALS
+                : record.receivedAtMs === null || now - record.receivedAtMs > SAMPLE_INTERVAL_MS * STALE_AFTER_INTERVALS
                   ? "stale"
                   : "fresh";
       return {
         host,
         sampleState,
         snapshot: record.snapshot,
+        receivedAtMs: record.receivedAtMs,
         error: record.error,
       };
     });
@@ -189,7 +191,6 @@ export default async function hostMonitorPlugin(bb: BbPluginApi): Promise<void> 
 
     const previous = records.get(host.id) ?? emptyRecord(host);
     records.set(host.id, { ...previous, sampling: true, error: null });
-    publish([host.id]);
 
     const timeoutSignal = AbortSignal.timeout(HOST_CALL_TIMEOUT_MS);
     const callSignal = signal === undefined
@@ -202,13 +203,15 @@ export default async function hostMonitorPlugin(bb: BbPluginApi): Promise<void> 
           { cpuSampleMs: CPU_SAMPLE_MS },
           { hostId: host.id, signal: callSignal },
         );
-        store.insert(host.id, snapshot);
-        records.set(host.id, { snapshot, error: null, sampling: false });
+        const receivedAtMs = Date.now();
+        store.insert(host.id, snapshot, receivedAtMs);
+        records.set(host.id, { snapshot, receivedAtMs, error: null, sampling: false });
       } catch (error) {
         if (signal?.aborted) return;
         bb.log.warn(`Could not sample host ${host.id}: ${errorMessage(error)}`);
         records.set(host.id, {
           snapshot: previous.snapshot,
+          receivedAtMs: previous.receivedAtMs,
           error: publicSampleError(error),
           sampling: false,
         });
@@ -220,7 +223,6 @@ export default async function hostMonitorPlugin(bb: BbPluginApi): Promise<void> 
       await pending;
     } finally {
       if (sampleInFlight.get(host.id) === pending) sampleInFlight.delete(host.id);
-      publish([host.id]);
     }
   }
 
@@ -228,7 +230,9 @@ export default async function hostMonitorPlugin(bb: BbPluginApi): Promise<void> 
     if (fullRefreshInFlight !== null) return fullRefreshInFlight;
     const pending = (async () => {
       const available = await listHosts(signal);
-      await Promise.all(available.map((host) => sampleHost(host, signal)));
+      const samples = available.map((host) => sampleHost(host, signal));
+      publish(available.map((host) => host.id));
+      await Promise.all(samples);
       store.prune(Date.now() - RETENTION_MS);
       publish(available.map((host) => host.id));
     })();
@@ -244,7 +248,10 @@ export default async function hostMonitorPlugin(bb: BbPluginApi): Promise<void> 
     const available = await listHosts();
     const host = available.find((candidate) => candidate.id === hostId);
     if (host === undefined) throw new Error("That enrolled machine no longer exists.");
-    await sampleHost(host);
+    const sample = sampleHost(host);
+    publish([host.id]);
+    await sample;
+    publish([host.id]);
   }
 
   bb.rpc.register(rpcContract, {

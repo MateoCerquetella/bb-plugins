@@ -42,6 +42,7 @@ function FleetDashboard() {
   const [query, setQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [historyLoading, setHistoryLoading] = useState(false);
   const historyRequest = useRef(0);
 
   const loadFleet = useCallback(async () => {
@@ -62,26 +63,36 @@ function FleetDashboard() {
     }
   }, [rpc]);
 
-  useEffect(() => { void loadFleet(); }, [loadFleet]);
-  useRealtime(REALTIME_CHANNEL, useCallback(() => { void loadFleet(); }, [loadFleet]));
-
-  useEffect(() => {
+  const loadHistory = useCallback(async () => {
     if (selectedHostId == null) {
       setHistory(null);
+      setHistoryLoading(false);
       return;
     }
     const request = ++historyRequest.current;
-    void rpc.call("machineHistory", { hostId: selectedHostId, rangeHours })
-      .then((next) => {
-        if (historyRequest.current === request) setHistory(next);
-      })
-      .catch((cause) => {
-        if (historyRequest.current === request) {
-          setHistory(null);
-          setError(cause instanceof Error ? cause.message : "Could not load machine history.");
-        }
-      });
+    setHistoryLoading(true);
+    try {
+      const next = await rpc.call("machineHistory", { hostId: selectedHostId, rangeHours });
+      if (historyRequest.current === request) {
+        setHistory(next);
+        setError(null);
+      }
+    } catch (cause) {
+      if (historyRequest.current === request) {
+        setHistory(null);
+        setError(cause instanceof Error ? cause.message : "Could not load machine history.");
+      }
+    } finally {
+      if (historyRequest.current === request) setHistoryLoading(false);
+    }
   }, [rangeHours, rpc, selectedHostId]);
+
+  useEffect(() => { void loadFleet(); }, [loadFleet]);
+  useEffect(() => { void loadHistory(); }, [loadHistory]);
+  useRealtime(REALTIME_CHANNEL, useCallback(() => {
+    void loadFleet();
+    void loadHistory();
+  }, [loadFleet, loadHistory]));
 
   const refreshAll = useCallback(async () => {
     if (refreshing) return;
@@ -89,13 +100,14 @@ function FleetDashboard() {
     try {
       const next = await rpc.call("refresh", { hostId: null });
       setFleet(next);
+      await loadHistory();
       setError(null);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Could not refresh the fleet.");
     } finally {
       setRefreshing(false);
     }
-  }, [refreshing, rpc]);
+  }, [loadHistory, refreshing, rpc]);
 
   const normalizedQuery = query.trim().toLocaleLowerCase();
   const visibleMachines = useMemo(() => {
@@ -107,7 +119,7 @@ function FleetDashboard() {
   }, [fleet, normalizedQuery]);
 
   const selected = fleet?.machines.find((machine) => machine.host.id === selectedHostId) ?? null;
-  const points = history?.hostId === selectedHostId ? history.points : [];
+  const points = history?.hostId === selectedHostId && history.rangeHours === rangeHours ? history.points : [];
 
   return (
     <main className="host-monitor">
@@ -157,7 +169,7 @@ function FleetDashboard() {
         )}
       </section>
 
-      <MachineDashboard machine={selected} points={points} rangeHours={rangeHours} thresholds={fleet?.thresholds ?? { cpu: 90, ram: 90, disk: 90 }} />
+      <MachineDashboard historyLoading={historyLoading} machine={selected} points={points} rangeHours={rangeHours} thresholds={fleet?.thresholds ?? { cpu: 90, ram: 90, disk: 90 }} />
     </main>
   );
 }
@@ -197,7 +209,7 @@ const MachineCard = memo(function MachineCard({
       <footer>
         <span>↓ {rate(snapshot?.network.receiveBytesPerSecond)}</span>
         <span>↑ {rate(snapshot?.network.sendBytesPerSecond)}</span>
-        <small>{snapshot == null ? "No sample yet" : relativeTime(snapshot.sampledAtMs)}</small>
+        <small>{machine.receivedAtMs == null ? "No sample yet" : relativeTime(machine.receivedAtMs)}</small>
       </footer>
     </button>
   );
@@ -208,11 +220,13 @@ function CardValue({ label, value, warning }: { label: string; value: string; wa
 }
 
 function MachineDashboard({
+  historyLoading,
   machine,
   points,
   rangeHours,
   thresholds,
 }: {
+  historyLoading: boolean;
   machine: MachineRow | null;
   points: HistoryPoint[];
   rangeHours: RangeHours;
@@ -248,7 +262,7 @@ function MachineDashboard({
           <span className="host-monitor__state-dot" data-state={machine.sampleState} aria-hidden="true" />
           <div><h2 id="machine-heading">{machine.host.name}</h2><p>{snapshot == null ? machine.host.id : `${snapshot.system.osName} · ${snapshot.system.arch}`}</p></div>
         </div>
-        <span>{sampleStateLabel(machine)}{snapshot == null ? "" : ` · sampled ${relativeTime(snapshot.sampledAtMs)}`}</span>
+        <span>{sampleStateLabel(machine)}{machine.receivedAtMs == null ? "" : ` · received ${relativeTime(machine.receivedAtMs)}`}{historyLoading ? " · loading history…" : ""}</span>
       </header>
 
       {machine.error != null && <p className="host-monitor__inline-status" role="status">{machine.error}</p>}
@@ -381,7 +395,7 @@ const Chart = memo(function Chart({
 
   useEffect(() => { applyRef.current?.(); }, [description, dimensions, percentChart, rows, series, thresholds, title, valueFormatter]);
 
-  return <article className="host-monitor__chart"><header><div><h3>{title}</h3><p>{rows.length} points</p></div><dl><div><dt>Latest</dt><dd>{summary.latest}</dd></div><div><dt>Min</dt><dd>{summary.min}</dd></div><div><dt>Max</dt><dd>{summary.max}</dd></div></dl></header><div ref={target} role="img" aria-label={description} /></article>;
+  return <article className="host-monitor__chart"><header><div><h3>{title}</h3><p>{rows.length} points · stats: {series[0]}</p></div><dl><div><dt>Latest</dt><dd>{summary.latest}</dd></div><div><dt>Min</dt><dd>{summary.min}</dd></div><div><dt>Max</dt><dd>{summary.max}</dd></div></dl></header><div ref={target} role="img" aria-label={description} /></article>;
 });
 
 function chartOption(current: {

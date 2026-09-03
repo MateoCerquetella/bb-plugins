@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:e29c7644357a7feeb628a49f89b26953f4d47079596f9fa6eee52e3964bb8649",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "a6391be14058735b3aebe1769edb313f20100014",
+  "headCommit": "91f5abe3420c39ef44dbd325b02f48003c1b7600",
+  "diffDigest": "sha256:3d98bf9e95dc9c309f41a38abff9a9d5f2a2d2a580a010cb47089500cef5ce77",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "codex/grafana_fleet_review",
+  "reviewerInvocationId": "c8f262ec-8579-4870-be4a-2590141d639f",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- FAIL AC-1: Remote sampledAtMs is compared to server time, so clock skew can misclassify fresh/stale samples.\n- PASS AC-2: Snapshots include required telemetry and expose no IP or process-control field.\n- FAIL AC-3: Ranges and 720 cap exist, but remote timestamps drive server-relative query/prune windows and can omit or misplace samples.\n- PASS AC-UI-1: Fleet totals, bounded search, card selection, explicit state text, and theme-token panels are present.\n- FAIL AC-UI-2: Realtime and Refresh all update fleet only, leaving selected history stale; old-range points can remain briefly and chart summaries silently cover only the first series.\n- PASS AC-UI-3: Branded nav icon and neutral connected/total accessory exist without popup/floating UI.\n- PASS AC-4: Notification, alert, IP reveal, popup, floating, and process-control surfaces are absent; errors are inline.\n- PASS AC-5: Threshold guides are passive and server refresh/sample promises coalesce.\n- PASS AC-6: Identity, route, assets, compatibility, coordinates, and append-only migrations remain stable.\n- PASS AC-7: Focused/workspace/build/live/browser evidence exists, though clock skew and live-history refresh need added coverage.\n\n## Security / correctness\n\nCHANGES_REQUESTED: trusting remote wall clocks breaks server-relative freshness, retention, and history; selected history is not refreshed after sampling/manual refresh.\n\n## Design / maintainability\n\nCHANGES_REQUESTED: centralize timestamp ownership on the server and coordinate fleet/history loading with explicit per-range state and clearer series summaries.",
+  "bodyDigest": "sha256:faca0a4b2fe707d5d05179d3022781a5b35a8cf445ef871b06a6b75cb6c4853d",
+  "digest": "sha256:c9e03424bebbac389221999ed6aa19564f42b46b9e2e0e4ecd1e00b5735be9ec"
+}

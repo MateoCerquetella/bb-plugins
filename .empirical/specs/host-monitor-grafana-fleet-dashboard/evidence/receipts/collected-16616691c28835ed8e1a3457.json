@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-16616691c28835ed8e1a3457",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Post-review Playwright run confirmed all four machines, clock-safe fresh state, neutral sidebar 4/4, same-page selection/search/range, selected-history reload after Refresh all, explicit series summaries, responsive desktop/mobile layout, and zero notification UI.",
+  "passed": true,
+  "startedAt": "2026-09-03T21:17:19.996Z",
+  "completedAt": "2026-09-03T21:17:19.996Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-grafana-fleet-dashboard",
+    "specRevision": 2,
+    "specDigest": "sha256:b68039cc56e374ac530c1d4ee1f57640d396e07bbb1b09684dcf0a38e345ecf3",
+    "treeDigest": "sha256:49c53573922276069530dedc79c7370706847c77a2a012792ccab95f2cd2812e",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf"
+  },
+  "digest": "sha256:b437d97d8e40f62d069a4737d6b463be76c7b01697c22bcc15233215b038da5a",
+  "kind": "collected",
+  "collector": "playwright-live-bb-host-monitor-repair",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/host-monitor-grafana-fleet-dashboard/qa/grafana-fleet-desktop.png",
+      "mediaType": "image/png",
+      "bytes": 127059,
+      "digest": "sha256:697f5810f7c62c997909910ed932549cc4926250e39cabafaffca321f19a8456"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-grafana-fleet-dashboard/qa/grafana-fleet-mobile.png",
+      "mediaType": "image/png",
+      "bytes": 39783,
+      "digest": "sha256:eda6daf447a093039c64a5894f93bb3207391fb6ab2fdfab4a460cf182d48508"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-grafana-fleet-dashboard/qa/live-validation.txt",
+      "mediaType": "text/plain",
+      "bytes": 1319,
+      "digest": "sha256:9a6c058ece39dfe5bedab1a644012322a85d0884150601f6223b25eea4ae8c0c"
+    }
+  ]
+}

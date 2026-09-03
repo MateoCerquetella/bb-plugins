@@ -33,4 +33,6 @@ test("charts preserve page scrolling and expose textual summaries", () => {
   assert.match(app, /<dt>Latest<\/dt>/u);
   assert.match(app, /<dt>Min<\/dt>/u);
   assert.match(app, /<dt>Max<\/dt>/u);
+  assert.match(app, /history\.rangeHours === rangeHours/u);
+  assert.match(app, /void loadHistory\(\)/u);
 });

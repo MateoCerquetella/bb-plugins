@@ -76,6 +76,7 @@ const machineRowSchema = z.object({
   host: hostSummarySchema,
   sampleState: sampleStateSchema,
   snapshot: machineSnapshotSchema.nullable(),
+  receivedAtMs: timestamp.nullable(),
   error: z.string().nullable(),
 }).strict();
 
