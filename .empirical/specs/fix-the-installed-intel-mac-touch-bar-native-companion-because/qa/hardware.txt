@@ -1,0 +1,14 @@
+Human hardware QA — 2026-09-03
+
+- The enrolled Intel Mac rebuilt and installed the app successfully. The
+  installer returned `__TB_DIRECT_TOUCH_INSTALL__:0` and the runtime source
+  marker is `finger-scroll-ui 2026-09-02`.
+- The running log records real `inline settings opened` and `inline settings
+  closed` actions from Touch Bar taps.
+- The running log records a physical thread card tap on `thr_axt3ycmenc` after
+  reaching a later card in the horizontally scrollable lane, followed by a
+  successful exact-id BB open.
+- The final repair enables `NSTouchType.direct` on the scroll view, document
+  stack, and custom group containers; child hit tests convert AppKit's
+  superview-coordinate point once; no controller button dispatches from
+  `mouseDown`.
