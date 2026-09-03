@@ -211,6 +211,23 @@ test("normalizes Antigravity fractional quotas across both groups", () => {
   assert.ok(Math.abs(provider.windows[3]!.usedPercent - 7) < 1e-12);
 });
 
+test("normalizes agy command-data buckets", () => {
+  const provider = normalizeAntigravityOutput({
+    response: "human-readable output",
+    command: { data: { groups: [
+      { name: "Gemini Models", buckets: [{ name: "Weekly Limit Remaining", remaining_fraction: 0.86 }] },
+      { name: "Claude and GPT models", buckets: [{ name: "Five Hour Limit Remaining", remaining_fraction: 1 }] },
+    ] } },
+  });
+  assert.equal(provider.status, "ok");
+  assert.deepEqual(provider.windows.map((window) => window.label), [
+    "Gemini: Weekly limit",
+    "Claude/GPT: 5-hour limit",
+  ]);
+  assert.ok(Math.abs(provider.windows[0]!.usedPercent - 14) < 1e-12);
+  assert.equal(provider.windows[1]!.usedPercent, 0);
+});
+
 test("uses the tightest Antigravity group in compact usage", () => {
   const provider = normalizeAntigravityOutput({ groups: [
       { name: "Gemini Models", windows: [

@@ -1,11 +1,19 @@
 import { execFile } from "node:child_process";
-import { readFile } from "node:fs/promises";
+import { access, constants } from "node:fs/promises";
 import { homedir } from "node:os";
+import path from "node:path";
+import { readFile } from "node:fs/promises";
 import type { ProviderUsage, UsageWindow } from "./usage.ts";
 
 const REFRESH_INTERVAL_MS = 5 * 60_000;
 const EXEC_TIMEOUT_MS = 10_000;
 const NOT_INSTALLED_MESSAGE = "Antigravity is not installed on this machine.";
+const candidatePaths = [
+  "agy",
+  path.join(homedir(), ".local", "bin", "agy"),
+  "/usr/local/bin/agy",
+  "/opt/homebrew/bin/agy",
+] as const;
 
 let cached: ProviderUsage = unavailableUsage("not_installed");
 let refreshInFlight: Promise<void> | null = null;
@@ -69,13 +77,16 @@ export function normalizeAntigravityOutput(output: unknown, accountEmail: string
     }
   }
   if (root === null) throw new TypeError("Antigravity usage output must be an object");
+  const commandData = asRecord(asRecord(root.command)?.data);
   const groups = Array.isArray(root.groups)
     ? root.groups
     : Array.isArray(root.quota_groups)
       ? root.quota_groups
       : Array.isArray(root.quotaGroups)
         ? root.quotaGroups
-        : [];
+        : Array.isArray(commandData?.groups)
+          ? commandData.groups
+      : [];
   const windows: UsageWindow[] = [];
   for (const groupValue of groups) {
     const group = asRecord(groupValue);
@@ -88,6 +99,8 @@ export function normalizeAntigravityOutput(output: unknown, accountEmail: string
         ? group.limits
         : Array.isArray(group.quotas)
           ? group.quotas
+          : Array.isArray(group.buckets)
+            ? group.buckets
           : [];
     for (const window of groupWindows) {
       const normalized = normalizeWindow(window, prefix);
@@ -120,12 +133,63 @@ async function activeAccountEmail(): Promise<string | null> {
   }
 }
 
-function executeAgy(): Promise<string> {
+async function resolveAgyPath(): Promise<string | null> {
+  const pathCandidates = (process.env.PATH ?? "")
+    .split(path.delimiter)
+    .filter(Boolean)
+    .map((directory) => path.join(directory, "agy"));
+  const candidates = [
+    ...pathCandidates,
+    ...candidatePaths.filter((candidate) => candidate !== "agy"),
+  ];
+
+  for (const candidate of candidates) {
+    try {
+      await access(candidate, constants.X_OK);
+      return candidate;
+    } catch {
+      // Try the next PATH or fallback candidate.
+    }
+  }
+  return null;
+}
+
+class AgyExecutionError extends Error {
+  readonly code: string | number | undefined;
+
+  constructor(
+    message: string,
+    code: string | number | undefined,
+  ) {
+    super(message);
+    this.code = code;
+    this.name = "AgyExecutionError";
+  }
+}
+
+async function executeAgy(): Promise<string> {
+  const executable = await resolveAgyPath();
+  if (executable === null) {
+    throw new AgyExecutionError("agy executable was not found in PATH or fallback locations", "ENOENT");
+  }
+
   return new Promise((resolve, reject) => {
-    execFile("agy", ["-p", "/usage", "--output-format", "json"], { timeout: EXEC_TIMEOUT_MS }, (error, stdout) => {
-      if (error) reject(error);
-      else resolve(stdout);
-    });
+    execFile(
+      executable,
+      ["-p", "/usage", "--output-format", "json"],
+      { timeout: EXEC_TIMEOUT_MS },
+      (error, stdout, stderr) => {
+        if (error) {
+          const detail = stderr.trim();
+          reject(new AgyExecutionError(
+            detail === "" ? error.message : `${error.message}: ${detail}`,
+            error.code,
+          ));
+          return;
+        }
+        resolve(stdout);
+      },
+    );
   });
 }
 
@@ -136,11 +200,13 @@ export async function refreshAntigravityUsage(): Promise<void> {
       const output = JSON.parse(await executeAgy()) as unknown;
       cached = normalizeAntigravityOutput(output, await activeAccountEmail());
     } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.warn(`[usage-tracker] Antigravity probe failed: ${message}`);
       cached = unavailableUsage(
-        "not_installed",
-        error instanceof Error && /ENOENT|not found/i.test(error.message)
+        error instanceof AgyExecutionError && error.code === "ENOENT" ? "not_installed" : "error",
+        error instanceof AgyExecutionError && error.code === "ENOENT"
           ? NOT_INSTALLED_MESSAGE
-          : NOT_INSTALLED_MESSAGE,
+          : `Unable to read Antigravity usage: ${message}`,
       );
     } finally {
       refreshInFlight = null;
