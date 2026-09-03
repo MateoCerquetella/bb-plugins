@@ -8,6 +8,10 @@
       "source": "./plugins/action-topbar"
     },
     {
+      "name": "clean-my-context",
+      "source": "./plugins/clean-my-context"
+    },
+    {
       "name": "dockside",
       "source": "./plugins/dockside"
     },

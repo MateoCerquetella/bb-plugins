@@ -21,6 +21,7 @@
 | | Plugin | Install | What it does |
 | --- | --- | --- | --- |
 | <img src="./plugins/action-topbar/assets/icon.svg" width="128" height="128" alt="" /> | [Action Topbar](./plugins/action-topbar) | [Experimental Git install](#action-topbar-experimental-install) | Adds a compact main-thread topbar with draggable BB Actions and persistent, per-thread workspace panes. Requires the matching experimental BB core/SDK build. |
+| <img src="./plugins/clean-my-context/assets/icon.svg" width="128" height="128" alt="" /> | [Clean My Context](./plugins/clean-my-context) | [Git release](#clean-my-context-quick-start) | Starts fresh model context while preserving the thread timeline and workspace. Requires the context-clear API from BB PR #2500. |
 | <img src="./plugins/dockside/assets/icon.svg" width="128" height="128" alt="" /> | [Dockside](./plugins/dockside) | [Git branch](#dockside-quick-start) | Replaces BB's thread list with a compact project-first sidebar, semantic status colors, filters, safe multi-select deletion, and child-agent families. |
 | <img src="./plugins/host-monitor/assets/icon.svg" width="128" height="128" alt="" /> | [Host Monitor](./plugins/host-monitor) | [Git release](#host-monitor-quick-start) | Monitors CPU, RAM, disk, network, host details, and guarded process actions across every machine enrolled in BB. Requires BB 0.40+. |
 | <img src="./plugins/save-my-model/assets/icon.svg" width="128" height="128" alt="" /> | [Save My Model](./plugins/save-my-model) | [Git release](#save-my-model-quick-start) | Stores provider by BB host and model/reasoning separately for each host and provider. |
@@ -46,6 +47,22 @@ bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@main \
 
 See the [Action Topbar README](./plugins/action-topbar) for the local-path
 installation command and current compatibility details.
+
+## Clean My Context quick start
+
+Install the immutable Git release:
+
+```sh
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.0 \
+  --subdirectory plugins/clean-my-context \
+  --tag-prefix clean-my-context/
+```
+
+Open an idle or failed thread and select **Clear model context** in its header,
+or run `bb clean-my-context clear <thread-id>`. BB keeps the visible timeline
+and workspace, while the next prompt starts with fresh model context. See the
+[Clean My Context README](./plugins/clean-my-context) for safety rules and
+development commands.
 
 ## Dockside quick start
 
