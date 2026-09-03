@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 6,
+  "revision": 7,
   "activeFeature": "fix-the-installed-intel-mac-touch-bar-native-companion-because",
   "request": "Fix the installed Intel Mac Touch Bar native companion because physical touch still does not activate thread cards or any settings controls. Reproduce on the enrolled Mac, identify the actual Touch Bar event-routing failure, and implement a reliable finger-scrollable lane where completed taps activate threads/settings and horizontal swipes scroll without triggering taps. Preserve the acknowledged-error filtering, red settings close control, larger controls, exact-id BB actions, BTT alternative, tests, and documentation. Rebuild and install the corrected app on the Mac, run focused/root verification, and record human hardware evidence.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "verify",
+  "phase": "review",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Refreshed repository context after the new input-routing repair contract; all required context pages are current.",
+  "message": "Verified the Touch Bar direct-touch repair with passing workspace and clean CI checks plus Intel Mac hardware evidence.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:0dc24ec3cc3f8465d5b95eb78b6fd7972a24e55d371a849d78630edfa7047a92",
@@ -20,21 +20,24 @@
   "capabilityClaimId": "fix-the-installed-intel-mac-touch-bar-native-companion-because-21366fe98a02",
   "authorizationDigest": null,
   "evidence": [],
-  "evidenceReceiptIds": [],
+  "evidenceReceiptIds": [
+    "qa-b7bdc3c1849583cfeeb09f22",
+    "qa-29420dbf3cb6a6f82a8cfc94",
+    "qa-339891af1687dd8a18b66483"
+  ],
   "legacyEvidenceCount": 0,
   "completion": {
     "implemented": true,
-    "verified": false,
+    "verified": true,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "implemented",
+    "highest": "verified",
     "reasons": {
-      "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-03T00:13:34.883Z"
+  "updatedAt": "2026-09-03T00:31:36.983Z"
 }
