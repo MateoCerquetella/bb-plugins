@@ -1,11 +1,12 @@
 {
   "schemaVersion": 1,
-  "status": "draft",
   "classification": "behavioral",
-  "capabilities": [],
+  "capabilities": [
+    "touchbar-agent-monitor"
+  ],
   "surfaces": [
     "workflow"
   ],
   "regressionRationale": null,
-  "digest": "sha256:50cdf659d260b3862fa5d4114b18e620487a9024681daa6489af839cd84aa470"
+  "digest": "sha256:5178c9dbca346cb25eddd79dfb6d3635dbd55440808ce4a1c8e9fdfdc7bf30fd"
 }

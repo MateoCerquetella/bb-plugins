@@ -115,22 +115,43 @@ final class AgentStore {
     private var stopped = false
     private static let offlineFailureThreshold = 3
 
+    private enum RetryPolicy {
+        static let baseDelay: TimeInterval = 2
+        static let maximumDelay: TimeInterval = 30
+
+        static func delay(for failures: Int) -> TimeInterval {
+            let exponent = min(max(failures - 1, 0), 4)
+            return min(maximumDelay, baseDelay * TimeInterval(1 << exponent))
+        }
+    }
+
     func start() {
         queue.async { [weak self] in
             while let self, !self.isStopped {
+                let failuresBeforePoll = self.consecutiveFailures
                 if let next = Self.fetch(previousHosts: self.lastGoodSnapshot.hosts) {
                     self.consecutiveFailures = 0
                     self.lastGoodSnapshot = next
                     self.publish(next)
+                    if failuresBeforePoll > 0 {
+                        NativeLog.info(
+                            "BB reconnected after \(failuresBeforePoll) failed poll(s)"
+                        )
+                    }
                 } else {
                     self.consecutiveFailures += 1
                     if self.consecutiveFailures == Self.offlineFailureThreshold {
                         var stale = self.lastGoodSnapshot
                         stale.connected = false
                         self.publish(stale)
+                        NativeLog.error(
+                            "BB entering reconnecting after \(self.consecutiveFailures) failed poll(s)"
+                        )
                     }
                 }
-                for _ in 0..<20 where !self.isStopped {
+                let delay = Self.RetryPolicy.delay(for: self.consecutiveFailures)
+                let ticks = max(1, Int((delay * 10).rounded()))
+                for _ in 0..<ticks where !self.isStopped {
                     Thread.sleep(forTimeInterval: 0.1)
                 }
             }
@@ -324,18 +345,18 @@ enum BBCommand {
         while process.isRunning && Date() < deadline {
             Thread.sleep(forTimeInterval: 0.04)
         }
-        var timedOut = false
         if process.isRunning {
             NativeLog.error("bb command timed out: \(arguments.first ?? "unknown")")
-            timedOut = true
             process.terminate()
+            process.waitUntilExit()
+            // A BB wrapper can leave a helper child holding the pipe open.
+            // Do not block the only polling loop waiting for that child.
+            output.fileHandleForReading.closeFile()
+            return nil
         }
         process.waitUntilExit()
         let data = output.fileHandleForReading.readDataToEndOfFile()
         guard process.terminationStatus == 0 else {
-            // The BB CLI can leave a helper child alive after writing its JSON.
-            // Preserve a complete snapshot even when the wrapper is terminated.
-            if timedOut, !data.isEmpty { return data }
             NativeLog.error("bb exited with status \(process.terminationStatus)")
             return nil
         }

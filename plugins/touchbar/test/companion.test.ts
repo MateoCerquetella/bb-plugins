@@ -212,6 +212,10 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(model, /\["touchbar", "snapshot"\]/u);
   assert.match(model, /timeout: 5/u);
   assert.match(model, /offlineFailureThreshold = 3/u);
+  assert.match(model, /maximumDelay: TimeInterval = 30/u);
+  assert.match(model, /BB entering reconnecting after/u);
+  assert.match(model, /BB reconnected after/u);
+  assert.match(model, /output\.fileHandleForReading\.closeFile\(\)/u);
   assert.match(model, /lastGoodSnapshot/u);
   assert.match(model, /stale\.connected = false/u);
   assert.match(model, /\["host-monitor", "snapshot"\]/u);

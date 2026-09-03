@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "sequence": 2,
+  "previousDigest": "sha256:7c93fe1483aa2a58093c13fafb177eaf45188f0c9c73c594053b64aad3bd796d",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Refined the reconnect contract with bounded retry/backoff, last-good retention, automatic recovery, malformed-output handling, direct-touch preservation, tests, and Mac evidence; accepted the single-loop backoff approach and declared its capability delta.",
+  "createdAt": "2026-09-03T12:58:00.018Z",
+  "stateBeforeDigest": "sha256:c776908aae55254bf6d01b97aae5db07002fd4c82bbec2541ca82d380f7afd69",
+  "stateAfterDigest": "sha256:dc8c1b8d2975ee210070765265d0000d1da15f5a4bf8b250af399ac4397ef36c",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 2,
+    "activeFeature": "fix-touch-bar-auto-reconnect-after-prolonged-uptime-or-transient",
+    "request": "Fix Touch Bar auto-reconnect: after prolonged uptime or transient BB CLI/server failures, the native companion must retry automatically with bounded backoff, recover connected state and refresh cards when BB is healthy again, and avoid permanently showing Reconnecting while commands work. First commit all currently present worktree files. Then implement and test retry/recovery behavior, rebuild/install on the enrolled Intel Mac, and record logs and verification.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "design",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Refined the reconnect contract with bounded retry/backoff, last-good retention, automatic recovery, malformed-output handling, direct-touch preservation, tests, and Mac evidence; accepted the single-loop backoff approach and declared its capability delta.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:da3d10406bc0dd67e22aabbaa533970cc96b26a0fd8f7a4eec1de8f3f5c2c858",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:f3b8796990aee6f82c2d0fdc5eb39272a4372a328b9799d590cea250df9c3003",
+    "impactDigest": "sha256:5178c9dbca346cb25eddd79dfb6d3635dbd55440808ce4a1c8e9fdfdc7bf30fd",
+    "capabilityClaimId": "fix-touch-bar-auto-reconnect-after-prolonged-uptime-or-transient-21366fe98a02",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-03T12:58:00.018Z"
+  },
+  "digest": "sha256:fa62e4ca2651e1ac50ebc80f10bd72baeaec40101bfa15e68069bb7042934153"
+}
