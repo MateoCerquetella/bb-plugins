@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "sequence": 4,
+  "previousDigest": "sha256:207c6d62e049b344cb017ce83384f9f292c7a6f3f8290a8f2436c453d6c0643e",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Designed a v0.1.1 Dockside package-boundary repair, isolated production-install verification, approval-gated immutable tag delivery, and a minimal thread-management marketplace category update; recorded five accepted decisions.",
+  "createdAt": "2026-09-02T23:00:16.302Z",
+  "stateBeforeDigest": "sha256:f73f56e856a2f94e74e6a86bbdb3b0c2d299a6d715b9a4f490d228fba563d9df",
+  "stateAfterDigest": "sha256:96edb68f6011dc6625d1c3f85ff98c56cca4313eec07530a2f40e62fe9442806",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 4,
+    "activeFeature": "address-all-outstanding-review-comments-on-https-github-com-get",
+    "request": "Address all outstanding review comments on https://github.com/get-bb/marketplace/pull/162 for the Dockside plugin: move every runtime-imported package from devDependencies to dependencies, verify a clean managed installation/build and the repository checks, prepare the required new matching plugin release, and update the existing marketplace PR. Do not perform any Git push, tag push, release publication, or PR mutation until the explicit release approval required by the submit-a-plugin workflow is obtained.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "yolo",
+    "phase": "plan",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Designed a v0.1.1 Dockside package-boundary repair, isolated production-install verification, approval-gated immutable tag delivery, and a minimal thread-management marketplace category update; recorded five accepted decisions.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:924878973259c9f8a5a164a32739a4cceccb06c6508dd53eb2af6e6ec1e2020d",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:9f000bf0dcc1104c1103db5eb7a7917d279479992beeca7b7ad9a01bbf3bbb74",
+    "impactDigest": "sha256:1bd55c2fb46fe41a3c0a5054a32e714d572483eed3f70395c534b365fccaf277",
+    "capabilityClaimId": "address-all-outstanding-review-comments-on-https-github-com-get-86a62072c354",
+    "authorizationDigest": "sha256:790752bf33d38a5a61f70aac05dc89de9cbf0d9be1a9ed19e358bc59c54c93ca",
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-02T23:00:16.302Z"
+  },
+  "digest": "sha256:41f23f862c43b03d13c10e1d74730d4a80257d100793536387aeeff9037fff72"
+}

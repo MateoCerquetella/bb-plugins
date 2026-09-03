@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "mode": "yolo",
+  "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+  "feature": "address-all-outstanding-review-comments-on-https-github-com-get",
+  "requestDigest": "sha256:2faf17f3dc76042552c4ff9f681ce7b5335d6d95e82bc590ad1ced9df1cc0b0d",
+  "ceiling": "verified",
+  "targetBranch": "main",
+  "allowExternalAgent": false,
+  "createdAt": "2026-09-02T22:55:47.545Z",
+  "expiresAt": null,
+  "digest": "sha256:790752bf33d38a5a61f70aac05dc89de9cbf0d9be1a9ed19e358bc59c54c93ca"
+}

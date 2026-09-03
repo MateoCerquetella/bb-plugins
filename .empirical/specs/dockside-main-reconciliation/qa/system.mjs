@@ -16,13 +16,18 @@ function run(command, args, options = {}) {
 run("git", ["merge-base", "--is-ancestor", MAIN, "HEAD"]);
 assert.equal(run("git", ["ls-files", "-u"]), "", "unmerged index entries");
 
-const merge = run("git", [
+const merges = run("git", [
   "rev-list",
   "--merges",
   "--ancestry-path",
   `${MAIN}..HEAD`,
-]).split("\n").filter(Boolean)[0];
-assert.ok(merge, "normal merge commit is present");
+]).split("\n").filter(Boolean);
+const merge = merges.find((candidate) =>
+  run("git", ["show", "-s", "--format=%P", candidate])
+    .split(" ")
+    .includes(MAIN),
+);
+assert.ok(merge, "normal merge commit with the current main parent is present");
 const mergeParents = run("git", ["show", "-s", "--format=%P", merge]).split(" ");
 assert.ok(mergeParents.includes(MAIN), "merge contains current main parent");
 

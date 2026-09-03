@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-6ef6b482f5775fa1773c1f6a",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Typecheck the Dockside v0.1.1 manifest and runtime import contract.",
+  "passed": true,
+  "startedAt": "2026-09-02T23:08:38.039Z",
+  "completedAt": "2026-09-02T23:08:39.395Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "address-all-outstanding-review-comments-on-https-github-com-get",
+    "specRevision": 3,
+    "specDigest": "sha256:924878973259c9f8a5a164a32739a4cceccb06c6508dd53eb2af6e6ec1e2020d",
+    "treeDigest": "sha256:84c7c8dcd2b76dc2384a6d71dbddde3d841e11eb940037fdedbadd6dfcf322f5",
+    "policyDigest": "sha256:dddc072c4f4908581e6e359608fe9aec39894c5258cd821ec894bbd59a67fbb7",
+    "workflowRevision": 7,
+    "gitCommit": "04cab07efa1c81edb1c8235064a7d09ff2cbaea4"
+  },
+  "digest": "sha256:4bd912d5033c38bd3eb90b8ce932237be1e0e54196c72ccf95ed4e05a5f5e903",
+  "kind": "qa",
+  "matrixDigest": "sha256:5efec9ede886074ce4082f7340fc583f93323486d73f8bd99c2812afa73aabda",
+  "check": {
+    "id": "qa-adapter-contract",
+    "kind": "adapter-contract"
+  },
+  "coveredChecks": [
+    "adapter-contract"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Typecheck the Dockside v0.1.1 manifest and runtime import contract.",
+      "startedAt": "2026-09-02T23:08:38.039Z",
+      "completedAt": "2026-09-02T23:08:39.395Z",
+      "durationMs": 1356,
+      "collector": null,
+      "command": {
+        "argv": [
+          "npm",
+          "run",
+          "typecheck",
+          "--workspace",
+          "bb-plugin-dockside"
+        ],
+        "cwd": ".",
+        "timeoutMs": 60000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:3a1ed5b706030fb57539a6ab96a94298f6220787e7485ceac9bfa9a9a7cd63a7",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "\n> bb-plugin-dockside@0.1.1 typecheck\n> tsc --noEmit\n\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:84c7c8dcd2b76dc2384a6d71dbddde3d841e11eb940037fdedbadd6dfcf322f5",
+      "sourceTreeAfter": "sha256:84c7c8dcd2b76dc2384a6d71dbddde3d841e11eb940037fdedbadd6dfcf322f5",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

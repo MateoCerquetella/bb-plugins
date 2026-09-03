@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "sequence": 2,
+  "previousDigest": "sha256:12cc03a428fb67d2a11a2392e6ee6ad375ffbeebac8a1602a131ecf8320e0591",
+  "actor": "empirical-yolo",
+  "type": "transition",
+  "summary": "Recorded standing authorization through verified",
+  "createdAt": "2026-09-02T22:55:47.553Z",
+  "stateBeforeDigest": "sha256:c262914f8bc4d8a2438d43bf2f8916906db14e4e6ce8d2941b4e2bbf5b326fc6",
+  "stateAfterDigest": "sha256:89ab33a4d159468c6eb1371703825fd237b02b878150335dcbc741fca8899c0b",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 2,
+    "activeFeature": "address-all-outstanding-review-comments-on-https-github-com-get",
+    "request": "Address all outstanding review comments on https://github.com/get-bb/marketplace/pull/162 for the Dockside plugin: move every runtime-imported package from devDependencies to dependencies, verify a clean managed installation/build and the repository checks, prepare the required new matching plugin release, and update the existing marketplace PR. Do not perform any Git push, tag push, release publication, or PR mutation until the explicit release approval required by the submit-a-plugin workflow is obtained.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "yolo",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": null,
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:48aefba7d478481bae40319810bb11c897c1a21453df50b5c92fb6e3969dbf40",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": null,
+    "authorizationDigest": "sha256:790752bf33d38a5a61f70aac05dc89de9cbf0d9be1a9ed19e358bc59c54c93ca",
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-02T22:55:47.553Z"
+  },
+  "digest": "sha256:2d3e64ef916e727911fe44fcb981f2537614027217f5f6bf09405bba99dd4dec"
+}

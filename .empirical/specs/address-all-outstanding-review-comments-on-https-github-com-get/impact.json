@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "dockside-managed-marketplace-install"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:1bd55c2fb46fe41a3c0a5054a32e714d572483eed3f70395c534b365fccaf277"
+}
