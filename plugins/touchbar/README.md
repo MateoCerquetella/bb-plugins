@@ -22,6 +22,24 @@ Swift/AppKit background app owns the physical Touch Bar:
 No subscription, developer account, external runtime, telemetry, or proprietary
 companion is required. The source builds and ad-hoc signs locally.
 
+## Screenshots
+
+### Agent threads
+
+![Finger-scrollable BB agent threads on an Intel MacBook Pro Touch Bar](../../docs/media/touchbar-threads.png)
+
+### Host Monitor
+
+![Live host metrics on the Touch Bar](../../docs/media/touchbar-host-monitor.png)
+
+### Settings
+
+![Touch Bar filters, subscriptions, providers, and Host Monitor settings](../../docs/media/touchbar-settings.png)
+
+### Running on an Intel MacBook Pro
+
+![BB Touch Bar companion running on an Intel MacBook Pro](../../docs/media/touchbar-intel-macbook-pro.jpg)
+
 ## Requirements
 
 - BB 0.40 or newer.
