@@ -5,6 +5,7 @@ import {
   readCodexResetCredits,
 } from "./lib/codex-reset-credits.ts";
 import { loadUsageSnapshot } from "./lib/load-usage.ts";
+import { getCachedAntigravityUsage } from "./lib/antigravity-probe.ts";
 import {
   createResetActionGate,
   type ResetPrepareResult,
@@ -149,6 +150,12 @@ export default function plugin(bb: BbPluginApi) {
       description: "Show Codex usage in the sidebar footer.",
       default: true,
     },
+    enableAntigravity: {
+      type: "boolean",
+      label: "Enable Antigravity",
+      description: "Show Google Antigravity usage in the sidebar footer.",
+      default: false,
+    },
     compactLimit: {
       type: "select",
       label: "Compact limit",
@@ -174,6 +181,15 @@ export default function plugin(bb: BbPluginApi) {
     },
     async getUsage({ threadId }) {
       const snapshot = await loadUsageSnapshot(bb.sdk, threadId);
+      const preferences = await settings.get();
+      const antigravity = preferences.enableAntigravity
+        ? getCachedAntigravityUsage()
+        : snapshot.providers.find((provider) => provider.id === "antigravity");
+      const providers = antigravity === undefined
+        ? snapshot.providers
+        : snapshot.providers.map((provider) =>
+            provider.id === "antigravity" ? antigravity : provider,
+          );
       const codexIsAvailable = snapshot.providers.some(
         (provider) => provider.id === "codex" && provider.status === "ok",
       );
@@ -187,7 +203,7 @@ export default function plugin(bb: BbPluginApi) {
         lastKnownCodexResetCount = null;
       }
       resetGate.setAvailableCount(lastKnownCodexResetCount);
-      return withCodexResetCredits(snapshot, lastKnownCodexResetCount);
+      return withCodexResetCredits({ ...snapshot, providers }, lastKnownCodexResetCount);
     },
     prepareReset(): ResetPrepareResult {
       return resetGate.prepare();

@@ -1,7 +1,7 @@
-export const PROVIDER_IDS = ["codex", "claudeCode", "cursor"] as const;
+export const PROVIDER_IDS = ["codex", "claudeCode", "cursor", "antigravity"] as const;
 
 export type ProviderId = (typeof PROVIDER_IDS)[number];
-export type RawProviderId = ProviderId | "claude-code" | "acp-cursor";
+export type RawProviderId = ProviderId | "claude-code" | "acp-cursor" | "acp-antigravity";
 export type ProviderStatus =
   | "ok"
   | "not_installed"
@@ -124,6 +124,12 @@ const PROVIDERS: readonly ProviderDefinition[] = [
     wireIds: ["acp-cursor", "cursor"],
     name: "Cursor",
     loginCommand: "cursor-agent login",
+  },
+  {
+    id: "antigravity",
+    wireIds: ["antigravity", "acp-antigravity"],
+    name: "Antigravity",
+    loginCommand: "agy",
   },
 ];
 
