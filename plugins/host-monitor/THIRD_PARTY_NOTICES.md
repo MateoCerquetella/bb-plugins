@@ -8,6 +8,18 @@ are MIT licensed; the common license text is included at the end.
 
 ---
 
+## Phosphor Machine Monitor
+
+MIT License, Copyright (c) Phosphor.
+
+Host Monitor's local sampler, SQLite history store, ECharts presentation, and
+focused tests adapt Machine Monitor at commit
+`7a28e61f1816499cf6b9c6faca4a1f7ab4662e18`.
+
+Source: <https://github.com/phosphorco/bb-community-plugins/tree/main/plugins/machine-monitor>
+
+---
+
 ## Hugeicons Free Icons
 
 MIT License, Copyright (c) 2025 Hugeicons.
@@ -30,6 +42,27 @@ Source: <https://github.com/colinhacks/zod>
 
 ---
 
+## Apache ECharts
+
+Apache License 2.0, Copyright (c) 2017-present The Apache Software Foundation.
+
+ECharts renders the SVG utilization and load history charts.
+
+Source: <https://github.com/apache/echarts>
+
+---
+
+## better-sqlite3
+
+MIT License, Copyright (c) Joshua Wise and contributors.
+
+better-sqlite3 provides the bounded local history database used by the plugin
+server.
+
+Source: <https://github.com/WiseLibs/better-sqlite3>
+
+---
+
 ## Not shipped here
 
 React and `@get-bb/plugin-sdk` are provided by bb at run time and are not
@@ -39,8 +72,9 @@ bundled in this package.
 
 ## MIT License
 
-The following text applies to each entry above together with its copyright
-notice.
+The following text applies to each MIT-licensed entry above together with its
+copyright notice. Apache ECharts is distributed under the Apache License 2.0;
+see <https://www.apache.org/licenses/LICENSE-2.0>.
 
 ```text
 MIT License

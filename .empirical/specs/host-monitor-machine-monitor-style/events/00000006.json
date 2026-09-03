@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sequence": 6,
+  "previousDigest": "sha256:f31efc5dd612c203bbfe6e51c5fcd39261cfd041a2e87f0b92a30f0f87a458f2",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Refreshed repository context after the Host Monitor architecture, package, tests, and documentation changes; all required context is current with no stale, missing, invalid, or refinement-required paths.",
+  "createdAt": "2026-09-03T19:15:43.663Z",
+  "stateBeforeDigest": "sha256:e0651779c7241ba0efc34d6cd291666cbaa3611b613464bb7183690f0471ef38",
+  "stateAfterDigest": "sha256:ad51252242b5844da7087f8678288aba03ad71a7e1bdadc2727cb5e373d19107",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 6,
+    "activeFeature": "host-monitor-machine-monitor-style",
+    "request": "Update the existing plugins/host-monitor plugin so its user interface and interaction model match the referenced phosphorco machine-monitor plugin at https://github.com/phosphorco/bb-community-plugins/tree/main/plugins/machine-monitor, while preserving Host Monitor identity and removing all notification functionality and notification UI.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "verify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Refreshed repository context after the Host Monitor architecture, package, tests, and documentation changes; all required context is current with no stale, missing, invalid, or refinement-required paths.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:e93d798af92707dbfb81e5dd055f8d2a24061485a8c0bd1147a92cf8b1f8359f",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:af6d949025b231b743d890db0c43da24c426721ce9a10e798751c3c88145dbc0",
+    "impactDigest": "sha256:09a5455d943bc14cd22cb4709eb496ecd61ce42000fab796d863540f65c1a23a",
+    "capabilityClaimId": "host-monitor-machine-monitor-style-a89b74a33ddf",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-03T19:15:43.663Z"
+  },
+  "digest": "sha256:9fc07a4cd8ca36cdfd91d6dd356775934a085e5914d5be4da24d9b3e32319231"
+}

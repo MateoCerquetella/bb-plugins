@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "host-monitor-local-history"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:09a5455d943bc14cd22cb4709eb496ecd61ce42000fab796d863540f65c1a23a"
+}

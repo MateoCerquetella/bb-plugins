@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "sequence": 4,
+  "previousDigest": "sha256:646f6ed756cdfb043bb7ab7e792df1d3eb74a81d8c26ffd2b11ab7497c5efe8c",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Planned the source adaptation, identity reconciliation, notification removal, dependency/docs/test updates, focused and repository verification, review, and local BB UI validation.",
+  "createdAt": "2026-09-03T19:08:46.480Z",
+  "stateBeforeDigest": "sha256:d42b20bddcd7fad6cef02a319cf77de99b0b086993590910efa7a582bdae6702",
+  "stateAfterDigest": "sha256:d22f131a039ceae051ad14399ad36588cd1aacace51fb3181b4374b4385e4414",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 4,
+    "activeFeature": "host-monitor-machine-monitor-style",
+    "request": "Update the existing plugins/host-monitor plugin so its user interface and interaction model match the referenced phosphorco machine-monitor plugin at https://github.com/phosphorco/bb-community-plugins/tree/main/plugins/machine-monitor, while preserving Host Monitor identity and removing all notification functionality and notification UI.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Planned the source adaptation, identity reconciliation, notification removal, dependency/docs/test updates, focused and repository verification, review, and local BB UI validation.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:e93d798af92707dbfb81e5dd055f8d2a24061485a8c0bd1147a92cf8b1f8359f",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:af6d949025b231b743d890db0c43da24c426721ce9a10e798751c3c88145dbc0",
+    "impactDigest": "sha256:09a5455d943bc14cd22cb4709eb496ecd61ce42000fab796d863540f65c1a23a",
+    "capabilityClaimId": "host-monitor-machine-monitor-style-a89b74a33ddf",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-03T19:08:46.480Z"
+  },
+  "digest": "sha256:784ebf6aa3be635f217dfd9a2cb06921d23b190665d88f3fa9626a90bd515fef"
+}

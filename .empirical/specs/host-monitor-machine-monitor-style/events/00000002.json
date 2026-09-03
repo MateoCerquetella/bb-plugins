@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "sequence": 2,
+  "previousDigest": "sha256:a2082c3a0daa2671b08d4dcc955291cb894de970e3c02e57d2b0df7bd2e43910",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Specified the Host Monitor migration to the referenced local historical monitor, including notification-free behavior, preserved identity, intentionally absent fleet/process-control surfaces, risks, and observable verification criteria.",
+  "createdAt": "2026-09-03T19:07:15.637Z",
+  "stateBeforeDigest": "sha256:536c419f8bc3ea8dfc9822c96e4a13bf487dfd9abcc73637291dd085f93d139c",
+  "stateAfterDigest": "sha256:6c878a867709f98c5b2bf3d252f1ab0d219dbb4102bca4759bf6d3efc0d20eff",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 2,
+    "activeFeature": "host-monitor-machine-monitor-style",
+    "request": "Update the existing plugins/host-monitor plugin so its user interface and interaction model match the referenced phosphorco machine-monitor plugin at https://github.com/phosphorco/bb-community-plugins/tree/main/plugins/machine-monitor, while preserving Host Monitor identity and removing all notification functionality and notification UI.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "design",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Specified the Host Monitor migration to the referenced local historical monitor, including notification-free behavior, preserved identity, intentionally absent fleet/process-control surfaces, risks, and observable verification criteria.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:e93d798af92707dbfb81e5dd055f8d2a24061485a8c0bd1147a92cf8b1f8359f",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:af6d949025b231b743d890db0c43da24c426721ce9a10e798751c3c88145dbc0",
+    "impactDigest": "sha256:09a5455d943bc14cd22cb4709eb496ecd61ce42000fab796d863540f65c1a23a",
+    "capabilityClaimId": "host-monitor-machine-monitor-style-a89b74a33ddf",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-03T19:07:15.637Z"
+  },
+  "digest": "sha256:b5f90dfe8d5238b62c29fc6a2125e263d680c16d4df24bb8de5f4e5ed5218cca"
+}

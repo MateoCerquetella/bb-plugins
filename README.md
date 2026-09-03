@@ -22,7 +22,7 @@
 | --- | --- | --- | --- |
 | <img src="./plugins/action-topbar/assets/icon.svg" width="128" height="128" alt="" /> | [Action Topbar](./plugins/action-topbar) | [Experimental Git install](#action-topbar-experimental-install) | Adds a compact main-thread topbar with draggable BB Actions and persistent, per-thread workspace panes. Requires the matching experimental BB core/SDK build. |
 | <img src="./plugins/dockside/assets/icon.svg" width="128" height="128" alt="" /> | [Dockside](./plugins/dockside) | [Git branch](#dockside-quick-start) | Replaces BB's thread list with a compact project-first sidebar, semantic status colors, filters, safe multi-select deletion, and child-agent families. |
-| <img src="./plugins/host-monitor/assets/icon.svg" width="128" height="128" alt="" /> | [Host Monitor](./plugins/host-monitor) | [Git release](#host-monitor-quick-start) | Monitors CPU, RAM, disk, network, host details, and guarded process actions across every machine enrolled in BB. Requires BB 0.40+. |
+| <img src="./plugins/host-monitor/assets/icon.svg" width="128" height="128" alt="" /> | [Host Monitor](./plugins/host-monitor) | [Git release](#host-monitor-quick-start) | Shows compact current and historical CPU, RAM, root-disk, load, cache-growth, and memory-pressure diagnostics for the BB server machine. Requires BB 0.40+. |
 | <img src="./plugins/save-my-model/assets/icon.svg" width="128" height="128" alt="" /> | [Save My Model](./plugins/save-my-model) | [Git release](#save-my-model-quick-start) | Stores provider by BB host and model/reasoning separately for each host and provider. |
 | <img src="./plugins/taskboard/assets/icon.svg" width="128" height="128" alt="" /> | [Taskboard](./plugins/taskboard) | [Git release](#taskboard-quick-start) | Brings each BB project's GitHub, Linear, or Jira tasks into one focused List or Kanban board. |
 | <img src="./plugins/touchbar/assets/icon.svg" width="128" height="128" alt="" /> | [Touch Bar Agent Monitor](./plugins/touchbar) | [Git release](#touch-bar-agent-monitor-quick-start) | Adds a native persistent Control Strip badge and fullscreen BB agent panel to Touch Bar Macs. Requires BB 0.40+. |
@@ -110,13 +110,13 @@ is merged and live, the equivalent shorthand is:
 bb plugin install host-monitor
 ```
 
-Host Monitor keeps live CPU, RAM used/total, disk, network, load, uptime, and
-connection state in responsive cards or rows. Its sidebar control opens a
-compact summary or movable floating monitor, while Host details provides a
-searchable process ledger with explicit, freshly validated stop confirmations.
-IPs remain masked until revealed. See the
-[Host Monitor README](./plugins/host-monitor) for platform support, privacy,
-thresholds, and process-safety details.
+Host Monitor keeps current CPU, RAM, root disk, five-minute load, uptime, and up
+to 30 days of history in a responsive local dashboard. It also reports cache
+growth and bounded Linux memory-pressure diagnostics, with identifying process
+attribution off by default. Thresholds remain passive in-panel cues; the plugin
+sends no toast, browser, desktop, or sidebar notifications. See the
+[Host Monitor README](./plugins/host-monitor) for sampling, privacy, and
+threshold details.
 
 Update or remove it with BB:
 

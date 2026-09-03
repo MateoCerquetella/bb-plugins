@@ -1,0 +1,34 @@
+Fresh-context QA — Host Monitor machine-monitor adaptation
+Date: 2026-09-03
+
+PASS AC-1: monitor.ts and server.ts use the reference's bounded local CPU,
+memory, root disk, load, directory, and Linux pressure collectors. Process
+enumeration is now skipped entirely until attribution is enabled.
+
+PASS AC-2: the app exposes 1h, 6h, 24h, 7d, and 30d ranges; storage history is
+bucketed to at most 720 points and app chart rows insert explicit null gaps.
+
+PASS AC-3: app.tsx/app.css contain four current metric cards, two SVG ECharts
+panels, directory cards, memory diagnostics, container breakpoints at 760px,
+460px, and 300px, and keyboard/touch overflow handling.
+
+PASS AC-4: built metadata identifies pluginId host-monitor version 0.1.4 with BB
+0.40.0 and SDK 0.4.21. The app registers id/path host-monitor and title Host
+Monitor. Custom icon and logo assets are the only packaged images.
+
+PASS AC-5: exact source and dist scans found no toast, Web Notification,
+experimental_sidebarAccessory, sidebar-warning, threshold-alert, or role=alert
+hook. Both failure states are inline role=status text.
+
+PASS AC-6: source and dist scans found no fleet matrix, IP reveal, floating
+monitor, host RPC, termination dialog, or process termination operation. The
+package dry-run includes no host entry or obsolete fleet/process-control source.
+
+PASS AC-7: server settings expose CPU/RAM/disk select thresholds with 90%
+defaults and showProcessDetails=false.
+
+PASS AC-8: npm run check passed across the complete workspace. Host Monitor's
+focused suite passed 17 tests, SDK declarations, TypeScript, and production
+build. npm pack --dry-run reported the intended 18 package entries.
+
+No acceptance-criterion failures or unsupported checks found.
