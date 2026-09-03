@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:0448f7cfdc49fd0c78392251ba473d030684efa03b4a28c33d2fd9fabc751301",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "b627bb0d43d8fac89e9777b0669700fa6f7e68ef",
+  "headCommit": "e0d6254b174e357d255862c97b25b5b11d1cafb3",
+  "diffDigest": "sha256:28b438ca389bd226bdd869f246b564ec1c8909e9339cecf43576a068e75877c0",
+  "verdict": "APPROVED",
+  "reviewerActor": "isolated-reviewer",
+  "reviewerInvocationId": "/root/input_fix_review",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: Exact thread tap guarded.\n- PASS AC-2: Settings actions wired.\n- PASS AC-3: Scroll preserved and drags cancel clicks.\n- PASS AC-4: Five hit tests convert superview points exactly once.\n- PASS AC-5: No mouseDown overrides.\n- PASS AC-6: Intel install marker evidenced.\n- PASS AC-7: Existing behavior preserved.\n\n## Security / correctness\n\nPASS\n\n## Design / maintainability\n\nPASS",
+  "bodyDigest": "sha256:56ed0ff741fe17a050882a595d16a1c3a8c22efc74a9203cc01908681e77d6bd",
+  "digest": "sha256:f0f7b88b9bec9746504473449dd35bad99cf02962d217494cb15838e5bb10ea4"
+}

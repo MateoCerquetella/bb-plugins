@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-8a2b489b629637f863a73ad5",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-09-03T00:39:56.564Z",
+  "completedAt": "2026-09-03T00:39:56.564Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "fix-the-installed-intel-mac-touch-bar-native-companion-because",
+    "specRevision": 2,
+    "specDigest": "sha256:0dc24ec3cc3f8465d5b95eb78b6fd7972a24e55d371a849d78630edfa7047a92",
+    "treeDigest": "sha256:7e632878cf722a9b466670dc69ff3fcc9a7ae18ec71717200f8929dd66e2ba23",
+    "policyDigest": "sha256:dddc072c4f4908581e6e359608fe9aec39894c5258cd821ec894bbd59a67fbb7"
+  },
+  "digest": "sha256:0b371c7420d056e63fc81d4633bca4a9b97fc64f09e0d30059cdf974b447776d",
+  "kind": "collected",
+  "collector": "empirical-review:isolated-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/fix-the-installed-intel-mac-touch-bar-native-companion-because/reviews/98ac7e41413b0473b890882b.json",
+      "mediaType": "application/json",
+      "bytes": 1400,
+      "digest": "sha256:ecbfbcf8fc9322ffcde8369a716c59c92d4d1342ea6848ee13e217448e4fec63"
+    },
+    {
+      "path": ".empirical/specs/fix-the-installed-intel-mac-touch-bar-native-companion-because/reviews/98ac7e41413b0473b890882b.md",
+      "mediaType": "text/markdown",
+      "bytes": 674,
+      "digest": "sha256:29d3d6609ac06a2a1f87a82147d6864ba2e9bb1d341de22bf9d1ed63939be794"
+    }
+  ]
+}

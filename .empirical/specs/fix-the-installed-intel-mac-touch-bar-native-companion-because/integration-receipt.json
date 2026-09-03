@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "feature": "fix-the-installed-intel-mac-touch-bar-native-companion-because",
+  "claimId": "fix-the-installed-intel-mac-touch-bar-native-companion-because-21366fe98a02",
+  "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+  "baseCommit": "8f3ba4d940d2261d6c580e43720ce03e9209ae65",
+  "baseTree": "ebb0c23e459a0f53cb8b96772d0dd3037d1c861e",
+  "featureTree": "sha256:15fd1ee92ea9a782a757f847153554c28447ae40d43ab86f4616e02b9200bd59",
+  "targetCommit": "c3ab1d88b602d7ee8578f1d8969f12a32a255c61",
+  "targetTree": "0ce2cea3bab1493068efa4701783dfa04616c14e",
+  "capabilityBaseDigests": {
+    "touchbar-agent-monitor": "sha256:f422459d2759212f7d05628b18eb090e2bf3151d75ba3e0c1d3ed7524d3321c6"
+  },
+  "deltaDigest": "sha256:5ba2ae2179e03e282faa540e507d098cfcedad6d3e858196a342e8718d82ae20",
+  "resultDigests": {
+    "touchbar-agent-monitor": "sha256:3a6a7b09387c87d2be52afffcad319608f321a3bc9d5e6a63a9b95a766eb40de"
+  },
+  "verificationReceiptDigests": [
+    "sha256:005b198d414a7bbf55038a6d8b557d293cab0c198aef6da063df77f0c2ca6ae6",
+    "sha256:1de8a6c2fefa419914cbeea6ac7f5e40d162ddbf43db65db1cea4af50f0a8199",
+    "sha256:1f8ff8ff2a1880e06a3a349c9f8971dd8be5d2a69b5cd4a2955e686044f9f2e0",
+    "sha256:22a024b0005a728998944aae2c18292195a969d9f8474b0d73a7e2d14fb88a59",
+    "sha256:2aa9603f3bcf6f23b23001a5496c286a924fc2a1516d1a710fc6911fe3b913c6",
+    "sha256:40f7905ff27ca1ed374ac54e1185484e19c7fabdea9255aafe39aeac4bbf77ca",
+    "sha256:63aa35a7003365ecfa21273acfc298ab37aa00b12fa9dce2b7d87d0913a8791b",
+    "sha256:85a4359856a00526bd8a977693b630e98c078910d3b1e1145ca7a94e42093d47",
+    "sha256:8a9aa3d0832cc0891fcba168aef2b3ea2a7e89686e143584f23cf7aa98773d37",
+    "sha256:a61b39243cd2386b432d5fd8d13b6a3dd9024f54948af6cbb948f82b1efdc9ed",
+    "sha256:b3e8c057f793a8dee8c3f542e97efda2ad396755e0c1fb83bdc78d1c769a1c42",
+    "sha256:be7c71ede0766629aef83812c3d3795915768e5f799bd066a3e40c50f51240bd",
+    "sha256:ea813065209b269810f809a1ad12aab6f31b1d3db9b3a11e397fcdc776268c30"
+  ],
+  "integratedAt": "2026-09-03T00:45:48.183Z",
+  "digest": "sha256:5a0e06c55f6e3f2fec2bef66dc48bbd7524ec53bbee52d662ec028f58e8925cc"
+}
