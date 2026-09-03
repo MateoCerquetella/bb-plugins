@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-5e358209bb91f29b003979e8",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-09-03T19:35:26.352Z",
+  "completedAt": "2026-09-03T19:35:26.352Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-machine-monitor-style",
+    "specRevision": 2,
+    "specDigest": "sha256:e93d798af92707dbfb81e5dd055f8d2a24061485a8c0bd1147a92cf8b1f8359f",
+    "treeDigest": "sha256:23e2ddc7b0e9677894646378dd561f8b96d78fc7c8ee4fb3168c0856e83afe65",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf"
+  },
+  "digest": "sha256:22815da606a871e824054efaf5cbf871525494cab724c155974718cb90ffd331",
+  "kind": "collected",
+  "collector": "empirical-review:/root/host_monitor_final_review",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/host-monitor-machine-monitor-style/reviews/eb4c73acb2b933ecc5f5e784.json",
+      "mediaType": "application/json",
+      "bytes": 2474,
+      "digest": "sha256:040f1172d0b81a1c8bba9fc41a912c7f1e6b6f33d8994bd114f7f72cde2cb8e7"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-machine-monitor-style/reviews/eb4c73acb2b933ecc5f5e784.md",
+      "mediaType": "text/markdown",
+      "bytes": 1719,
+      "digest": "sha256:1595102f768fabf03ccb390da6575dc96a4ab953834ee062238c96bab78c2bda"
+    }
+  ]
+}

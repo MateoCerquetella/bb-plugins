@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:eae3391c8c531c92bba15f597e90a116571f479b7c49fb8da23cc1a7fab72bf5",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "a6391be14058735b3aebe1769edb313f20100014",
+  "headCommit": "672a3eb26b15acd69d1fe14f00c54e27badb5710",
+  "diffDigest": "sha256:5e1bf6056fb749e55ec6a959a58999ab449da55b596766d67add70c270fc1be3",
+  "verdict": "APPROVED",
+  "reviewerActor": "/root/host_monitor_final_review",
+  "reviewerInvocationId": "f6d6f529-97f8-4f0b-b7df-c58b82e01250",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: Local bounded CPU/RAM/root disk/load/uptime, directory, and Linux pressure/process collectors are implemented; partial du totals are retained and true failures surface inline.\n- PASS AC-2: All five ranges exist; range-relative SQL and slicing cap rows at 720, and null replacement marks gaps without adding rows.\n- PASS AC-3: Compact cards, responsive SVG charts, directory summaries, and memory-pressure/process sections support narrow layouts, touch, scrolling, and keyboard access.\n- PASS AC-4: Package, manifest/navigation, icon, and light/dark logos preserve Host Monitor identity.\n- PASS AC-5: No toast, browser/desktop notification, sidebar accessory, or alert banner remains; errors are inline role=status and threshold styling is passive.\n- PASS AC-6: Fleet, floating, IP, destructive process controls, host RPC/client, worker source, and manifest host entry are removed.\n- PASS AC-7: Thresholds are configurable; process attribution defaults off, suppresses enumeration, and is bounded/read-only when enabled.\n- PASS AC-8: Tests cover identity/removals, notification absence, SDK boundary, history cap, gaps, partial directory totals, parsers, privacy, service/settings/RPC registration, chart hover, storage, and responsiveness; diff check passes.\n\n## Security / correctness\n\nAPPROVED: no blocking issue; external commands are fixed-argument and bounded, RPC is schema-validated, and process inspection is opt-in, local, bounded, and read-only.\n\n## Design / maintainability\n\nAPPROVED: coherent separation across collection, persistence, RPC contract, chart transformation, orchestration, and UI. Nonexistent legacy include names in tsconfig are harmless minor cleanup debt.",
+  "bodyDigest": "sha256:cea6d4840b2c08cae72867c6ed3d25e270305b413597bd0cb0c315e23511270f",
+  "digest": "sha256:eb4c73acb2b933ecc5f5e784669501ccae3befa363a37c81ff90149c9e933a10"
+}

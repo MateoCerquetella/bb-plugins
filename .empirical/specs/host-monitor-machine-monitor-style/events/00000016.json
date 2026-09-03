@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "sequence": 16,
+  "previousDigest": "sha256:590aa68fa9b2928cc9e0a7a498510303d9e0462baae713b7397861e3688acb75",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Final isolated review approved every acceptance criterion and found no blocking security, correctness, or maintainability issue in committed revision 672a3eb.",
+  "createdAt": "2026-09-03T19:35:33.485Z",
+  "stateBeforeDigest": "sha256:89b9f094790dc6cb60f2ff506024a30dadf40068f04f556722cf3226b6232af8",
+  "stateAfterDigest": "sha256:dcb445c67ad39ee65e01d4d105c2c8d11e6ece82a336ccb2b536a2e3897c67e2",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 16,
+    "activeFeature": "host-monitor-machine-monitor-style",
+    "request": "Update the existing plugins/host-monitor plugin so its user interface and interaction model match the referenced phosphorco machine-monitor plugin at https://github.com/phosphorco/bb-community-plugins/tree/main/plugins/machine-monitor, while preserving Host Monitor identity and removing all notification functionality and notification UI.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "integrate",
+    "status": "waiting",
+    "repairAttempts": 2,
+    "message": "Final isolated review approved every acceptance criterion and found no blocking security, correctness, or maintainability issue in committed revision 672a3eb.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:e93d798af92707dbfb81e5dd055f8d2a24061485a8c0bd1147a92cf8b1f8359f",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:af6d949025b231b743d890db0c43da24c426721ce9a10e798751c3c88145dbc0",
+    "impactDigest": "sha256:09a5455d943bc14cd22cb4709eb496ecd61ce42000fab796d863540f65c1a23a",
+    "capabilityClaimId": "host-monitor-machine-monitor-style-a89b74a33ddf",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "qa-ef5053fac834d413367cd6be",
+      "qa-f26a3600e292514fa3dba89d",
+      "collected-5e358209bb91f29b003979e8"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": true,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "verified",
+      "reasons": {
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-03T19:35:33.485Z"
+  },
+  "digest": "sha256:91252a476429271622a94d94570a3e086a5a498876999f2f8cee459672ccc8c3"
+}
