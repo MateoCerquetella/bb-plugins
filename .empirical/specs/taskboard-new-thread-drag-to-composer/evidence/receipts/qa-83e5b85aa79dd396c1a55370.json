@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-83e5b85aa79dd396c1a55370",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Re-run Taskboard focused verification against the final reconciled committed tree after the 0.3.3 baseline merge.",
+  "passed": true,
+  "startedAt": "2026-09-02T23:50:46.310Z",
+  "completedAt": "2026-09-02T23:50:55.467Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "taskboard-new-thread-drag-to-composer",
+    "specRevision": 2,
+    "specDigest": "sha256:1160f7f4d7ad0ec46be9753497ef99fa76a7f5b5b59379f1bce0a6b795ea49a4",
+    "treeDigest": "sha256:c7fb21f778fe09aebef7964a339a0f77d6e0704d5d82d24701857d2526fedaf1",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf",
+    "workflowRevision": 9,
+    "gitCommit": "bd2d857508325115ecfd5fae4ce7d17179128649"
+  },
+  "digest": "sha256:a66cd731baf2ddc26d6e16e9bffaf43ce4990387de04ce1c20fe740e61a96fef",
+  "kind": "qa",
+  "matrixDigest": "sha256:c35749317b90ccc960dc896c06bf925361e7b28bceb1c14621b95b033003810b",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Re-run Taskboard focused verification against the final reconciled committed tree after the 0.3.3 baseline merge.",
+      "startedAt": "2026-09-02T23:50:46.310Z",
+      "completedAt": "2026-09-02T23:50:55.467Z",
+      "durationMs": 9157,
+      "collector": null,
+      "command": {
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-taskboard"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:fadd6ace056bf387f91499ee035ea42b3ad77fa242b04c7070d742f427506ccd",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "uration_ms: 0.324141\n  type: 'test'\n  ...\n# Subtest: keeps Taskboard private and Git-buildable without npm publication hooks\nok 77 - keeps Taskboard private and Git-buildable without npm publication hooks\n  ---\n  duration_ms: 0.723038\n  type: 'test'\n  ...\n# Subtest: documents only BB Community and direct Git installation for Taskboard\nok 78 - documents only BB Community and direct Git installation for Taskboard\n  ---\n  duration_ms: 0.552467\n  type: 'test'\n  ...\n# Subtest: keeps Usage Tracker private and documents its Git release too\nok 79 - keeps Usage Tracker private and documents its Git release too\n  ---\n  duration_ms: 4.313956\n  type: 'test'\n  ...\n# Subtest: has no active registry publication automation or credential path\nok 80 - has no active registry publication automation or credential path\n  ---\n  duration_ms: 0.41683\n  type: 'test'\n  ...\n# Subtest: credits merged contributors without reviving superseded filter storage\nok 81 - credits merged contributors without reviving superseded filter storage\n  ---\n  duration_ms: 2.645654\n  type: 'test'\n  ...\n# Subtest: appends only the preset migration and round-trips complete state\nok 82 - appends only the preset migration and round-trips complete state\n  ---\n  duration_ms: 16.959283\n  type: 'test'\n  ...\n# Subtest: isolates names and ids between projects\nok 83 - isolates names and ids between projects\n  ---\n  duration_ms: 2.721612\n  type: 'test'\n  ...\n# Subtest: contains corrupt rows and makes reorder exact and atomic\nok 84 - contains corrupt rows and makes reorder exact and atomic\n  ---\n  duration_ms: 4.661079\n  type: 'test'\n  ...\n# Subtest: enforces the per-project preset limit without blocking updates\nok 85 - enforces the per-project preset limit without blocking updates\n  ---\n  duration_ms: 12.044693\n  type: 'test'\n  ...\n# Subtest: bounds reads and fails closed when raw rows exceed the preset limit\nok 86 - bounds reads and fails closed when raw rows exceed the preset limit\n  ---\n  duration_ms: 12.234077\n  type: 'test'\n  ...\n# Subtest: rejects --from-state on wrong verbs and preserves explicit precedence\nok 87 - rejects --from-state on wrong verbs and preserves explicit precedence\n  ---\n  duration_ms: 0.410218\n  type: 'test'\n  ...\n# Subtest: keeps maximum aggregate preset JSON compact and under the CLI cap\nok 88 - keeps maximum aggregate preset JSON compact and under the CLI cap\n  ---\n  duration_ms: 13.96313\n  type: 'test'\n  ...\n# Subtest: enforces a transactional aggregate state-byte limit per project\nok 89 - enforces a transactional aggregate state-byte limit per project\n  ---\n  duration_ms: 33.206489\n  type: 'test'\n  ...\n# Subtest: accepts a complete strict project browse preference snapshot\nok 90 - accepts a complete strict project browse preference snapshot\n  ---\n  duration_ms: 5.373969\n  type: 'test'\n  ...\n# Subtest: requires a project provider and matching source\nok 91 - requires a project provider and matching source\n  ---\n  duration_ms: 0.632714\n  type: 'test'\n  ...\n# Subtest: bounds names, ids, positions, order size, and state fields\nok 92 - bounds names, ids, positions, order size, and state fields\n  ---\n  duration_ms: 1.287057\n  type: 'test'\n  ...\n# Subtest: rejects control characters in preset identity and state\nok 93 - rejects control characters in preset identity and state\n  ---\n  duration_ms: 0.931108\n  type: 'test'\n  ...\n# Subtest: rejects oversized adversarial containers before inspecting elements\nok 94 - rejects oversized adversarial containers before inspecting elements\n  ---\n  duration_ms: 0.323931\n  type: 'test'\n  ...\n# Subtest: accepts the maximum valid browse state inside the UTF-8 envelope\nok 95 - accepts the maximum valid browse state inside the UTF-8 envelope\n  ---\n  duration_ms: 5.563223\n  type: 'test'\n  ...\n# Subtest: normalizes unique names without depending on locale\nok 96 - normalizes unique names without depending on locale\n  ---\n  duration_ms: 0.262338\n  type: 'test'\n  ...\n# Subtest: resolves only exact preset order permutations\nok 97 - resolves only exact preset order permutations\n  ---\n  duration_ms: 0.275011\n  type: 'test'\n  ...\n# Subtest: selects the active thread project only when it still exists\nok 98 - selects the active thread project only when it still exists\n  ---\n  duration_ms: 0.599243\n  type: 'test'\n  ...\n# Subtest: treats a different thread in the same project as new context\nok 99 - treats a different thread in the same project as new context\n  ---\n  duration_ms: 0.133473\n  type: 'test'\n  ...\n# Subtest: reads the project and thread from a BB project route\nok 100 - reads the project and thread from a BB project route\n  ---\n  duration_ms: 0.548339\n  type: 'test'\n  ...\n# Subtest: uses only the immediately previous navigation entry as source context\nok 101 - uses only the immediately previous navigation entry as source context\n  ---\n  duration_ms: 0.183024\n  type: 'test'\n  ...\n# Subtest: never replaces an explicit Taskboard project selection with route context\nok 102 - never replaces an explicit Taskboard project selection with route context\n  ---\n  duration_ms: 0.108959\n  type: 'test'\n  ...\n# Subtest: writes project credentials atomically with owner-only permissions\nok 103 - writes project credentials atomically with owner-only permissions\n  ---\n  duration_ms: 38.006992\n  type: 'test'\n  ...\n# Subtest: deleting a missing credential is harmless\nok 104 - deleting a missing credential is harmless\n  ---\n  duration_ms: 1.021774\n  type: 'test'\n  ...\n# Subtest: cached summaries never retain provider comments\nok 105 - cached summaries never retain provider comments\n  ---\n  duration_ms: 0.961183\n  type: 'test'\n  ...\n# Subtest: provider creation results carry strict native assignee confirmation\nok 106 - provider creation results carry strict native assignee confirmation\n  ---\n  duration_ms: 0.118146\n  type: 'test'\n  ...\n# Subtest: metadata failures expose only a fixed server-safe message\nok 107 - metadata failures expose only a fixed server-safe message\n  ---\n  duration_ms: 0.24147\n  type: 'test'\n  ...\n# Subtest: finds Jira project keys from common configured JQL scopes\nok 108 - finds Jira project keys from common configured JQL scopes\n  ---\n  duration_ms: 0.522733\n  type: 'test'\n  ...\n# Subtest: binds issue creation to the tracker reviewed in the modal\nok 109 - binds issue creation to the tracker reviewed in the modal\n  ---\n  duration_ms: 0.304406\n  type: 'test'\n  ...\n# Subtest: refreshes authoritative provider data after successful issue creation\nok 110 - refreshes authoritative provider data after successful issue creation\n  ---\n  duration_ms: 0.166112\n  type: 'test'\n  ...\n# Subtest: refreshes authoritative provider data after ambiguous issue creation failure\nok 111 - refreshes authoritative provider data after ambiguous issue creation failure\n  ---\n  duration_ms: 0.179027\n  type: 'test'\n  ...\n# Subtest: keeps structural headers on neutral host theme surfaces\nok 112 - keeps structural headers on neutral host theme surfaces\n  ---\n  duration_ms: 0.831406\n  type: 'test'\n  ...\n# Subtest: uses restrained state glyph, focus, and conversation treatments\nok 113 - uses restrained state glyph, focus, and conversation treatments\n  ---\n  duration_ms: 0.237072\n  type: 'test'\n  ...\n# Subtest: keeps constrained filter values inside the vertical menu measure\nok 114 - keeps constrained filter values inside the vertical menu measure\n  ---\n  duration_ms: 0.144664\n  type: 'test'\n  ...\n# Subtest: keeps assignee avatars compact with six theme-safe identity tones\nok 115 - keeps assignee avatars compact with six theme-safe identity tones\n  ---\n  duration_ms: 0.264703\n  type: 'test'\n  ...\n# Subtest: shows restrained composer drop feedback and discoverable drag grips\nok 116 - shows restrained composer drop feedback and discoverable drag grips\n  ---\n  duration_ms: 0.275573\n  type: 'test'\n  ...\n1..116\n# tests 116\n# suites 0\n# pass 116\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 411.402208\n\n> bb-plugin-taskboard@0.3.3 build\n> env -u BB_CLI bb plugin build .\n\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\n\n> bb-plugin-taskboard@0.3.3 verify:build\n> node scripts/verify-build.mjs\n\nTaskboard build metadata is valid.\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:c7fb21f778fe09aebef7964a339a0f77d6e0704d5d82d24701857d2526fedaf1",
+      "sourceTreeAfter": "sha256:c7fb21f778fe09aebef7964a339a0f77d6e0704d5d82d24701857d2526fedaf1",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

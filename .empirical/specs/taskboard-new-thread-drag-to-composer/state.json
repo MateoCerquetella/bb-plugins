@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 5,
+  "revision": 14,
+  "activeFeature": "taskboard-new-thread-drag-to-composer",
+  "request": "Fix Taskboard on BB's root New Thread surface so users can reliably open Taskboard in the right panel instead of landing on an unavailable panel view. Add an explicit Taskboard affordance on New Thread if the current SDK supports it without fragile DOM coupling. Allow dragging a Taskboard ticket from the right panel into the currently visible composer—existing thread or New Thread—to insert the ticket as Taskboard's live external-work-item mention, focus the composer, preserve any existing draft and attachments, and never submit automatically. Preserve Kanban status drag behavior and provide an accessible non-drag equivalent. Add focused tests, build the plugin, install or move the local path installation to this checkout, reload it, and verify both existing-thread and New Thread flows live without publishing.",
+  "profile": "complex",
+  "workflow": "complex",
+  "mode": "normal",
+  "phase": "integrate",
+  "status": "waiting",
+  "repairAttempts": 1,
+  "message": "Approved implementation: Taskboard tickets drag into existing and New Thread composers, Add to chat fallback, semantic drop target, constrained-list/kanban affordances, no auto-submit/navigation, and v0.3.3 safety baseline. Focused, browser, fresh-context QA and isolated review passed.",
+  "implementationActor": "agent",
+  "workStartedAt": null,
+  "specDigest": "sha256:1160f7f4d7ad0ec46be9753497ef99fa76a7f5b5b59379f1bce0a6b795ea49a4",
+  "approvedSpecRevision": 2,
+  "capabilityArchiveRequired": true,
+  "capabilityDeltaDigest": "sha256:66a541c14b2aebdcb37309ab123cba965ba91ea3b97e170164b76e92afc5cc06",
+  "impactDigest": "sha256:8b5e653b2ef533df4fb4f48b4614947114c6ae7b1f7172f1d584eb99dd2c91a5",
+  "capabilityClaimId": "taskboard-new-thread-drag-to-composer-cf82bcfe1438",
+  "authorizationDigest": null,
+  "evidence": [],
+  "evidenceReceiptIds": [
+    "qa-83e5b85aa79dd396c1a55370",
+    "qa-58f5b56c983e6669704a1a4a",
+    "qa-78b5940a71cdeb26f859e679",
+    "collected-94ed8c067b1169e8a9380561",
+    "collected-93fd69dd51e2719757521eed",
+    "collected-1308e7f6e0029c0ad3bb391c"
+  ],
+  "legacyEvidenceCount": 0,
+  "completion": {
+    "implemented": true,
+    "verified": true,
+    "integrated": false,
+    "delivered": false,
+    "published": false,
+    "highest": "verified",
+    "reasons": {
+      "integrated": "integrated has not been proven by a durable receipt.",
+      "delivered": "delivered has not been proven by a durable receipt.",
+      "published": "published has not been proven by a durable receipt."
+    }
+  },
+  "updatedAt": "2026-09-03T00:02:22.314Z"
+}

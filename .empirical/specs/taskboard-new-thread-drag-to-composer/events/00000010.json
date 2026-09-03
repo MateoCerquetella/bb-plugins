@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sequence": 10,
+  "previousDigest": "sha256:200075f44c473443e60bddc0258b5e88086b39a9a14081ca46011ba83c551e3b",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Superseded pre-reconciliation verification receipts were stale after the authorized 0.3.3 safety-baseline commits; reset the review evidence set to rerun against the final committed tree.",
+  "createdAt": "2026-09-02T23:53:07.091Z",
+  "stateBeforeDigest": "sha256:2b1487a5ad717479d48a9c1b0d7ddfb38a884f46f6a2131b0f2f2842145de5be",
+  "stateAfterDigest": "sha256:1e4ad949cf1a37a0c5c402e5c5c98447b7a8efb4e86793bdd8760d597a720384",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 10,
+    "activeFeature": "taskboard-new-thread-drag-to-composer",
+    "request": "Fix Taskboard on BB's root New Thread surface so users can reliably open Taskboard in the right panel instead of landing on an unavailable panel view. Add an explicit Taskboard affordance on New Thread if the current SDK supports it without fragile DOM coupling. Allow dragging a Taskboard ticket from the right panel into the currently visible composer—existing thread or New Thread—to insert the ticket as Taskboard's live external-work-item mention, focus the composer, preserve any existing draft and attachments, and never submit automatically. Preserve Kanban status drag behavior and provide an accessible non-drag equivalent. Add focused tests, build the plugin, install or move the local path installation to this checkout, reload it, and verify both existing-thread and New Thread flows live without publishing.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 1,
+    "message": "Superseded pre-reconciliation verification receipts were stale after the authorized 0.3.3 safety-baseline commits; reset the review evidence set to rerun against the final committed tree.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:1160f7f4d7ad0ec46be9753497ef99fa76a7f5b5b59379f1bce0a6b795ea49a4",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:66a541c14b2aebdcb37309ab123cba965ba91ea3b97e170164b76e92afc5cc06",
+    "impactDigest": "sha256:8b5e653b2ef533df4fb4f48b4614947114c6ae7b1f7172f1d584eb99dd2c91a5",
+    "capabilityClaimId": "taskboard-new-thread-drag-to-composer-cf82bcfe1438",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-02T23:53:07.091Z"
+  },
+  "digest": "sha256:d687c7a5bc71bce579bab1c85585366e41ef095027e07d7c46d32398daf627f5"
+}

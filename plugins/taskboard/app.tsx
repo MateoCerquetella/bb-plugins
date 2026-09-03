@@ -23,6 +23,7 @@ import {
   type PluginNavPanelProps,
   type PluginNewThreadPanelProps,
   type PluginPendingInteractionProps,
+  type PluginComposerMention,
   type PluginThreadHeaderActionProps,
   type PluginThreadPanelProps
 } from '@get-bb/plugin-sdk/app';
@@ -72,7 +73,6 @@ import type {
   CreateIssueContext,
   CreateIssueMetadata,
   CreateIssueOption,
-  IssueDraftRecord,
   SecretMutation,
   TrackerProject,
   WorkItem,
@@ -140,6 +140,14 @@ import {
   type NavigationEntryLike,
   type ProjectRouteContext
 } from './project-selection.js';
+import {
+  TASKBOARD_COMPOSER_MIME,
+  hasTaskboardComposerDragType,
+  parseTaskboardComposerMention,
+  serializeTaskboardComposerMention,
+  taskboardComposerMention,
+  writeTaskboardComposerDrag
+} from './composer-handoff.js';
 import './app.css';
 
 const PANEL_PATH = 'tasks';
@@ -156,6 +164,21 @@ const SIDEBAR_MIN_WIDTH = 180;
 const SIDEBAR_MAX_WIDTH = 340;
 const CREATE_METADATA_NETWORK_ERROR =
   'Taskboard could not load issue creation options. Check the connection and try again.';
+const COMPOSER_DROP_CUE_TEXT = 'Drop to add ticket to chat';
+
+interface ComposerDropTarget {
+  editor: HTMLElement;
+  form: HTMLFormElement;
+}
+
+function composerDropTarget(target: EventTarget | null): ComposerDropTarget | null {
+  const element = target instanceof Element ? target : null;
+  const editor = element?.closest<HTMLElement>(
+    '[contenteditable="true"][role="textbox"]'
+  );
+  const form = editor?.closest<HTMLFormElement>('form') ?? null;
+  return editor && form ? { editor, form } : null;
+}
 
 const STATE_CATEGORY_ORDER: readonly WorkStateCategory[] = [
   'in_progress',
@@ -595,16 +618,13 @@ type CreateIssueDialogProps = {
   | { mode: 'direct' }
   | {
       mode: 'composer-assisted';
-      draftRequestId: string;
       initialPrompt: string;
-      onRegenerate: () => void;
     }
 );
 
 function CreateIssueDialog(props: CreateIssueDialogProps) {
   const { projectId, open, onOpenChange, onCreated } = props;
   const assisted = props.mode === 'composer-assisted';
-  const draftRequestId = assisted ? props.draftRequestId : null;
   const initialPrompt = assisted ? props.initialPrompt : '';
   const rpc = useRpc<TaskboardRpcContract>();
   const navigate = useBbNavigate();
@@ -632,21 +652,26 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
   const [labelIds, setLabelIds] = useState<string[]>([]);
   const [dueDate, setDueDate] = useState('');
   const [milestoneId, setMilestoneId] = useState<string | null>(null);
-  const [draftStatus, setDraftStatus] = useState<
-    IssueDraftRecord['status'] | 'idle' | 'manual'
-  >('idle');
-  const [draftError, setDraftError] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [createOutcomeUncertain, setCreateOutcomeUncertain] = useState(false);
-  const draftRevisionRef = useRef(0);
+  const initializedForOpenRef = useRef(false);
+
+  useEffect(() => {
+    if (!open) {
+      initializedForOpenRef.current = false;
+      return;
+    }
+    if (initializedForOpenRef.current) return;
+    initializedForOpenRef.current = true;
+    setTitle(assisted ? titleFromPrompt(initialPrompt) : '');
+    setDescription(assisted ? initialPrompt.trim() : '');
+  }, [assisted, initialPrompt, open]);
 
   useEffect(() => {
     if (!open) return;
     setContext(undefined);
     setContextError(null);
-    setTitle('');
-    setDescription('');
     setDestinationId('');
     setIssueType('');
     setMetadata(undefined);
@@ -660,8 +685,6 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
     setLabelIds([]);
     setDueDate('');
     setMilestoneId(null);
-    setDraftStatus(assisted ? 'idle' : 'manual');
-    setDraftError(null);
     setCreating(false);
     setCreateError(null);
     setCreateOutcomeUncertain(false);
@@ -684,7 +707,7 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
     return () => {
       active = false;
     };
-  }, [assisted, draftRequestId, initialPrompt, open, projectId, rpc]);
+  }, [open, projectId, rpc]);
 
   useEffect(() => {
     setMetadata(undefined);
@@ -774,95 +797,8 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
     rpc
   ]);
 
-  useEffect(() => {
-    if (
-      !assisted ||
-      !draftRequestId ||
-      !open ||
-      !projectId ||
-      context?.available !== true
-    ) {
-      return;
-    }
-    const revision = ++draftRevisionRef.current;
-    let active = true;
-    const isActive = () =>
-      active && draftRevisionRef.current === revision;
-    const useFallback = (error: unknown) => {
-      if (!isActive()) return;
-      setTitle(titleFromPrompt(initialPrompt));
-      setDescription(initialPrompt.trim());
-      setDraftStatus('failed');
-      setDraftError(describeError(error));
-    };
-
-    setDraftStatus('running');
-    setDraftError(null);
-    void (async () => {
-      try {
-        await rpc.call('startIssueDraft', {
-          requestId: draftRequestId,
-          projectId,
-          prompt: initialPrompt
-        });
-        while (isActive()) {
-          const { draft } = await rpc.call('getIssueDraft', {
-            requestId: draftRequestId
-          });
-          if (!isActive()) return;
-          if (draft === null) {
-            throw new Error('The issue draft is no longer available.');
-          }
-          if (draft.status === 'complete') {
-            setTitle(draft.title);
-            setDescription(draft.description);
-            setDraftStatus('complete');
-            return;
-          }
-          if (draft.status === 'failed') {
-            throw new Error(draft.error);
-          }
-          await new Promise(resolve => setTimeout(resolve, 700));
-        }
-      } catch (error) {
-        useFallback(error);
-      }
-    })();
-
-    return () => {
-      active = false;
-    };
-  }, [
-    assisted,
-    context?.available,
-    draftRequestId,
-    initialPrompt,
-    open,
-    projectId,
-    rpc
-  ]);
-
-  const discardDraft = () => {
-    if (!draftRequestId) return;
-    void rpc
-      .call('cancelIssueDraft', { requestId: draftRequestId })
-      .catch(() => undefined);
-  };
-
   const closeDialog = () => {
-    draftRevisionRef.current += 1;
-    discardDraft();
     onOpenChange(false);
-  };
-
-  const useOriginalPrompt = () => {
-    if (!assisted) return;
-    draftRevisionRef.current += 1;
-    discardDraft();
-    setTitle(titleFromPrompt(initialPrompt));
-    setDescription(initialPrompt.trim());
-    setDraftStatus('manual');
-    setDraftError(null);
   };
 
   const currentMetadataScope =
@@ -924,7 +860,6 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
       if (result.warnings.length > 0) {
         toast.warning(result.warnings.join(' '));
       }
-      discardDraft();
       onOpenChange(false);
     } catch (error) {
       const message = describeError(error);
@@ -945,10 +880,73 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
     loadedConnectorRevision !== null &&
     currentMetadataScope !== null &&
     loadedMetadataScope === currentMetadataScope &&
-    (!assisted || !['idle', 'running'].includes(draftStatus)) &&
     title.trim() !== '' &&
     destinationId.trim() !== '' &&
     (context.source !== 'jira' || issueType.trim() !== '');
+
+  const editablePromptFields = (
+    <>
+      {assisted ? (
+        <div className="flex items-start gap-2.5 rounded-lg border border-border bg-surface-recessed-solid p-3">
+          <Icon
+            name="ListTodo"
+            className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+            aria-hidden="true"
+          />
+          <div className="space-y-0.5">
+            <p className="text-sm font-medium">Prompt copied for review</p>
+            <p className="text-xs text-muted-foreground">
+              Your prompt was copied into these editable fields. Nothing is
+              created until you select Create.
+            </p>
+          </div>
+        </div>
+      ) : null}
+
+      <div className="grid gap-1.5">
+        <label htmlFor={`${formId}-title`} className="text-xs font-semibold">
+          Title
+        </label>
+        <Input
+          id={`${formId}-title`}
+          value={title}
+          autoFocus
+          maxLength={500}
+          placeholder="What needs to be done?"
+          disabled={creating}
+          onChange={event => {
+            setTitle(event.target.value);
+            setCreateError(null);
+          }}
+        />
+      </div>
+
+      <div className="grid gap-1.5">
+        <label
+          htmlFor={`${formId}-description`}
+          className="text-xs font-semibold"
+        >
+          Description
+        </label>
+        <Textarea
+          id={`${formId}-description`}
+          value={description}
+          rows={9}
+          maxLength={100_000}
+          placeholder="Add context, acceptance criteria, or links…"
+          disabled={creating}
+          onChange={event => {
+            setDescription(event.target.value);
+            setCreateError(null);
+          }}
+        />
+        <p className="text-xs text-muted-foreground">
+          Markdown is supported by GitHub and Linear. Jira receives formatted
+          text.
+        </p>
+      </div>
+    </>
+  );
 
   return (
     <Dialog
@@ -977,30 +975,31 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
                 ? `Finish setting up ${sourceName(context.source)} for this project.`
                 : !assisted
                   ? `Create an issue directly in the tracker configured for ${context.projectName}.`
-                : draftStatus === 'complete'
-                  ? `Drafted from your prompt and the ${context.projectName} repository.`
-                  : draftStatus === 'manual'
-                    ? 'The original prompt is ready for review.'
-                  : draftStatus === 'failed'
-                    ? 'The original prompt is ready as an editable fallback.'
-                    : `Reading ${context.projectName} and structuring the ticket…`}
+                  : 'Review the copied prompt and provider fields before creating the issue.'}
           </DialogDescription>
         </DialogHeader>
 
         {contextError ? (
-          <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3">
-            <p role="alert" className="text-sm text-destructive">
-              {contextError}
-            </p>
+          <div className="grid gap-4">
+            {assisted ? editablePromptFields : null}
+            <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3">
+              <p role="alert" className="text-sm text-destructive">
+                {contextError}
+              </p>
+            </div>
           </div>
         ) : context === undefined ? (
-          <div className="space-y-3 py-1" aria-label="Loading issue form">
-            <Skeleton className="h-9 w-full" />
-            <Skeleton className="h-9 w-full" />
-            <Skeleton className="h-28 w-full" />
+          <div className="grid gap-4" aria-label="Loading issue provider">
+            {assisted ? editablePromptFields : null}
+            <div className="space-y-3 py-1">
+              <Skeleton className="h-9 w-full" />
+              <Skeleton className="h-9 w-full" />
+              {!assisted ? <Skeleton className="h-28 w-full" /> : null}
+            </div>
           </div>
         ) : !context.available ? (
           <div className="space-y-3 rounded-lg border border-border bg-card p-4">
+            {assisted ? editablePromptFields : null}
             <p role="alert" className="text-sm text-muted-foreground">
               {context.message ?? `${sourceName(context.source)} is not ready.`}
             </p>
@@ -1080,159 +1079,8 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
               ) : null}
             </div>
 
-            {assisted &&
-            (draftStatus === 'idle' || draftStatus === 'running') ? (
-              <div
-                className="grid gap-3 rounded-lg border border-border bg-surface-recessed-solid p-3"
-                role="status"
-                aria-live="polite"
-              >
-                <div className="flex items-start gap-2.5">
-                  <Icon
-                    name="Loading"
-                    className="mt-0.5 size-4 shrink-0 animate-spin text-muted-foreground"
-                    aria-hidden="true"
-                  />
-                  <div className="space-y-0.5">
-                    <p className="text-sm font-medium">
-                      Structuring your issue
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      A model is reading relevant repository context and turning
-                      the prompt into a title, description, and acceptance criteria.
-                    </p>
-                  </div>
-                </div>
-                <Skeleton className="h-9 w-full" />
-                <Skeleton className="h-32 w-full" />
-                <div className="flex justify-end">
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    onClick={useOriginalPrompt}
-                  >
-                    Use original prompt
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <>
-                {assisted ? (
-                  <div
-                    className={cn(
-                      'flex items-start gap-2.5 rounded-lg border p-3',
-                      draftStatus === 'failed'
-                        ? 'border-destructive/30 bg-destructive/5'
-                        : 'border-border bg-surface-recessed-solid'
-                    )}
-                  >
-                    <Icon
-                      name={
-                        draftStatus === 'failed'
-                          ? 'AlertCircle'
-                          : draftStatus === 'manual'
-                            ? 'ListTodo'
-                            : 'AiContentGenerator01'
-                      }
-                      className={cn(
-                        'mt-0.5 size-4 shrink-0',
-                        draftStatus === 'failed'
-                          ? 'text-destructive'
-                          : 'text-muted-foreground'
-                      )}
-                      aria-hidden="true"
-                    />
-                    <div className="space-y-0.5">
-                      <p className="text-sm font-medium">
-                        {draftStatus === 'failed'
-                          ? 'Repository-aware draft unavailable'
-                          : draftStatus === 'manual'
-                            ? 'Using the original prompt'
-                            : 'Drafted with repository context'}
-                      </p>
-                      <p
-                        className={cn(
-                          'text-xs',
-                          draftStatus === 'failed'
-                            ? 'text-destructive'
-                            : 'text-muted-foreground'
-                        )}
-                      >
-                        {draftStatus === 'failed'
-                          ? `${draftError ?? 'The drafting model failed.'} Review the original prompt below before creating.`
-                          : draftStatus === 'manual'
-                            ? 'Review and edit the prompt below before creating the issue.'
-                            : 'Review and edit the generated ticket before it is created.'}
-                      </p>
-                      {draftStatus === 'failed' || draftStatus === 'manual' ? (
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="ghost"
-                          className="mt-1 -ml-2"
-                          disabled={creating}
-                          onClick={() => {
-                            if (props.mode === 'composer-assisted') {
-                              props.onRegenerate();
-                            }
-                          }}
-                        >
-                          <Icon
-                            name="ArrowReloadHorizontal"
-                            className="size-3.5"
-                          />
-                          Try repository draft again
-                        </Button>
-                      ) : null}
-                    </div>
-                  </div>
-                ) : null}
-
-                <div className="grid gap-1.5">
-                  <label
-                    htmlFor={`${formId}-title`}
-                    className="text-xs font-semibold"
-                  >
-                    Title
-                  </label>
-                  <Input
-                    id={`${formId}-title`}
-                    value={title}
-                    autoFocus
-                    maxLength={500}
-                    placeholder="What needs to be done?"
-                    disabled={creating}
-                    onChange={event => {
-                      setTitle(event.target.value);
-                      setCreateError(null);
-                    }}
-                  />
-                </div>
-
-                <div className="grid gap-1.5">
-                  <label
-                    htmlFor={`${formId}-description`}
-                    className="text-xs font-semibold"
-                  >
-                    Description
-                  </label>
-                  <Textarea
-                    id={`${formId}-description`}
-                    value={description}
-                    rows={9}
-                    maxLength={100_000}
-                    placeholder="Add context, acceptance criteria, or links…"
-                    disabled={creating}
-                    onChange={event => {
-                      setDescription(event.target.value);
-                      setCreateError(null);
-                    }}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Markdown is supported by GitHub and Linear. Jira receives formatted text.
-                  </p>
-                </div>
+            <>
+              {editablePromptFields}
 
                 <div className="flex flex-wrap items-center gap-1.5 border-t border-border-hairline pt-3">
                   {metadataLoading ? (
@@ -1350,8 +1198,7 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
                     </div>
                   ) : null}
                 </div>
-              </>
-            )}
+            </>
 
             {createError ? (
               <p role="alert" className="text-sm text-destructive">
@@ -1447,11 +1294,7 @@ function ComposerCreateIssueAction() {
   const view = useComposerView();
   const composer = useComposer();
   const { projectId: contextProjectId } = useBbContext();
-  const [open, setOpen] = useState(false);
-  const [draftSession, setDraftSession] = useState<{
-    requestId: string;
-    prompt: string;
-  } | null>(null);
+  const [capturedPrompt, setCapturedPrompt] = useState<string | null>(null);
   const projectId =
     view.scope.kind === 'new-thread'
       ? (view.scope.projectId ?? contextProjectId)
@@ -1490,11 +1333,7 @@ function ComposerCreateIssueAction() {
                     composer.focus();
                     return;
                   }
-                  setDraftSession({
-                    requestId: globalThis.crypto.randomUUID(),
-                    prompt: view.draft.text
-                  });
-                  setOpen(true);
+                  setCapturedPrompt(view.draft.text);
                 }}
               >
                 <Icon name="Ticket" className="size-4" aria-hidden="true" />
@@ -1503,24 +1342,15 @@ function ComposerCreateIssueAction() {
           </TooltipTrigger>
           <TooltipContent side="top">{guidance}</TooltipContent>
         </Tooltip>
-        {draftSession ? (
+        {capturedPrompt !== null ? (
           <CreateIssueDialog
             mode="composer-assisted"
             projectId={projectId}
-            open={open}
-            onOpenChange={setOpen}
-            draftRequestId={draftSession.requestId}
-            initialPrompt={draftSession.prompt}
-            onRegenerate={() => {
-              setDraftSession(current =>
-                current
-                  ? {
-                      ...current,
-                      requestId: globalThis.crypto.randomUUID()
-                    }
-                  : current
-              );
+            open
+            onOpenChange={nextOpen => {
+              if (!nextOpen) setCapturedPrompt(null);
             }}
+            initialPrompt={capturedPrompt}
             onCreated={result => {
               composer.insertMention(result.mention);
               composer.focus();
@@ -3391,12 +3221,14 @@ function WorkItemRow({
   item,
   project,
   showProject,
+  composerDragEnabled,
   onMove,
   onOpen
 }: {
   item: WorkItem;
   project: TrackerProject | undefined;
   showProject: boolean;
+  composerDragEnabled: boolean;
   onMove: (item: WorkItem, option: WorkStatusOption) => Promise<void>;
   onOpen: () => void;
 }) {
@@ -3406,14 +3238,35 @@ function WorkItemRow({
     <div
       data-state-category={item.stateCategory}
       data-status-tone={workflowStatusTone(item.status, item.stateCategory)}
+      data-composer-drag={composerDragEnabled ? 'true' : undefined}
       className="tb-item-row group relative grid min-h-9 w-full items-center gap-x-2 border-b border-border-hairline px-2.5 py-1 text-left"
     >
       <button
         type="button"
+        draggable={composerDragEnabled}
         aria-label={`Open ${item.key}: ${item.title}.${priority ? ` Priority ${priority}.` : ''}${assignee ? ` Assigned to ${assignee}.` : ''}`}
+        onDragStart={event => {
+          if (
+            !composerDragEnabled ||
+            !writeTaskboardComposerDrag(event.dataTransfer, item, 'copy')
+          ) {
+            event.preventDefault();
+          }
+        }}
         onClick={onOpen}
-        className="absolute inset-0 z-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring"
+        className={cn(
+          'absolute inset-0 z-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring',
+          composerDragEnabled && 'cursor-grab active:cursor-grabbing'
+        )}
       />
+      {composerDragEnabled ? (
+        <span
+          aria-hidden="true"
+          className="tb-composer-drag-grip pointer-events-none relative z-[1] flex items-center justify-center text-muted-foreground"
+        >
+          <Icon name="DragDropVertical" className="size-3.5" />
+        </span>
+      ) : null}
       <span className="relative z-10 flex items-center justify-center">
         <WorkItemStatusMenu item={item} variant="row" onMove={onMove} />
       </span>
@@ -3444,6 +3297,7 @@ function ListStateGroups({
   statusOrder,
   projectsById,
   showProject,
+  composerDragEnabled,
   idPrefix,
   nested = false,
   collapsedGroups,
@@ -3456,6 +3310,7 @@ function ListStateGroups({
   statusOrder: readonly string[];
   projectsById: ReadonlyMap<string, TrackerProject>;
   showProject: boolean;
+  composerDragEnabled: boolean;
   idPrefix: string;
   nested?: boolean;
   collapsedGroups: Readonly<Record<string, boolean>>;
@@ -3519,6 +3374,7 @@ function ListStateGroups({
               item={item}
               project={projectsById.get(item.bbProjectId)}
               showProject={showProject}
+              composerDragEnabled={composerDragEnabled}
               onMove={onMove}
               onOpen={() => onOpen(item)}
             />
@@ -3670,6 +3526,7 @@ function KanbanCard({
   pickedUp,
   pending,
   moveDisabled,
+  composerDragEnabled,
   onOpen,
   onPrepare,
   onDragStart,
@@ -3680,6 +3537,7 @@ function KanbanCard({
   pickedUp: boolean;
   pending: boolean;
   moveDisabled: boolean;
+  composerDragEnabled: boolean;
   onOpen: () => void;
   onPrepare: () => void;
   onDragStart: (event: ReactDragEvent<HTMLButtonElement>) => void;
@@ -3705,13 +3563,17 @@ function KanbanCard({
       data-picked-up={pickedUp ? 'true' : 'false'}
       data-pending={pending ? 'true' : 'false'}
       data-move-disabled={moveDisabled ? 'true' : 'false'}
+      data-composer-drag={composerDragEnabled ? 'true' : undefined}
       onPointerDown={onPrepare}
       onFocus={onPrepare}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       onKeyDown={onKeyDown}
       onClick={onOpen}
-      className="tb-kanban-card group w-full rounded-md px-3 py-2.5 text-left transition-[border-color,background-color,opacity,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className={cn(
+        'tb-kanban-card group w-full rounded-md px-3 py-2.5 text-left transition-[border-color,background-color,opacity,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        composerDragEnabled && 'cursor-grab active:cursor-grabbing'
+      )}
     >
       <span className="flex items-center gap-2 text-xs">
         <span className="tb-priority-slot flex size-4 items-center justify-center">
@@ -3720,6 +3582,14 @@ function KanbanCard({
         <span className="tb-key min-w-0 truncate font-medium tabular-nums">
           {item.key}
         </span>
+        {composerDragEnabled ? (
+          <span
+            aria-hidden="true"
+            className="tb-composer-drag-grip ml-auto flex items-center justify-center text-muted-foreground"
+          >
+            <Icon name="DragDropVertical" className="size-3.5" />
+          </span>
+        ) : null}
       </span>
       <span className="mt-1.5 flex items-start gap-1.5">
         <span className="mt-1 flex shrink-0">
@@ -3762,12 +3632,14 @@ function KanbanBoard({
   items,
   workflowItems,
   statusOrder,
+  composerDragEnabled,
   onOpen,
   onMove
 }: {
   items: readonly WorkItem[];
   workflowItems: readonly WorkItem[];
   statusOrder: readonly string[];
+  composerDragEnabled: boolean;
   onOpen: (item: WorkItem) => void;
   onMove: (item: WorkItem, option: WorkStatusOption) => Promise<void>;
 }) {
@@ -4090,6 +3962,7 @@ function KanbanBoard({
                           }
                           pending={pending === itemId}
                           moveDisabled={!workflowReady}
+                          composerDragEnabled={composerDragEnabled}
                           onPrepare={() => {
                             void loadOptions(item).catch(() => undefined);
                           }}
@@ -4098,8 +3971,17 @@ function KanbanBoard({
                               event.preventDefault();
                               return;
                             }
-                            event.dataTransfer.effectAllowed = 'move';
+                            event.dataTransfer.effectAllowed = composerDragEnabled
+                              ? 'copyMove'
+                              : 'move';
                             event.dataTransfer.setData('text/plain', itemId);
+                            if (composerDragEnabled) {
+                              writeTaskboardComposerDrag(
+                                event.dataTransfer,
+                                item,
+                                'copyMove'
+                              );
+                            }
                             draggedItemRef.current = item;
                             suppressOpenRef.current = itemId;
                             void beginPickup(item, 'pointer');
@@ -4760,6 +4642,7 @@ function TrackerList({
               items={visibleItems}
               workflowItems={items}
               statusOrder={boardSettings.statusOrder}
+              composerDragEnabled={surfaceMode === 'constrained'}
               onOpen={onOpen}
               onMove={moveItemStatus}
             />
@@ -4795,6 +4678,7 @@ function TrackerList({
                     statusOrder={boardSettings.statusOrder}
                     projectsById={projectsById}
                     showProject={false}
+                    composerDragEnabled={surfaceMode === 'constrained'}
                     idPrefix={project.id}
                     nested
                     collapsedGroups={collapsedGroups}
@@ -4813,6 +4697,7 @@ function TrackerList({
                 statusOrder={boardSettings.statusOrder}
                 projectsById={projectsById}
                 showProject={false}
+                composerDragEnabled={surfaceMode === 'constrained'}
                 idPrefix={projectId ?? 'selected-project'}
                 collapsedGroups={collapsedGroups}
                 searchActive={committedQuery.trim() !== ''}
@@ -4938,10 +4823,12 @@ function DetailMetadata({
 
 function TrackerDetail({
   route,
-  refreshGeneration
+  refreshGeneration,
+  onAddToComposer
 }: {
   route: Extract<TrackerRoute, { kind: 'item' }>;
   refreshGeneration: number;
+  onAddToComposer?: (item: WorkItem) => void;
 }) {
   const rpc = useRpc<TaskboardRpcContract>();
   const navigate = useBbNavigate();
@@ -5068,6 +4955,17 @@ function TrackerDetail({
                   Open
                 </a>
               </Button>
+              {onAddToComposer ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onAddToComposer(item)}
+                >
+                  <Icon name="MessageCirclePlus" className="size-3.5" />
+                  Add to chat
+                </Button>
+              ) : null}
               <Button
                 size="sm"
                 onClick={() =>
@@ -6791,6 +6689,89 @@ function TaskboardPanel({ subPath }: PluginNavPanelProps) {
   );
 }
 
+function useTaskboardComposerDrop(
+  onMention: (mention: PluginComposerMention) => void
+) {
+  useEffect(() => {
+    let activeForm: HTMLFormElement | null = null;
+    let cue: HTMLDivElement | null = null;
+
+    const clearTarget = () => {
+      if (activeForm?.dataset.taskboardComposerDropTarget === 'active') {
+        delete activeForm.dataset.taskboardComposerDropTarget;
+      }
+      cue?.remove();
+      activeForm = null;
+      cue = null;
+    };
+
+    const showTarget = (form: HTMLFormElement) => {
+      if (activeForm === form) return;
+      clearTarget();
+      activeForm = form;
+      form.dataset.taskboardComposerDropTarget = 'active';
+      cue = document.createElement('div');
+      cue.className = 'tb-composer-drop-cue';
+      cue.setAttribute('aria-hidden', 'true');
+      cue.textContent = COMPOSER_DROP_CUE_TEXT;
+      form.append(cue);
+    };
+
+    const onDragOver = (event: DragEvent) => {
+      const transfer = event.dataTransfer;
+      if (
+        !transfer ||
+        !hasTaskboardComposerDragType(transfer.types)
+      ) {
+        clearTarget();
+        return;
+      }
+      const target = composerDropTarget(event.target);
+      if (target === null) {
+        clearTarget();
+        return;
+      }
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      transfer.dropEffect = 'copy';
+      showTarget(target.form);
+    };
+
+    const onDrop = (event: DragEvent) => {
+      const transfer = event.dataTransfer;
+      const target = composerDropTarget(event.target);
+      if (
+        !transfer ||
+        target === null ||
+        !hasTaskboardComposerDragType(transfer.types)
+      ) {
+        clearTarget();
+        return;
+      }
+      const mention = parseTaskboardComposerMention(
+        transfer.getData(TASKBOARD_COMPOSER_MIME)
+      );
+      clearTarget();
+      if (mention === null) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      onMention(mention);
+    };
+
+    document.addEventListener('dragover', onDragOver, true);
+    document.addEventListener('drop', onDrop, true);
+    document.addEventListener('dragend', clearTarget, true);
+    window.addEventListener('blur', clearTarget);
+    return () => {
+      document.removeEventListener('dragover', onDragOver, true);
+      document.removeEventListener('drop', onDrop, true);
+      document.removeEventListener('dragend', clearTarget, true);
+      window.removeEventListener('blur', clearTarget);
+      clearTarget();
+    };
+  }, [onMention]);
+}
+
 function TaskboardRightPanel({
   projectId
 }: {
@@ -6798,6 +6779,7 @@ function TaskboardRightPanel({
 }) {
   const rpc = useRpc<TaskboardRpcContract>();
   const navigate = useBbNavigate();
+  const composer = useComposer();
   const [itemRoute, setItemRoute] = useState<Extract<
     TrackerRoute,
     { kind: 'item' }
@@ -6806,6 +6788,30 @@ function TaskboardRightPanel({
   const [refreshError, setRefreshError] = useState<string | null>(null);
   const [refreshGeneration, setRefreshGeneration] = useState(0);
   const [pinned, setPinned] = useState(loadRightPanelPinned);
+  const [composerAnnouncement, setComposerAnnouncement] = useState('');
+
+  const insertComposerMention = useCallback(
+    (mention: PluginComposerMention) => {
+      const payload = serializeTaskboardComposerMention(mention);
+      const safeMention = payload
+        ? parseTaskboardComposerMention(payload)
+        : null;
+      if (safeMention === null) {
+        toast.error('This ticket could not be added to chat.');
+        return;
+      }
+      setComposerAnnouncement(`Added ${safeMention.label} to chat`);
+      composer.insertMention(safeMention);
+      composer.focus();
+      toast.success(`Added ${safeMention.label} to chat`);
+    },
+    [composer]
+  );
+  const addItemToComposer = useCallback(
+    (item: WorkItem) => insertComposerMention(taskboardComposerMention(item)),
+    [insertComposerMention]
+  );
+  useTaskboardComposerDrop(insertComposerMention);
 
   useEffect(() => {
     setItemRoute(null);
@@ -6852,6 +6858,14 @@ function TaskboardRightPanel({
         data-taskboard-right-panel
         className="tb-linear flex h-full min-h-0 flex-col text-foreground"
       >
+        <p
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          className="sr-only"
+        >
+          {composerAnnouncement}
+        </p>
         <header className="tb-topbar flex h-11 shrink-0 items-center gap-2 border-b px-2.5">
           {activeItemRoute ? (
             <Button
@@ -6977,6 +6991,7 @@ function TaskboardRightPanel({
             <TrackerDetail
               route={activeItemRoute}
               refreshGeneration={refreshGeneration}
+              onAddToComposer={addItemToComposer}
             />
           ) : (
             <TrackerList

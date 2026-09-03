@@ -191,6 +191,48 @@
       1.25rem minmax(5.25rem, 6.5rem) minmax(0, 1fr) auto;
   }
 
+  .tb-item-row[data-composer-drag='true'] {
+    grid-template-columns:
+      0.875rem 1.25rem minmax(4.75rem, 6rem) minmax(0, 1fr) auto;
+  }
+
+  .tb-composer-drag-grip {
+    opacity: 0.42;
+    transition: opacity 120ms ease;
+  }
+
+  [data-composer-drag='true']:hover .tb-composer-drag-grip,
+  [data-composer-drag='true']:focus-within .tb-composer-drag-grip {
+    opacity: 0.82;
+  }
+
+  form[data-taskboard-composer-drop-target='active'] {
+    outline: 2px dashed var(--input);
+    outline-offset: 3px;
+  }
+
+  .tb-composer-drop-cue {
+    position: absolute;
+    top: 0.5rem;
+    left: 50%;
+    z-index: 50;
+    max-width: calc(100% - 2rem);
+    transform: translateX(-50%);
+    overflow: hidden;
+    border: 1px solid var(--input);
+    border-radius: 999px;
+    background: var(--canvas);
+    box-shadow: 0 2px 8px color-mix(in oklab, var(--ink) 12%, transparent);
+    color: var(--ink);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+    padding: 0 0.625rem;
+    pointer-events: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   [data-state-category='backlog'] {
     --tb-state-accent: var(--tb-violet);
   }
@@ -559,8 +601,19 @@
         1.25rem minmax(4.25rem, 5.25rem) minmax(0, 1fr) auto;
     }
 
+    .tb-item-row[data-composer-drag='true'] {
+      grid-template-columns:
+        0.875rem 1.25rem minmax(4rem, 4.75rem) minmax(0, 1fr) auto;
+    }
+
     .tb-item-row .tb-assignee-mark {
       display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tb-composer-drag-grip {
+      transition: none;
     }
   }
 }

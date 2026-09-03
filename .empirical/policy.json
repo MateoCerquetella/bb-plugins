@@ -11,6 +11,62 @@
     },
     "commands": [
       {
+        "id": "taskboard-focused",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-taskboard"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "evidenceKinds": [
+          "test"
+        ],
+        "checks": [
+          "unit"
+        ],
+        "criteria": [
+          "AC-1",
+          "AC-2",
+          "AC-3",
+          "AC-4",
+          "AC-5",
+          "AC-6",
+          "AC-7",
+          "AC-UI-1"
+        ]
+      },
+      {
+        "id": "taskboard-browser",
+        "argv": [
+          "node",
+          ".empirical/specs/taskboard-new-thread-drag-to-composer/qa/browser.mjs"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 262144,
+        "evidenceKinds": [
+          "browser",
+          "screenshot"
+        ],
+        "checks": [
+          "end-to-end"
+        ],
+        "criteria": [
+          "AC-1",
+          "AC-2",
+          "AC-3",
+          "AC-4",
+          "AC-5",
+          "AC-6",
+          "AC-7",
+          "AC-UI-1"
+        ]
+      },
+      {
         "id": "action-topbar-focused",
         "argv": [
           "npm",

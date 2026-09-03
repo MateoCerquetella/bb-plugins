@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sequence": 5,
+  "previousDigest": "sha256:53325c77d07cb957d04ce30d79ec921e1523b06ed85f61e8f351239d24b89a23",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Implemented strict Taskboard composer-drag payloads, constrained List and Kanban drag sources, semantic visible-composer drop handling with cue and cleanup, route-bound live mention insertion and polite feedback, an accessible ticket-detail Add to chat action, New Thread panel coverage, CSS, tests, and README guidance. Taskboard checks and production build pass.",
+  "createdAt": "2026-09-02T22:59:11.138Z",
+  "stateBeforeDigest": "sha256:1c4d2df6795f6b937990acd3fa5fd5f20a0cdb682fc21c11c876d6e7019e736d",
+  "stateAfterDigest": "sha256:36a7ef427088a3d7b60481647f6e74a440e0ab06fc50fc82fe8b484e5524734b",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 5,
+    "activeFeature": "taskboard-new-thread-drag-to-composer",
+    "request": "Fix Taskboard on BB's root New Thread surface so users can reliably open Taskboard in the right panel instead of landing on an unavailable panel view. Add an explicit Taskboard affordance on New Thread if the current SDK supports it without fragile DOM coupling. Allow dragging a Taskboard ticket from the right panel into the currently visible composer—existing thread or New Thread—to insert the ticket as Taskboard's live external-work-item mention, focus the composer, preserve any existing draft and attachments, and never submit automatically. Preserve Kanban status drag behavior and provide an accessible non-drag equivalent. Add focused tests, build the plugin, install or move the local path installation to this checkout, reload it, and verify both existing-thread and New Thread flows live without publishing.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "context",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Implemented strict Taskboard composer-drag payloads, constrained List and Kanban drag sources, semantic visible-composer drop handling with cue and cleanup, route-bound live mention insertion and polite feedback, an accessible ticket-detail Add to chat action, New Thread panel coverage, CSS, tests, and README guidance. Taskboard checks and production build pass.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:1160f7f4d7ad0ec46be9753497ef99fa76a7f5b5b59379f1bce0a6b795ea49a4",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:66a541c14b2aebdcb37309ab123cba965ba91ea3b97e170164b76e92afc5cc06",
+    "impactDigest": "sha256:8b5e653b2ef533df4fb4f48b4614947114c6ae7b1f7172f1d584eb99dd2c91a5",
+    "capabilityClaimId": "taskboard-new-thread-drag-to-composer-cf82bcfe1438",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-02T22:59:11.138Z"
+  },
+  "digest": "sha256:fef4d08e4646c2206d9bcdc342c578db3b8a2b8ce93c1ff6c57985a49faad2b3"
+}

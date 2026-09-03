@@ -285,41 +285,6 @@ export const createIssueInputSchema = z
   .strict();
 export type CreateIssueInput = z.infer<typeof createIssueInputSchema>;
 
-export const issueDraftRequestIdSchema = z.string().uuid();
-
-const issueDraftBaseSchema = z
-  .object({
-    requestId: issueDraftRequestIdSchema,
-    helperThreadId: z.string().min(1),
-    createdAt: z.number().int().nonnegative()
-  })
-  .strict();
-
-export const runningIssueDraftSchema = issueDraftBaseSchema
-  .extend({ status: z.literal('running') })
-  .strict();
-
-export const issueDraftRecordSchema = z.discriminatedUnion('status', [
-  runningIssueDraftSchema,
-  issueDraftBaseSchema
-    .extend({
-      status: z.literal('complete'),
-      title: z.string().trim().min(1).max(500),
-      description: z.string().trim().min(1).max(100_000),
-      completedAt: z.number().int().nonnegative()
-    })
-    .strict(),
-  issueDraftBaseSchema
-    .extend({
-      status: z.literal('failed'),
-      error: z.string().min(1),
-      completedAt: z.number().int().nonnegative()
-    })
-    .strict()
-]);
-export type IssueDraftRecord = z.infer<typeof issueDraftRecordSchema>;
-export type RunningIssueDraft = z.infer<typeof runningIssueDraftSchema>;
-
 const listInputSchema = z
   .object({
     projectId: bbProjectIdSchema.optional(),
@@ -420,33 +385,6 @@ export const taskboardRpcContract = defineRpcContract({
         .strict(),
       createIssueMetadataFailureSchema
     ])
-  },
-  startIssueDraft: {
-    input: z
-      .object({
-        requestId: issueDraftRequestIdSchema,
-        projectId: bbProjectIdSchema,
-        prompt: z
-          .string()
-          .min(1)
-          .max(64_000)
-          .refine(value => value.trim().length > 0, 'Prompt cannot be blank')
-      })
-      .strict(),
-    output: z
-      .object({
-        requestId: issueDraftRequestIdSchema,
-        helperThreadId: z.string().min(1)
-      })
-      .strict()
-  },
-  getIssueDraft: {
-    input: z.object({ requestId: issueDraftRequestIdSchema }).strict(),
-    output: z.object({ draft: issueDraftRecordSchema.nullable() }).strict()
-  },
-  cancelIssueDraft: {
-    input: z.object({ requestId: issueDraftRequestIdSchema }).strict(),
-    output: z.object({ cancelled: z.literal(true) }).strict()
   },
   createIssue: {
     input: createIssueInputSchema,

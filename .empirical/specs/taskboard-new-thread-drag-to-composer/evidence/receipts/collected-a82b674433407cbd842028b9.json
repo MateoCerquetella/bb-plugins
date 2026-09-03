@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-a82b674433407cbd842028b9",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "human",
+    "screenshot",
+    "test"
+  ],
+  "summary": "Fresh-context QA report and supplied committed screenshots reviewed; focused Taskboard tests pass 28/28.",
+  "passed": true,
+  "startedAt": "2026-09-02T23:55:56.552Z",
+  "completedAt": "2026-09-02T23:55:56.552Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "taskboard-new-thread-drag-to-composer",
+    "specRevision": 2,
+    "specDigest": "sha256:1160f7f4d7ad0ec46be9753497ef99fa76a7f5b5b59379f1bce0a6b795ea49a4",
+    "treeDigest": "sha256:c7fb21f778fe09aebef7964a339a0f77d6e0704d5d82d24701857d2526fedaf1",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf"
+  },
+  "digest": "sha256:5c06697059bf627e687d4c274f1d1e41b22c94124d77666f82ee15eea812e85c",
+  "kind": "collected",
+  "collector": "fresh-context-qa",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/taskboard-new-thread-drag-to-composer/qa/fresh-context-final.md",
+      "mediaType": "text/plain",
+      "bytes": 1962,
+      "digest": "sha256:b2def9e0242542aa55357b8612a6337ba2b4810d72e78dbcf523931995c0e635"
+    },
+    {
+      "path": ".empirical/specs/taskboard-new-thread-drag-to-composer/qa/new-thread-drag-active.png",
+      "mediaType": "image/png",
+      "bytes": 132406,
+      "digest": "sha256:c41781b8052a9952b49d9c7c3e0fd6f5fa28bc600aabb0a5941aa0dfb9c69359"
+    },
+    {
+      "path": ".empirical/specs/taskboard-new-thread-drag-to-composer/qa/new-thread-drop.png",
+      "mediaType": "image/png",
+      "bytes": 70718,
+      "digest": "sha256:4928b66ae8ddb0e0d34673fa483ca9e24e4c01d5b8bec84aaf67eb479a7e0bb0"
+    }
+  ]
+}

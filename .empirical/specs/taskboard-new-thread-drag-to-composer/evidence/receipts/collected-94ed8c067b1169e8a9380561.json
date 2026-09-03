@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-94ed8c067b1169e8a9380561",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Final matrix-bound Chromium artifacts after v0.3.3 reconciliation show accepted composer drop feedback and the preserved New Thread draft with a live ticket mention; both New Thread and existing-thread command assertions passed without submission.",
+  "passed": true,
+  "startedAt": "2026-09-02T23:56:43.263Z",
+  "completedAt": "2026-09-02T23:56:43.263Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "taskboard-new-thread-drag-to-composer",
+    "specRevision": 2,
+    "specDigest": "sha256:1160f7f4d7ad0ec46be9753497ef99fa76a7f5b5b59379f1bce0a6b795ea49a4",
+    "treeDigest": "sha256:c7fb21f778fe09aebef7964a339a0f77d6e0704d5d82d24701857d2526fedaf1",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf"
+  },
+  "digest": "sha256:5f288992c59fd9b3457554e25356f7cd27ba716b0342d800a3a828f04d2c6611",
+  "kind": "collected",
+  "collector": "final-matrix-browser-artifacts",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/taskboard-new-thread-drag-to-composer/qa/new-thread-drag-active.png",
+      "mediaType": "image/png",
+      "bytes": 132406,
+      "digest": "sha256:c41781b8052a9952b49d9c7c3e0fd6f5fa28bc600aabb0a5941aa0dfb9c69359"
+    },
+    {
+      "path": ".empirical/specs/taskboard-new-thread-drag-to-composer/qa/new-thread-drop.png",
+      "mediaType": "image/png",
+      "bytes": 70718,
+      "digest": "sha256:4928b66ae8ddb0e0d34673fa483ca9e24e4c01d5b8bec84aaf67eb479a7e0bb0"
+    }
+  ]
+}

@@ -4,6 +4,63 @@ import { test } from 'node:test';
 
 const app = await readFile(new URL('../app.tsx', import.meta.url), 'utf8');
 
+test('registers Taskboard for existing-thread and New Thread right panels', () => {
+  assert.match(app, /app\.slots\.threadPanelAction\(\{[\s\S]*?id: THREAD_PANEL_ACTION_ID[\s\S]*?component: TaskboardThreadPanel[\s\S]*?layout: 'flush'/u);
+  assert.match(app, /app\.slots\.experimental_newThreadPanelAction\(\{[\s\S]*?id: 'taskboard-new-thread-panel'[\s\S]*?component: TaskboardNewThreadPanel[\s\S]*?layout: 'flush'/u);
+  assert.match(app, /function TaskboardNewThreadPanel\(\{ projectId \}[\s\S]*?<TaskboardRightPanel projectId=\{projectId\}/u);
+  assert.match(app, /surfaceMode="constrained"/u);
+});
+
+test('accepts bounded Taskboard drops only on the visible composer textbox', () => {
+  const dropHook = app.match(
+    /function useTaskboardComposerDrop[\s\S]*?\nfunction TaskboardRightPanel/u
+  )?.[0];
+  assert.ok(dropHook, 'Missing useTaskboardComposerDrop');
+  assert.match(dropHook, /hasTaskboardComposerDragType\(transfer\.types\)/u);
+  assert.match(app, /\[contenteditable="true"\]\[role="textbox"\]/u);
+  assert.match(dropHook, /parseTaskboardComposerMention/u);
+  assert.match(dropHook, /event\.preventDefault\(\)/u);
+  assert.match(dropHook, /event\.stopImmediatePropagation\(\)/u);
+  assert.match(dropHook, /transfer\.dropEffect = 'copy'/u);
+  assert.match(dropHook, /COMPOSER_DROP_CUE_TEXT/u);
+  assert.match(dropHook, /clearTarget\(\)/u);
+
+  const insertion = app.match(
+    /const insertComposerMention = useCallback[\s\S]*?useTaskboardComposerDrop\(insertComposerMention\)/u
+  )?.[0];
+  assert.ok(insertion, 'Missing route-bound composer insertion');
+  assert.match(insertion, /serializeTaskboardComposerMention/u);
+  assert.match(insertion, /composer\.insertMention\(safeMention\)/u);
+  assert.match(insertion, /composer\.focus\(\)/u);
+  assert.match(insertion, /setComposerAnnouncement\(`Added/u);
+  assert.doesNotMatch(insertion, /toCompose|spawn|submit|send|queue|steer/u);
+});
+
+test('makes constrained List and Kanban tickets composer drag sources', () => {
+  const row = app.match(/function WorkItemRow[\s\S]*?\nfunction ListStateGroups/u)?.[0];
+  assert.ok(row, 'Missing WorkItemRow');
+  assert.match(row, /draggable=\{composerDragEnabled\}/u);
+  assert.match(row, /writeTaskboardComposerDrag\(event\.dataTransfer, item, 'copy'\)/u);
+  assert.match(row, /name="DragDropVertical"/u);
+  assert.match(app, /composerDragEnabled=\{surfaceMode === 'constrained'\}/u);
+
+  const kanban = app.match(/function KanbanBoard[\s\S]*?\nfunction TrackerList/u)?.[0];
+  assert.ok(kanban, 'Missing KanbanBoard');
+  assert.match(kanban, /event\.dataTransfer\.effectAllowed = composerDragEnabled[\s\S]*?'copyMove'[\s\S]*?: 'move'/u);
+  assert.match(kanban, /event\.dataTransfer\.setData\('text\/plain', itemId\)/u);
+  assert.match(kanban, /writeTaskboardComposerDrag\([\s\S]*?'copyMove'/u);
+  assert.match(kanban, /void commitMove\(item, lane\.key/u);
+});
+
+test('offers an accessible non-drag Add to chat detail action', () => {
+  const detail = app.match(/function TrackerDetail[\s\S]*?\nfunction configFingerprint/u)?.[0];
+  assert.ok(detail, 'Missing TrackerDetail');
+  assert.match(detail, /type="button"[\s\S]*?variant="outline"[\s\S]*?onClick=\{\(\) => onAddToComposer\(item\)\}/u);
+  assert.match(detail, /MessageCirclePlus/u);
+  assert.match(detail, /Add to chat/u);
+  assert.match(app, /role="status"[\s\S]*?aria-live="polite"[\s\S]*?\{composerAnnouncement\}/u);
+});
+
 test('shares durable project preferences between full and constrained surfaces', () => {
   assert.match(app, /useSyncExternalStore\(/u);
   assert.match(app, /browsePreferenceStore\.subscribe/u);
@@ -148,7 +205,7 @@ test('centralizes and reuses decorative filter icons across surfaces', () => {
   assert.doesNotMatch(app, /<DropdownMenuLabel>(?:Source|State group|Status|Assignee|Priority|External project|Labels)<\/DropdownMenuLabel>/u);
 });
 
-test('supports direct and composer-assisted creation through one dialog', () => {
+test('supports direct and manual composer capture through one dialog', () => {
   assert.match(app, /mode: 'direct'/u);
   assert.match(app, /mode: 'composer-assisted'/u);
   assert.match(app, /mode="direct"/u);
@@ -177,7 +234,6 @@ test('supports direct and composer-assisted creation through one dialog', () => 
     rememberIndex < createCallIndex,
     'The create RPC must be wrapped by the success-bound persistence helper'
   );
-  assert.match(app, /!assisted \|\|\s*!draftRequestId/u);
   assert.match(app, /context\.projectName.*sourceName\(context\.source\).*New issue/su);
   assert.match(app, /Couldn&apos;t load creation options/u);
   assert.match(app, /role="alert"/u);
@@ -185,6 +241,45 @@ test('supports direct and composer-assisted creation through one dialog', () => 
   assert.match(app, /if \(!result\.ok\)/u);
   assert.match(app, /result\.error\.safeMessage/u);
   assert.match(app, /CREATE_METADATA_NETWORK_ERROR/u);
+});
+
+test('captures the original composer prompt locally exactly once per open', () => {
+  const initialization = app.match(
+    /const initializedForOpenRef = useRef\(false\);[\s\S]*?\}, \[assisted, initialPrompt, open\]\);/u
+  )?.[0];
+  assert.ok(initialization, 'Missing one-time prompt initialization');
+  assert.match(initialization, /if \(!open\) \{\s*initializedForOpenRef\.current = false/u);
+  assert.match(initialization, /if \(initializedForOpenRef\.current\) return/u);
+  assert.match(initialization, /setTitle\(assisted \? titleFromPrompt\(initialPrompt\) : ''\)/u);
+  assert.match(initialization, /setDescription\(assisted \? initialPrompt\.trim\(\) : ''\)/u);
+
+  const contextLoad = app.match(
+    /useEffect\(\(\) => \{\s*if \(!open\) return;[\s\S]*?\}, \[open, projectId, rpc\]\);/u
+  )?.[0];
+  assert.ok(contextLoad, 'Missing provider context loading effect');
+  assert.doesNotMatch(contextLoad, /setTitle|setDescription/u);
+  assert.match(app, /const \[capturedPrompt, setCapturedPrompt\] = useState<string \| null>\(null\)/u);
+  assert.match(app, /setCapturedPrompt\(view\.draft\.text\)/u);
+  assert.match(app, /initialPrompt=\{capturedPrompt\}/u);
+  assert.match(app, /Prompt copied for review/u);
+  assert.match(app, /copied into these editable fields/u);
+  assert.match(app, /Nothing\s*is\s+created until you select Create/u);
+  assert.ok(
+    [...app.matchAll(/\{assisted \? editablePromptFields : null\}/gu)].length >= 3,
+    'Captured fields must remain visible while the provider loads or is unavailable'
+  );
+  assert.match(app, /<form id=\{formId\}[\s\S]*?onSubmit=\{create\}/u);
+});
+
+test('contains no frontend issue-drafting lifecycle or generation copy', () => {
+  assert.doesNotMatch(
+    app,
+    /startIssueDraft|getIssueDraft|cancelIssueDraft|IssueDraftRecord|draftRequestId|onRegenerate|randomUUID/u
+  );
+  assert.doesNotMatch(
+    app,
+    /Structuring your issue|A model|drafting model|Repository-aware draft|Drafted with repository context|Try repository draft again/u
+  );
 });
 
 test('routes detail handoff through the external-content trust boundary', () => {

@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-93fd69dd51e2719757521eed",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-09-02T23:49:24.672Z",
+  "completedAt": "2026-09-02T23:49:24.672Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "taskboard-new-thread-drag-to-composer",
+    "specRevision": 2,
+    "specDigest": "sha256:1160f7f4d7ad0ec46be9753497ef99fa76a7f5b5b59379f1bce0a6b795ea49a4",
+    "treeDigest": "sha256:c7fb21f778fe09aebef7964a339a0f77d6e0704d5d82d24701857d2526fedaf1",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf"
+  },
+  "digest": "sha256:b4024d509faa63c7c69237cf70352e1cce8210d13228d807b101d760f9a988e4",
+  "kind": "collected",
+  "collector": "empirical-review:committed-diff-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/taskboard-new-thread-drag-to-composer/reviews/a5ae9da34381fb65cc40b3f1.json",
+      "mediaType": "application/json",
+      "bytes": 2476,
+      "digest": "sha256:2efd92e1cd67144135276ec7ac77e5d34fe6e9b9e7d423b04c9807d02e0a0fc5"
+    },
+    {
+      "path": ".empirical/specs/taskboard-new-thread-drag-to-composer/reviews/a5ae9da34381fb65cc40b3f1.md",
+      "mediaType": "text/markdown",
+      "bytes": 1703,
+      "digest": "sha256:573489166f82f3938f981dcdfd149f2a9dc5acee897cbd54033f91ab181c92ac"
+    }
+  ]
+}
