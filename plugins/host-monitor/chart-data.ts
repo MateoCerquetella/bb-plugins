@@ -1,5 +1,5 @@
 const MAX_RENDER_POINTS = 720;
-const SAMPLE_INTERVAL_MS = 30_000;
+const SAMPLE_INTERVAL_MS = 10_000;
 
 export function expectedSampleInterval(rangeHours: number): number {
   const rangeMs = Math.max(0, rangeHours) * 60 * 60_000;

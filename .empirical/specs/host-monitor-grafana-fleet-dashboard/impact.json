@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "host-monitor-grafana-fleet"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:42f9862d6a78d8af4992daff81ce95cd027c5d1b40731ab9eb1da33c51191537"
+}

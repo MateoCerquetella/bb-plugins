@@ -1,6 +1,10 @@
 import type Database from "better-sqlite3";
 
-import { bucketSizeFor, MAX_RENDER_POINTS, type DirectorySample, type MachineSample, type MemoryDiagnostics } from "./monitor.ts";
+import type { HistoryPoint, MachineSnapshot } from "./contract.ts";
+
+export const MAX_RENDER_POINTS = 720;
+export const RETENTION_MS = 30 * 24 * 60 * 60_000;
+export const SAMPLE_INTERVAL_MS = 10_000;
 
 export const hostMonitorMigrations = [
   `CREATE TABLE IF NOT EXISTS machine_samples (
@@ -36,7 +40,29 @@ export const hostMonitorMigrations = [
   `CREATE INDEX IF NOT EXISTS memory_diagnostics_collected_at ON memory_diagnostics(collected_at)`,
   `ALTER TABLE memory_diagnostics ADD COLUMN process_details_collected_at INTEGER`,
   `UPDATE memory_diagnostics SET processes_json = '[]'`,
+  `CREATE TABLE IF NOT EXISTS fleet_samples (
+    host_id TEXT NOT NULL,
+    collected_at INTEGER NOT NULL,
+    cpu_percent REAL,
+    memory_percent REAL,
+    disk_percent REAL,
+    receive_bytes_per_second INTEGER,
+    send_bytes_per_second INTEGER,
+    load1 REAL,
+    load5 REAL,
+    load15 REAL,
+    PRIMARY KEY (host_id, collected_at)
+  )`,
+  `CREATE INDEX IF NOT EXISTS fleet_samples_host_collected_at
+    ON fleet_samples(host_id, collected_at)`,
 ];
+
+export function bucketSizeFor(rangeMs: number): number {
+  return Math.max(
+    SAMPLE_INTERVAL_MS,
+    Math.ceil((Math.max(0, rangeMs) + 1) / MAX_RENDER_POINTS / 1_000) * 1_000,
+  );
+}
 
 export class HostMonitorStore {
   private readonly db: Database.Database;
@@ -45,84 +71,56 @@ export class HostMonitorStore {
     this.db = db;
   }
 
-  insert(sample: MachineSample): void {
-    this.db.prepare(`INSERT OR REPLACE INTO machine_samples
-      (collected_at, cpu_percent, memory_used_bytes, memory_total_bytes, disk_used_bytes, disk_total_bytes, load1, load5)
-      VALUES (@collectedAt, @cpuPercent, @memoryUsedBytes, @memoryTotalBytes, @diskUsedBytes, @diskTotalBytes, @load1, @load5)`)
-      .run(sample);
+  insert(hostId: string, snapshot: MachineSnapshot): void {
+    this.db.prepare(`INSERT OR REPLACE INTO fleet_samples (
+      host_id, collected_at, cpu_percent, memory_percent, disk_percent,
+      receive_bytes_per_second, send_bytes_per_second, load1, load5, load15
+    ) VALUES (
+      @hostId, @collectedAtMs, @cpuPercent, @memoryPercent, @diskPercent,
+      @receiveBytesPerSecond, @sendBytesPerSecond, @load1, @load5, @load15
+    )`).run(toHistoryPoint(hostId, snapshot));
   }
 
   prune(before: number): void {
-    this.db.prepare("DELETE FROM machine_samples WHERE collected_at < ?").run(before);
-    this.db.prepare("DELETE FROM directory_samples WHERE collected_at < ?").run(before);
+    this.db.prepare("DELETE FROM fleet_samples WHERE collected_at < ?").run(before);
   }
 
-  latest(): MachineSample | null {
-    return this.db.prepare(`SELECT collected_at AS collectedAt, cpu_percent AS cpuPercent,
-      memory_used_bytes AS memoryUsedBytes, memory_total_bytes AS memoryTotalBytes,
-      disk_used_bytes AS diskUsedBytes, disk_total_bytes AS diskTotalBytes, load1, load5
-      FROM machine_samples ORDER BY collected_at DESC LIMIT 1`).get() as MachineSample | undefined ?? null;
-  }
-
-  history(since: number, until: number): MachineSample[] {
+  history(hostId: string, since: number, until: number): HistoryPoint[] {
     const bucketSize = bucketSizeFor(until - since);
-    const samples = this.db.prepare(`SELECT CAST((((collected_at - @since) / @bucketSize) * @bucketSize) + @since AS INTEGER) AS collectedAt,
-      AVG(cpu_percent) AS cpuPercent, AVG(memory_used_bytes) AS memoryUsedBytes,
-      AVG(memory_total_bytes) AS memoryTotalBytes, AVG(disk_used_bytes) AS diskUsedBytes,
-      AVG(disk_total_bytes) AS diskTotalBytes, AVG(load1) AS load1, AVG(load5) AS load5
-      FROM machine_samples WHERE collected_at BETWEEN @since AND @until
-      GROUP BY ((collected_at - @since) / @bucketSize) ORDER BY collectedAt ASC`)
-      .all({ since, until, bucketSize }) as MachineSample[];
-    return samples.slice(-MAX_RENDER_POINTS);
+    const points = this.db.prepare(`SELECT
+      CAST((((collected_at - @since) / @bucketSize) * @bucketSize) + @since AS INTEGER) AS collectedAtMs,
+      AVG(cpu_percent) AS cpuPercent,
+      AVG(memory_percent) AS memoryPercent,
+      AVG(disk_percent) AS diskPercent,
+      CAST(AVG(receive_bytes_per_second) AS INTEGER) AS receiveBytesPerSecond,
+      CAST(AVG(send_bytes_per_second) AS INTEGER) AS sendBytesPerSecond,
+      AVG(load1) AS load1,
+      AVG(load5) AS load5,
+      AVG(load15) AS load15
+      FROM fleet_samples
+      WHERE host_id = @hostId AND collected_at BETWEEN @since AND @until
+      GROUP BY ((collected_at - @since) / @bucketSize)
+      ORDER BY collectedAtMs ASC`).all({
+        hostId,
+        since,
+        until,
+        bucketSize,
+      }) as HistoryPoint[];
+    return points.slice(-MAX_RENDER_POINTS);
   }
+}
 
-  insertDirectories(samples: DirectorySample[]): void {
-    const insert = this.db.prepare("INSERT OR REPLACE INTO directory_samples (collected_at, location, bytes) VALUES (@collectedAt, @location, @bytes)");
-    this.db.transaction((entries: DirectorySample[]) => entries.forEach((entry) => insert.run(entry)))(samples);
-  }
-
-  insertMemoryDiagnostics(diagnostics: MemoryDiagnostics): void {
-    this.db.prepare(`INSERT OR REPLACE INTO memory_diagnostics
-      (collected_at, sample_interval_ms, pressure_some_percent, pressure_full_percent,
-       swap_in_pages_per_second, swap_out_pages_per_second, refault_pages_per_second,
-       reclaim_pages_per_second, bb_cgroup_memory_bytes, processes_json, process_details_collected_at)
-      VALUES (@collectedAt, @sampleIntervalMs, @pressureSomePercent, @pressureFullPercent,
-       @swapInPagesPerSecond, @swapOutPagesPerSecond, @refaultPagesPerSecond,
-       @reclaimPagesPerSecond, @bbCgroupMemoryBytes, @processesJson, @processDetailsCollectedAt)`)
-      .run({ ...diagnostics, processesJson: JSON.stringify(diagnostics.processes) });
-  }
-
-  latestMemoryDiagnostics(): MemoryDiagnostics | null {
-    const row = this.db.prepare(`SELECT collected_at AS collectedAt, sample_interval_ms AS sampleIntervalMs,
-      pressure_some_percent AS pressureSomePercent, pressure_full_percent AS pressureFullPercent,
-      swap_in_pages_per_second AS swapInPagesPerSecond, swap_out_pages_per_second AS swapOutPagesPerSecond,
-      refault_pages_per_second AS refaultPagesPerSecond, reclaim_pages_per_second AS reclaimPagesPerSecond,
-      bb_cgroup_memory_bytes AS bbCgroupMemoryBytes, processes_json AS processesJson,
-      process_details_collected_at AS processDetailsCollectedAt
-      FROM memory_diagnostics ORDER BY collected_at DESC LIMIT 1`).get() as (Omit<MemoryDiagnostics, "processes"> & { processesJson: string }) | undefined;
-    if (row == null) return null;
-    const { processesJson, ...diagnostics } = row;
-    try { return { ...diagnostics, processes: JSON.parse(processesJson) as MemoryDiagnostics["processes"] }; } catch { return null; }
-  }
-
-  pruneMemoryDiagnostics(before: number, maxSnapshots: number): void {
-    this.db.prepare("DELETE FROM memory_diagnostics WHERE collected_at < ?").run(before);
-    this.db.prepare(`DELETE FROM memory_diagnostics WHERE collected_at NOT IN (
-      SELECT collected_at FROM memory_diagnostics ORDER BY collected_at DESC LIMIT ?
-    )`).run(maxSnapshots);
-  }
-
-  averageCpuSince(since: number): number | null {
-    const row = this.db.prepare("SELECT AVG(cpu_percent) AS value FROM machine_samples WHERE collected_at >= ? AND cpu_percent IS NOT NULL").get(since) as { value: number | null };
-    return row.value;
-  }
-
-  directorySummary(since: number, until: number): Array<{ location: string; bytes: number; collectedAt: number; firstBytes: number; firstCollectedAt: number }> {
-    return this.db.prepare(`SELECT newest.location, newest.bytes, newest.collected_at AS collectedAt, first.bytes AS firstBytes, first.collected_at AS firstCollectedAt
-      FROM directory_samples newest
-      JOIN directory_samples first ON first.location = newest.location
-      WHERE newest.collected_at = (SELECT MAX(collected_at) FROM directory_samples latest WHERE latest.location = newest.location AND latest.collected_at <= @until)
-        AND first.collected_at = (SELECT MIN(collected_at) FROM directory_samples earliest WHERE earliest.location = newest.location AND earliest.collected_at >= @since AND earliest.collected_at <= @until)
-      ORDER BY newest.location`).all({ since, until }) as Array<{ location: string; bytes: number; collectedAt: number; firstBytes: number; firstCollectedAt: number }>;
-  }
+function toHistoryPoint(hostId: string, snapshot: MachineSnapshot): HistoryPoint & { hostId: string } {
+  return {
+    hostId,
+    collectedAtMs: snapshot.sampledAtMs,
+    cpuPercent: snapshot.cpu.usagePercent,
+    memoryPercent: snapshot.memory.usagePercent,
+    diskPercent: snapshot.disk?.usagePercent ?? null,
+    receiveBytesPerSecond: snapshot.network.receiveBytesPerSecond,
+    sendBytesPerSecond: snapshot.network.sendBytesPerSecond,
+    load1: snapshot.cpu.loadAverage?.[0] ?? null,
+    load5: snapshot.cpu.loadAverage?.[1] ?? null,
+    load15: snapshot.cpu.loadAverage?.[2] ?? null,
+  };
 }

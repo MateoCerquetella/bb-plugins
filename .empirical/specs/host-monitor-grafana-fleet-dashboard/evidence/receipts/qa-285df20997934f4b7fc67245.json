@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-285df20997934f4b7fc67245",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "Fresh-context QA confirmed all-machine collection/history, Grafana-style same-page interaction, neutral branded sidebar accessory, responsive desktop/mobile behavior, notification and privacy exclusions, coalesced refresh, identity, and passing focused/workspace/live checks.",
+  "passed": true,
+  "startedAt": "2026-09-03T21:06:50.972Z",
+  "completedAt": "2026-09-03T21:06:50.972Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-grafana-fleet-dashboard",
+    "specRevision": 2,
+    "specDigest": "sha256:b68039cc56e374ac530c1d4ee1f57640d396e07bbb1b09684dcf0a38e345ecf3",
+    "treeDigest": "sha256:d4aaa34dc66f27d64d184fc17891b7cb50515a8cf5a37d0ed00280b91341f065",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf",
+    "workflowRevision": 6,
+    "gitCommit": "01786f5515aab91017d5453e32ffaa9920b52013"
+  },
+  "digest": "sha256:dbf5fbb85d8c2f2a31f6028851a00662d22528a1941bfeddfcaf9331503cd15c",
+  "kind": "qa",
+  "matrixDigest": "sha256:2741a41cfc2ce1eb93b7e154676a12bfbaf30b4bf32512771855a3eeb886d549",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Fresh-context QA confirmed all-machine collection/history, Grafana-style same-page interaction, neutral branded sidebar accessory, responsive desktop/mobile behavior, notification and privacy exclusions, coalesced refresh, identity, and passing focused/workspace/live checks.",
+      "startedAt": "2026-09-03T21:06:50.972Z",
+      "completedAt": "2026-09-03T21:06:50.972Z",
+      "durationMs": 0,
+      "collector": "codex-fresh-context-grafana-fleet",
+      "command": null,
+      "result": null,
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:d4aaa34dc66f27d64d184fc17891b7cb50515a8cf5a37d0ed00280b91341f065",
+      "sourceTreeAfter": "sha256:d4aaa34dc66f27d64d184fc17891b7cb50515a8cf5a37d0ed00280b91341f065",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/host-monitor-grafana-fleet-dashboard/qa/fresh-context.txt",
+          "mediaType": "text/plain",
+          "bytes": 2444,
+          "digest": "sha256:3da246a877f8a418fa6e6dc3be41f7da2dca73a7679ac6036eed6b21efa5abc4"
+        },
+        {
+          "path": ".empirical/specs/host-monitor-grafana-fleet-dashboard/qa/grafana-fleet-desktop.png",
+          "mediaType": "image/png",
+          "bytes": 135642,
+          "digest": "sha256:9e9d9cdafc41738e847b6e7f3a873c1de97ef4e6c472d11c373267bbdfdb9134"
+        },
+        {
+          "path": ".empirical/specs/host-monitor-grafana-fleet-dashboard/qa/grafana-fleet-mobile.png",
+          "mediaType": "image/png",
+          "bytes": 40321,
+          "digest": "sha256:9a2109bb94fdb991ca0211bb217503e30d9b76420d246a4cf29cf20a2441f90b"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}

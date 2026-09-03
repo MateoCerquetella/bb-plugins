@@ -14,47 +14,39 @@ const manifest = JSON.parse(
   files: string[];
 };
 
-test("keeps the Host Monitor package and navigation identity", () => {
+test("keeps Host Monitor identity and restores the host artifact", () => {
   assert.equal(manifest.name, "bb-plugin-host-monitor");
   assert.equal(manifest.bb.name, "Host Monitor");
   assert.equal(manifest.bb.app, "./app.tsx");
   assert.equal(manifest.bb.server, "./server.ts");
-  assert.equal(manifest.bb.host, undefined);
+  assert.equal(manifest.bb.host, "./host.ts");
   assert.match(app, /id: "host-monitor"/u);
   assert.match(app, /title: "Host Monitor"/u);
   assert.match(app, /path: "host-monitor"/u);
-  assert.doesNotMatch(app, /Machine Monitor|machine-monitor/u);
-  assert.doesNotMatch(server, /machine-monitor/u);
+  assert.match(app, /experimental_sidebarAccessory: SidebarFleetAccessory/u);
+  assert.match(app, /className="host-monitor__sidebar-summary"/u);
 });
 
-test("ships historical monitoring dependencies and sources", () => {
+test("ships per-host history and metrics-only host sources", () => {
   assert.equal(manifest.dependencies.echarts, "6.1.0");
   assert.ok(manifest.dependencies["better-sqlite3"]);
-  for (const source of ["chart-data.ts", "monitor.ts", "store.ts", "rpc-contract.ts"]) {
+  for (const source of ["chart-data.ts", "contract.ts", "host.ts", "store.ts", "lib/"]) {
     assert.ok(manifest.files.includes(source));
   }
+  assert.ok(manifest.files.includes("dist/host.js"));
+  assert.ok(manifest.files.includes("dist/host.meta.json"));
 });
 
-test("removes every notification surface", () => {
-  for (const source of [app, server, JSON.stringify(manifest)]) {
+test("keeps every monitoring surface inside the page without notifications", () => {
+  for (const source of [app, server]) {
     assert.doesNotMatch(
       source,
-      /\btoast\b|new Notification|experimental_sidebarAccessory|sidebar-warning|threshold-alert/u,
+      /\btoast\b|new Notification|threshold-alert|warning-badge|popover|floating|contentScripts\.register|sidebarFooterAction/u,
     );
   }
   assert.doesNotMatch(app, /role="alert"/u);
   assert.match(app, /role="status"/u);
-});
-
-test("removes the old fleet and destructive process-control surfaces", () => {
-  assert.doesNotMatch(
-    app,
-    /FleetMatrix|floating monitor|ProcessTerminationDialog|terminateProcess|Show IPs/u,
-  );
-  assert.doesNotMatch(
-    server,
-    /experimental_callHostRpc|terminateProcess|inspectProcessTermination|listProcesses/u,
-  );
+  assert.doesNotMatch(server, /terminateProcess|listProcesses|primaryIpAddress/u);
 });
 
 test("imports only public SDK and declared third-party surfaces", () => {

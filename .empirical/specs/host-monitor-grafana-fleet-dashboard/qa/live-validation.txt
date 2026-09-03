@@ -1,0 +1,15 @@
+Host Monitor Grafana fleet live validation
+Date: 2026-09-03
+
+- Local path plugin reloaded successfully with status running.
+- machine-sampler service is running.
+- BB machine inventory: 4 enrolled, 4 connected.
+- Fleet RPC: 4/4 represented; development1, dyaus, Mateo's MacBook Pro, and
+  omarchy each returned a fresh snapshot with no error.
+- Machine history RPC: all four hosts returned independent history points.
+- Playwright desktop/mobile flow passed with 4 machine cards, neutral 4/4
+  sidebar accessory, selection changed to dyaus inside the page, search reduced
+  the fleet to one card, history changed to 1 hour, Refresh all completed, and
+  zero toast or role=alert surfaces appeared.
+- Desktop screenshot: qa/grafana-fleet-desktop.png (1440px viewport).
+- Mobile screenshot: qa/grafana-fleet-mobile.png (390px viewport).

@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-a69c2d501db5142f0ac7f08d",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Run the repository's configured end-to-end structural gate; Host Monitor-specific browser and screenshot evidence is recorded separately in collected-aa98d36b5deb5b7cde0b42e2.",
+  "passed": true,
+  "startedAt": "2026-09-03T21:06:20.562Z",
+  "completedAt": "2026-09-03T21:06:20.687Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-grafana-fleet-dashboard",
+    "specRevision": 2,
+    "specDigest": "sha256:b68039cc56e374ac530c1d4ee1f57640d396e07bbb1b09684dcf0a38e345ecf3",
+    "treeDigest": "sha256:d4aaa34dc66f27d64d184fc17891b7cb50515a8cf5a37d0ed00280b91341f065",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf",
+    "workflowRevision": 6,
+    "gitCommit": "01786f5515aab91017d5453e32ffaa9920b52013"
+  },
+  "digest": "sha256:d80c45cbb3b39b5c3b95a0599e65a7df98b6ab6e5b6d09a5ce21294a272d61a7",
+  "kind": "qa",
+  "matrixDigest": "sha256:2741a41cfc2ce1eb93b7e154676a12bfbaf30b4bf32512771855a3eeb886d549",
+  "check": {
+    "id": "qa-end-to-end",
+    "kind": "end-to-end"
+  },
+  "coveredChecks": [
+    "end-to-end"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Run the repository's configured end-to-end structural gate; Host Monitor-specific browser and screenshot evidence is recorded separately in collected-aa98d36b5deb5b7cde0b42e2.",
+      "startedAt": "2026-09-03T21:06:20.562Z",
+      "completedAt": "2026-09-03T21:06:20.687Z",
+      "durationMs": 125,
+      "collector": null,
+      "command": {
+        "argv": [
+          "node",
+          ".empirical/specs/dockside-main-reconciliation/qa/system.mjs"
+        ],
+        "cwd": ".",
+        "timeoutMs": 60000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:356f03768a1d33ba0d0ddbc765cb4beac0132fff6dbf784cb2def8e96e84f580",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "Dockside system check passed: normal main merge, six-plugin npm inventory, six semantic states, live activity colors, two-row cards, persistent guarded family order, semantic PR backgrounds, and no stale t3sidebar or conflict markers.\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:d4aaa34dc66f27d64d184fc17891b7cb50515a8cf5a37d0ed00280b91341f065",
+      "sourceTreeAfter": "sha256:d4aaa34dc66f27d64d184fc17891b7cb50515a8cf5a37d0ed00280b91341f065",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

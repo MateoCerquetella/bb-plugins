@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-aa98d36b5deb5b7cde0b42e2",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Playwright exercised the installed Grafana-style Host Monitor at desktop and 390px: all 4 enrolled machines, neutral 4/4 sidebar accessory, card selection, filtering, range selection, refresh, in-page charts, and zero notification surfaces.",
+  "passed": true,
+  "startedAt": "2026-09-03T21:06:10.675Z",
+  "completedAt": "2026-09-03T21:06:10.675Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-grafana-fleet-dashboard",
+    "specRevision": 2,
+    "specDigest": "sha256:b68039cc56e374ac530c1d4ee1f57640d396e07bbb1b09684dcf0a38e345ecf3",
+    "treeDigest": "sha256:d4aaa34dc66f27d64d184fc17891b7cb50515a8cf5a37d0ed00280b91341f065",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf"
+  },
+  "digest": "sha256:a1e20af04e388bea3f16075841830c45a248f49abe50ac28793e6aaa45d974c7",
+  "kind": "collected",
+  "collector": "playwright-live-bb-host-monitor",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/host-monitor-grafana-fleet-dashboard/qa/grafana-fleet-desktop.png",
+      "mediaType": "image/png",
+      "bytes": 135642,
+      "digest": "sha256:9e9d9cdafc41738e847b6e7f3a873c1de97ef4e6c472d11c373267bbdfdb9134"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-grafana-fleet-dashboard/qa/grafana-fleet-mobile.png",
+      "mediaType": "image/png",
+      "bytes": 40321,
+      "digest": "sha256:9a2109bb94fdb991ca0211bb217503e30d9b76420d246a4cf29cf20a2441f90b"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-grafana-fleet-dashboard/qa/live-validation.txt",
+      "mediaType": "text/plain",
+      "bytes": 834,
+      "digest": "sha256:22333a01708b1998cd0d5a4bc231df3d5762fb4606106761fba3aeb5ae5e56d2"
+    }
+  ]
+}

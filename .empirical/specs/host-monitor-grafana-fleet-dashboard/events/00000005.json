@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sequence": 5,
+  "previousDigest": "sha256:435bc31cbea6fb3e81e17d07f3dc29066894c9c98a73e825d915a0e3c2b0a0bf",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Implemented the Grafana-inspired all-machine Host Monitor: metrics-only host worker, coalesced per-host sampling, append-only per-machine 30-day history, fleet/history/sidebar RPCs, searchable in-page cards and drill-down charts, neutral connected/total sidebar accessory, passive thresholds, updated docs/package, and notification/IP/process-control exclusions. All 23 focused tests, type, SDK, and build checks pass; live BB shows 4/4 machines with fresh samples and history.",
+  "createdAt": "2026-09-03T21:02:00.666Z",
+  "stateBeforeDigest": "sha256:bec009213bf976dd94b3baceecb145cf9ade76fd44aa3690c5d94f2458ca0e1b",
+  "stateAfterDigest": "sha256:a2b61c67dc10c2ff7ba1a64bb4a18aaf6a4e5e27b737a1f50f90182d03aa0901",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 5,
+    "activeFeature": "host-monitor-grafana-fleet-dashboard",
+    "request": "Rework Host Monitor into a Grafana-style in-page fleet dashboard. Restore the Host Monitor sidebar accessory icon as a compact quick-access/status control, but keep the full monitoring interface inside the Host Monitor page rather than a popup or floating overlay. Monitor and display every enrolled BB machine, with per-machine CPU, RAM, disk, load, uptime, network and historical panels where available. Preserve notification-free behavior: no toast, desktop/browser notification, alert banner, or warning badge.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "context",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Implemented the Grafana-inspired all-machine Host Monitor: metrics-only host worker, coalesced per-host sampling, append-only per-machine 30-day history, fleet/history/sidebar RPCs, searchable in-page cards and drill-down charts, neutral connected/total sidebar accessory, passive thresholds, updated docs/package, and notification/IP/process-control exclusions. All 23 focused tests, type, SDK, and build checks pass; live BB shows 4/4 machines with fresh samples and history.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:b68039cc56e374ac530c1d4ee1f57640d396e07bbb1b09684dcf0a38e345ecf3",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:2561f73f015a326ca22f3cb8d709f67b032e2383df9b19b6fd41b6293dc2a045",
+    "impactDigest": "sha256:42f9862d6a78d8af4992daff81ce95cd027c5d1b40731ab9eb1da33c51191537",
+    "capabilityClaimId": "host-monitor-grafana-fleet-dashboard-a89b74a33ddf",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-03T21:02:00.666Z"
+  },
+  "digest": "sha256:d73b21ad0db375f94da4ea24871e1711eaaf64d433163548622992e97f27322b"
+}

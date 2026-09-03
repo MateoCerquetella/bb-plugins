@@ -12,8 +12,8 @@ are MIT licensed; the common license text is included at the end.
 
 MIT License, Copyright (c) Phosphor.
 
-Host Monitor's local sampler, SQLite history store, ECharts presentation, and
-focused tests adapt Machine Monitor at commit
+Host Monitor's ECharts history presentation and bounded time-series patterns
+adapt Machine Monitor at commit
 `7a28e61f1816499cf6b9c6faca4a1f7ab4662e18`.
 
 Source: <https://github.com/phosphorco/bb-community-plugins/tree/main/plugins/machine-monitor>
@@ -46,7 +46,7 @@ Source: <https://github.com/colinhacks/zod>
 
 Apache License 2.0, Copyright (c) 2017-present The Apache Software Foundation.
 
-ECharts renders the SVG utilization and load history charts.
+ECharts renders the SVG utilization, load, and network history charts.
 
 Source: <https://github.com/apache/echarts>
 
@@ -56,7 +56,7 @@ Source: <https://github.com/apache/echarts>
 
 MIT License, Copyright (c) Joshua Wise and contributors.
 
-better-sqlite3 provides the bounded local history database used by the plugin
+better-sqlite3 provides the bounded per-machine history database used by the plugin
 server.
 
 Source: <https://github.com/WiseLibs/better-sqlite3>

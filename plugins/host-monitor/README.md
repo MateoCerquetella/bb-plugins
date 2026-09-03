@@ -8,62 +8,71 @@
 <h1 align="center">Host Monitor</h1>
 
 <p align="center">
-  Compact current and historical health for the machine running the BB server.
+  Grafana-inspired current and historical health for every machine enrolled in BB.
 </p>
 
 <p align="center">
-  <strong>bb 0.40+</strong> · <strong>MIT</strong>
+  <strong>bb 0.40+</strong> · <strong>macOS, Linux, and Windows</strong> · <strong>MIT</strong>
 </p>
 
-Host Monitor records CPU, memory, root-disk, and load telemetry for the machine
-running the BB server. It also tracks local Go, Rust, Bun, pnpm, and npm caches,
-`/tmp`, and `~/.bb`. The responsive panel follows the compact
-[Phosphor Machine Monitor](https://github.com/phosphorco/bb-community-plugins/tree/main/plugins/machine-monitor)
-experience with current-value cards, selectable history, SVG charts, directory
-growth, and Linux memory-pressure diagnostics.
+Host Monitor turns BB's enrolled machines into one dense observability page.
+The fleet overview keeps every connected, disconnected, stale, loading, and
+failed machine visible. Select a machine card to inspect its current telemetry
+and up to 30 days of utilization, load, and network history without leaving the
+page.
 
-It monitors the BB server machine only. It does not enumerate enrolled execution
-hosts, reveal IP addresses, float an overlay, or stop processes.
+The Host Monitor sidebar row keeps the branded icon and shows neutral
+`connected/total` text. It is navigation only: there is no popup, floating
+window, warning badge, or notification surface.
 
-## How it samples
+## Dashboard
 
-CPU, RAM, root disk, and load are sampled every 30 seconds and retained for 30
-days in the plugin SQLite database. Cache directories are sampled every 15
-minutes. Each requested history range is aggregated to at most 720 chart points,
-and collection gaps stay visible instead of being connected.
+Each machine reports:
 
-Linux memory pressure and reclaim counters are sampled every minute, temporarily
-increasing to five seconds while the kernel reports stalls. A bounded read-only
-process ranking runs once per minute and retains seven days or at most 20,000
-compact snapshots.
+- CPU utilization, model, logical cores, and 1/5/15-minute load.
+- RAM used, available, total, and utilization.
+- Root-disk used, available, total, and utilization.
+- Aggregate download and upload throughput.
+- Uptime, operating system, architecture, and kernel.
+- Independent connection, sampling, freshness, and inline error state.
 
-## Warning thresholds
+The page offers 1 hour, 6 hours, 1 day, 7 days, and 30 days. Per-machine
+history is persisted in the plugin database, aggregated to at most 720 points,
+and displays collection gaps as breaks instead of zeroes.
 
-Configure CPU, RAM, and root-disk thresholds in **Extensions → Plugins → Host
-Monitor**. Each threshold offers 70%, 80%, 90%, or 95%.
+## Grafana-inspired, BB-native
 
-- CPU uses a rolling five-minute average so normal short agent bursts do not
-  dominate the display.
-- RAM uses Linux `MemAvailable` where available, so reclaimable filesystem cache
-  is not treated as pressure.
-- Disk is the filesystem mounted at `/`; directory growth is diagnostic only.
-- Load average is context only because a healthy value depends on CPU count and
-  workload.
+The interface borrows the useful dashboard grammar—compact toolbars, fleet
+variables, dense stat tiles, bordered panels, tabular values, and time-series
+charts—without copying Grafana branding. Colors come from the active BB theme,
+and every state has text so color is never the only signal. The dashboard
+collapses into a single readable column on narrow/mobile views.
 
-Thresholds are passive in-panel colors and chart guides. Host Monitor sends no
-toast, browser, desktop, or sidebar notifications and renders no resource alert
-banner.
+## Threshold guides and notifications
 
-## Process privacy
+Configure CPU, RAM, and root-disk guides in **Extensions → Plugins → Host
+Monitor**. Each guide offers 70%, 80%, 90%, or 95%.
 
-Names, PIDs, and inferred workload labels are hidden by default because they can
-expose deployment-host details. Enable **Show process attribution** in plugin
-settings for an operator-only, read-only ranking. Host Monitor scans at most
-2,048 processes and displays at most 12. It never returns command lines,
-environment variables, credentials, or process-control actions.
+Guides only tint in-page panels and chart lines. Host Monitor deliberately has:
 
-Unavailable platform metrics are shown as `—` rather than failing the complete
-collector.
+- No toast notifications.
+- No browser or desktop notifications.
+- No warning badge or resource alert banner.
+- No popup or floating monitor.
+- No automatic or destructive process actions.
+
+Sampling failures stay inline on the affected machine while other machines
+continue updating.
+
+## Privacy and safety
+
+Host Monitor uses BB's authenticated enrolled-host connection and a
+metrics-only host worker. It does not manage SSH credentials or send telemetry
+to third parties.
+
+Snapshots exclude IP addresses, MAC addresses, interface names, netmasks,
+processes, command lines, environment variables, and credentials. The worker
+has no process-control methods.
 
 ## Install
 
@@ -94,5 +103,6 @@ bb plugin reload host-monitor
 
 ## License
 
-[MIT](./LICENSE) © Mateo Cerquetella. The implementation adapts the MIT-licensed
-Phosphor Machine Monitor; see [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).
+[MIT](./LICENSE) © Mateo Cerquetella. The chart presentation adapts ideas and
+code from the MIT-licensed Phosphor Machine Monitor; see
+[THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).

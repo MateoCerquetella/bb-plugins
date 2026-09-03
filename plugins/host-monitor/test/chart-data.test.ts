@@ -17,6 +17,6 @@ test("marks deterministic collection gaps without adding chart rows", () => {
 });
 
 test("derives the same bounded interval used by long history queries", () => {
-  assert.equal(expectedSampleInterval(1), 30_000);
-  assert.ok(expectedSampleInterval(24 * 30) > 30_000);
+  assert.equal(expectedSampleInterval(1), 10_000);
+  assert.ok(expectedSampleInterval(24 * 30) > 10_000);
 });

@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "sequence": 7,
+  "previousDigest": "sha256:bfb3b606ca224e142aff6c451d51d313d7e3ef8cb17aaa8ceab7723e5c5d7d9a",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Verified every criterion with passing workspace and structural E2E commands, Host Monitor-specific Playwright interaction across all four enrolled machines, desktop/mobile screenshots, fresh-context QA, 23 focused tests, live history RPCs, and notification-free sidebar/page inspection.",
+  "createdAt": "2026-09-03T21:06:59.698Z",
+  "stateBeforeDigest": "sha256:0bc9074b22c122f6774fae4fccc9ab9a276d635def868d1775dbb84ba7bd8ae2",
+  "stateAfterDigest": "sha256:d33d14f681fe15dc0a6e8dd91a6c915c76fce5091ee73f19eb1c432b5e283726",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 7,
+    "activeFeature": "host-monitor-grafana-fleet-dashboard",
+    "request": "Rework Host Monitor into a Grafana-style in-page fleet dashboard. Restore the Host Monitor sidebar accessory icon as a compact quick-access/status control, but keep the full monitoring interface inside the Host Monitor page rather than a popup or floating overlay. Monitor and display every enrolled BB machine, with per-machine CPU, RAM, disk, load, uptime, network and historical panels where available. Preserve notification-free behavior: no toast, desktop/browser notification, alert banner, or warning badge.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "review",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Verified every criterion with passing workspace and structural E2E commands, Host Monitor-specific Playwright interaction across all four enrolled machines, desktop/mobile screenshots, fresh-context QA, 23 focused tests, live history RPCs, and notification-free sidebar/page inspection.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:b68039cc56e374ac530c1d4ee1f57640d396e07bbb1b09684dcf0a38e345ecf3",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:2561f73f015a326ca22f3cb8d709f67b032e2383df9b19b6fd41b6293dc2a045",
+    "impactDigest": "sha256:42f9862d6a78d8af4992daff81ce95cd027c5d1b40731ab9eb1da33c51191537",
+    "capabilityClaimId": "host-monitor-grafana-fleet-dashboard-a89b74a33ddf",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "qa-5637fae20fe51dad8821eaf9",
+      "qa-a69c2d501db5142f0ac7f08d",
+      "qa-285df20997934f4b7fc67245",
+      "collected-aa98d36b5deb5b7cde0b42e2"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": true,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "verified",
+      "reasons": {
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-03T21:06:59.698Z"
+  },
+  "digest": "sha256:896a278b1bb830214a229a18bd261cd76c1de642e310c9200daafab8d19bc6d4"
+}

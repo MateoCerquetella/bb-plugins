@@ -1,206 +1,343 @@
-import os from "node:os";
+import { setTimeout as delay } from "node:timers/promises";
 
 import type { BbPluginApi } from "@get-bb/plugin-sdk";
 
-import { bucketSizeFor, collectDirectorySamples, collectMemoryDiagnostics, collectSample, DIRECTORY_SAMPLE_INTERVAL_MS, MAX_MEMORY_DIAGNOSTICS_SNAPSHOTS, MEMORY_DIAGNOSTICS_INTERVAL_MS, MEMORY_DIAGNOSTICS_RETENTION_MS, MEMORY_PRESSURE_CAPTURE_MS, MEMORY_PRESSURE_INTERVAL_MS, memoryPressureActive, MONITORED_DIRECTORIES, RETENTION_MS, SAMPLE_INTERVAL_MS, type CpuCounters, type MemoryDiagnosticState } from "./monitor.ts";
-import { rpcContract } from "./rpc-contract.ts";
-import { HostMonitorStore, hostMonitorMigrations } from "./store.ts";
+import {
+  hostContract,
+  rpcContract,
+  type Fleet,
+  type MachineRow,
+  type MachineSnapshot,
+} from "./contract.ts";
+import {
+  HostMonitorStore,
+  hostMonitorMigrations,
+  RETENTION_MS,
+  SAMPLE_INTERVAL_MS,
+} from "./store.ts";
 
-function wait(ms: number, signal: AbortSignal): Promise<void> {
-  return new Promise((resolve) => {
-    if (signal.aborted) { resolve(); return; }
-    const done = () => { signal.removeEventListener("abort", abort); resolve(); };
-    const timer = setTimeout(done, ms);
-    const abort = () => { clearTimeout(timer); done(); };
-    signal.addEventListener("abort", abort, { once: true });
-  });
+const CPU_SAMPLE_MS = 300;
+const HOST_CALL_TIMEOUT_MS = 5_000;
+const REALTIME_CHANNEL = "host-monitor-machines-changed";
+const STALE_AFTER_INTERVALS = 2;
+
+type MachineHost = MachineRow["host"];
+type MachineRecord = {
+  snapshot: MachineSnapshot | null;
+  error: string | null;
+  sampling: boolean;
+};
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }
 
-export default function hostMonitorPlugin(bb: BbPluginApi) {
+function publicSampleError(error: unknown): string {
+  return error instanceof Error &&
+    (error.name === "TimeoutError" || /timed?\s*out/iu.test(error.message))
+    ? "Sampling timed out. The machine may be busy or reconnecting."
+    : "Could not collect metrics from this machine.";
+}
+
+function projectHost(host: {
+  id: string;
+  name: string;
+  status: "connected" | "disconnected";
+  lastSeenAt: number | null;
+}): MachineHost {
+  return {
+    id: host.id,
+    name: host.name,
+    status: host.status,
+    lastSeenAt: host.lastSeenAt,
+  };
+}
+
+function emptyRecord(host: MachineHost): MachineRecord {
+  return { snapshot: null, error: null, sampling: host.status === "connected" };
+}
+
+function compareHosts(left: MachineHost, right: MachineHost): number {
+  const status = Number(right.status === "connected") - Number(left.status === "connected");
+  if (status !== 0) return status;
+  return left.name.localeCompare(right.name, undefined, { sensitivity: "base" }) ||
+    left.id.localeCompare(right.id);
+}
+
+export default async function hostMonitorPlugin(bb: BbPluginApi): Promise<void> {
   const settings = bb.settings.define({
     cpuWarningPercent: {
       type: "select" as const,
-      label: "CPU warning threshold",
-      description: "Warn when the rolling five-minute CPU average reaches this percentage. Short agent bursts do not alert.",
+      label: "CPU guide",
+      description: "Highlight CPU panels at this percentage. This is an in-page visual guide, not a notification.",
       options: ["70", "80", "90", "95"],
       default: "90",
     },
     ramWarningPercent: {
       type: "select" as const,
-      label: "RAM warning threshold",
-      description: "Warn when memory in use reaches this percentage; Linux cache remains available memory.",
+      label: "RAM guide",
+      description: "Highlight RAM panels at this percentage. This is an in-page visual guide, not a notification.",
       options: ["70", "80", "90", "95"],
       default: "90",
     },
     diskWarningPercent: {
       type: "select" as const,
-      label: "Root disk warning threshold",
-      description: "Warn when the root filesystem reaches this percentage. Cache-directory size trends remain diagnostics only.",
+      label: "Disk guide",
+      description: "Highlight root-disk panels at this percentage. This is an in-page visual guide, not a notification.",
       options: ["70", "80", "90", "95"],
       default: "90",
     },
-    showProcessDetails: {
-      type: "boolean" as const,
-      label: "Show process attribution",
-      description: "Show local process names, PIDs, and inferred workloads in Memory pressure. Keep this off when panel readers should not see deployment-host workload details.",
-      default: false,
-    },
   });
+
   const db = bb.storage.database();
   bb.storage.migrate(db, hostMonitorMigrations);
   const store = new HostMonitorStore(db);
-  let cpu: CpuCounters | null = null;
-  let memoryState: MemoryDiagnosticState | null = null;
-  let lastError: string | null = null;
-  let directoryError: string | null = null;
-  let memoryError: string | null = null;
-  let processDetailsEnabled = false;
-  void settings.get().then((configured) => { processDetailsEnabled = configured.showProcessDetails; });
+  const hostClient = bb.hosts.experimental_client({ contract: hostContract });
 
-  const percentage = (used: number | null, total: number | null) => used == null || total == null || total <= 0 ? null : used / total * 100;
-  const configuredThresholds = async () => {
+  let thresholds = await readThresholds();
+  let hosts: MachineHost[] = [];
+  let records = new Map<string, MachineRecord>();
+  let hostListInFlight: Promise<MachineHost[]> | null = null;
+  let fullRefreshInFlight: Promise<void> | null = null;
+  const sampleInFlight = new Map<string, Promise<void>>();
+  let refreshRequested = true;
+  let wakeWaiter: (() => void) | null = null;
+
+  async function readThresholds() {
     const configured = await settings.get();
     return {
       cpu: Number(configured.cpuWarningPercent),
       ram: Number(configured.ramWarningPercent),
       disk: Number(configured.diskWarningPercent),
-      showProcessDetails: configured.showProcessDetails,
     };
-  };
-  const withRollingCpu = <T extends { collectedAt: number; cpuPercent: number | null }>(samples: T[]) => {
-    const window: T[] = [];
-    let total = 0;
-    return samples.map((sample) => {
-      window.push(sample);
-      if (sample.cpuPercent != null) total += sample.cpuPercent;
-      while (window[0] != null && window[0].collectedAt < sample.collectedAt - 5 * 60_000) {
-        const removed = window.shift()!;
-        if (removed.cpuPercent != null) total -= removed.cpuPercent;
-      }
-      const count = window.reduce((sum, entry) => sum + (entry.cpuPercent == null ? 0 : 1), 0);
-      return { ...sample, cpu5mPercent: count === 0 ? null : total / count };
+  }
+
+  function publish(hostIds: readonly string[]): void {
+    bb.realtime.publish(REALTIME_CHANNEL, {
+      hostIds: [...hostIds],
+      generatedAtMs: Date.now(),
     });
-  };
+  }
 
-  const snapshot = async (rangeHours: number) => {
-    const now = Date.now();
-    const since = now - rangeHours * 60 * 60_000;
-    const samples = withRollingCpu(store.history(since, now));
-    const cpuAverage = store.averageCpuSince(now - 5 * 60_000);
-    const { showProcessDetails, ...thresholds } = await configuredThresholds();
-    const latest = store.latest();
-    const diskSamples = samples.filter((sample): sample is typeof sample & { diskUsedBytes: number } => sample.diskUsedBytes != null);
-    const contiguousDiskSamples: Array<typeof diskSamples[number]> = [];
-    const maxGap = bucketSizeFor(now - since) * 3;
-    for (let index = diskSamples.length - 1; index >= 0; index -= 1) {
-      const sample = diskSamples[index]!;
-      const newest = contiguousDiskSamples[0];
-      if (newest != null && newest.collectedAt - sample.collectedAt > maxGap) break;
-      contiguousDiskSamples.unshift(sample);
-    }
-    const first = contiguousDiskSamples[0];
-    const last = contiguousDiskSamples.at(-1);
-    const diskGrowthBytesPerDay = first == null || last == null || last.collectedAt <= first.collectedAt
-      ? null : (last.diskUsedBytes! - first.diskUsedBytes!) / (last.collectedAt - first.collectedAt) * 86_400_000;
-    const labels = new Map<string, string>(MONITORED_DIRECTORIES.map((entry) => [entry.id, entry.label]));
-    const memoryDiagnostics = store.latestMemoryDiagnostics();
-    return {
-      hostName: os.hostname(),
-      platform: `${os.platform()} ${os.release()} (${os.arch()})`,
-      uptimeSeconds: Math.round(os.uptime()),
-      latest: latest == null ? null : { ...latest, cpu5mPercent: cpuAverage },
-      samples,
-      thresholds,
-      diskGrowthBytesPerDay,
-      directories: store.directorySummary(since, now).map((entry) => ({
-        id: entry.location,
-        label: labels.get(entry.location) ?? entry.location,
-        bytes: entry.bytes,
-        growthBytesPerDay: entry.firstCollectedAt >= entry.collectedAt ? null : (entry.bytes - entry.firstBytes) / (entry.collectedAt - entry.firstCollectedAt) * 86_400_000,
-      })),
-      memoryDiagnostics: memoryDiagnostics == null || showProcessDetails ? memoryDiagnostics : { ...memoryDiagnostics, processes: [] },
-      processDetailsEnabled: showProcessDetails,
-      lastError,
-      collectorErrors: [directoryError, memoryError].filter((message): message is string => message != null),
-    };
-  };
+  function requestRefresh(): void {
+    refreshRequested = true;
+    wakeWaiter?.();
+  }
 
-  bb.rpc.register(rpcContract, { snapshot: ({ rangeHours }) => snapshot(rangeHours) });
   settings.onChange(async () => {
-    processDetailsEnabled = (await settings.get()).showProcessDetails;
-    bb.realtime.publish("host-monitor-sample", { settingsChanged: true });
+    thresholds = await readThresholds();
+    publish(hosts.map((host) => host.id));
   });
 
-  bb.background.service("host-monitor-core", {
-    start: async (signal) => {
-      while (!signal.aborted) {
-        const startedAt = Date.now();
-        try {
-          const result = await collectSample(cpu, startedAt);
-          cpu = result.cpu;
-          store.insert(result.sample);
-          store.prune(startedAt - RETENTION_MS);
-          lastError = null;
-          bb.realtime.publish("host-monitor-sample", { collectedAt: startedAt });
-        } catch (cause) {
-          lastError = cause instanceof Error ? cause.message : String(cause);
-          bb.log.warn(`Could not collect local machine health: ${lastError}`);
-          bb.realtime.publish("host-monitor-sample", { collectedAt: startedAt, error: true });
-        }
-        await wait(Math.max(0, SAMPLE_INTERVAL_MS - (Date.now() - startedAt)), signal);
+  function fleet(): Fleet {
+    const now = Date.now();
+    const machines = [...hosts].sort(compareHosts).map((host): MachineRow => {
+      const record = records.get(host.id) ?? emptyRecord(host);
+      const sampleState: MachineRow["sampleState"] =
+        host.status === "disconnected"
+          ? "offline"
+          : record.sampling
+            ? "sampling"
+            : record.error !== null
+              ? "error"
+              : record.snapshot === null
+                ? "sampling"
+                : now - record.snapshot.sampledAtMs > SAMPLE_INTERVAL_MS * STALE_AFTER_INTERVALS
+                  ? "stale"
+                  : "fresh";
+      return {
+        host,
+        sampleState,
+        snapshot: record.snapshot,
+        error: record.error,
+      };
+    });
+    return {
+      generatedAtMs: now,
+      refreshIntervalMs: SAMPLE_INTERVAL_MS,
+      refreshing: fullRefreshInFlight !== null || sampleInFlight.size > 0,
+      connected: machines.filter((machine) => machine.host.status === "connected").length,
+      total: machines.length,
+      thresholds: { ...thresholds },
+      machines,
+    };
+  }
+
+  async function listHosts(signal?: AbortSignal): Promise<MachineHost[]> {
+    if (hostListInFlight !== null) return hostListInFlight;
+    const pending = bb.sdk.hosts
+      .list(signal === undefined ? undefined : { signal })
+      .then((available) => available.map(projectHost));
+    hostListInFlight = pending;
+    try {
+      hosts = await pending;
+      const enrolled = new Set(hosts.map((host) => host.id));
+      records = new Map([...records].filter(([hostId]) => enrolled.has(hostId)));
+      for (const host of hosts) {
+        if (!records.has(host.id)) records.set(host.id, emptyRecord(host));
       }
+      return hosts;
+    } finally {
+      if (hostListInFlight === pending) hostListInFlight = null;
+    }
+  }
+
+  async function sampleHost(host: MachineHost, signal?: AbortSignal): Promise<void> {
+    if (host.status !== "connected") return;
+    const existing = sampleInFlight.get(host.id);
+    if (existing !== undefined) return existing;
+
+    const previous = records.get(host.id) ?? emptyRecord(host);
+    records.set(host.id, { ...previous, sampling: true, error: null });
+    publish([host.id]);
+
+    const timeoutSignal = AbortSignal.timeout(HOST_CALL_TIMEOUT_MS);
+    const callSignal = signal === undefined
+      ? timeoutSignal
+      : AbortSignal.any([signal, timeoutSignal]);
+    const pending = (async () => {
+      try {
+        const snapshot = await hostClient.call(
+          "snapshot",
+          { cpuSampleMs: CPU_SAMPLE_MS },
+          { hostId: host.id, signal: callSignal },
+        );
+        store.insert(host.id, snapshot);
+        records.set(host.id, { snapshot, error: null, sampling: false });
+      } catch (error) {
+        if (signal?.aborted) return;
+        bb.log.warn(`Could not sample host ${host.id}: ${errorMessage(error)}`);
+        records.set(host.id, {
+          snapshot: previous.snapshot,
+          error: publicSampleError(error),
+          sampling: false,
+        });
+      }
+    })();
+
+    sampleInFlight.set(host.id, pending);
+    try {
+      await pending;
+    } finally {
+      if (sampleInFlight.get(host.id) === pending) sampleInFlight.delete(host.id);
+      publish([host.id]);
+    }
+  }
+
+  async function refreshAll(signal?: AbortSignal): Promise<void> {
+    if (fullRefreshInFlight !== null) return fullRefreshInFlight;
+    const pending = (async () => {
+      const available = await listHosts(signal);
+      await Promise.all(available.map((host) => sampleHost(host, signal)));
+      store.prune(Date.now() - RETENTION_MS);
+      publish(available.map((host) => host.id));
+    })();
+    fullRefreshInFlight = pending;
+    try {
+      await pending;
+    } finally {
+      if (fullRefreshInFlight === pending) fullRefreshInFlight = null;
+    }
+  }
+
+  async function refreshOne(hostId: string): Promise<void> {
+    const available = await listHosts();
+    const host = available.find((candidate) => candidate.id === hostId);
+    if (host === undefined) throw new Error("That enrolled machine no longer exists.");
+    await sampleHost(host);
+  }
+
+  bb.rpc.register(rpcContract, {
+    async fleet() {
+      if (hosts.length === 0) await listHosts();
+      return fleet();
+    },
+    async sidebarSummary() {
+      if (hosts.length === 0) await listHosts();
+      return {
+        connected: hosts.filter((host) => host.status === "connected").length,
+        total: hosts.length,
+      };
+    },
+    async machineHistory({ hostId, rangeHours }) {
+      if (hosts.length === 0) await listHosts();
+      if (!hosts.some((host) => host.id === hostId)) {
+        throw new Error("That enrolled machine no longer exists.");
+      }
+      const now = Date.now();
+      return {
+        hostId,
+        rangeHours,
+        points: store.history(hostId, now - rangeHours * 60 * 60_000, now),
+      };
+    },
+    async refresh({ hostId }) {
+      if (hostId === null) await refreshAll();
+      else await refreshOne(hostId);
+      return fleet();
     },
   });
 
-  bb.background.service("host-monitor-directories", {
-    start: async (signal) => {
-      while (!signal.aborted) {
-        const startedAt = Date.now();
-        try {
-          const result = await collectDirectorySamples(startedAt, signal);
-          store.insertDirectories(result.samples);
-          directoryError = result.errors.length === 0 ? null : result.errors.join(" ");
-          store.prune(startedAt - RETENTION_MS);
-          bb.realtime.publish("host-monitor-directories", { collectedAt: startedAt });
-        } catch (cause) {
-          if (signal.aborted) break;
-          directoryError = "Directory usage diagnostics are unavailable.";
-          bb.log.warn(`Could not collect local directory usage: ${cause instanceof Error ? cause.message : String(cause)}`);
-          bb.realtime.publish("host-monitor-directories", { collectedAt: startedAt, error: true });
-        }
-        await wait(Math.max(0, DIRECTORY_SAMPLE_INTERVAL_MS - (Date.now() - startedAt)), signal);
-      }
-    },
-  });
+  async function waitForRefresh(signal: AbortSignal): Promise<void> {
+    if (signal.aborted || refreshRequested) return;
+    const wakeController = new AbortController();
+    const wake = (): void => wakeController.abort();
+    wakeWaiter = wake;
+    try {
+      await delay(SAMPLE_INTERVAL_MS, undefined, {
+        signal: AbortSignal.any([signal, wakeController.signal]),
+      });
+    } catch (error) {
+      if (!signal.aborted && !wakeController.signal.aborted) throw error;
+    } finally {
+      if (wakeWaiter === wake) wakeWaiter = null;
+    }
+  }
 
-  bb.background.service("host-monitor-memory-pressure", {
-    start: async (signal) => {
-      let captureUntil = 0;
-      let lastProcessRankingAt = 0;
-      let nextPruneAt = 0;
-      while (!signal.aborted) {
-        const startedAt = Date.now();
-        try {
-          const includeProcesses = startedAt - lastProcessRankingAt >= MEMORY_DIAGNOSTICS_INTERVAL_MS;
-          const result = await collectMemoryDiagnostics(memoryState, startedAt, signal, { includeProcesses, includeProcessDetails: processDetailsEnabled });
-          memoryState = result.state;
-          memoryError = null;
-          if (includeProcesses) lastProcessRankingAt = startedAt;
-          store.insertMemoryDiagnostics(result.diagnostics);
-          if (startedAt >= nextPruneAt) {
-            store.pruneMemoryDiagnostics(startedAt - MEMORY_DIAGNOSTICS_RETENTION_MS, MAX_MEMORY_DIAGNOSTICS_SNAPSHOTS);
-            nextPruneAt = startedAt + 5 * 60_000;
+  const unsubscribeWorkerExit = hostClient.experimental_onWorkerExit(({ hostId }) => {
+    const previous = records.get(hostId);
+    if (previous !== undefined) {
+      records.set(hostId, {
+        ...previous,
+        sampling: false,
+        error: "The machine monitor worker stopped; the next refresh will restart it.",
+      });
+      publish([hostId]);
+    }
+  });
+  bb.onDispose(unsubscribeWorkerExit);
+
+  bb.background.service("machine-sampler", {
+    async start(signal) {
+      const unsubscribeHost = bb.sdk.subscribe({
+        event: "host:changed",
+        callback: requestRefresh,
+      });
+      const unsubscribeRealtime = bb.sdk.subscribe({
+        event: "realtime:connection",
+        callback: (event) => {
+          if (event.state === "connected" && event.reconnected) requestRefresh();
+        },
+      });
+      try {
+        while (!signal.aborted) {
+          refreshRequested = false;
+          try {
+            await refreshAll(signal);
+          } catch (error) {
+            if (!signal.aborted) {
+              bb.log.warn(`Could not refresh machines: ${errorMessage(error)}`);
+            }
           }
-          if (memoryPressureActive(result.diagnostics)) captureUntil = Math.max(captureUntil, startedAt + MEMORY_PRESSURE_CAPTURE_MS);
-          bb.realtime.publish("host-monitor-memory", { collectedAt: startedAt });
-        } catch (cause) {
           if (signal.aborted) break;
-          memoryError = "Memory pressure diagnostics are unavailable.";
-          bb.log.warn(`Could not collect memory-pressure diagnostics: ${cause instanceof Error ? cause.message : String(cause)}`);
-          bb.realtime.publish("host-monitor-memory", { collectedAt: startedAt, error: true });
+          if (refreshRequested) continue;
+          await waitForRefresh(signal);
         }
-        const interval = Date.now() < captureUntil ? MEMORY_PRESSURE_INTERVAL_MS : MEMORY_DIAGNOSTICS_INTERVAL_MS;
-        await wait(Math.max(1_000, interval - (Date.now() - startedAt)), signal);
+      } finally {
+        unsubscribeRealtime();
+        unsubscribeHost();
+        wakeWaiter?.();
+        wakeWaiter = null;
       }
     },
   });

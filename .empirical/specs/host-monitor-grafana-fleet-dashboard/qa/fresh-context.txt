@@ -1,0 +1,45 @@
+Fresh-context QA: Host Monitor Grafana fleet dashboard
+Date: 2026-09-03
+
+PASS AC-1: Fleet RPC and BB inventory both report four machines; all four
+connected hosts hold independent fresh snapshots. Fake-host coverage proves a
+failed and an offline host remain visible without blocking a successful host.
+
+PASS AC-2: Host contract and live payloads contain CPU, RAM, root disk,
+receive/send throughput, load 1/5/15, uptime, OS, architecture, kernel, and CPU
+model/core facts. No IP or process-control field is in the schema or payload.
+
+PASS AC-3: Prior ten migrations remain ordered and two fleet migrations append.
+In-memory SQLite coverage proves per-host isolation and <=720 points; chart
+transforms mark deterministic gaps without growing the dataset.
+
+PASS AC-UI-1: Desktop capture shows 4/4 totals, machine search, range and refresh
+controls, four compact fleet cards, explicit Live text, and dense theme-token
+panel chrome. The fleet region is bounded and scrollable.
+
+PASS AC-UI-2: Playwright changed selection to dyaus inside the page, filtered to
+one machine, selected 1-hour history, and refreshed. The selected dashboard has
+current CPU/RAM/disk/load, utilization/load/network charts, textual
+latest/min/max summaries, system facts, and no route/popup transition. The 390px
+capture stacks controls, cards, stats, and charts into a readable vertical flow.
+
+PASS AC-UI-3: Desktop sidebar shows the unchanged Host Monitor branded icon and
+neutral 4/4 accessory. Registration uses experimental_sidebarAccessory only;
+there is no content script or interactive accessory.
+
+PASS AC-4: Source/build scans and Playwright found no toast, Notification,
+role=alert, warning badge, popup, floating, IP reveal, or process termination
+surface. Failures use inline role=status copy.
+
+PASS AC-5: Three threshold settings explicitly describe passive in-page guides.
+Concurrent refresh test proves one host call; live Refresh all completed and the
+history range changed without notification UI.
+
+PASS AC-6: Built server/app/host metadata, package id, route/title, repository
+coordinates, and icon/light/dark logo assets retain Host Monitor identity.
+
+PASS AC-7: The focused suite passes 23 tests plus type, SDK, server/app/host
+build checks. The complete workspace check and configured structural E2E gate
+pass. Local plugin status is running with machine-sampler active.
+
+No blocking UX, correctness, privacy, lifecycle, or accessibility issue found.

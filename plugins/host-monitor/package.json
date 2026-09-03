@@ -2,7 +2,7 @@
   "name": "bb-plugin-host-monitor",
   "version": "0.1.4",
   "private": true,
-  "description": "Compact local CPU, memory, disk, load, history, cache growth, and memory-pressure diagnostics for the BB server machine.",
+  "description": "Grafana-inspired CPU, memory, disk, network, load, and history dashboards for every machine enrolled in BB.",
   "license": "MIT",
   "author": "Mateo Cerquetella",
   "homepage": "https://github.com/MateoCerquetella/bb-plugins/tree/main/plugins/host-monitor#readme",
@@ -31,7 +31,7 @@
   },
   "bb": {
     "name": "Host Monitor",
-    "description": "Monitor current and historical resource health on the BB server machine.",
+    "description": "Monitor current and historical resource health across every machine enrolled in BB.",
     "branding": {
       "icon": "./assets/icon.svg",
       "logo": {
@@ -41,6 +41,7 @@
     },
     "server": "./server.ts",
     "app": "./app.tsx",
+    "host": "./host.ts",
     "skills": []
   },
   "files": [
@@ -49,6 +50,8 @@
     "dist/app.js",
     "dist/app.meta.json",
     "dist/app.css",
+    "dist/host.js",
+    "dist/host.meta.json",
     "assets/",
     "README.md",
     "LICENSE",
@@ -57,9 +60,10 @@
     "app.tsx",
     "app.css",
     "chart-data.ts",
-    "monitor.ts",
+    "host.ts",
+    "contract.ts",
     "store.ts",
-    "rpc-contract.ts"
+    "lib/"
   ],
   "dependencies": {
     "better-sqlite3": "^12.0.0",
