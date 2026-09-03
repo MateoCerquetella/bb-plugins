@@ -180,8 +180,9 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(controller, /compactWidth/u);
   assert.match(controller, /compactWidth = projectFirst\s*\? 32/su);
   assert.match(controller, /action: #selector\(agentTapped/u);
-  assert.match(controller, /bounds\.contains\(local\) \? self : nil/u);
-  assert.equal((controller.match(/convert\(point, from: superview\)/gu) ?? []).length, 5);
+  assert.match(controller, /bounds\.contains\(point\) \? self : nil/u);
+  assert.equal((controller.match(/convert\(point, from: superview\)/gu) ?? []).length, 0);
+  assert.equal((controller.match(/bounds\.contains\(point\)/gu) ?? []).length, 5);
   assert.doesNotMatch(controller, /override func mouseDown/u);
   assert.match(controller, /close control tapped/u);
   assert.match(controller, /projectInitials/u);
@@ -287,7 +288,7 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(controller, /statusPill\.update/u);
   assert.match(controller, /floor\(\(bounds\.height - size\.height\) \/ 2\)/u);
   assert.doesNotMatch(controller, /accentLayer/u);
-  assert.match(controller, /bounds\.contains\(local\) \? self : nil/u);
+  assert.match(controller, /bounds\.contains\(point\) \? self : nil/u);
   assert.doesNotMatch(controller, /statusIconView/u);
   assert.match(controller, /hostMonitorTapped/u);
   assert.match(controller, /hostViewVisible\.toggle\(\)/u);

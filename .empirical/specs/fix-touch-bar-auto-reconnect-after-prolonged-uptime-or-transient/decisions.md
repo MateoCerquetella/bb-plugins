@@ -35,3 +35,11 @@ the configured BB executable and server connection.
 
 Inject failures, timeouts, malformed output, and success; assert retention,
 backoff bounds, one loop, and connected recovery. Verify on the enrolled Mac.
+
+## D-002: Keep hit-test coordinates receiver-local
+
+Status: Accepted
+
+The independent review identified that AppKit supplies `hitTest` points in the
+receiver's local coordinate space. The five custom controls now test
+`bounds.contains(point)` directly; no superview conversion is performed.

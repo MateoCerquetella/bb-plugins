@@ -187,8 +187,7 @@ private final class GroupDividerView: NSButton {
     }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        let local = convert(point, from: superview)
-        return bounds.contains(local) ? self : nil
+        return bounds.contains(point) ? self : nil
     }
 
     func setSelected(_ selected: Bool) {
@@ -410,8 +409,7 @@ private final class HostMetricView: NSButton {
     override var intrinsicContentSize: NSSize { NSSize(width: measuredWidth, height: 30) }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        let local = convert(point, from: superview)
-        return bounds.contains(local) ? self : nil
+        return bounds.contains(point) ? self : nil
     }
 
     override func layout() {
@@ -612,8 +610,7 @@ private final class SettingsControlButton: NSButton {
     }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        let local = convert(point, from: superview)
-        return bounds.contains(local) ? self : nil
+        return bounds.contains(point) ? self : nil
     }
 
     override func draw(_ dirtyRect: NSRect) {
@@ -661,8 +658,7 @@ private final class CompactNativeButton: NSButton {
     override var intrinsicContentSize: NSSize { NSSize(width: fixedWidth, height: 30) }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        let local = convert(point, from: superview)
-        return bounds.contains(local) ? self : nil
+        return bounds.contains(point) ? self : nil
     }
 }
 
@@ -827,8 +823,7 @@ private final class AgentButton: NSButton {
     }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        let local = convert(point, from: superview)
-        return bounds.contains(local) ? self : nil
+        return bounds.contains(point) ? self : nil
     }
 
     func setGrouped(_ value: Bool) {
