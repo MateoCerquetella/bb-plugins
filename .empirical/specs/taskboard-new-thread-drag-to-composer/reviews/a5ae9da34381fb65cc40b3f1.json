@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:6465c4b6ad2352dd27946318c05aaf68a12ef8250e3e20cbc56042055e23fcb8",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "b627bb0d43d8fac89e9777b0669700fa6f7e68ef",
+  "headCommit": "bd2d857508325115ecfd5fae4ce7d17179128649",
+  "diffDigest": "sha256:23a08d39976ba39e127b3e075806290a6a9911b0188cf553b0b87c8cae01e3c3",
+  "verdict": "APPROVED",
+  "reviewerActor": "committed-diff-reviewer",
+  "reviewerInvocationId": "committed-diff-review-bd2d857508325115ecfd5fae4ce7d17179128649",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: Both existing-thread and New Thread Taskboard panel actions remain registered; the New Thread panel passes the selected project and uses constrained rendering.\n- PASS AC-2: Constrained List rows emit bounded Taskboard payloads, and composer drops validate, insert one mention, and focus the composer.\n- PASS AC-3: Kanban cards emit copyMove payloads while retaining plain-text/status drag handling; lane drops remain available and composer drops insert mentions.\n- PASS AC-4: Insertion uses the SDK composer mention primitive and does not invoke send, queue, steer, thread creation, or submission paths.\n- PASS AC-5: Tracker detail provides an accessible Add to chat button wired to the same validated insertion path.\n- PASS AC-6: Payloads contain only provider/id/label, enforce strict keys and bounds, reject unsafe values, and ignore unrelated or malformed drops.\n- PASS AC-UI-1: Composer dragover feedback visibly marks the target and displays a drop cue; successful drops remain in place and add the mention.\n- PASS AC-7: Focused tests cover payload round-tripping and rejection, drag wiring, detail insertion, panel registration, and no automatic submission.\n\n## Security / correctness\n\nApproved. The strict private MIME payload, exact schema validation, bounded fields, unsafe-control rejection, composer-target restriction, and preserved Kanban lane behavior provide sound security and interaction handling.\n\n## Design / maintainability\n\nApproved. Composer handoff logic is isolated in a pure helper, panel behavior is route-bound, and focused source/UI tests document the integration contract. The global capture listener is carefully filtered and cleaned up.",
+  "bodyDigest": "sha256:04c06d251e4fb6bf6b26dfc16e15b3c37d67828e1b185b541765370f341cab33",
+  "digest": "sha256:a5ae9da34381fb65cc40b3f1b36075e482849fdbd209eb16750c32adc2674d91"
+}

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:6465c4b6ad2352dd27946318c05aaf68a12ef8250e3e20cbc56042055e23fcb8",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "b627bb0d43d8fac89e9777b0669700fa6f7e68ef",
+  "headCommit": "bd2d857508325115ecfd5fae4ce7d17179128649",
+  "diffDigest": "sha256:23a08d39976ba39e127b3e075806290a6a9911b0188cf553b0b87c8cae01e3c3",
+  "verdict": "APPROVED",
+  "reviewerActor": "committed-diff-reviewer-final2",
+  "reviewerInvocationId": "committed-diff-review-final-20260902-02",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: Existing-thread and New Thread Taskboard panel registrations are preserved.\n- PASS AC-2: Constrained List ticket drags use validated mention payloads and focus insertion.\n- PASS AC-3: Kanban supports composer copy drops while retaining lane status moves.\n- PASS AC-4: Composer insertion uses insertMention/focus without submission or draft replacement.\n- PASS AC-5: Ticket detail provides accessible Add to chat action.\n- PASS AC-6: Private payload is bounded, strict, provider-validated, and ignores malformed data.\n- PASS AC-UI-1: Composer drop cue and inserted mention announcement provide visible/accessibility feedback.\n- PASS AC-7: Focused tests cover payloads, drag wiring, insertion, registration, and no auto-submit.\n\n## Security / correctness\n\nStrict payload validation and supported composer APIs preserve trust boundaries and prevent unintended actions.\n\n## Design / maintainability\n\nHandoff logic is isolated in pure helpers; constrained drag behavior preserves existing Kanban semantics.",
+  "bodyDigest": "sha256:d9bfcf09ae6ed5b4a87ed25417cdf191c643061ebb8733a5e12fbc65254dc8ec",
+  "digest": "sha256:85aa336dbb0960ba47bb2bd01fc7f2c531347db7ad0de1849ce15d8ab80ffb04"
+}
