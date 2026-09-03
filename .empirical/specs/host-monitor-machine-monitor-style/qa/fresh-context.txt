@@ -32,3 +32,18 @@ focused suite passed 17 tests, SDK declarations, TypeScript, and production
 build. npm pack --dry-run reported the intended 18 package entries.
 
 No acceptance-criterion failures or unsupported checks found.
+
+Repair verification after isolated review:
+
+- History buckets are anchored to the requested range, use a +1ms ceiling, and
+  are defensively sliced to MAX_RENDER_POINTS. A real in-memory SQLite test
+  inserts 901 unaligned samples and proves the response stays at or below 720.
+- Chart gaps use the range-derived expected interval and replace a row with a
+  null sentinel instead of appending one, so chart rows cannot exceed samples.
+- Directory and memory-diagnostic failures publish invalidations and appear in
+  snapshot.collectorErrors, rendered as inline role=status text.
+- Linux process RSS uses getconf PAGESIZE with a bounded fallback instead of a
+  hard-coded 4 KiB page.
+- Backend registration/snapshot, store bounding, chart-gap, and public-SDK-only
+  tests raise the focused suite to 22 passing tests. The complete workspace
+  check passes after these repairs.

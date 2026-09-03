@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:7526768270f121d809d1cb896bcab3da67160b1071b090c6d3966a96f77742d8",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "a6391be14058735b3aebe1769edb313f20100014",
+  "headCommit": "700a3fb9c3e4410b1dbb790728c8269e383edf87",
+  "diffDigest": "sha256:fed0234c898c34674b2aa32563a3d003668d916a6228557548d230cfbdea8c79",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "codex:/root/host_monitor_review",
+  "reviewerInvocationId": "host-monitor-review-700a3fb9-20260903-01",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- PASS AC-1: The committed implementation samples Linux-local CPU and RAM, root disk, load/uptime, bounded directories, and memory-pressure/process diagnostics with explicit bounded cadences and retention.\n- FAIL AC-2: The five ranges and gap insertion exist, but floor-aligned SQL buckets can produce 721 rows and added null gap sentinels can further exceed 720; sparse-history median gap detection can also connect gaps.\n- PASS AC-3: Four dense current cards, two responsive SVG charts, directory usage/growth, and memory-pressure/process sections are present with mobile breakpoints.\n- PASS AC-4: Package, route/title, repository metadata, and custom branded assets preserve Host Monitor identity.\n- FAIL AC-5: Notification surfaces are removed and core errors are inline, but directory failures are swallowed and memory-diagnostic failures only logged, leaving the panel silent or stale.\n- PASS AC-6: Fleet, floating, IP, termination, host-worker, and installable host artifacts are removed.\n- PASS AC-7: Threshold settings and opt-in bounded read-only process attribution are correctly implemented.\n- FAIL AC-8: Workspace checks pass, but store/snapshot integration and exact history-cap/gap edge cases lack tests.\n\n## Security / correctness\n\nCHANGES_REQUESTED: strict history bounding and complete inline failure reporting need repair; Linux process RSS also hard-codes a 4096-byte page size and can misreport on 16/64 KiB page systems.\n\n## Design / maintainability\n\nCHANGES_REQUESTED: architecture is coherent and smaller, but store/server behavioral tests are missing; shim devDependencies are SDK-required despite being unused at runtime.",
+  "bodyDigest": "sha256:1ff82a01dc9a8476632e63b4103844bab64f89db436965697d1dfd5aca602213",
+  "digest": "sha256:d655fd16affcb0d4fc4b986a086318ceac72cbb67e1c086090ac455ebe025b6f"
+}

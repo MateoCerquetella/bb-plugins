@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { experimental_scanPublicSdkOnly } from "@get-bb/plugin-sdk/testing";
 
 const app = await readFile(new URL("../app.tsx", import.meta.url), "utf8");
 const server = await readFile(new URL("../server.ts", import.meta.url), "utf8");
@@ -29,7 +30,7 @@ test("keeps the Host Monitor package and navigation identity", () => {
 test("ships historical monitoring dependencies and sources", () => {
   assert.equal(manifest.dependencies.echarts, "6.1.0");
   assert.ok(manifest.dependencies["better-sqlite3"]);
-  for (const source of ["monitor.ts", "store.ts", "rpc-contract.ts"]) {
+  for (const source of ["chart-data.ts", "monitor.ts", "store.ts", "rpc-contract.ts"]) {
     assert.ok(manifest.files.includes(source));
   }
 });
@@ -54,4 +55,13 @@ test("removes the old fleet and destructive process-control surfaces", () => {
     server,
     /experimental_callHostRpc|terminateProcess|inspectProcessTermination|listProcesses/u,
   );
+});
+
+test("imports only public SDK and declared third-party surfaces", () => {
+  const scan = experimental_scanPublicSdkOnly(
+    new URL("..", import.meta.url).pathname,
+    { allow: [/^better-sqlite3$/u, /^echarts(?:\/.*)?$/u, /^react$/u] },
+  );
+  assert.deepEqual(scan.violations, []);
+  assert.deepEqual(scan.privateDependencies, []);
 });

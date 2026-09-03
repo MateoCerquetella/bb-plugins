@@ -43,6 +43,7 @@ export const rpcContract = defineRpcContract({
       memoryDiagnostics: memoryDiagnosticsSchema.nullable(),
       processDetailsEnabled: z.boolean(),
       lastError: z.string().nullable(),
+      collectorErrors: z.array(z.string()),
     }).strict(),
   },
 });

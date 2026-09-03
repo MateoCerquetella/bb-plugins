@@ -208,16 +208,20 @@ export async function collectSample(previousCpu: CpuCounters | null, collectedAt
 }
 
 export function bucketSizeFor(rangeMs: number): number {
-  return Math.max(SAMPLE_INTERVAL_MS, Math.ceil(rangeMs / MAX_RENDER_POINTS / 1_000) * 1_000);
+  return Math.max(
+    SAMPLE_INTERVAL_MS,
+    Math.ceil((Math.max(0, rangeMs) + 1) / MAX_RENDER_POINTS / 1_000) * 1_000,
+  );
 }
 
 function throwIfAborted(signal?: AbortSignal): void {
   if (signal?.aborted) throw new DOMException("Machine monitor collection aborted", "AbortError");
 }
 
-export async function collectDirectorySamples(collectedAt = Date.now(), signal?: AbortSignal): Promise<DirectorySample[]> {
+export async function collectDirectorySamples(collectedAt = Date.now(), signal?: AbortSignal): Promise<{ samples: DirectorySample[]; errors: string[] }> {
   const home = os.homedir();
-  const results: DirectorySample[] = [];
+  const samples: DirectorySample[] = [];
+  const errors: string[] = [];
   for (const location of MONITORED_DIRECTORIES) {
     throwIfAborted(signal);
     const paths = location.paths.map((path) => path.startsWith("/") ? path : `${home}/${path}`);
@@ -231,13 +235,13 @@ export async function collectDirectorySamples(collectedAt = Date.now(), signal?:
         const kibibytes = Number(/^\s*(\d+)\s/.exec(line)?.[1]);
         return Number.isFinite(kibibytes) ? total + kibibytes * 1024 : total;
       }, 0);
-      results.push({ collectedAt, location: location.id, bytes });
+      samples.push({ collectedAt, location: location.id, bytes });
     } catch (cause) {
       if (signal?.aborted) throw cause;
-      // Directory diagnostics are best-effort. The core health collector stays independent.
+      errors.push(`Could not measure ${location.label}.`);
     }
   }
-  return results;
+  return { samples, errors };
 }
 
 function rate(current: number, previous: number | undefined, intervalMs: number | null): number | null {
@@ -260,6 +264,18 @@ async function mapWithConcurrency<T, R>(items: readonly T[], limit: number, map:
 }
 
 let cgroupMemoryPath: string | null | undefined;
+let systemPageSizePromise: Promise<number> | null = null;
+
+async function systemPageSize(): Promise<number> {
+  systemPageSizePromise ??= execFileAsync("getconf", ["PAGESIZE"], {
+    timeout: 5_000,
+    maxBuffer: 1_024,
+  }).then(({ stdout }) => {
+    const value = Number(stdout.trim());
+    return Number.isSafeInteger(value) && value > 0 ? value : 4_096;
+  }).catch(() => 4_096);
+  return systemPageSizePromise;
+}
 
 async function readBbCgroupMemory(): Promise<number | null> {
   if (cgroupMemoryPath === undefined) {
@@ -272,7 +288,7 @@ async function readBbCgroupMemory(): Promise<number | null> {
   return Number.isFinite(value) ? value : null;
 }
 
-async function enrichProcessWorkload(process: Omit<MemoryProcess, "workload" | "workloadDetail">, signal?: AbortSignal): Promise<MemoryProcess> {
+async function enrichProcessWorkload(process: Omit<MemoryProcess, "workload" | "workloadDetail">, pageSize: number, signal?: AbortSignal): Promise<MemoryProcess> {
   const [cmdline, cwd, cgroup, currentStat] = await Promise.all([
     readFile(`/proc/${process.pid}/cmdline`, "utf8").catch(() => ""),
     readlink(`/proc/${process.pid}/cwd`).catch(() => null),
@@ -280,7 +296,7 @@ async function enrichProcessWorkload(process: Omit<MemoryProcess, "workload" | "
     readFile(`/proc/${process.pid}/stat`, { encoding: "utf8", signal }).catch(() => ""),
   ]);
   throwIfAborted(signal);
-  const current = parseProcessStat(currentStat, 4_096);
+  const current = parseProcessStat(currentStat, pageSize);
   if (current == null || current.startTime !== process.startTime) {
     return { ...process, workload: `${humanize(process.name)} process`, workloadDetail: "Process changed" };
   }
@@ -299,15 +315,15 @@ export async function collectMemoryDiagnostics(previous: MemoryDiagnosticState |
   // scan entirely until the operator opts into attribution, rather than only
   // hiding the resulting rows at the RPC boundary.
   const includeProcesses = (options.includeProcesses ?? true) && includeProcessDetails;
-  const [pressureSource, vmstatSource, cgroupBytes, entries] = await Promise.all([
+  const [pressureSource, vmstatSource, cgroupBytes, pageSize, entries] = await Promise.all([
     readFile("/proc/pressure/memory", { encoding: "utf8", signal }).catch(() => null),
     readFile("/proc/vmstat", { encoding: "utf8", signal }).catch(() => null),
     readBbCgroupMemory(),
+    systemPageSize(),
     includeProcesses ? readdir("/proc", { withFileTypes: true }).catch(() => []) : Promise.resolve([]),
   ]);
   const pressure = pressureSource == null ? { some: null, full: null } : parseMemoryPressure(pressureSource);
   const system = vmstatSource == null ? null : parseVmstat(vmstatSource);
-  const pageSize = 4_096;
   const pids = entries.filter((entry) => entry.isDirectory() && /^\d+$/.test(entry.name)).sort((left, right) => Number(left.name) - Number(right.name)).slice(0, MAX_PROCESS_SCAN);
   const parsed = await mapWithConcurrency(pids, PROCESS_READ_CONCURRENCY, async (entry) =>
     parseProcessStat(await readFile(`/proc/${entry.name}/stat`, { encoding: "utf8", signal }).catch(() => ""), pageSize), signal);
@@ -331,7 +347,7 @@ export async function collectMemoryDiagnostics(previous: MemoryDiagnosticState |
   const largest = [...ranked].sort((left, right) => right.rssBytes - left.rssBytes).slice(0, 8);
   const faulting = [...ranked].sort((left, right) => (right.majorFaultsPerSecond ?? -1) - (left.majorFaultsPerSecond ?? -1));
   const reported = [...largest, ...faulting].filter((process, index, list) => list.findIndex((entry) => entry.pid === process.pid && entry.startTime === process.startTime) === index).slice(0, MAX_REPORTED_PROCESSES);
-  const enrichedProcesses = !includeProcesses ? includeProcessDetails ? previous?.reportedProcesses ?? [] : [] : !includeProcessDetails ? [] : await Promise.all(reported.map((process) => enrichProcessWorkload(process, signal)));
+  const enrichedProcesses = !includeProcesses ? includeProcessDetails ? previous?.reportedProcesses ?? [] : [] : !includeProcessDetails ? [] : await Promise.all(reported.map((process) => enrichProcessWorkload(process, pageSize, signal)));
   throwIfAborted(signal);
   const priorSystem = previous?.system;
   const diagnostics: MemoryDiagnostics = {

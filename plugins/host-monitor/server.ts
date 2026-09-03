@@ -52,6 +52,8 @@ export default function hostMonitorPlugin(bb: BbPluginApi) {
   let cpu: CpuCounters | null = null;
   let memoryState: MemoryDiagnosticState | null = null;
   let lastError: string | null = null;
+  let directoryError: string | null = null;
+  let memoryError: string | null = null;
   let processDetailsEnabled = false;
   void settings.get().then((configured) => { processDetailsEnabled = configured.showProcessDetails; });
 
@@ -119,6 +121,7 @@ export default function hostMonitorPlugin(bb: BbPluginApi) {
       memoryDiagnostics: memoryDiagnostics == null || showProcessDetails ? memoryDiagnostics : { ...memoryDiagnostics, processes: [] },
       processDetailsEnabled: showProcessDetails,
       lastError,
+      collectorErrors: [directoryError, memoryError].filter((message): message is string => message != null),
     };
   };
 
@@ -154,12 +157,16 @@ export default function hostMonitorPlugin(bb: BbPluginApi) {
       while (!signal.aborted) {
         const startedAt = Date.now();
         try {
-          store.insertDirectories(await collectDirectorySamples(startedAt, signal));
+          const result = await collectDirectorySamples(startedAt, signal);
+          store.insertDirectories(result.samples);
+          directoryError = result.errors.length === 0 ? null : result.errors.join(" ");
           store.prune(startedAt - RETENTION_MS);
           bb.realtime.publish("host-monitor-directories", { collectedAt: startedAt });
         } catch (cause) {
           if (signal.aborted) break;
+          directoryError = "Directory usage diagnostics are unavailable.";
           bb.log.warn(`Could not collect local directory usage: ${cause instanceof Error ? cause.message : String(cause)}`);
+          bb.realtime.publish("host-monitor-directories", { collectedAt: startedAt, error: true });
         }
         await wait(Math.max(0, DIRECTORY_SAMPLE_INTERVAL_MS - (Date.now() - startedAt)), signal);
       }
@@ -177,6 +184,7 @@ export default function hostMonitorPlugin(bb: BbPluginApi) {
           const includeProcesses = startedAt - lastProcessRankingAt >= MEMORY_DIAGNOSTICS_INTERVAL_MS;
           const result = await collectMemoryDiagnostics(memoryState, startedAt, signal, { includeProcesses, includeProcessDetails: processDetailsEnabled });
           memoryState = result.state;
+          memoryError = null;
           if (includeProcesses) lastProcessRankingAt = startedAt;
           store.insertMemoryDiagnostics(result.diagnostics);
           if (startedAt >= nextPruneAt) {
@@ -187,7 +195,9 @@ export default function hostMonitorPlugin(bb: BbPluginApi) {
           bb.realtime.publish("host-monitor-memory", { collectedAt: startedAt });
         } catch (cause) {
           if (signal.aborted) break;
+          memoryError = "Memory pressure diagnostics are unavailable.";
           bb.log.warn(`Could not collect memory-pressure diagnostics: ${cause instanceof Error ? cause.message : String(cause)}`);
+          bb.realtime.publish("host-monitor-memory", { collectedAt: startedAt, error: true });
         }
         const interval = Date.now() < captureUntil ? MEMORY_PRESSURE_INTERVAL_MS : MEMORY_DIAGNOSTICS_INTERVAL_MS;
         await wait(Math.max(1_000, interval - (Date.now() - startedAt)), signal);

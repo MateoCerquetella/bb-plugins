@@ -5,6 +5,7 @@ import * as echarts from "echarts/core";
 import { SVGRenderer } from "echarts/renderers";
 import { definePluginApp, useRealtime, useRpc } from "@get-bb/plugin-sdk/app";
 
+import { expectedSampleInterval, withChartGaps } from "./chart-data.ts";
 import type { HostMonitorSnapshot, rpcContract } from "./rpc-contract.ts";
 import "./app.css";
 
@@ -79,6 +80,7 @@ function HostMonitorPanel() {
 
       {error != null && <p className="host-monitor__error" role="status">{error}</p>}
       {snapshot?.lastError != null && <p className="host-monitor__error" role="status">Collector: {snapshot.lastError}</p>}
+      {snapshot?.collectorErrors.map((message) => <p className="host-monitor__error" role="status" key={message}>{message}</p>)}
 
       <section className="host-monitor__metrics" aria-label="Current machine health">
         <Metric label="CPU (5 min)" value={percent(latest?.cpu5mPercent)} warning={isOver(latest?.cpu5mPercent, snapshot?.thresholds.cpu)} />
@@ -87,7 +89,7 @@ function HostMonitorPanel() {
         <Metric label="Load (5 min)" value={number(latest?.load5)} detail={snapshot == null ? undefined : `up ${uptime(snapshot.uptimeSeconds)}`} warning={false} />
       </section>
 
-      {snapshot != null && <DiagnosticsCharts samples={snapshot.samples} thresholds={snapshot.thresholds} />}
+      {snapshot != null && <DiagnosticsCharts rangeHours={rangeHours} samples={snapshot.samples} thresholds={snapshot.thresholds} />}
       {snapshot != null && <DirectoryUsage directories={snapshot.directories} />}
       {snapshot?.memoryDiagnostics != null && <MemoryPressure diagnostics={snapshot.memoryDiagnostics} processDetailsEnabled={snapshot.processDetailsEnabled} />}
       {snapshot != null && latest == null && <p className="host-monitor__empty">Waiting for the first local sample.</p>}
@@ -109,9 +111,10 @@ const Metric = memo(function Metric({ label, value, detail, warning }: { label: 
   return <article data-warning={warning}><span>{label}</span><strong>{value}</strong>{detail != null && <small>{detail}</small>}</article>;
 });
 
-const DiagnosticsCharts = memo(function DiagnosticsCharts({ samples, thresholds }: { samples: HostMonitorSnapshot["samples"]; thresholds: HostMonitorSnapshot["thresholds"] }) {
-  const usage = useMemo(() => withChartGaps(samples.map((sample) => [sample.collectedAt, sample.cpu5mPercent, percentNumber(sample.memoryUsedBytes, sample.memoryTotalBytes), percentNumber(sample.diskUsedBytes, sample.diskTotalBytes)])), [samples]);
-  const load = useMemo(() => withChartGaps(samples.map((sample) => [sample.collectedAt, sample.load5])), [samples]);
+const DiagnosticsCharts = memo(function DiagnosticsCharts({ rangeHours, samples, thresholds }: { rangeHours: RangeHours; samples: HostMonitorSnapshot["samples"]; thresholds: HostMonitorSnapshot["thresholds"] }) {
+  const interval = expectedSampleInterval(rangeHours);
+  const usage = useMemo(() => withChartGaps(samples.map((sample) => [sample.collectedAt, sample.cpu5mPercent, percentNumber(sample.memoryUsedBytes, sample.memoryTotalBytes), percentNumber(sample.diskUsedBytes, sample.diskTotalBytes)]), interval), [interval, samples]);
+  const load = useMemo(() => withChartGaps(samples.map((sample) => [sample.collectedAt, sample.load5]), interval), [interval, samples]);
   return <section className="host-monitor__charts">
     <Chart title="Utilization" description="Five-minute CPU, memory, and disk utilization over the selected period. Shaded regions were above a configured warning threshold." dimensions={["time", "CPU", "Memory", "Disk"]} rows={usage} sampleCount={samples.length} series={["CPU", "Memory", "Disk"]} thresholds={{ CPU: thresholds.cpu, Memory: thresholds.ram, Disk: thresholds.disk }} />
     <Chart title="Load average" description="Five-minute system load average over the selected period." dimensions={["time", "Load"]} rows={load} sampleCount={samples.length} series={["Load"]} thresholds={{}} />
@@ -249,19 +252,6 @@ function warningWindows(rows: Array<Array<number | null>>, series: string[], thr
   }
   if (startedAt != null && rows.at(-1)?.[0] != null) windows.push([{ xAxis: startedAt }, { xAxis: rows.at(-1)![0]! + 30_000 }]);
   return windows;
-}
-
-function withChartGaps(rows: Array<Array<number | null>>): Array<Array<number | null>> {
-  const deltas = rows.slice(1).map((row, index) => (row[0] ?? 0) - (rows[index]?.[0] ?? 0)).filter((delta) => delta > 0).sort((left, right) => left - right);
-  const median = deltas.length === 0 ? 30_000 : deltas[Math.floor(deltas.length / 2)]!;
-  const maxGap = Math.max(90_000, median * 3);
-  const result: Array<Array<number | null>> = [];
-  for (const row of rows) {
-    const previous = result.at(-1);
-    if (previous != null && row[0] != null && previous[0] != null && row[0] - previous[0] > maxGap) result.push([previous[0] + 1, ...Array(row.length - 1).fill(null)]);
-    result.push(row);
-  }
-  return result;
 }
 
 export default definePluginApp((app) => {

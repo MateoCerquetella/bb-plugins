@@ -1,6 +1,6 @@
 import type Database from "better-sqlite3";
 
-import { bucketSizeFor, type DirectorySample, type MachineSample, type MemoryDiagnostics } from "./monitor.ts";
+import { bucketSizeFor, MAX_RENDER_POINTS, type DirectorySample, type MachineSample, type MemoryDiagnostics } from "./monitor.ts";
 
 export const hostMonitorMigrations = [
   `CREATE TABLE IF NOT EXISTS machine_samples (
@@ -39,7 +39,11 @@ export const hostMonitorMigrations = [
 ];
 
 export class HostMonitorStore {
-  constructor(private readonly db: Database.Database) {}
+  private readonly db: Database.Database;
+
+  constructor(db: Database.Database) {
+    this.db = db;
+  }
 
   insert(sample: MachineSample): void {
     this.db.prepare(`INSERT OR REPLACE INTO machine_samples
@@ -62,13 +66,14 @@ export class HostMonitorStore {
 
   history(since: number, until: number): MachineSample[] {
     const bucketSize = bucketSizeFor(until - since);
-    return this.db.prepare(`SELECT CAST((collected_at / @bucketSize) * @bucketSize AS INTEGER) AS collectedAt,
+    const samples = this.db.prepare(`SELECT CAST((((collected_at - @since) / @bucketSize) * @bucketSize) + @since AS INTEGER) AS collectedAt,
       AVG(cpu_percent) AS cpuPercent, AVG(memory_used_bytes) AS memoryUsedBytes,
       AVG(memory_total_bytes) AS memoryTotalBytes, AVG(disk_used_bytes) AS diskUsedBytes,
       AVG(disk_total_bytes) AS diskTotalBytes, AVG(load1) AS load1, AVG(load5) AS load5
       FROM machine_samples WHERE collected_at BETWEEN @since AND @until
-      GROUP BY (collected_at / @bucketSize) ORDER BY collectedAt ASC`)
+      GROUP BY ((collected_at - @since) / @bucketSize) ORDER BY collectedAt ASC`)
       .all({ since, until, bucketSize }) as MachineSample[];
+    return samples.slice(-MAX_RENDER_POINTS);
   }
 
   insertDirectories(samples: DirectorySample[]): void {
