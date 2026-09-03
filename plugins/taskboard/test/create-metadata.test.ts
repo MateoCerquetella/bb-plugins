@@ -1143,6 +1143,7 @@ test('GitHub loads native metadata and reports partially applied fields', async 
           if (input.method === 'status') {
             return {
               ghOk: true,
+              ghState: 'ready',
               ghError: null,
               repos: [{ repo: 'acme/repo', projectId: 'proj_taskboard' }],
               lastSyncedAt: null

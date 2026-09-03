@@ -52,6 +52,8 @@ const detailOutputSchema = z
 export const githubStatusOutputSchema = z
   .object({
     ghOk: z.boolean(),
+    // Added by the GitHub plugin in bb 0.41; optional so older plugins still parse.
+    ghState: z.enum(["ready", "needs_configuration", "unavailable"]).optional(),
     ghError: z.string().nullable(),
     repos: z.array(
       z.object({ repo: z.string(), projectId: z.string().nullable() }).strict()
