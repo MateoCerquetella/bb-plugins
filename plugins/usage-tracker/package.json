@@ -1,6 +1,6 @@
 {
   "name": "bb-plugin-usage-tracker",
-  "version": "0.1.5",
+  "version": "0.1.7",
   "private": true,
   "description": "Compact Codex and Claude usage limits in bb's sidebar footer.",
   "license": "MIT",
