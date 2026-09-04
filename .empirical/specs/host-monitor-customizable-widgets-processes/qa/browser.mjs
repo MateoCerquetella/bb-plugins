@@ -239,13 +239,20 @@ try {
   await evaluate(`(() => {
     const transfer = window.__hostMonitorGridQaTransfer;
     const target = document.querySelectorAll('.host-monitor__grid-item')[1];
-    target?.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true, dataTransfer: transfer }));
-    target?.dispatchEvent(new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer: transfer }));
+    if (target == null) return;
+    target.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true, clientY: target.getBoundingClientRect().bottom - 1, dataTransfer: transfer }));
+  })()`);
+  await waitFor("document.querySelectorAll('.host-monitor__grid-item')[1]?.dataset.dropPosition === 'after'");
+  await evaluate("document.querySelector('.host-monitor__panel-grid')?.scrollIntoView({ block: 'start' })");
+  await screenshot(dashboardDragPath);
+  await evaluate(`(() => {
+    const transfer = window.__hostMonitorGridQaTransfer;
+    const target = document.querySelectorAll('.host-monitor__grid-item')[1];
+    if (target == null) return;
+    target.dispatchEvent(new DragEvent('drop', { bubbles: true, cancelable: true, clientY: target.getBoundingClientRect().bottom - 1, dataTransfer: transfer }));
     delete window.__hostMonitorGridQaTransfer;
   })()`);
   await waitFor(`document.querySelectorAll('.host-monitor__grid-item')[1]?.dataset.widgetKey === ${JSON.stringify(gridDragKey)}`);
-  await evaluate("document.querySelector('.host-monitor__panel-grid')?.scrollIntoView({ block: 'start' })");
-  await screenshot(dashboardDragPath);
   await evaluate(`document.querySelector('.host-monitor__editor-list [data-widget-key="${gridDragKey}"] button[aria-label*=" earlier"]')?.click()`);
   await waitFor(`document.querySelectorAll('.host-monitor__grid-item')[0]?.dataset.widgetKey === ${JSON.stringify(gridDragKey)}`);
   await evaluate(`(() => {

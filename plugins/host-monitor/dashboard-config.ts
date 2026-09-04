@@ -175,6 +175,29 @@ export function moveDashboardPanel(
   return { version: 2, panels };
 }
 
+export type DashboardDropPosition = "before" | "after";
+
+export function dashboardDropIndex(
+  length: number,
+  from: number,
+  target: number,
+  position: DashboardDropPosition,
+): number {
+  if (
+    !Number.isInteger(length) ||
+    !Number.isInteger(from) ||
+    !Number.isInteger(target) ||
+    length <= 0 ||
+    from < 0 ||
+    target < 0 ||
+    from >= length ||
+    target >= length
+  ) return from;
+  const insertion = position === "after" ? target + 1 : target;
+  const adjusted = insertion > from ? insertion - 1 : insertion;
+  return Math.max(0, Math.min(length - 1, adjusted));
+}
+
 export function changeDashboardPanelVisualization(
   config: ReadonlyDashboardConfig,
   index: number,

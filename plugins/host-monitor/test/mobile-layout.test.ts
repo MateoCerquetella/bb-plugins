@@ -54,10 +54,14 @@ test("widget editor exposes pointer and keyboard-accessible reorder paths", () =
 test("live dashboard widgets are draggable in customization mode", () => {
   assert.match(app, /className="host-monitor__grid-item"/u);
   assert.match(app, /draggable=\{editing\}/u);
-  assert.match(app, /moveDashboardWidget\(source, key\)/u);
+  assert.match(app, /moveDashboardWidget\(source, key, position\)/u);
+  assert.match(app, /dashboardPointerDropPosition/u);
+  assert.match(app, /setDashboardDragPreview/u);
   assert.match(app, /className="host-monitor__widget-drag-handle"/u);
   assert.match(styles, /\.host-monitor__panel-grid\[data-editing="true"\]\s+\.host-monitor__grid-item/u);
   assert.match(styles, /\.host-monitor__grid-item\[data-dragging="true"\]/u);
+  assert.match(styles, /\.host-monitor__grid-item\[data-drop-position="before"\]::after/u);
+  assert.match(styles, /\.host-monitor__grid-item\[data-drop-position="after"\]::after/u);
 });
 
 test("typography and restrained accents use BB theme conventions", () => {

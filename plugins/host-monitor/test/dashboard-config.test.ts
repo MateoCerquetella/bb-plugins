@@ -9,6 +9,7 @@ import {
   addDashboardPanel,
   availableDashboardPanels,
   changeDashboardPanelVisualization,
+  dashboardDropIndex,
   defaultDashboardConfig,
   isCompleteDashboardConfig,
   moveDashboardPanel,
@@ -48,6 +49,15 @@ test("editor operations show, hide, and reorder widgets without mutating input",
 
   const toggled = setDashboardPanelVisibility(moved, 3, false);
   assert.equal(toggled.panels[3]!.visible, false);
+});
+
+test("dashboard drop positions insert before or after the visual target", () => {
+  assert.equal(dashboardDropIndex(4, 0, 1, "after"), 1);
+  assert.equal(dashboardDropIndex(4, 2, 0, "before"), 0);
+  assert.equal(dashboardDropIndex(4, 1, 3, "after"), 3);
+  assert.equal(dashboardDropIndex(4, 3, 1, "before"), 1);
+  assert.equal(dashboardDropIndex(4, 2, 2, "before"), 2);
+  assert.equal(dashboardDropIndex(4, -1, 2, "after"), -1);
 });
 
 test("visualization changes transfer visibility to the catalog-backed sibling", () => {

@@ -177,3 +177,35 @@ The extra step is deliberate friction for a destructive operation.
 ### Verification
 
 Process server tests plus live confirmation-cancel inspection.
+
+## D-007: Use neutral panels with explicit insertion feedback
+
+Status: Accepted
+
+### Evidence
+
+- User feedback rejected metric-tinted card surfaces.
+- Grafana's dashboard guidance keeps panels visually neutral and specifies a
+  solid blue insertion line at the destination while moving a panel.
+
+### Options
+
+1. Keep per-metric colored card borders.
+2. Remove all metric identity and keep the existing opaque drag ghost.
+3. Use neutral BB card surfaces, a short low-intensity metric marker, a compact
+   drag preview, and a primary-colored before/after insertion line.
+
+### Chosen approach
+
+Choose option 3. Preserve BB theme tokens while adopting Grafana's clearer move
+feedback rather than copying Grafana colors or branding.
+
+### Trade-offs and risks
+
+The dashboard is calmer and drop intent is explicit. A small metric marker
+remains for scanning, and HTML drag behavior still depends on the browser.
+
+### Verification
+
+Pure insertion-index tests, focused UI contract tests, and browser evidence of
+dragging-state, insertion-line, drop, save, and reload behavior.

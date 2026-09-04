@@ -39,6 +39,8 @@ import type {
 import {
   DASHBOARD_CATALOG,
   cloneDashboardConfig,
+  dashboardDropIndex,
+  type DashboardDropPosition,
   dashboardPanelKey,
   defaultDashboardConfig,
   moveDashboardPanel,
@@ -473,6 +475,10 @@ function MachineDashboard({
   thresholds: Fleet["thresholds"];
 }) {
   const [draggedWidgetKey, setDraggedWidgetKey] = useState<string | null>(null);
+  const [dashboardDropTarget, setDashboardDropTarget] = useState<{
+    key: string;
+    position: DashboardDropPosition;
+  } | null>(null);
 
   if (machine == null) {
     return (
@@ -485,15 +491,20 @@ function MachineDashboard({
   const renderedConfig = editing && draft != null ? draft : config;
   const panels = renderedConfig == null ? [] : visibleDashboardPanels(renderedConfig);
 
-  const moveDashboardWidget = (fromKey: string, toKey: string) => {
+  const moveDashboardWidget = (
+    fromKey: string,
+    toKey: string,
+    position: DashboardDropPosition,
+  ) => {
     if (!editing || draft == null || fromKey === toKey) return;
     const from = draft.panels.findIndex((panel) => dashboardPanelKey(panel) === fromKey);
     const to = draft.panels.findIndex((panel) => dashboardPanelKey(panel) === toKey);
     if (from < 0 || to < 0) return;
     const moved = draft.panels[from];
     if (moved == null) return;
-    onChangeDraft(moveDashboardPanel(draft, from, to));
-    onAnnouncement(`${DASHBOARD_CATALOG[moved.metric].label} ${presentationLabel(moved)} moved on the dashboard.`);
+    const destination = dashboardDropIndex(draft.panels.length, from, to, position);
+    onChangeDraft(moveDashboardPanel(draft, from, destination));
+    onAnnouncement(`${DASHBOARD_CATALOG[moved.metric].label} ${presentationLabel(moved)} moved to position ${destination + 1} of ${draft.panels.length}.`);
   };
 
   return (
@@ -548,25 +559,37 @@ function MachineDashboard({
                 className="host-monitor__grid-item"
                 data-accent={panel.metric}
                 data-dragging={draggedWidgetKey === key}
+                data-drop-position={dashboardDropTarget?.key === key ? dashboardDropTarget.position : undefined}
                 data-span={widgetSpan(panel)}
                 data-widget-key={key}
                 draggable={editing}
                 key={key}
-                onDragEnd={() => setDraggedWidgetKey(null)}
+                onDragEnd={() => {
+                  setDraggedWidgetKey(null);
+                  setDashboardDropTarget(null);
+                }}
                 onDragOver={(event) => {
-                  if (editing && draggedWidgetKey != null) event.preventDefault();
+                  if (!editing || draggedWidgetKey == null || draggedWidgetKey === key) return;
+                  event.preventDefault();
+                  const position = dashboardPointerDropPosition(event.currentTarget, event.clientY);
+                  setDashboardDropTarget((current) =>
+                    current?.key === key && current.position === position ? current : { key, position });
                 }}
                 onDragStart={(event) => {
                   if (!editing) return;
                   setDraggedWidgetKey(key);
                   event.dataTransfer.effectAllowed = "move";
                   event.dataTransfer.setData("text/plain", key);
+                  setDashboardDropTarget(null);
+                  setDashboardDragPreview(event.dataTransfer, DASHBOARD_CATALOG[panel.metric].label, presentationLabel(panel));
                 }}
                 onDrop={(event) => {
                   event.preventDefault();
                   const source = draggedWidgetKey ?? event.dataTransfer.getData("text/plain");
-                  if (source !== "") moveDashboardWidget(source, key);
+                  const position = dashboardPointerDropPosition(event.currentTarget, event.clientY);
+                  if (source !== "") moveDashboardWidget(source, key, position);
                   setDraggedWidgetKey(null);
+                  setDashboardDropTarget(null);
                 }}
               >
                 {editing && (
@@ -592,6 +615,24 @@ function widgetSpan(panel: DashboardPanel): "single" | "wide" | "full" {
   if (panel.metric === "processes") return "full";
   if (panel.metric === "system" || panel.visualization === "timeseries") return "wide";
   return "single";
+}
+
+function dashboardPointerDropPosition(target: HTMLElement, clientY: number): DashboardDropPosition {
+  const bounds = target.getBoundingClientRect();
+  return clientY >= bounds.top + bounds.height / 2 ? "after" : "before";
+}
+
+function setDashboardDragPreview(
+  transfer: DataTransfer,
+  label: string,
+  presentation: string,
+): void {
+  const preview = document.createElement("div");
+  preview.className = "host-monitor__drag-preview";
+  preview.textContent = `${label} · ${presentation}`;
+  document.body.append(preview);
+  transfer.setDragImage(preview, 18, 16);
+  requestAnimationFrame(() => preview.remove());
 }
 
 function MetricPanel({
