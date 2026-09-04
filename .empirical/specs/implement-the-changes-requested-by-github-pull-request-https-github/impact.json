@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "usage-tracker"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:805b4facdc948d7a2b90b3b2e96308afbe1a051a1a7f77fd7dfead8b756af686"
+}
