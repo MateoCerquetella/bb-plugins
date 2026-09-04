@@ -1,6 +1,6 @@
 {
   "name": "bb-plugin-host-monitor",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": true,
   "description": "Grafana-inspired CPU, memory, disk, network, load, and history dashboards for every machine enrolled in BB.",
   "license": "MIT",
