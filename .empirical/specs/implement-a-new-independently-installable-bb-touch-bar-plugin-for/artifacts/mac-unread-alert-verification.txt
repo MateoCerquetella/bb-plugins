@@ -24,6 +24,15 @@ Unread transition exercise:
 - The user physically tapped the two-unread alert successfully.
 - Final tap behavior only dismisses the notification; it does not open BB or
   navigate to a thread.
+
+Application icon verification:
+- final package version: 0.1.0-icon.1
+- package SHA-256: dd847ef22cfd469560a214e60b92f813b4ec3205349c5f8bd71cf2337f6d86f0
+- The Mac build generated Contents/Resources/BBTouchBar.icns from the committed
+  1024px branded source image.
+- Info.plist declares CFBundleIconFile as BBTouchBar.
+- Homebrew installed the icon build, quarantine was removed from that exact
+  app bundle, and /Applications/BB Touch Bar.app remains running.
 - The fixture was then removed.
 - The bb-path configuration was restored to /usr/local/bin/bb.
 - The installed app was restarted against the real BB server and remains running.

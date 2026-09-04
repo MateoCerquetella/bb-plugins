@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-bde352271ec758e4653e79db",
+  "criteria": [
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "evidenceKinds": [
+    "screenshot",
+    "test"
+  ],
+  "summary": "Branded 1024px app icon inspected, converted to a complete macOS ICNS set, compiled and signed on the Intel Mac, installed through Homebrew icon.1, and verified through Info.plist plus the nonempty bundle resource.",
+  "passed": true,
+  "startedAt": "2026-09-04T16:44:44.842Z",
+  "completedAt": "2026-09-04T16:44:44.842Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "implement-a-new-independently-installable-bb-touch-bar-plugin-for",
+    "specRevision": 2,
+    "specDigest": "sha256:2cb81eb836af98d280d0660ae933e1f9672f2d1932631e43bef9d4f04b55ef08",
+    "treeDigest": "sha256:50b8e4b00a188caaf0c7429119da49ba07d3048356c8e9d5cbc0f341cbe51372",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf"
+  },
+  "digest": "sha256:bb5e71549a22fa19d91a8ab06792b45c24c8a5469e3e4bd595d1e6de298299bf",
+  "kind": "collected",
+  "collector": "codex-mac-app-icon-verification",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/implement-a-new-independently-installable-bb-touch-bar-plugin-for/artifacts/mac-unread-alert-verification.txt",
+      "mediaType": "text/plain",
+      "bytes": 2500,
+      "digest": "sha256:5826ea4f316224fbd9613173d79f01655ede1fb3893db49ba3642c545da8a74d"
+    },
+    {
+      "path": "plugins/touchbar/native/Assets/app-icon-1024.png",
+      "mediaType": "image/png",
+      "bytes": 147879,
+      "digest": "sha256:9b00468d9fdc95351e892dbea97a2b93e0336dbbcf30dac7f484752abbac94ed"
+    }
+  ]
+}

@@ -25,6 +25,32 @@ mkdir -p "$MACOS_DIR" "$RESOURCES"
 cp "$ROOT"/Assets/*.svg "$RESOURCES"/
 cp "$ROOT"/Assets/*.png "$RESOURCES"/
 
+ICON_SOURCE="$ROOT/Assets/app-icon-1024.png"
+ICONSET="$BUILD/BBTouchBar.iconset"
+[ -f "$ICON_SOURCE" ] || {
+  printf 'error: missing app icon source %s\n' "$ICON_SOURCE" >&2
+  exit 1
+}
+rm -rf "$ICONSET"
+mkdir -p "$ICONSET"
+for spec in \
+  "16 icon_16x16.png" \
+  "32 icon_16x16@2x.png" \
+  "32 icon_32x32.png" \
+  "64 icon_32x32@2x.png" \
+  "128 icon_128x128.png" \
+  "256 icon_128x128@2x.png" \
+  "256 icon_256x256.png" \
+  "512 icon_256x256@2x.png" \
+  "512 icon_512x512.png" \
+  "1024 icon_512x512@2x.png"; do
+  read -r pixels filename <<< "$spec"
+  sips -z "$pixels" "$pixels" "$ICON_SOURCE" \
+    --out "$ICONSET/$filename" >/dev/null
+done
+iconutil -c icns "$ICONSET" -o "$RESOURCES/BBTouchBar.icns"
+rm -rf "$ICONSET"
+
 compile() {
   local arch="$1" output="$2"
   xcrun swiftc -O -warnings-as-errors \
@@ -66,6 +92,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleIdentifier</key><string>app.getbb.touchbar.native</string>
   <key>CFBundleName</key><string>BBTouchBar</string>
   <key>CFBundleDisplayName</key><string>BB Touch Bar</string>
+  <key>CFBundleIconFile</key><string>BBTouchBar</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>$VERSION</string>
   <key>CFBundleVersion</key><string>$BUILD_NUMBER</string>

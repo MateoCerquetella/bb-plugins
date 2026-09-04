@@ -361,6 +361,10 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(build, /DFRFoundation/u);
   assert.match(build, /codesign --force --sign -/u);
   assert.match(build, /BB_TOUCHBAR_SIGN_IDENTITY/u);
+  assert.match(build, /app-icon-1024\.png/u);
+  assert.match(build, /iconutil -c icns/u);
+  assert.match(build, /CFBundleIconFile/u);
+  assert.doesNotThrow(() => readFileSync(join(native, "Assets/app-icon-1024.png")));
   assert.match(packager, /BBTouchBar-\$VERSION-universal\.zip/u);
   assert.match(packager, /notarytool submit/u);
   assert.match(packager, /stapler staple/u);

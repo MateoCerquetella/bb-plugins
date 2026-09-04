@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="background" x1="144" y1="96" x2="880" y2="928" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#9f67ff"/>
+      <stop offset="0.48" stop-color="#6d28d9"/>
+      <stop offset="1" stop-color="#35106f"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="226" y1="346" x2="808" y2="690" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.07"/>
+    </linearGradient>
+  </defs>
+  <rect x="64" y="64" width="896" height="896" rx="218" fill="url(#background)"/>
+  <path d="M196 200C302 104 496 82 672 132c102 29 185 83 242 151" fill="none" stroke="#ffffff" stroke-opacity="0.14" stroke-width="30" stroke-linecap="round"/>
+  <rect x="168" y="326" width="688" height="372" rx="96" fill="url(#glass)" stroke="#ffffff" stroke-width="42"/>
+  <circle cx="326" cy="512" r="66" fill="#ffffff"/>
+  <circle cx="326" cy="512" r="38" fill="#ff8a00"/>
+  <rect x="454" y="420" width="252" height="44" rx="22" fill="#ffffff"/>
+  <rect x="454" y="494" width="188" height="44" rx="22" fill="#ffffff" fill-opacity="0.88"/>
+  <rect x="454" y="568" width="118" height="44" rx="22" fill="#ffffff" fill-opacity="0.62"/>
+</svg>

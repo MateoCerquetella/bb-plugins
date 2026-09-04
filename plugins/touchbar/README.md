@@ -110,11 +110,12 @@ The installer:
 
 1. builds `BBTouchBar.app` from the committed Swift source;
 2. emits Intel and Apple-silicon slices when the local toolchain supports them;
-3. links the private Touch Bar framework and ad-hoc signs the real app bundle;
-4. installs it at `~/Applications/BBTouchBar.app`;
-5. pins the current `bb` executable path in owner-only configuration;
-6. installs a user LaunchAgent for login startup;
-7. launches the app and waits for its readiness file.
+3. packages the branded BB Touch Bar Finder/Application icon;
+4. links the private Touch Bar framework and ad-hoc signs the real app bundle;
+5. installs it at `~/Applications/BBTouchBar.app`;
+6. pins the current `bb` executable path in owner-only configuration;
+7. installs a user LaunchAgent for login startup;
+8. launches the app and waits for its readiness file.
 
 The app has no Dock icon. Its BB badge appears in the Touch Bar's Control Strip.
 Install and enable the repository's `host-monitor` plugin to populate the host
