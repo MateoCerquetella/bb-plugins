@@ -24,6 +24,7 @@ const modalPath = join(outputDir, "mini-modal-desktop.png");
 const processPath = join(outputDir, "process-widget-wide.png");
 const processDialogPath = join(outputDir, "process-confirmation.png");
 const processCollapsedPath = join(outputDir, "process-collapsed.png");
+const processNarrowPath = join(outputDir, "process-narrow.png");
 const comboPath = join(outputDir, "history-combobox.png");
 const dashboardDragPath = join(outputDir, "dashboard-drag.png");
 
@@ -224,6 +225,7 @@ try {
     await waitFor(`document.querySelector('.host-monitor__dialog') !== null || (((Array.from(document.querySelectorAll('.host-monitor__process-widget .host-monitor__widget-status')).at(-1)?.textContent ?? '') !== ${JSON.stringify(processStatusBefore)}) && !(Array.from(document.querySelectorAll('.host-monitor__process-widget .host-monitor__widget-status')).at(-1)?.textContent ?? '').includes('Rechecking'))`, 20000);
     const processActionState = await evaluate(`({ dialog: document.querySelector('.host-monitor__dialog') !== null, status: Array.from(document.querySelectorAll('.host-monitor__process-widget .host-monitor__widget-status')).at(-1)?.textContent ?? null })`);
     if (!processActionState.dialog) throw new Error(`Process preflight did not open confirmation: ${JSON.stringify(processActionState)}`);
+    await waitFor("document.activeElement?.textContent?.trim() === 'Cancel'");
     const dialogSummary = await evaluate(`({
       title: document.querySelector('.host-monitor__dialog h2')?.textContent ?? null,
       cancel: Array.from(document.querySelectorAll('.host-monitor__dialog button')).some((button) => button.textContent?.trim() === 'Cancel'),
@@ -341,6 +343,25 @@ try {
   if (narrowCombo == null || narrowCombo.left < 0 || narrowCombo.right > narrowCombo.viewportWidth || narrowCombo.top < 0 || narrowCombo.bottom > narrowCombo.viewportHeight) throw new Error(`History popup escaped narrow viewport: ${JSON.stringify(narrowCombo)}`);
   await pressKey("Escape");
   await waitFor("document.querySelector('.bb-select__content') === null && document.activeElement === document.querySelector('.bb-select__trigger')");
+  await waitFor("document.querySelector('.host-monitor__process-list > li') !== null", 20000);
+  await evaluate("document.querySelector('.host-monitor__process-widget')?.scrollIntoView({ block: 'start' })");
+  const narrowProcesses = await evaluate(`(() => {
+    const summary = document.querySelector('.host-monitor__process-summary');
+    const summaryRect = summary?.getBoundingClientRect();
+    const itemRects = Array.from(summary?.children ?? []).map((item) => item.getBoundingClientRect());
+    const row = document.querySelector('.host-monitor__process-list > li');
+    const rowStyle = row == null ? null : getComputedStyle(row);
+    return {
+      summaryContained: summaryRect != null && itemRects.every((rect) => rect.left >= summaryRect.left && rect.right <= summaryRect.right),
+      rowBorderRadius: rowStyle?.borderRadius ?? null,
+      rowBackground: rowStyle?.backgroundColor ?? null,
+      rowTopBorder: rowStyle?.borderTopWidth ?? null,
+      overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth
+    };
+  })()`);
+  if (!narrowProcesses.summaryContained || narrowProcesses.rowBorderRadius !== '0px' || narrowProcesses.rowBackground !== 'rgba(0, 0, 0, 0)' || narrowProcesses.rowTopBorder !== '0px' || narrowProcesses.overflow) throw new Error(`Invalid flat narrow Processes layout: ${JSON.stringify(narrowProcesses)}`);
+  await screenshot(processNarrowPath);
+  await evaluate("document.querySelector('.host-monitor__machine-heading')?.scrollIntoView({ block: 'start' })");
   await evaluate(`Array.from(document.querySelectorAll('button')).find((button) => button.textContent?.trim() === 'Customize')?.click()`);
   await waitFor("document.querySelector('.host-monitor__editor') !== null");
   await waitFor("document.querySelector('.host-monitor__process-list') !== null");
@@ -358,7 +379,7 @@ try {
   if (narrow.overflow || narrow.rows < 10 || narrow.hostStripOverflow !== 'auto' || narrow.processTableDisplay !== 'none' || narrow.processListDisplay !== 'grid' || narrow.rangeRight > narrow.viewport[0] || narrow.rangeWidth < 96) throw new Error(`Invalid narrow layout: ${JSON.stringify(narrow)}`);
   await screenshot(narrowPath);
 
-  console.log(JSON.stringify({ modal: modalSummary, navigation: navigationState, combobox: { ...comboboxSummary, options: comboOptions, keyboardFocusRestored: true, narrowBounds: narrowCombo }, initial, widgets: { original: originalWidgets.length, persisted: persistedWidgets.length, changedKey, gridDragKey }, processes: { ...processSummary, collapsed: { ...collapsedProcesses, pollingPaused: collapsedRefreshCount === processRefreshCount } }, switchedTo: targetName, narrow, artifacts: [sidebarPath, modalPath, monitorPath, comboPath, dashboardDragPath, processPath, processCollapsedPath, processDialogPath, desktopPath, narrowPath] }));
+  console.log(JSON.stringify({ modal: modalSummary, navigation: navigationState, combobox: { ...comboboxSummary, options: comboOptions, keyboardFocusRestored: true, narrowBounds: narrowCombo }, initial, widgets: { original: originalWidgets.length, persisted: persistedWidgets.length, changedKey, gridDragKey }, processes: { ...processSummary, collapsed: { ...collapsedProcesses, pollingPaused: collapsedRefreshCount === processRefreshCount }, narrow: narrowProcesses }, switchedTo: targetName, narrow, artifacts: [sidebarPath, modalPath, monitorPath, comboPath, dashboardDragPath, processPath, processCollapsedPath, processNarrowPath, processDialogPath, desktopPath, narrowPath] }));
   socket.close();
 } finally {
   browser.kill("SIGTERM");

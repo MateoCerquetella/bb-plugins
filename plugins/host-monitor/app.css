@@ -1778,9 +1778,30 @@
   }
 
   .host-monitor__process-summary {
-    align-items: flex-start;
+    align-items: stretch;
     flex-direction: column;
     gap: 4px;
+  }
+
+  .host-monitor__process-widget {
+    scroll-margin-top: 300px;
+  }
+
+  .host-monitor__process-summary > div,
+  .host-monitor__process-summary dd {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .host-monitor__process-summary dt {
+    flex: 0 0 94px;
+    white-space: nowrap;
+  }
+
+  .host-monitor__process-summary dd {
+    width: auto;
+    min-width: 0;
+    flex: 1;
   }
 
   .host-monitor__process-toolbar fieldset {
@@ -1805,10 +1826,11 @@
   .host-monitor__process-list > li {
     display: grid;
     gap: 7px;
-    padding: 8px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: var(--card);
+    padding: 8px 0;
+    border: 0;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+    background: transparent;
   }
 
   .host-monitor__process-list > li dl {

@@ -97,15 +97,17 @@ test("process section toggles compactly and pauses polling while collapsed", () 
   assert.match(app, /if \(!expanded \|\| machine\.host\.status !== "connected"\) return/u);
   assert.match(app, /!expanded \? \([\s\S]*?<ProcessSummaryStrip/u);
   assert.match(app, /processPanelState/u);
-  assert.match(app, /Top CPU shown/u);
-  assert.match(app, /Top RAM shown/u);
-  assert.match(app, /Protected shown/u);
+  assert.match(app, /Top CPU/u);
+  assert.match(app, /Top RAM/u);
+  assert.match(app, /Top usage and protected counts are based on the/u);
   assert.match(app, /data-refresh-count=\{refreshCount\}/u);
   assert.match(app, /const processFooterMessage = !expanded/u);
   assert.match(styles, /\.host-monitor__process-summary\s*\{[^}]*display:\s*flex/su);
   assert.match(styles, /\.host-monitor__process-summary\s*>\s*div\s*\{[^}]*background:\s*transparent/su);
   assert.match(styles, /\.host-monitor__process-table-wrap\s*\{[^}]*border:\s*0/su);
   assert.match(styles, /\.host-monitor__process-state\[data-state="success"\]/u);
+  assert.match(styles, /@container\s*\(max-width:\s*560px\)[\s\S]*\.host-monitor__process-list\s*>\s*li\s*\{[^}]*border-radius:\s*0[^}]*background:\s*transparent/su);
+  assert.match(styles, /@container\s*\(max-width:\s*560px\)[\s\S]*\.host-monitor__process-summary\s*>\s*div,[\s\S]*max-width:\s*100%/su);
   assert.match(styles, /\.host-monitor__process-protection/u);
 });
 

@@ -1245,9 +1245,9 @@ function ProcessSummaryStrip({
     <dl className="host-monitor__process-summary">
       <Fact label="Processes" value={totalCount == null ? "—" : String(totalCount)} />
       <Fact label="Shown" value={String(shownCount)} />
-      <Fact label="Top CPU shown" value={topCpu == null ? "—" : `${topCpu.name} · ${percent(topCpu.cpuPercent)}`} />
-      <Fact label="Top RAM shown" value={topMemory == null ? "—" : `${topMemory.name} · ${percent(topMemory.memoryPercent)}`} />
-      <Fact label="Protected shown" value={String(protectedCount)} />
+      <Fact label="Top CPU" value={topCpu == null ? "—" : `${topCpu.name} · ${percent(topCpu.cpuPercent)}`} />
+      <Fact label="Top RAM" value={topMemory == null ? "—" : `${topMemory.name} · ${percent(topMemory.memoryPercent)}`} />
+      <Fact label="Protected" value={String(protectedCount)} />
     </dl>
   );
 }
