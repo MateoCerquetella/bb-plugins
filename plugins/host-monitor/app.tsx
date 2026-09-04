@@ -6,7 +6,17 @@ import { SVGRenderer } from "echarts/renderers";
 import { definePluginApp, useRealtime, useRpc } from "@get-bb/plugin-sdk/app";
 
 import { expectedSampleInterval, withChartGaps } from "./chart-data.ts";
-import type { Fleet, HistoryPoint, MachineHistory, MachineRow, RangeHours, rpcContract } from "./contract.ts";
+import type { DashboardConfig, DashboardPanel, Fleet, HistoryPoint, MachineHistory, MachineRow, RangeHours, rpcContract } from "./contract.ts";
+import {
+  DASHBOARD_CATALOG,
+  addDashboardPanel,
+  availableDashboardPanels,
+  changeDashboardPanelVisualization,
+  cloneDashboardConfig,
+  dashboardPanelKey,
+  moveDashboardPanel,
+  removeDashboardPanel,
+} from "./dashboard-config.ts";
 import "./app.css";
 
 echarts.use([
@@ -33,6 +43,15 @@ type ChartTheme = {
   warning: string;
 };
 
+type MetricChart = {
+  dimensions: string[];
+  rows: Array<Array<number | null>>;
+  series: string[];
+  thresholds: Record<string, number>;
+  percentChart: boolean;
+  valueFormatter?: (value: number | null | undefined) => string;
+};
+
 function FleetDashboard() {
   const rpc = useRpc<typeof rpcContract>();
   const [fleet, setFleet] = useState<Fleet | null>(null);
@@ -43,7 +62,16 @@ function FleetDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [dashboardConfig, setDashboardConfig] = useState<DashboardConfig | null>(null);
+  const [dashboardDraft, setDashboardDraft] = useState<DashboardConfig | null>(null);
+  const [dashboardLoading, setDashboardLoading] = useState(false);
+  const [dashboardError, setDashboardError] = useState<string | null>(null);
+  const [editingDashboard, setEditingDashboard] = useState(false);
+  const [savingDashboard, setSavingDashboard] = useState(false);
   const historyRequest = useRef(0);
+  const dashboardRequest = useRef(0);
+  const selectedHost = useRef<string | null>(null);
+  selectedHost.current = selectedHostId;
 
   const loadFleet = useCallback(async () => {
     try {
@@ -87,8 +115,43 @@ function FleetDashboard() {
     }
   }, [rangeHours, rpc, selectedHostId]);
 
+  const loadDashboardConfig = useCallback(async () => {
+    if (selectedHostId == null) {
+      setDashboardConfig(null);
+      setDashboardDraft(null);
+      setDashboardLoading(false);
+      return;
+    }
+    const request = ++dashboardRequest.current;
+    setDashboardLoading(true);
+    try {
+      const next = await rpc.call("dashboardConfig", { hostId: selectedHostId });
+      if (dashboardRequest.current === request) {
+        setDashboardConfig(next);
+        setDashboardDraft(cloneDashboardConfig(next));
+        setDashboardError(null);
+      }
+    } catch (cause) {
+      if (dashboardRequest.current === request) {
+        setDashboardConfig(null);
+        setDashboardDraft(null);
+        setDashboardError(cause instanceof Error ? cause.message : "Could not load this dashboard configuration.");
+      }
+    } finally {
+      if (dashboardRequest.current === request) setDashboardLoading(false);
+    }
+  }, [rpc, selectedHostId]);
+
   useEffect(() => { void loadFleet(); }, [loadFleet]);
   useEffect(() => { void loadHistory(); }, [loadHistory]);
+  useEffect(() => {
+    setEditingDashboard(false);
+    setSavingDashboard(false);
+    setDashboardError(null);
+    setDashboardConfig(null);
+    setDashboardDraft(null);
+    void loadDashboardConfig();
+  }, [loadDashboardConfig]);
   useRealtime(REALTIME_CHANNEL, useCallback(() => {
     void loadFleet();
     void loadHistory();
@@ -120,6 +183,24 @@ function FleetDashboard() {
 
   const selected = fleet?.machines.find((machine) => machine.host.id === selectedHostId) ?? null;
   const points = history?.hostId === selectedHostId && history.rangeHours === rangeHours ? history.points : [];
+
+  const saveDashboard = useCallback(async () => {
+    if (selectedHostId == null || dashboardDraft == null || savingDashboard) return;
+    const hostId = selectedHostId;
+    setSavingDashboard(true);
+    setDashboardError(null);
+    try {
+      const saved = await rpc.call("saveDashboardConfig", { hostId, config: dashboardDraft });
+      if (selectedHost.current !== hostId) return;
+      setDashboardConfig(saved);
+      setDashboardDraft(cloneDashboardConfig(saved));
+      setEditingDashboard(false);
+    } catch (cause) {
+      setDashboardError(cause instanceof Error ? cause.message : "Could not save this dashboard configuration.");
+    } finally {
+      setSavingDashboard(false);
+    }
+  }, [dashboardDraft, rpc, savingDashboard, selectedHostId]);
 
   return (
     <main className="host-monitor">
@@ -169,7 +250,31 @@ function FleetDashboard() {
         )}
       </section>
 
-      <MachineDashboard historyLoading={historyLoading} machine={selected} points={points} rangeHours={rangeHours} thresholds={fleet?.thresholds ?? { cpu: 90, ram: 90, disk: 90 }} />
+      <MachineDashboard
+        config={dashboardConfig}
+        configError={dashboardError}
+        configLoading={dashboardLoading}
+        draft={dashboardDraft}
+        editing={editingDashboard}
+        historyLoading={historyLoading}
+        machine={selected}
+        onCancelEdit={() => {
+          setDashboardDraft(dashboardConfig == null ? null : cloneDashboardConfig(dashboardConfig));
+          setDashboardError(null);
+          setEditingDashboard(false);
+        }}
+        onChangeDraft={setDashboardDraft}
+        onEdit={() => {
+          if (dashboardConfig != null) setDashboardDraft(cloneDashboardConfig(dashboardConfig));
+          setDashboardError(null);
+          setEditingDashboard(true);
+        }}
+        onSave={() => void saveDashboard()}
+        points={points}
+        rangeHours={rangeHours}
+        saving={savingDashboard}
+        thresholds={fleet?.thresholds ?? { cpu: 90, ram: 90, disk: 90 }}
+      />
     </main>
   );
 }
@@ -220,40 +325,42 @@ function CardValue({ label, value, warning }: { label: string; value: string; wa
 }
 
 function MachineDashboard({
+  config,
+  configError,
+  configLoading,
+  draft,
+  editing,
   historyLoading,
   machine,
+  onCancelEdit,
+  onChangeDraft,
+  onEdit,
+  onSave,
   points,
   rangeHours,
+  saving,
   thresholds,
 }: {
+  config: DashboardConfig | null;
+  configError: string | null;
+  configLoading: boolean;
+  draft: DashboardConfig | null;
+  editing: boolean;
   historyLoading: boolean;
   machine: MachineRow | null;
+  onCancelEdit(): void;
+  onChangeDraft(config: DashboardConfig): void;
+  onEdit(): void;
+  onSave(): void;
   points: HistoryPoint[];
   rangeHours: RangeHours;
+  saving: boolean;
   thresholds: Fleet["thresholds"];
 }) {
   if (machine == null) {
     return <section className="host-monitor__dashboard host-monitor__dashboard--empty"><p>Select a machine to inspect its dashboard.</p></section>;
   }
   const snapshot = machine.snapshot;
-  const interval = expectedSampleInterval(rangeHours);
-  const usageRows = withChartGaps(points.map((point) => [
-    point.collectedAtMs,
-    point.cpuPercent,
-    point.memoryPercent,
-    point.diskPercent,
-  ]), interval);
-  const loadRows = withChartGaps(points.map((point) => [
-    point.collectedAtMs,
-    point.load1,
-    point.load5,
-    point.load15,
-  ]), interval);
-  const networkRows = withChartGaps(points.map((point) => [
-    point.collectedAtMs,
-    point.receiveBytesPerSecond,
-    point.sendBytesPerSecond,
-  ]), interval);
 
   return (
     <section className="host-monitor__dashboard" aria-labelledby="machine-heading">
@@ -262,41 +369,158 @@ function MachineDashboard({
           <span className="host-monitor__state-dot" data-state={machine.sampleState} aria-hidden="true" />
           <div><h2 id="machine-heading">{machine.host.name}</h2><p>{snapshot == null ? machine.host.id : `${snapshot.system.osName} · ${snapshot.system.arch}`}</p></div>
         </div>
-        <span>{sampleStateLabel(machine)}{machine.receivedAtMs == null ? "" : ` · received ${relativeTime(machine.receivedAtMs)}`}{historyLoading ? " · loading history…" : ""}</span>
+        <div className="host-monitor__machine-actions">
+          <span>{sampleStateLabel(machine)}{machine.receivedAtMs == null ? "" : ` · received ${relativeTime(machine.receivedAtMs)}`}{historyLoading ? " · loading history…" : ""}</span>
+          {!editing && <button className="host-monitor__button host-monitor__button--outline" disabled={configLoading || config == null} onClick={onEdit} type="button">Edit dashboard</button>}
+        </div>
       </header>
 
       {machine.error != null && <p className="host-monitor__inline-status" role="status">{machine.error}</p>}
       {snapshot?.issues.map((issue) => <p className="host-monitor__inline-status host-monitor__inline-status--quiet" role="status" key={`${issue.metric}:${issue.message}`}>{issue.metric}: {issue.message}</p>)}
+      {configError != null && <p className="host-monitor__inline-status" role="status">{configError}</p>}
 
-      <div className="host-monitor__stat-grid">
-        <StatPanel label="CPU" value={percent(snapshot?.cpu.usagePercent)} detail={snapshot == null ? "Unavailable" : `${snapshot.cpu.logicalCores} logical cores`} warning={isOver(snapshot?.cpu.usagePercent, thresholds.cpu)} />
-        <StatPanel label="RAM" value={percent(snapshot?.memory.usagePercent)} detail={snapshot == null ? "Unavailable" : `${bytes(snapshot.memory.usedBytes)} / ${bytes(snapshot.memory.totalBytes)}`} warning={isOver(snapshot?.memory.usagePercent, thresholds.ram)} />
-        <StatPanel label="Root disk" value={percent(snapshot?.disk?.usagePercent)} detail={snapshot?.disk == null ? "Unavailable" : `${bytes(snapshot.disk.availableBytes)} free`} warning={isOver(snapshot?.disk?.usagePercent, thresholds.disk)} />
-        <StatPanel label="Load (5m)" value={number(snapshot?.cpu.loadAverage?.[1])} detail={snapshot == null ? "Unavailable" : `up ${uptime(snapshot.system.uptimeSeconds)}`} warning={false} />
-      </div>
+      {editing && draft != null && (
+        <DashboardEditor config={draft} onCancel={onCancelEdit} onChange={onChangeDraft} onSave={onSave} saving={saving} />
+      )}
 
-      <div className="host-monitor__chart-grid">
-        <Chart
-          description="CPU, RAM, and root disk utilization history"
-          dimensions={["time", "CPU", "RAM", "Disk"]}
-          percentChart
-          rows={usageRows}
-          series={["CPU", "RAM", "Disk"]}
-          thresholds={{ CPU: thresholds.cpu, RAM: thresholds.ram, Disk: thresholds.disk }}
-          title="Utilization"
-        />
-        <Chart description="One, five, and fifteen minute load history" dimensions={["time", "1m", "5m", "15m"]} rows={loadRows} series={["1m", "5m", "15m"]} thresholds={{}} title="Load average" />
-        <Chart description="Aggregate receive and send throughput history" dimensions={["time", "Receive", "Send"]} rows={networkRows} series={["Receive", "Send"]} thresholds={{}} title="Network throughput" valueFormatter={rate} />
-      </div>
+      {configLoading && config == null ? (
+        <p className="host-monitor__empty" role="status">Loading dashboard configuration…</p>
+      ) : config == null ? null : (
+        <div className="host-monitor__panel-grid">
+          {config.panels.map((panel) => (
+            <MetricPanel
+              key={`${panel.metric}:${panel.visualization}`}
+              machine={machine}
+              panel={panel}
+              points={points}
+              rangeHours={rangeHours}
+              thresholds={thresholds}
+            />
+          ))}
+        </div>
+      )}
 
       <dl className="host-monitor__facts">
         <Fact label="Processor" value={snapshot?.cpu.model || "Unavailable"} />
         <Fact label="Platform" value={snapshot == null ? "Unavailable" : `${snapshot.system.platform} · ${snapshot.system.arch}`} />
         <Fact label="Kernel" value={snapshot?.system.kernelRelease ?? "Unavailable"} />
-        <Fact label="Uptime" value={snapshot == null ? "Unavailable" : uptime(snapshot.system.uptimeSeconds)} />
-        <Fact label="Download" value={rate(snapshot?.network.receiveBytesPerSecond)} />
-        <Fact label="Upload" value={rate(snapshot?.network.sendBytesPerSecond)} />
       </dl>
+    </section>
+  );
+}
+
+function MetricPanel({
+  machine,
+  panel,
+  points,
+  rangeHours,
+  thresholds,
+}: {
+  machine: MachineRow;
+  panel: DashboardPanel;
+  points: HistoryPoint[];
+  rangeHours: RangeHours;
+  thresholds: Fleet["thresholds"];
+}) {
+  const snapshot = machine.snapshot;
+  const definition = DASHBOARD_CATALOG[panel.metric];
+  if (panel.visualization === "stat") {
+    const reading = metricStat(machine, panel.metric, thresholds);
+    return <StatPanel detail={reading.detail} label={definition.label} value={reading.value} warning={reading.warning} />;
+  }
+
+  const interval = expectedSampleInterval(rangeHours);
+  const chart = metricChart(panel.metric, points, thresholds);
+  return (
+    <Chart
+      description={`${definition.description} history for ${machine.host.name}`}
+      dimensions={chart.dimensions}
+      percentChart={chart.percentChart}
+      rows={withChartGaps(chart.rows, interval)}
+      series={chart.series}
+      thresholds={chart.thresholds}
+      title={definition.label}
+      valueFormatter={chart.valueFormatter}
+    />
+  );
+}
+
+function metricStat(machine: MachineRow, metric: DashboardPanel["metric"], thresholds: Fleet["thresholds"]) {
+  const snapshot = machine.snapshot;
+  if (metric === "cpu") return { value: percent(snapshot?.cpu.usagePercent), detail: snapshot == null ? "Unavailable" : `${snapshot.cpu.logicalCores} logical cores`, warning: isOver(snapshot?.cpu.usagePercent, thresholds.cpu) };
+  if (metric === "memory") return { value: percent(snapshot?.memory.usagePercent), detail: snapshot == null ? "Unavailable" : `${bytes(snapshot.memory.usedBytes)} / ${bytes(snapshot.memory.totalBytes)}`, warning: isOver(snapshot?.memory.usagePercent, thresholds.ram) };
+  if (metric === "disk") return { value: percent(snapshot?.disk?.usagePercent), detail: snapshot?.disk == null ? "Unavailable" : `${bytes(snapshot.disk.availableBytes)} free`, warning: isOver(snapshot?.disk?.usagePercent, thresholds.disk) };
+  if (metric === "load") return { value: number(snapshot?.cpu.loadAverage?.[1]), detail: snapshot?.cpu.loadAverage == null ? "Unavailable" : snapshot.cpu.loadAverage.map(number).join(" / "), warning: false };
+  if (metric === "network") return { value: `↓ ${rate(snapshot?.network.receiveBytesPerSecond)}`, detail: `↑ ${rate(snapshot?.network.sendBytesPerSecond)}`, warning: false };
+  return { value: snapshot == null ? "—" : uptime(snapshot.system.uptimeSeconds), detail: snapshot == null ? "Unavailable" : "Since last boot", warning: false };
+}
+
+function metricChart(metric: DashboardPanel["metric"], points: HistoryPoint[], thresholds: Fleet["thresholds"]): MetricChart {
+  if (metric === "cpu") return { dimensions: ["time", "CPU"], rows: points.map((point) => [point.collectedAtMs, point.cpuPercent]), series: ["CPU"], thresholds: { CPU: thresholds.cpu }, percentChart: true };
+  if (metric === "memory") return { dimensions: ["time", "RAM"], rows: points.map((point) => [point.collectedAtMs, point.memoryPercent]), series: ["RAM"], thresholds: { RAM: thresholds.ram }, percentChart: true };
+  if (metric === "disk") return { dimensions: ["time", "Disk"], rows: points.map((point) => [point.collectedAtMs, point.diskPercent]), series: ["Disk"], thresholds: { Disk: thresholds.disk }, percentChart: true };
+  if (metric === "load") return { dimensions: ["time", "1m", "5m", "15m"], rows: points.map((point) => [point.collectedAtMs, point.load1, point.load5, point.load15]), series: ["1m", "5m", "15m"], thresholds: {}, percentChart: false };
+  return { dimensions: ["time", "Receive", "Send"], rows: points.map((point) => [point.collectedAtMs, point.receiveBytesPerSecond, point.sendBytesPerSecond]), series: ["Receive", "Send"], thresholds: {}, percentChart: false, valueFormatter: rate };
+}
+
+function DashboardEditor({
+  config,
+  onCancel,
+  onChange,
+  onSave,
+  saving,
+}: {
+  config: DashboardConfig;
+  onCancel(): void;
+  onChange(config: DashboardConfig): void;
+  onSave(): void;
+  saving: boolean;
+}) {
+  const configured = new Set(config.panels.map(dashboardPanelKey));
+  const available = availableDashboardPanels(config);
+  const [nextKey, setNextKey] = useState(available[0] == null ? "" : `${available[0].metric}:${available[0].visualization}`);
+  const effectiveNextKey = available.some((panel) => `${panel.metric}:${panel.visualization}` === nextKey)
+    ? nextKey
+    : available[0] == null ? "" : `${available[0].metric}:${available[0].visualization}`;
+
+  return (
+    <section className="host-monitor__editor" aria-labelledby="dashboard-editor-heading">
+      <header>
+        <div><h3 id="dashboard-editor-heading">Edit dashboard</h3><p>Panels are saved for this machine only.</p></div>
+        <span>{config.panels.length} panels</span>
+      </header>
+      <ol className="host-monitor__editor-list">
+        {config.panels.map((panel, index) => {
+          const definition = DASHBOARD_CATALOG[panel.metric];
+          return (
+            <li key={`${panel.metric}:${panel.visualization}`}>
+              <span><strong>{definition.label}</strong><small>{definition.description}</small></span>
+              <label><span>Visualization</span><select value={panel.visualization} onChange={(event) => {
+                const visualization = event.target.value as DashboardPanel["visualization"];
+                onChange(changeDashboardPanelVisualization(config, index, visualization));
+              }}>{definition.visualizations.map((visualization) => <option disabled={visualization !== panel.visualization && configured.has(`${panel.metric}:${visualization}`)} key={visualization} value={visualization}>{visualization === "stat" ? "Stat" : "Time series"}</option>)}</select></label>
+              <div className="host-monitor__editor-order">
+                <button aria-label={`Move ${definition.label} earlier`} className="host-monitor__icon-button" disabled={index === 0} onClick={() => onChange(moveDashboardPanel(config, index, index - 1))} type="button">↑</button>
+                <button aria-label={`Move ${definition.label} later`} className="host-monitor__icon-button" disabled={index === config.panels.length - 1} onClick={() => onChange(moveDashboardPanel(config, index, index + 1))} type="button">↓</button>
+                <button aria-label={`Remove ${definition.label} ${panel.visualization} panel`} className="host-monitor__button host-monitor__button--ghost" disabled={config.panels.length === 1} onClick={() => onChange(removeDashboardPanel(config, index))} type="button">Remove</button>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+      {available.length > 0 && (
+        <div className="host-monitor__editor-add">
+          <label><span>Add metric panel</span><select value={effectiveNextKey} onChange={(event) => setNextKey(event.target.value)}>{available.map((panel) => <option key={`${panel.metric}:${panel.visualization}`} value={`${panel.metric}:${panel.visualization}`}>{DASHBOARD_CATALOG[panel.metric].label} · {panel.visualization === "stat" ? "Stat" : "Time series"}</option>)}</select></label>
+          <button className="host-monitor__button host-monitor__button--outline" onClick={() => {
+            const panel = available.find((candidate) => `${candidate.metric}:${candidate.visualization}` === effectiveNextKey);
+            if (panel != null) onChange(addDashboardPanel(config, panel));
+          }} type="button">Add panel</button>
+        </div>
+      )}
+      <footer>
+        <button className="host-monitor__button host-monitor__button--ghost" disabled={saving} onClick={onCancel} type="button">Cancel</button>
+        <button className="host-monitor__button" disabled={saving} onClick={onSave} type="button">{saving ? "Saving…" : "Save dashboard"}</button>
+      </footer>
     </section>
   );
 }
@@ -311,18 +535,6 @@ function Fact({ label, value }: { label: string; value: string }) {
 
 function FleetSkeleton() {
   return <div className="host-monitor__machine-grid" aria-label="Loading machines">{[0, 1, 2].map((index) => <div className="host-monitor__skeleton" key={index} />)}</div>;
-}
-
-function SidebarFleetAccessory() {
-  const rpc = useRpc<typeof rpcContract>();
-  const [summary, setSummary] = useState<{ connected: number; total: number } | null>(null);
-  const refresh = useCallback(() => {
-    void rpc.call("sidebarSummary").then(setSummary).catch(() => setSummary(null));
-  }, [rpc]);
-  useEffect(refresh, [refresh]);
-  useRealtime(REALTIME_CHANNEL, refresh);
-  if (summary == null) return null;
-  return <span className="host-monitor__sidebar-summary" aria-label={`${summary.connected} of ${summary.total} machines connected`}>{summary.connected}/{summary.total}</span>;
 }
 
 const Chart = memo(function Chart({
@@ -523,12 +735,16 @@ function isOver(value: number | null | undefined, threshold: number): boolean {
 }
 
 export default definePluginApp((app) => {
-  app.slots.navPanel({
+  app.slots.sidebarFooterAction({
     id: "host-monitor",
     title: "Host Monitor",
     icon: "Activity",
-    path: "host-monitor",
+    run: ({ openSettings }) => openSettings(),
+  });
+  app.slots.settingsSection({
+    id: "monitor",
+    title: "Host Monitor",
+    description: "Live and historical health for every machine enrolled in BB.",
     component: FleetDashboard,
-    experimental_sidebarAccessory: SidebarFleetAccessory,
   });
 });

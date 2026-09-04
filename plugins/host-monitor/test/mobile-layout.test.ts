@@ -22,10 +22,12 @@ test("fleet is searchable, bounded, and selected by cards", () => {
 
 test("390px layout stacks controls, stats, facts, and keeps chart height", () => {
   const compact = styles.match(/@container\s*\(max-width:\s*390px\)\s*\{([\s\S]*?)\n\}/u)?.[1] ?? "";
-  assert.match(compact, /\.host-monitor__stat-grid[\s\S]*grid-template-columns:\s*1fr/u);
+  assert.match(compact, /\.host-monitor__panel-grid[\s\S]*grid-template-columns:\s*1fr/u);
   assert.match(compact, /\.host-monitor__facts[\s\S]*grid-template-columns:\s*1fr/u);
+  assert.match(compact, /\.host-monitor__chart[\s\S]*grid-column:\s*auto/u);
   assert.match(compact, /\.host-monitor__chart\s*>\s*div[\s\S]*min-height:\s*210px/u);
   assert.match(styles, /@container\s*\(max-width:\s*460px\)[\s\S]*\.host-monitor__toolbar\s*\{\s*grid-template-columns:\s*1fr/u);
+  assert.match(styles, /@container\s*\(max-width:\s*460px\)[\s\S]*\.host-monitor__editor-list\s*>\s*li\s*\{\s*grid-template-columns:\s*1fr/u);
 });
 
 test("charts preserve page scrolling and expose textual summaries", () => {

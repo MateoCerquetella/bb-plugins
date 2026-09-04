@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-79f19fa564ffbd3d0de7f9d5",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Host Monitor typecheck, 29 focused tests, and production build for native footer navigation and configurable per-host dashboards.",
+  "passed": true,
+  "startedAt": "2026-09-04T14:50:10.817Z",
+  "completedAt": "2026-09-04T14:50:12.988Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-native-footer-configurable-metrics",
+    "specRevision": 3,
+    "specDigest": "sha256:fd37f25b7500db5ba4f7ec524a9e51487ce15c050f83de0b3e8055ec6492ccfe",
+    "treeDigest": "sha256:5760f4e498a32cd99e415ea28bba60f182ace5ee2acae740f98ebfa0b02dab81",
+    "policyDigest": "sha256:c5b1f8545a62eabba349adba50f5d106bace9b033a2296d48b1e4dda20231b48",
+    "workflowRevision": 7,
+    "gitCommit": "5174ac783641a190a25e9ecd2aa55e92253e25b5"
+  },
+  "digest": "sha256:6fd556e035dcadbde8957fd43c9b993bbff073c4cda4f71e9bcb1accfebe79dd",
+  "kind": "qa",
+  "matrixDigest": "sha256:acce612f4b3e25f019c229c2750742f5fd5ea8f29f766dc48fd96e9f088ab1ed",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Host Monitor typecheck, 29 focused tests, and production build for native footer navigation and configurable per-host dashboards.",
+      "startedAt": "2026-09-04T14:50:10.817Z",
+      "completedAt": "2026-09-04T14:50:12.988Z",
+      "durationMs": 2171,
+      "collector": null,
+      "command": {
+        "argv": [
+          "npm",
+          "run",
+          "verify",
+          "--workspace",
+          "bb-plugin-host-monitor"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:3c60e4f297232cc6de9bbe5b92d70d83106aab0298237e2e4b01075df4f6d091",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "\n> bb-plugin-host-monitor@0.1.4 verify\n> npm run typecheck && npm test && npm run build\n\n\n> bb-plugin-host-monitor@0.1.4 typecheck\n> tsc --noEmit\n\n\n> bb-plugin-host-monitor@0.1.4 test\n> node --test --experimental-strip-types test/*.test.ts\n\nTAP version 13\n# Subtest: keeps Host Monitor identity and restores the host artifact\nok 1 - keeps Host Monitor identity and restores the host artifact\n  ---\n  duration_ms: 0.643814\n  type: 'test'\n  ...\n# Subtest: ships per-host history and metrics-only host sources\nok 2 - ships per-host history and metrics-only host sources\n  ---\n  duration_ms: 0.13166\n  type: 'test'\n  ...\n# Subtest: keeps every monitoring surface inside the page without notifications\nok 3 - keeps every monitoring surface inside the page without notifications\n  ---\n  duration_ms: 0.323149\n  type: 'test'\n  ...\n# Subtest: imports only public SDK and declared third-party surfaces\nok 4 - imports only public SDK and declared third-party surfaces\n  ---\n  duration_ms: 2.107953\n  type: 'test'\n  ...\n# Subtest: marks deterministic collection gaps without adding chart rows\nok 5 - marks deterministic collection gaps without adding chart rows\n  ---\n  duration_ms: 1.534597\n  type: 'test'\n  ...\n# Subtest: derives the same bounded interval used by long history queries\nok 6 - derives the same bounded interval used by long history queries\n  ---\n  duration_ms: 0.147619\n  type: 'test'\n  ...\n# Subtest: default dashboard is bounded, independent, and uses supported unique panels\nok 7 - default dashboard is bounded, independent, and uses supported unique panels\n  ---\n  duration_ms: 0.644545\n  type: 'test'\n  ...\n# Subtest: editor operations add, change, reorder, and remove panels without mutating input\nok 8 - editor operations add, change, reorder, and remove panels without mutating input\n  ---\n  duration_ms: 0.676883\n  type: 'test'\n  ...\n# Subtest: catalog covers every supported host metric and stat/time-series compatibility\nok 9 - catalog covers every supported host metric and stat/time-series compatibility\n  ---\n  duration_ms: 0.22474\n  type: 'test'\n  ...\n# Subtest: dashboard schema rejects duplicates, unknown fields, invalid combinations, and oversized input\nok 10 - dashboard schema rejects duplicates, unknown fields, invalid combinations, and oversized input\n  ---\n  duration_ms: 1.813245\n  type: 'test'\n  ...\n# Subtest: axis tooltip leaves every SVG line visible\nok 11 - axis tooltip leaves every SVG line visible\n  ---\n  duration_ms: 29.620039\n  type: 'test'\n  ...\n# Subtest: host worker returns bounded telemetry without IP or process fields\nok 12 - host worker returns bounded telemetry without IP or process fields\n  ---\n  duration_ms: 117.802058\n  type: 'test'\n  ...\n# Subtest: calculates aggregate machine-wide CPU utilization\nok 13 - calculates aggregate machine-wide CPU utilization\n  ---\n  duration_ms: 0.704324\n  type: 'test'\n  ...\n# Subtest: calculates validated byte capacities\nok 14 - calculates validated byte capacities\n  ---\n  duration_ms: 0.64758\n  type: 'test'\n  ...\n# Subtest: uses Linux MemAvailable for memory pressure\nok 15 - uses Linux MemAvailable for memory pressure\n  ---\n  duration_ms: 0.335331\n  type: 'test'\n  ...\n# Subtest: aggregates throughput only from useful non-loopback interfaces\nok 16 - aggregates throughput only from useful non-loopback interfaces\n  ---\n  duration_ms: 0.427419\n  type: 'test'\n  ...\n# Subtest: calculates root filesystem capacity\nok 17 - calculates root filesystem capacity\n  ---\n  duration_ms: 0.16997\n  type: 'test'\n  ...\n# Subtest: page owns constrained-height vertical scrolling\nok 18 - page owns constrained-height vertical scrolling\n  ---\n  duration_ms: 0.742593\n  type: 'test'\n  ...\n# Subtest: fleet is searchable, bounded, and selected by cards\nok 19 - fleet is searchable, bounded, and selected by cards\n  ---\n  duration_ms: 0.176652\n  type: 'test'\n  ...\n# Subtest: 390px layout stacks controls, stats, facts, and keeps chart height\nok 20 - 390px layout stacks controls, stats, facts, and keeps chart height\n  ---\n  duration_ms: 0.333278\n  type: 'test'\n  ...\n# Subtest: charts preserve page scrolling and expose textual summaries\nok 21 - charts preserve page scrolling and expose textual summaries\n  ---\n  duration_ms: 0.168007\n  type: 'test'\n  ...\n# Subtest: refresh represents every host, samples connected hosts, and isolates failure\nok 22 - refresh represents every host, samples connected hosts, and isolates failure\n  ---\n  duration_ms: 16.452828\n  type: 'test'\n  ...\n# Subtest: simultaneous fleet refreshes coalesce host calls\nok 23 - simultaneous fleet refreshes coalesce host calls\n  ---\n  duration_ms: 3.59343\n  type: 'test'\n  ...\n# Subtest: sidebar summary lists hosts without starting samples\nok 24 - sidebar summary lists hosts without starting samples\n  ---\n  duration_ms: 3.355776\n  type: 'test'\n  ...\n# Subtest: dashboard configuration is isolated by enrolled host and survives plugin reload\nok 25 - dashboard configuration is isolated by enrolled host and survives plugin reload\n  ---\n  duration_ms: 3.887426\n  type: 'test'\n  ...\n# Subtest: settings are passive in-page threshold guides\nok 26 - settings are passive in-page threshold guides\n  ---\n  duration_ms: 1.343198\n  type: 'test'\n  ...\n# Subtest: append-only migrations upgrade the prior single-machine schema\nok 27 - append-only migrations upgrade the prior single-machine schema\n  ---\n  duration_ms: 2.493444\n  type: 'test'\n  ...\n# Subtest: dashboard configuration persists independently per host and corrupt rows fall back\nok 28 - dashboard configuration persists independently per host and corrupt rows fall back\n  ---\n  duration_ms: 2.149949\n  type: 'test'\n  ...\n# Subtest: history is isolated per host and never exceeds 720 relative buckets\nok 29 - history is isolated per host and never exceeds 720 relative buckets\n  ---\n  duration_ms: 11.021679\n  type: 'test'\n  ...\n1..29\n# tests 29\n# suites 0\n# pass 29\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 367.317101\n\n> bb-plugin-host-monitor@0.1.4 build\n> env -u BB_CLI bb plugin build .\n\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\ndist/host.js\ndist/host.js.map\ndist/host.meta.json\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:5760f4e498a32cd99e415ea28bba60f182ace5ee2acae740f98ebfa0b02dab81",
+      "sourceTreeAfter": "sha256:5760f4e498a32cd99e415ea28bba60f182ace5ee2acae740f98ebfa0b02dab81",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

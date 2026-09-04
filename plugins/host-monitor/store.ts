@@ -1,6 +1,7 @@
 import type Database from "better-sqlite3";
 
-import type { HistoryPoint, MachineSnapshot } from "./contract.ts";
+import { dashboardConfigSchema, type DashboardConfig, type HistoryPoint, type MachineSnapshot } from "./contract.ts";
+import { defaultDashboardConfig } from "./dashboard-config.ts";
 
 export const MAX_RENDER_POINTS = 720;
 export const RETENTION_MS = 30 * 24 * 60 * 60_000;
@@ -56,6 +57,11 @@ export const hostMonitorMigrations = [
   `CREATE INDEX IF NOT EXISTS fleet_samples_host_collected_at
     ON fleet_samples(host_id, collected_at)`,
   `DELETE FROM fleet_samples`,
+  `CREATE TABLE IF NOT EXISTS host_dashboard_configs (
+    host_id TEXT PRIMARY KEY,
+    config_json TEXT NOT NULL,
+    updated_at INTEGER NOT NULL
+  )`,
 ];
 
 export function bucketSizeFor(rangeMs: number): number {
@@ -108,6 +114,27 @@ export class HostMonitorStore {
         bucketSize,
       }) as HistoryPoint[];
     return points.slice(-MAX_RENDER_POINTS);
+  }
+
+  dashboardConfig(hostId: string): DashboardConfig {
+    const row = this.db.prepare("SELECT config_json AS configJson FROM host_dashboard_configs WHERE host_id = ?")
+      .get(hostId) as { configJson: string } | undefined;
+    if (row === undefined) return defaultDashboardConfig();
+    try {
+      const parsed = dashboardConfigSchema.safeParse(JSON.parse(row.configJson));
+      return parsed.success ? parsed.data : defaultDashboardConfig();
+    } catch {
+      return defaultDashboardConfig();
+    }
+  }
+
+  saveDashboardConfig(hostId: string, config: DashboardConfig, updatedAt = Date.now()): DashboardConfig {
+    const validated = dashboardConfigSchema.parse(config);
+    this.db.prepare(`INSERT INTO host_dashboard_configs (host_id, config_json, updated_at)
+      VALUES (?, ?, ?)
+      ON CONFLICT(host_id) DO UPDATE SET config_json = excluded.config_json, updated_at = excluded.updated_at`)
+      .run(hostId, JSON.stringify(validated), updatedAt);
+    return validated;
   }
 }
 

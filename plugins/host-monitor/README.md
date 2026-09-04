@@ -21,9 +21,10 @@ failed machine visible. Select a machine card to inspect its current telemetry
 and up to 30 days of utilization, load, and network history without leaving the
 page.
 
-The Host Monitor sidebar row keeps the branded icon and shows neutral
-`connected/total` text. It is navigation only: there is no popup, floating
-window, warning badge, or notification surface.
+Host Monitor does not add a page row to BB's sidebar. Its only persistent
+sidebar control is the native Activity icon in the bottom-left action row.
+Click it to open the full monitor inside BB's plugin detail. There is no popup,
+floating window, warning badge, or notification surface.
 
 ## Dashboard
 
@@ -39,6 +40,20 @@ Each machine reports:
 The page offers 1 hour, 6 hours, 1 day, 7 days, and 30 days. Per-machine
 history is persisted in the plugin database, aggregated to at most 720 points,
 and displays collection gaps as breaks instead of zeroes.
+
+## Per-machine dashboards
+
+Select any machine—including a disconnected one—and choose **Edit dashboard**.
+Each machine keeps its own ordered dashboard. You can:
+
+- Add CPU, RAM, root disk, load, network, or uptime panels.
+- Show supported metrics as a current stat or time-series visualization.
+- Move panels earlier or later and remove panels you do not need.
+- Cancel a draft or save it explicitly.
+
+Saved layouts use BB's stable machine id and the plugin database, so they
+survive Host Monitor reloads and stay independent between machines. A missing
+or unreadable saved layout safely falls back to the default dashboard.
 
 ## Grafana-inspired, BB-native
 

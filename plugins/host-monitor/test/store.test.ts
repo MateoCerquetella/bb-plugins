@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import Database from "better-sqlite3";
 
-import type { MachineSnapshot } from "../contract.ts";
+import type { DashboardConfig, MachineSnapshot } from "../contract.ts";
+import { defaultDashboardConfig } from "../dashboard-config.ts";
 import { HostMonitorStore, hostMonitorMigrations, MAX_RENDER_POINTS } from "../store.ts";
 
 function snapshot(sampledAtMs: number, cpuPercent: number): MachineSnapshot {
@@ -37,6 +38,27 @@ test("append-only migrations upgrade the prior single-machine schema", () => {
     const tables = db.prepare("SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name").all() as Array<{ name: string }>;
     assert.ok(tables.some((table) => table.name === "machine_samples"));
     assert.ok(tables.some((table) => table.name === "fleet_samples"));
+    assert.ok(tables.some((table) => table.name === "host_dashboard_configs"));
+  } finally {
+    db.close();
+  }
+});
+
+test("dashboard configuration persists independently per host and corrupt rows fall back", () => {
+  const db = new Database(":memory:");
+  try {
+    for (const migration of hostMonitorMigrations) db.exec(migration);
+    const store = new HostMonitorStore(db);
+    const alpha: DashboardConfig = { version: 1, panels: [{ metric: "cpu", visualization: "timeseries" }] };
+    const bravo: DashboardConfig = { version: 1, panels: [{ metric: "uptime", visualization: "stat" }] };
+    assert.deepEqual(store.dashboardConfig("host-alpha"), defaultDashboardConfig());
+    store.saveDashboardConfig("host-alpha", alpha, 1);
+    store.saveDashboardConfig("host-bravo", bravo, 2);
+    assert.deepEqual(new HostMonitorStore(db).dashboardConfig("host-alpha"), alpha);
+    assert.deepEqual(store.dashboardConfig("host-bravo"), bravo);
+
+    db.prepare("UPDATE host_dashboard_configs SET config_json = ? WHERE host_id = ?").run("not json", "host-alpha");
+    assert.deepEqual(store.dashboardConfig("host-alpha"), defaultDashboardConfig());
   } finally {
     db.close();
   }

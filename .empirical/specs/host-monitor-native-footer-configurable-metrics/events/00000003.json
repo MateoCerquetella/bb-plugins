@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "sequence": 3,
+  "previousDigest": "sha256:52e2cf8e543568f2e9a96fe2dc21f9730f24c1b8e4716e179413cd3ff133f6ee",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Specified the native bottom-left BB footer action, recovered in-page fleet behavior, strict per-host configurable metric panels with persistent storage, notification-free constraints, accessibility, responsive UI, and focused/live verification boundaries.",
+  "createdAt": "2026-09-04T14:28:27.858Z",
+  "stateBeforeDigest": "sha256:005703e7b39b3fa8c8dcd131a8626986e02e54775f769580f3fcf0a3436b1c56",
+  "stateAfterDigest": "sha256:4bba9d547a8a5ef5f4e1a9d6651dfeda8c5f0829a8f7bfad7d271d5410931e91",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 3,
+    "activeFeature": "host-monitor-native-footer-configurable-metrics",
+    "request": "Restore the most recent recoverable Host Monitor implementation, preserve unrelated work, make its UI native to BB, place its icon in the bottom-left sidebar, and extend it into a Grafana-like multi-host monitoring experience using BB machine identity, connection state, and realtime infrastructure. Add configurable per-host metrics and visualizations with persistence; verify tests, typecheck, build, connected/disconnected hosts, persistence, and final diff. Stop ready for review; do not merge or deploy.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "design",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Specified the native bottom-left BB footer action, recovered in-page fleet behavior, strict per-host configurable metric panels with persistent storage, notification-free constraints, accessibility, responsive UI, and focused/live verification boundaries.",
+    "implementationActor": null,
+    "workStartedAt": "2026-09-04T14:22:43.362Z",
+    "specDigest": "sha256:fd37f25b7500db5ba4f7ec524a9e51487ce15c050f83de0b3e8055ec6492ccfe",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:37d8f67989d884a0afde4ea5c02058fd96e3166ec3df8f730582825fbe464543",
+    "impactDigest": "sha256:42f9862d6a78d8af4992daff81ce95cd027c5d1b40731ab9eb1da33c51191537",
+    "capabilityClaimId": "host-monitor-native-footer-configurable-metrics-3fef91e7eb43",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-04T14:28:27.858Z"
+  },
+  "digest": "sha256:57253dfb953204e2576ecd12ff2df34e6bed06adce1acbb7d362612fce66339c"
+}

@@ -1,6 +1,13 @@
 import { defineRpcContract } from "@get-bb/plugin-sdk";
 import { z } from "zod";
 
+import {
+  DASHBOARD_METRICS,
+  DASHBOARD_PANEL_LIMIT,
+  DASHBOARD_VISUALIZATIONS,
+  supportsVisualization,
+} from "./dashboard-config.ts";
+
 const timestamp = z.number().int().nonnegative();
 const bytes = z.number().int().nonnegative();
 const percent = z.number().min(0).max(100);
@@ -106,6 +113,35 @@ const rangeHoursSchema = z.union([
   z.literal(1), z.literal(6), z.literal(24), z.literal(24 * 7), z.literal(24 * 30),
 ]);
 
+export const dashboardPanelSchema = z.object({
+  metric: z.enum(DASHBOARD_METRICS),
+  visualization: z.enum(DASHBOARD_VISUALIZATIONS),
+}).strict().superRefine((panel, context) => {
+  if (!supportsVisualization(panel.metric, panel.visualization)) {
+    context.addIssue({
+      code: "custom",
+      path: ["visualization"],
+      message: `${panel.metric} does not support ${panel.visualization}.`,
+    });
+  }
+});
+
+export const dashboardConfigSchema = z.object({
+  version: z.literal(1),
+  panels: z.array(dashboardPanelSchema).min(1).max(DASHBOARD_PANEL_LIMIT),
+}).strict().superRefine((config, context) => {
+  const keys = new Set<string>();
+  for (const [index, panel] of config.panels.entries()) {
+    const key = `${panel.metric}:${panel.visualization}`;
+    if (keys.has(key)) {
+      context.addIssue({ code: "custom", path: ["panels", index], message: "Dashboard panels must be unique." });
+    }
+    keys.add(key);
+  }
+});
+
+const dashboardHostInputSchema = z.object({ hostId: z.string().min(1).max(256) }).strict();
+
 export const rpcContract = defineRpcContract({
   fleet: { input: z.null(), output: fleetSchema },
   sidebarSummary: {
@@ -115,6 +151,14 @@ export const rpcContract = defineRpcContract({
   machineHistory: {
     input: z.object({ hostId: z.string().min(1).max(256), rangeHours: rangeHoursSchema }).strict(),
     output: z.object({ hostId: z.string(), rangeHours: rangeHoursSchema, points: z.array(historyPointSchema).max(720) }).strict(),
+  },
+  dashboardConfig: {
+    input: dashboardHostInputSchema,
+    output: dashboardConfigSchema,
+  },
+  saveDashboardConfig: {
+    input: dashboardHostInputSchema.extend({ config: dashboardConfigSchema }).strict(),
+    output: dashboardConfigSchema,
   },
   refresh: {
     input: z.object({ hostId: z.string().min(1).max(256).nullable() }).strict(),
@@ -127,3 +171,5 @@ export type MachineRow = z.infer<typeof machineRowSchema>;
 export type HistoryPoint = z.infer<typeof historyPointSchema>;
 export type MachineHistory = z.infer<typeof rpcContract.machineHistory.output>;
 export type RangeHours = z.infer<typeof rangeHoursSchema>;
+export type DashboardConfig = z.infer<typeof dashboardConfigSchema>;
+export type DashboardPanel = z.infer<typeof dashboardPanelSchema>;

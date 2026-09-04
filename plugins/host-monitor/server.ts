@@ -254,6 +254,13 @@ export default async function hostMonitorPlugin(bb: BbPluginApi): Promise<void> 
     publish([host.id]);
   }
 
+  async function requireEnrolledHost(hostId: string): Promise<void> {
+    const available = await listHosts();
+    if (!available.some((host) => host.id === hostId)) {
+      throw new Error("That enrolled machine no longer exists.");
+    }
+  }
+
   bb.rpc.register(rpcContract, {
     async fleet() {
       if (hosts.length === 0) await listHosts();
@@ -267,16 +274,23 @@ export default async function hostMonitorPlugin(bb: BbPluginApi): Promise<void> 
       };
     },
     async machineHistory({ hostId, rangeHours }) {
-      if (hosts.length === 0) await listHosts();
-      if (!hosts.some((host) => host.id === hostId)) {
-        throw new Error("That enrolled machine no longer exists.");
-      }
+      await requireEnrolledHost(hostId);
       const now = Date.now();
       return {
         hostId,
         rangeHours,
         points: store.history(hostId, now - rangeHours * 60 * 60_000, now),
       };
+    },
+    async dashboardConfig({ hostId }) {
+      await requireEnrolledHost(hostId);
+      return store.dashboardConfig(hostId);
+    },
+    async saveDashboardConfig({ hostId, config }) {
+      await requireEnrolledHost(hostId);
+      const saved = store.saveDashboardConfig(hostId, config);
+      publish([hostId]);
+      return saved;
     },
     async refresh({ hostId }) {
       if (hostId === null) await refreshAll();

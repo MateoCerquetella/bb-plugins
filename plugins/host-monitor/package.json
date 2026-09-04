@@ -60,6 +60,7 @@
     "app.tsx",
     "app.css",
     "chart-data.ts",
+    "dashboard-config.ts",
     "host.ts",
     "contract.ts",
     "store.ts",
@@ -103,6 +104,7 @@
     "types:check": "env -u BB_CLI bb plugin types --check .",
     "types:refresh": "env -u BB_CLI bb plugin types .",
     "test": "node --test --experimental-strip-types test/*.test.ts",
+    "verify": "npm run typecheck && npm test && npm run build",
     "check": "npm run types:check && npm run typecheck && npm test && npm run build"
   }
 }

@@ -134,6 +134,34 @@ test("sidebar summary lists hosts without starting samples", async (t) => {
   );
 });
 
+test("dashboard configuration is isolated by enrolled host and survives plugin reload", async (t) => {
+  const machines = [
+    hostRecord("host-alpha", "Alpha"),
+    hostRecord("host-bravo", "Bravo", "disconnected"),
+  ];
+  const factory = () => createFakePluginHost({
+    pluginId: "host-monitor",
+    sdk: { hosts: { list: async () => machines } },
+  });
+  const fake = factory();
+  t.after(() => fake.harness.lifecycle.dispose());
+  await plugin(fake.bb);
+
+  const alpha = { version: 1, panels: [{ metric: "cpu", visualization: "timeseries" }] } as const;
+  const bravo = { version: 1, panels: [{ metric: "uptime", visualization: "stat" }] } as const;
+  assert.deepEqual(await fake.harness.behavior.callRpc("saveDashboardConfig", { hostId: "host-alpha", config: alpha }), alpha);
+  assert.deepEqual(await fake.harness.behavior.callRpc("saveDashboardConfig", { hostId: "host-bravo", config: bravo }), bravo);
+  assert.deepEqual(await fake.harness.behavior.callRpc("dashboardConfig", { hostId: "host-alpha" }), alpha);
+  assert.deepEqual(await fake.harness.behavior.callRpc("dashboardConfig", { hostId: "host-bravo" }), bravo);
+  const reloaded = await fake.harness.lifecycle.reload(plugin);
+  t.after(() => reloaded.harness.lifecycle.dispose());
+  assert.deepEqual(await reloaded.harness.behavior.callRpc("dashboardConfig", { hostId: "host-alpha" }), alpha);
+  await assert.rejects(
+    reloaded.harness.behavior.callRpc("dashboardConfig", { hostId: "host-missing" }),
+    /handler_error|no longer exists/u,
+  );
+});
+
 test("settings are passive in-page threshold guides", async (t) => {
   const fake = createFakePluginHost({ pluginId: "host-monitor" });
   t.after(() => fake.harness.lifecycle.dispose());

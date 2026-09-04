@@ -9,7 +9,71 @@
       "screenshotForUi": true,
       "codeReview": true
     },
-    "commands": [
+  "commands": [
+    {
+      "id": "host-monitor-focused",
+      "argv": [
+        "npm",
+        "run",
+        "verify",
+        "--workspace",
+        "bb-plugin-host-monitor"
+      ],
+      "cwd": ".",
+      "timeoutMs": 120000,
+      "maxOutputBytes": 1048576,
+      "evidenceKinds": [
+        "test"
+      ],
+      "checks": [
+        "unit",
+        "adapter-contract",
+        "package-consumer"
+      ],
+      "criteria": [
+        "AC-1",
+        "AC-2",
+        "AC-3",
+        "AC-4",
+        "AC-5",
+        "AC-6",
+        "AC-7",
+        "AC-8",
+        "AC-UI-1",
+        "AC-UI-2",
+        "AC-UI-3"
+      ]
+    },
+    {
+      "id": "host-monitor-browser",
+      "argv": [
+        "node",
+        ".empirical/specs/host-monitor-native-footer-configurable-metrics/qa/browser.mjs"
+      ],
+      "cwd": ".",
+      "timeoutMs": 120000,
+      "maxOutputBytes": 262144,
+      "evidenceKinds": [
+        "browser",
+        "screenshot"
+      ],
+      "checks": [
+        "end-to-end"
+      ],
+      "criteria": [
+        "AC-1",
+        "AC-2",
+        "AC-3",
+        "AC-4",
+        "AC-5",
+        "AC-6",
+        "AC-7",
+        "AC-8",
+        "AC-UI-1",
+        "AC-UI-2",
+        "AC-UI-3"
+      ]
+    },
       {
         "id": "taskboard-focused",
         "argv": [

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "generator": "empirical-0.30.0",
-  "sourceDigest": "sha256:149a43b9cbfaaa070777a2ec35a68caf0b49900d048e1df082bba85917ee6992",
+  "sourceDigest": "sha256:ef78a882f9a1a73479c966603b23e66ec08f47beec8988a005eb88659531e46d",
   "files": [
     {
       "path": ".agents/skills/empirical/SKILL.md",
@@ -570,8 +570,8 @@
     },
     {
       "path": "plugins/host-monitor/README.md",
-      "size": 3550,
-      "digest": "sha256:43a65bdcec4e7b56c1029e014de8a9d6399f7012a1912322f79e31761cca6848"
+      "size": 4280,
+      "digest": "sha256:405d71203a1e95218ff880ce6645750be428534bd793cbe34359c89fced52e44"
     },
     {
       "path": "plugins/host-monitor/THIRD_PARTY_NOTICES.md",
@@ -580,13 +580,13 @@
     },
     {
       "path": "plugins/host-monitor/app.css",
-      "size": 11570,
-      "digest": "sha256:322ce78d362ab6ddd1305a502c099da163d446609f21bb4eb641b9b5528c8537"
+      "size": 15095,
+      "digest": "sha256:984a150ccdc9ea5104496d0a19450e75d55c6d12e7daac01051c3ab3af1ca746"
     },
     {
       "path": "plugins/host-monitor/app.tsx",
-      "size": 22966,
-      "digest": "sha256:4fe67a5d12622bc5281b0de950cb83ca80b8ee596c33e1c85b1dde992c7c4a66"
+      "size": 33597,
+      "digest": "sha256:0685a0850b1115dcb102d265956532f0d3c7c417d1d53e4346a9e21be076477f"
     },
     {
       "path": "plugins/host-monitor/assets/icon.svg",
@@ -610,8 +610,13 @@
     },
     {
       "path": "plugins/host-monitor/contract.ts",
-      "size": 4466,
-      "digest": "sha256:38a04f58eba600b4ee3982c16dab8904684629f76d5753460a3d1ef314ed64ae"
+      "size": 6021,
+      "digest": "sha256:d324f13bd55b116dbaaf5b30e82ef5d93f839bf1e0ddf01b37509d3a3dd838ba"
+    },
+    {
+      "path": "plugins/host-monitor/dashboard-config.ts",
+      "size": 5111,
+      "digest": "sha256:5dbdf32417c6e07895f20eae4cb31ed10155184e56246cde1ff162228bd62d71"
     },
     {
       "path": "plugins/host-monitor/host.ts",
@@ -630,28 +635,33 @@
     },
     {
       "path": "plugins/host-monitor/package.json",
-      "size": 3027,
-      "digest": "sha256:674f995ba14997ff118b40ca1a0408efefe8b513b3597b1882d4813279e67cdc"
+      "size": 3054,
+      "digest": "sha256:c4637e2c7958bbba4aa8a4ce13dccedc255e5ef9669cbce846e36184a1f23ad9"
     },
     {
       "path": "plugins/host-monitor/server.ts",
-      "size": 11320,
-      "digest": "sha256:3439b258de623368f73c522ea959fdcaae38d12d460f1bad5bab10ca62410d4e"
+      "size": 11766,
+      "digest": "sha256:6262ecc30c6241ab08990fd46deca94eb129aff4987ea5a2bf085cbbca4a804e"
     },
     {
       "path": "plugins/host-monitor/store.ts",
-      "size": 4667,
-      "digest": "sha256:6ec7ff0468da0a15a22666d27c564a6d2a0e9f4bfbfcd197035b0efda4882379"
+      "size": 5922,
+      "digest": "sha256:1ed872d8e4283dd6b4b7e50578c636a0e133230bebad3638ee1ca088b10c7e20"
     },
     {
       "path": "plugins/host-monitor/test/app-registration.test.ts",
-      "size": 2474,
-      "digest": "sha256:46b93bf79f55901dee07a98e59997a3697a9ec1a5f223effbf19f87a6e08a0e6"
+      "size": 2788,
+      "digest": "sha256:7282f27dff02ac1f79d6a1b8294fbd60ea4b4c49d665c77985e615c0ee7e6ba0"
     },
     {
       "path": "plugins/host-monitor/test/chart-data.test.ts",
       "size": 694,
       "digest": "sha256:a39a1ad9d30916dbe5aa3f7941e5ce8f939a4ca774a17df8476fb2e5aee2bed7"
+    },
+    {
+      "path": "plugins/host-monitor/test/dashboard-config.test.ts",
+      "size": 3539,
+      "digest": "sha256:35fa05788cb9e81ed24e611f00a86a1b21b3a7b9a394b2748c921359b8149ef9"
     },
     {
       "path": "plugins/host-monitor/test/echarts-hover.test.ts",
@@ -670,18 +680,18 @@
     },
     {
       "path": "plugins/host-monitor/test/mobile-layout.test.ts",
-      "size": 1958,
-      "digest": "sha256:7646744407e2ad11987848befa2ed1dc261d8a04f125f331a35a543f49a6b690"
+      "size": 2179,
+      "digest": "sha256:294380e4575f88949c48a9c81ed91c99926198d0263ab275ef8d127c79163e82"
     },
     {
       "path": "plugins/host-monitor/test/server-registration.test.ts",
-      "size": 5681,
-      "digest": "sha256:1282d4b7008e5b02dd603a4285f6ad5d4c804a2271ba68286845ab9c02d3624a"
+      "size": 7202,
+      "digest": "sha256:210c6d2249957eb17856ec92f2bfa43123ef8685c7314e16d98d865fec434c4a"
     },
     {
       "path": "plugins/host-monitor/test/store.test.ts",
-      "size": 2615,
-      "digest": "sha256:2ccaf6cc2824fdb2915596a863cf2e4ada0ae87caf7896e78885babcf17e1504"
+      "size": 3841,
+      "digest": "sha256:14f7a97a02896f03247a0e1a3273d3fea546ee895fba3a162cf0a637922747d5"
     },
     {
       "path": "plugins/host-monitor/tsconfig.json",
@@ -1487,6 +1497,7 @@
         "plugins/host-monitor/assets/logo.svg",
         "plugins/host-monitor/chart-data.ts",
         "plugins/host-monitor/contract.ts",
+        "plugins/host-monitor/dashboard-config.ts",
         "plugins/host-monitor/host.ts",
         "plugins/host-monitor/lib/metrics.ts",
         "plugins/host-monitor/lib/network-throughput.ts",
@@ -1495,6 +1506,7 @@
         "plugins/host-monitor/store.ts",
         "plugins/host-monitor/test/app-registration.test.ts",
         "plugins/host-monitor/test/chart-data.test.ts",
+        "plugins/host-monitor/test/dashboard-config.test.ts",
         "plugins/host-monitor/test/echarts-hover.test.ts",
         "plugins/host-monitor/test/host.test.ts",
         "plugins/host-monitor/test/metrics.test.ts",
@@ -1637,7 +1649,7 @@
         "plugins/usage-tracker/tsconfig.json",
         "plugins/usage-tracker/types/css-modules.d.ts"
       ],
-      "sourceDigest": "sha256:149a43b9cbfaaa070777a2ec35a68caf0b49900d048e1df082bba85917ee6992",
+      "sourceDigest": "sha256:ef78a882f9a1a73479c966603b23e66ec08f47beec8988a005eb88659531e46d",
       "digest": "sha256:eed9cfd95fdecbf70535c9b9bfdb204011bdad5af0a5418d4d923f3a99f354f2",
       "freshness": "fresh"
     },
@@ -1672,7 +1684,7 @@
         "plugins/usage-tracker/README.md",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:78928f6b8ade5d3a4935ec1ea74ebe54829548b34a78f2685aa4cc27427b6c26",
+      "sourceDigest": "sha256:05c433f08f04a0ffc5c4a72d85695c3df253f4536ca2e08f190bb0db6c0ea372",
       "digest": "sha256:37f1b782a0e88dee101030bf6ac6aa2742c329ca37daf764d5022e793ce6bc15",
       "freshness": "fresh"
     },
@@ -1690,7 +1702,7 @@
         "plugins/touchbar/package.json",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:8fd2ec0b597238c048ab0090d7f42b38b82379e85b12342c8a54fed9d6f270b9",
+      "sourceDigest": "sha256:f12f0a83203dd72f1120463f4a340b86b8685959f6d855c048f607e68c3e731f",
       "digest": "sha256:6a3333fdbbcffff93c96400aab0596932dc23cce823061cdedacad5e44ef7bd7",
       "freshness": "fresh"
     },
@@ -1709,7 +1721,7 @@
         "plugins/touchbar/package.json",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:286c5849b95108f45d3c1ef87725de23f1f5caf2aa1698025145bcc41f13f00e",
+      "sourceDigest": "sha256:f902153c442417724b77f6e7fe2a6651fe450d678e6cf8318fceb7aac805abe0",
       "digest": "sha256:06a7a6d07d2649e2d00a93cf62beef749d2f5dada25077c225726f81ec2eeed3",
       "freshness": "fresh"
     },
@@ -1733,5 +1745,5 @@
     }
   ],
   "truncated": false,
-  "digest": "sha256:276882bd106e9aa7dac8b676de6a6d7530759c8ccb69cc46f8941501b18c2741"
+  "digest": "sha256:78703716e1608d46931b962a36ef61e06e6f9a57fe8f41b61cbc6707152e00d1"
 }
