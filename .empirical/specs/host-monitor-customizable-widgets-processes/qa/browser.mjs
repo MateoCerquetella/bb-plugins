@@ -78,8 +78,27 @@ try {
     writeFileSync(path, Buffer.from(result.data, "base64"));
   };
   const pressKey = async (key, code = key) => {
-    await call("Input.dispatchKeyEvent", { type: "keyDown", key, code });
-    await call("Input.dispatchKeyEvent", { type: "keyUp", key, code });
+    const keyCode = { ArrowDown: 40, ArrowUp: 38, Home: 36, End: 35, Enter: 13, Escape: 27 }[key];
+    const virtual = keyCode == null ? {} : { windowsVirtualKeyCode: keyCode, nativeVirtualKeyCode: keyCode };
+    await call("Input.dispatchKeyEvent", { type: "keyDown", key, code, ...virtual });
+    await call("Input.dispatchKeyEvent", { type: "keyUp", key, code, ...virtual });
+  };
+  const typeKey = async (key, code) => {
+    const keyCode = key.codePointAt(0);
+    await call("Input.dispatchKeyEvent", { type: "keyDown", key, code, text: key, unmodifiedText: key, windowsVirtualKeyCode: keyCode, nativeVirtualKeyCode: keyCode });
+    await call("Input.dispatchKeyEvent", { type: "keyUp", key, code, windowsVirtualKeyCode: keyCode, nativeVirtualKeyCode: keyCode });
+  };
+  const clickCenter = async (elementExpression) => {
+    const point = await evaluate(`(() => {
+      const element = ${elementExpression};
+      if (!(element instanceof Element)) return null;
+      const rect = element.getBoundingClientRect();
+      return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    })()`);
+    if (point == null) throw new Error(`Could not resolve pointer target: ${elementExpression}`);
+    await call("Input.dispatchMouseEvent", { type: "mouseMoved", ...point });
+    await call("Input.dispatchMouseEvent", { type: "mousePressed", button: "left", clickCount: 1, ...point });
+    await call("Input.dispatchMouseEvent", { type: "mouseReleased", button: "left", clickCount: 1, ...point });
   };
 
   await call("Page.enable");
@@ -128,22 +147,29 @@ try {
     value: document.querySelector('.bb-select__trigger')?.textContent?.trim() ?? null
   })`);
   if (comboboxSummary.role !== 'combobox' || comboboxSummary.label !== 'host-monitor-history-label' || comboboxSummary.value !== '1 day') throw new Error(`Invalid History combobox: ${JSON.stringify(comboboxSummary)}`);
-  await evaluate("document.querySelector('.bb-select__trigger')?.click()");
+  await clickCenter("document.querySelector('.bb-select__trigger')");
   await waitFor("document.querySelector('.bb-select__content') !== null");
   const comboOptions = await evaluate("Array.from(document.querySelectorAll('.bb-select__item')).map((item) => item.textContent?.trim())");
   if (JSON.stringify(comboOptions) !== JSON.stringify(['1 hour', '6 hours', '1 day', '7 days', '30 days'])) throw new Error(`Unexpected History options: ${JSON.stringify(comboOptions)}`);
   await screenshot(comboPath);
-  await evaluate(`Array.from(document.querySelectorAll('.bb-select__item')).find((item) => item.textContent?.trim() === '6 hours')?.click()`);
+  await clickCenter("Array.from(document.querySelectorAll('.bb-select__item')).find((item) => item.textContent?.trim() === '6 hours')");
   await waitFor("document.querySelector('.bb-select__trigger')?.textContent?.trim() === '6 hours'");
+  await evaluate("document.querySelector('.bb-select__trigger')?.focus()");
+  await pressKey("ArrowDown");
+  await waitFor("document.querySelector('.bb-select__content') !== null");
+  await typeKey("7", "Digit7");
+  await waitFor("document.querySelector('.bb-select__item[data-highlighted]')?.textContent?.trim() === '7 days'");
+  await pressKey("Enter");
+  await waitFor("document.querySelector('.bb-select__content') === null && document.querySelector('.bb-select__trigger')?.textContent?.trim() === '7 days'");
+  await clickCenter("document.querySelector('.bb-select__trigger')");
+  await waitFor("document.querySelector('.bb-select__content') !== null");
+  await clickCenter("Array.from(document.querySelectorAll('.bb-select__item')).find((item) => item.textContent?.trim() === '1 day')");
+  await waitFor("document.querySelector('.bb-select__content') === null && document.querySelector('.bb-select__trigger')?.textContent?.trim() === '1 day'");
   await evaluate("document.querySelector('.bb-select__trigger')?.focus()");
   await pressKey("ArrowDown");
   await waitFor("document.querySelector('.bb-select__content') !== null");
   await pressKey("Escape");
   await waitFor("document.querySelector('.bb-select__content') === null && document.activeElement === document.querySelector('.bb-select__trigger')");
-  await evaluate("document.querySelector('.bb-select__trigger')?.click()");
-  await waitFor("document.querySelector('.bb-select__content') !== null");
-  await evaluate(`Array.from(document.querySelectorAll('.bb-select__item')).find((item) => item.textContent?.trim() === '1 day')?.click()`);
-  await waitFor("document.querySelector('.bb-select__trigger')?.textContent?.trim() === '1 day'");
 
   const initial = await evaluate(`({
     machines: document.querySelectorAll('.host-monitor__machine-card').length,
@@ -245,7 +271,7 @@ try {
   await call("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 1, mobile: false });
   await call("Page.navigate", { url: `${serverUrl}/plugins/host-monitor/host-monitor` });
   await waitFor("Array.from(document.querySelectorAll('button')).some((button) => button.textContent?.trim() === 'Customize' && !button.disabled)");
-  await evaluate("document.querySelector('.bb-select__trigger')?.click()");
+  await clickCenter("document.querySelector('.bb-select__trigger')");
   await waitFor("document.querySelector('.bb-select__content') !== null");
   const narrowCombo = await evaluate(`(() => {
     const rect = document.querySelector('.bb-select__content')?.getBoundingClientRect();
