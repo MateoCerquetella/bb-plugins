@@ -86,6 +86,9 @@ grok login
 opencode auth login
 ```
 
+Antigravity quota probing runs in the background from a cached snapshot, so it
+does not add its 3–4 second CLI startup time to the sidebar RPC response.
+
 If a CLI is missing, signed out, or expired, expand that provider in the strip
 to see the recovery instruction reported by BB.
 

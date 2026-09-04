@@ -82,7 +82,7 @@ export default function cleanMyContextPlugin(bb: BbPluginApi): void {
           exitCode: 0,
           stdout: json
             ? JSON.stringify(result)
-            : `Cleared model context for ${threadId}. Thread history and workspace are unchanged.`,
+            : `Reset active chat and model context for ${threadId}. Durable history and workspace are unchanged.`,
         };
       } catch (error) {
         return { exitCode: 1, stderr: errorMessage(error) };

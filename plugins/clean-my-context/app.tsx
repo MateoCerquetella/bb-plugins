@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   definePluginApp,
+  useBbContext,
+  useComposer,
   useRpc,
-  type PluginThreadHeaderActionProps,
 } from "@get-bb/plugin-sdk/app";
 import { toast } from "sonner";
 import type { rpcContract } from "./server.js";
@@ -13,30 +14,39 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-function ClearContextAction({ threadId }: PluginThreadHeaderActionProps) {
+function ClearContextAction() {
+  const { threadId } = useBbContext();
+  const composer = useComposer();
   const rpc = useRpc<typeof rpcContract>();
+  const clearingRef = useRef(false);
   const [clearing, setClearing] = useState(false);
 
-  async function clearContext(): Promise<void> {
+  async function clearCurrentThread(): Promise<void> {
+    if (clearingRef.current || threadId === null) {
+      return;
+    }
     if (
       !window.confirm(
-        "Clear this thread's model context? Its BB history and workspace will stay unchanged.",
+        "Clear this thread's visible chat and model context? Its branch, folder, workspace, and settings will stay the same.",
       )
     ) {
       return;
     }
+    clearingRef.current = true;
     setClearing(true);
     try {
       await rpc.call("clearContext", { threadId });
-      toast.success("Model context cleared", {
+      toast.success("Thread context cleared", {
         description:
-          "New prompts start fresh; thread history and workspace are unchanged.",
+          "Continue here with the same branch, folder, workspace, and settings.",
       });
+      composer.focus();
     } catch (error) {
-      toast.error("Could not clear model context", {
+      toast.error("Could not clear this thread", {
         description: errorMessage(error),
       });
     } finally {
+      clearingRef.current = false;
       setClearing(false);
     }
   }
@@ -46,10 +56,11 @@ function ClearContextAction({ threadId }: PluginThreadHeaderActionProps) {
       type="button"
       variant="ghost"
       size="icon"
-      className="size-7"
-      aria-label="Clear model context"
-      disabled={clearing}
-      onClick={() => void clearContext()}
+      className="size-7 bg-transparent text-foreground hover:bg-state-hover"
+      aria-label="Clear this thread"
+      disabled={clearing || threadId === null}
+      onMouseDown={(event) => event.preventDefault()}
+      onClick={() => void clearCurrentThread()}
     >
       <Icon
         name={clearing ? "Spinner" : "Clean"}
@@ -60,9 +71,9 @@ function ClearContextAction({ threadId }: PluginThreadHeaderActionProps) {
 }
 
 export default definePluginApp((app) => {
-  app.slots.experimental_threadHeaderAction({
+  app.composer.customize({
     id: "clear-context",
-    title: "Clean My Context",
-    component: ClearContextAction,
+    scopes: ["thread"],
+    actions: [{ id: "clear-thread", component: ClearContextAction }],
   });
 });

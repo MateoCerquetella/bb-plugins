@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { readFile } from "node:fs/promises";
 import {
   createFakePluginHost,
   experimental_scanPublicSdkOnly,
@@ -6,6 +7,13 @@ import {
 import plugin from "./server.js";
 
 describe("Clean My Context backend", () => {
+  it("requires a runtime SDK with same-thread context clearing", async () => {
+    const manifest = JSON.parse(
+      await readFile(new URL("./package.json", import.meta.url), "utf8"),
+    ) as { engines: { bbPluginSdk: string } };
+    expect(manifest.engines.bbPluginSdk).toBe("0.4.41 || >=0.4.46");
+  });
+
   it("clears context through RPC and explicit CLI targets", async () => {
     const { bb, harness } = createFakePluginHost({
       pluginId: "clean-my-context",

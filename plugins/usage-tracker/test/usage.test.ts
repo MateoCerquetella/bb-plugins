@@ -17,6 +17,7 @@ import {
   type RawProviderUsage,
   type RawUsageResponse,
 } from "../lib/usage.ts";
+import { normalizeAntigravityOutput } from "../lib/antigravity-probe.ts";
 import {
   highestSidebarUsagePrimary,
   mergeLastKnownWindows,
@@ -209,6 +210,79 @@ test("normalizes providers in stable order with every usage window", () => {
   assert.match(snapshot.providers[1]?.message ?? "", /`claude`/);
   assert.equal(snapshot.providers[2]?.status, "unauthenticated");
   assert.match(snapshot.providers[2]?.message ?? "", /cursor-agent login/);
+});
+
+test("normalizes Antigravity fractional quotas across both groups", () => {
+  const provider = normalizeAntigravityOutput(
+    {
+      plan: "Google AI Pro",
+      groups: [
+        { name: "Gemini Models", windows: [
+          { label: "5h", remaining_fraction: 0.875, reset_time: "2026-09-02T12:00:00Z" },
+          { label: "weekly", remaining_fraction: 0.61, reset_time: null },
+        ] },
+        { name: "Claude and GPT models", windows: [
+          { label: "5-hour", remainingFraction: 0.42, resetTime: null },
+          { label: "Weekly", remaining_fraction: 0.93, reset_time: null },
+        ] },
+      ],
+    },
+    "user@example.com",
+  );
+  assert.equal(provider.status, "ok");
+  assert.equal(provider.accountEmail, "user@example.com");
+  assert.equal(provider.planLabel, "Google AI Pro");
+  assert.deepEqual(provider.windows.map((window) => window.label), [
+    "Gemini: 5-hour limit", "Gemini: Weekly limit",
+    "Claude/GPT: 5-hour limit", "Claude/GPT: Weekly limit",
+  ]);
+  assert.ok(Math.abs(provider.windows[0]!.usedPercent - 12.5) < 1e-12);
+  assert.ok(Math.abs(provider.windows[2]!.usedPercent - 58) < 1e-12);
+  assert.ok(Math.abs(provider.windows[3]!.usedPercent - 7) < 1e-12);
+});
+
+test("normalizes agy command-data buckets", () => {
+  const provider = normalizeAntigravityOutput({
+    response: "human-readable output",
+    command: { data: { groups: [
+      { name: "Gemini Models", buckets: [{ name: "Weekly Limit Remaining", remaining_fraction: 0.86 }] },
+      { name: "Claude and GPT models", buckets: [{ name: "Five Hour Limit Remaining", remaining_fraction: 1 }] },
+    ] } },
+  });
+  assert.equal(provider.status, "ok");
+  assert.deepEqual(provider.windows.map((window) => window.label), [
+    "Gemini: Weekly limit",
+    "Claude/GPT: 5-hour limit",
+  ]);
+  assert.ok(Math.abs(provider.windows[0]!.usedPercent - 14) < 1e-12);
+  assert.equal(provider.windows[1]!.usedPercent, 0);
+});
+
+test("uses the tightest Antigravity group in compact usage", () => {
+  const provider = normalizeAntigravityOutput({ groups: [
+      { name: "Gemini Models", windows: [
+        { label: "5h", remaining_fraction: 0.8 },
+        { label: "weekly", remaining_fraction: 0.5 },
+      ] },
+      { name: "Claude and GPT models", windows: [
+        { label: "5h", remaining_fraction: 0.3 },
+        { label: "weekly", remaining_fraction: 0.9 },
+      ] },
+    ] });
+  assert.equal(sidebarUsagePrimarySummary(provider, "Five-hour"), "70%");
+  assert.equal(sidebarUsagePrimarySummary(provider, "Weekly"), "50%");
+  assert.deepEqual(sidebarUsageDetailRows(provider).map((row) => row.label), [
+    "Gemini: 5-hour limit", "Gemini: Weekly limit", "Claude/GPT: 5-hour limit", "Claude/GPT: Weekly limit",
+  ]);
+});
+
+test("normalizes an uninstalled Antigravity provider", () => {
+  const provider = normalizeUsage(
+    { antigravity: { status: "not_installed" } },
+    { id: null, name: null },
+  ).providers.find((candidate) => candidate.id === "antigravity");
+  assert.equal(provider?.status, "not_installed");
+  assert.equal(provider?.message, "Antigravity is not installed on this machine.");
 });
 
 test("keeps current provider wire-key windows intact", () => {
