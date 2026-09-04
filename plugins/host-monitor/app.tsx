@@ -1087,7 +1087,7 @@ function ProcessesWidget({ machine }: { machine: MachineRow }) {
               }}
             />
           )}
-          {ok.truncated && <p className="host-monitor__widget-status">Showing {ok.processes.length} of {ok.totalCount} processes. Filter applies to shown rows.</p>}
+          {ok.truncated && <p className="host-monitor__widget-status">Summary and filter use these {ok.processes.length} shown processes; {ok.totalCount} exist on the host.</p>}
           {ok.elevated && <p className="host-monitor__widget-status">Process actions are protected while Host Monitor runs with elevated privileges.</p>}
         </>
       ) : null}

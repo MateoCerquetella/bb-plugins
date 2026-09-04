@@ -100,6 +100,7 @@ test("process section toggles compactly and pauses polling while collapsed", () 
   assert.match(app, /Top CPU/u);
   assert.match(app, /Top RAM/u);
   assert.match(app, /Top usage and protected counts are based on the/u);
+  assert.match(app, /Summary and filter use these .* shown processes/u);
   assert.match(app, /data-refresh-count=\{refreshCount\}/u);
   assert.match(app, /const processFooterMessage = !expanded/u);
   assert.match(styles, /\.host-monitor__process-summary\s*\{[^}]*display:\s*flex/su);
