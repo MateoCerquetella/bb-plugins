@@ -352,14 +352,16 @@ try {
     const row = document.querySelector('.host-monitor__process-list > li');
     const rowStyle = row == null ? null : getComputedStyle(row);
     return {
+      summaryLabels: Array.from(summary?.querySelectorAll('dt') ?? []).map((term) => term.textContent?.trim()),
       summaryContained: summaryRect != null && itemRects.every((rect) => rect.left >= summaryRect.left && rect.right <= summaryRect.right),
+      boundedScope: Array.from(document.querySelectorAll('.host-monitor__process-widget .host-monitor__widget-status')).some((node) => node.textContent?.includes('Summary and filter use these')),
       rowBorderRadius: rowStyle?.borderRadius ?? null,
       rowBackground: rowStyle?.backgroundColor ?? null,
       rowTopBorder: rowStyle?.borderTopWidth ?? null,
       overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth
     };
   })()`);
-  if (!narrowProcesses.summaryContained || narrowProcesses.rowBorderRadius !== '0px' || narrowProcesses.rowBackground !== 'rgba(0, 0, 0, 0)' || narrowProcesses.rowTopBorder !== '0px' || narrowProcesses.overflow) throw new Error(`Invalid flat narrow Processes layout: ${JSON.stringify(narrowProcesses)}`);
+  if (JSON.stringify(narrowProcesses.summaryLabels) !== JSON.stringify(['Processes', 'Shown', 'Top CPU', 'Top RAM', 'Protected']) || !narrowProcesses.summaryContained || !narrowProcesses.boundedScope || narrowProcesses.rowBorderRadius !== '0px' || narrowProcesses.rowBackground !== 'rgba(0, 0, 0, 0)' || narrowProcesses.rowTopBorder !== '0px' || narrowProcesses.overflow) throw new Error(`Invalid flat narrow Processes layout: ${JSON.stringify(narrowProcesses)}`);
   await screenshot(processNarrowPath);
   await evaluate("document.querySelector('.host-monitor__machine-heading')?.scrollIntoView({ block: 'start' })");
   await evaluate(`Array.from(document.querySelectorAll('button')).find((button) => button.textContent?.trim() === 'Customize')?.click()`);
