@@ -63,17 +63,30 @@ function isCodexProWithoutFiveHourLimit(
 export function sidebarUsageWindows(
   provider: ProviderUsage,
 ): SidebarUsageWindows {
+  const matching = (predicate: (label: string) => boolean) => {
+    const candidates = provider.windows.filter((window) => predicate(window.label));
+    return (provider.id === "antigravity"
+      ? [...candidates].sort((a, b) => b.usedPercent - a.usedPercent)
+      : candidates)[0] ?? null;
+  };
+
   return {
     fiveHour:
-      provider.windows.find((window) => isFiveHourLabel(window.label)) ?? null,
+      matching((label) => isFiveHourLabel(label)),
     weekly:
-      provider.windows.find((window) => isWeeklyLabel(window.label)) ?? null,
+      matching((label) => isWeeklyLabel(label)),
   };
 }
 
 export function sidebarUsageDetailRows(
   provider: ProviderUsage,
 ): SidebarUsageDetailRow[] {
+  if (provider.id === "antigravity") {
+    return provider.windows.map((window) => ({
+      label: window.label,
+      window,
+    }));
+  }
   const pair = sidebarUsageWindows(provider);
   const selected = new Set<UsageWindow>();
   if (pair.fiveHour !== null) selected.add(pair.fiveHour);

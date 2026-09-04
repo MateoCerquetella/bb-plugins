@@ -1,4 +1,4 @@
-export const SIDEBAR_PROVIDER_IDS = ["claudeCode", "codex"] as const;
+export const SIDEBAR_PROVIDER_IDS = ["claudeCode", "codex", "antigravity"] as const;
 export const COMPACT_LIMIT_OPTIONS = ["Weekly", "Five-hour"] as const;
 
 export type SidebarProviderId = (typeof SIDEBAR_PROVIDER_IDS)[number];
@@ -13,18 +13,21 @@ export function normalizeCompactLimitOption(
 export interface UsageTrackerPreferences {
   enableClaudeCode: boolean;
   enableCodex: boolean;
+  enableAntigravity?: boolean;
   compactLimit: CompactLimitOption;
 }
 
 export function enabledSidebarProviderIds(
   preferences: Pick<
     UsageTrackerPreferences,
-    "enableClaudeCode" | "enableCodex"
+    "enableClaudeCode" | "enableCodex" | "enableAntigravity"
   >,
 ): SidebarProviderId[] {
   return SIDEBAR_PROVIDER_IDS.filter((providerId) =>
     providerId === "claudeCode"
       ? preferences.enableClaudeCode
-      : preferences.enableCodex,
+      : providerId === "codex"
+        ? preferences.enableCodex
+        : preferences.enableAntigravity === true,
   );
 }
