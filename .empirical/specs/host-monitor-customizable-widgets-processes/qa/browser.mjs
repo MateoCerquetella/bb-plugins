@@ -77,6 +77,10 @@ try {
     const result = await call("Page.captureScreenshot", { format: "png", captureBeyondViewport: false });
     writeFileSync(path, Buffer.from(result.data, "base64"));
   };
+  const pressKey = async (key, code = key) => {
+    await call("Input.dispatchKeyEvent", { type: "keyDown", key, code });
+    await call("Input.dispatchKeyEvent", { type: "keyUp", key, code });
+  };
 
   await call("Page.enable");
   await call("Runtime.enable");
@@ -131,6 +135,11 @@ try {
   await screenshot(comboPath);
   await evaluate(`Array.from(document.querySelectorAll('.bb-select__item')).find((item) => item.textContent?.trim() === '6 hours')?.click()`);
   await waitFor("document.querySelector('.bb-select__trigger')?.textContent?.trim() === '6 hours'");
+  await evaluate("document.querySelector('.bb-select__trigger')?.focus()");
+  await pressKey("ArrowDown");
+  await waitFor("document.querySelector('.bb-select__content') !== null");
+  await pressKey("Escape");
+  await waitFor("document.querySelector('.bb-select__content') === null && document.activeElement === document.querySelector('.bb-select__trigger')");
   await evaluate("document.querySelector('.bb-select__trigger')?.click()");
   await waitFor("document.querySelector('.bb-select__content') !== null");
   await evaluate(`Array.from(document.querySelectorAll('.bb-select__item')).find((item) => item.textContent?.trim() === '1 day')?.click()`);
@@ -236,6 +245,15 @@ try {
   await call("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 1, mobile: false });
   await call("Page.navigate", { url: `${serverUrl}/plugins/host-monitor/host-monitor` });
   await waitFor("Array.from(document.querySelectorAll('button')).some((button) => button.textContent?.trim() === 'Customize' && !button.disabled)");
+  await evaluate("document.querySelector('.bb-select__trigger')?.click()");
+  await waitFor("document.querySelector('.bb-select__content') !== null");
+  const narrowCombo = await evaluate(`(() => {
+    const rect = document.querySelector('.bb-select__content')?.getBoundingClientRect();
+    return rect == null ? null : { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, viewportWidth: innerWidth, viewportHeight: innerHeight };
+  })()`);
+  if (narrowCombo == null || narrowCombo.left < 0 || narrowCombo.right > narrowCombo.viewportWidth || narrowCombo.top < 0 || narrowCombo.bottom > narrowCombo.viewportHeight) throw new Error(`History popup escaped narrow viewport: ${JSON.stringify(narrowCombo)}`);
+  await pressKey("Escape");
+  await waitFor("document.querySelector('.bb-select__content') === null && document.activeElement === document.querySelector('.bb-select__trigger')");
   await evaluate(`Array.from(document.querySelectorAll('button')).find((button) => button.textContent?.trim() === 'Customize')?.click()`);
   await waitFor("document.querySelector('.host-monitor__editor') !== null");
   await waitFor("document.querySelector('.host-monitor__process-list') !== null");
@@ -253,7 +271,7 @@ try {
   if (narrow.overflow || narrow.rows < 10 || narrow.hostStripOverflow !== 'auto' || narrow.processTableDisplay !== 'none' || narrow.processListDisplay !== 'grid' || narrow.rangeRight > narrow.viewport[0] || narrow.rangeWidth < 96) throw new Error(`Invalid narrow layout: ${JSON.stringify(narrow)}`);
   await screenshot(narrowPath);
 
-  console.log(JSON.stringify({ modal: modalSummary, navigation: navigationState, combobox: { ...comboboxSummary, options: comboOptions }, initial, widgets: { original: originalWidgets.length, persisted: persistedWidgets.length, changedKey }, processes: processSummary, switchedTo: targetName, narrow, artifacts: [sidebarPath, modalPath, monitorPath, comboPath, processPath, processDialogPath, desktopPath, narrowPath] }));
+  console.log(JSON.stringify({ modal: modalSummary, navigation: navigationState, combobox: { ...comboboxSummary, options: comboOptions, keyboardFocusRestored: true, narrowBounds: narrowCombo }, initial, widgets: { original: originalWidgets.length, persisted: persistedWidgets.length, changedKey }, processes: processSummary, switchedTo: targetName, narrow, artifacts: [sidebarPath, modalPath, monitorPath, comboPath, processPath, processDialogPath, desktopPath, narrowPath] }));
   socket.close();
 } finally {
   browser.kill("SIGTERM");

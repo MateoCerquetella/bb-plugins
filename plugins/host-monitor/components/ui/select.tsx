@@ -42,7 +42,6 @@ export const SelectTrigger = forwardRef<
     </SelectPrimitive.Trigger>
   );
 });
-
 export const SelectContent = forwardRef<
   ComponentRef<typeof SelectPrimitive.Content>,
   ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
@@ -76,4 +75,3 @@ export const SelectItem = forwardRef<
     </SelectPrimitive.Item>
   );
 });
-
