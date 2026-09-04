@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-2d47c836591f1b226bce2864",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3",
+    "AC-UI-4",
+    "AC-UI-5"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Exercise the installed Host Monitor across four connected hosts: native no-reload navigation, no numeric guide chips, persisted/restored widget order and visibility, live bounded processes, cancel-first confirmation, host switching, and 390px responsive layout.",
+  "passed": true,
+  "startedAt": "2026-09-04T16:38:02.377Z",
+  "completedAt": "2026-09-04T16:38:13.324Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-customizable-widgets-processes",
+    "specRevision": 3,
+    "specDigest": "sha256:0f675990300c9c0db81b1e9c546fcb6c5535bdfbba824c9c0ed513f2f64a697e",
+    "treeDigest": "sha256:37a80ab02c140b5ed241afd316b89c95223b5c93cd405db6e808693d314fb064",
+    "policyDigest": "sha256:39d04bb7b0c02856e618bfb5175d1f83577318536445ecf69eccb54b9a7471a8",
+    "workflowRevision": 7,
+    "gitCommit": "f2318350a138acd210c98a6d8423ddeec77102ea"
+  },
+  "digest": "sha256:4e6eee01d627f8141a6c440d3db087d167ede2a51d9dc8dcc448bfdfb73f8ad4",
+  "kind": "qa",
+  "matrixDigest": "sha256:3eb52a71bb786ae377107f6c82bf081bea94d54b9817b0056d1046b97450fe44",
+  "check": {
+    "id": "qa-end-to-end",
+    "kind": "end-to-end"
+  },
+  "coveredChecks": [
+    "end-to-end"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Exercise the installed Host Monitor across four connected hosts: native no-reload navigation, no numeric guide chips, persisted/restored widget order and visibility, live bounded processes, cancel-first confirmation, host switching, and 390px responsive layout.",
+      "startedAt": "2026-09-04T16:38:02.377Z",
+      "completedAt": "2026-09-04T16:38:13.324Z",
+      "durationMs": 10947,
+      "collector": null,
+      "command": {
+        "argv": [
+          "node",
+          ".empirical/specs/host-monitor-native-footer-configurable-metrics/qa/browser.mjs"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:e09e3db5c74e766c4b39638fac4b0b5579e7b685ec7a26855a9ec9a1f832c30a",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "{\"modal\":{\"machines\":4,\"metrics\":12,\"dialog\":\"dialog\",\"guideLabels\":8,\"numericGuideChips\":0,\"settingsRoute\":false,\"alerts\":0},\"navigation\":{\"marker\":\"host-monitor-1788539884051\",\"visiblePageRows\":0,\"settingsRoute\":false},\"initial\":{\"machines\":4,\"panels\":11,\"selected\":\"development1\",\"alerts\":0,\"settingsRoute\":false,\"footerActionsBefore\":1},\"widgets\":{\"original\":13,\"persisted\":13,\"changedKey\":\"cpu:timeseries\"},\"processes\":{\"rows\":100,\"actionable\":8,\"state\":null},\"switchedTo\":\"development1\",\"narrow\":{\"viewport\":[390,844],\"overflow\":false,\"rows\":13,\"hostStripOverflow\":\"auto\",\"processTableDisplay\":\"none\",\"processListDisplay\":\"grid\"},\"artifacts\":[\"/home/dyaus/.bb/worktrees/host-monitor-customizable-widgets-processes/.empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/sidebar-icon-only.png\",\"/home/dyaus/.bb/worktrees/host-monitor-customizable-widgets-processes/.empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/mini-modal-desktop.png\",\"/home/dyaus/.bb/worktrees/host-monitor-customizable-widgets-processes/.empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/dashboard-wide.png\",\"/home/dyaus/.bb/worktrees/host-monitor-customizable-widgets-processes/.empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/process-widget-wide.png\",\"/home/dyaus/.bb/worktrees/host-monitor-customizable-widgets-processes/.empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/process-confirmation.png\",\"/home/dyaus/.bb/worktrees/host-monitor-customizable-widgets-processes/.empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/editor-desktop.png\",\"/home/dyaus/.bb/worktrees/host-monitor-customizable-widgets-processes/.empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/editor-390.png\"]}\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:37a80ab02c140b5ed241afd316b89c95223b5c93cd405db6e808693d314fb064",
+      "sourceTreeAfter": "sha256:37a80ab02c140b5ed241afd316b89c95223b5c93cd405db6e808693d314fb064",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/dashboard-wide.png",
+          "mediaType": "image/png",
+          "bytes": 156381,
+          "digest": "sha256:b6e9afc00b133f65d5dc95538983fe77d3338e71c4fad9c93c657924a92138e1"
+        },
+        {
+          "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/editor-390.png",
+          "mediaType": "image/png",
+          "bytes": 39610,
+          "digest": "sha256:673f59949377daa1cfaccca250d660a823e251f37de718434181e6dacc51161d"
+        },
+        {
+          "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/editor-desktop.png",
+          "mediaType": "image/png",
+          "bytes": 147087,
+          "digest": "sha256:be9fb6165405f783843786bfa7819416829742118ad678a68693c841f4a0ecbe"
+        },
+        {
+          "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/mini-modal-desktop.png",
+          "mediaType": "image/png",
+          "bytes": 84464,
+          "digest": "sha256:131fdec4f5f2f6f49b05de34eb274a91f53bcc50f934a61e8c9090a0e01b5a2e"
+        },
+        {
+          "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/process-confirmation.png",
+          "mediaType": "image/png",
+          "bytes": 139346,
+          "digest": "sha256:4acf5b676c38c9ff3a6918b8d53f34e669b45de7daca56d79552798d139e46a9"
+        },
+        {
+          "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/process-widget-wide.png",
+          "mediaType": "image/png",
+          "bytes": 104821,
+          "digest": "sha256:a05c5ff5df223cc503e66b27e39e8ebdb0e3b0115991f1dd9d806cf01ab5c723"
+        },
+        {
+          "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/sidebar-icon-only.png",
+          "mediaType": "image/png",
+          "bytes": 72436,
+          "digest": "sha256:6ed7064edd8c32ad1061a9e0afe7f4fe5a2f5877865be8893804de41fca3f767"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}

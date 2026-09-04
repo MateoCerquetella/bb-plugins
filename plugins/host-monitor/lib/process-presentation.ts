@@ -157,4 +157,3 @@ export function processOwnerLabel(
   if (owner === "different-user") return "Other user";
   return "Unknown";
 }
-

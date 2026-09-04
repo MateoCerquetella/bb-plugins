@@ -50,7 +50,7 @@
       "id": "host-monitor-browser",
       "argv": [
         "node",
-        ".empirical/specs/host-monitor-native-footer-configurable-metrics/qa/browser.mjs"
+          ".empirical/specs/host-monitor-customizable-widgets-processes/qa/browser.mjs"
       ],
       "cwd": ".",
       "timeoutMs": 120000,

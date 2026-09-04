@@ -136,4 +136,3 @@ export class ProcessConfirmationStore {
     return JSON.stringify([payload.hostId, payload.pid, payload.identity]);
   }
 }
-

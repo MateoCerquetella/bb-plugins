@@ -5,4 +5,3 @@ export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputE
     return <input className={`bb-input ${className}`.trim()} ref={ref} {...props} />;
   },
 );
-

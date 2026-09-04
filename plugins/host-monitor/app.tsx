@@ -743,12 +743,14 @@ function ProcessesWidget({ machine }: { machine: MachineRow }) {
   const [challenge, setChallenge] = useState<PreparedTerminationReady | null>(null);
   const [executing, setExecuting] = useState(false);
   const [status, setStatus] = useState("");
-  const requestGeneration = useRef(0);
+  const hostGeneration = useRef(0);
+  const listRequest = useRef(0);
   const cancelRef = useRef<HTMLButtonElement>(null);
 
   const loadProcesses = useCallback(async () => {
     if (machine.host.status !== "connected") return;
-    const generation = ++requestGeneration.current;
+    const generation = hostGeneration.current;
+    const request = ++listRequest.current;
     setLoading(true);
     setError(null);
     try {
@@ -757,20 +759,21 @@ function ProcessesWidget({ machine }: { machine: MachineRow }) {
         sortBy,
         limit: PROCESS_PAGE_LIMIT,
       });
-      if (requestGeneration.current !== generation) return;
+      if (hostGeneration.current !== generation || listRequest.current !== request) return;
       setResult(next);
       if (next.outcome !== "ok") setStatus(next.message);
       else setStatus(`${next.processes.length} processes refreshed.`);
     } catch (cause) {
-      if (requestGeneration.current !== generation) return;
+      if (hostGeneration.current !== generation || listRequest.current !== request) return;
       setError(cause instanceof Error ? cause.message : "Could not load processes.");
     } finally {
-      if (requestGeneration.current === generation) setLoading(false);
+      if (hostGeneration.current === generation && listRequest.current === request) setLoading(false);
     }
   }, [machine.host.id, machine.host.status, rpc, sortBy]);
 
   useEffect(() => {
-    requestGeneration.current += 1;
+    hostGeneration.current += 1;
+    listRequest.current += 1;
     setResult(null);
     setError(null);
     setChallenge(null);
@@ -780,7 +783,8 @@ function ProcessesWidget({ machine }: { machine: MachineRow }) {
     void loadProcesses();
     const timer = window.setInterval(() => void loadProcesses(), PROCESS_REFRESH_MS);
     return () => {
-      requestGeneration.current += 1;
+      hostGeneration.current += 1;
+      listRequest.current += 1;
       window.clearInterval(timer);
     };
   }, [loadProcesses, machine.host.id, machine.host.status]);
@@ -790,7 +794,7 @@ function ProcessesWidget({ machine }: { machine: MachineRow }) {
     identity: string,
     mode: ProcessTerminationMode,
   ) => {
-    const generation = requestGeneration.current;
+    const generation = hostGeneration.current;
     setPendingIdentity(identity);
     setStatus("Rechecking process identity and permissions…");
     try {
@@ -800,7 +804,7 @@ function ProcessesWidget({ machine }: { machine: MachineRow }) {
         identity,
         mode,
       });
-      if (requestGeneration.current !== generation) return;
+      if (hostGeneration.current !== generation) return;
       if (prepared.outcome === "ready") {
         setChallenge(prepared);
         setStatus(`${prepared.process.name} is ready for confirmation.`);
@@ -809,24 +813,24 @@ function ProcessesWidget({ machine }: { machine: MachineRow }) {
         void loadProcesses();
       }
     } catch (cause) {
-      if (requestGeneration.current === generation) {
+      if (hostGeneration.current === generation) {
         setStatus(cause instanceof Error ? cause.message : "Could not safely recheck this process.");
       }
     } finally {
-      if (requestGeneration.current === generation) setPendingIdentity(null);
+      if (hostGeneration.current === generation) setPendingIdentity(null);
     }
   }, [loadProcesses, machine.host.id, rpc]);
 
   const executeTermination = useCallback(async () => {
     if (challenge == null || executing) return;
     const current = challenge;
-    const generation = requestGeneration.current;
+    const generation = hostGeneration.current;
     setExecuting(true);
     try {
       const executed = await rpc.call("executeProcessTermination", {
         confirmationToken: current.confirmationToken,
       });
-      if (requestGeneration.current !== generation) return;
+      if (hostGeneration.current !== generation) return;
       setChallenge(null);
       setStatus(executed.message);
       if (executed.outcome === "still-running" && current.process.mode === "graceful") {
@@ -835,12 +839,12 @@ function ProcessesWidget({ machine }: { machine: MachineRow }) {
         void loadProcesses();
       }
     } catch (cause) {
-      if (requestGeneration.current === generation) {
+      if (hostGeneration.current === generation) {
         setChallenge(null);
         setStatus(cause instanceof Error ? cause.message : "The process action could not be completed.");
       }
     } finally {
-      if (requestGeneration.current === generation) setExecuting(false);
+      if (hostGeneration.current === generation) setExecuting(false);
     }
   }, [challenge, executing, loadProcesses, prepareTermination, rpc]);
 

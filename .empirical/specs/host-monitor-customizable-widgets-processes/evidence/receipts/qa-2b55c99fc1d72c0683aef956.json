@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-2b55c99fc1d72c0683aef956",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3",
+    "AC-UI-4",
+    "AC-UI-5"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "Fresh-context QA passed all criteria using only the specification, commit-bound receipts, and live screenshots; observable UI/process flow and deeper safety/config guarantees were distinguished.",
+  "passed": true,
+  "startedAt": "2026-09-04T16:39:32.795Z",
+  "completedAt": "2026-09-04T16:39:32.795Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-customizable-widgets-processes",
+    "specRevision": 3,
+    "specDigest": "sha256:0f675990300c9c0db81b1e9c546fcb6c5535bdfbba824c9c0ed513f2f64a697e",
+    "treeDigest": "sha256:37a80ab02c140b5ed241afd316b89c95223b5c93cd405db6e808693d314fb064",
+    "policyDigest": "sha256:39d04bb7b0c02856e618bfb5175d1f83577318536445ecf69eccb54b9a7471a8",
+    "workflowRevision": 7,
+    "gitCommit": "f2318350a138acd210c98a6d8423ddeec77102ea"
+  },
+  "digest": "sha256:016da6b7175c044dc057b6baacc023daf8832c03ca032924c5ee7d13a9fc8b2e",
+  "kind": "qa",
+  "matrixDigest": "sha256:3eb52a71bb786ae377107f6c82bf081bea94d54b9817b0056d1046b97450fe44",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Fresh-context QA passed all criteria using only the specification, commit-bound receipts, and live screenshots; observable UI/process flow and deeper safety/config guarantees were distinguished.",
+      "startedAt": "2026-09-04T16:39:32.795Z",
+      "completedAt": "2026-09-04T16:39:32.795Z",
+      "durationMs": 0,
+      "collector": "fresh-context-agent:host_monitor_fresh_context_qa",
+      "command": null,
+      "result": null,
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:37a80ab02c140b5ed241afd316b89c95223b5c93cd405db6e808693d314fb064",
+      "sourceTreeAfter": "sha256:37a80ab02c140b5ed241afd316b89c95223b5c93cd405db6e808693d314fb064",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/dashboard-wide.png",
+          "mediaType": "image/png",
+          "bytes": 156381,
+          "digest": "sha256:b6e9afc00b133f65d5dc95538983fe77d3338e71c4fad9c93c657924a92138e1"
+        },
+        {
+          "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/editor-390.png",
+          "mediaType": "image/png",
+          "bytes": 39610,
+          "digest": "sha256:673f59949377daa1cfaccca250d660a823e251f37de718434181e6dacc51161d"
+        },
+        {
+          "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/process-confirmation.png",
+          "mediaType": "image/png",
+          "bytes": 139346,
+          "digest": "sha256:4acf5b676c38c9ff3a6918b8d53f34e669b45de7daca56d79552798d139e46a9"
+        },
+        {
+          "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/receipts/qa-09bd18248e9951a6a5aa27a6.json",
+          "mediaType": "application/json",
+          "bytes": 11341,
+          "digest": "sha256:4e7161e8367d5e62d0f620fe44b36748fb6164ca4e4d9cfc81c9c064f2b63861"
+        },
+        {
+          "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/receipts/qa-2d47c836591f1b226bce2864.json",
+          "mediaType": "application/json",
+          "bytes": 7159,
+          "digest": "sha256:ab4586cb8ce4eca801cc5d925ca613f48094a48fe5816b305f5086c756ed4cd2"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}

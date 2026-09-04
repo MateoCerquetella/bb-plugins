@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "sequence": 8,
+  "previousDigest": "sha256:86770f8d99c78909b2701a139f1b0ef4d9d66088b098b777a489f1c13842ecf1",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Verified committed Host Monitor implementation with 72 focused tests/typecheck/build, live four-host browser navigation and persistence, process preflight confirmation, wide/390px screenshots, and fresh-context acceptance QA.",
+  "createdAt": "2026-09-04T16:39:42.713Z",
+  "stateBeforeDigest": "sha256:b0fb85977ac69bc9b87216d397900cbd0b66b8407e8c8cfbea1509ae5bf7acbc",
+  "stateAfterDigest": "sha256:b1425c09a0d1878a694bb4a1455c1648bdbe7555d999806b6ce507f62aadd275",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 8,
+    "activeFeature": "host-monitor-customizable-widgets-processes",
+    "request": "Improve Host Monitor dashboard with BB-native UI, restored per-host process controls, and persisted customizable widget layout; preserve existing committed baseline and do not merge/deploy.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "review",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Verified committed Host Monitor implementation with 72 focused tests/typecheck/build, live four-host browser navigation and persistence, process preflight confirmation, wide/390px screenshots, and fresh-context acceptance QA.",
+    "implementationActor": "agent",
+    "workStartedAt": "2026-09-04T16:04:00.718Z",
+    "specDigest": "sha256:0f675990300c9c0db81b1e9c546fcb6c5535bdfbba824c9c0ed513f2f64a697e",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:aa291476de377d476479eca2117c07e71faea79324a7bcdbcb25f1bc4c613630",
+    "impactDigest": "sha256:5a2e04a8694489b8ddc3ab5b09ad21acfe4d45a28200bf02ad381631b0189ed5",
+    "capabilityClaimId": "host-monitor-customizable-widgets-processes-73cb5622e3c9",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "qa-09bd18248e9951a6a5aa27a6",
+      "qa-2d47c836591f1b226bce2864",
+      "collected-0224885d9c0f1af1271c28ed",
+      "qa-2b55c99fc1d72c0683aef956"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": true,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "verified",
+      "reasons": {
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-04T16:39:42.713Z"
+  },
+  "digest": "sha256:89a8de19f048795586bc37a482654ed4b8e0c0fa1b0ae04313635349f79fdef5"
+}

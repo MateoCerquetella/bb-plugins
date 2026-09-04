@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 7,
+  "revision": 8,
   "activeFeature": "host-monitor-customizable-widgets-processes",
   "request": "Improve Host Monitor dashboard with BB-native UI, restored per-host process controls, and persisted customizable widget layout; preserve existing committed baseline and do not merge/deploy.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "verify",
+  "phase": "review",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Refreshed repository context after implementation; all managed context pages are present, current, valid, and require no refinement.",
+  "message": "Verified committed Host Monitor implementation with 72 focused tests/typecheck/build, live four-host browser navigation and persistence, process preflight confirmation, wide/390px screenshots, and fresh-context acceptance QA.",
   "implementationActor": "agent",
   "workStartedAt": "2026-09-04T16:04:00.718Z",
   "specDigest": "sha256:0f675990300c9c0db81b1e9c546fcb6c5535bdfbba824c9c0ed513f2f64a697e",
@@ -20,21 +20,25 @@
   "capabilityClaimId": "host-monitor-customizable-widgets-processes-73cb5622e3c9",
   "authorizationDigest": null,
   "evidence": [],
-  "evidenceReceiptIds": [],
+  "evidenceReceiptIds": [
+    "qa-09bd18248e9951a6a5aa27a6",
+    "qa-2d47c836591f1b226bce2864",
+    "collected-0224885d9c0f1af1271c28ed",
+    "qa-2b55c99fc1d72c0683aef956"
+  ],
   "legacyEvidenceCount": 0,
   "completion": {
     "implemented": true,
-    "verified": false,
+    "verified": true,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "implemented",
+    "highest": "verified",
     "reasons": {
-      "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-04T16:36:52.834Z"
+  "updatedAt": "2026-09-04T16:39:42.713Z"
 }

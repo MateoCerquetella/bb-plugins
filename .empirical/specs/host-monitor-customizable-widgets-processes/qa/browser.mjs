@@ -1,0 +1,251 @@
+import { spawn } from "node:child_process";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { homedir, tmpdir } from "node:os";
+import { join } from "node:path";
+
+const runtime = JSON.parse(readFileSync(join(homedir(), ".bb/bb-app-runtime.json"), "utf8"));
+const serverUrl = process.env.BB_SERVER_URL ?? runtime.serverUrl;
+if (typeof serverUrl !== "string") throw new Error("Could not resolve the BB server URL.");
+
+const port = 9337;
+const profile = mkdtempSync(join(tmpdir(), "host-monitor-browser-"));
+const browser = spawn("chromium", [
+  "--headless", "--no-sandbox", "--disable-gpu", "--hide-scrollbars",
+  `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, "about:blank",
+], { stdio: "ignore" });
+
+const outputDir = join(process.cwd(), ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser");
+mkdirSync(outputDir, { recursive: true });
+const desktopPath = join(outputDir, "editor-desktop.png");
+const narrowPath = join(outputDir, "editor-390.png");
+const sidebarPath = join(outputDir, "sidebar-icon-only.png");
+const monitorPath = join(outputDir, "dashboard-wide.png");
+const modalPath = join(outputDir, "mini-modal-desktop.png");
+const processPath = join(outputDir, "process-widget-wide.png");
+const processDialogPath = join(outputDir, "process-confirmation.png");
+
+try {
+  let pages;
+  for (let attempt = 0; attempt < 100; attempt += 1) {
+    try {
+      pages = await fetch(`http://127.0.0.1:${port}/json/list`).then((response) => response.json());
+      break;
+    } catch {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+  }
+  const page = pages?.find((candidate) => candidate.type === "page");
+  if (page == null) throw new Error("No Chromium page target found.");
+
+  const socket = new WebSocket(page.webSocketDebuggerUrl);
+  await new Promise((resolve, reject) => {
+    socket.addEventListener("open", resolve, { once: true });
+    socket.addEventListener("error", reject, { once: true });
+  });
+
+  let nextId = 1;
+  const pending = new Map();
+  socket.addEventListener("message", (event) => {
+    const message = JSON.parse(String(event.data));
+    const handler = pending.get(message.id);
+    if (handler == null) return;
+    pending.delete(message.id);
+    if (message.error != null) handler.reject(new Error(message.error.message));
+    else handler.resolve(message.result);
+  });
+
+  const call = (method, params = {}) => {
+    const id = nextId++;
+    socket.send(JSON.stringify({ id, method, params }));
+    return new Promise((resolve, reject) => pending.set(id, { resolve, reject }));
+  };
+  const evaluate = async (expression) => {
+    const result = await call("Runtime.evaluate", { expression, awaitPromise: true, returnByValue: true });
+    if (result.exceptionDetails != null) throw new Error(result.exceptionDetails.text);
+    return result.result.value;
+  };
+  const waitFor = async (expression, timeoutMs = 10_000) => {
+    const started = Date.now();
+    while (Date.now() - started < timeoutMs) {
+      if (await evaluate(expression)) return;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    throw new Error(`Timed out waiting for ${expression}`);
+  };
+  const screenshot = async (path) => {
+    const result = await call("Page.captureScreenshot", { format: "png", captureBeyondViewport: false });
+    writeFileSync(path, Buffer.from(result.data, "base64"));
+  };
+
+  await call("Page.enable");
+  await call("Runtime.enable");
+  await call("Emulation.setDeviceMetricsOverride", { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false });
+  await call("Page.navigate", { url: serverUrl });
+  await waitFor("Array.from(document.querySelectorAll('button')).some((button) => button.getAttribute('aria-label') === 'Host Monitor' || button.getAttribute('title') === 'Host Monitor')");
+  const documentMarker = `host-monitor-${Date.now()}`;
+  await evaluate(`document.documentElement.dataset.hostMonitorTestMarker = ${JSON.stringify(documentMarker)}`);
+  const footerActionsBefore = await evaluate("Array.from(document.querySelectorAll('button')).filter((button) => button.getAttribute('aria-label') === 'Host Monitor' || button.getAttribute('title') === 'Host Monitor').length");
+  const visiblePageRowsBefore = await evaluate("document.querySelectorAll('[data-sidebar-navigation-item=\"host-monitor/host-monitor\"]:not([hidden])').length");
+  await screenshot(sidebarPath);
+  await evaluate(`Array.from(document.querySelectorAll('button')).find((button) => button.getAttribute('aria-label') === 'Host Monitor' || button.getAttribute('title') === 'Host Monitor')?.click()`);
+  await waitFor("document.querySelector('.host-monitor-mini') !== null");
+  await waitFor("document.querySelectorAll('.host-monitor-mini__machine').length >= 2");
+  const modalSummary = await evaluate(`({
+    machines: document.querySelectorAll('.host-monitor-mini__machine').length,
+    metrics: document.querySelectorAll('.host-monitor-mini__machine dd').length,
+    dialog: document.querySelector('.host-monitor-mini')?.getAttribute('role'),
+    guideLabels: Array.from(document.querySelectorAll('.host-monitor-mini__machine [data-guide]')).filter((node) => node.getAttribute('aria-label')?.includes('guide')).length,
+    numericGuideChips: document.querySelectorAll('.host-monitor-mini__machine dt small').length,
+    settingsRoute: location.pathname.includes('/settings'),
+    alerts: document.querySelectorAll('[role="alert"]').length
+  })`);
+  if (footerActionsBefore !== 1 || visiblePageRowsBefore !== 0 || modalSummary.machines < 2 || modalSummary.metrics < 6 || modalSummary.guideLabels < 4 || modalSummary.numericGuideChips !== 0 || modalSummary.dialog !== "dialog" || modalSummary.settingsRoute || modalSummary.alerts !== 0) throw new Error(`Invalid mini modal: ${JSON.stringify({ footerActionsBefore, visiblePageRowsBefore, ...modalSummary })}`);
+  await screenshot(modalPath);
+  await evaluate(`document.querySelector('[data-host-monitor-mini-close]')?.click()`);
+  await waitFor("document.querySelector('.host-monitor-mini') === null");
+  await evaluate(`Array.from(document.querySelectorAll('button')).find((button) => button.getAttribute('aria-label') === 'Host Monitor' || button.getAttribute('title') === 'Host Monitor')?.click()`);
+  await waitFor("document.querySelectorAll('.host-monitor-mini__machine').length >= 2");
+  await evaluate(`Array.from(document.querySelectorAll('.host-monitor-mini button')).find((button) => button.textContent?.trim() === 'Refresh')?.click()`);
+  await waitFor("document.querySelector('[data-host-monitor-mini-status]')?.textContent === 'Updated now'");
+  await evaluate(`Array.from(document.querySelectorAll('.host-monitor-mini button')).find((button) => button.textContent?.trim() === 'Open Host Monitor')?.click()`);
+  await waitFor("location.pathname === '/plugins/host-monitor/host-monitor'");
+  const navigationState = await evaluate(`({
+    marker: document.documentElement.dataset.hostMonitorTestMarker ?? null,
+    visiblePageRows: document.querySelectorAll('[data-sidebar-navigation-item="host-monitor/host-monitor"]:not([hidden])').length,
+    settingsRoute: location.pathname.includes('/settings')
+  })`);
+  if (navigationState.marker !== documentMarker || navigationState.visiblePageRows !== 0 || navigationState.settingsRoute) throw new Error(`Navigation reloaded or exposed the row: ${JSON.stringify(navigationState)}`);
+  await waitFor("document.querySelectorAll('.host-monitor__machine-card').length >= 2");
+  await waitFor("document.querySelectorAll('.host-monitor__panel-grid > article').length > 0");
+
+  const initial = await evaluate(`({
+    machines: document.querySelectorAll('.host-monitor__machine-card').length,
+    panels: document.querySelectorAll('.host-monitor__panel-grid > article').length,
+    selected: document.querySelector('#machine-heading')?.textContent ?? null,
+    alerts: document.querySelectorAll('[role="alert"]').length,
+    settingsRoute: location.pathname.includes('/settings')
+  })`);
+  initial.footerActionsBefore = footerActionsBefore;
+  if (initial.footerActionsBefore !== 1 || initial.alerts !== 0 || initial.settingsRoute) throw new Error(`Unexpected dedicated page: ${JSON.stringify(initial)}`);
+  await screenshot(monitorPath);
+
+  const processHostName = await evaluate(`Array.from(document.querySelectorAll('.host-monitor__machine-card')).find((button) => button.querySelector('strong')?.textContent === 'dyaus' && !button.disabled)?.querySelector('strong')?.textContent ?? null`);
+  if (processHostName != null) {
+    await evaluate(`Array.from(document.querySelectorAll('.host-monitor__machine-card')).find((button) => button.querySelector('strong')?.textContent === 'dyaus')?.click()`);
+    await waitFor("document.querySelector('.host-monitor__machine-card[data-selected=\"true\"] strong')?.textContent === 'dyaus'");
+  }
+  await waitFor("Array.from(document.querySelectorAll('button')).some((button) => button.textContent?.trim() === 'Customize' && !button.disabled)");
+  await waitFor("document.querySelector('.host-monitor__process-widget') !== null");
+  await waitFor("document.querySelector('.host-monitor__process-widget .host-monitor__process-table tbody tr') !== null || document.querySelector('.host-monitor__process-widget .host-monitor__widget-state') !== null", 20000);
+  await evaluate("document.querySelector('.host-monitor__process-widget')?.scrollIntoView({ block: 'start' })");
+  await screenshot(processPath);
+  const processSummary = await evaluate(`({
+    rows: document.querySelectorAll('.host-monitor__process-table tbody tr').length,
+    actionable: Array.from(document.querySelectorAll('.host-monitor__process-widget button')).filter((button) => button.textContent?.trim() === 'Terminate' || button.textContent?.trim() === 'Force terminate').length,
+    state: document.querySelector('.host-monitor__process-widget .host-monitor__widget-state strong')?.textContent ?? null
+  })`);
+  if (processSummary.actionable < 1) throw new Error(`No actionable process was available for confirmation QA: ${JSON.stringify(processSummary)}`);
+  {
+    const processStatusBefore = await evaluate(`Array.from(document.querySelectorAll('.host-monitor__process-widget .host-monitor__widget-status')).at(-1)?.textContent ?? ''`);
+    await evaluate(`Array.from(document.querySelectorAll('.host-monitor__process-widget button')).find((button) => button.textContent?.trim() === 'Terminate' || button.textContent?.trim() === 'Force terminate')?.click()`);
+    await waitFor(`document.querySelector('.host-monitor__dialog') !== null || (((Array.from(document.querySelectorAll('.host-monitor__process-widget .host-monitor__widget-status')).at(-1)?.textContent ?? '') !== ${JSON.stringify(processStatusBefore)}) && !(Array.from(document.querySelectorAll('.host-monitor__process-widget .host-monitor__widget-status')).at(-1)?.textContent ?? '').includes('Rechecking'))`, 20000);
+    const processActionState = await evaluate(`({ dialog: document.querySelector('.host-monitor__dialog') !== null, status: Array.from(document.querySelectorAll('.host-monitor__process-widget .host-monitor__widget-status')).at(-1)?.textContent ?? null })`);
+    if (!processActionState.dialog) throw new Error(`Process preflight did not open confirmation: ${JSON.stringify(processActionState)}`);
+    const dialogSummary = await evaluate(`({
+      title: document.querySelector('.host-monitor__dialog h2')?.textContent ?? null,
+      cancel: Array.from(document.querySelectorAll('.host-monitor__dialog button')).some((button) => button.textContent?.trim() === 'Cancel'),
+      destructive: Array.from(document.querySelectorAll('.host-monitor__dialog button')).some((button) => /terminate/i.test(button.textContent ?? '')),
+      cancelFocused: document.activeElement?.textContent?.trim() === 'Cancel'
+    })`);
+    if (!dialogSummary.cancel || !dialogSummary.cancelFocused || !dialogSummary.destructive || !dialogSummary.title?.includes('process')) throw new Error(`Invalid process confirmation: ${JSON.stringify(dialogSummary)}`);
+    await screenshot(processDialogPath);
+    await evaluate(`Array.from(document.querySelectorAll('.host-monitor__dialog button')).find((button) => button.textContent?.trim() === 'Cancel')?.click()`);
+    await waitFor("document.querySelector('.host-monitor__dialog') === null");
+  }
+
+  await evaluate("document.querySelector('.host-monitor__machine-heading')?.scrollIntoView({ block: 'start' })");
+  await evaluate(`Array.from(document.querySelectorAll('button')).find((button) => button.textContent?.trim() === 'Customize')?.click()`);
+  await waitFor("document.querySelector('.host-monitor__editor') !== null");
+  await waitFor("document.querySelector('.host-monitor__process-list') !== null");
+  const originalWidgets = await evaluate(`Array.from(document.querySelectorAll('.host-monitor__editor-list > li')).map((row) => ({ key: row.dataset.widgetKey, visible: row.querySelector('input[type=checkbox]')?.checked ?? false }))`);
+  if (originalWidgets.length < 10) throw new Error(`Incomplete widget catalog: ${JSON.stringify(originalWidgets)}`);
+  const changedKey = originalWidgets[0].key;
+  await evaluate("document.querySelector('.host-monitor__editor')?.scrollIntoView({ block: 'start' })");
+  await screenshot(desktopPath);
+  await evaluate(`(() => {
+    const transfer = new DataTransfer();
+    window.__hostMonitorQaTransfer = transfer;
+    document.querySelectorAll('.host-monitor__editor-list > li')[0]?.dispatchEvent(new DragEvent('dragstart', { bubbles: true, dataTransfer: transfer }));
+  })()`);
+  await waitFor("document.querySelectorAll('.host-monitor__editor-list > li')[0]?.dataset.dragging === 'true'");
+  await evaluate(`(() => {
+    const transfer = window.__hostMonitorQaTransfer;
+    const target = document.querySelectorAll('.host-monitor__editor-list > li')[1];
+    target?.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true, dataTransfer: transfer }));
+    target?.dispatchEvent(new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer: transfer }));
+    delete window.__hostMonitorQaTransfer;
+  })()`);
+  await waitFor(`document.querySelectorAll('.host-monitor__editor-list > li')[1]?.dataset.widgetKey === ${JSON.stringify(changedKey)}`);
+  await evaluate(`document.querySelector('[data-widget-key="${changedKey}"] button[aria-label*=" earlier"]')?.click()`);
+  await waitFor(`document.querySelectorAll('.host-monitor__editor-list > li')[0]?.dataset.widgetKey === ${JSON.stringify(changedKey)}`);
+  await evaluate(`document.querySelector('[data-widget-key="${changedKey}"] input[type=checkbox]')?.click()`);
+  await evaluate(`document.querySelector('[data-widget-key="${changedKey}"] button[aria-label*=" later"]')?.click()`);
+  await evaluate(`Array.from(document.querySelectorAll('.host-monitor__editor button')).find((button) => button.textContent?.trim() === 'Save layout')?.click()`);
+  await waitFor("document.querySelector('.host-monitor__editor') === null");
+  await evaluate("new Promise((resolve) => setTimeout(resolve, 300))");
+  await call("Page.reload", { ignoreCache: true });
+  await waitFor("Array.from(document.querySelectorAll('button')).some((button) => button.textContent?.trim() === 'Customize' && !button.disabled)");
+  if (processHostName != null) {
+    await evaluate(`Array.from(document.querySelectorAll('.host-monitor__machine-card')).find((button) => button.querySelector('strong')?.textContent === 'dyaus')?.click()`);
+    await waitFor("document.querySelector('.host-monitor__machine-card[data-selected=\"true\"] strong')?.textContent === 'dyaus'");
+    await waitFor("Array.from(document.querySelectorAll('button')).some((button) => button.textContent?.trim() === 'Customize' && !button.disabled)");
+  }
+  await evaluate(`Array.from(document.querySelectorAll('button')).find((button) => button.textContent?.trim() === 'Customize')?.click()`);
+  await waitFor("document.querySelector('.host-monitor__editor') !== null");
+  const persistedWidgets = await evaluate(`Array.from(document.querySelectorAll('.host-monitor__editor-list > li')).map((row) => ({ key: row.dataset.widgetKey, visible: row.querySelector('input[type=checkbox]')?.checked ?? false }))`);
+  if (persistedWidgets[1]?.key !== changedKey || persistedWidgets[1]?.visible === originalWidgets[0]?.visible) throw new Error(`Widget layout did not persist: ${JSON.stringify({ changedKey, originalWidgets, persistedWidgets })}`);
+  await evaluate(`document.querySelector('[data-widget-key="${changedKey}"] input[type=checkbox]')?.click()`);
+  await evaluate(`document.querySelector('[data-widget-key="${changedKey}"] button[aria-label*=" earlier"]')?.click()`);
+  await evaluate(`Array.from(document.querySelectorAll('.host-monitor__editor button')).find((button) => button.textContent?.trim() === 'Save layout')?.click()`);
+  await waitFor("document.querySelector('.host-monitor__editor') === null");
+
+  const targetName = await evaluate("document.querySelector('.host-monitor__machine-card:not([data-selected=\"true\"]) strong')?.textContent ?? null");
+  if (targetName == null) throw new Error("A second host was not available.");
+  await evaluate(`Array.from(document.querySelectorAll('.host-monitor__machine-card')).find((button) => button.querySelector('strong')?.textContent === ${JSON.stringify(targetName)})?.click()`);
+  await waitFor(`document.querySelector('.host-monitor__machine-card[data-selected="true"] strong')?.textContent === ${JSON.stringify(targetName)}`);
+  await waitFor("document.querySelectorAll('.host-monitor__panel-grid > article').length > 0");
+
+  await call("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 1, mobile: false });
+  await call("Page.navigate", { url: `${serverUrl}/plugins/host-monitor/host-monitor` });
+  await waitFor("Array.from(document.querySelectorAll('button')).some((button) => button.textContent?.trim() === 'Customize' && !button.disabled)");
+  await evaluate(`Array.from(document.querySelectorAll('button')).find((button) => button.textContent?.trim() === 'Customize')?.click()`);
+  await waitFor("document.querySelector('.host-monitor__editor') !== null");
+  await waitFor("document.querySelector('.host-monitor__process-list') !== null");
+  await evaluate("document.querySelector('.host-monitor__editor')?.scrollIntoView({ block: 'start' })");
+  const narrow = await evaluate(`({
+    viewport: [innerWidth, innerHeight],
+    overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+    rows: document.querySelectorAll('.host-monitor__editor-list > li').length,
+    hostStripOverflow: getComputedStyle(document.querySelector('.host-monitor__machine-grid')).overflowX,
+    processTableDisplay: getComputedStyle(document.querySelector('.host-monitor__process-table-wrap')).display,
+    processListDisplay: getComputedStyle(document.querySelector('.host-monitor__process-list')).display,
+    rangeRight: document.querySelector('.host-monitor__range')?.getBoundingClientRect().right ?? innerWidth + 1,
+    rangeWidth: document.querySelector('.host-monitor__range')?.getBoundingClientRect().width ?? 0
+  })`);
+  if (narrow.overflow || narrow.rows < 10 || narrow.hostStripOverflow !== 'auto' || narrow.processTableDisplay !== 'none' || narrow.processListDisplay !== 'grid' || narrow.rangeRight > narrow.viewport[0] || narrow.rangeWidth < 96) throw new Error(`Invalid narrow layout: ${JSON.stringify(narrow)}`);
+  await screenshot(narrowPath);
+
+  console.log(JSON.stringify({ modal: modalSummary, navigation: navigationState, initial, widgets: { original: originalWidgets.length, persisted: persistedWidgets.length, changedKey }, processes: processSummary, switchedTo: targetName, narrow, artifacts: [sidebarPath, modalPath, monitorPath, processPath, processDialogPath, desktopPath, narrowPath] }));
+  socket.close();
+} finally {
+  browser.kill("SIGTERM");
+  await new Promise((resolve) => browser.once("exit", resolve));
+  for (let attempt = 0; attempt < 10; attempt += 1) {
+    try {
+      rmSync(profile, { recursive: true, force: true });
+      break;
+    } catch {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+  }
+}

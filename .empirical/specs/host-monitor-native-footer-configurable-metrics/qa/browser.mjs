@@ -14,15 +14,13 @@ const browser = spawn("chromium", [
   `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, "about:blank",
 ], { stdio: "ignore" });
 
-const outputDir = join(process.cwd(), ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser");
+const outputDir = join(process.cwd(), ".empirical/specs/host-monitor-native-modal-navigation-fixes/evidence/browser");
 mkdirSync(outputDir, { recursive: true });
 const desktopPath = join(outputDir, "editor-desktop.png");
 const narrowPath = join(outputDir, "editor-390.png");
 const sidebarPath = join(outputDir, "sidebar-icon-only.png");
-const monitorPath = join(outputDir, "dashboard-wide.png");
+const monitorPath = join(outputDir, "monitor-desktop.png");
 const modalPath = join(outputDir, "mini-modal-desktop.png");
-const processPath = join(outputDir, "process-widget-wide.png");
-const processDialogPath = join(outputDir, "process-confirmation.png");
 
 try {
   let pages;
@@ -95,11 +93,10 @@ try {
     metrics: document.querySelectorAll('.host-monitor-mini__machine dd').length,
     dialog: document.querySelector('.host-monitor-mini')?.getAttribute('role'),
     guideLabels: Array.from(document.querySelectorAll('.host-monitor-mini__machine [data-guide]')).filter((node) => node.getAttribute('aria-label')?.includes('guide')).length,
-    numericGuideChips: document.querySelectorAll('.host-monitor-mini__machine dt small').length,
     settingsRoute: location.pathname.includes('/settings'),
     alerts: document.querySelectorAll('[role="alert"]').length
   })`);
-  if (footerActionsBefore !== 1 || visiblePageRowsBefore !== 0 || modalSummary.machines < 2 || modalSummary.metrics < 6 || modalSummary.guideLabels < 4 || modalSummary.numericGuideChips !== 0 || modalSummary.dialog !== "dialog" || modalSummary.settingsRoute || modalSummary.alerts !== 0) throw new Error(`Invalid mini modal: ${JSON.stringify({ footerActionsBefore, visiblePageRowsBefore, ...modalSummary })}`);
+  if (footerActionsBefore !== 1 || visiblePageRowsBefore !== 0 || modalSummary.machines < 2 || modalSummary.metrics < 6 || modalSummary.guideLabels < 4 || modalSummary.dialog !== "dialog" || modalSummary.settingsRoute || modalSummary.alerts !== 0) throw new Error(`Invalid mini modal: ${JSON.stringify({ footerActionsBefore, visiblePageRowsBefore, ...modalSummary })}`);
   await screenshot(modalPath);
   await evaluate(`document.querySelector('[data-host-monitor-mini-close]')?.click()`);
   await waitFor("document.querySelector('.host-monitor-mini') === null");
@@ -129,94 +126,39 @@ try {
   if (initial.footerActionsBefore !== 1 || initial.alerts !== 0 || initial.settingsRoute) throw new Error(`Unexpected dedicated page: ${JSON.stringify(initial)}`);
   await screenshot(monitorPath);
 
-  const processHostName = await evaluate(`Array.from(document.querySelectorAll('.host-monitor__machine-card')).find((button) => button.querySelector('strong')?.textContent === 'dyaus' && !button.disabled)?.querySelector('strong')?.textContent ?? null`);
-  if (processHostName != null) {
-    await evaluate(`Array.from(document.querySelectorAll('.host-monitor__machine-card')).find((button) => button.querySelector('strong')?.textContent === 'dyaus')?.click()`);
-    await waitFor("document.querySelector('.host-monitor__machine-card[data-selected=\"true\"] strong')?.textContent === 'dyaus'");
-  }
-  await waitFor("Array.from(document.querySelectorAll('button')).some((button) => button.textContent?.trim() === 'Customize' && !button.disabled)");
-  await waitFor("document.querySelector('.host-monitor__process-widget') !== null");
-  await waitFor("document.querySelector('.host-monitor__process-widget .host-monitor__process-table tbody tr') !== null || document.querySelector('.host-monitor__process-widget .host-monitor__widget-state') !== null", 20000);
-  await evaluate("document.querySelector('.host-monitor__process-widget')?.scrollIntoView({ block: 'start' })");
-  await screenshot(processPath);
-  const processSummary = await evaluate(`({
-    rows: document.querySelectorAll('.host-monitor__process-table tbody tr').length,
-    actionable: Array.from(document.querySelectorAll('.host-monitor__process-widget button')).filter((button) => button.textContent?.trim() === 'Terminate' || button.textContent?.trim() === 'Force terminate').length,
-    state: document.querySelector('.host-monitor__process-widget .host-monitor__widget-state strong')?.textContent ?? null
-  })`);
-  if (processSummary.actionable > 0) {
-    const processStatusBefore = await evaluate(`Array.from(document.querySelectorAll('.host-monitor__process-widget .host-monitor__widget-status')).at(-1)?.textContent ?? ''`);
-    await evaluate(`Array.from(document.querySelectorAll('.host-monitor__process-widget button')).find((button) => button.textContent?.trim() === 'Terminate' || button.textContent?.trim() === 'Force terminate')?.click()`);
-    await waitFor(`document.querySelector('.host-monitor__dialog') !== null || (((Array.from(document.querySelectorAll('.host-monitor__process-widget .host-monitor__widget-status')).at(-1)?.textContent ?? '') !== ${JSON.stringify(processStatusBefore)}) && !(Array.from(document.querySelectorAll('.host-monitor__process-widget .host-monitor__widget-status')).at(-1)?.textContent ?? '').includes('Rechecking'))`, 20000);
-    const processActionState = await evaluate(`({ dialog: document.querySelector('.host-monitor__dialog') !== null, status: Array.from(document.querySelectorAll('.host-monitor__process-widget .host-monitor__widget-status')).at(-1)?.textContent ?? null })`);
-    if (!processActionState.dialog) throw new Error(`Process preflight did not open confirmation: ${JSON.stringify(processActionState)}`);
-    const dialogSummary = await evaluate(`({
-      title: document.querySelector('.host-monitor__dialog h2')?.textContent ?? null,
-      cancel: Array.from(document.querySelectorAll('.host-monitor__dialog button')).some((button) => button.textContent?.trim() === 'Cancel'),
-      destructive: Array.from(document.querySelectorAll('.host-monitor__dialog button')).some((button) => /terminate/i.test(button.textContent ?? '')),
-      cancelFocused: document.activeElement?.textContent?.trim() === 'Cancel'
-    })`);
-    if (!dialogSummary.cancel || !dialogSummary.cancelFocused || !dialogSummary.destructive || !dialogSummary.title?.includes('process')) throw new Error(`Invalid process confirmation: ${JSON.stringify(dialogSummary)}`);
-    await screenshot(processDialogPath);
-    await evaluate(`Array.from(document.querySelectorAll('.host-monitor__dialog button')).find((button) => button.textContent?.trim() === 'Cancel')?.click()`);
-    await waitFor("document.querySelector('.host-monitor__dialog') === null");
-  }
-
-  await evaluate("document.querySelector('.host-monitor__machine-heading')?.scrollIntoView({ block: 'start' })");
-  await evaluate(`Array.from(document.querySelectorAll('button')).find((button) => button.textContent?.trim() === 'Customize')?.click()`);
+  await waitFor("Array.from(document.querySelectorAll('button')).some((button) => button.textContent?.includes('Edit dashboard') && !button.disabled)");
+  await evaluate(`Array.from(document.querySelectorAll('button')).find((button) => button.textContent?.includes('Edit dashboard'))?.click()`);
   await waitFor("document.querySelector('.host-monitor__editor') !== null");
-  await waitFor("document.querySelector('.host-monitor__process-list') !== null");
-  const originalWidgets = await evaluate(`Array.from(document.querySelectorAll('.host-monitor__editor-list > li')).map((row) => ({ key: row.dataset.widgetKey, visible: row.querySelector('input[type=checkbox]')?.checked ?? false }))`);
-  if (originalWidgets.length < 10) throw new Error(`Incomplete widget catalog: ${JSON.stringify(originalWidgets)}`);
-  const changedKey = originalWidgets[0].key;
+  const beforeAdd = await evaluate("document.querySelectorAll('.host-monitor__editor-list > li').length");
   await evaluate("document.querySelector('.host-monitor__editor')?.scrollIntoView({ block: 'start' })");
   await screenshot(desktopPath);
-  await evaluate(`document.querySelector('[data-widget-key="${changedKey}"] input[type=checkbox]')?.click()`);
-  await evaluate(`document.querySelector('[data-widget-key="${changedKey}"] button[aria-label*=" later"]')?.click()`);
-  await evaluate(`Array.from(document.querySelectorAll('.host-monitor__editor button')).find((button) => button.textContent?.trim() === 'Save layout')?.click()`);
-  await waitFor("document.querySelector('.host-monitor__editor') === null");
-  await evaluate("new Promise((resolve) => setTimeout(resolve, 300))");
-  await call("Page.reload", { ignoreCache: true });
-  await waitFor("Array.from(document.querySelectorAll('button')).some((button) => button.textContent?.trim() === 'Customize' && !button.disabled)");
-  if (processHostName != null) {
-    await evaluate(`Array.from(document.querySelectorAll('.host-monitor__machine-card')).find((button) => button.querySelector('strong')?.textContent === 'dyaus')?.click()`);
-    await waitFor("document.querySelector('.host-monitor__machine-card[data-selected=\"true\"] strong')?.textContent === 'dyaus'");
-    await waitFor("Array.from(document.querySelectorAll('button')).some((button) => button.textContent?.trim() === 'Customize' && !button.disabled)");
-  }
-  await evaluate(`Array.from(document.querySelectorAll('button')).find((button) => button.textContent?.trim() === 'Customize')?.click()`);
-  await waitFor("document.querySelector('.host-monitor__editor') !== null");
-  const persistedWidgets = await evaluate(`Array.from(document.querySelectorAll('.host-monitor__editor-list > li')).map((row) => ({ key: row.dataset.widgetKey, visible: row.querySelector('input[type=checkbox]')?.checked ?? false }))`);
-  if (persistedWidgets[1]?.key !== changedKey || persistedWidgets[1]?.visible === originalWidgets[0]?.visible) throw new Error(`Widget layout did not persist: ${JSON.stringify({ changedKey, originalWidgets, persistedWidgets })}`);
-  await evaluate(`document.querySelector('[data-widget-key="${changedKey}"] input[type=checkbox]')?.click()`);
-  await evaluate(`document.querySelector('[data-widget-key="${changedKey}"] button[aria-label*=" earlier"]')?.click()`);
-  await evaluate(`Array.from(document.querySelectorAll('.host-monitor__editor button')).find((button) => button.textContent?.trim() === 'Save layout')?.click()`);
+  await evaluate(`Array.from(document.querySelectorAll('.host-monitor__editor button')).find((button) => button.textContent?.trim() === 'Add panel')?.click()`);
+  await waitFor(`document.querySelectorAll('.host-monitor__editor-list > li').length === ${beforeAdd + 1}`);
+  const afterAdd = await evaluate("document.querySelectorAll('.host-monitor__editor-list > li').length");
+  await evaluate(`Array.from(document.querySelectorAll('.host-monitor__editor button')).find((button) => button.textContent?.trim() === 'Cancel')?.click()`);
   await waitFor("document.querySelector('.host-monitor__editor') === null");
 
-  const targetName = await evaluate("document.querySelector('.host-monitor__machine-card:not([data-selected=\"true\"]) strong')?.textContent ?? null");
+  const targetName = await evaluate("document.querySelectorAll('.host-monitor__machine-card strong')[1]?.textContent ?? null");
   if (targetName == null) throw new Error("A second host was not available.");
-  await evaluate(`Array.from(document.querySelectorAll('.host-monitor__machine-card')).find((button) => button.querySelector('strong')?.textContent === ${JSON.stringify(targetName)})?.click()`);
+  await evaluate(`document.querySelectorAll('.host-monitor__machine-card')[1]?.click()`);
   await waitFor(`document.querySelector('.host-monitor__machine-card[data-selected="true"] strong')?.textContent === ${JSON.stringify(targetName)}`);
   await waitFor("document.querySelectorAll('.host-monitor__panel-grid > article').length > 0");
 
   await call("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 1, mobile: false });
   await call("Page.navigate", { url: `${serverUrl}/plugins/host-monitor/host-monitor` });
-  await waitFor("Array.from(document.querySelectorAll('button')).some((button) => button.textContent?.trim() === 'Customize' && !button.disabled)");
-  await evaluate(`Array.from(document.querySelectorAll('button')).find((button) => button.textContent?.trim() === 'Customize')?.click()`);
+  await waitFor("Array.from(document.querySelectorAll('button')).some((button) => button.textContent?.includes('Edit dashboard') && !button.disabled)");
+  await evaluate(`Array.from(document.querySelectorAll('button')).find((button) => button.textContent?.includes('Edit dashboard'))?.click()`);
   await waitFor("document.querySelector('.host-monitor__editor') !== null");
-  await waitFor("document.querySelector('.host-monitor__process-list') !== null");
   await evaluate("document.querySelector('.host-monitor__editor')?.scrollIntoView({ block: 'start' })");
   const narrow = await evaluate(`({
     viewport: [innerWidth, innerHeight],
     overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
-    rows: document.querySelectorAll('.host-monitor__editor-list > li').length,
-    hostStripOverflow: getComputedStyle(document.querySelector('.host-monitor__machine-grid')).overflowX,
-    processTableDisplay: getComputedStyle(document.querySelector('.host-monitor__process-table-wrap')).display,
-    processListDisplay: getComputedStyle(document.querySelector('.host-monitor__process-list')).display
+    rows: document.querySelectorAll('.host-monitor__editor-list > li').length
   })`);
-  if (narrow.overflow || narrow.rows < 10 || narrow.hostStripOverflow !== 'auto' || narrow.processTableDisplay !== 'none' || narrow.processListDisplay !== 'grid') throw new Error(`Invalid narrow layout: ${JSON.stringify(narrow)}`);
+  if (narrow.overflow || narrow.rows < 1) throw new Error(`Invalid narrow layout: ${JSON.stringify(narrow)}`);
   await screenshot(narrowPath);
 
-  console.log(JSON.stringify({ modal: modalSummary, navigation: navigationState, initial, widgets: { original: originalWidgets.length, persisted: persistedWidgets.length, changedKey }, processes: processSummary, switchedTo: targetName, narrow, artifacts: [sidebarPath, modalPath, monitorPath, processPath, processDialogPath, desktopPath, narrowPath] }));
+  console.log(JSON.stringify({ modal: modalSummary, navigation: navigationState, initial, editor: { beforeAdd, afterAdd }, switchedTo: targetName, narrow, artifacts: [sidebarPath, modalPath, monitorPath, desktopPath, narrowPath] }));
   socket.close();
 } finally {
   browser.kill("SIGTERM");

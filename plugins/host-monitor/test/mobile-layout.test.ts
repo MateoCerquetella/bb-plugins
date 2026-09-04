@@ -47,7 +47,25 @@ test("process widget is selected-host scoped and uses explicit confirmation", ()
   assert.match(app, /executeProcessTermination/u);
   assert.match(app, /Terminate process\?/u);
   assert.match(app, /Force terminate process\?/u);
-  assert.match(app, /requestGeneration/u);
+  assert.match(app, /hostGeneration/u);
+  assert.match(app, /listRequest/u);
+  assert.doesNotMatch(app, /const generation = \+\+requestGeneration/u);
+});
+
+test("process polling cannot invalidate a pending destructive action", () => {
+  const listStart = app.indexOf("const loadProcesses = useCallback");
+  const listEnd = app.indexOf("useEffect(() =>", listStart);
+  const listBody = app.slice(listStart, listEnd);
+  assert.match(listBody, /const generation = hostGeneration\.current/u);
+  assert.match(listBody, /const request = \+\+listRequest\.current/u);
+  assert.doesNotMatch(listBody, /hostGeneration\.current\s*[+]=|\+\+hostGeneration\.current/u);
+
+  const actionStart = app.indexOf("const executeTermination = useCallback");
+  const actionEnd = app.indexOf("const ok =", actionStart);
+  const actionBody = app.slice(actionStart, actionEnd);
+  assert.match(actionBody, /const generation = hostGeneration\.current/u);
+  assert.match(actionBody, /setExecuting\(false\)/u);
+  assert.doesNotMatch(actionBody, /listRequest/u);
 });
 
 test("charts preserve page scrolling and expose textual summaries", () => {

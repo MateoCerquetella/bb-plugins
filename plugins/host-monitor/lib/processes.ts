@@ -1269,4 +1269,3 @@ export async function terminateProcess(
     message: "The stop signal was sent. Refresh the process list to confirm it exited.",
   };
 }
-

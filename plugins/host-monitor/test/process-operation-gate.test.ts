@@ -87,4 +87,3 @@ test("closing the gate rejects queued destructive work without starting it", asy
   await poll;
   assert.equal(actionStarted, false);
 });
-

@@ -98,4 +98,3 @@ test("process confirmation options reject unbounded configurations", () => {
     /capacity/iu,
   );
 });
-

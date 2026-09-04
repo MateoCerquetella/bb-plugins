@@ -314,4 +314,3 @@ test("host process RPC validates its bounded strict result", async (t) => {
   assert.ok(result.processes.length <= 5);
   assert.equal(result.truncated, result.totalCount > result.processes.length);
 });
-
