@@ -21,10 +21,14 @@ failed machine visible. Select a machine card to inspect its current telemetry
 and up to 30 days of utilization, load, and network history without leaving the
 page.
 
-Host Monitor does not add a page row to BB's sidebar. Its only persistent
-sidebar control is the native Activity icon in the bottom-left action row.
-Click it to open the full monitor inside BB's plugin detail. There is no popup,
-floating window, warning badge, or notification surface.
+The bottom-left Host Monitor icon opens a compact machine mini-modal with every
+enrolled host's current state, CPU, RAM, and disk. Choose **Open Host Monitor**
+there to enter the dedicated full dashboard page. The monitor never redirects
+you into plugin Settings.
+
+The mini-modal is quick telemetry and navigation—not a warning surface. It has
+no notification badge, toast, alert banner, IP/process controls, or draggable
+floating mode.
 
 ## Dashboard
 
@@ -73,7 +77,8 @@ Guides only tint in-page panels and chart lines. Host Monitor deliberately has:
 - No toast notifications.
 - No browser or desktop notifications.
 - No warning badge or resource alert banner.
-- No popup or floating monitor.
+- No warning popup or draggable floating monitor; the footer icon opens only
+  the explicit telemetry mini-modal described above.
 - No automatic or destructive process actions.
 
 Sampling failures stay inline on the affected machine while other machines

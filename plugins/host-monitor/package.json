@@ -61,6 +61,7 @@
     "app.css",
     "chart-data.ts",
     "dashboard-config.ts",
+    "sidebar-modal.ts",
     "host.ts",
     "contract.ts",
     "store.ts",

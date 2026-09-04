@@ -17,6 +17,7 @@ import {
   moveDashboardPanel,
   removeDashboardPanel,
 } from "./dashboard-config.ts";
+import { mountHostMonitorMiniModal, toggleHostMonitorMiniModal } from "./sidebar-modal.ts";
 import "./app.css";
 
 echarts.use([
@@ -734,21 +735,22 @@ function isOver(value: number | null | undefined, threshold: number): boolean {
   return value != null && Number.isFinite(value) && value >= threshold;
 }
 
-function openHostMonitor({ openSettings }: { openSettings(): void }): void {
-  openSettings();
-}
-
 export default definePluginApp((app) => {
+  app.contentScripts.register({
+    id: "host-monitor-sidebar",
+    mount: ({ pluginId, signal }) => mountHostMonitorMiniModal(pluginId, signal),
+  });
   app.slots.sidebarFooterAction({
     id: "host-monitor",
     title: "Host Monitor",
-    icon: "Activity",
-    run: openHostMonitor,
+    icon: "Terminal",
+    run: toggleHostMonitorMiniModal,
   });
-  app.slots.settingsSection({
-    id: "monitor",
+  app.slots.navPanel({
+    id: "host-monitor",
     title: "Host Monitor",
-    description: "Live and historical health for every machine enrolled in BB.",
+    icon: "Activity",
+    path: "host-monitor",
     component: FleetDashboard,
   });
 });

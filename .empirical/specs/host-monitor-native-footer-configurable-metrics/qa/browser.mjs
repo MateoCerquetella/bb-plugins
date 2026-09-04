@@ -14,12 +14,13 @@ const browser = spawn("chromium", [
   `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, "about:blank",
 ], { stdio: "ignore" });
 
-const outputDir = join(process.cwd(), ".empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser");
+const outputDir = join(process.cwd(), ".empirical/specs/host-monitor-two-stage-modal-page/evidence/browser");
 mkdirSync(outputDir, { recursive: true });
 const desktopPath = join(outputDir, "editor-desktop.png");
 const narrowPath = join(outputDir, "editor-390.png");
 const sidebarPath = join(outputDir, "sidebar-icon-only.png");
 const monitorPath = join(outputDir, "monitor-desktop.png");
+const modalPath = join(outputDir, "mini-modal-desktop.png");
 
 try {
   let pages;
@@ -82,18 +83,37 @@ try {
   const footerActionsBefore = await evaluate("Array.from(document.querySelectorAll('button')).filter((button) => button.getAttribute('aria-label') === 'Host Monitor' || button.getAttribute('title') === 'Host Monitor').length");
   await screenshot(sidebarPath);
   await evaluate(`Array.from(document.querySelectorAll('button')).find((button) => button.getAttribute('aria-label') === 'Host Monitor' || button.getAttribute('title') === 'Host Monitor')?.click()`);
+  await waitFor("document.querySelector('.host-monitor-mini') !== null");
+  await waitFor("document.querySelectorAll('.host-monitor-mini__machine').length >= 2");
+  const modalSummary = await evaluate(`({
+    machines: document.querySelectorAll('.host-monitor-mini__machine').length,
+    metrics: document.querySelectorAll('.host-monitor-mini__machine dd').length,
+    dialog: document.querySelector('.host-monitor-mini')?.getAttribute('role'),
+    settingsRoute: location.pathname.includes('/settings'),
+    alerts: document.querySelectorAll('[role="alert"]').length
+  })`);
+  if (footerActionsBefore !== 1 || modalSummary.machines < 2 || modalSummary.metrics < 6 || modalSummary.dialog !== "dialog" || modalSummary.settingsRoute || modalSummary.alerts !== 0) throw new Error(`Invalid mini modal: ${JSON.stringify(modalSummary)}`);
+  await screenshot(modalPath);
+  await evaluate(`document.querySelector('[data-host-monitor-mini-close]')?.click()`);
+  await waitFor("document.querySelector('.host-monitor-mini') === null");
+  await evaluate(`Array.from(document.querySelectorAll('button')).find((button) => button.getAttribute('aria-label') === 'Host Monitor' || button.getAttribute('title') === 'Host Monitor')?.click()`);
+  await waitFor("document.querySelectorAll('.host-monitor-mini__machine').length >= 2");
+  await evaluate(`Array.from(document.querySelectorAll('.host-monitor-mini button')).find((button) => button.textContent?.trim() === 'Refresh')?.click()`);
+  await waitFor("document.querySelector('[data-host-monitor-mini-status]')?.textContent === 'Updated now'");
+  await evaluate(`Array.from(document.querySelectorAll('.host-monitor-mini button')).find((button) => button.textContent?.trim() === 'Open Host Monitor')?.click()`);
+  await waitFor("location.pathname === '/plugins/host-monitor/host-monitor'");
   await waitFor("document.querySelectorAll('.host-monitor__machine-card').length >= 2");
   await waitFor("document.querySelectorAll('.host-monitor__panel-grid > article').length > 0");
 
   const initial = await evaluate(`({
     machines: document.querySelectorAll('.host-monitor__machine-card').length,
     panels: document.querySelectorAll('.host-monitor__panel-grid > article').length,
-    sidebarRows: Array.from(document.querySelectorAll('[data-testid="plugin-nav-sidebar-items"] a, [data-testid="plugin-nav-sidebar-items"] button')).filter((node) => node.textContent?.trim() === 'Host Monitor').length,
     selected: document.querySelector('#machine-heading')?.textContent ?? null,
-    alerts: document.querySelectorAll('[role="alert"]').length
+    alerts: document.querySelectorAll('[role="alert"]').length,
+    settingsRoute: location.pathname.includes('/settings')
   })`);
   initial.footerActionsBefore = footerActionsBefore;
-  if (initial.footerActionsBefore !== 1 || initial.sidebarRows !== 0 || initial.alerts !== 0) throw new Error(`Unexpected native chrome: ${JSON.stringify(initial)}`);
+  if (initial.footerActionsBefore !== 1 || initial.alerts !== 0 || initial.settingsRoute) throw new Error(`Unexpected dedicated page: ${JSON.stringify(initial)}`);
   await screenshot(monitorPath);
 
   await waitFor("Array.from(document.querySelectorAll('button')).some((button) => button.textContent?.includes('Edit dashboard') && !button.disabled)");
@@ -115,9 +135,7 @@ try {
   await waitFor("document.querySelectorAll('.host-monitor__panel-grid > article').length > 0");
 
   await call("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 1, mobile: false });
-  await call("Page.navigate", { url: serverUrl });
-  await waitFor("Array.from(document.querySelectorAll('button')).some((button) => button.getAttribute('aria-label') === 'Host Monitor' || button.getAttribute('title') === 'Host Monitor')");
-  await evaluate(`Array.from(document.querySelectorAll('button')).find((button) => button.getAttribute('aria-label') === 'Host Monitor' || button.getAttribute('title') === 'Host Monitor')?.click()`);
+  await call("Page.navigate", { url: `${serverUrl}/plugins/host-monitor/host-monitor` });
   await waitFor("Array.from(document.querySelectorAll('button')).some((button) => button.textContent?.includes('Edit dashboard') && !button.disabled)");
   await evaluate(`Array.from(document.querySelectorAll('button')).find((button) => button.textContent?.includes('Edit dashboard'))?.click()`);
   await waitFor("document.querySelector('.host-monitor__editor') !== null");
@@ -130,7 +148,7 @@ try {
   if (narrow.overflow || narrow.rows < 1) throw new Error(`Invalid narrow layout: ${JSON.stringify(narrow)}`);
   await screenshot(narrowPath);
 
-  console.log(JSON.stringify({ initial, editor: { beforeAdd, afterAdd }, switchedTo: targetName, narrow, artifacts: [sidebarPath, monitorPath, desktopPath, narrowPath] }));
+  console.log(JSON.stringify({ modal: modalSummary, initial, editor: { beforeAdd, afterAdd }, switchedTo: targetName, narrow, artifacts: [sidebarPath, modalPath, monitorPath, desktopPath, narrowPath] }));
   socket.close();
 } finally {
   browser.kill("SIGTERM");

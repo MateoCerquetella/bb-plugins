@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-26665f20816b5461d13e47f3",
+  "criteria": [
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3",
+    "AC-UI-4",
+    "AC-UI-5"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Screenshots show the bottom icon, old-style four-host mini-modal, dedicated full page, desktop editor, and responsive 390px editor.",
+  "passed": true,
+  "startedAt": "2026-09-04T15:26:01.367Z",
+  "completedAt": "2026-09-04T15:26:01.367Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-two-stage-modal-page",
+    "specRevision": 3,
+    "specDigest": "sha256:94ddfb4397b0f0439209bfed49ff884bb372eb1e6b42fc7e9f5c87c37eba30e7",
+    "treeDigest": "sha256:80b4e56343ad0c85540b1ceb922120049fabc3c2fc72e2e672b189ee68c13101",
+    "policyDigest": "sha256:39d04bb7b0c02856e618bfb5175d1f83577318536445ecf69eccb54b9a7471a8"
+  },
+  "digest": "sha256:6bd95cd7ac5f92d8eba68338e74c1e854625eb1940f3bf78dc855b77764ea3ed",
+  "kind": "collected",
+  "collector": "Chromium CDP two-stage visual verification",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/host-monitor-two-stage-modal-page/evidence/browser/editor-390.png",
+      "mediaType": "image/png",
+      "bytes": 33873,
+      "digest": "sha256:199099b112a2bfcd7ecf5c882dd2808b11cb21791876057eec0563c183d29bf6"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-two-stage-modal-page/evidence/browser/editor-desktop.png",
+      "mediaType": "image/png",
+      "bytes": 139688,
+      "digest": "sha256:41f023208cbe210c2cd21d0a00230dbe10b95207440cac6a891ff33e69b8a522"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-two-stage-modal-page/evidence/browser/mini-modal-desktop.png",
+      "mediaType": "image/png",
+      "bytes": 83812,
+      "digest": "sha256:52242f6a040e3881f716962c32e44d6a7e44d3cf48b8599ebdd3684805ab512a"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-two-stage-modal-page/evidence/browser/monitor-desktop.png",
+      "mediaType": "image/png",
+      "bytes": 134767,
+      "digest": "sha256:233c06e3d518f1ef77d4252b41cfe7ee81e5af608bd6f964b76586c5d0a92843"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-two-stage-modal-page/evidence/browser/sidebar-icon-only.png",
+      "mediaType": "image/png",
+      "bytes": 65835,
+      "digest": "sha256:1dfdef94a73c638b10bb55c6f96686bae85258cf1eabe03aecf96e1119928df9"
+    }
+  ]
+}

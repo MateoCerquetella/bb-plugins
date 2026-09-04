@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "host-monitor-two-stage-navigation"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:c6d90c7c98ede07af1d85a2328fe3eadf7cf21a873b4e2d26d45718ece75403b"
+}
