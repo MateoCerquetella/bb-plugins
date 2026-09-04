@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-07160e3de443ef24de0add13",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3",
+    "AC-UI-4"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-09-04T15:58:28.773Z",
+  "completedAt": "2026-09-04T15:58:28.773Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-native-modal-navigation-fixes",
+    "specRevision": 3,
+    "specDigest": "sha256:ed21c063a82fb9ea12f43c73ca9924afbe20cca73c0cfd5dd2c49e760e4273b4",
+    "treeDigest": "sha256:767f6e6a297744f1e01ea151ab659e2a5799a339f722d0f21d81438e14f93790",
+    "policyDigest": "sha256:39d04bb7b0c02856e618bfb5175d1f83577318536445ecf69eccb54b9a7471a8"
+  },
+  "digest": "sha256:e3ac6bb895b30ac7d6ec7e8c2ad487d4f2d4163b2a82402f1f4340a1957c6c06",
+  "kind": "collected",
+  "collector": "empirical-review:isolated-empirical-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/host-monitor-native-modal-navigation-fixes/reviews/17302b422aaf12efda53035f.json",
+      "mediaType": "application/json",
+      "bytes": 2411,
+      "digest": "sha256:c689115ba5ab7a6e8a4aa9558166b6e54f54062e0119ffa072ff4f8560b18117"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-native-modal-navigation-fixes/reviews/17302b422aaf12efda53035f.md",
+      "mediaType": "text/markdown",
+      "bytes": 1673,
+      "digest": "sha256:ec86f2d27ee8ed07ed8d3204ef5792a7e558da94d81efdfe64e960916f368f20"
+    }
+  ]
+}

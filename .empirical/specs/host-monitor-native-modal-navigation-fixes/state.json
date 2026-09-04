@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 8,
+  "revision": 9,
   "activeFeature": "host-monitor-native-modal-navigation-fixes",
   "request": "Fix and refine the current Host Monitor two-stage UX. Add passive CPU and RAM threshold indication inside the mini-modal using the existing configured threshold guides. Make Open Host Monitor transition in-app without reloading BB. Remove the Host Monitor nav page row from the main sidebar while keeping the full dedicated monitor surface reachable from the mini-modal. Improve the mini-modal and full monitor UI/UX to match BB spacing, typography, controls, focus, responsive, and interaction patterns. Preserve multi-host Grafana-style persisted per-host panels, BB machine/realtime infrastructure, notification-free behavior, and unrelated work. Verify tests, typecheck, build, live browser navigation without document reload, threshold states, no sidebar row, connected/disconnected hosts, persistence, and final diff. Stop ready for review; do not merge or deploy.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "review",
+  "phase": "integrate",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Verified the final committed tree with 34 tests, typecheck, build, footer-only browser presence, threshold semantics, stable-document SPA navigation, five screenshots, fleet/editor behavior, and responsive inspection.",
+  "message": "Completed isolated review with all acceptance criteria approved after recording the passing root workspace check and exact final-diff audit.",
   "implementationActor": "agent",
   "workStartedAt": "2026-09-04T15:34:31.168Z",
   "specDigest": "sha256:ed21c063a82fb9ea12f43c73ca9924afbe20cca73c0cfd5dd2c49e760e4273b4",
@@ -24,7 +24,9 @@
     "qa-21e4e0c5d4ff2f34331f70fe",
     "qa-10403383c31a00f14fabe237",
     "collected-5e51e1db1d995ee40f4eb23a",
-    "qa-9a2eae0f72f2fa31f4483e79"
+    "qa-9a2eae0f72f2fa31f4483e79",
+    "collected-07160e3de443ef24de0add13",
+    "qa-1df3d11702bc8bd04e4c8f9f"
   ],
   "legacyEvidenceCount": 0,
   "completion": {
@@ -40,5 +42,5 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-04T15:42:50.626Z"
+  "updatedAt": "2026-09-04T15:58:58.183Z"
 }

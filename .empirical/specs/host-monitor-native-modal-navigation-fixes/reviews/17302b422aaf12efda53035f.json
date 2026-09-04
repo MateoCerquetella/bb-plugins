@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:77b9f783cdf929bfa0b71f6ab56a4fad3d1e6c99ccf8fa644786d1a75d57a7fe",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "a6391be14058735b3aebe1769edb313f20100014",
+  "headCommit": "a038fd727b62da4ed1154e5ae4933a3d86cc6e88",
+  "diffDigest": "sha256:841888b9dd88bc192682fb61796c8801f55668fc08545eea1d544d13a951dc33",
+  "verdict": "APPROVED",
+  "reviewerActor": "isolated-empirical-reviewer",
+  "reviewerInvocationId": "prior_feature_rereview",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-UI-1: The exact semantic Host Monitor nav row is hidden without removal and restored on disposal; browser evidence records one footer action and zero visible page rows.\n- PASS AC-UI-2: Open Host Monitor invokes BB's semantic nav button with no hard-navigation fallback; live evidence preserves document identity.\n- PASS AC-UI-3: CPU/RAM guides use validated values, passive token states, and accessible wording while stale/offline remain distinct.\n- PASS AC-UI-4: BB-token styling, focus behavior, contained scrolling, and responsive layouts are covered by live evidence at desktop and 390px.\n- PASS AC-1: Exact suppression observes remounts, preserves prior hidden state, and disconnects/restores on disposal.\n- PASS AC-2: Fleet projection, polling, request coalescing/abort, parsing, text bounds, and safe DOM rendering remain bounded.\n- PASS AC-3: Fleet sampling, realtime, bounded per-host history, dashboard editing, and per-host persistence are retained.\n- PASS AC-4: No hard navigation, Settings, overlay, notifications, alert role, IP/process operation, or floating monitor exists.\n- PASS AC-5: Immutable workspace receipt passed at committed source; independent exact-range diff audit passed with no Host Monitor source delta after b0afe44b1.\n\n## Security / correctness\n\nNo blocking security or runtime-correctness defect was found. Inputs and rendered text remain bounded, navigation delegates to BB, and lifecycle cleanup is controlled.\n\n## Design / maintainability\n\nNavigation suppression, modal presentation, fleet services, and persistence remain separated and tested; the BB semantic selector dependency is narrowly contained.",
+  "bodyDigest": "sha256:c202817b5eaa5106166295d9cc6e294f8004ecb692079ae899da61ff0b4a2ed8",
+  "digest": "sha256:17302b422aaf12efda53035f704d4821e7173e79de95fd2de1859c943de44565"
+}
