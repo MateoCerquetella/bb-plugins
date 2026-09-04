@@ -14,7 +14,7 @@ const browser = spawn("chromium", [
   `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, "about:blank",
 ], { stdio: "ignore" });
 
-const outputDir = join(process.cwd(), ".empirical/specs/host-monitor-two-stage-modal-page/evidence/browser");
+const outputDir = join(process.cwd(), ".empirical/specs/host-monitor-native-modal-navigation-fixes/evidence/browser");
 mkdirSync(outputDir, { recursive: true });
 const desktopPath = join(outputDir, "editor-desktop.png");
 const narrowPath = join(outputDir, "editor-390.png");
@@ -80,7 +80,10 @@ try {
   await call("Emulation.setDeviceMetricsOverride", { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false });
   await call("Page.navigate", { url: serverUrl });
   await waitFor("Array.from(document.querySelectorAll('button')).some((button) => button.getAttribute('aria-label') === 'Host Monitor' || button.getAttribute('title') === 'Host Monitor')");
+  const documentMarker = `host-monitor-${Date.now()}`;
+  await evaluate(`document.documentElement.dataset.hostMonitorTestMarker = ${JSON.stringify(documentMarker)}`);
   const footerActionsBefore = await evaluate("Array.from(document.querySelectorAll('button')).filter((button) => button.getAttribute('aria-label') === 'Host Monitor' || button.getAttribute('title') === 'Host Monitor').length");
+  const visiblePageRowsBefore = await evaluate("document.querySelectorAll('[data-sidebar-navigation-item=\"host-monitor/host-monitor\"]:not([hidden])').length");
   await screenshot(sidebarPath);
   await evaluate(`Array.from(document.querySelectorAll('button')).find((button) => button.getAttribute('aria-label') === 'Host Monitor' || button.getAttribute('title') === 'Host Monitor')?.click()`);
   await waitFor("document.querySelector('.host-monitor-mini') !== null");
@@ -89,10 +92,11 @@ try {
     machines: document.querySelectorAll('.host-monitor-mini__machine').length,
     metrics: document.querySelectorAll('.host-monitor-mini__machine dd').length,
     dialog: document.querySelector('.host-monitor-mini')?.getAttribute('role'),
+    guideLabels: Array.from(document.querySelectorAll('.host-monitor-mini__machine [data-guide]')).filter((node) => node.getAttribute('aria-label')?.includes('guide')).length,
     settingsRoute: location.pathname.includes('/settings'),
     alerts: document.querySelectorAll('[role="alert"]').length
   })`);
-  if (footerActionsBefore !== 1 || modalSummary.machines < 2 || modalSummary.metrics < 6 || modalSummary.dialog !== "dialog" || modalSummary.settingsRoute || modalSummary.alerts !== 0) throw new Error(`Invalid mini modal: ${JSON.stringify(modalSummary)}`);
+  if (footerActionsBefore !== 1 || visiblePageRowsBefore !== 0 || modalSummary.machines < 2 || modalSummary.metrics < 6 || modalSummary.guideLabels < 4 || modalSummary.dialog !== "dialog" || modalSummary.settingsRoute || modalSummary.alerts !== 0) throw new Error(`Invalid mini modal: ${JSON.stringify({ footerActionsBefore, visiblePageRowsBefore, ...modalSummary })}`);
   await screenshot(modalPath);
   await evaluate(`document.querySelector('[data-host-monitor-mini-close]')?.click()`);
   await waitFor("document.querySelector('.host-monitor-mini') === null");
@@ -102,6 +106,12 @@ try {
   await waitFor("document.querySelector('[data-host-monitor-mini-status]')?.textContent === 'Updated now'");
   await evaluate(`Array.from(document.querySelectorAll('.host-monitor-mini button')).find((button) => button.textContent?.trim() === 'Open Host Monitor')?.click()`);
   await waitFor("location.pathname === '/plugins/host-monitor/host-monitor'");
+  const navigationState = await evaluate(`({
+    marker: document.documentElement.dataset.hostMonitorTestMarker ?? null,
+    visiblePageRows: document.querySelectorAll('[data-sidebar-navigation-item="host-monitor/host-monitor"]:not([hidden])').length,
+    settingsRoute: location.pathname.includes('/settings')
+  })`);
+  if (navigationState.marker !== documentMarker || navigationState.visiblePageRows !== 0 || navigationState.settingsRoute) throw new Error(`Navigation reloaded or exposed the row: ${JSON.stringify(navigationState)}`);
   await waitFor("document.querySelectorAll('.host-monitor__machine-card').length >= 2");
   await waitFor("document.querySelectorAll('.host-monitor__panel-grid > article').length > 0");
 
@@ -148,7 +158,7 @@ try {
   if (narrow.overflow || narrow.rows < 1) throw new Error(`Invalid narrow layout: ${JSON.stringify(narrow)}`);
   await screenshot(narrowPath);
 
-  console.log(JSON.stringify({ modal: modalSummary, initial, editor: { beforeAdd, afterAdd }, switchedTo: targetName, narrow, artifacts: [sidebarPath, modalPath, monitorPath, desktopPath, narrowPath] }));
+  console.log(JSON.stringify({ modal: modalSummary, navigation: navigationState, initial, editor: { beforeAdd, afterAdd }, switchedTo: targetName, narrow, artifacts: [sidebarPath, modalPath, monitorPath, desktopPath, narrowPath] }));
   socket.close();
 } finally {
   browser.kill("SIGTERM");

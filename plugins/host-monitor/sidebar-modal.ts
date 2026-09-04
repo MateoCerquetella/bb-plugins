@@ -1,7 +1,10 @@
 export const HOST_MONITOR_TOGGLE_EVENT = "host-monitor:toggle-mini-modal";
 export const HOST_MONITOR_PAGE_PATH = "/plugins/host-monitor/host-monitor";
+export const HOST_MONITOR_NAV_ROW_SELECTOR = '[data-sidebar-navigation-item="host-monitor/host-monitor"]';
+export const HOST_MONITOR_FOOTER_SELECTOR = '[data-testid="plugin-sidebar-footer-action-host-monitor-host-monitor"]';
 export const MINI_MODAL_REFRESH_MS = 10_000;
 export const MINI_MODAL_MACHINE_LIMIT = 128;
+export const DEFAULT_MINI_MODAL_THRESHOLD = 90;
 
 export type MiniModalMachine = {
   id: string;
@@ -15,6 +18,7 @@ export type MiniModalMachine = {
 export type MiniModalFleet = {
   connected: number;
   total: number;
+  thresholds: { cpu: number; ram: number };
   machines: MiniModalMachine[];
 };
 
@@ -34,6 +38,9 @@ export function parseMiniModalFleet(value: unknown): MiniModalFleet | null {
   if (envelope.ok !== true || typeof envelope.result !== "object" || envelope.result === null || Array.isArray(envelope.result)) return null;
   const fleet = envelope.result as Record<string, unknown>;
   if (!Array.isArray(fleet.machines)) return null;
+  const thresholds = typeof fleet.thresholds === "object" && fleet.thresholds !== null && !Array.isArray(fleet.thresholds)
+    ? fleet.thresholds as Record<string, unknown>
+    : {};
   const machines: MiniModalMachine[] = [];
   for (const raw of fleet.machines.slice(0, MINI_MODAL_MACHINE_LIMIT)) {
     if (typeof raw !== "object" || raw === null || Array.isArray(raw)) continue;
@@ -59,7 +66,29 @@ export function parseMiniModalFleet(value: unknown): MiniModalFleet | null {
   }
   const connected = typeof fleet.connected === "number" && Number.isInteger(fleet.connected) && fleet.connected >= 0 ? fleet.connected : machines.filter((machine) => machine.state !== "offline").length;
   const total = typeof fleet.total === "number" && Number.isInteger(fleet.total) && fleet.total >= 0 ? fleet.total : machines.length;
-  return { connected, total, machines };
+  return {
+    connected,
+    total,
+    thresholds: {
+      cpu: finitePercent(thresholds.cpu) ?? DEFAULT_MINI_MODAL_THRESHOLD,
+      ram: finitePercent(thresholds.ram) ?? DEFAULT_MINI_MODAL_THRESHOLD,
+    },
+    machines,
+  };
+}
+
+export function miniMetricPresentation(
+  label: string,
+  value: number | null,
+  threshold: number | null,
+  isFresh: boolean,
+): { guide: "normal" | "over" | "unavailable" | "neutral"; accessibleLabel: string } {
+  if (value === null) return { guide: "unavailable", accessibleLabel: `${label} unavailable` };
+  const reading = `${label} ${value.toFixed(1)}%`;
+  if (!isFresh || threshold === null) return { guide: "neutral", accessibleLabel: reading };
+  return value >= threshold
+    ? { guide: "over", accessibleLabel: `${reading}, above ${threshold}% guide` }
+    : { guide: "normal", accessibleLabel: `${reading}, below ${threshold}% guide` };
 }
 
 export function miniModalPosition(
@@ -84,9 +113,27 @@ export function mountHostMonitorMiniModal(pluginId: string, signal: AbortSignal)
   let request: Promise<void> | null = null;
   let requestController: AbortController | null = null;
   let disposed = false;
+  const hiddenNavRows = new Map<HTMLElement, HTMLElement["hidden"]>();
 
-  const findTrigger = (): HTMLButtonElement | null => Array.from(document.querySelectorAll<HTMLButtonElement>("button"))
-    .find((button) => button.getAttribute("aria-label") === "Host Monitor" || button.getAttribute("title") === "Host Monitor") ?? null;
+  const findTrigger = (): HTMLButtonElement | null => document.querySelector<HTMLButtonElement>(HOST_MONITOR_FOOTER_SELECTOR)
+    ?? Array.from(document.querySelectorAll<HTMLButtonElement>("button"))
+      .find((button) => button.getAttribute("aria-label") === "Host Monitor" || button.getAttribute("title") === "Host Monitor")
+    ?? null;
+
+  const hideNavRows = (): void => {
+    for (const row of document.querySelectorAll<HTMLElement>(HOST_MONITOR_NAV_ROW_SELECTOR)) {
+      if (!hiddenNavRows.has(row)) hiddenNavRows.set(row, row.hidden);
+      row.hidden = true;
+    }
+  };
+
+  const openPage = (): boolean => {
+    const row = document.querySelector<HTMLElement>(HOST_MONITOR_NAV_ROW_SELECTOR);
+    const button = row?.querySelector<HTMLButtonElement>('button:not([disabled])');
+    if (button === null || button === undefined) return false;
+    button.click();
+    return true;
+  };
 
   const position = (): void => {
     if (modal === null || trigger === null) return;
@@ -127,7 +174,7 @@ export function mountHostMonitorMiniModal(pluginId: string, signal: AbortSignal)
       if (!response.ok || fleet === null) throw new Error("Could not load machines.");
       if (modal === null || rows === null || summary === null || status === null) return;
       summary.textContent = `${fleet.connected}/${fleet.total} connected`;
-      rows.replaceChildren(...fleet.machines.map(machineRow));
+      rows.replaceChildren(...fleet.machines.map((machine) => machineRow(machine, fleet.thresholds)));
       status.textContent = fleet.machines.length === 0 ? "No machines are enrolled in BB." : "Updated now";
     }).catch((error: unknown) => {
       if (modal !== null && status !== null && !(error instanceof DOMException && error.name === "AbortError")) {
@@ -144,7 +191,7 @@ export function mountHostMonitorMiniModal(pluginId: string, signal: AbortSignal)
   const open = (): void => {
     trigger = findTrigger();
     if (trigger === null || modal !== null) return;
-    modal = createModal(close, refresh);
+    modal = createModal(close, refresh, openPage);
     document.body.append(modal);
     position();
     interval = setInterval(() => { void refresh(); }, MINI_MODAL_REFRESH_MS);
@@ -170,6 +217,9 @@ export function mountHostMonitorMiniModal(pluginId: string, signal: AbortSignal)
   window.addEventListener("resize", position);
   window.addEventListener("popstate", onNavigation);
   window.addEventListener("hashchange", onNavigation);
+  hideNavRows();
+  const navObserver = new MutationObserver(hideNavRows);
+  navObserver.observe(document.body, { childList: true, subtree: true });
 
   const dispose = (): void => {
     if (disposed) return;
@@ -181,12 +231,17 @@ export function mountHostMonitorMiniModal(pluginId: string, signal: AbortSignal)
     window.removeEventListener("resize", position);
     window.removeEventListener("popstate", onNavigation);
     window.removeEventListener("hashchange", onNavigation);
+    navObserver.disconnect();
+    for (const [row, wasHidden] of hiddenNavRows) {
+      if (row.isConnected) row.hidden = wasHidden;
+    }
+    hiddenNavRows.clear();
   };
   signal.addEventListener("abort", dispose, { once: true });
   return dispose;
 }
 
-function machineRow(machine: MiniModalMachine): HTMLElement {
+function machineRow(machine: MiniModalMachine, thresholds: MiniModalFleet["thresholds"]): HTMLElement {
   const row = document.createElement("li");
   row.className = "host-monitor-mini__machine";
   const heading = document.createElement("div");
@@ -197,15 +252,29 @@ function machineRow(machine: MiniModalMachine): HTMLElement {
   state.dataset.state = machine.state;
   heading.append(name, state);
   const metrics = document.createElement("dl");
-  metrics.append(metric("CPU", machine.cpuPercent), metric("RAM", machine.ramPercent), metric("Disk", machine.diskPercent));
+  const isFresh = machine.state === "fresh";
+  metrics.append(
+    metric("CPU", machine.cpuPercent, thresholds.cpu, isFresh),
+    metric("RAM", machine.ramPercent, thresholds.ram, isFresh),
+    metric("Disk", machine.diskPercent, null, isFresh),
+  );
   row.append(heading, metrics);
   return row;
 }
 
-function metric(label: string, value: number | null): HTMLElement {
+function metric(label: string, value: number | null, threshold: number | null, isFresh: boolean): HTMLElement {
   const wrapper = document.createElement("div");
+  const presentation = miniMetricPresentation(label, value, threshold, isFresh);
+  wrapper.dataset.guide = presentation.guide;
+  wrapper.setAttribute("aria-label", presentation.accessibleLabel);
   const term = document.createElement("dt");
   term.textContent = label;
+  if (threshold !== null) {
+    const guide = document.createElement("small");
+    guide.textContent = `${threshold}%`;
+    guide.setAttribute("aria-hidden", "true");
+    term.append(" ", guide);
+  }
   const detail = document.createElement("dd");
   detail.textContent = value === null ? "—" : `${value.toFixed(1)}%`;
   wrapper.append(term, detail);
@@ -220,7 +289,11 @@ function stateLabel(state: string): string {
   return "Sampling";
 }
 
-function createModal(close: (restoreFocus?: boolean) => void, refresh: () => Promise<void>): HTMLElement {
+function createModal(
+  close: (restoreFocus?: boolean) => void,
+  refresh: () => Promise<void>,
+  openPage: () => boolean,
+): HTMLElement {
   const modal = document.createElement("section");
   modal.className = "host-monitor-mini";
   modal.dataset.hostMonitorMini = "";
@@ -255,8 +328,8 @@ function createModal(close: (restoreFocus?: boolean) => void, refresh: () => Pro
   status.textContent = "Loading machines…";
   const openButton = button("Open Host Monitor", "host-monitor-mini__open");
   openButton.addEventListener("click", () => {
-    close(false);
-    window.location.assign(HOST_MONITOR_PAGE_PATH);
+    if (openPage()) close(false);
+    else status.textContent = "The Host Monitor page is unavailable. Reload the plugin and retry.";
   });
   modal.append(header, rows, status, openButton);
   return modal;

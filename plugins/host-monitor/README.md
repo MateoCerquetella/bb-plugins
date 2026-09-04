@@ -24,7 +24,13 @@ page.
 The bottom-left Host Monitor icon opens a compact machine mini-modal with every
 enrolled host's current state, CPU, RAM, and disk. Choose **Open Host Monitor**
 there to enter the dedicated full dashboard page. The monitor never redirects
-you into plugin Settings.
+you into plugin Settings and the transition does not reload BB. The dedicated
+route stays available without adding a second Host Monitor row to the main
+sidebar.
+
+CPU and RAM values use the existing configured guides. A fresh reading at or
+above its guide receives passive visual treatment and explicit accessible
+wording inside the mini-modal; it does not create a badge or notification.
 
 The mini-modal is quick telemetry and navigation—not a warning surface. It has
 no notification badge, toast, alert banner, IP/process controls, or draggable
