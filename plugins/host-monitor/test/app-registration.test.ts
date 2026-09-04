@@ -65,7 +65,7 @@ test("keeps the modal and page notification-free while restoring guarded process
 test("imports only public SDK and declared third-party surfaces", () => {
   const scan = experimental_scanPublicSdkOnly(
     new URL("..", import.meta.url).pathname,
-    { allow: [/^better-sqlite3$/u, /^echarts(?:\/.*)?$/u, /^react$/u, /^@radix-ui\/react-alert-dialog$/u] },
+    { allow: [/^better-sqlite3$/u, /^echarts(?:\/.*)?$/u, /^react$/u, /^@radix-ui\/react-(?:alert-dialog|select)$/u] },
   );
   assert.deepEqual(scan.violations, []);
   assert.deepEqual(scan.privateDependencies, []);

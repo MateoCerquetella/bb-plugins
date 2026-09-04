@@ -23,6 +23,7 @@ const monitorPath = join(outputDir, "dashboard-wide.png");
 const modalPath = join(outputDir, "mini-modal-desktop.png");
 const processPath = join(outputDir, "process-widget-wide.png");
 const processDialogPath = join(outputDir, "process-confirmation.png");
+const comboPath = join(outputDir, "history-combobox.png");
 
 try {
   let pages;
@@ -117,6 +118,23 @@ try {
   if (navigationState.marker !== documentMarker || navigationState.visiblePageRows !== 0 || navigationState.settingsRoute) throw new Error(`Navigation reloaded or exposed the row: ${JSON.stringify(navigationState)}`);
   await waitFor("document.querySelectorAll('.host-monitor__machine-card').length >= 2");
   await waitFor("document.querySelectorAll('.host-monitor__panel-grid > article').length > 0");
+  const comboboxSummary = await evaluate(`({
+    role: document.querySelector('.bb-select__trigger')?.getAttribute('role'),
+    label: document.querySelector('.bb-select__trigger')?.getAttribute('aria-labelledby'),
+    value: document.querySelector('.bb-select__trigger')?.textContent?.trim() ?? null
+  })`);
+  if (comboboxSummary.role !== 'combobox' || comboboxSummary.label !== 'host-monitor-history-label' || comboboxSummary.value !== '1 day') throw new Error(`Invalid History combobox: ${JSON.stringify(comboboxSummary)}`);
+  await evaluate("document.querySelector('.bb-select__trigger')?.click()");
+  await waitFor("document.querySelector('.bb-select__content') !== null");
+  const comboOptions = await evaluate("Array.from(document.querySelectorAll('.bb-select__item')).map((item) => item.textContent?.trim())");
+  if (JSON.stringify(comboOptions) !== JSON.stringify(['1 hour', '6 hours', '1 day', '7 days', '30 days'])) throw new Error(`Unexpected History options: ${JSON.stringify(comboOptions)}`);
+  await screenshot(comboPath);
+  await evaluate(`Array.from(document.querySelectorAll('.bb-select__item')).find((item) => item.textContent?.trim() === '6 hours')?.click()`);
+  await waitFor("document.querySelector('.bb-select__trigger')?.textContent?.trim() === '6 hours'");
+  await evaluate("document.querySelector('.bb-select__trigger')?.click()");
+  await waitFor("document.querySelector('.bb-select__content') !== null");
+  await evaluate(`Array.from(document.querySelectorAll('.bb-select__item')).find((item) => item.textContent?.trim() === '1 day')?.click()`);
+  await waitFor("document.querySelector('.bb-select__trigger')?.textContent?.trim() === '1 day'");
 
   const initial = await evaluate(`({
     machines: document.querySelectorAll('.host-monitor__machine-card').length,
@@ -235,7 +253,7 @@ try {
   if (narrow.overflow || narrow.rows < 10 || narrow.hostStripOverflow !== 'auto' || narrow.processTableDisplay !== 'none' || narrow.processListDisplay !== 'grid' || narrow.rangeRight > narrow.viewport[0] || narrow.rangeWidth < 96) throw new Error(`Invalid narrow layout: ${JSON.stringify(narrow)}`);
   await screenshot(narrowPath);
 
-  console.log(JSON.stringify({ modal: modalSummary, navigation: navigationState, initial, widgets: { original: originalWidgets.length, persisted: persistedWidgets.length, changedKey }, processes: processSummary, switchedTo: targetName, narrow, artifacts: [sidebarPath, modalPath, monitorPath, processPath, processDialogPath, desktopPath, narrowPath] }));
+  console.log(JSON.stringify({ modal: modalSummary, navigation: navigationState, combobox: { ...comboboxSummary, options: comboOptions }, initial, widgets: { original: originalWidgets.length, persisted: persistedWidgets.length, changedKey }, processes: processSummary, switchedTo: targetName, narrow, artifacts: [sidebarPath, modalPath, monitorPath, comboPath, processPath, processDialogPath, desktopPath, narrowPath] }));
   socket.close();
 } finally {
   browser.kill("SIGTERM");

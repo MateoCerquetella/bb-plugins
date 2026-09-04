@@ -21,6 +21,17 @@ test("fleet is searchable, selected by cards, and protects dirty drafts", () => 
   assert.match(app, /Save or cancel dashboard changes before switching hosts/u);
 });
 
+test("history uses the optimized BB-style combobox instead of a native select", () => {
+  assert.match(app, /<HistoryRangeSelect/u);
+  assert.match(app, /<SelectTrigger aria-labelledby="host-monitor-history-label">/u);
+  assert.match(app, /<SelectContent align="end">/u);
+  assert.match(app, /const RANGE_OPTIONS: ReadonlyArray/u);
+  assert.doesNotMatch(app, /<select/u);
+  assert.match(styles, /\.bb-select__content\s*\{[^}]*min-width:\s*var\(--radix-select-trigger-width\)/su);
+  assert.match(styles, /\.bb-select__item\[data-highlighted\]/u);
+  assert.match(styles, /\.bb-select__item\[data-state="checked"\]/u);
+});
+
 test("narrow layout uses a snap host strip, one widget column, and compact processes", () => {
   assert.match(styles, /@container\s*\(max-width:\s*560px\)[\s\S]*\.host-monitor__machine-grid\s*\{[^}]*overflow-x:\s*auto[^}]*scroll-snap-type:\s*x\s+mandatory/su);
   assert.match(styles, /@container\s*\(max-width:\s*560px\)[\s\S]*\.host-monitor__panel-grid\s*\{[^}]*grid-template-columns:\s*1fr/su);

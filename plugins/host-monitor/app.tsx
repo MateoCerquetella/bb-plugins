@@ -18,6 +18,7 @@ import { definePluginApp, useRealtime, useRpc } from "@get-bb/plugin-sdk/app";
 import { Badge } from "./components/ui/badge.tsx";
 import { Button } from "./components/ui/button.tsx";
 import { Input } from "./components/ui/input.tsx";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/ui/select.tsx";
 import { Skeleton } from "./components/ui/skeleton.tsx";
 import { expectedSampleInterval, withChartGaps } from "./chart-data.ts";
 import type {
@@ -64,7 +65,13 @@ echarts.use([
   TooltipComponent,
 ]);
 
-const RANGES: RangeHours[] = [1, 6, 24, 24 * 7, 24 * 30];
+const RANGE_OPTIONS: ReadonlyArray<{ value: RangeHours; label: string }> = [
+  { value: 1, label: "1 hour" },
+  { value: 6, label: "6 hours" },
+  { value: 24, label: "1 day" },
+  { value: 24 * 7, label: "7 days" },
+  { value: 24 * 30, label: "30 days" },
+];
 const REALTIME_CHANNEL = "host-monitor-machines-changed";
 const PROCESS_PAGE_LIMIT = 100;
 const PROCESS_REFRESH_MS = 10_000;
@@ -272,12 +279,7 @@ function FleetDashboard() {
             <span>Find machine</span>
             <Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Name, id, or platform" type="search" />
           </label>
-          <label className="host-monitor__range">
-            <span>History</span>
-            <select value={rangeHours} onChange={(event) => setRangeHours(Number(event.target.value) as RangeHours)}>
-              {RANGES.map((hours) => <option key={hours} value={hours}>{rangeLabel(hours)}</option>)}
-            </select>
-          </label>
+          <HistoryRangeSelect onChange={setRangeHours} value={rangeHours} />
           <Button disabled={refreshing || fleet?.refreshing === true} onClick={() => void refreshAll()} variant="outline">
             {refreshing || fleet?.refreshing ? "Refreshing…" : "Refresh all"}
           </Button>
@@ -358,6 +360,30 @@ function FleetDashboard() {
     </main>
   );
 }
+
+const HistoryRangeSelect = memo(function HistoryRangeSelect({
+  onChange,
+  value,
+}: {
+  onChange(value: RangeHours): void;
+  value: RangeHours;
+}) {
+  return (
+    <div className="host-monitor__range">
+      <span id="host-monitor-history-label">History</span>
+      <Select onValueChange={(next) => onChange(Number(next) as RangeHours)} value={String(value)}>
+        <SelectTrigger aria-labelledby="host-monitor-history-label">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent align="end">
+          {RANGE_OPTIONS.map((option) => (
+            <SelectItem key={option.value} value={String(option.value)}>{option.label}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+});
 
 const MachineCard = memo(function MachineCard({
   disabled,
@@ -1245,12 +1271,6 @@ function relativeTime(timestamp: number): string {
   const minutes = Math.floor(seconds / 60);
   if (minutes < 60) return `${minutes}m ago`;
   return `${Math.floor(minutes / 60)}h ago`;
-}
-
-function rangeLabel(hours: number): string {
-  if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"}`;
-  if (hours === 24) return "1 day";
-  return `${hours / 24} days`;
 }
 
 function isOver(value: number | null | undefined, threshold: number): boolean {
