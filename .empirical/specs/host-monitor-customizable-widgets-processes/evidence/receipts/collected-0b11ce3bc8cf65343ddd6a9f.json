@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-0b11ce3bc8cf65343ddd6a9f",
+  "criteria": [
+    "AC-4",
+    "AC-5",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3",
+    "AC-UI-4",
+    "AC-UI-5"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Final screenshots for expanded and collapsed Processes states, polling pause/resume browser outcome, dashboard dragging, and responsive Host Monitor flow.",
+  "passed": true,
+  "startedAt": "2026-09-04T18:59:15.375Z",
+  "completedAt": "2026-09-04T18:59:15.375Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-customizable-widgets-processes",
+    "specRevision": 3,
+    "specDigest": "sha256:0f675990300c9c0db81b1e9c546fcb6c5535bdfbba824c9c0ed513f2f64a697e",
+    "treeDigest": "sha256:f97d950969234e8092fb3059be4271b2b45cceb742bcb3dff1c93da1483fec46",
+    "policyDigest": "sha256:34cb74e5a73a43fa03cfc3431653cf299fd3a920d5e3e02c7a795a02cffbdc6f"
+  },
+  "digest": "sha256:4cf0436492bead0e0747a941a9c8f3720f54581d45178f0473af674de3046231",
+  "kind": "collected",
+  "collector": "codex-process-panel-final",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/dashboard-drag.png",
+      "mediaType": "image/png",
+      "bytes": 123821,
+      "digest": "sha256:0cbc57bb9e76ac5c651086d5e7bb36bc64ce6dd297b8009481de04cbd89e636b"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/dashboard-wide.png",
+      "mediaType": "image/png",
+      "bytes": 136843,
+      "digest": "sha256:53ec9d975ddc3e43bfa95fbcda408c099edadba408417256d2cb945f0a8ef756"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/editor-390.png",
+      "mediaType": "image/png",
+      "bytes": 43327,
+      "digest": "sha256:46d25528670173d081530b45187910667f79b21332b810f18bb0cc638f3ddda6"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/editor-desktop.png",
+      "mediaType": "image/png",
+      "bytes": 130599,
+      "digest": "sha256:dbfcdd90f460e85ec6be78ea3fb3e8bd6c9f880f8920d4d682b3212254f2d525"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/history-combobox.png",
+      "mediaType": "image/png",
+      "bytes": 141295,
+      "digest": "sha256:992bd917192a311d2c90a3fda659599a623b4472572143949548dcb5ee0cc14e"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/mini-modal-desktop.png",
+      "mediaType": "image/png",
+      "bytes": 79608,
+      "digest": "sha256:ea58090c4cc8ad8c5bd0c51abde38c042d94c1cd13c5db6728a9334744c96c67"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/process-collapsed.png",
+      "mediaType": "image/png",
+      "bytes": 157267,
+      "digest": "sha256:c10fd0d34aa7ba4a3ca355f17d7688c7d3abf0a5a48d2766952ae50642eaf6b8"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/process-confirmation.png",
+      "mediaType": "image/png",
+      "bytes": 166280,
+      "digest": "sha256:ead5132737d65076d0e70ac1dc70c96517c2b8092e9a4d6e48c7f05a61fee671"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/process-widget-wide.png",
+      "mediaType": "image/png",
+      "bytes": 132873,
+      "digest": "sha256:57c366749bc04fdb56c6a5e9a5784a30dae657b6de9025f4705f6516c2262712"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/sidebar-icon-only.png",
+      "mediaType": "image/png",
+      "bytes": 61125,
+      "digest": "sha256:0cf87d3c2f0adb78a590d444b6a14c93e089edfdea447cb4c82389cfa78405c5"
+    }
+  ]
+}
