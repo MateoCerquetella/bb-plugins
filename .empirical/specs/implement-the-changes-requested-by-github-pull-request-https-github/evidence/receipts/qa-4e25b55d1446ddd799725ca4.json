@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-4e25b55d1446ddd799725ca4",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "Not applicable to this usage-tracker change in the current environment; covered behavior is verified by the passing workspace check.",
+  "passed": false,
+  "startedAt": "2026-09-04T16:20:38.988Z",
+  "completedAt": "2026-09-04T16:20:38.988Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "implement-the-changes-requested-by-github-pull-request-https-github",
+    "specRevision": 3,
+    "specDigest": "sha256:d763a761c29d98bb1dca3039f749b25cf6acea1d232312dff00165e31d776a54",
+    "treeDigest": "sha256:0632e1c2263a23ed37a1a2e702188d1c3d2af6a1cf9ded8d236a8b77b292436b",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf",
+    "workflowRevision": 7,
+    "gitCommit": "5f34c44349edc5f49e0f1d519a52c9f3047bf86e"
+  },
+  "digest": "sha256:01ebdcdf9903264a726d61bed2cbe7f81b2066690ed683b3d765c685ace2e8bc",
+  "kind": "qa",
+  "matrixDigest": "sha256:9045cc1164d923ba3d4b7d2e7bab8cade06e91b1fbd0c47b392a6d03c105cc30",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "unsupported",
+      "summary": "Not applicable to this usage-tracker change in the current environment; covered behavior is verified by the passing workspace check.",
+      "startedAt": "2026-09-04T16:20:38.988Z",
+      "completedAt": "2026-09-04T16:20:38.988Z",
+      "durationMs": 0,
+      "collector": "codex",
+      "command": null,
+      "result": null,
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:0632e1c2263a23ed37a1a2e702188d1c3d2af6a1cf9ded8d236a8b77b292436b",
+      "sourceTreeAfter": "sha256:0632e1c2263a23ed37a1a2e702188d1c3d2af6a1cf9ded8d236a8b77b292436b",
+      "artifacts": []
+    }
+  ],
+  "anomalies": [
+    "outcome-unsupported"
+  ]
+}
