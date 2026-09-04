@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-5e51e1db1d995ee40f4eb23a",
+  "criteria": [
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3",
+    "AC-UI-4"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Screenshots and browser state show footer-only presence, CPU/RAM guides, BB-native modal, stable-document SPA handoff, dense page, and responsive editor.",
+  "passed": true,
+  "startedAt": "2026-09-04T15:42:31.739Z",
+  "completedAt": "2026-09-04T15:42:31.739Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-native-modal-navigation-fixes",
+    "specRevision": 3,
+    "specDigest": "sha256:ed21c063a82fb9ea12f43c73ca9924afbe20cca73c0cfd5dd2c49e760e4273b4",
+    "treeDigest": "sha256:767f6e6a297744f1e01ea151ab659e2a5799a339f722d0f21d81438e14f93790",
+    "policyDigest": "sha256:39d04bb7b0c02856e618bfb5175d1f83577318536445ecf69eccb54b9a7471a8"
+  },
+  "digest": "sha256:54fbf96e40d1ebeadb66b07cc1ed701db114a557fceeb1be71cc7a45d7f801bc",
+  "kind": "collected",
+  "collector": "Chromium native Host Monitor UX verification",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/host-monitor-native-modal-navigation-fixes/evidence/browser/editor-390.png",
+      "mediaType": "image/png",
+      "bytes": 33873,
+      "digest": "sha256:199099b112a2bfcd7ecf5c882dd2808b11cb21791876057eec0563c183d29bf6"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-native-modal-navigation-fixes/evidence/browser/editor-desktop.png",
+      "mediaType": "image/png",
+      "bytes": 133209,
+      "digest": "sha256:e435ce523c384e0a1d3f2388e74136d7780e58eb9426a3d0848db6ced44ce694"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-native-modal-navigation-fixes/evidence/browser/mini-modal-desktop.png",
+      "mediaType": "image/png",
+      "bytes": 84801,
+      "digest": "sha256:448705d2dbd1182f8ab52b896bd1f85f1aba393d81d7fdb7808a1acbe81a2225"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-native-modal-navigation-fixes/evidence/browser/monitor-desktop.png",
+      "mediaType": "image/png",
+      "bytes": 127493,
+      "digest": "sha256:c7564d18332030b6ce8cf6d4316eccbf5dade5700608a3306ef79c3a5704f91d"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-native-modal-navigation-fixes/evidence/browser/sidebar-icon-only.png",
+      "mediaType": "image/png",
+      "bytes": 56939,
+      "digest": "sha256:a42f8de7edd739510f6aaa95ed1d8cda88abacc1fb51ea79724363365ef94cc8"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "sequence": 8,
+  "previousDigest": "sha256:772769959ea8450115c50e47f5de7831e3a981e7fd1f7711d437ba4aa8e7b19c",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Verified the final committed tree with 34 tests, typecheck, build, footer-only browser presence, threshold semantics, stable-document SPA navigation, five screenshots, fleet/editor behavior, and responsive inspection.",
+  "createdAt": "2026-09-04T15:42:50.626Z",
+  "stateBeforeDigest": "sha256:a581722e8cf8288eab6a226e292ed536f0468e9cf694582eaa7d29e5b24169f4",
+  "stateAfterDigest": "sha256:1c3727685120abbb57b815a1550d9779f0e01d5bd38e10bfa64bdad234c642ca",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 8,
+    "activeFeature": "host-monitor-native-modal-navigation-fixes",
+    "request": "Fix and refine the current Host Monitor two-stage UX. Add passive CPU and RAM threshold indication inside the mini-modal using the existing configured threshold guides. Make Open Host Monitor transition in-app without reloading BB. Remove the Host Monitor nav page row from the main sidebar while keeping the full dedicated monitor surface reachable from the mini-modal. Improve the mini-modal and full monitor UI/UX to match BB spacing, typography, controls, focus, responsive, and interaction patterns. Preserve multi-host Grafana-style persisted per-host panels, BB machine/realtime infrastructure, notification-free behavior, and unrelated work. Verify tests, typecheck, build, live browser navigation without document reload, threshold states, no sidebar row, connected/disconnected hosts, persistence, and final diff. Stop ready for review; do not merge or deploy.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "review",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Verified the final committed tree with 34 tests, typecheck, build, footer-only browser presence, threshold semantics, stable-document SPA navigation, five screenshots, fleet/editor behavior, and responsive inspection.",
+    "implementationActor": "agent",
+    "workStartedAt": "2026-09-04T15:34:31.168Z",
+    "specDigest": "sha256:ed21c063a82fb9ea12f43c73ca9924afbe20cca73c0cfd5dd2c49e760e4273b4",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:b02df483579227569cd445fc2385b9a15cad920fa735c6ae54ad48902c0cc33d",
+    "impactDigest": "sha256:d346bf5342f747fc05ac294db728c582674aed61452d5108ae354e6aad8ae028",
+    "capabilityClaimId": "host-monitor-native-modal-navigation-fixes-65efdf592f38",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "qa-21e4e0c5d4ff2f34331f70fe",
+      "qa-10403383c31a00f14fabe237",
+      "collected-5e51e1db1d995ee40f4eb23a",
+      "qa-9a2eae0f72f2fa31f4483e79"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": true,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "verified",
+      "reasons": {
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-04T15:42:50.626Z"
+  },
+  "digest": "sha256:be7c8a3442d3392b1a9934550f2ae2e5d9b28db37c368c39399c0c52440051cf"
+}
