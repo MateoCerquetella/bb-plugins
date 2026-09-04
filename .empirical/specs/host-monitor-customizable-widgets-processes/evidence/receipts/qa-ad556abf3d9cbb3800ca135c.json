@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-ad556abf3d9cbb3800ca135c",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3",
+    "AC-UI-4",
+    "AC-UI-5"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Re-verify final commit d407f6e7d after hardening process-action concurrency, responsive bounds, stylesheet structure, and QA ownership.",
+  "passed": true,
+  "startedAt": "2026-09-04T16:54:21.840Z",
+  "completedAt": "2026-09-04T16:54:24.778Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-customizable-widgets-processes",
+    "specRevision": 3,
+    "specDigest": "sha256:0f675990300c9c0db81b1e9c546fcb6c5535bdfbba824c9c0ed513f2f64a697e",
+    "treeDigest": "sha256:f8902fdff7f5d9073ea63dc24fbb0f91c7de7e4245d68e7990ac28e338b9713c",
+    "policyDigest": "sha256:34cb74e5a73a43fa03cfc3431653cf299fd3a920d5e3e02c7a795a02cffbdc6f",
+    "workflowRevision": 8,
+    "gitCommit": "d407f6e7df0961ea41ea02700daf1141d7ac24ae"
+  },
+  "digest": "sha256:c39d69ce2b35254e0e46e3b6d4d0aa587520f4d158f2badb61d7894d12d5b15a",
+  "kind": "qa",
+  "matrixDigest": "sha256:5ff142880aa2b3fb6e27240d7ef98d004f7718b23c4c18a50765e1539264d93a",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Re-verify final commit d407f6e7d after hardening process-action concurrency, responsive bounds, stylesheet structure, and QA ownership.",
+      "startedAt": "2026-09-04T16:54:21.840Z",
+      "completedAt": "2026-09-04T16:54:24.778Z",
+      "durationMs": 2938,
+      "collector": null,
+      "command": {
+        "argv": [
+          "npm",
+          "run",
+          "verify",
+          "--workspace",
+          "bb-plugin-host-monitor"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:5dd495eedcd5114c2d913485d798b5068369184886e54a250b5e3b86b6455551",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "host queue\nok 34 - a synchronous operation throw cannot wedge the host queue\n  ---\n  duration_ms: 0.250266\n  type: 'test'\n  ...\n# Subtest: closing the gate rejects queued destructive work without starting it\nok 35 - closing the gate rejects queued destructive work without starting it\n  ---\n  duration_ms: 0.254253\n  type: 'test'\n  ...\n# Subtest: sorts processes deterministically without mutating the RPC rows\nok 36 - sorts processes deterministically without mutating the RPC rows\n  ---\n  duration_ms: 5.355667\n  type: 'test'\n  ...\n# Subtest: filters processes by safe name or PID fields\nok 37 - filters processes by safe name or PID fields\n  ---\n  duration_ms: 0.266315\n  type: 'test'\n  ...\n# Subtest: summarizes top resource consumers and protected processes\nok 38 - summarizes top resource consumers and protected processes\n  ---\n  duration_ms: 0.227365\n  type: 'test'\n  ...\n# Subtest: prefers a graceful end and only labels force-only platforms honestly\nok 39 - prefers a graceful end and only labels force-only platforms honestly\n  ---\n  duration_ms: 0.14798\n  type: 'test'\n  ...\n# Subtest: keeps blocked processes non-actionable with an accessible reason\nok 40 - keeps blocked processes non-actionable with an accessible reason\n  ---\n  duration_ms: 0.200405\n  type: 'test'\n  ...\n# Subtest: shows only safe ownership categories\nok 41 - shows only safe ownership categories\n  ---\n  duration_ms: 0.081067\n  type: 'test'\n  ...\n# Subtest: termination timeout has clear headroom over bounded Windows commands\nok 42 - termination timeout has clear headroom over bounded Windows commands\n  ---\n  duration_ms: 0.731653\n  type: 'test'\n  ...\n# Subtest: listProcesses routes only to the explicit enrolled connected host\nok 43 - listProcesses routes only to the explicit enrolled connected host\n  ---\n  duration_ms: 9.855755\n  type: 'test'\n  ...\n# Subtest: identical overlapping process polls are coalesced\nok 44 - identical overlapping process polls are coalesced\n  ---\n  duration_ms: 5.035293\n  type: 'test'\n  ...\n# Subtest: termination preparation waits behind one active poll on the same host\nok 45 - termination preparation waits behind one active poll on the same host\n  ---\n  duration_ms: 4.238502\n  type: 'test'\n  ...\n# Subtest: offline and unknown hosts never start a host worker\nok 46 - offline and unknown hosts never start a host worker\n  ---\n  duration_ms: 2.214384\n  type: 'test'\n  ...\n# Subtest: prepare issues a one-use challenge and execute consumes it before dispatch\nok 47 - prepare issues a one-use challenge and execute consumes it before dispatch\n  ---\n  duration_ms: 3.328144\n  type: 'test'\n  ...\n# Subtest: execute reports known preflight failure before dispatch and unknown transport outcome after dispatch\nok 48 - execute reports known preflight failure before dispatch and unknown transport outcome after dispatch\n  ---\n  duration_ms: 2.553572\n  type: 'test'\n  ...\n# Subtest: process names are reduced to safe basenames without Unicode controls\nok 49 - process names are reduced to safe basenames without Unicode controls\n  ---\n  duration_ms: 1.68508\n  type: 'test'\n  ...\n# Subtest: opaque process identities bind platform, PID, and lifetime without leaking it\nok 50 - opaque process identities bind platform, PID, and lifetime without leaking it\n  ---\n  duration_ms: 0.655694\n  type: 'test'\n  ...\n# Subtest: Linux proc parsers handle parenthesized names and bounded RSS\nok 51 - Linux proc parsers handle parenthesized names and bounded RSS\n  ---\n  duration_ms: 0.913314\n  type: 'test'\n  ...\n# Subtest: macOS parser never returns path or UID and normalizes machine CPU\nok 52 - macOS parser never returns path or UID and normalizes machine CPU\n  ---\n  duration_ms: 0.586599\n  type: 'test'\n  ...\n# Subtest: Windows parser ignores injected credentials and executable details\nok 53 - Windows parser ignores injected credentials and executable details\n  ---\n  duration_ms: 0.511512\n  type: 'test'\n  ...\n# Subtest: Windows collection proves ownership without requiring elevated Get-Process\nok 54 - Windows collection proves ownership without requiring elevated Get-Process\n  ---\n  duration_ms: 0.619178\n  type: 'test'\n  ...\n# Subtest: process protection blocks system, monitor, ancestor, owner, identity, and elevation\nok 55 - process protection blocks system, monitor, ancestor, owner, identity, and elevation\n  ---\n  duration_ms: 0.232253\n  type: 'test'\n  ...\n# Subtest: monitor ancestry is bounded and cycle safe\nok 56 - monitor ancestry is bounded and cycle safe\n  ---\n  duration_ms: 0.218518\n  type: 'test'\n  ...\n# Subtest: POSIX modes map only to SIGTERM and explicit SIGKILL\nok 57 - POSIX modes map only to SIGTERM and explicit SIGKILL\n  ---\n  duration_ms: 0.189855\n  type: 'test'\n  ...\n# Subtest: Windows force script rechecks StartTime and kills the validated object\nok 58 - Windows force script rechecks StartTime and kills the validated object\n  ---\n  duration_ms: 0.424814\n  type: 'test'\n  ...\n# Subtest: live process collection is schema-valid and exposes only safe fields\nok 59 - live process collection is schema-valid and exposes only safe fields\n  ---\n  duration_ms: 295.553746\n  type: 'test'\n  ...\n# Subtest: host process RPC validates its bounded strict result\nok 60 - host process RPC validates its bounded strict result\n  ---\n  duration_ms: 244.562911\n  type: 'test'\n  ...\n# Subtest: refresh represents every host, samples connected hosts, and isolates failure\nok 61 - refresh represents every host, samples connected hosts, and isolates failure\n  ---\n  duration_ms: 17.036538\n  type: 'test'\n  ...\n# Subtest: simultaneous fleet refreshes coalesce host calls\nok 62 - simultaneous fleet refreshes coalesce host calls\n  ---\n  duration_ms: 4.524492\n  type: 'test'\n  ...\n# Subtest: sidebar summary lists hosts without starting samples\nok 63 - sidebar summary lists hosts without starting samples\n  ---\n  duration_ms: 1.762331\n  type: 'test'\n  ...\n# Subtest: dashboard configuration is isolated by enrolled host and survives plugin reload\nok 64 - dashboard configuration is isolated by enrolled host and survives plugin reload\n  ---\n  duration_ms: 4.616841\n  type: 'test'\n  ...\n# Subtest: settings are passive in-page threshold guides\nok 65 - settings are passive in-page threshold guides\n  ---\n  duration_ms: 1.469988\n  type: 'test'\n  ...\n# Subtest: projects a bounded safe fleet for the mini modal\nok 66 - projects a bounded safe fleet for the mini modal\n  ---\n  duration_ms: 1.364586\n  type: 'test'\n  ...\n# Subtest: parses safe CPU/RAM guides and exposes accessible passive states\nok 67 - parses safe CPU/RAM guides and exposes accessible passive states\n  ---\n  duration_ms: 0.232624\n  type: 'test'\n  ...\n# Subtest: rejects malformed envelopes and drops malformed rows\nok 68 - rejects malformed envelopes and drops malformed rows\n  ---\n  duration_ms: 0.205093\n  type: 'test'\n  ...\n# Subtest: anchors above the footer trigger and clamps narrow viewports\nok 69 - anchors above the footer trigger and clamps narrow viewports\n  ---\n  duration_ms: 0.129966\n  type: 'test'\n  ...\n# Subtest: owns a cleanup-safe DOM lifecycle without unsafe HTML or legacy features\nok 70 - owns a cleanup-safe DOM lifecycle without unsafe HTML or legacy features\n  ---\n  duration_ms: 4.979722\n  type: 'test'\n  ...\n# Subtest: append-only migrations upgrade the prior single-machine schema\nok 71 - append-only migrations upgrade the prior single-machine schema\n  ---\n  duration_ms: 5.685929\n  type: 'test'\n  ...\n# Subtest: dashboard configuration persists independently per host and corrupt rows fall back\nok 72 - dashboard configuration persists independently per host and corrupt rows fall back\n  ---\n  duration_ms: 2.871572\n  type: 'test'\n  ...\n# Subtest: history is isolated per host and never exceeds 720 relative buckets\nok 73 - history is isolated per host and never exceeds 720 relative buckets\n  ---\n  duration_ms: 11.988812\n  type: 'test'\n  ...\n1..73\n# tests 73\n# suites 0\n# pass 73\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 902.089549\n\n> bb-plugin-host-monitor@0.1.4 build\n> env -u BB_CLI bb plugin build .\n\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\ndist/host.js\ndist/host.js.map\ndist/host.meta.json\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:f8902fdff7f5d9073ea63dc24fbb0f91c7de7e4245d68e7990ac28e338b9713c",
+      "sourceTreeAfter": "sha256:f8902fdff7f5d9073ea63dc24fbb0f91c7de7e4245d68e7990ac28e338b9713c",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

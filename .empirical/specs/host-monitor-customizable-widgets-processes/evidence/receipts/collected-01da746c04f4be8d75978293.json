@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-01da746c04f4be8d75978293",
+  "criteria": [
+    "AC-4",
+    "AC-5",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3",
+    "AC-UI-4",
+    "AC-UI-5"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Final live screenshots after process concurrency and responsive fixes, including actionable confirmation and unclipped 390px controls.",
+  "passed": true,
+  "startedAt": "2026-09-04T16:55:23.638Z",
+  "completedAt": "2026-09-04T16:55:23.638Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-customizable-widgets-processes",
+    "specRevision": 3,
+    "specDigest": "sha256:0f675990300c9c0db81b1e9c546fcb6c5535bdfbba824c9c0ed513f2f64a697e",
+    "treeDigest": "sha256:f8902fdff7f5d9073ea63dc24fbb0f91c7de7e4245d68e7990ac28e338b9713c",
+    "policyDigest": "sha256:34cb74e5a73a43fa03cfc3431653cf299fd3a920d5e3e02c7a795a02cffbdc6f"
+  },
+  "digest": "sha256:dcc7720bce4a18a8636b1d0fe6b38755e1b31c1c7d99907c7a653f62f485c1d0",
+  "kind": "collected",
+  "collector": "codex-final-live-browser",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/dashboard-wide.png",
+      "mediaType": "image/png",
+      "bytes": 149231,
+      "digest": "sha256:6241178a9878c71f2f951014d19dfb3cabf5ebca811d439ef73b6e42b378caaf"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/editor-390.png",
+      "mediaType": "image/png",
+      "bytes": 45385,
+      "digest": "sha256:b5b8cf09c9a791748d895b6fe25f2fabf39669a02db25e1f600b324e80228b38"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/editor-desktop.png",
+      "mediaType": "image/png",
+      "bytes": 143499,
+      "digest": "sha256:5a1ff202f81ddace82e63d79ef87eee841fbdf36860ac74d6649d2cd4f79a108"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/mini-modal-desktop.png",
+      "mediaType": "image/png",
+      "bytes": 82104,
+      "digest": "sha256:ce029a6219b9feda89cf6fa8072c0aea13c4c0c0a262ccd618b54b06f9afffcb"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/process-confirmation.png",
+      "mediaType": "image/png",
+      "bytes": 135399,
+      "digest": "sha256:69e6d303fc639dc9a3f536a3963c0797b149bd0011690e5505415f1999dc798a"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/process-widget-wide.png",
+      "mediaType": "image/png",
+      "bytes": 99702,
+      "digest": "sha256:22d85ca094206b83e99d51c53d41a9a948fda93410dceda66d46bb2f765fb311"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/browser/sidebar-icon-only.png",
+      "mediaType": "image/png",
+      "bytes": 67758,
+      "digest": "sha256:0f74f61e3a1e9f576010fba47e4b568f0398980887ef576a957da6c73ffb8f26"
+    }
+  ]
+}
