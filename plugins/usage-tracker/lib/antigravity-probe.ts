@@ -183,7 +183,7 @@ async function executeAgy(): Promise<string> {
           const detail = stderr.trim();
           reject(new AgyExecutionError(
             detail === "" ? error.message : `${error.message}: ${detail}`,
-            error.code,
+            error.code ?? undefined,
           ));
           return;
         }

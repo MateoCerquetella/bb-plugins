@@ -12,8 +12,8 @@ licensed; the common license text is included at the end.
 
 MIT License, Copyright (c) 2026 Michael Yong.
 
-The OpenAI and Claude brand-mark geometry in `lib/provider-marks.ts` is lifted
-from bb's provider icon components.
+The OpenAI, Claude, Grok Build, and OpenCode brand-mark geometry in
+`lib/provider-marks.ts` is lifted from bb's provider icon components.
 
 Source: <https://github.com/get-bb/bb>
 
@@ -49,9 +49,9 @@ bundled in this package.
 
 ## Trademarks and brand marks
 
-The glyphs in `lib/provider-marks.ts` depict OpenAI and Claude. Each mark
-belongs to its owner. No software licence grants trademark rights; the marks
-are used only to identify the agent whose limits are shown.
+The glyphs in `lib/provider-marks.ts` depict OpenAI, Claude, Grok Build, and
+OpenCode. Each mark belongs to its owner. No software licence grants trademark
+rights; the marks are used only to identify the agent whose limits are shown.
 
 ---
 

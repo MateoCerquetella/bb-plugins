@@ -150,6 +150,18 @@ export default function plugin(bb: BbPluginApi) {
       description: "Show Codex usage in the sidebar footer.",
       default: true,
     },
+    enableGrok: {
+      type: "boolean",
+      label: "Enable Grok",
+      description: "Show Grok usage in the sidebar footer.",
+      default: true,
+    },
+    enableOpenCode: {
+      type: "boolean",
+      label: "Enable OpenCode",
+      description: "Show OpenCode usage in the sidebar footer.",
+      default: true,
+    },
     enableAntigravity: {
       type: "boolean",
       label: "Enable Antigravity",
@@ -182,14 +194,12 @@ export default function plugin(bb: BbPluginApi) {
     async getUsage({ threadId }) {
       const snapshot = await loadUsageSnapshot(bb.sdk, threadId);
       const preferences = await settings.get();
-      const antigravity = preferences.enableAntigravity
-        ? getCachedAntigravityUsage()
-        : snapshot.providers.find((provider) => provider.id === "antigravity");
-      const providers = antigravity === undefined
-        ? snapshot.providers
-        : snapshot.providers.map((provider) =>
-            provider.id === "antigravity" ? antigravity : provider,
-          );
+      const providers = preferences.enableAntigravity
+        ? [
+            ...snapshot.providers.filter((provider) => provider.id !== "antigravity"),
+            getCachedAntigravityUsage(),
+          ]
+        : snapshot.providers.filter((provider) => provider.id !== "antigravity");
       const codexIsAvailable = snapshot.providers.some(
         (provider) => provider.id === "codex" && provider.status === "ok",
       );

@@ -27,6 +27,28 @@ export interface SidebarUsagePrimarySelection {
   fallback: SidebarUsagePrimaryFallback;
 }
 
+export interface SidebarUsageOverviewItem {
+  provider: ProviderUsage;
+  selection: SidebarUsagePrimarySelection;
+}
+
+export function highestSidebarUsagePrimary(
+  items: readonly SidebarUsageOverviewItem[],
+): SidebarUsageOverviewItem | null {
+  let highest: SidebarUsageOverviewItem | null = null;
+  for (const item of items) {
+    if (item.selection.window === null) continue;
+    if (
+      highest === null ||
+      item.selection.window.usedPercent >
+        (highest.selection.window?.usedPercent ?? Number.NEGATIVE_INFINITY)
+    ) {
+      highest = item;
+    }
+  }
+  return highest;
+}
+
 function isFiveHourLabel(label: string): boolean {
   const normalized = label.toLowerCase();
   return (
@@ -69,12 +91,9 @@ export function sidebarUsageWindows(
       ? [...candidates].sort((a, b) => b.usedPercent - a.usedPercent)
       : candidates)[0] ?? null;
   };
-
   return {
-    fiveHour:
-      matching((label) => isFiveHourLabel(label)),
-    weekly:
-      matching((label) => isWeeklyLabel(label)),
+    fiveHour: matching((label) => isFiveHourLabel(label)),
+    weekly: matching((label) => isWeeklyLabel(label)),
   };
 }
 
@@ -82,10 +101,7 @@ export function sidebarUsageDetailRows(
   provider: ProviderUsage,
 ): SidebarUsageDetailRow[] {
   if (provider.id === "antigravity") {
-    return provider.windows.map((window) => ({
-      label: window.label,
-      window,
-    }));
+    return provider.windows.map((window) => ({ label: window.label, window }));
   }
   const pair = sidebarUsageWindows(provider);
   const selected = new Set<UsageWindow>();

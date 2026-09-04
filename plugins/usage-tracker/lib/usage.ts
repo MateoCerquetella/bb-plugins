@@ -1,7 +1,20 @@
-export const PROVIDER_IDS = ["codex", "claudeCode", "cursor", "antigravity"] as const;
+export const PROVIDER_IDS = [
+  "codex",
+  "claudeCode",
+  "cursor",
+  "grok",
+  "openCode",
+  "antigravity",
+] as const;
 
 export type ProviderId = (typeof PROVIDER_IDS)[number];
-export type RawProviderId = ProviderId | "claude-code" | "acp-cursor" | "acp-antigravity";
+export type RawProviderId =
+  | ProviderId
+  | "claude-code"
+  | "acp-cursor"
+  | "acp-grok"
+  | "acp-opencode"
+  | "acp-antigravity";
 export type ProviderStatus =
   | "ok"
   | "not_installed"
@@ -55,6 +68,8 @@ export interface UsageWindow {
   resetsAt: string | null;
   cost: UsageCost | null;
 }
+
+export type UsageLevel = "normal" | "warning" | "critical";
 
 export interface ProviderUsage {
   id: ProviderId;
@@ -126,10 +141,16 @@ const PROVIDERS: readonly ProviderDefinition[] = [
     loginCommand: "cursor-agent login",
   },
   {
-    id: "antigravity",
-    wireIds: ["antigravity", "acp-antigravity"],
-    name: "Antigravity",
-    loginCommand: "agy",
+    id: "grok",
+    wireIds: ["acp-grok", "grok"],
+    name: "Grok",
+    loginCommand: "grok login",
+  },
+  {
+    id: "openCode",
+    wireIds: ["acp-opencode", "openCode"],
+    name: "OpenCode",
+    loginCommand: "opencode auth login",
   },
 ];
 
@@ -141,6 +162,16 @@ export function clampPercent(value: number): number {
     throw new TypeError("Usage percentages must be finite numbers");
   }
   return Math.min(100, Math.max(0, value));
+}
+
+export function usageLevel(value: number | null): UsageLevel {
+  if (value === null) return "normal";
+  if (!Number.isFinite(value)) {
+    throw new TypeError("Usage percentages must be finite numbers");
+  }
+  if (value >= 95) return "critical";
+  if (value >= 80) return "warning";
+  return "normal";
 }
 
 function finiteNumber(value: number, label: string): number {

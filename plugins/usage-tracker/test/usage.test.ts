@@ -13,11 +13,12 @@ import {
   formatUsedPercent,
   normalizeUsage,
   providerStatusLabel,
+  usageLevel,
   type RawProviderUsage,
   type RawUsageResponse,
 } from "../lib/usage.ts";
-import { normalizeAntigravityOutput } from "../lib/antigravity-probe.ts";
 import {
+  highestSidebarUsagePrimary,
   mergeLastKnownWindows,
   selectSidebarUsagePrimary,
   sidebarUsageDetailRows,
@@ -31,6 +32,7 @@ import {
   enabledSidebarProviderIds,
   normalizeCompactLimitOption,
 } from "../lib/preferences.ts";
+import { providerMark } from "../lib/provider-marks.ts";
 
 function healthyResponse(): RawUsageResponse {
   return {
@@ -54,6 +56,8 @@ function healthyResponse(): RawUsageResponse {
     },
     "claude-code": { status: "expired" },
     "acp-cursor": { status: "unauthenticated" },
+    "acp-grok": { status: "not_installed" },
+    "acp-opencode": { status: "unauthenticated" },
   };
 }
 
@@ -128,23 +132,48 @@ function providerWithFable() {
 
 test("enables sidebar providers independently in display order", () => {
   assert.deepEqual(
-    enabledSidebarProviderIds({ enableClaudeCode: true, enableCodex: true }),
-    ["claudeCode", "codex"],
+    enabledSidebarProviderIds({
+      enableClaudeCode: true,
+      enableCodex: true,
+      enableGrok: true,
+      enableOpenCode: true,
+    }),
+    ["claudeCode", "codex", "grok", "openCode"],
   );
   assert.deepEqual(
-    enabledSidebarProviderIds({ enableClaudeCode: true, enableCodex: false }),
+    enabledSidebarProviderIds({
+      enableClaudeCode: true,
+      enableCodex: false,
+      enableGrok: false,
+      enableOpenCode: false,
+    }),
     ["claudeCode"],
   );
   assert.deepEqual(
-    enabledSidebarProviderIds({ enableClaudeCode: false, enableCodex: true }),
+    enabledSidebarProviderIds({
+      enableClaudeCode: false,
+      enableCodex: true,
+      enableGrok: false,
+      enableOpenCode: false,
+    }),
     ["codex"],
   );
   assert.deepEqual(
-    enabledSidebarProviderIds({ enableClaudeCode: false, enableCodex: false, enableAntigravity: true }),
-    ["antigravity"],
+    enabledSidebarProviderIds({
+      enableClaudeCode: true,
+      enableCodex: true,
+      enableGrok: false,
+      enableOpenCode: true,
+    }),
+    ["claudeCode", "codex", "openCode"],
   );
   assert.deepEqual(
-    enabledSidebarProviderIds({ enableClaudeCode: false, enableCodex: false }),
+    enabledSidebarProviderIds({
+      enableClaudeCode: false,
+      enableCodex: false,
+      enableGrok: false,
+      enableOpenCode: false,
+    }),
     [],
   );
 });
@@ -166,7 +195,7 @@ test("normalizes providers in stable order with every usage window", () => {
   assert.equal(snapshot.fetchedAt, "2026-08-11T17:00:00.000Z");
   assert.deepEqual(
     snapshot.providers.map((provider) => provider.id),
-    ["codex", "claudeCode", "cursor", "antigravity"],
+    ["codex", "claudeCode", "cursor", "grok", "openCode"],
   );
   assert.equal(snapshot.providers[0]?.windows.length, 2);
   assert.equal(snapshot.providers[0]?.windows[0]?.barPercent, 17.25);
@@ -182,85 +211,14 @@ test("normalizes providers in stable order with every usage window", () => {
   assert.match(snapshot.providers[2]?.message ?? "", /cursor-agent login/);
 });
 
-test("normalizes Antigravity fractional quotas across both groups", () => {
-  const provider = normalizeAntigravityOutput(
-    {
-      plan: "Google AI Pro",
-      groups: [
-        { name: "Gemini Models", windows: [
-          { label: "5h", remaining_fraction: 0.875, reset_time: "2026-09-02T12:00:00Z" },
-          { label: "weekly", remaining_fraction: 0.61, reset_time: null },
-        ] },
-        { name: "Claude and GPT models", windows: [
-          { label: "5-hour", remainingFraction: 0.42, resetTime: null },
-          { label: "Weekly", remaining_fraction: 0.93, reset_time: null },
-        ] },
-      ],
-    },
-    "user@example.com",
-  );
-  assert.equal(provider.status, "ok");
-  assert.equal(provider.accountEmail, "user@example.com");
-  assert.equal(provider.planLabel, "Google AI Pro");
-  assert.deepEqual(provider.windows.map((window) => window.label), [
-    "Gemini: 5-hour limit", "Gemini: Weekly limit",
-    "Claude/GPT: 5-hour limit", "Claude/GPT: Weekly limit",
-  ]);
-  assert.ok(Math.abs(provider.windows[0]!.usedPercent - 12.5) < 1e-12);
-  assert.ok(Math.abs(provider.windows[2]!.usedPercent - 58) < 1e-12);
-  assert.ok(Math.abs(provider.windows[3]!.usedPercent - 7) < 1e-12);
-});
-
-test("normalizes agy command-data buckets", () => {
-  const provider = normalizeAntigravityOutput({
-    response: "human-readable output",
-    command: { data: { groups: [
-      { name: "Gemini Models", buckets: [{ name: "Weekly Limit Remaining", remaining_fraction: 0.86 }] },
-      { name: "Claude and GPT models", buckets: [{ name: "Five Hour Limit Remaining", remaining_fraction: 1 }] },
-    ] } },
-  });
-  assert.equal(provider.status, "ok");
-  assert.deepEqual(provider.windows.map((window) => window.label), [
-    "Gemini: Weekly limit",
-    "Claude/GPT: 5-hour limit",
-  ]);
-  assert.ok(Math.abs(provider.windows[0]!.usedPercent - 14) < 1e-12);
-  assert.equal(provider.windows[1]!.usedPercent, 0);
-});
-
-test("uses the tightest Antigravity group in compact usage", () => {
-  const provider = normalizeAntigravityOutput({ groups: [
-      { name: "Gemini Models", windows: [
-        { label: "5h", remaining_fraction: 0.8 },
-        { label: "weekly", remaining_fraction: 0.5 },
-      ] },
-      { name: "Claude and GPT models", windows: [
-        { label: "5h", remaining_fraction: 0.3 },
-        { label: "weekly", remaining_fraction: 0.9 },
-      ] },
-    ] });
-  assert.equal(sidebarUsagePrimarySummary(provider, "Five-hour"), "70%");
-  assert.equal(sidebarUsagePrimarySummary(provider, "Weekly"), "50%");
-  assert.deepEqual(sidebarUsageDetailRows(provider).map((row) => row.label), [
-    "Gemini: 5-hour limit", "Gemini: Weekly limit", "Claude/GPT: 5-hour limit", "Claude/GPT: Weekly limit",
-  ]);
-});
-
-test("normalizes an uninstalled Antigravity provider", () => {
-  const provider = normalizeUsage(
-    { antigravity: { status: "not_installed" } },
-    { id: null, name: null },
-  ).providers.find((candidate) => candidate.id === "antigravity");
-  assert.equal(provider?.status, "not_installed");
-  assert.equal(provider?.message, "Antigravity is not installed on this machine.");
-});
-
 test("keeps current provider wire-key windows intact", () => {
   const snapshot = normalizeUsage(
     {
       codex: healthyProvider("Codex weekly", 11),
       "claude-code": healthyProvider("Claude Fable", 22),
       "acp-cursor": healthyProvider("Cursor monthly", 33),
+      "acp-grok": healthyProvider("Grok session", 44),
+      "acp-opencode": healthyProvider("OpenCode monthly", 55),
     },
     { id: null, name: null },
   );
@@ -275,7 +233,8 @@ test("keeps current provider wire-key windows intact", () => {
       ["codex", "ok", [["Codex weekly", 11]]],
       ["claudeCode", "ok", [["Claude Fable", 22]]],
       ["cursor", "ok", [["Cursor monthly", 33]]],
-      ["antigravity", "error", []],
+      ["grok", "ok", [["Grok session", 44]]],
+      ["openCode", "ok", [["OpenCode monthly", 55]]],
     ],
   );
 });
@@ -286,6 +245,8 @@ test("keeps healthy legacy provider windows intact", () => {
       codex: healthyProvider("Codex legacy", 10),
       claudeCode: healthyProvider("Claude legacy", 20),
       cursor: healthyProvider("Cursor legacy", 30),
+      grok: healthyProvider("Grok legacy", 40),
+      openCode: healthyProvider("OpenCode legacy", 50),
     },
     { id: null, name: null },
   );
@@ -294,7 +255,13 @@ test("keeps healthy legacy provider windows intact", () => {
     snapshot.providers.map((provider) =>
       provider.windows.map((window) => window.label),
     ),
-    [["Codex legacy"], ["Claude legacy"], ["Cursor legacy"], []],
+    [
+      ["Codex legacy"],
+      ["Claude legacy"],
+      ["Cursor legacy"],
+      ["Grok legacy"],
+      ["OpenCode legacy"],
+    ],
   );
 });
 
@@ -332,6 +299,8 @@ test("prefers current provider keys over legacy aliases", () => {
     claudeCode: healthyProvider("Claude legacy", 21),
     "acp-cursor": healthyProvider("Cursor current", 30),
     cursor: healthyProvider("Cursor legacy", 31),
+    "acp-grok": healthyProvider("Grok current", 40),
+    "acp-opencode": healthyProvider("OpenCode current", 50),
   };
 
   const snapshot = normalizeUsage(response, { id: null, name: null });
@@ -343,7 +312,8 @@ test("prefers current provider keys over legacy aliases", () => {
       [["Codex current", 10]],
       [["Claude current", 20]],
       [["Cursor current", 30]],
-      [],
+      [["Grok current", 40]],
+      [["OpenCode current", 50]],
     ],
   );
 });
@@ -355,7 +325,7 @@ test("isolates an omitted provider response", () => {
   const snapshot = normalizeUsage(response, { id: null, name: null });
   assert.deepEqual(
     snapshot.providers.map((provider) => provider.status),
-    ["ok", "expired", "error", "error"],
+    ["ok", "expired", "error", "not_installed", "unauthenticated"],
   );
   assert.equal(snapshot.providers[0]?.windows.length, 2);
   assert.deepEqual(snapshot.providers[2], {
@@ -367,6 +337,35 @@ test("isolates an omitted provider response", () => {
     message: "Cursor usage was not reported by bb.",
     windows: [],
   });
+});
+
+test("normalizes Grok and OpenCode and isolates an omitted new provider", () => {
+  const response: RawUsageResponse = {
+    codex: healthyProvider("Codex weekly", 11),
+    "claude-code": healthyProvider("Claude weekly", 22),
+    "acp-cursor": healthyProvider("Cursor monthly", 33),
+    "acp-grok": healthyProvider("Grok session", 44),
+  };
+
+  const snapshot = normalizeUsage(response, { id: null, name: null });
+  assert.deepEqual(
+    snapshot.providers.map((provider) => [
+      provider.id,
+      provider.status,
+      provider.windows[0]?.label ?? null,
+    ]),
+    [
+      ["codex", "ok", "Codex weekly"],
+      ["claudeCode", "ok", "Claude weekly"],
+      ["cursor", "ok", "Cursor monthly"],
+      ["grok", "ok", "Grok session"],
+      ["openCode", "error", null],
+    ],
+  );
+  assert.equal(
+    snapshot.providers[4]?.message,
+    "OpenCode usage was not reported by bb.",
+  );
 });
 
 test("clamps progress geometry and rejects non-finite values", () => {
@@ -383,6 +382,27 @@ test("clamps progress geometry and rejects non-finite values", () => {
     () => normalizeUsage(response, { id: null, name: null }),
     /finite/,
   );
+});
+
+test("classifies exact usage warning and critical thresholds", () => {
+  assert.equal(usageLevel(null), "normal");
+  assert.equal(usageLevel(-1), "normal");
+  assert.equal(usageLevel(79.9), "normal");
+  assert.equal(usageLevel(80), "warning");
+  assert.equal(usageLevel(94.9), "warning");
+  assert.equal(usageLevel(95), "critical");
+  assert.equal(usageLevel(140), "critical");
+  assert.throws(() => usageLevel(Number.NaN), /finite/);
+});
+
+test("provides Grok and layered OpenCode provider marks", () => {
+  const grok = providerMark("grok");
+  const openCode = providerMark("openCode");
+  assert.equal(grok.title, "Grok Build");
+  assert.match(grok.path ?? "", /^M13\.2371/u);
+  assert.equal(openCode.title, "OpenCode");
+  assert.equal(openCode.paths?.length, 2);
+  assert.equal(openCode.paths?.[0]?.fillOpacity, 0.45);
 });
 
 test("formats reset, update, percentage, and cost copy safely", () => {
@@ -422,6 +442,37 @@ test("selects the configured compact usage window", () => {
     "Five-hour limit",
   );
   assert.equal(sidebarUsagePrimarySummary(provider, "Five-hour"), "120%");
+});
+
+test("selects the highest available compact usage for an overview summary", () => {
+  const snapshot = normalizeUsage(
+    {
+      codex: healthyProvider("Weekly limit", 80),
+      "claude-code": healthyProvider("Weekly limit", 79.9),
+      "acp-grok": healthyProvider("Weekly limit", 95),
+      "acp-opencode": healthyProvider("Weekly limit", 96),
+    },
+    { id: null, name: null },
+  );
+  const items = snapshot.providers
+    .filter((provider) => provider.id !== "cursor")
+    .map((provider) => ({
+      provider,
+      selection: selectSidebarUsagePrimary(provider, provider, "Weekly"),
+    }));
+
+  const highest = highestSidebarUsagePrimary(items);
+  assert.equal(highest?.provider.id, "openCode");
+  assert.equal(highest?.selection.window?.usedPercent, 96);
+  assert.equal(
+    highestSidebarUsagePrimary(
+      items.map((item) => ({
+        ...item,
+        selection: { window: null, actualKind: null, fallback: "unavailable" },
+      })),
+    ),
+    null,
+  );
 });
 
 test("keeps additional provider windows in expanded details only", () => {

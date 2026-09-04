@@ -8,6 +8,16 @@
   --usage-sidebar-hover: var(--sidebar-accent, var(--muted));
   --usage-sidebar-focus: var(--sidebar-ring, var(--ring));
   --usage-sidebar-claude: #d97757;
+  --usage-sidebar-warning: color-mix(
+    in srgb,
+    #eab308 72%,
+    var(--usage-sidebar-text)
+  );
+  --usage-sidebar-critical: color-mix(
+    in srgb,
+    #ef4444 82%,
+    var(--usage-sidebar-text)
+  );
 
   /* Static on purpose: the details card is positioned against the footer. */
   position: static;
@@ -32,8 +42,11 @@
   --usage-sidebar-width: 6.5rem;
 }
 
-.usage-tracker-sidebar[data-provider-count="3"] {
-  --usage-sidebar-width: 15.5rem;
+.usage-tracker-sidebar:is(
+    [data-provider-count="3"],
+    [data-provider-count="4"]
+  ) {
+  --usage-sidebar-width: 7.25rem;
 }
 
 [data-collapsible="icon"] .usage-tracker-sidebar {
@@ -78,7 +91,8 @@
   gap: 0.1875rem;
 }
 
-.usage-tracker-sidebar__provider {
+.usage-tracker-sidebar__provider,
+.usage-tracker-sidebar__summary {
   display: flex;
   min-width: 0;
   height: 2rem;
@@ -95,8 +109,23 @@
 }
 
 .usage-tracker-sidebar__provider:hover,
-.usage-tracker-sidebar__provider[aria-expanded="true"] {
+.usage-tracker-sidebar__provider[aria-expanded="true"],
+.usage-tracker-sidebar__summary:hover,
+.usage-tracker-sidebar__summary[aria-expanded="true"] {
   background: var(--usage-sidebar-hover);
+}
+
+.usage-tracker-sidebar__summary {
+  padding: 0 0.25rem;
+  gap: 0.25rem;
+}
+
+.usage-tracker-sidebar__summary-count {
+  color: var(--usage-sidebar-muted);
+  font-size: 0.625rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .usage-tracker-sidebar__provider[data-status]:not([data-status="ok"]) {
@@ -104,6 +133,8 @@
 }
 
 .usage-tracker-sidebar__provider:focus-visible,
+.usage-tracker-sidebar__summary:focus-visible,
+.usage-tracker-sidebar__overview-provider:focus-visible,
 .usage-tracker-sidebar__refresh:focus-visible,
 .usage-tracker-sidebar__close:focus-visible,
 .usage-tracker-sidebar__windows:focus-visible,
@@ -113,6 +144,7 @@
 }
 
 .usage-tracker-sidebar__mark,
+.usage-tracker-sidebar__summary-mark,
 .usage-tracker-sidebar__details-mark {
   display: inline-flex;
   flex: none;
@@ -121,7 +153,8 @@
 }
 
 /* Matches the weight of bb's own footer glyphs (16px at 0.8 opacity). */
-.usage-tracker-sidebar__mark {
+.usage-tracker-sidebar__mark,
+.usage-tracker-sidebar__summary-mark {
   width: 0.875rem;
   height: 0.875rem;
   opacity: 0.8;
@@ -130,11 +163,13 @@
 
 .usage-tracker-sidebar__provider[data-provider="claudeCode"]
   .usage-tracker-sidebar__mark,
+.usage-tracker-sidebar__summary-mark[data-provider="claudeCode"],
 .usage-tracker-sidebar__details-mark[data-provider="claudeCode"] {
   color: var(--usage-sidebar-claude);
 }
 
 .usage-tracker-sidebar__mark svg,
+.usage-tracker-sidebar__summary-mark svg,
 .usage-tracker-sidebar__details-mark svg {
   width: 100%;
   height: 100%;
@@ -162,14 +197,6 @@
 
 /* Past the point where the rail has anything useful left to show, drop it. The
  * thresholds differ because a single-provider strip is itself narrower. */
-@container usage-strip (max-width: 15rem) {
-  .usage-tracker-sidebar__strip[data-provider-count="3"]
-    .usage-tracker-sidebar__provider
-    > .usage-tracker-sidebar__rail {
-    display: none;
-  }
-}
-
 @container usage-strip (max-width: 10.75rem) {
   .usage-tracker-sidebar__strip[data-provider-count="2"]
     .usage-tracker-sidebar__provider
@@ -199,6 +226,16 @@
   transition: width 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+.usage-tracker-sidebar__rail[data-level="warning"]
+  .usage-tracker-sidebar__fill {
+  background: var(--usage-sidebar-warning);
+}
+
+.usage-tracker-sidebar__rail[data-level="critical"]
+  .usage-tracker-sidebar__fill {
+  background: var(--usage-sidebar-critical);
+}
+
 /* Hugs its text rather than filling a "100%"-wide box, which would leave a
  * short reading padded away from its mark. */
 .usage-tracker-sidebar__reading {
@@ -214,43 +251,30 @@
   white-space: nowrap;
 }
 
+.usage-tracker-sidebar__provider[data-level="warning"]
+  .usage-tracker-sidebar__reading,
+.usage-tracker-sidebar__summary[data-level="warning"]
+  .usage-tracker-sidebar__reading,
+.usage-tracker-sidebar__overview-provider[data-level="warning"]
+  .usage-tracker-sidebar__reading,
+.usage-tracker-sidebar__window[data-level="warning"]
+  .usage-tracker-sidebar__window-heading strong {
+  color: var(--usage-sidebar-warning);
+}
+
+.usage-tracker-sidebar__provider[data-level="critical"]
+  .usage-tracker-sidebar__reading,
+.usage-tracker-sidebar__summary[data-level="critical"]
+  .usage-tracker-sidebar__reading,
+.usage-tracker-sidebar__overview-provider[data-level="critical"]
+  .usage-tracker-sidebar__reading,
+.usage-tracker-sidebar__window[data-level="critical"]
+  .usage-tracker-sidebar__window-heading strong {
+  color: var(--usage-sidebar-critical);
+}
+
 /* Narrowest tier: spacing and type size stay put, and the refresh button pays
  * the shortfall instead. The details card carries one of its own. */
-@container usage-strip (max-width: 12rem) {
-  .usage-tracker-sidebar__strip[data-provider-count="3"]
-    .usage-tracker-sidebar__refresh {
-    display: none;
-  }
-}
-
-/* Ultra-compact tier for 3 providers on a minimum-width sidebar:
- * tighten gap, icon size, font size, and provider padding so all 3
- * readings remain completely visible without truncation or wrapping. */
-@container usage-strip (max-width: 9.75rem) {
-  .usage-tracker-sidebar__strip[data-provider-count="3"] {
-    gap: 0.125rem;
-  }
-
-  .usage-tracker-sidebar__strip[data-provider-count="3"]
-    .usage-tracker-sidebar__provider {
-    gap: 0.125rem;
-    padding: 0 0.0625rem;
-  }
-
-  .usage-tracker-sidebar__strip[data-provider-count="3"]
-    .usage-tracker-sidebar__mark {
-    width: 0.75rem;
-    height: 0.75rem;
-  }
-
-  .usage-tracker-sidebar__strip[data-provider-count="3"]
-    .usage-tracker-sidebar__reading {
-    font-size: 0.625rem;
-    letter-spacing: -0.03em;
-  }
-}
-
-
 @container usage-strip (max-width: 8.5rem) {
   .usage-tracker-sidebar__strip[data-provider-count="2"]
     .usage-tracker-sidebar__refresh {
@@ -343,6 +367,57 @@
   gap: 0.75rem;
   padding: 0.625rem 0.625rem 0.5rem;
   border-bottom: 1px solid var(--usage-sidebar-line);
+}
+
+.usage-tracker-sidebar__overview-list {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.usage-tracker-sidebar__overview-provider {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  min-height: 2.25rem;
+  cursor: pointer;
+  grid-template-columns: 1rem minmax(0, 1fr) minmax(2.5rem, 4.5rem) auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.625rem;
+  text-align: left;
+  transition:
+    background-color 140ms ease,
+    opacity 140ms ease;
+}
+
+.usage-tracker-sidebar__overview-provider +
+  .usage-tracker-sidebar__overview-provider {
+  border-top: 1px solid var(--usage-sidebar-line);
+}
+
+.usage-tracker-sidebar__overview-provider:hover {
+  background: var(--usage-sidebar-hover);
+}
+
+.usage-tracker-sidebar__overview-provider[data-status]:not([data-status="ok"]) {
+  opacity: 0.78;
+}
+
+.usage-tracker-sidebar__overview-name {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.usage-tracker-sidebar__overview-provider > .usage-tracker-sidebar__rail {
+  height: 0.25rem;
 }
 
 .usage-tracker-sidebar__details-actions {
