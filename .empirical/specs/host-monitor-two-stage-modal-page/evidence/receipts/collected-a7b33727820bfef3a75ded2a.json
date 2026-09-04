@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-a7b33727820bfef3a75ded2a",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3",
+    "AC-UI-4",
+    "AC-UI-5"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-09-04T15:30:29.046Z",
+  "completedAt": "2026-09-04T15:30:29.046Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-two-stage-modal-page",
+    "specRevision": 3,
+    "specDigest": "sha256:94ddfb4397b0f0439209bfed49ff884bb372eb1e6b42fc7e9f5c87c37eba30e7",
+    "treeDigest": "sha256:80b4e56343ad0c85540b1ceb922120049fabc3c2fc72e2e672b189ee68c13101",
+    "policyDigest": "sha256:39d04bb7b0c02856e618bfb5175d1f83577318536445ecf69eccb54b9a7471a8"
+  },
+  "digest": "sha256:0d8033f56979a8d6e24b47669b4e08629fce24db6a5308391efb41a60d2e5004",
+  "kind": "collected",
+  "collector": "empirical-review:codex:/root/two_stage_review",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/host-monitor-two-stage-modal-page/reviews/79fb0d7f1c42f9e201050b16.json",
+      "mediaType": "application/json",
+      "bytes": 3491,
+      "digest": "sha256:ec18a9996475777b2471662657d7d368bd12e4be1c778a03d03f4d3f6382ea06"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-two-stage-modal-page/reviews/79fb0d7f1c42f9e201050b16.md",
+      "mediaType": "text/markdown",
+      "bytes": 2739,
+      "digest": "sha256:0e8868b8e168cb85d16b7958c58278696b6a17c9d29b6a3a219398315386414a"
+    }
+  ]
+}

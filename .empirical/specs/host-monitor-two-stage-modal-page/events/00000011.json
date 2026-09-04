@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "sequence": 11,
+  "previousDigest": "sha256:24d0011892ca753a0edae5c632dbda8f6f8744d89789a33c3dc3642a9180bdf9",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Reverified the final committed tree with 33 tests, typecheck, build, live footer modal to page flow, five screenshots, and fresh-context inspection.",
+  "createdAt": "2026-09-04T15:31:03.552Z",
+  "stateBeforeDigest": "sha256:1e052d19e3b68faccc2f409674649f971c8f18256b562bb0d8fd41002f4f8bb3",
+  "stateAfterDigest": "sha256:cfb82190a350b8ad7c18c987df83953124b1318353143154b1f5ece8351641e1",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 11,
+    "activeFeature": "host-monitor-two-stage-modal-page",
+    "request": "Restore the prior two-stage Host Monitor UX: a bottom-left BB sidebar icon opens the compact old-style machine telemetry mini-modal; an Open Host Monitor action in that mini-modal opens the dedicated Host Monitor page, never plugin Settings. The full page must retain the new dense CPU/RAM/disk/load/network multi-host UI and Grafana-like per-host configurable persisted panels, using BB machine identity/connection/realtime infrastructure. Keep notifications removed. Recover the old footer-action/content-script modal pattern where safe, preserve unrelated work, verify focused tests/typecheck/build, live connected/disconnected behavior, persistence, browser desktop/mobile UI, and stop ready for review without merge or deploy.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "review",
+    "status": "waiting",
+    "repairAttempts": 1,
+    "message": "Reverified the final committed tree with 33 tests, typecheck, build, live footer modal to page flow, five screenshots, and fresh-context inspection.",
+    "implementationActor": "agent",
+    "workStartedAt": "2026-09-04T15:16:35.252Z",
+    "specDigest": "sha256:94ddfb4397b0f0439209bfed49ff884bb372eb1e6b42fc7e9f5c87c37eba30e7",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:ed0c688002d32eb70dfeb3c7c663a66c6f48f7c12a8773b2188767a7b7d4df64",
+    "impactDigest": "sha256:c6d90c7c98ede07af1d85a2328fe3eadf7cf21a873b4e2d26d45718ece75403b",
+    "capabilityClaimId": "host-monitor-two-stage-modal-page-1f2e948ed8e9",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "qa-2c8a18bdb495fb2d83371a23",
+      "qa-6e589888913707c7cdd3d201",
+      "collected-b328717117dcf89b118c7c0b",
+      "qa-cbda4277a41b8712a584f784"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": true,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "verified",
+      "reasons": {
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-04T15:31:03.552Z"
+  },
+  "digest": "sha256:41077ee8c82871c2d6e9cd390b1b4911bc633b21b85897b395c2b5dd46e10fdb"
+}

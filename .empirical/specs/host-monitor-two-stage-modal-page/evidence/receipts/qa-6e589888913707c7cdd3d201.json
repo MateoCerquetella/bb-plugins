@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-6e589888913707c7cdd3d201",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3",
+    "AC-UI-4",
+    "AC-UI-5"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Final committed-tree live footer modal to dedicated page flow.",
+  "passed": true,
+  "startedAt": "2026-09-04T15:26:53.177Z",
+  "completedAt": "2026-09-04T15:27:01.091Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-two-stage-modal-page",
+    "specRevision": 3,
+    "specDigest": "sha256:94ddfb4397b0f0439209bfed49ff884bb372eb1e6b42fc7e9f5c87c37eba30e7",
+    "treeDigest": "sha256:80b4e56343ad0c85540b1ceb922120049fabc3c2fc72e2e672b189ee68c13101",
+    "policyDigest": "sha256:39d04bb7b0c02856e618bfb5175d1f83577318536445ecf69eccb54b9a7471a8",
+    "workflowRevision": 8,
+    "gitCommit": "c5ebefa852ad4140f3bfafea22464263a6cd24fe"
+  },
+  "digest": "sha256:b4d27451bac5fa162fb4ce87c045800cb14517361a50a5d917eaa91edd883bd9",
+  "kind": "qa",
+  "matrixDigest": "sha256:02efd290088bbc67a18087078391ac821279ad599e7be4269f017a1087743a9f",
+  "check": {
+    "id": "qa-end-to-end",
+    "kind": "end-to-end"
+  },
+  "coveredChecks": [
+    "end-to-end"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Final committed-tree live footer modal to dedicated page flow.",
+      "startedAt": "2026-09-04T15:26:53.177Z",
+      "completedAt": "2026-09-04T15:27:01.091Z",
+      "durationMs": 7914,
+      "collector": null,
+      "command": {
+        "argv": [
+          "node",
+          ".empirical/specs/host-monitor-native-footer-configurable-metrics/qa/browser.mjs"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:c38a4854b78ec0ec0c87d4fd7cc65e5e91aa71c4776880bc69fa149ec8aa50aa",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "{\"modal\":{\"machines\":4,\"metrics\":12,\"dialog\":\"dialog\",\"settingsRoute\":false,\"alerts\":0},\"initial\":{\"machines\":4,\"panels\":9,\"selected\":\"development1\",\"alerts\":0,\"settingsRoute\":false,\"footerActionsBefore\":1},\"editor\":{\"beforeAdd\":9,\"afterAdd\":10},\"switchedTo\":\"dyaus\",\"narrow\":{\"viewport\":[390,844],\"overflow\":false,\"rows\":9},\"artifacts\":[\"/home/dyaus/.bb/worktrees/host-monitor-two-stage-modal-page/.empirical/specs/host-monitor-two-stage-modal-page/evidence/browser/sidebar-icon-only.png\",\"/home/dyaus/.bb/worktrees/host-monitor-two-stage-modal-page/.empirical/specs/host-monitor-two-stage-modal-page/evidence/browser/mini-modal-desktop.png\",\"/home/dyaus/.bb/worktrees/host-monitor-two-stage-modal-page/.empirical/specs/host-monitor-two-stage-modal-page/evidence/browser/monitor-desktop.png\",\"/home/dyaus/.bb/worktrees/host-monitor-two-stage-modal-page/.empirical/specs/host-monitor-two-stage-modal-page/evidence/browser/editor-desktop.png\",\"/home/dyaus/.bb/worktrees/host-monitor-two-stage-modal-page/.empirical/specs/host-monitor-two-stage-modal-page/evidence/browser/editor-390.png\"]}\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:80b4e56343ad0c85540b1ceb922120049fabc3c2fc72e2e672b189ee68c13101",
+      "sourceTreeAfter": "sha256:80b4e56343ad0c85540b1ceb922120049fabc3c2fc72e2e672b189ee68c13101",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/host-monitor-two-stage-modal-page/evidence/browser/editor-390.png",
+          "mediaType": "image/png",
+          "bytes": 33873,
+          "digest": "sha256:199099b112a2bfcd7ecf5c882dd2808b11cb21791876057eec0563c183d29bf6"
+        },
+        {
+          "path": ".empirical/specs/host-monitor-two-stage-modal-page/evidence/browser/editor-desktop.png",
+          "mediaType": "image/png",
+          "bytes": 140427,
+          "digest": "sha256:9c0b3b66a94a71bb9ccc53cb64b3c22a23eb5ee1038f9e4e386d4488d1595fd6"
+        },
+        {
+          "path": ".empirical/specs/host-monitor-two-stage-modal-page/evidence/browser/mini-modal-desktop.png",
+          "mediaType": "image/png",
+          "bytes": 83993,
+          "digest": "sha256:6e1849dbcf72b5fb16f270d12183e7ae79811e0d3c2f3144352a9042c7cfbee7"
+        },
+        {
+          "path": ".empirical/specs/host-monitor-two-stage-modal-page/evidence/browser/monitor-desktop.png",
+          "mediaType": "image/png",
+          "bytes": 134729,
+          "digest": "sha256:8c907bba558bd96236a03933fd90c1466d61270b75d09d434be691ded58e0221"
+        },
+        {
+          "path": ".empirical/specs/host-monitor-two-stage-modal-page/evidence/browser/sidebar-icon-only.png",
+          "mediaType": "image/png",
+          "bytes": 64876,
+          "digest": "sha256:45bd5f15cf5fd0c56dee1b9fb7767e5536989ec55478bee0cdd6a07fb010e05e"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}
