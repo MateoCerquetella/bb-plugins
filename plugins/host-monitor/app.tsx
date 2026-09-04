@@ -991,6 +991,11 @@ function ProcessesWidget({ machine }: { machine: MachineRow }) {
   const rows = useMemo(() => filterProcessRows(sortedRows, query), [query, sortedRows]);
   const summary = useMemo(() => summarizeProcessRows(sortedRows), [sortedRows]);
   const panelState = processPanelState(machine, result, error, expanded, loading);
+  const processFooterMessage = !expanded
+    ? null
+    : error != null
+      ? ok == null ? null : error
+      : status || null;
 
   const toggleExpanded = () => {
     if (expanded) {
@@ -1081,7 +1086,7 @@ function ProcessesWidget({ machine }: { machine: MachineRow }) {
           {ok.elevated && <p className="host-monitor__widget-status">Process actions are protected while Host Monitor runs with elevated privileges.</p>}
         </>
       ) : null}
-      {(error || (expanded && status)) && <p className="host-monitor__widget-status" role="status">{error ?? status}</p>}
+      {processFooterMessage != null && <p className="host-monitor__widget-status" role="status">{processFooterMessage}</p>}
       </div>
 
       <AlertDialog.Root open={challenge != null} onOpenChange={(open) => {

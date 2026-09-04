@@ -207,6 +207,9 @@ try {
   })`);
   if (collapsedProcesses.summaries !== 5 || collapsedProcesses.table || !collapsedProcesses.paused || collapsedProcesses.toggleExpanded !== 'false') throw new Error(`Invalid collapsed process panel: ${JSON.stringify(collapsedProcesses)}`);
   await screenshot(processCollapsedPath);
+  await new Promise((resolve) => setTimeout(resolve, 10_500));
+  const collapsedRefreshCount = await evaluate("Number(document.querySelector('.host-monitor__process-widget')?.dataset.refreshCount ?? 0)");
+  if (collapsedRefreshCount !== processRefreshCount) throw new Error(`Process polling continued while collapsed: ${JSON.stringify({ processRefreshCount, collapsedRefreshCount })}`);
   await evaluate(`Array.from(document.querySelectorAll('.host-monitor__process-widget button')).find((button) => button.textContent?.includes('Expand'))?.click()`);
   await waitFor(`document.querySelector('.host-monitor__process-widget')?.dataset.expanded === 'true' && document.querySelector('.host-monitor__process-table') !== null && Number(document.querySelector('.host-monitor__process-widget')?.dataset.refreshCount ?? 0) > ${processRefreshCount}`, 20000);
   const processSummary = await evaluate(`({
@@ -355,7 +358,7 @@ try {
   if (narrow.overflow || narrow.rows < 10 || narrow.hostStripOverflow !== 'auto' || narrow.processTableDisplay !== 'none' || narrow.processListDisplay !== 'grid' || narrow.rangeRight > narrow.viewport[0] || narrow.rangeWidth < 96) throw new Error(`Invalid narrow layout: ${JSON.stringify(narrow)}`);
   await screenshot(narrowPath);
 
-  console.log(JSON.stringify({ modal: modalSummary, navigation: navigationState, combobox: { ...comboboxSummary, options: comboOptions, keyboardFocusRestored: true, narrowBounds: narrowCombo }, initial, widgets: { original: originalWidgets.length, persisted: persistedWidgets.length, changedKey, gridDragKey }, processes: { ...processSummary, collapsed: collapsedProcesses }, switchedTo: targetName, narrow, artifacts: [sidebarPath, modalPath, monitorPath, comboPath, dashboardDragPath, processPath, processCollapsedPath, processDialogPath, desktopPath, narrowPath] }));
+  console.log(JSON.stringify({ modal: modalSummary, navigation: navigationState, combobox: { ...comboboxSummary, options: comboOptions, keyboardFocusRestored: true, narrowBounds: narrowCombo }, initial, widgets: { original: originalWidgets.length, persisted: persistedWidgets.length, changedKey, gridDragKey }, processes: { ...processSummary, collapsed: { ...collapsedProcesses, pollingPaused: collapsedRefreshCount === processRefreshCount } }, switchedTo: targetName, narrow, artifacts: [sidebarPath, modalPath, monitorPath, comboPath, dashboardDragPath, processPath, processCollapsedPath, processDialogPath, desktopPath, narrowPath] }));
   socket.close();
 } finally {
   browser.kill("SIGTERM");
