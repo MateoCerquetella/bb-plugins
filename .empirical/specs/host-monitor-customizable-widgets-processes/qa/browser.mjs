@@ -196,6 +196,7 @@ try {
   await waitFor("document.querySelector('.host-monitor__process-widget .host-monitor__process-table tbody tr') !== null || document.querySelector('.host-monitor__process-widget .host-monitor__widget-state') !== null", 20000);
   await evaluate("document.querySelector('.host-monitor__process-widget')?.scrollIntoView({ block: 'start' })");
   await screenshot(processPath);
+  const processRefreshCount = await evaluate("Number(document.querySelector('.host-monitor__process-widget')?.dataset.refreshCount ?? 0)");
   await evaluate(`Array.from(document.querySelectorAll('.host-monitor__process-widget button')).find((button) => button.textContent?.includes('Collapse'))?.click()`);
   await waitFor("document.querySelector('.host-monitor__process-widget')?.dataset.expanded === 'false'");
   const collapsedProcesses = await evaluate(`({
@@ -207,7 +208,7 @@ try {
   if (collapsedProcesses.summaries !== 5 || collapsedProcesses.table || !collapsedProcesses.paused || collapsedProcesses.toggleExpanded !== 'false') throw new Error(`Invalid collapsed process panel: ${JSON.stringify(collapsedProcesses)}`);
   await screenshot(processCollapsedPath);
   await evaluate(`Array.from(document.querySelectorAll('.host-monitor__process-widget button')).find((button) => button.textContent?.includes('Expand'))?.click()`);
-  await waitFor("document.querySelector('.host-monitor__process-widget')?.dataset.expanded === 'true' && document.querySelector('.host-monitor__process-table') !== null");
+  await waitFor(`document.querySelector('.host-monitor__process-widget')?.dataset.expanded === 'true' && document.querySelector('.host-monitor__process-table') !== null && Number(document.querySelector('.host-monitor__process-widget')?.dataset.refreshCount ?? 0) > ${processRefreshCount}`, 20000);
   const processSummary = await evaluate(`({
     rows: document.querySelectorAll('.host-monitor__process-table tbody tr').length,
     actionable: Array.from(document.querySelectorAll('.host-monitor__process-widget button')).filter((button) => button.textContent?.trim() === 'Terminate' || button.textContent?.trim() === 'Force terminate').length,

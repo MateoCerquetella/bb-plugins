@@ -91,9 +91,16 @@ test("process section toggles compactly and pauses polling while collapsed", () 
   assert.match(app, /const \[expanded, setExpanded\] = useState\(true\)/u);
   assert.match(app, /data-expanded=\{expanded\}/u);
   assert.match(app, /aria-expanded=\{expanded\}/u);
+  assert.match(app, /aria-controls="host-monitor-process-content"/u);
+  assert.match(app, /id="host-monitor-process-content"/u);
   assert.match(app, /expanded \? "Collapse" : "Expand"/u);
   assert.match(app, /if \(!expanded \|\| machine\.host\.status !== "connected"\) return/u);
-  assert.match(app, /!expanded \? \(\s*<ProcessSummaryStrip/su);
+  assert.match(app, /!expanded \? \([\s\S]*?<ProcessSummaryStrip/u);
+  assert.match(app, /processPanelState/u);
+  assert.match(app, /Top CPU shown/u);
+  assert.match(app, /Top RAM shown/u);
+  assert.match(app, /Protected shown/u);
+  assert.match(app, /data-refresh-count=\{refreshCount\}/u);
   assert.match(styles, /\.host-monitor__process-summary\s*\{[^}]*grid-template-columns:\s*repeat\(5,/su);
   assert.match(styles, /\.host-monitor__process-protection/u);
 });

@@ -869,6 +869,7 @@ function ProcessesWidget({ machine }: { machine: MachineRow }) {
   const [challenge, setChallenge] = useState<PreparedTerminationReady | null>(null);
   const [executing, setExecuting] = useState(false);
   const [status, setStatus] = useState("");
+  const [refreshCount, setRefreshCount] = useState(0);
   const hostGeneration = useRef(0);
   const listRequest = useRef(0);
   const cancelRef = useRef<HTMLButtonElement>(null);
@@ -888,7 +889,10 @@ function ProcessesWidget({ machine }: { machine: MachineRow }) {
       if (hostGeneration.current !== generation || listRequest.current !== request) return;
       setResult(next);
       if (next.outcome !== "ok") setStatus(next.message);
-      else setStatus(`${next.processes.length} processes refreshed.`);
+      else {
+        setRefreshCount((current) => current + 1);
+        setStatus(`${next.processes.length} processes refreshed.`);
+      }
     } catch (cause) {
       if (hostGeneration.current !== generation || listRequest.current !== request) return;
       setError(cause instanceof Error ? cause.message : "Could not load processes.");
@@ -905,6 +909,7 @@ function ProcessesWidget({ machine }: { machine: MachineRow }) {
     setChallenge(null);
     setPendingIdentity(null);
     setStatus("");
+    setRefreshCount(0);
     setLoading(false);
     return () => {
       hostGeneration.current += 1;
@@ -985,6 +990,7 @@ function ProcessesWidget({ machine }: { machine: MachineRow }) {
   const sortedRows = useMemo(() => sortProcessRows(ok?.processes ?? [], sortBy), [ok?.processes, sortBy]);
   const rows = useMemo(() => filterProcessRows(sortedRows, query), [query, sortedRows]);
   const summary = useMemo(() => summarizeProcessRows(sortedRows), [sortedRows]);
+  const panelState = processPanelState(machine, result, error, expanded, loading);
 
   const toggleExpanded = () => {
     if (expanded) {
@@ -995,23 +1001,25 @@ function ProcessesWidget({ machine }: { machine: MachineRow }) {
   };
 
   return (
-    <article className="host-monitor__widget host-monitor__process-widget" data-expanded={expanded} data-span="full">
+    <article className="host-monitor__widget host-monitor__process-widget" data-expanded={expanded} data-refresh-count={refreshCount} data-refreshing={loading} data-span="full">
       <output aria-live="polite" className="host-monitor__sr-only">{status}</output>
       <header className="host-monitor__widget-header">
         <div>
-          <span className="host-monitor__process-title"><h3>Processes</h3><Badge tone={expanded ? "success" : "neutral"}>{expanded ? "Live" : "Paused"}</Badge></span>
+          <div className="host-monitor__process-title"><h3>Processes</h3><Badge tone={panelState.tone}>{panelState.label}</Badge></div>
           <p>{ok == null ? "Resource usage and protected actions" : `${ok.totalCount} reported · sampled ${relativeTime(ok.sampledAtMs)}`}</p>
         </div>
         <div className="host-monitor__widget-actions">
           {expanded && loading && ok != null && <Badge>Updating</Badge>}
           {expanded && <Button disabled={loading || executing || machine.host.status !== "connected"} onClick={() => void loadProcesses()} size="sm" variant="outline">Refresh</Button>}
-          <Button aria-expanded={expanded} disabled={executing || pendingIdentity != null} onClick={toggleExpanded} size="sm" variant="ghost">
+          <Button aria-controls="host-monitor-process-content" aria-expanded={expanded} disabled={executing || pendingIdentity != null} onClick={toggleExpanded} size="sm" variant="ghost">
             {expanded ? "Collapse" : "Expand"}<span aria-hidden="true">{expanded ? "⌃" : "⌄"}</span>
           </Button>
         </div>
       </header>
 
+      <div className="host-monitor__process-content" id="host-monitor-process-content">
       {!expanded ? (
+        <>
         <ProcessSummaryStrip
           protectedCount={summary.protectedCount}
           shownCount={ok?.processes.length ?? 0}
@@ -1019,6 +1027,11 @@ function ProcessesWidget({ machine }: { machine: MachineRow }) {
           topMemory={summary.topMemory}
           totalCount={ok?.totalCount ?? null}
         />
+        {machine.host.status !== "connected" && <p className="host-monitor__widget-status">Reconnect this machine to inspect its processes.</p>}
+        {machine.host.status === "connected" && result != null && result.outcome !== "ok" && <p className="host-monitor__widget-status">{result.message}</p>}
+        {error != null && <p className="host-monitor__widget-status">{error}</p>}
+        {ok?.truncated && <p className="host-monitor__widget-status">Top usage and protected counts are based on the {ok.processes.length} shown processes.</p>}
+        </>
       ) : machine.host.status !== "connected" ? (
         <ProcessState title="Machine disconnected" message="Reconnect this machine to inspect or control its processes." />
       ) : result == null && loading ? (
@@ -1069,6 +1082,7 @@ function ProcessesWidget({ machine }: { machine: MachineRow }) {
         </>
       ) : null}
       {(error || (expanded && status)) && <p className="host-monitor__widget-status" role="status">{error ?? status}</p>}
+      </div>
 
       <AlertDialog.Root open={challenge != null} onOpenChange={(open) => {
         if (!open && !executing) setChallenge(null);
@@ -1123,6 +1137,20 @@ function ProcessesWidget({ machine }: { machine: MachineRow }) {
       </AlertDialog.Root>
     </article>
   );
+}
+
+function processPanelState(
+  machine: MachineRow,
+  result: ProcessListResult | null,
+  error: string | null,
+  expanded: boolean,
+  loading: boolean,
+): { label: string; tone: "neutral" | "success" | "warning" } {
+  if (machine.host.status !== "connected") return { label: "Offline", tone: "neutral" };
+  if (error != null || (result != null && result.outcome !== "ok")) return { label: "Unavailable", tone: "warning" };
+  if (!expanded) return { label: "Paused", tone: "neutral" };
+  if (loading && result == null) return { label: "Loading", tone: "neutral" };
+  return { label: "Live", tone: "success" };
 }
 
 function ProcessRows({
@@ -1207,9 +1235,9 @@ function ProcessSummaryStrip({
     <dl className="host-monitor__process-summary">
       <Fact label="Processes" value={totalCount == null ? "—" : String(totalCount)} />
       <Fact label="Shown" value={String(shownCount)} />
-      <Fact label="Top CPU" value={topCpu == null ? "—" : `${topCpu.name} · ${percent(topCpu.cpuPercent)}`} />
-      <Fact label="Top RAM" value={topMemory == null ? "—" : `${topMemory.name} · ${percent(topMemory.memoryPercent)}`} />
-      <Fact label="Protected" value={String(protectedCount)} />
+      <Fact label="Top CPU shown" value={topCpu == null ? "—" : `${topCpu.name} · ${percent(topCpu.cpuPercent)}`} />
+      <Fact label="Top RAM shown" value={topMemory == null ? "—" : `${topMemory.name} · ${percent(topMemory.memoryPercent)}`} />
+      <Fact label="Protected shown" value={String(protectedCount)} />
     </dl>
   );
 }
