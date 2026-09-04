@@ -3,6 +3,7 @@ import {
   formatResetTime,
   formatUsedPercent,
   providerStatusLabel,
+  usageLevel,
   type ProviderUsage,
   type UsageSnapshot,
   type UsageWindow,
@@ -16,11 +17,13 @@ import {
 } from "./preferences.ts";
 import { providerMark } from "./provider-marks.ts";
 import {
+  highestSidebarUsagePrimary,
   mergeLastKnownWindows,
   selectSidebarUsagePrimary,
   sidebarUsageDetailRows,
   sidebarUsagePrimaryAccessibleText,
   sidebarUsagePrimarySelectionSummary,
+  type SidebarUsageOverviewItem,
 } from "./sidebar-usage.ts";
 
 const ROOT_ATTRIBUTE = "data-usage-tracker-sidebar";
@@ -31,6 +34,7 @@ const AUTO_REFRESH_MS = 5 * 60_000;
 const PREFERENCES_REFRESH_MS = 5_000;
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 const DETAILS_ID_PREFIX = "usage-tracker-sidebar-details";
+const OVERVIEW_DETAILS_ID = "usage-tracker-sidebar-overview";
 
 interface RpcEnvelope<T> {
   ok: boolean;
@@ -74,6 +78,7 @@ type ResetRpcMethod = "prepareReset" | "consumeReset";
 
 type SidebarFocusTarget =
   | { kind: "provider"; providerId: SidebarProviderId }
+  | { kind: "summary" }
   | { kind: "close" }
   | { kind: "windows" }
   | { kind: "refresh" }
@@ -120,8 +125,29 @@ function providerGlyph(providerId: SidebarProviderId): SVGSVGElement {
   svg.setAttribute("aria-hidden", "true");
   svg.setAttribute("focusable", "false");
   if (mark.fillRule !== undefined) svg.setAttribute("fill-rule", mark.fillRule);
+  const paths =
+    mark.paths ?? (mark.path === undefined ? [] : [{ d: mark.path }]);
+  for (const definition of paths) {
+    const path = document.createElementNS(SVG_NAMESPACE, "path");
+    path.setAttribute("d", definition.d);
+    if (definition.fillOpacity !== undefined) {
+      path.setAttribute("fill-opacity", String(definition.fillOpacity));
+    }
+    svg.append(path);
+  }
+  return svg;
+}
+
+function summaryGlyph(): SVGSVGElement {
+  const svg = document.createElementNS(SVG_NAMESPACE, "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("aria-hidden", "true");
+  svg.setAttribute("focusable", "false");
   const path = document.createElementNS(SVG_NAMESPACE, "path");
-  path.setAttribute("d", mark.path);
+  path.setAttribute(
+    "d",
+    "M4 19h16v2H4zm1-7h3v6H5zm5-5h3v11h-3zm5 3h3v8h-3z",
+  );
   svg.append(path);
   return svg;
 }
@@ -159,14 +185,16 @@ function closeGlyph(): SVGSVGElement {
 }
 
 function emptyProvider(providerId: SidebarProviderId): ProviderUsage {
+  const names: Readonly<Record<SidebarProviderId, string>> = {
+    claudeCode: "Claude Code",
+    codex: "Codex",
+    grok: "Grok",
+    openCode: "OpenCode",
+    antigravity: "Antigravity",
+  };
   return {
     id: providerId,
-    name:
-      providerId === "codex"
-        ? "Codex"
-        : providerId === "claudeCode"
-          ? "Claude Code"
-          : "Antigravity",
+    name: names[providerId],
     status: "error",
     accountEmail: null,
     planLabel: null,
@@ -222,6 +250,9 @@ function activeSidebarFocusTarget(root: HTMLElement): SidebarFocusTarget {
   if (active.classList.contains("usage-tracker-sidebar__reset-action")) {
     return { kind: "reset" };
   }
+  if (active.classList.contains("usage-tracker-sidebar__summary")) {
+    return { kind: "summary" };
+  }
   if (isSidebarProviderId(active.dataset.provider)) {
     return { kind: "provider", providerId: active.dataset.provider };
   }
@@ -238,10 +269,15 @@ function focusSidebarTarget(
       element =
         Array.from(
           root.querySelectorAll<HTMLElement>(
-            ".usage-tracker-sidebar__provider",
+            ".usage-tracker-sidebar__provider, .usage-tracker-sidebar__overview-provider",
           ),
         ).find((candidate) => candidate.dataset.provider === target.providerId) ??
         null;
+      break;
+    case "summary":
+      element = root.querySelector<HTMLElement>(
+        ".usage-tracker-sidebar__summary",
+      );
       break;
     case "close":
       element = root.querySelector<HTMLElement>(
@@ -337,6 +373,7 @@ function mergeSnapshot(
 
 function progressRail(window: UsageWindow | null): HTMLSpanElement {
   const rail = element("span", "usage-tracker-sidebar__rail");
+  rail.dataset.level = usageLevel(window?.usedPercent ?? null);
   const fill = element("span", "usage-tracker-sidebar__fill");
   fill.style.width = `${window?.barPercent ?? 0}%`;
   if (window === null) rail.dataset.empty = "true";
@@ -349,6 +386,7 @@ function detailWindowRow(
   window: UsageWindow | null,
 ): HTMLDivElement {
   const row = element("div", "usage-tracker-sidebar__window");
+  row.dataset.level = usageLevel(window?.usedPercent ?? null);
   const heading = element("div", "usage-tracker-sidebar__window-heading");
   heading.append(
     element("span", undefined, label),
@@ -552,6 +590,84 @@ function detailsCard(
   return card;
 }
 
+function overviewCard(
+  items: readonly SidebarUsageOverviewItem[],
+  compactLimit: CompactLimitOption,
+  onClose: () => void,
+  onSelect: (providerId: SidebarProviderId) => void,
+  refresh: HTMLButtonElement,
+): HTMLDivElement {
+  const card = element(
+    "div",
+    "usage-tracker-sidebar__details usage-tracker-sidebar__overview",
+  );
+  card.id = OVERVIEW_DETAILS_ID;
+  card.setAttribute("role", "dialog");
+  card.setAttribute("aria-label", "Agent usage overview");
+
+  const header = element("div", "usage-tracker-sidebar__details-header");
+  const identity = element("div", "usage-tracker-sidebar__details-identity");
+  const mark = element("span", "usage-tracker-sidebar__details-mark");
+  mark.append(summaryGlyph());
+  const title = element("div");
+  title.append(
+    element("strong", undefined, "Agent usage"),
+    element("span", undefined, `${items.length} providers`),
+  );
+  identity.append(mark, title);
+
+  const close = element("button", "usage-tracker-sidebar__close");
+  close.type = "button";
+  close.setAttribute("aria-label", "Close usage overview");
+  close.append(closeGlyph());
+  close.addEventListener("click", onClose);
+  const actions = element("div", "usage-tracker-sidebar__details-actions");
+  actions.append(refresh, close);
+  header.append(identity, actions);
+
+  const list = element("div", "usage-tracker-sidebar__overview-list");
+  list.setAttribute("role", "region");
+  list.setAttribute("aria-label", "Provider usage");
+  for (const item of items) {
+    const providerId = item.provider.id as SidebarProviderId;
+    const row = element("button", "usage-tracker-sidebar__overview-provider");
+    row.type = "button";
+    row.dataset.provider = providerId;
+    row.dataset.status = item.provider.status;
+    row.dataset.level = usageLevel(item.selection.window?.usedPercent ?? null);
+    row.setAttribute("aria-haspopup", "dialog");
+    row.setAttribute("aria-controls", detailsId(providerId));
+    row.setAttribute(
+      "aria-label",
+      sidebarUsagePrimaryAccessibleText(
+        item.provider.name,
+        compactLimit,
+        item.selection,
+      ),
+    );
+
+    const providerMark = element("span", "usage-tracker-sidebar__details-mark");
+    providerMark.dataset.provider = providerId;
+    providerMark.append(providerGlyph(providerId));
+    const name = element(
+      "span",
+      "usage-tracker-sidebar__overview-name",
+      item.provider.name,
+    );
+    const reading = element(
+      "span",
+      "usage-tracker-sidebar__reading",
+      sidebarUsagePrimarySelectionSummary(item.selection),
+    );
+    row.append(providerMark, name, progressRail(item.selection.window), reading);
+    row.addEventListener("click", () => onSelect(providerId));
+    list.append(row);
+  }
+
+  card.append(header, list);
+  return card;
+}
+
 function visibleSidebarFooterMenu(): HTMLElement | null {
   const footers = Array.from(
     document.querySelectorAll<HTMLElement>('[data-sidebar="footer"]'),
@@ -570,6 +686,7 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
   let enabledProviderIds = readCachedProviderIds();
   let compactLimit = readCachedCompactLimit();
   let selectedProviderId: SidebarProviderId | null = null;
+  let isOverviewOpen = false;
   let isLoading = false;
   let isLoadingPreferences = false;
   let lastError: string | null = null;
@@ -590,6 +707,21 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
       (provider) => provider.id === providerId,
     ) ??
     emptyProvider(providerId);
+
+  const overviewItems = (): SidebarUsageOverviewItem[] =>
+    enabledProviderIds.map((providerId) => {
+      const provider = providerFor(providerId);
+      return {
+        provider,
+        selection: selectSidebarUsagePrimary(
+          currentSnapshot?.providers.find(
+            (candidate) => candidate.id === providerId,
+          ),
+          provider,
+          compactLimit,
+        ),
+      };
+    });
 
   const refreshButton = (): HTMLButtonElement => {
     const refresh = element("button", "usage-tracker-sidebar__refresh");
@@ -792,6 +924,7 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
       root.replaceChildren();
       return;
     }
+    const items = overviewItems();
     const content: Node[] = [];
 
     if (selectedProviderId !== null) {
@@ -818,6 +951,26 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
           },
         ),
       );
+    } else if (isOverviewOpen && items.length > 2) {
+      content.push(
+        overviewCard(
+          items,
+          compactLimit,
+          () => {
+            isOverviewOpen = false;
+            requestedFocus = { kind: "summary" };
+            render();
+          },
+          (providerId) => {
+            selectedProviderId = providerId;
+            resetConfirmation = null;
+            resetMessage = null;
+            requestedFocus = { kind: "close" };
+            render();
+          },
+          refreshButton(),
+        ),
+      );
     }
 
     const strip = element("div", "usage-tracker-sidebar__strip");
@@ -825,56 +978,107 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
     strip.setAttribute("role", "group");
     strip.setAttribute("aria-label", "Agent usage limits");
 
-    for (const providerId of enabledProviderIds) {
-      const provider = providerFor(providerId);
-      const currentProvider = currentSnapshot?.providers.find(
-        (candidate) => candidate.id === providerId,
+    if (items.length > 2) {
+      const highest = highestSidebarUsagePrimary(items);
+      const additionalCount = items.length - 1;
+      const primarySummary =
+        highest === null
+          ? "—%"
+          : sidebarUsagePrimarySelectionSummary(highest.selection);
+      const overviewIsVisible = isOverviewOpen && selectedProviderId === null;
+      const action = overviewIsVisible ? "Close" : "Open";
+      const accessibleText =
+        highest === null
+          ? `Agent usage overview: no usage window is available across ${items.length} providers. ${action} usage overview.`
+          : `Agent usage overview: highest is ${highest.provider.name} ${primarySummary}; ${additionalCount} additional provider${additionalCount === 1 ? "" : "s"}. ${action} usage overview.`;
+      const summary = element("button", "usage-tracker-sidebar__summary");
+      summary.type = "button";
+      summary.dataset.level = usageLevel(
+        highest?.selection.window?.usedPercent ?? null,
       );
-      const primary = selectSidebarUsagePrimary(
-        currentProvider,
-        provider,
-        compactLimit,
-      );
-      const primaryAccessibleText = sidebarUsagePrimaryAccessibleText(
-        provider.name,
-        compactLimit,
-        primary,
-        selectedProviderId === providerId,
-      );
-      const button = element("button", "usage-tracker-sidebar__provider");
-      button.type = "button";
-      button.dataset.provider = providerId;
-      button.dataset.status = provider.status;
-      button.setAttribute("aria-haspopup", "dialog");
-      button.setAttribute("aria-controls", detailsId(providerId));
-      button.setAttribute(
-        "aria-expanded",
-        String(selectedProviderId === providerId),
-      );
-      button.setAttribute("aria-label", primaryAccessibleText);
-      button.title = primaryAccessibleText;
+      summary.setAttribute("aria-haspopup", "dialog");
+      summary.setAttribute("aria-controls", OVERVIEW_DETAILS_ID);
+      summary.setAttribute("aria-expanded", String(overviewIsVisible));
+      summary.setAttribute("aria-label", accessibleText);
+      summary.title = accessibleText;
 
-      const mark = element("span", "usage-tracker-sidebar__mark");
-      mark.append(providerGlyph(providerId));
-      const primarySummary = sidebarUsagePrimarySelectionSummary(primary);
-      const reading = element(
-        "span",
-        "usage-tracker-sidebar__reading",
-        isLoading && lastKnownSnapshot === null ? "…" : primarySummary,
+      const mark = element("span", "usage-tracker-sidebar__summary-mark");
+      if (highest === null) {
+        mark.append(summaryGlyph());
+      } else {
+        const providerId = highest.provider.id as SidebarProviderId;
+        mark.dataset.provider = providerId;
+        mark.append(providerGlyph(providerId));
+      }
+      summary.append(
+        mark,
+        element(
+          "span",
+          "usage-tracker-sidebar__reading",
+          isLoading && lastKnownSnapshot === null ? "…" : primarySummary,
+        ),
+        element(
+          "span",
+          "usage-tracker-sidebar__summary-count",
+          `+${additionalCount}`,
+        ),
       );
-      button.append(mark, progressRail(primary.window), reading);
-      button.addEventListener("click", () => {
-        if (isConsumingReset) return;
-        const isClosing = selectedProviderId === providerId;
-        selectedProviderId = isClosing ? null : providerId;
-        resetConfirmation = null;
-        resetMessage = null;
-        requestedFocus = isClosing
-          ? { kind: "provider", providerId }
-          : { kind: "close" };
+      summary.addEventListener("click", () => {
+        isOverviewOpen = !overviewIsVisible;
+        requestedFocus = isOverviewOpen
+          ? { kind: "close" }
+          : { kind: "summary" };
         render();
       });
-      strip.append(button);
+      strip.append(summary);
+    } else {
+      for (const item of items) {
+        const providerId = item.provider.id as SidebarProviderId;
+        const provider = item.provider;
+        const primary = item.selection;
+        const primaryAccessibleText = sidebarUsagePrimaryAccessibleText(
+          provider.name,
+          compactLimit,
+          primary,
+          selectedProviderId === providerId,
+        );
+        const button = element("button", "usage-tracker-sidebar__provider");
+        button.type = "button";
+        button.dataset.provider = providerId;
+        button.dataset.status = provider.status;
+        button.dataset.level = usageLevel(primary.window?.usedPercent ?? null);
+        button.setAttribute("aria-haspopup", "dialog");
+        button.setAttribute("aria-controls", detailsId(providerId));
+        button.setAttribute(
+          "aria-expanded",
+          String(selectedProviderId === providerId),
+        );
+        button.setAttribute("aria-label", primaryAccessibleText);
+        button.title = primaryAccessibleText;
+
+        const mark = element("span", "usage-tracker-sidebar__mark");
+        mark.append(providerGlyph(providerId));
+        const primarySummary = sidebarUsagePrimarySelectionSummary(primary);
+        const reading = element(
+          "span",
+          "usage-tracker-sidebar__reading",
+          isLoading && lastKnownSnapshot === null ? "…" : primarySummary,
+        );
+        button.append(mark, progressRail(primary.window), reading);
+        button.addEventListener("click", () => {
+          if (isConsumingReset) return;
+          isOverviewOpen = false;
+          const isClosing = selectedProviderId === providerId;
+          selectedProviderId = isClosing ? null : providerId;
+          resetConfirmation = null;
+          resetMessage = null;
+          requestedFocus = isClosing
+            ? { kind: "provider", providerId }
+            : { kind: "close" };
+          render();
+        });
+        strip.append(button);
+      }
     }
 
     strip.append(refreshButton());
@@ -992,6 +1196,7 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
 
       enabledProviderIds = nextProviderIds;
       compactLimit = nextCompactLimit;
+      if (enabledProviderIds.length <= 2) isOverviewOpen = false;
       if (
         selectedProviderId !== null &&
         !enabledProviderIds.includes(selectedProviderId)
@@ -999,7 +1204,10 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
         selectedProviderId = null;
         resetConfirmation = null;
         resetMessage = null;
-        requestedFocus = { kind: "refresh" };
+        requestedFocus =
+          enabledProviderIds.length > 2
+            ? { kind: "summary" }
+            : { kind: "refresh" };
       }
       cacheProviderIds(enabledProviderIds);
       cacheCompactLimit(compactLimit);
@@ -1041,12 +1249,13 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
     "pointerdown",
     (event) => {
       if (
-        selectedProviderId !== null &&
+        (selectedProviderId !== null || isOverviewOpen) &&
         root !== null &&
         event.target instanceof Node &&
         !root.contains(event.target)
       ) {
         selectedProviderId = null;
+        isOverviewOpen = false;
         resetConfirmation = null;
         resetMessage = null;
         render();
@@ -1064,16 +1273,21 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
           (active instanceof Node && root.contains(active)));
       if (
         event.key === "Escape" &&
-        selectedProviderId !== null &&
+        (selectedProviderId !== null || isOverviewOpen) &&
         belongsToUsageTracker
       ) {
-        const providerId = selectedProviderId;
         event.preventDefault();
         event.stopImmediatePropagation();
-        selectedProviderId = null;
-        resetConfirmation = null;
-        resetMessage = null;
-        requestedFocus = { kind: "provider", providerId };
+        if (selectedProviderId !== null) {
+          const providerId = selectedProviderId;
+          selectedProviderId = null;
+          resetConfirmation = null;
+          resetMessage = null;
+          requestedFocus = { kind: "provider", providerId };
+        } else {
+          isOverviewOpen = false;
+          requestedFocus = { kind: "summary" };
+        }
         render();
       }
     },

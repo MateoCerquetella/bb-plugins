@@ -1,10 +1,23 @@
 # Changelog
 
+## 0.1.8 - 2026-09-04
+
+- Preserve the v0.1.6 provider set (Codex, Claude Code, Cursor, Grok, and OpenCode) and add Google Antigravity quota tracking as an opt-in provider.
+- Discover `agy` from PATH and supported macOS fallback locations, use the official Antigravity mark, and show all Antigravity quota groups.
+
 All notable changes to Usage Tracker are documented here.
 
 ## Unreleased
+
+## 0.1.6 - 2026-09-02
+
 ### Added
 
+- Show Grok and OpenCode usage with independent settings, provider details,
+  and their BB provider marks.
+- Summarize larger provider sets with the highest usage and a `+N` count, with
+  a click-open provider overview, and color usage yellow from 80% and red from
+  95%.
 - Show available Codex usage resets in expanded details with an explicit
   confirmation before any reset is consumed.
 

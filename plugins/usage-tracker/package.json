@@ -1,8 +1,8 @@
 {
   "name": "bb-plugin-usage-tracker",
-  "version": "0.1.5",
+  "version": "0.1.8",
   "private": true,
-  "description": "Compact Codex and Claude usage limits in bb's sidebar footer.",
+  "description": "Compact Codex, Claude, Cursor, Grok, OpenCode, and Antigravity usage limits in bb's sidebar footer.",
   "license": "MIT",
   "author": "Mateo Cerquetella",
   "homepage": "https://github.com/MateoCerquetella/bb-plugins/tree/main/plugins/usage-tracker#readme",
@@ -22,7 +22,10 @@
     "quota",
     "codex",
     "claude-code",
-    "cursor"
+    "cursor",
+    "grok",
+    "opencode",
+    "antigravity"
   ],
   "type": "module",
   "engines": {
@@ -31,7 +34,7 @@
   },
   "bb": {
     "name": "Usage Tracker",
-    "description": "Compact Codex and Claude usage limits in the sidebar footer.",
+    "description": "Compact Codex, Claude, Cursor, Grok, OpenCode, and Antigravity usage limits in the sidebar footer.",
     "branding": {
       "icon": "./assets/icon.svg",
       "logo": {
@@ -60,6 +63,7 @@
     "types:check": "env -u BB_CLI bb plugin types --check .",
     "types:refresh": "env -u BB_CLI bb plugin types .",
     "test": "node --test --experimental-strip-types test/*.test.ts",
+    "verify:focused": "npm run typecheck && npm test && npm run build",
     "check": "npm run types:check && npm run typecheck && npm test && npm run build"
   }
 }
