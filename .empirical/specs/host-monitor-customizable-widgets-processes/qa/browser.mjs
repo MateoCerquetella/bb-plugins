@@ -243,6 +243,20 @@ try {
     target.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true, clientY: target.getBoundingClientRect().bottom - 1, dataTransfer: transfer }));
   })()`);
   await waitFor("document.querySelectorAll('.host-monitor__grid-item')[1]?.dataset.dropPosition === 'after'");
+  await evaluate(`(() => {
+    const transfer = window.__hostMonitorGridQaTransfer;
+    const source = document.querySelectorAll('.host-monitor__grid-item')[0];
+    if (source == null) return;
+    source.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true, clientY: source.getBoundingClientRect().bottom - 1, dataTransfer: transfer }));
+  })()`);
+  await waitFor("document.querySelector('.host-monitor__grid-item[data-drop-position]') === null");
+  await evaluate(`(() => {
+    const transfer = window.__hostMonitorGridQaTransfer;
+    const target = document.querySelectorAll('.host-monitor__grid-item')[1];
+    if (target == null) return;
+    target.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true, clientY: target.getBoundingClientRect().bottom - 1, dataTransfer: transfer }));
+  })()`);
+  await waitFor("document.querySelectorAll('.host-monitor__grid-item')[1]?.dataset.dropPosition === 'after'");
   await evaluate("document.querySelector('.host-monitor__panel-grid')?.scrollIntoView({ block: 'start' })");
   await screenshot(dashboardDragPath);
   await evaluate(`(() => {

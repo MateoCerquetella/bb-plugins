@@ -57,6 +57,8 @@ test("live dashboard widgets are draggable in customization mode", () => {
   assert.match(app, /moveDashboardWidget\(source, key, position\)/u);
   assert.match(app, /dashboardPointerDropPosition/u);
   assert.match(app, /setDashboardDragPreview/u);
+  assert.match(app, /onDragLeave/u);
+  assert.match(app, /draggedWidgetKey === key[\s\S]*setDashboardDropTarget\(null\)/u);
   assert.match(app, /className="host-monitor__widget-drag-handle"/u);
   assert.match(styles, /\.host-monitor__panel-grid\[data-editing="true"\]\s+\.host-monitor__grid-item/u);
   assert.match(styles, /\.host-monitor__grid-item\[data-dragging="true"\]/u);

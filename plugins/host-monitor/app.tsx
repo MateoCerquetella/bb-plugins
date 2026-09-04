@@ -568,8 +568,16 @@ function MachineDashboard({
                   setDraggedWidgetKey(null);
                   setDashboardDropTarget(null);
                 }}
+                onDragLeave={(event) => {
+                  if (event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget)) return;
+                  setDashboardDropTarget((current) => current?.key === key ? null : current);
+                }}
                 onDragOver={(event) => {
-                  if (!editing || draggedWidgetKey == null || draggedWidgetKey === key) return;
+                  if (!editing || draggedWidgetKey == null) return;
+                  if (draggedWidgetKey === key) {
+                    setDashboardDropTarget(null);
+                    return;
+                  }
                   event.preventDefault();
                   const position = dashboardPointerDropPosition(event.currentTarget, event.clientY);
                   setDashboardDropTarget((current) =>
