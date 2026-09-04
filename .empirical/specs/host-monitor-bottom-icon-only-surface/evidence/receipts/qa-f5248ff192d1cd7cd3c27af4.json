@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-f5248ff192d1cd7cd3c27af4",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3",
+    "AC-UI-4"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Automated live BB browser verification of one bottom icon, zero Host Monitor page rows, four hosts, dense monitor, edit/add/cancel, host switching, and 390px layout.",
+  "passed": true,
+  "startedAt": "2026-09-04T15:06:18.133Z",
+  "completedAt": "2026-09-04T15:06:22.815Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-bottom-icon-only-surface",
+    "specRevision": 3,
+    "specDigest": "sha256:91b95406a1be92b5dcb40ac5fdc7516cac1111322a12c454334458d60fe44b76",
+    "treeDigest": "sha256:6869af7956d3bc9f15cdd35aa90f886203b8e89c609d35b557ac5cdcf38f9b5a",
+    "policyDigest": "sha256:3425fbb9bad135beeeb67d6becc5c9c1152d50729eda1ad2fdf33c05b6747679",
+    "workflowRevision": 7,
+    "gitCommit": "68c6b19eefd53ed98a96a79dda7e385d496aa5e1"
+  },
+  "digest": "sha256:9e0ebf104c6e3dd2525afb4f56a60c0385f7807d31333f2db6d127c5b82fe748",
+  "kind": "qa",
+  "matrixDigest": "sha256:284821fa0403b0bccce1245b153615e6df75448b03e195a4e7773134a472f940",
+  "check": {
+    "id": "qa-end-to-end",
+    "kind": "end-to-end"
+  },
+  "coveredChecks": [
+    "end-to-end"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Automated live BB browser verification of one bottom icon, zero Host Monitor page rows, four hosts, dense monitor, edit/add/cancel, host switching, and 390px layout.",
+      "startedAt": "2026-09-04T15:06:18.133Z",
+      "completedAt": "2026-09-04T15:06:22.815Z",
+      "durationMs": 4682,
+      "collector": null,
+      "command": {
+        "argv": [
+          "node",
+          ".empirical/specs/host-monitor-native-footer-configurable-metrics/qa/browser.mjs"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:c5d29e91dc30044cda20315bb4182226496b80fb9a5a79a9864497cf1645bfd5",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "{\"initial\":{\"machines\":4,\"panels\":9,\"sidebarRows\":0,\"selected\":\"development1\",\"alerts\":0,\"footerActionsBefore\":1},\"editor\":{\"beforeAdd\":9,\"afterAdd\":10},\"switchedTo\":\"dyaus\",\"narrow\":{\"viewport\":[390,844],\"overflow\":false,\"rows\":9},\"artifacts\":[\"/home/dyaus/.bb/worktrees/host-monitor-bottom-icon-only-surface/.empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser/sidebar-icon-only.png\",\"/home/dyaus/.bb/worktrees/host-monitor-bottom-icon-only-surface/.empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser/monitor-desktop.png\",\"/home/dyaus/.bb/worktrees/host-monitor-bottom-icon-only-surface/.empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser/editor-desktop.png\",\"/home/dyaus/.bb/worktrees/host-monitor-bottom-icon-only-surface/.empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser/editor-390.png\"]}\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:6869af7956d3bc9f15cdd35aa90f886203b8e89c609d35b557ac5cdcf38f9b5a",
+      "sourceTreeAfter": "sha256:6869af7956d3bc9f15cdd35aa90f886203b8e89c609d35b557ac5cdcf38f9b5a",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser/editor-390.png",
+          "mediaType": "image/png",
+          "bytes": 32167,
+          "digest": "sha256:f38bf28708fe404278ff49c34a4d5d26c4f2e4351a4178cd64cf421527334bc7"
+        },
+        {
+          "path": ".empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser/editor-desktop.png",
+          "mediaType": "image/png",
+          "bytes": 130583,
+          "digest": "sha256:ebbc2c478422046267930ec4a0d8aadb585a1938e1aeefad3ce92e1375efbadf"
+        },
+        {
+          "path": ".empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser/monitor-desktop.png",
+          "mediaType": "image/png",
+          "bytes": 124182,
+          "digest": "sha256:9742dc2081268b512ebc98a1f41c40aec8452fdfa8fd85b7917d0f72b63ea0cf"
+        },
+        {
+          "path": ".empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser/sidebar-icon-only.png",
+          "mediaType": "image/png",
+          "bytes": 64849,
+          "digest": "sha256:ed1460949db2aef80f23a5787a329febb13106f5cbfe62971dc8ea090be9ff1b"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}

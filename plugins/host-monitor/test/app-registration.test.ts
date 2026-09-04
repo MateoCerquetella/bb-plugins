@@ -24,7 +24,8 @@ test("keeps Host Monitor identity with only the native bottom sidebar action", (
   assert.match(app, /title: "Host Monitor"/u);
   assert.match(app, /app\.slots\.sidebarFooterAction\(\{/u);
   assert.match(app, /icon: "Activity"/u);
-  assert.match(app, /run: \(\{ openSettings \}\) => openSettings\(\)/u);
+  assert.match(app, /function openHostMonitor\(\{ openSettings \}/u);
+  assert.match(app, /run: openHostMonitor/u);
   assert.match(app, /app\.slots\.settingsSection\(\{/u);
   assert.match(app, /id: "monitor"/u);
   assert.doesNotMatch(app, /app\.slots\.navPanel\(/u);

@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "sequence": 4,
+  "previousDigest": "sha256:fc44e366e941db47b54ea341723b3fa02c01c3dda47c3d20639ae02a56327aed",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Designed the public-SDK icon-only registration, native plugin-detail destination, preserved fleet/configuration boundaries, reference-aligned responsive hierarchy, exact browser flow, two accepted decisions, and required UI/UX advisory.",
+  "createdAt": "2026-09-04T15:03:31.740Z",
+  "stateBeforeDigest": "sha256:8b875af120ec04ebbc124a53d654143db9b20e24f5b236084250462f80f52189",
+  "stateAfterDigest": "sha256:4164927df25ab12fe2fbd658c62ef70307d448dbef93e4404fb37d9c22303728",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 4,
+    "activeFeature": "host-monitor-bottom-icon-only-surface",
+    "request": "Remove Host Monitor from BB's main sidebar page rows. Keep only its bottom-left native icon. When clicked, the icon must open the full monitor surface with the dense Machine Monitor-style charts and metric cards shown in the supplied reference, while preserving multi-host selection, persisted per-host configurable metrics, BB machine/realtime infrastructure, and notification-free behavior.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "plan",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Designed the public-SDK icon-only registration, native plugin-detail destination, preserved fleet/configuration boundaries, reference-aligned responsive hierarchy, exact browser flow, two accepted decisions, and required UI/UX advisory.",
+    "implementationActor": null,
+    "workStartedAt": "2026-09-04T15:01:51.246Z",
+    "specDigest": "sha256:91b95406a1be92b5dcb40ac5fdc7516cac1111322a12c454334458d60fe44b76",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:f8b6d39591961240c4a9fcf31aebd603d0bb43bdf7b55159e0558f206780fd89",
+    "impactDigest": "sha256:f5e094b0562dfe301774aae480fb95d58980315afbf2c6994d5dc5fbd496cd27",
+    "capabilityClaimId": "host-monitor-bottom-icon-only-surface-a096aa81d34f",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-04T15:03:31.740Z"
+  },
+  "digest": "sha256:49b160c7c5d6e775d247f06933e9ba75fb3b17a16a1faa5571fa8d3ce4a77d7b"
+}

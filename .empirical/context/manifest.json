@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "generator": "empirical-0.30.0",
-  "sourceDigest": "sha256:ef78a882f9a1a73479c966603b23e66ec08f47beec8988a005eb88659531e46d",
+  "sourceDigest": "sha256:6183b1ce034e0a7a1ee01debccd7f5bb347aae8d69f48fa9e7994f6354d63980",
   "files": [
     {
       "path": ".agents/skills/empirical/SKILL.md",
@@ -570,8 +570,8 @@
     },
     {
       "path": "plugins/host-monitor/README.md",
-      "size": 4280,
-      "digest": "sha256:405d71203a1e95218ff880ce6645750be428534bd793cbe34359c89fced52e44"
+      "size": 4273,
+      "digest": "sha256:38a290ee9096cefb9cd7fecce9df1651cd10c4bd009efc0df373f994a5fb0170"
     },
     {
       "path": "plugins/host-monitor/THIRD_PARTY_NOTICES.md",
@@ -580,13 +580,13 @@
     },
     {
       "path": "plugins/host-monitor/app.css",
-      "size": 15095,
-      "digest": "sha256:984a150ccdc9ea5104496d0a19450e75d55c6d12e7daac01051c3ab3af1ca746"
+      "size": 14968,
+      "digest": "sha256:66f24318e6104c418446a07504fc3f94d237eac29182416924c988321971b657"
     },
     {
       "path": "plugins/host-monitor/app.tsx",
-      "size": 33597,
-      "digest": "sha256:0685a0850b1115dcb102d265956532f0d3c7c417d1d53e4346a9e21be076477f"
+      "size": 32888,
+      "digest": "sha256:8cdbc68a5e712e2da0059552276702e124318ba7f241e7534dbc530f07eeb551"
     },
     {
       "path": "plugins/host-monitor/assets/icon.svg",
@@ -635,8 +635,8 @@
     },
     {
       "path": "plugins/host-monitor/package.json",
-      "size": 3054,
-      "digest": "sha256:c4637e2c7958bbba4aa8a4ce13dccedc255e5ef9669cbce846e36184a1f23ad9"
+      "size": 3118,
+      "digest": "sha256:d04c137c38a5cc733e169f56abe49a231f3fa85f5b9dc7a6e297fa59a73a09f2"
     },
     {
       "path": "plugins/host-monitor/server.ts",
@@ -650,8 +650,8 @@
     },
     {
       "path": "plugins/host-monitor/test/app-registration.test.ts",
-      "size": 2788,
-      "digest": "sha256:7282f27dff02ac1f79d6a1b8294fbd60ea4b4c49d665c77985e615c0ee7e6ba0"
+      "size": 2823,
+      "digest": "sha256:f0d1c9dfeece963635aa06b099dd38b30cbdc93edf4d498c466030c3ee94ae8e"
     },
     {
       "path": "plugins/host-monitor/test/chart-data.test.ts",
@@ -1649,7 +1649,7 @@
         "plugins/usage-tracker/tsconfig.json",
         "plugins/usage-tracker/types/css-modules.d.ts"
       ],
-      "sourceDigest": "sha256:ef78a882f9a1a73479c966603b23e66ec08f47beec8988a005eb88659531e46d",
+      "sourceDigest": "sha256:6183b1ce034e0a7a1ee01debccd7f5bb347aae8d69f48fa9e7994f6354d63980",
       "digest": "sha256:eed9cfd95fdecbf70535c9b9bfdb204011bdad5af0a5418d4d923f3a99f354f2",
       "freshness": "fresh"
     },
@@ -1684,7 +1684,7 @@
         "plugins/usage-tracker/README.md",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:05c433f08f04a0ffc5c4a72d85695c3df253f4536ca2e08f190bb0db6c0ea372",
+      "sourceDigest": "sha256:5ccd654d02a4b1c802deb41c6299c91f950ae6556574c4524525ae77866baac5",
       "digest": "sha256:37f1b782a0e88dee101030bf6ac6aa2742c329ca37daf764d5022e793ce6bc15",
       "freshness": "fresh"
     },
@@ -1702,7 +1702,7 @@
         "plugins/touchbar/package.json",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:f12f0a83203dd72f1120463f4a340b86b8685959f6d855c048f607e68c3e731f",
+      "sourceDigest": "sha256:e33227d99ac5860a4530f48930409d5fb9bb368c1d3efa948e7cf3ae444347c7",
       "digest": "sha256:6a3333fdbbcffff93c96400aab0596932dc23cce823061cdedacad5e44ef7bd7",
       "freshness": "fresh"
     },
@@ -1721,7 +1721,7 @@
         "plugins/touchbar/package.json",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:f902153c442417724b77f6e7fe2a6651fe450d678e6cf8318fceb7aac805abe0",
+      "sourceDigest": "sha256:d5e4dac05be8d84a37d9f0a7f856d9cd121e4af22368c001044748320870783b",
       "digest": "sha256:06a7a6d07d2649e2d00a93cf62beef749d2f5dada25077c225726f81ec2eeed3",
       "freshness": "fresh"
     },
@@ -1745,5 +1745,5 @@
     }
   ],
   "truncated": false,
-  "digest": "sha256:78703716e1608d46931b962a36ef61e06e6f9a57fe8f41b61cbc6707152e00d1"
+  "digest": "sha256:2061d901f6faff8a63356daa7a1a9416a5c969a436d33556c2340bc316c7ee6e"
 }

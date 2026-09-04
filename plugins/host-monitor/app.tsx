@@ -734,12 +734,16 @@ function isOver(value: number | null | undefined, threshold: number): boolean {
   return value != null && Number.isFinite(value) && value >= threshold;
 }
 
+function openHostMonitor({ openSettings }: { openSettings(): void }): void {
+  openSettings();
+}
+
 export default definePluginApp((app) => {
   app.slots.sidebarFooterAction({
     id: "host-monitor",
     title: "Host Monitor",
     icon: "Activity",
-    run: ({ openSettings }) => openSettings(),
+    run: openHostMonitor,
   });
   app.slots.settingsSection({
     id: "monitor",

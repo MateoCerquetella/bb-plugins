@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-3e0398bd18243919849b85be",
+  "criteria": [
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3",
+    "AC-UI-4"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Final screenshots show one bottom icon, zero main-sidebar rows, the dense native monitor, desktop editor, and overflow-free 390px editor.",
+  "passed": true,
+  "startedAt": "2026-09-04T15:08:01.140Z",
+  "completedAt": "2026-09-04T15:08:01.140Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-bottom-icon-only-surface",
+    "specRevision": 3,
+    "specDigest": "sha256:91b95406a1be92b5dcb40ac5fdc7516cac1111322a12c454334458d60fe44b76",
+    "treeDigest": "sha256:6cb075c529016f9ea48b24b2f5d77fc74b1f955c05a77f8efc5cdbe44bce1ba2",
+    "policyDigest": "sha256:3425fbb9bad135beeeb67d6becc5c9c1152d50729eda1ad2fdf33c05b6747679"
+  },
+  "digest": "sha256:cd84d216a560259e863e166908608584a006867c551b5142ea3e3fcaf31f20eb",
+  "kind": "collected",
+  "collector": "Chromium CDP visual verification",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser/editor-390.png",
+      "mediaType": "image/png",
+      "bytes": 32167,
+      "digest": "sha256:f38bf28708fe404278ff49c34a4d5d26c4f2e4351a4178cd64cf421527334bc7"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser/editor-desktop.png",
+      "mediaType": "image/png",
+      "bytes": 130274,
+      "digest": "sha256:ac477413714e3c46d0add7f0612cc1df79bb25195316d1c9a726cbcabe983868"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser/monitor-desktop.png",
+      "mediaType": "image/png",
+      "bytes": 124668,
+      "digest": "sha256:abb8d1ea8611ca65a018755828366d7d45a056bdd2b72fb819fb8822d18573db"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser/sidebar-icon-only.png",
+      "mediaType": "image/png",
+      "bytes": 65098,
+      "digest": "sha256:c9205c8d0d083e5849e51d0c68a225b6e64c9e22c522763eaca7031702cefac6"
+    }
+  ]
+}

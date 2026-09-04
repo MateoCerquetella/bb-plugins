@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-88d5a0899b809f0b30acc35a",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3",
+    "AC-UI-4"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Final automated live BB icon-only browser pass.",
+  "passed": true,
+  "startedAt": "2026-09-04T15:07:49.895Z",
+  "completedAt": "2026-09-04T15:07:54.747Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-bottom-icon-only-surface",
+    "specRevision": 3,
+    "specDigest": "sha256:91b95406a1be92b5dcb40ac5fdc7516cac1111322a12c454334458d60fe44b76",
+    "treeDigest": "sha256:6cb075c529016f9ea48b24b2f5d77fc74b1f955c05a77f8efc5cdbe44bce1ba2",
+    "policyDigest": "sha256:3425fbb9bad135beeeb67d6becc5c9c1152d50729eda1ad2fdf33c05b6747679",
+    "workflowRevision": 8,
+    "gitCommit": "68c6b19eefd53ed98a96a79dda7e385d496aa5e1"
+  },
+  "digest": "sha256:a5c63ed289cbcf59dce036cd3c409e066d41ed5aea8a154c3f3239be93919e7b",
+  "kind": "qa",
+  "matrixDigest": "sha256:284821fa0403b0bccce1245b153615e6df75448b03e195a4e7773134a472f940",
+  "check": {
+    "id": "qa-end-to-end",
+    "kind": "end-to-end"
+  },
+  "coveredChecks": [
+    "end-to-end"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Final automated live BB icon-only browser pass.",
+      "startedAt": "2026-09-04T15:07:49.895Z",
+      "completedAt": "2026-09-04T15:07:54.747Z",
+      "durationMs": 4852,
+      "collector": null,
+      "command": {
+        "argv": [
+          "node",
+          ".empirical/specs/host-monitor-native-footer-configurable-metrics/qa/browser.mjs"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:c5d29e91dc30044cda20315bb4182226496b80fb9a5a79a9864497cf1645bfd5",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "{\"initial\":{\"machines\":4,\"panels\":9,\"sidebarRows\":0,\"selected\":\"development1\",\"alerts\":0,\"footerActionsBefore\":1},\"editor\":{\"beforeAdd\":9,\"afterAdd\":10},\"switchedTo\":\"dyaus\",\"narrow\":{\"viewport\":[390,844],\"overflow\":false,\"rows\":9},\"artifacts\":[\"/home/dyaus/.bb/worktrees/host-monitor-bottom-icon-only-surface/.empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser/sidebar-icon-only.png\",\"/home/dyaus/.bb/worktrees/host-monitor-bottom-icon-only-surface/.empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser/monitor-desktop.png\",\"/home/dyaus/.bb/worktrees/host-monitor-bottom-icon-only-surface/.empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser/editor-desktop.png\",\"/home/dyaus/.bb/worktrees/host-monitor-bottom-icon-only-surface/.empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser/editor-390.png\"]}\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:6cb075c529016f9ea48b24b2f5d77fc74b1f955c05a77f8efc5cdbe44bce1ba2",
+      "sourceTreeAfter": "sha256:6cb075c529016f9ea48b24b2f5d77fc74b1f955c05a77f8efc5cdbe44bce1ba2",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser/editor-390.png",
+          "mediaType": "image/png",
+          "bytes": 32167,
+          "digest": "sha256:f38bf28708fe404278ff49c34a4d5d26c4f2e4351a4178cd64cf421527334bc7"
+        },
+        {
+          "path": ".empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser/editor-desktop.png",
+          "mediaType": "image/png",
+          "bytes": 130274,
+          "digest": "sha256:ac477413714e3c46d0add7f0612cc1df79bb25195316d1c9a726cbcabe983868"
+        },
+        {
+          "path": ".empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser/monitor-desktop.png",
+          "mediaType": "image/png",
+          "bytes": 124668,
+          "digest": "sha256:abb8d1ea8611ca65a018755828366d7d45a056bdd2b72fb819fb8822d18573db"
+        },
+        {
+          "path": ".empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser/sidebar-icon-only.png",
+          "mediaType": "image/png",
+          "bytes": 65098,
+          "digest": "sha256:c9205c8d0d083e5849e51d0c68a225b6e64c9e22c522763eaca7031702cefac6"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}

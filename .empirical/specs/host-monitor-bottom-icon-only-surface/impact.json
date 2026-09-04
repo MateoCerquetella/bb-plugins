@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "host-monitor-bottom-icon-surface"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:f5e094b0562dfe301774aae480fb95d58980315afbf2c6994d5dc5fbd496cd27"
+}
