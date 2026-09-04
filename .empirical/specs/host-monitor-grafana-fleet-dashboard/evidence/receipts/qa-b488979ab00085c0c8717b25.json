@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-b488979ab00085c0c8717b25",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Promotion full CI for the restored Host Monitor Grafana fleet dashboard baseline.",
+  "passed": false,
+  "startedAt": "2026-09-04T14:16:58.954Z",
+  "completedAt": "2026-09-04T14:17:00.542Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-grafana-fleet-dashboard",
+    "specRevision": 2,
+    "specDigest": "sha256:b68039cc56e374ac530c1d4ee1f57640d396e07bbb1b09684dcf0a38e345ecf3",
+    "treeDigest": "sha256:49c53573922276069530dedc79c7370706847c77a2a012792ccab95f2cd2812e",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf",
+    "workflowRevision": 12,
+    "gitCommit": "06234a3f6fb70a300f819518f1cba7df21105ef8"
+  },
+  "digest": "sha256:b6ad3ecb38a4f9f17829500949d7966acd563b9edf75c61b9d7d7280b6527b7c",
+  "kind": "qa",
+  "matrixDigest": "sha256:2741a41cfc2ce1eb93b7e154676a12bfbaf30b4bf32512771855a3eeb886d549",
+  "check": {
+    "id": "qa-full-ci",
+    "kind": "full-ci"
+  },
+  "coveredChecks": [
+    "full-ci"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "failed",
+      "summary": "Promotion full CI for the restored Host Monitor Grafana fleet dashboard baseline.",
+      "startedAt": "2026-09-04T14:16:58.954Z",
+      "completedAt": "2026-09-04T14:17:00.542Z",
+      "durationMs": 1588,
+      "collector": null,
+      "command": {
+        "argv": [
+          "bun",
+          "run",
+          "ci"
+        ],
+        "cwd": ".",
+        "timeoutMs": 900000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 1,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:0e661f9fd63586f9038fd411d63229f0b4d5721b3a15ee930f246505dbadb91e",
+        "stderrDigest": "sha256:aca84957a39fef26d950a2de64724c7e34994455ab16f2130e6c9bf45e7b7c07",
+        "stdoutTail": "\n> bb-plugins@0.0.0 check\n> npm run check --workspaces --if-present && npm run check:dockside\n\n\n> bb-plugin-host-monitor@0.1.4 check\n> npm run types:check && npm run typecheck && npm test && npm run build\n\n\n> bb-plugin-host-monitor@0.1.4 types:check\n> env -u BB_CLI bb plugin types --check .\n\nThis plugin uses the npm package @get-bb/plugin-sdk; pin is 0.4.21, host is 0.4.41.\n\n> bb-plugin-save-my-model@0.1.2 check\n> npm run types:check && npm run typecheck && npm test && npm run build\n\n\n> bb-plugin-save-my-model@0.1.2 types:check\n> env -u BB_CLI bb plugin types --check .\n\nThis plugin uses the npm package @get-bb/plugin-sdk; pin is 0.4.21, host is 0.4.41.\n\n> bb-plugin-taskboard@0.3.3 check\n> npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build\n\n\n> bb-plugin-taskboard@0.3.3 types:check\n> env -u BB_CLI bb plugin types --check .\n\nThis plugin uses the npm package @get-bb/plugin-sdk; pin is 0.4.6, host is 0.4.41.\n\n> bb-plugin-touchbar@0.1.0 check\n> npm run types:check && npm run typecheck && npm test && npm run build\n\n\n> bb-plugin-touchbar@0.1.0 types:check\n> env -u BB_CLI bb plugin types --check .\n\nThis plugin uses the npm package @get-bb/plugin-sdk; pin is 0.4.21, host is 0.4.41.\n\n> bb-plugin-usage-tracker@0.1.5 check\n> npm run types:check && npm run typecheck && npm test && npm run build\n\n\n> bb-plugin-usage-tracker@0.1.5 types:check\n> env -u BB_CLI bb plugin types --check .\n\nThis plugin uses the npm package @get-bb/plugin-sdk; pin is 0.4.6, host is 0.4.41.\n",
+        "stderrTail": "s/.bb/worktrees/host-monitor-native-footer-configurable-metrics/plugins/save-my-model\nnpm error command failed\nnpm error command sh -c env -u BB_CLI bb plugin types --check .\nnpm error Lifecycle script `check` failed with error:\nnpm error code 1\nnpm error path /home/dyaus/.bb/worktrees/host-monitor-native-footer-configurable-metrics/plugins/save-my-model\nnpm error workspace bb-plugin-save-my-model@0.1.2\nnpm error location /home/dyaus/.bb/worktrees/host-monitor-native-footer-configurable-metrics/plugins/save-my-model\nnpm error command failed\nnpm error command sh -c npm run types:check && npm run typecheck && npm test && npm run build\n\nSet \"@get-bb/plugin-sdk\" to 0.4.41 in devDependencies and re-run npm install (`bb plugin types` does it for you).\nSet \"@pierre/diffs\" to ^1.2.9 in devDependencies — the version this bb shims at runtime (`bb plugin types` does it for you).\nSet \"@radix-ui/react-alert-dialog\" to ^1.1.19 in devDependencies — the version this bb shims at runtime (`bb plugin types` does it for you).\nSet \"@radix-ui/react-context-menu\" to ^2.3.3 in devDependencies — the version this bb shims at runtime (`bb plugin types` does it for you).\nMove \"@radix-ui/react-dialog\" from dependencies to devDependencies at ^1.1.19 — bb shims it at runtime and never bundles it (`bb plugin types` does it for you).\nMove \"@radix-ui/react-dropdown-menu\" from dependencies to devDependencies at ^2.1.20 — bb shims it at runtime and never bundles it (`bb plugin types` does it for you).\nSet \"@radix-ui/react-hover-card\" to ^1.1.19 in devDependencies — the version this bb shims at runtime (`bb plugin types` does it for you).\nSet \"@radix-ui/react-menubar\" to ^1.1.20 in devDependencies — the version this bb shims at runtime (`bb plugin types` does it for you).\nSet \"@radix-ui/react-navigation-menu\" to ^1.2.18 in devDependencies — the version this bb shims at runtime (`bb plugin types` does it for you).\nSet \"@radix-ui/react-popover\" to ^1.1.19 in devDependencies — the version this bb shims at runtime (`bb plugin types` does it for you).\nMove \"@radix-ui/react-select\" from dependencies to devDependencies at ^2.3.3 — bb shims it at runtime and never bundles it (`bb plugin types` does it for you).\nMove \"@radix-ui/react-tooltip\" from dependencies to devDependencies at ^1.2.12 — bb shims it at runtime and never bundles it (`bb plugin types` does it for you).\nMove \"class-variance-authority\" from dependencies to devDependencies at ^0.7.1 — bb shims it at runtime and never bundles it (`bb plugin types` does it for you).\nMove \"clsx\" from dependencies to devDependencies at ^2.1.1 — bb shims it at runtime and never bundles it (`bb plugin types` does it for you).\nMove \"sonner\" from dependencies to devDependencies at ^1.7.4 — bb shims it at runtime and never bundles it (`bb plugin types` does it for you).\nMove \"tailwind-merge\" from dependencies to devDependencies at ^3.4.0 — bb shims it at runtime and never bundles it (`bb plugin types` does it for you).\nMove \"vaul\" from dependencies to devDependencies at ^1.1.2 — bb shims it at runtime and never bundles it (`bb plugin types` does it for you).\nnpm error Lifecycle script `types:check` failed with error:\nnpm error code 1\nnpm error path /home/dyaus/.bb/worktrees/host-monitor-native-footer-configurable-metrics/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.3\nnpm error location /home/dyaus/.bb/worktrees/host-monitor-native-footer-configurable-metrics/plugins/taskboard\nnpm error command failed\nnpm error command sh -c env -u BB_CLI bb plugin types --check .\nnpm error Lifecycle script `check` failed with error:\nnpm error code 1\nnpm error path /home/dyaus/.bb/worktrees/host-monitor-native-footer-configurable-metrics/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.3\nnpm error location /home/dyaus/.bb/worktrees/host-monitor-native-footer-configurable-metrics/plugins/taskboard\nnpm error command failed\nnpm error command sh -c npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build\n\nSet \"@get-bb/plugin-sdk\" to 0.4.41 in devDependencies and re-run npm install (`bb plugin types` does it for you).\nnpm error Lifecycle script `types:check` failed with error:\nnpm error code 1\nnpm error path /home/dyaus/.bb/worktrees/host-monitor-native-footer-configurable-metrics/plugins/touchbar\nnpm error workspace bb-plugin-touchbar@0.1.0\nnpm error location /home/dyaus/.bb/worktrees/host-monitor-native-footer-configurable-metrics/plugins/touchbar\nnpm error command failed\nnpm error command sh -c env -u BB_CLI bb plugin types --check .\nnpm error Lifecycle script `check` failed with error:\nnpm error code 1\nnpm error path /home/dyaus/.bb/worktrees/host-monitor-native-footer-configurable-metrics/plugins/touchbar\nnpm error workspace bb-plugin-touchbar@0.1.0\nnpm error location /home/dyaus/.bb/worktrees/host-monitor-native-footer-configurable-metrics/plugins/touchbar\nnpm error command failed\nnpm error command sh -c npm run types:check && npm run typecheck && npm test && npm run build\n\nSet \"@get-bb/plugin-sdk\" to 0.4.41 in devDependencies and re-run npm install (`bb plugin types` does it for you).\nSet \"@pierre/diffs\" to ^1.2.9 in devDependencies — the version this bb shims at runtime (`bb plugin types` does it for you).\nSet \"@radix-ui/react-alert-dialog\" to ^1.1.19 in devDependencies — the version this bb shims at runtime (`bb plugin types` does it for you).\nSet \"@radix-ui/react-context-menu\" to ^2.3.3 in devDependencies — the version this bb shims at runtime (`bb plugin types` does it for you).\nSet \"@radix-ui/react-dialog\" to ^1.1.19 in devDependencies — the version this bb shims at runtime (`bb plugin types` does it for you).\nSet \"@radix-ui/react-dropdown-menu\" to ^2.1.20 in devDependencies — the version this bb shims at runtime (`bb plugin types` does it for you).\nSet \"@radix-ui/react-hover-card\" to ^1.1.19 in devDependencies — the version this bb shims at runtime (`bb plugin types` does it for you).\nSet \"@radix-ui/react-menubar\" to ^1.1.20 in devDependencies — the version this bb shims at runtime (`bb plugin types` does it for you).\nSet \"@radix-ui/react-navigation-menu\" to ^1.2.18 in devDependencies — the version this bb shims at runtime (`bb plugin types` does it for you).\nSet \"@radix-ui/react-popover\" to ^1.1.19 in devDependencies — the version this bb shims at runtime (`bb plugin types` does it for you).\nSet \"@radix-ui/react-select\" to ^2.3.3 in devDependencies — the version this bb shims at runtime (`bb plugin types` does it for you).\nSet \"@radix-ui/react-tooltip\" to ^1.2.12 in devDependencies — the version this bb shims at runtime (`bb plugin types` does it for you).\nSet \"class-variance-authority\" to ^0.7.1 in devDependencies — the version this bb shims at runtime (`bb plugin types` does it for you).\nSet \"clsx\" to ^2.1.1 in devDependencies — the version this bb shims at runtime (`bb plugin types` does it for you).\nSet \"sonner\" to ^1.7.4 in devDependencies — the version this bb shims at runtime (`bb plugin types` does it for you).\nSet \"tailwind-merge\" to ^3.4.0 in devDependencies — the version this bb shims at runtime (`bb plugin types` does it for you).\nSet \"vaul\" to ^1.1.2 in devDependencies — the version this bb shims at runtime (`bb plugin types` does it for you).\nnpm error Lifecycle script `types:check` failed with error:\nnpm error code 1\nnpm error path /home/dyaus/.bb/worktrees/host-monitor-native-footer-configurable-metrics/plugins/usage-tracker\nnpm error workspace bb-plugin-usage-tracker@0.1.5\nnpm error location /home/dyaus/.bb/worktrees/host-monitor-native-footer-configurable-metrics/plugins/usage-tracker\nnpm error command failed\nnpm error command sh -c env -u BB_CLI bb plugin types --check .\nnpm error Lifecycle script `check` failed with error:\nnpm error code 1\nnpm error path /home/dyaus/.bb/worktrees/host-monitor-native-footer-configurable-metrics/plugins/usage-tracker\nnpm error workspace bb-plugin-usage-tracker@0.1.5\nnpm error location /home/dyaus/.bb/worktrees/host-monitor-native-footer-configurable-metrics/plugins/usage-tracker\nnpm error command failed\nnpm error command sh -c npm run types:check && npm run typecheck && npm test && npm run build\nerror: script \"ci\" exited with code 1\n",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:49c53573922276069530dedc79c7370706847c77a2a012792ccab95f2cd2812e",
+      "sourceTreeAfter": "sha256:49c53573922276069530dedc79c7370706847c77a2a012792ccab95f2cd2812e",
+      "artifacts": []
+    }
+  ],
+  "anomalies": [
+    "outcome-failed"
+  ]
+}
