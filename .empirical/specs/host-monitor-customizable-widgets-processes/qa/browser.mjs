@@ -23,6 +23,7 @@ const monitorPath = join(outputDir, "dashboard-wide.png");
 const modalPath = join(outputDir, "mini-modal-desktop.png");
 const processPath = join(outputDir, "process-widget-wide.png");
 const processDialogPath = join(outputDir, "process-confirmation.png");
+const processCollapsedPath = join(outputDir, "process-collapsed.png");
 const comboPath = join(outputDir, "history-combobox.png");
 const dashboardDragPath = join(outputDir, "dashboard-drag.png");
 
@@ -195,6 +196,18 @@ try {
   await waitFor("document.querySelector('.host-monitor__process-widget .host-monitor__process-table tbody tr') !== null || document.querySelector('.host-monitor__process-widget .host-monitor__widget-state') !== null", 20000);
   await evaluate("document.querySelector('.host-monitor__process-widget')?.scrollIntoView({ block: 'start' })");
   await screenshot(processPath);
+  await evaluate(`Array.from(document.querySelectorAll('.host-monitor__process-widget button')).find((button) => button.textContent?.includes('Collapse'))?.click()`);
+  await waitFor("document.querySelector('.host-monitor__process-widget')?.dataset.expanded === 'false'");
+  const collapsedProcesses = await evaluate(`({
+    summaries: document.querySelectorAll('.host-monitor__process-summary > div').length,
+    table: document.querySelector('.host-monitor__process-table') !== null,
+    paused: Array.from(document.querySelectorAll('.host-monitor__process-widget .bb-badge')).some((badge) => badge.textContent?.trim() === 'Paused'),
+    toggleExpanded: Array.from(document.querySelectorAll('.host-monitor__process-widget button')).find((button) => button.textContent?.includes('Expand'))?.getAttribute('aria-expanded')
+  })`);
+  if (collapsedProcesses.summaries !== 5 || collapsedProcesses.table || !collapsedProcesses.paused || collapsedProcesses.toggleExpanded !== 'false') throw new Error(`Invalid collapsed process panel: ${JSON.stringify(collapsedProcesses)}`);
+  await screenshot(processCollapsedPath);
+  await evaluate(`Array.from(document.querySelectorAll('.host-monitor__process-widget button')).find((button) => button.textContent?.includes('Expand'))?.click()`);
+  await waitFor("document.querySelector('.host-monitor__process-widget')?.dataset.expanded === 'true' && document.querySelector('.host-monitor__process-table') !== null");
   const processSummary = await evaluate(`({
     rows: document.querySelectorAll('.host-monitor__process-table tbody tr').length,
     actionable: Array.from(document.querySelectorAll('.host-monitor__process-widget button')).filter((button) => button.textContent?.trim() === 'Terminate' || button.textContent?.trim() === 'Force terminate').length,
@@ -341,7 +354,7 @@ try {
   if (narrow.overflow || narrow.rows < 10 || narrow.hostStripOverflow !== 'auto' || narrow.processTableDisplay !== 'none' || narrow.processListDisplay !== 'grid' || narrow.rangeRight > narrow.viewport[0] || narrow.rangeWidth < 96) throw new Error(`Invalid narrow layout: ${JSON.stringify(narrow)}`);
   await screenshot(narrowPath);
 
-  console.log(JSON.stringify({ modal: modalSummary, navigation: navigationState, combobox: { ...comboboxSummary, options: comboOptions, keyboardFocusRestored: true, narrowBounds: narrowCombo }, initial, widgets: { original: originalWidgets.length, persisted: persistedWidgets.length, changedKey, gridDragKey }, processes: processSummary, switchedTo: targetName, narrow, artifacts: [sidebarPath, modalPath, monitorPath, comboPath, dashboardDragPath, processPath, processDialogPath, desktopPath, narrowPath] }));
+  console.log(JSON.stringify({ modal: modalSummary, navigation: navigationState, combobox: { ...comboboxSummary, options: comboOptions, keyboardFocusRestored: true, narrowBounds: narrowCombo }, initial, widgets: { original: originalWidgets.length, persisted: persistedWidgets.length, changedKey, gridDragKey }, processes: { ...processSummary, collapsed: collapsedProcesses }, switchedTo: targetName, narrow, artifacts: [sidebarPath, modalPath, monitorPath, comboPath, dashboardDragPath, processPath, processCollapsedPath, processDialogPath, desktopPath, narrowPath] }));
   socket.close();
 } finally {
   browser.kill("SIGTERM");

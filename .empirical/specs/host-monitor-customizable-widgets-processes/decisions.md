@@ -209,3 +209,35 @@ remains for scanning, and HTML drag behavior still depends on the browser.
 
 Pure insertion-index tests, focused UI contract tests, and browser evidence of
 dragging-state, insertion-line, drop, save, and reload behavior.
+
+## D-008: Collapse processes without discarding the last sample
+
+Status: Accepted
+
+### Evidence
+
+- User feedback requested a cleaner, toggleable Processes section.
+- Process polling is useful only while detailed rows are visible.
+
+### Options
+
+1. Hide the widget only through dashboard customization.
+2. Collapse the UI but keep polling in the background.
+3. Add an inline expand/collapse control, retain the last summary, and pause
+   polling while collapsed.
+
+### Chosen approach
+
+Choose option 3. Default expanded, show a five-value summary in both states,
+and keep the existing Customize visibility control for fully hiding the widget.
+
+### Trade-offs and risks
+
+Collapsed data is explicitly labelled Paused and can become old until expanded.
+The last sample remains useful without spending a host process call every ten
+seconds.
+
+### Verification
+
+Focused source/state coverage plus browser evidence for collapse, summary,
+paused label, absent detail table, expand, and resumed detail rendering.

@@ -1137,6 +1137,10 @@
   padding: 10px;
 }
 
+.host-monitor__process-widget[data-expanded="false"] {
+  padding-bottom: 9px;
+}
+
 .host-monitor__system-widget > header,
 .host-monitor__widget-header {
   justify-content: space-between;
@@ -1149,6 +1153,47 @@
   margin: 0;
   font-size: 12px;
   font-weight: 680;
+}
+
+.host-monitor__process-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.host-monitor__process-summary {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  margin: 0 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--border);
+}
+
+.host-monitor__process-summary > div {
+  min-width: 0;
+  padding: 8px 9px;
+  background: color-mix(in srgb, var(--card) 96%, var(--muted) 4%);
+}
+
+.host-monitor__process-summary dt {
+  color: var(--muted-foreground);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.host-monitor__process-summary dd {
+  margin-top: 4px;
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: 11px;
+  font-weight: 620;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .host-monitor__system-widget > header > div,
@@ -1354,10 +1399,10 @@
   align-items: end;
   gap: 8px;
   margin-bottom: 8px;
-  padding: 7px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--card);
+  padding: 7px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: transparent;
 }
 
 .host-monitor__process-toolbar > label {
@@ -1380,7 +1425,7 @@
 }
 
 .host-monitor__process-table-wrap {
-  max-height: 360px;
+  max-height: 340px;
   overflow: auto;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -1421,6 +1466,10 @@
 
 .host-monitor__process-table tr:last-child td {
   border-bottom: 0;
+}
+
+.host-monitor__process-table tbody tr:hover td {
+  background: var(--state-hover, color-mix(in srgb, var(--muted) 38%, transparent));
 }
 
 .host-monitor__process-table td:nth-child(2),
@@ -1469,15 +1518,31 @@
   margin-top: 2px;
 }
 
+.host-monitor__process-protection {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.host-monitor__process-protection > small {
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .host-monitor__process-list {
   display: none;
 }
 
 .host-monitor__widget-status {
   margin: 7px 0 0 !important;
-  padding: 6px 8px;
-  border-radius: 5px;
-  background: var(--muted);
+  padding: 6px 2px 0;
+  border-top: 1px solid var(--border);
+  background: transparent;
   color: var(--muted-foreground);
   font-size: 9px;
   line-height: 1.35;
@@ -1676,6 +1741,14 @@
   .host-monitor__process-toolbar {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .host-monitor__process-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .host-monitor__process-summary > div:last-child {
+    grid-column: 1 / -1;
   }
 
   .host-monitor__process-toolbar fieldset {

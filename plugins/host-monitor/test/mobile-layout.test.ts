@@ -87,6 +87,17 @@ test("process widget is selected-host scoped and uses explicit confirmation", ()
   assert.doesNotMatch(app, /const generation = \+\+requestGeneration/u);
 });
 
+test("process section toggles compactly and pauses polling while collapsed", () => {
+  assert.match(app, /const \[expanded, setExpanded\] = useState\(true\)/u);
+  assert.match(app, /data-expanded=\{expanded\}/u);
+  assert.match(app, /aria-expanded=\{expanded\}/u);
+  assert.match(app, /expanded \? "Collapse" : "Expand"/u);
+  assert.match(app, /if \(!expanded \|\| machine\.host\.status !== "connected"\) return/u);
+  assert.match(app, /!expanded \? \(\s*<ProcessSummaryStrip/su);
+  assert.match(styles, /\.host-monitor__process-summary\s*\{[^}]*grid-template-columns:\s*repeat\(5,/su);
+  assert.match(styles, /\.host-monitor__process-protection/u);
+});
+
 test("process polling cannot invalidate a pending destructive action", () => {
   const listStart = app.indexOf("const loadProcesses = useCallback");
   const listEnd = app.indexOf("useEffect(() =>", listStart);
