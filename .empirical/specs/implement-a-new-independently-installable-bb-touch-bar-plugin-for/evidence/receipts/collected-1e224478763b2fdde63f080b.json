@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-1e224478763b2fdde63f080b",
+  "criteria": [
+    "AC-4",
+    "AC-5",
+    "AC-7",
+    "AC-8"
+  ],
+  "evidenceKinds": [
+    "human",
+    "test"
+  ],
+  "summary": "Final Mac evidence records the Touch Bar-aware standard button, direct-touch gesture fallback, 0.32-second entrance fade, Homebrew touchfix.3 installation, restored production connection, and the user's physical confirmation that the alert tap works.",
+  "passed": true,
+  "startedAt": "2026-09-04T15:48:13.458Z",
+  "completedAt": "2026-09-04T15:48:13.458Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "implement-a-new-independently-installable-bb-touch-bar-plugin-for",
+    "specRevision": 2,
+    "specDigest": "sha256:2cb81eb836af98d280d0660ae933e1f9672f2d1932631e43bef9d4f04b55ef08",
+    "treeDigest": "sha256:e67c74931f5caedc420afc8a6b3fb3e70b9e3da2976496907f10ba216a226f2b",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf"
+  },
+  "digest": "sha256:c9950c3473b119fc5fba3328f542e7ab60b8806dad857d3ed5053bd721c331ea",
+  "kind": "collected",
+  "collector": "codex-remote-mac-verification",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/implement-a-new-independently-installable-bb-touch-bar-plugin-for/artifacts/mac-unread-alert-verification.txt",
+      "mediaType": "text/plain",
+      "bytes": 1654,
+      "digest": "sha256:a5929716833bb7a3a6561fe610a49d96deb2339ded01aad933e65323b8b3a4a3"
+    }
+  ]
+}

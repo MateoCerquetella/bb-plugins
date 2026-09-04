@@ -3,9 +3,10 @@ Observed: 2026-09-04
 
 Native build and installation:
 - Swift/AppKit compilation completed successfully with warnings treated as errors.
-- package version: 0.1.0-unreadalert.1
-- package SHA-256: bd8484ecb0265f2fef6355907549e329dff0f160fbf60cef87785414fb242691
-- Homebrew upgraded the private local-tap Cask from 0.1.0-wakefix.1.
+- final package version: 0.1.0-touchfix.3
+- final package SHA-256: 8801ba1d4c22ce24085fa935db05f02093614329874d0aab72527090d22b0671
+- Homebrew upgraded the private local-tap Cask through the unread-alert and
+  touch-fix revisions.
 - Gatekeeper quarantine was removed only from /Applications/BB Touch Bar.app.
 - The running executable is /Applications/BB Touch Bar.app/Contents/MacOS/BBTouchBar.
 - A real bb touchbar snapshot succeeds after installation.
@@ -13,6 +14,10 @@ Native build and installation:
 Unread transition exercise:
 - The app was restarted against a controlled one-thread unread snapshot.
 - The installed app logged: presented unread completion alert for 1 agent(s)
+- The user physically tapped the final alert and confirmed that touch works.
+- The final alert hosts an AppKit convenience-initialized NSButton and a direct
+  Touch Bar gesture recognizer fallback.
+- The alert fades in for 0.32 seconds before starting its orange pulse.
 - The fixture was then removed.
 - The bb-path configuration was restored to /usr/local/bin/bb.
 - The installed app was restarted against the real BB server and remains running.

@@ -688,28 +688,50 @@ private final class CompactNativeButton: NSButton {
     }
 }
 
-private final class UnreadAlertButton: NSButton {
+private final class UnreadAlertView: NSView {
+    private let button = NSButton(title: "", target: nil, action: nil)
+    private var directTapRecognizer: NSClickGestureRecognizer?
     private var bright = true
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
-        isBordered = false
-        refusesFirstResponder = true
         wantsLayer = true
+        button.isBordered = false
+        button.refusesFirstResponder = true
+        addSubview(button)
     }
 
     required init?(coder: NSCoder) { fatalError("init(coder:) is unsupported") }
     override var intrinsicContentSize: NSSize { NSSize(width: 1_000, height: 30) }
 
+    override func layout() {
+        super.layout()
+        button.frame = bounds
+    }
+
+    func configure(target: AnyObject, action: Selector) {
+        button.target = target
+        button.action = action
+        allowedTouchTypes = [.direct]
+        let recognizer = NSClickGestureRecognizer(target: target, action: action)
+        recognizer.allowedTouchTypes = [.direct]
+        addGestureRecognizer(recognizer)
+        directTapRecognizer = recognizer
+    }
+
     func update(count: Int) {
-        title = count == 1
+        let title = count == 1
             ? "✓ AGENT FINISHED — TAP TO VIEW"
             : "✓ \(count) AGENTS FINISHED — TAP TO VIEW"
-        setAccessibilityLabel(
-            count == 1
-                ? "One agent finished with unread results. Tap to view."
-                : "\(count) agents finished with unread results. Tap to view."
-        )
+        button.attributedTitle = NSAttributedString(string: title, attributes: [
+            .font: NSFont.monospacedSystemFont(ofSize: 13, weight: .heavy),
+            .foregroundColor: NSColor.white,
+        ])
+        let accessibilityLabel = count == 1
+            ? "One agent finished with unread results. Tap to view."
+            : "\(count) agents finished with unread results. Tap to view."
+        button.setAccessibilityLabel(accessibilityLabel)
+        setAccessibilityLabel(accessibilityLabel)
         needsDisplay = true
     }
 
@@ -718,34 +740,12 @@ private final class UnreadAlertButton: NSButton {
         needsDisplay = true
     }
 
-    override func hitTest(_ point: NSPoint) -> NSView? {
-        bounds.contains(point) ? self : nil
-    }
-
-    override func mouseDown(with event: NSEvent) {
-        guard isEnabled, let action else { return }
-        NSApp.sendAction(action, to: target, from: self)
-    }
-
     override func draw(_ dirtyRect: NSRect) {
         let orange = bright
             ? NSColor(calibratedRed: 1, green: 0.48, blue: 0.02, alpha: 1)
             : NSColor(calibratedRed: 0.58, green: 0.22, blue: 0.01, alpha: 1)
         orange.setFill()
         NSBezierPath(roundedRect: bounds, xRadius: 6, yRadius: 6).fill()
-        let attributes: [NSAttributedString.Key: Any] = [
-            .font: NSFont.monospacedSystemFont(ofSize: 13, weight: .heavy),
-            .foregroundColor: NSColor.white,
-        ]
-        let string = title as NSString
-        let size = string.size(withAttributes: attributes)
-        string.draw(
-            at: NSPoint(
-                x: max(8, floor((bounds.width - size.width) / 2)),
-                y: floor((bounds.height - size.height) / 2)
-            ),
-            withAttributes: attributes
-        )
     }
 }
 
@@ -1040,7 +1040,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
     private let claudeToggleButton = SettingsControlButton(title: "", width: 25)
     private let cursorToggleButton = SettingsControlButton(title: "", width: 25)
     private let closeButton = CompactNativeButton(title: "✕", width: 34)
-    private let unreadAlertButton = UnreadAlertButton(frame: .zero)
+    private let unreadAlertView = UnreadAlertView(frame: .zero)
     private var panelTouchBar: NSTouchBar?
     private weak var panelScrollView: TouchBarScrollView?
     private var panelVisible = false
@@ -1238,8 +1238,10 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         closeButton.action = #selector(closeTapped(_:))
         closeButton.bezelColor = NSColor(white: 0.18, alpha: 1)
         closeButton.setAccessibilityLabel("Quit BB Touch Bar")
-        unreadAlertButton.target = self
-        unreadAlertButton.action = #selector(unreadAlertTapped(_:))
+        unreadAlertView.configure(
+            target: self,
+            action: #selector(unreadAlertTapped(_:))
+        )
 
         settingsItem.view = settingsButton
         previousProjectItem.view = previousProjectButton
@@ -1247,7 +1249,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         usageItem.view = usageIconsView
         hostMonitorItem.view = hostMonitorButton
         closeItem.view = closeButton
-        unreadAlertItem.view = unreadAlertButton
+        unreadAlertItem.view = unreadAlertView
         updateControlColors()
     }
 
@@ -1351,7 +1353,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         } else if unreadAlertVisible, unreadIds.isEmpty {
             dismissUnreadAlert(showThreads: false)
         } else if unreadAlertVisible {
-            unreadAlertButton.update(count: unreadIds.count)
+            unreadAlertView.update(count: unreadIds.count)
         }
     }
 
@@ -1361,23 +1363,45 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         guard let bar = panelTouchBar else { return }
         if !unreadAlertVisible { unreadAlertOpenedPanel = !wasPanelVisible }
         unreadAlertVisible = true
-        unreadAlertButton.update(count: count)
+        unreadAlertView.update(count: count)
         bar.defaultItemIdentifiers = [.bbUnreadAlert]
-        startUnreadFlash()
+        beginUnreadAlertTransition()
         NativeLog.info("presented unread completion alert for \(count) agent(s)")
+    }
+
+    private func beginUnreadAlertTransition() {
+        stopUnreadFlash()
+        unreadAlertView.setPulse(bright: false)
+        guard !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion else {
+            unreadAlertView.alphaValue = 1
+            unreadAlertView.setPulse(bright: true)
+            return
+        }
+        unreadAlertView.alphaValue = 0
+        DispatchQueue.main.async { [weak self] in
+            guard let self, self.unreadAlertVisible else { return }
+            NSAnimationContext.runAnimationGroup { context in
+                context.duration = 0.32
+                context.allowsImplicitAnimation = true
+                self.unreadAlertView.animator().alphaValue = 1
+            } completionHandler: { [weak self] in
+                guard let self, self.unreadAlertVisible else { return }
+                self.startUnreadFlash()
+            }
+        }
     }
 
     private func startUnreadFlash() {
         stopUnreadFlash()
         unreadFlashBright = true
-        unreadAlertButton.setPulse(bright: true)
+        unreadAlertView.setPulse(bright: true)
         guard !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion else {
             return
         }
         let timer = Timer(timeInterval: 0.55, repeats: true) { [weak self] _ in
             guard let self else { return }
             self.unreadFlashBright.toggle()
-            self.unreadAlertButton.setPulse(bright: self.unreadFlashBright)
+            self.unreadAlertView.setPulse(bright: self.unreadFlashBright)
         }
         RunLoop.main.add(timer, forMode: .common)
         unreadFlashTimer = timer
@@ -1387,7 +1411,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         unreadFlashTimer?.invalidate()
         unreadFlashTimer = nil
         unreadFlashBright = true
-        unreadAlertButton.setPulse(bright: true)
+        unreadAlertView.setPulse(bright: true)
     }
 
     private func dismissUnreadAlert(showThreads: Bool) {
@@ -1527,9 +1551,15 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         NSApp.terminate(nil)
     }
 
-    @objc private func unreadAlertTapped(_ sender: NSButton) {
+    @objc private func unreadAlertTapped(_ sender: Any) {
+        guard unreadAlertVisible else { return }
+        NativeLog.info("unread alert touch dispatched")
         NativeLog.info("unread completion alert acknowledged")
+        let firstUnread = organized(store.snapshot.agents).first {
+            $0.status == .done
+        }
         dismissUnreadAlert(showThreads: true)
+        if let firstUnread { AgentStore.focus(firstUnread) }
     }
 
     @objc private func settingsTapped(_ sender: NSButton) {

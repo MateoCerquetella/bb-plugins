@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sequence": 27,
+  "previousDigest": "sha256:5e97b1f756c9186006dc295fb9b8ea31eec31e7411551a252256630fc669a8f5",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Touch Bar native interaction and animation are verified: user physically confirmed tap, touchfix.3 compiles and runs on the Intel Mac, production configuration is restored, and full workspace checks pass. The legacy aggregate Empirical matrix cannot close because all three unrelated configured end-to-end fixtures fail independently (Action Topbar missing packed app.js, Save Model runtime shape drift, Taskboard preview timeout).",
+  "createdAt": "2026-09-04T15:56:45.313Z",
+  "stateBeforeDigest": "sha256:9ef9a2553efceb5c6be8dea1719974b50191d67862c3a4446fcf58eb6458af17",
+  "stateAfterDigest": "sha256:0d4879915930b23e44b4805ba2100bfdb08192d22ceaa40069d8f617f6d726e3",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 27,
+    "activeFeature": "implement-a-new-independently-installable-bb-touch-bar-plugin-for",
+    "request": "Implement a new independently installable BB Touch Bar plugin for Intel MacBook Pro Touch Bar machines, plus a BetterTouchTool companion/preset that can remain visible across all apps. The BB plugin should expose live compact thread/agent status and safe actions, integrate with BB host/server APIs, include clear setup documentation, tests, and repository catalog updates. Target an MVP that is usable without private macOS APIs, with BetterTouchTool as the persistence layer.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "verify",
+    "status": "awaiting_human",
+    "repairAttempts": 3,
+    "message": "Touch Bar native interaction and animation are verified: user physically confirmed tap, touchfix.3 compiles and runs on the Intel Mac, production configuration is restored, and full workspace checks pass. The legacy aggregate Empirical matrix cannot close because all three unrelated configured end-to-end fixtures fail independently (Action Topbar missing packed app.js, Save Model runtime shape drift, Taskboard preview timeout).",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:2cb81eb836af98d280d0660ae933e1f9672f2d1932631e43bef9d4f04b55ef08",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:2d251c63e1f2227d81443dd718e85b841fde132f94fd5c4dd03547b021236868",
+    "impactDigest": "sha256:5178c9dbca346cb25eddd79dfb6d3635dbd55440808ce4a1c8e9fdfdc7bf30fd",
+    "capabilityClaimId": "implement-a-new-independently-installable-bb-touch-bar-plugin-for-21366fe98a02",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-04T15:56:45.313Z"
+  },
+  "digest": "sha256:70cb6bf626815950480a40a587609678373fb8aa7a99288892f0dabfa0c8dacd"
+}

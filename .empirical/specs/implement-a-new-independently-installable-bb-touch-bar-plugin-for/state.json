@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 25,
+  "revision": 27,
   "activeFeature": "implement-a-new-independently-installable-bb-touch-bar-plugin-for",
   "request": "Implement a new independently installable BB Touch Bar plugin for Intel MacBook Pro Touch Bar machines, plus a BetterTouchTool companion/preset that can remain visible across all apps. The BB plugin should expose live compact thread/agent status and safe actions, integrate with BB host/server APIs, include clear setup documentation, tests, and repository catalog updates. Target an MVP that is usable without private macOS APIs, with BetterTouchTool as the persistence layer.",
   "profile": "complex",
@@ -9,7 +9,7 @@
   "phase": "verify",
   "status": "awaiting_human",
   "repairAttempts": 3,
-  "message": "Implemented a full-width orange unread completion alert that presents once per unread transition, pulses every 0.55 seconds, respects Reduce Motion, opens the normal thread panel on tap, and dismisses when unread clears. Full workspace check passes; native Swift compilation and Homebrew upgrade passed on the Intel Mac; a controlled unread snapshot exercised the installed alert path and production BB configuration was restored. Awaiting the user's visual confirmation of the physical Touch Bar appearance.",
+  "message": "Touch Bar native interaction and animation are verified: user physically confirmed tap, touchfix.3 compiles and runs on the Intel Mac, production configuration is restored, and full workspace checks pass. The legacy aggregate Empirical matrix cannot close because all three unrelated configured end-to-end fixtures fail independently (Action Topbar missing packed app.js, Save Model runtime shape drift, Taskboard preview timeout).",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:2cb81eb836af98d280d0660ae933e1f9672f2d1932631e43bef9d4f04b55ef08",
@@ -36,5 +36,5 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-04T15:16:48.950Z"
+  "updatedAt": "2026-09-04T15:56:45.313Z"
 }

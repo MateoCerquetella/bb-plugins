@@ -180,7 +180,8 @@ test("native app owns the Control Strip and fullscreen panel without physical st
     /@objc private func closeTapped[\s\S]*?NSApp\.terminate\(nil\)/u,
   );
   assert.match(controller, /static let bbUnreadAlert/u);
-  assert.match(controller, /private final class UnreadAlertButton: NSButton/u);
+  assert.match(controller, /private final class UnreadAlertView: NSView/u);
+  assert.match(controller, /private let button = NSButton\(title: "", target: nil, action: nil\)/u);
   assert.match(controller, /NSSize\(width: 1_000, height: 30\)/u);
   assert.match(controller, /0\.48, blue: 0\.02/u);
   assert.match(controller, /AGENT FINISHED — TAP TO VIEW/u);
@@ -189,7 +190,17 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(controller, /bar\.defaultItemIdentifiers = \[\.bbUnreadAlert\]/u);
   assert.match(controller, /Timer\(timeInterval: 0\.55, repeats: true\)/u);
   assert.match(controller, /accessibilityDisplayShouldReduceMotion/u);
+  assert.match(controller, /unread alert touch dispatched/u);
+  assert.match(controller, /unreadAlertView\.configure/u);
+  assert.match(controller, /#selector\(unreadAlertTapped\(_:\)\)/u);
+  assert.match(controller, /NSClickGestureRecognizer\(target: target, action: action\)/u);
+  assert.match(controller, /recognizer\.allowedTouchTypes = \[\.direct\]/u);
+  assert.match(controller, /guard unreadAlertVisible else \{ return \}/u);
+  assert.match(controller, /func beginUnreadAlertTransition/u);
+  assert.match(controller, /context\.duration = 0\.32/u);
+  assert.match(controller, /unreadAlertView\.animator\(\)\.alphaValue = 1/u);
   assert.match(controller, /dismissUnreadAlert\(showThreads: true\)/u);
+  assert.match(controller, /AgentStore\.focus\(firstUnread\)/u);
   assert.match(controller, /case \.bbUnreadAlert: return unreadAlertItem/u);
   assert.match(controller, /projectInitials/u);
   assert.match(controller, /provider == "cursor" \|\| provider == "acp-cursor"/u);

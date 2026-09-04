@@ -157,6 +157,9 @@ completion alert and pulses it until you tap it or the unread state clears. The
 same unread thread is announced only once per unread transition, so the two-second
 snapshot refresh does not repeatedly reopen the alert. With Reduce Motion enabled
 in macOS accessibility settings, the alert stays solid orange instead of flashing.
+The orange alert fades in before pulsing instead of appearing abruptly. Tapping
+anywhere on it acknowledges the alert, reveals the finished cards, and opens the
+first unread thread in BB.
 
 ## Controls
 
