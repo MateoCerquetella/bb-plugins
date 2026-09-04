@@ -202,7 +202,7 @@ try {
   const collapsedProcesses = await evaluate(`({
     summaries: document.querySelectorAll('.host-monitor__process-summary > div').length,
     table: document.querySelector('.host-monitor__process-table') !== null,
-    paused: Array.from(document.querySelectorAll('.host-monitor__process-widget .bb-badge')).some((badge) => badge.textContent?.trim() === 'Paused'),
+    paused: document.querySelector('.host-monitor__process-state')?.textContent?.trim() === 'Paused' && document.querySelector('.host-monitor__process-state')?.dataset.state === 'neutral',
     toggleExpanded: Array.from(document.querySelectorAll('.host-monitor__process-widget button')).find((button) => button.textContent?.includes('Expand'))?.getAttribute('aria-expanded')
   })`);
   if (collapsedProcesses.summaries !== 5 || collapsedProcesses.table || !collapsedProcesses.paused || collapsedProcesses.toggleExpanded !== 'false') throw new Error(`Invalid collapsed process panel: ${JSON.stringify(collapsedProcesses)}`);

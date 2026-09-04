@@ -1010,7 +1010,12 @@ function ProcessesWidget({ machine }: { machine: MachineRow }) {
       <output aria-live="polite" className="host-monitor__sr-only">{status}</output>
       <header className="host-monitor__widget-header">
         <div>
-          <div className="host-monitor__process-title"><h3>Processes</h3><Badge tone={panelState.tone}>{panelState.label}</Badge></div>
+          <div className="host-monitor__process-title">
+            <h3>Processes</h3>
+            <span className="host-monitor__process-state" data-state={panelState.tone}>
+              <span aria-hidden="true" />{panelState.label}
+            </span>
+          </div>
           <p>{ok == null ? "Resource usage and protected actions" : `${ok.totalCount} reported · sampled ${relativeTime(ok.sampledAtMs)}`}</p>
         </div>
         <div className="host-monitor__widget-actions">

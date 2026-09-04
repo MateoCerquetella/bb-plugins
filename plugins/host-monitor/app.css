@@ -1161,33 +1161,67 @@
   gap: 7px;
 }
 
+.host-monitor__process-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--muted-foreground);
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.host-monitor__process-state > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted-foreground);
+}
+
+.host-monitor__process-state[data-state="success"] {
+  color: var(--success);
+}
+
+.host-monitor__process-state[data-state="success"] > span {
+  background: var(--success);
+}
+
+.host-monitor__process-state[data-state="warning"] {
+  color: var(--warning);
+}
+
+.host-monitor__process-state[data-state="warning"] > span {
+  background: var(--warning);
+}
+
 .host-monitor__process-summary {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 1px;
-  overflow: hidden;
-  margin: 0 0 8px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 16px;
+  margin: 0;
+  padding: 0 0 8px;
+  border-bottom: 1px solid var(--border);
 }
 
 .host-monitor__process-summary > div {
+  display: inline-flex;
   min-width: 0;
-  padding: 8px 9px;
-  background: color-mix(in srgb, var(--card) 96%, var(--muted) 4%);
+  align-items: baseline;
+  gap: 5px;
+  padding: 0;
+  background: transparent;
 }
 
 .host-monitor__process-summary dt {
   color: var(--muted-foreground);
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .host-monitor__process-summary dd {
-  margin-top: 4px;
+  margin: 0;
   overflow: hidden;
   color: var(--foreground);
   font-size: 11px;
@@ -1400,7 +1434,6 @@
   gap: 8px;
   margin-bottom: 8px;
   padding: 7px 0;
-  border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   background: transparent;
 }
@@ -1427,8 +1460,9 @@
 .host-monitor__process-table-wrap {
   max-height: 340px;
   overflow: auto;
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
 }
 
 .host-monitor__process-table {
@@ -1744,11 +1778,9 @@
   }
 
   .host-monitor__process-summary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .host-monitor__process-summary > div:last-child {
-    grid-column: 1 / -1;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
   }
 
   .host-monitor__process-toolbar fieldset {

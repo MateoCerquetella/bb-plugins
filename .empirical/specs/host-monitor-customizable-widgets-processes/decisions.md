@@ -241,3 +241,33 @@ seconds.
 
 Focused source/state coverage plus browser evidence for collapse, summary,
 paused label, absent detail table, expand, and resumed detail rendering.
+
+## D-009: Keep Processes as one flat surface
+
+Status: Accepted
+
+### Evidence
+
+- User feedback rejected nested summary/table cards inside the Processes panel.
+
+### Options
+
+1. Keep the five summary tiles and bordered table container.
+2. Remove all summary information.
+3. Flatten summary values into one metadata rail, use a text-and-dot state, and
+   render controls/table rows directly on the outer panel surface.
+
+### Chosen approach
+
+Choose option 3. Controls may retain normal button/input boundaries, but content
+regions do not create additional card containers.
+
+### Trade-offs and risks
+
+The section has less visual nesting and reads faster. Inline summary values wrap
+instead of preserving equal tile widths at smaller viewports.
+
+### Verification
+
+Browser screenshots for expanded/collapsed states and focused CSS assertions for
+flat summary/table containers.

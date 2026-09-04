@@ -102,7 +102,10 @@ test("process section toggles compactly and pauses polling while collapsed", () 
   assert.match(app, /Protected shown/u);
   assert.match(app, /data-refresh-count=\{refreshCount\}/u);
   assert.match(app, /const processFooterMessage = !expanded/u);
-  assert.match(styles, /\.host-monitor__process-summary\s*\{[^}]*grid-template-columns:\s*repeat\(5,/su);
+  assert.match(styles, /\.host-monitor__process-summary\s*\{[^}]*display:\s*flex/su);
+  assert.match(styles, /\.host-monitor__process-summary\s*>\s*div\s*\{[^}]*background:\s*transparent/su);
+  assert.match(styles, /\.host-monitor__process-table-wrap\s*\{[^}]*border:\s*0/su);
+  assert.match(styles, /\.host-monitor__process-state\[data-state="success"\]/u);
   assert.match(styles, /\.host-monitor__process-protection/u);
 });
 
