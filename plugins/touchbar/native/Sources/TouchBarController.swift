@@ -1084,7 +1084,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         for name in [NSWorkspace.didWakeNotification,
                      NSWorkspace.screensDidWakeNotification,
                      NSWorkspace.sessionDidBecomeActiveNotification] {
-            center.addObserver(self, selector: #selector(assertStripPresence), name: name, object: nil)
+            center.addObserver(self, selector: #selector(recoverAfterWake), name: name, object: nil)
         }
         installSignalHandlers()
         store.onChange = { [weak self] snapshot in self?.apply(snapshot) }
@@ -1168,7 +1168,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         closeButton.target = self
         closeButton.action = #selector(closeTapped(_:))
         closeButton.bezelColor = NSColor(white: 0.18, alpha: 1)
-        closeButton.setAccessibilityLabel("Close BB agent panel")
+        closeButton.setAccessibilityLabel("Quit BB Touch Bar")
 
         settingsItem.view = settingsButton
         previousProjectItem.view = previousProjectButton
@@ -1228,6 +1228,11 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
 
     @objc private func assertStripPresence() {
         DFRElementSetControlStripPresenceForIdentifier(.bbStrip, true)
+    }
+
+    @objc private func recoverAfterWake() {
+        assertStripPresence()
+        store.refreshAfterWake()
     }
 
     private func installSignalHandlers() {
@@ -1371,8 +1376,8 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     @objc private func closeTapped(_ sender: NSButton) {
-        NativeLog.info("close control tapped")
-        closePanel()
+        NativeLog.info("close control tapped; quitting app")
+        NSApp.terminate(nil)
     }
 
     @objc private func settingsTapped(_ sender: NSButton) {

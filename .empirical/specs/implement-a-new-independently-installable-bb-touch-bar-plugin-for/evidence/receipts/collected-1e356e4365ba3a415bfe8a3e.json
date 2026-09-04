@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-1e356e4365ba3a415bfe8a3e",
+  "criteria": [
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Mac-side evidence records successful Intel native compilation, signed package creation, checksum-pinned Homebrew Cask installation, running /Applications executable, LaunchAgent ownership, background snapshot connectivity, and recoverable migration of the unmanaged app.",
+  "passed": true,
+  "startedAt": "2026-09-04T14:57:06.779Z",
+  "completedAt": "2026-09-04T14:57:06.779Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "implement-a-new-independently-installable-bb-touch-bar-plugin-for",
+    "specRevision": 2,
+    "specDigest": "sha256:2cb81eb836af98d280d0660ae933e1f9672f2d1932631e43bef9d4f04b55ef08",
+    "treeDigest": "sha256:bc7051a00c039e935834916312e33b8f4bde959b5f0ea13272f6ad512573548b",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf"
+  },
+  "digest": "sha256:daf00915e9d678c4a75364c8bd30524ffc2fadb31779c1faffe1051a5742cc94",
+  "kind": "collected",
+  "collector": "codex-remote-mac-verification",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/implement-a-new-independently-installable-bb-touch-bar-plugin-for/artifacts/mac-homebrew-wakefix-install.txt",
+      "mediaType": "text/plain",
+      "bytes": 1251,
+      "digest": "sha256:a9c7aea1ae3a0701ab6de6f3da4144762a9f6b2d1c8cf63eefff7b3a015c660f"
+    }
+  ]
+}

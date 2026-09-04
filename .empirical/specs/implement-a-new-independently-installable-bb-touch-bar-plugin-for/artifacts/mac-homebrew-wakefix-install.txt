@@ -1,0 +1,28 @@
+Mac host: Mateo's MacBook Pro (Intel x86_64), macOS Tahoe 26.2
+Observed: 2026-09-04
+
+Source archive SHA-256:
+0aab5c3cde611c7cb969f98813e9bdc06d91c27dfb0abc00687a69d2786fe11b
+
+Native package result:
+- build.sh compiled and ad-hoc signed BBTouchBar.app successfully on the Mac.
+- package.sh produced version 0.1.0-wakefix.1.
+- package archive SHA-256: e6ce2aaffb07954e90e77ae927fe7a772e1c11083369ca41bc0884d181584317
+
+Homebrew result:
+- Homebrew 6.0.21 installed the private local tap Cask.
+- brew info reports bb-touch-bar 0.1.0-wakefix.1 installed on request.
+- brew list reports /Applications/BB Touch Bar.app.
+- codesign --verify --deep --strict exited 0.
+- CFBundleShortVersionString is 0.1.0-wakefix.1.
+- The running executable is /Applications/BB Touch Bar.app/Contents/MacOS/BBTouchBar.
+- The LaunchAgent program points to that Homebrew-managed executable.
+- bb touchbar snapshot exits 0 in the stripped background environment.
+
+Migration result:
+- The prior unmanaged ~/Applications/BBTouchBar.app was moved to
+  ~/.Trash/BBTouchBar-source-install-before-homebrew-20260904.app.
+
+Still requiring physical user interaction:
+- Tap the panel X and confirm the app fully exits.
+- Reopen the app, close/open the lid, and confirm Reconnecting clears.

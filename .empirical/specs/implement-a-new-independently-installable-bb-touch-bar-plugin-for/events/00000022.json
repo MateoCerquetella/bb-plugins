@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sequence": 22,
+  "previousDigest": "sha256:69268616c5a718033aec565d854b5ba6383bc9dfe56c815465d8b921fb139182",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Resumed workflow",
+  "createdAt": "2026-09-04T15:02:07.456Z",
+  "stateBeforeDigest": "sha256:087395e1d3eb00cc258b8bfbaf92274aa605c52e43ac9eb00e7e43837aee8eff",
+  "stateAfterDigest": "sha256:9a7deada503ffc0c9bd5ee7c14f500fac1372504ff72723ed21be36af15dee9e",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 22,
+    "activeFeature": "implement-a-new-independently-installable-bb-touch-bar-plugin-for",
+    "request": "Implement a new independently installable BB Touch Bar plugin for Intel MacBook Pro Touch Bar machines, plus a BetterTouchTool companion/preset that can remain visible across all apps. The BB plugin should expose live compact thread/agent status and safe actions, integrate with BB host/server APIs, include clear setup documentation, tests, and repository catalog updates. Target an MVP that is usable without private macOS APIs, with BetterTouchTool as the persistence layer.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "verify",
+    "status": "waiting",
+    "repairAttempts": 3,
+    "message": null,
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:2cb81eb836af98d280d0660ae933e1f9672f2d1932631e43bef9d4f04b55ef08",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:2d251c63e1f2227d81443dd718e85b841fde132f94fd5c4dd03547b021236868",
+    "impactDigest": "sha256:5178c9dbca346cb25eddd79dfb6d3635dbd55440808ce4a1c8e9fdfdc7bf30fd",
+    "capabilityClaimId": "implement-a-new-independently-installable-bb-touch-bar-plugin-for-21366fe98a02",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-04T15:02:07.456Z"
+  },
+  "digest": "sha256:8759a365beea4ca4e650a3088ef3c09a2dcca0b24528f57dfc06b78fe4940d3e"
+}

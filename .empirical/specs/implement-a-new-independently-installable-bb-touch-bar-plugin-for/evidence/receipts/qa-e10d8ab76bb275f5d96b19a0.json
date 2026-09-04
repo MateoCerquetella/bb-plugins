@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-e10d8ab76bb275f5d96b19a0",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "A real Touch Bar Mac is required to compile the AppKit/DFRFoundation app and exercise an actual lid close/open cycle. The current Linux x64 environment cannot perform that physical wake test.",
+  "passed": false,
+  "startedAt": "2026-09-04T14:30:14.165Z",
+  "completedAt": "2026-09-04T14:30:14.165Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "implement-a-new-independently-installable-bb-touch-bar-plugin-for",
+    "specRevision": 2,
+    "specDigest": "sha256:2cb81eb836af98d280d0660ae933e1f9672f2d1932631e43bef9d4f04b55ef08",
+    "treeDigest": "sha256:744b3d6781875d227350eca6a3a3fa1050344e3069cecb88788f8eda50af6b4d",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf",
+    "workflowRevision": 16,
+    "gitCommit": "29178ad180d5701966515a4af9d6d6b3c79c617c"
+  },
+  "digest": "sha256:9e03056c87f335a20bba6123abc541df008dec9bb8de576b147564014cb0fbc4",
+  "kind": "qa",
+  "matrixDigest": "sha256:15d4d3c242f440ffc8940ced51be00a5b5bccf74fe22248734ff616ecc72f445",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "missing-environment",
+      "summary": "A real Touch Bar Mac is required to compile the AppKit/DFRFoundation app and exercise an actual lid close/open cycle. The current Linux x64 environment cannot perform that physical wake test.",
+      "startedAt": "2026-09-04T14:30:14.165Z",
+      "completedAt": "2026-09-04T14:30:14.165Z",
+      "durationMs": 0,
+      "collector": "codex-linux-environment",
+      "command": null,
+      "result": null,
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:744b3d6781875d227350eca6a3a3fa1050344e3069cecb88788f8eda50af6b4d",
+      "sourceTreeAfter": "sha256:744b3d6781875d227350eca6a3a3fa1050344e3069cecb88788f8eda50af6b4d",
+      "artifacts": []
+    }
+  ],
+  "anomalies": [
+    "outcome-missing-environment"
+  ]
+}

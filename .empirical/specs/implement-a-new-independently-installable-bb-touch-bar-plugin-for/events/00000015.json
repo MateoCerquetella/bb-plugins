@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sequence": 15,
+  "previousDigest": "sha256:14e7dabf9257a01e3680e50d4251dc75c8c73d34e5d1fb4d90a813d5417075e2",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Implemented sleep/wake recovery for the native Touch Bar app: wake notifications now restore the strip and immediately refresh the store, stale polling processes are cancelled with bounded termination, polling waits are interruptible, and CLI stdout is asynchronously drained so inherited helper pipes cannot block recovery. Added regression contract coverage; all 18 focused Touch Bar tests and TypeScript typecheck pass.",
+  "createdAt": "2026-09-04T14:26:24.535Z",
+  "stateBeforeDigest": "sha256:3e387970921dfa75c0c70ee07d7f57d9c7541996b0884ae134de8214c26f8f71",
+  "stateAfterDigest": "sha256:0de56b2a2126f47970b2eabde172fdbadc2b89bbac123be14763dae7014397fa",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 15,
+    "activeFeature": "implement-a-new-independently-installable-bb-touch-bar-plugin-for",
+    "request": "Implement a new independently installable BB Touch Bar plugin for Intel MacBook Pro Touch Bar machines, plus a BetterTouchTool companion/preset that can remain visible across all apps. The BB plugin should expose live compact thread/agent status and safe actions, integrate with BB host/server APIs, include clear setup documentation, tests, and repository catalog updates. Target an MVP that is usable without private macOS APIs, with BetterTouchTool as the persistence layer.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "context",
+    "status": "waiting",
+    "repairAttempts": 2,
+    "message": "Implemented sleep/wake recovery for the native Touch Bar app: wake notifications now restore the strip and immediately refresh the store, stale polling processes are cancelled with bounded termination, polling waits are interruptible, and CLI stdout is asynchronously drained so inherited helper pipes cannot block recovery. Added regression contract coverage; all 18 focused Touch Bar tests and TypeScript typecheck pass.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:2cb81eb836af98d280d0660ae933e1f9672f2d1932631e43bef9d4f04b55ef08",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:2d251c63e1f2227d81443dd718e85b841fde132f94fd5c4dd03547b021236868",
+    "impactDigest": "sha256:5178c9dbca346cb25eddd79dfb6d3635dbd55440808ce4a1c8e9fdfdc7bf30fd",
+    "capabilityClaimId": "implement-a-new-independently-installable-bb-touch-bar-plugin-for-21366fe98a02",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-04T14:26:24.535Z"
+  },
+  "digest": "sha256:26542510a622a7fb520c9118eb6924e6bca7228996e63910730d3af971081f03"
+}

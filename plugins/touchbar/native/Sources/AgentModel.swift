@@ -109,6 +109,7 @@ final class AgentStore {
     private(set) var snapshot = AgentSnapshot()
 
     private let queue = DispatchQueue(label: "app.getbb.touchbar.store", qos: .utility)
+    private let pollSignal = DispatchSemaphore(value: 0)
     private let lock = NSLock()
     private var lastGoodSnapshot = AgentSnapshot()
     private var consecutiveFailures = 0
@@ -130,8 +131,8 @@ final class AgentStore {
                         self.publish(stale)
                     }
                 }
-                for _ in 0..<20 where !self.isStopped {
-                    Thread.sleep(forTimeInterval: 0.1)
+                if !self.isStopped {
+                    _ = self.pollSignal.wait(timeout: .now() + 2)
                 }
             }
         }
@@ -141,6 +142,14 @@ final class AgentStore {
         lock.lock()
         stopped = true
         lock.unlock()
+        BBCommand.cancelPolling()
+        pollSignal.signal()
+    }
+
+    func refreshAfterWake() {
+        NativeLog.info("wake detected; refreshing BB connection")
+        BBCommand.cancelPolling()
+        pollSignal.signal()
     }
 
     private var isStopped: Bool {
@@ -158,7 +167,9 @@ final class AgentStore {
     }
 
     private static func fetch(previousHosts: [HostMetricEntry]) -> AgentSnapshot? {
-        guard let data = BBCommand.run(["touchbar", "snapshot"], timeout: 5) else {
+        guard let data = BBCommand.run(
+            ["touchbar", "snapshot"], timeout: 5, polling: true
+        ) else {
             NativeLog.debug("snapshot command returned no data")
             return nil
         }
@@ -208,7 +219,9 @@ final class AgentStore {
         guard enabled else {
             return fallback
         }
-        guard let data = BBCommand.run(["host-monitor", "snapshot"], timeout: 5),
+        guard let data = BBCommand.run(
+                  ["host-monitor", "snapshot"], timeout: 5, polling: true
+              ),
               data.count <= 65_536,
               let payload = try? JSONDecoder().decode(BBHostSnapshot.self, from: data),
               payload.schemaVersion == 1 else {
@@ -294,10 +307,65 @@ final class AgentStore {
 }
 
 enum BBCommand {
-    static func run(_ arguments: [String], timeout: TimeInterval = 1.5) -> Data? {
+    private final class OutputBuffer: @unchecked Sendable {
+        private let lock = NSLock()
+        private var data = Data()
+
+        func append(_ chunk: Data) {
+            lock.lock()
+            let remaining = max(0, 65_537 - data.count)
+            if remaining > 0 { data.append(chunk.prefix(remaining)) }
+            lock.unlock()
+        }
+
+        func snapshot() -> Data {
+            lock.lock()
+            defer { lock.unlock() }
+            return data
+        }
+    }
+
+    private final class PollingState: @unchecked Sendable {
+        private let lock = NSLock()
+        private weak var process: Process?
+
+        func set(_ next: Process) {
+            lock.lock()
+            process = next
+            lock.unlock()
+        }
+
+        func clear(_ expected: Process) {
+            lock.lock()
+            if process === expected { process = nil }
+            lock.unlock()
+        }
+
+        func cancel() {
+            lock.lock()
+            let current = process
+            lock.unlock()
+            if let current, current.isRunning { current.terminate() }
+        }
+    }
+
+    private static let pollingState = PollingState()
+
+    static func cancelPolling() {
+        pollingState.cancel()
+    }
+
+    static func run(
+        _ arguments: [String],
+        timeout: TimeInterval = 1.5,
+        polling: Bool = false
+    ) -> Data? {
         guard let executable = NativeConfig.bbExecutable else { return nil }
         let process = Process()
         let output = Pipe()
+        let captured = OutputBuffer()
+        let finished = DispatchSemaphore(value: 0)
+        let outputClosed = DispatchSemaphore(value: 0)
         process.executableURL = URL(fileURLWithPath: executable)
         process.arguments = arguments
         var environment = ProcessInfo.processInfo.environment
@@ -308,23 +376,44 @@ enum BBCommand {
         process.environment = environment
         process.standardOutput = output
         process.standardError = FileHandle.nullDevice
+        output.fileHandleForReading.readabilityHandler = { handle in
+            let chunk = handle.availableData
+            if chunk.isEmpty {
+                outputClosed.signal()
+                return
+            }
+            captured.append(chunk)
+        }
+        process.terminationHandler = { _ in finished.signal() }
 
         do { try process.run() } catch {
+            output.fileHandleForReading.readabilityHandler = nil
             NativeLog.error("could not launch bb: \(error.localizedDescription)")
             return nil
         }
-        let deadline = Date().addingTimeInterval(timeout)
-        while process.isRunning && Date() < deadline {
-            Thread.sleep(forTimeInterval: 0.04)
+        if polling {
+            pollingState.set(process)
         }
-        var timedOut = false
-        if process.isRunning {
+        defer {
+            if polling { pollingState.clear(process) }
+            output.fileHandleForReading.readabilityHandler = nil
+        }
+
+        let timedOut = finished.wait(timeout: .now() + timeout) == .timedOut
+        if timedOut {
             NativeLog.error("bb snapshot timed out")
-            timedOut = true
             process.terminate()
+            if finished.wait(timeout: .now() + 0.5) == .timedOut {
+                kill(process.processIdentifier, SIGKILL)
+                _ = finished.wait(timeout: .now() + 0.5)
+            }
         }
-        process.waitUntilExit()
-        let data = output.fileHandleForReading.readDataToEndOfFile()
+        _ = outputClosed.wait(timeout: .now() + 0.25)
+        guard !process.isRunning else {
+            NativeLog.error("bb process did not stop after timeout")
+            return nil
+        }
+        let data = captured.snapshot()
         guard process.terminationStatus == 0 else {
             // The BB CLI can leave a helper child alive after writing its JSON.
             // Preserve a complete snapshot even when the wrapper is terminated.

@@ -16,7 +16,7 @@ Swift/AppKit background app owns the physical Touch Bar:
 - an optional icon-only Host Monitor button that swaps the thread lane for bounded
   host cards containing compact circular CPU, RAM, disk, download, and upload
   gauges for every enrolled host;
-- tap ✕ to collapse to the ordinary Control Strip;
+- tap ✕ to quit the native Touch Bar app completely;
 - automatic restoration after login and wake.
 
 No subscription, developer account, external runtime, telemetry, or proprietary
@@ -55,8 +55,7 @@ bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.0 
 
 ### Homebrew Cask
 
-After a `touchbar/vX.Y.Z` release is published with its universal archive, add
-this repository as a tap and install the macOS app:
+For a published release, install the native app with Homebrew:
 
 ```sh
 brew tap mateocerquetella/bb-plugins \
@@ -76,9 +75,24 @@ The Cask keeps the archive in Homebrew's Caskroom, moves the `.app` into
 starts after login without a Dock icon. **Open at Login** in the menu-bar
 settings can remove or recreate that next-login registration.
 
-Public Cask archives must be Developer ID signed and Apple-notarized because
-current Homebrew preserves Gatekeeper quarantine and no longer offers a
-`--no-quarantine` install option.
+If macOS blocks a locally built or otherwise unnotarized app because of the
+Gatekeeper quarantine attribute, remove quarantine from this one app after
+checking that the archive came from a source you trust:
+
+```sh
+xattr -dr com.apple.quarantine "/Applications/BB Touch Bar.app"
+open -a "BB Touch Bar"
+```
+
+Verify the attribute is gone with:
+
+```sh
+xattr -l "/Applications/BB Touch Bar.app"
+```
+
+Published Cask archives should instead be Developer ID signed and notarized;
+do not disable Gatekeeper globally or use Homebrew's old `--no-quarantine`
+option.
 
 ### Source install
 
@@ -117,8 +131,12 @@ persist per macOS user. Tap the computer icon to switch between threads and
 the compact inline host metrics lane. Tap an individual host card to open that
 host's detail page inside the BB desktop app.
 
-Settings, Host Monitor, and X use fixed 34-point native controls to preserve
-space for cards while retaining explicit touch dispatch.
+Settings and Host Monitor use fixed 34-point native controls to preserve space
+for cards while retaining explicit touch dispatch. X quits the native app
+through `NSApplication.terminate`, so its cleanup lifecycle dismisses the modal
+Touch Bar, removes the Control Strip item, and stops polling. The login job
+remains configured for the next login; reopen it immediately with
+`open -a "BB Touch Bar"` when needed.
 
 Agent provider icons are embedded as large circular badges in every thread
 card. Status uses the card outline plus a vertically centered compact text pill:
@@ -174,10 +192,15 @@ bb plugin config touchbar set includeHidden false
 ## Remove
 
 ```sh
-cd ~/Downloads/touchbar
-./native/uninstall.sh
+brew uninstall --cask bb-touch-bar
 bb plugin remove touchbar
 ```
+
+The Homebrew command removes the app and login job. Use
+`brew uninstall --cask --zap bb-touch-bar` instead when you also want to
+remove Touch Bar preferences, logs, and support data.
+If you used a source install instead, run `./native/uninstall.sh` from that
+source checkout. The old unmanaged app is separate from the BB server plugin.
 
 The native uninstaller first collapses/dismisses the modal Touch Bar, then
 stops the process, unloads its user LaunchAgent, and removes only the installed

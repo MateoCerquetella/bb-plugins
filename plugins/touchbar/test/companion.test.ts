@@ -173,7 +173,12 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(controller, /action: #selector\(agentTapped/u);
   assert.match(controller, /bounds\.contains\(point\) \? self : nil/u);
   assert.match(controller, /NSApp\.sendAction\(action, to: target, from: self\)/u);
-  assert.match(controller, /close control tapped/u);
+  assert.match(controller, /close control tapped; quitting app/u);
+  assert.match(controller, /closeButton\.setAccessibilityLabel\("Quit BB Touch Bar"\)/u);
+  assert.match(
+    controller,
+    /@objc private func closeTapped[\s\S]*?NSApp\.terminate\(nil\)/u,
+  );
   assert.match(controller, /projectInitials/u);
   assert.match(controller, /provider == "cursor" \|\| provider == "acp-cursor"/u);
   assert.match(controller, /\.error: 0, \.blocked: 1, \.done: 2, \.working: 3/u);
@@ -204,6 +209,14 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(model, /offlineFailureThreshold = 3/u);
   assert.match(model, /lastGoodSnapshot/u);
   assert.match(model, /stale\.connected = false/u);
+  assert.match(model, /func refreshAfterWake\(\)/u);
+  assert.match(model, /BBCommand\.cancelPolling\(\)/u);
+  assert.match(model, /pollSignal\.wait\(timeout: \.now\(\) \+ 2\)/u);
+  assert.match(model, /readabilityHandler/u);
+  assert.match(model, /finished\.wait\(timeout: \.now\(\) \+ timeout\)/u);
+  assert.doesNotMatch(model, /readDataToEndOfFile/u);
+  assert.match(controller, /#selector\(recoverAfterWake\)/u);
+  assert.match(controller, /store\.refreshAfterWake\(\)/u);
   assert.match(model, /\["host-monitor", "snapshot"\]/u);
   assert.match(model, /struct UsageEntry/u);
   assert.match(model, /struct HostMetricEntry/u);
