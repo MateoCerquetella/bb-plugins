@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sequence": 10,
+  "previousDigest": "sha256:0a3cfd60ddb0203b390e122615410042ded89e8c5caa4746aca912476d683004",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "No source repair was required; the final commit remains correct. Repair resets verification bookkeeping so current-tree receipts can replace the stale pre-commit receipt set.",
+  "createdAt": "2026-09-04T15:12:18.731Z",
+  "stateBeforeDigest": "sha256:0a3827049f6bf6f424b9664df2df60a0bd5dc0eebfe634f34ddc3dcbd740ea29",
+  "stateAfterDigest": "sha256:a45b512f450b631108f4d57c8a811fce142f95019e8fe00d407287ffa352e7a4",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 10,
+    "activeFeature": "host-monitor-bottom-icon-only-surface",
+    "request": "Remove Host Monitor from BB's main sidebar page rows. Keep only its bottom-left native icon. When clicked, the icon must open the full monitor surface with the dense Machine Monitor-style charts and metric cards shown in the supplied reference, while preserving multi-host selection, persisted per-host configurable metrics, BB machine/realtime infrastructure, and notification-free behavior.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "context",
+    "status": "waiting",
+    "repairAttempts": 1,
+    "message": "No source repair was required; the final commit remains correct. Repair resets verification bookkeeping so current-tree receipts can replace the stale pre-commit receipt set.",
+    "implementationActor": "agent",
+    "workStartedAt": "2026-09-04T15:01:51.246Z",
+    "specDigest": "sha256:91b95406a1be92b5dcb40ac5fdc7516cac1111322a12c454334458d60fe44b76",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:f8b6d39591961240c4a9fcf31aebd603d0bb43bdf7b55159e0558f206780fd89",
+    "impactDigest": "sha256:f5e094b0562dfe301774aae480fb95d58980315afbf2c6994d5dc5fbd496cd27",
+    "capabilityClaimId": "host-monitor-bottom-icon-only-surface-a096aa81d34f",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-04T15:12:18.731Z"
+  },
+  "digest": "sha256:01b7713c2ab9957a685dcfc80c087ff8421bfb5c59396aa54a4e2414f83412ea"
+}

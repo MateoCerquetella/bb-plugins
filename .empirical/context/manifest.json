@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "generator": "empirical-0.30.0",
-  "sourceDigest": "sha256:6183b1ce034e0a7a1ee01debccd7f5bb347aae8d69f48fa9e7994f6354d63980",
+  "sourceDigest": "sha256:ebc9fd8eab6646c9773a2dda30a5cecdc3aceb26114b3b1af152580bfa8aa529",
   "files": [
     {
       "path": ".agents/skills/empirical/SKILL.md",
@@ -585,8 +585,8 @@
     },
     {
       "path": "plugins/host-monitor/app.tsx",
-      "size": 32888,
-      "digest": "sha256:8cdbc68a5e712e2da0059552276702e124318ba7f241e7534dbc530f07eeb551"
+      "size": 32965,
+      "digest": "sha256:337cf6f91fc563b29f330bdad265dd4a13c9bbc7135658d1d4ac7c47d204115c"
     },
     {
       "path": "plugins/host-monitor/assets/icon.svg",
@@ -650,8 +650,8 @@
     },
     {
       "path": "plugins/host-monitor/test/app-registration.test.ts",
-      "size": 2823,
-      "digest": "sha256:f0d1c9dfeece963635aa06b099dd38b30cbdc93edf4d498c466030c3ee94ae8e"
+      "size": 2866,
+      "digest": "sha256:25b0826cfb4fa0d948a025094ffa2c3d4b07da9ab266736c413e2a88e1db0727"
     },
     {
       "path": "plugins/host-monitor/test/chart-data.test.ts",
@@ -1649,7 +1649,7 @@
         "plugins/usage-tracker/tsconfig.json",
         "plugins/usage-tracker/types/css-modules.d.ts"
       ],
-      "sourceDigest": "sha256:6183b1ce034e0a7a1ee01debccd7f5bb347aae8d69f48fa9e7994f6354d63980",
+      "sourceDigest": "sha256:ebc9fd8eab6646c9773a2dda30a5cecdc3aceb26114b3b1af152580bfa8aa529",
       "digest": "sha256:eed9cfd95fdecbf70535c9b9bfdb204011bdad5af0a5418d4d923f3a99f354f2",
       "freshness": "fresh"
     },
@@ -1745,5 +1745,5 @@
     }
   ],
   "truncated": false,
-  "digest": "sha256:2061d901f6faff8a63356daa7a1a9416a5c969a436d33556c2340bc316c7ee6e"
+  "digest": "sha256:47947adfebfd596e3d4aefab86f31838ee88571fe819b295a4a58322cc6569ad"
 }

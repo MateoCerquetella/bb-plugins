@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 8,
+  "revision": 13,
   "activeFeature": "host-monitor-bottom-icon-only-surface",
   "request": "Remove Host Monitor from BB's main sidebar page rows. Keep only its bottom-left native icon. When clicked, the icon must open the full monitor surface with the dense Machine Monitor-style charts and metric cards shown in the supplied reference, while preserving multi-host selection, persisted per-host configurable metrics, BB machine/realtime infrastructure, and notification-free behavior.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "review",
+  "phase": "integrate",
   "status": "waiting",
-  "repairAttempts": 0,
-  "message": "Verified the icon-only Host Monitor with passing typecheck, 29 focused tests, production build, automated live Chromium icon/navigation/edit/host-switch/390px checks, four collected browser screenshots, and fresh-context acceptance inspection.",
+  "repairAttempts": 1,
+  "message": "Independent fresh-context review approved all eight criteria with no security, correctness, design, or maintainability blockers after current-tree verification.",
   "implementationActor": "agent",
   "workStartedAt": "2026-09-04T15:01:51.246Z",
   "specDigest": "sha256:91b95406a1be92b5dcb40ac5fdc7516cac1111322a12c454334458d60fe44b76",
@@ -21,10 +21,11 @@
   "authorizationDigest": null,
   "evidence": [],
   "evidenceReceiptIds": [
-    "qa-1e947b3d0b46a6c98f282646",
-    "qa-f5248ff192d1cd7cd3c27af4",
-    "qa-b168da32c83560928fd929c7",
-    "collected-60f24ed718d1988163405810"
+    "qa-e9ab175d6f672bf59421f0f1",
+    "qa-04d0598f15cc66f4e3ce9c08",
+    "collected-941889b6a11cc3f59ac67659",
+    "qa-d70e676d6b1f943a2fcfa6c2",
+    "collected-d6c34528be458b74623852e7"
   ],
   "legacyEvidenceCount": 0,
   "completion": {
@@ -40,5 +41,5 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-04T15:07:02.985Z"
+  "updatedAt": "2026-09-04T15:13:33.145Z"
 }

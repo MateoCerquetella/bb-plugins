@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "sequence": 12,
+  "previousDigest": "sha256:450d9170a3eda0b1bf1c6adce53e81e744da5ea9250d36153d4a87b34b3e3494",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Reverified the final committed tree with passing typecheck, 29 tests, build, live icon-only browser flow, four screenshots, and fresh-context acceptance.",
+  "createdAt": "2026-09-04T15:13:23.935Z",
+  "stateBeforeDigest": "sha256:57a63fcb021443d5283594c557a4b8f02466bdd940c0dcdc75af3cbee9803a29",
+  "stateAfterDigest": "sha256:f41e7fe973906e3031d567e689225b21a2c98980218cc81e131fa17dab9ab6e3",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 12,
+    "activeFeature": "host-monitor-bottom-icon-only-surface",
+    "request": "Remove Host Monitor from BB's main sidebar page rows. Keep only its bottom-left native icon. When clicked, the icon must open the full monitor surface with the dense Machine Monitor-style charts and metric cards shown in the supplied reference, while preserving multi-host selection, persisted per-host configurable metrics, BB machine/realtime infrastructure, and notification-free behavior.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "review",
+    "status": "waiting",
+    "repairAttempts": 1,
+    "message": "Reverified the final committed tree with passing typecheck, 29 tests, build, live icon-only browser flow, four screenshots, and fresh-context acceptance.",
+    "implementationActor": "agent",
+    "workStartedAt": "2026-09-04T15:01:51.246Z",
+    "specDigest": "sha256:91b95406a1be92b5dcb40ac5fdc7516cac1111322a12c454334458d60fe44b76",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:f8b6d39591961240c4a9fcf31aebd603d0bb43bdf7b55159e0558f206780fd89",
+    "impactDigest": "sha256:f5e094b0562dfe301774aae480fb95d58980315afbf2c6994d5dc5fbd496cd27",
+    "capabilityClaimId": "host-monitor-bottom-icon-only-surface-a096aa81d34f",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "qa-e9ab175d6f672bf59421f0f1",
+      "qa-04d0598f15cc66f4e3ce9c08",
+      "collected-941889b6a11cc3f59ac67659",
+      "qa-d70e676d6b1f943a2fcfa6c2"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": true,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "verified",
+      "reasons": {
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-04T15:13:23.935Z"
+  },
+  "digest": "sha256:4969ffb7a060b2c3cb2f9e917a4a4474d598976b05f1c4501a6f81799538024e"
+}

@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-e9ab175d6f672bf59421f0f1",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3",
+    "AC-UI-4"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Final committed-tree Host Monitor typecheck, 29 tests, and build.",
+  "passed": true,
+  "startedAt": "2026-09-04T15:12:46.014Z",
+  "completedAt": "2026-09-04T15:12:48.548Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-bottom-icon-only-surface",
+    "specRevision": 3,
+    "specDigest": "sha256:91b95406a1be92b5dcb40ac5fdc7516cac1111322a12c454334458d60fe44b76",
+    "treeDigest": "sha256:6cb075c529016f9ea48b24b2f5d77fc74b1f955c05a77f8efc5cdbe44bce1ba2",
+    "policyDigest": "sha256:3425fbb9bad135beeeb67d6becc5c9c1152d50729eda1ad2fdf33c05b6747679",
+    "workflowRevision": 11,
+    "gitCommit": "b1e14f5b87dba1d058f280c1eaf7766b55d45508"
+  },
+  "digest": "sha256:0036be622f1087a21d2dca976a0a17149af8b1f008a3eaa13436b774bbae8003",
+  "kind": "qa",
+  "matrixDigest": "sha256:284821fa0403b0bccce1245b153615e6df75448b03e195a4e7773134a472f940",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Final committed-tree Host Monitor typecheck, 29 tests, and build.",
+      "startedAt": "2026-09-04T15:12:46.014Z",
+      "completedAt": "2026-09-04T15:12:48.548Z",
+      "durationMs": 2534,
+      "collector": null,
+      "command": {
+        "argv": [
+          "npm",
+          "run",
+          "verify",
+          "--workspace",
+          "bb-plugin-host-monitor"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:c0db7e7dc025999d64928f3a8fbf72e7684ee6bea99e56e075821c50ad3f9836",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "\n> bb-plugin-host-monitor@0.1.4 verify\n> npm run typecheck && npm test && npm run build\n\n\n> bb-plugin-host-monitor@0.1.4 typecheck\n> tsc --noEmit\n\n\n> bb-plugin-host-monitor@0.1.4 test\n> node --test --experimental-strip-types test/*.test.ts\n\nTAP version 13\n# Subtest: keeps Host Monitor identity with only the native bottom sidebar action\nok 1 - keeps Host Monitor identity with only the native bottom sidebar action\n  ---\n  duration_ms: 0.913003\n  type: 'test'\n  ...\n# Subtest: ships per-host history and metrics-only host sources\nok 2 - ships per-host history and metrics-only host sources\n  ---\n  duration_ms: 0.206185\n  type: 'test'\n  ...\n# Subtest: keeps every monitoring surface inside the page without notifications\nok 3 - keeps every monitoring surface inside the page without notifications\n  ---\n  duration_ms: 0.502215\n  type: 'test'\n  ...\n# Subtest: imports only public SDK and declared third-party surfaces\nok 4 - imports only public SDK and declared third-party surfaces\n  ---\n  duration_ms: 3.085803\n  type: 'test'\n  ...\n# Subtest: marks deterministic collection gaps without adding chart rows\nok 5 - marks deterministic collection gaps without adding chart rows\n  ---\n  duration_ms: 1.406593\n  type: 'test'\n  ...\n# Subtest: derives the same bounded interval used by long history queries\nok 6 - derives the same bounded interval used by long history queries\n  ---\n  duration_ms: 0.127362\n  type: 'test'\n  ...\n# Subtest: default dashboard is bounded, independent, and uses supported unique panels\nok 7 - default dashboard is bounded, independent, and uses supported unique panels\n  ---\n  duration_ms: 0.596387\n  type: 'test'\n  ...\n# Subtest: editor operations add, change, reorder, and remove panels without mutating input\nok 8 - editor operations add, change, reorder, and remove panels without mutating input\n  ---\n  duration_ms: 0.592951\n  type: 'test'\n  ...\n# Subtest: catalog covers every supported host metric and stat/time-series compatibility\nok 9 - catalog covers every supported host metric and stat/time-series compatibility\n  ---\n  duration_ms: 0.172214\n  type: 'test'\n  ...\n# Subtest: dashboard schema rejects duplicates, unknown fields, invalid combinations, and oversized input\nok 10 - dashboard schema rejects duplicates, unknown fields, invalid combinations, and oversized input\n  ---\n  duration_ms: 1.656338\n  type: 'test'\n  ...\n# Subtest: axis tooltip leaves every SVG line visible\nok 11 - axis tooltip leaves every SVG line visible\n  ---\n  duration_ms: 29.019714\n  type: 'test'\n  ...\n# Subtest: host worker returns bounded telemetry without IP or process fields\nok 12 - host worker returns bounded telemetry without IP or process fields\n  ---\n  duration_ms: 121.003558\n  type: 'test'\n  ...\n# Subtest: calculates aggregate machine-wide CPU utilization\nok 13 - calculates aggregate machine-wide CPU utilization\n  ---\n  duration_ms: 0.895742\n  type: 'test'\n  ...\n# Subtest: calculates validated byte capacities\nok 14 - calculates validated byte capacities\n  ---\n  duration_ms: 0.94373\n  type: 'test'\n  ...\n# Subtest: uses Linux MemAvailable for memory pressure\nok 15 - uses Linux MemAvailable for memory pressure\n  ---\n  duration_ms: 0.488801\n  type: 'test'\n  ...\n# Subtest: aggregates throughput only from useful non-loopback interfaces\nok 16 - aggregates throughput only from useful non-loopback interfaces\n  ---\n  duration_ms: 0.550153\n  type: 'test'\n  ...\n# Subtest: calculates root filesystem capacity\nok 17 - calculates root filesystem capacity\n  ---\n  duration_ms: 0.234077\n  type: 'test'\n  ...\n# Subtest: page owns constrained-height vertical scrolling\nok 18 - page owns constrained-height vertical scrolling\n  ---\n  duration_ms: 0.666735\n  type: 'test'\n  ...\n# Subtest: fleet is searchable, bounded, and selected by cards\nok 19 - fleet is searchable, bounded, and selected by cards\n  ---\n  duration_ms: 0.201106\n  type: 'test'\n  ...\n# Subtest: 390px layout stacks controls, stats, facts, and keeps chart height\nok 20 - 390px layout stacks controls, stats, facts, and keeps chart height\n  ---\n  duration_ms: 0.485224\n  type: 'test'\n  ...\n# Subtest: charts preserve page scrolling and expose textual summaries\nok 21 - charts preserve page scrolling and expose textual summaries\n  ---\n  duration_ms: 0.224479\n  type: 'test'\n  ...\n# Subtest: refresh represents every host, samples connected hosts, and isolates failure\nok 22 - refresh represents every host, samples connected hosts, and isolates failure\n  ---\n  duration_ms: 17.010368\n  type: 'test'\n  ...\n# Subtest: simultaneous fleet refreshes coalesce host calls\nok 23 - simultaneous fleet refreshes coalesce host calls\n  ---\n  duration_ms: 4.594092\n  type: 'test'\n  ...\n# Subtest: sidebar summary lists hosts without starting samples\nok 24 - sidebar summary lists hosts without starting samples\n  ---\n  duration_ms: 1.874666\n  type: 'test'\n  ...\n# Subtest: dashboard configuration is isolated by enrolled host and survives plugin reload\nok 25 - dashboard configuration is isolated by enrolled host and survives plugin reload\n  ---\n  duration_ms: 4.080076\n  type: 'test'\n  ...\n# Subtest: settings are passive in-page threshold guides\nok 26 - settings are passive in-page threshold guides\n  ---\n  duration_ms: 1.506495\n  type: 'test'\n  ...\n# Subtest: append-only migrations upgrade the prior single-machine schema\nok 27 - append-only migrations upgrade the prior single-machine schema\n  ---\n  duration_ms: 4.035274\n  type: 'test'\n  ...\n# Subtest: dashboard configuration persists independently per host and corrupt rows fall back\nok 28 - dashboard configuration persists independently per host and corrupt rows fall back\n  ---\n  duration_ms: 2.205208\n  type: 'test'\n  ...\n# Subtest: history is isolated per host and never exceeds 720 relative buckets\nok 29 - history is isolated per host and never exceeds 720 relative buckets\n  ---\n  duration_ms: 11.180745\n  type: 'test'\n  ...\n1..29\n# tests 29\n# suites 0\n# pass 29\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 404.749636\n\n> bb-plugin-host-monitor@0.1.4 build\n> env -u BB_CLI bb plugin build .\n\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\ndist/host.js\ndist/host.js.map\ndist/host.meta.json\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:6cb075c529016f9ea48b24b2f5d77fc74b1f955c05a77f8efc5cdbe44bce1ba2",
+      "sourceTreeAfter": "sha256:6cb075c529016f9ea48b24b2f5d77fc74b1f955c05a77f8efc5cdbe44bce1ba2",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

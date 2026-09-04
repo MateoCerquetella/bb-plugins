@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-941889b6a11cc3f59ac67659",
+  "criteria": [
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3",
+    "AC-UI-4"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Final committed-tree screenshots for icon-only sidebar and dense responsive monitor.",
+  "passed": true,
+  "startedAt": "2026-09-04T15:13:06.778Z",
+  "completedAt": "2026-09-04T15:13:06.778Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-bottom-icon-only-surface",
+    "specRevision": 3,
+    "specDigest": "sha256:91b95406a1be92b5dcb40ac5fdc7516cac1111322a12c454334458d60fe44b76",
+    "treeDigest": "sha256:6cb075c529016f9ea48b24b2f5d77fc74b1f955c05a77f8efc5cdbe44bce1ba2",
+    "policyDigest": "sha256:3425fbb9bad135beeeb67d6becc5c9c1152d50729eda1ad2fdf33c05b6747679"
+  },
+  "digest": "sha256:c0f01bb5b65e7656abed55668910d38660a1e895cb91f4bf2e577f99bb0a9ec1",
+  "kind": "collected",
+  "collector": "Chromium CDP visual verification",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser/editor-390.png",
+      "mediaType": "image/png",
+      "bytes": 32167,
+      "digest": "sha256:f38bf28708fe404278ff49c34a4d5d26c4f2e4351a4178cd64cf421527334bc7"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser/editor-desktop.png",
+      "mediaType": "image/png",
+      "bytes": 130628,
+      "digest": "sha256:aac7e9b7ddb1872e743fb2155a4c25110927f2f7023fb7893a36caa1c3528f98"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser/monitor-desktop.png",
+      "mediaType": "image/png",
+      "bytes": 125507,
+      "digest": "sha256:4047d64e2a9dfe765d659b990aabde22edfe65601a8bc55ad1175486d6bd23fe"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-native-footer-configurable-metrics/evidence/browser/sidebar-icon-only.png",
+      "mediaType": "image/png",
+      "bytes": 64990,
+      "digest": "sha256:858b0f7b9cdd459e09b05c9047b85827502ec6dd225f70397f85488afdda5d27"
+    }
+  ]
+}

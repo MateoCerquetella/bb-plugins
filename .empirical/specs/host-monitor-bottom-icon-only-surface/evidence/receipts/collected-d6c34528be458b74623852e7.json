@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-d6c34528be458b74623852e7",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3",
+    "AC-UI-4"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-09-04T15:11:33.784Z",
+  "completedAt": "2026-09-04T15:11:33.784Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-bottom-icon-only-surface",
+    "specRevision": 3,
+    "specDigest": "sha256:91b95406a1be92b5dcb40ac5fdc7516cac1111322a12c454334458d60fe44b76",
+    "treeDigest": "sha256:6cb075c529016f9ea48b24b2f5d77fc74b1f955c05a77f8efc5cdbe44bce1ba2",
+    "policyDigest": "sha256:3425fbb9bad135beeeb67d6becc5c9c1152d50729eda1ad2fdf33c05b6747679"
+  },
+  "digest": "sha256:54f1b871278e89a5cdface8a2ca1b60ab3e25a1763c167db2d518c0190ca5233",
+  "kind": "collected",
+  "collector": "empirical-review:independent-read-only-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/host-monitor-bottom-icon-only-surface/reviews/87051dd0e77027ea142ddfee.json",
+      "mediaType": "application/json",
+      "bytes": 3593,
+      "digest": "sha256:dadc9e43897ec0f3a3a963e028c430656ce0f6a7b17f3e7aaa927004fb1e0e58"
+    },
+    {
+      "path": ".empirical/specs/host-monitor-bottom-icon-only-surface/reviews/87051dd0e77027ea142ddfee.md",
+      "mediaType": "text/markdown",
+      "bytes": 2855,
+      "digest": "sha256:15dac14f2afc7f157e4040d239d16793588c978c61071422b7ea682134e1fc95"
+    }
+  ]
+}
