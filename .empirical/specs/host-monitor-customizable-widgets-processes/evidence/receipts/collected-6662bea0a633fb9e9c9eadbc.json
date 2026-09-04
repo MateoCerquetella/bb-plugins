@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-6662bea0a633fb9e9c9eadbc",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3",
+    "AC-UI-4",
+    "AC-UI-5"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "Independent exact-range final review approved all criteria with no findings after verifying receipt and screenshot integrity.",
+  "passed": true,
+  "startedAt": "2026-09-04T17:04:35.197Z",
+  "completedAt": "2026-09-04T17:04:35.197Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "host-monitor-customizable-widgets-processes",
+    "specRevision": 3,
+    "specDigest": "sha256:0f675990300c9c0db81b1e9c546fcb6c5535bdfbba824c9c0ed513f2f64a697e",
+    "treeDigest": "sha256:f8902fdff7f5d9073ea63dc24fbb0f91c7de7e4245d68e7990ac28e338b9713c",
+    "policyDigest": "sha256:34cb74e5a73a43fa03cfc3431653cf299fd3a920d5e3e02c7a795a02cffbdc6f"
+  },
+  "digest": "sha256:f781e144bd1d9a153fd85976bf3845b2cc1d5dd85bec63305db2249db1b44b59",
+  "kind": "collected",
+  "collector": "isolated-reviewer:host_monitor_evidence_rereview",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/host-monitor-customizable-widgets-processes/evidence/scoped-review.md",
+      "mediaType": "text/plain",
+      "bytes": 887,
+      "digest": "sha256:e54112b684f8be447b1631ca3e21ce6c69677cb75571183d2461be2a8023805c"
+    }
+  ]
+}
