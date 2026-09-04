@@ -179,6 +179,18 @@ test("native app owns the Control Strip and fullscreen panel without physical st
     controller,
     /@objc private func closeTapped[\s\S]*?NSApp\.terminate\(nil\)/u,
   );
+  assert.match(controller, /static let bbUnreadAlert/u);
+  assert.match(controller, /private final class UnreadAlertButton: NSButton/u);
+  assert.match(controller, /NSSize\(width: 1_000, height: 30\)/u);
+  assert.match(controller, /0\.48, blue: 0\.02/u);
+  assert.match(controller, /AGENT FINISHED — TAP TO VIEW/u);
+  assert.match(controller, /func syncUnreadAlert/u);
+  assert.match(controller, /unreadIds\.subtracting\(knownUnreadIds\)/u);
+  assert.match(controller, /bar\.defaultItemIdentifiers = \[\.bbUnreadAlert\]/u);
+  assert.match(controller, /Timer\(timeInterval: 0\.55, repeats: true\)/u);
+  assert.match(controller, /accessibilityDisplayShouldReduceMotion/u);
+  assert.match(controller, /dismissUnreadAlert\(showThreads: true\)/u);
+  assert.match(controller, /case \.bbUnreadAlert: return unreadAlertItem/u);
   assert.match(controller, /projectInitials/u);
   assert.match(controller, /provider == "cursor" \|\| provider == "acp-cursor"/u);
   assert.match(controller, /\.error: 0, \.blocked: 1, \.done: 2, \.working: 3/u);
@@ -276,7 +288,7 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(controller, /BBTouchBarUsageCursor/u);
   assert.match(controller, /0x34A853/u);
   assert.match(controller, /0xD9911A/u);
-  assert.match(controller, /0x3B82C4/u);
+  assert.match(controller, /0xFF7A00/u);
   assert.match(controller, /0xD94B4B/u);
   assert.match(controller, /iconView\.layer\?\.borderWidth = 0/u);
   assert.match(controller, /iconView\.layer\?\.cornerRadius = 12/u);

@@ -17,6 +17,8 @@ Swift/AppKit background app owns the physical Touch Bar:
   host cards containing compact circular CPU, RAM, disk, download, and upload
   gauges for every enrolled host;
 - tap ✕ to quit the native Touch Bar app completely;
+- a new unread result automatically fills the Touch Bar with a flashing orange
+  completion alert; tap it to reveal the finished thread cards;
 - automatic restoration after login and wake.
 
 No subscription, developer account, external runtime, telemetry, or proprietary
@@ -149,6 +151,12 @@ gauge colors on the next sample; download remains red and upload blue.
 
 Trackpad or finger horizontal scrolling moves the card lane; paging arrows are
 intentionally omitted to preserve card space.
+
+When a thread first becomes unread, the native app presents a full-width orange
+completion alert and pulses it until you tap it or the unread state clears. The
+same unread thread is announced only once per unread transition, so the two-second
+snapshot refresh does not repeatedly reopen the alert. With Reduce Motion enabled
+in macOS accessibility settings, the alert stays solid orange instead of flashing.
 
 ## Controls
 

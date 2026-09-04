@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-0459bbe2b17952857a77e87c",
+  "criteria": [
+    "AC-4",
+    "AC-5",
+    "AC-7",
+    "AC-8"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Mac-side evidence records successful Swift compilation, checksum-pinned Homebrew upgrade, scoped quarantine removal, real snapshot connectivity, controlled unread transition presentation, fixture cleanup, and restoration of the production BB path.",
+  "passed": true,
+  "startedAt": "2026-09-04T15:15:57.379Z",
+  "completedAt": "2026-09-04T15:15:57.379Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "implement-a-new-independently-installable-bb-touch-bar-plugin-for",
+    "specRevision": 2,
+    "specDigest": "sha256:2cb81eb836af98d280d0660ae933e1f9672f2d1932631e43bef9d4f04b55ef08",
+    "treeDigest": "sha256:3418ae559a406abce1e242ad0a49664de248f2653994604eaf8706fbfbe9e957",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf"
+  },
+  "digest": "sha256:58280e87db53379f8d8102e9c0f459f109ac2018e2914248a6daf7558aa06f90",
+  "kind": "collected",
+  "collector": "codex-remote-mac-verification",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/implement-a-new-independently-installable-bb-touch-bar-plugin-for/artifacts/mac-unread-alert-verification.txt",
+      "mediaType": "text/plain",
+      "bytes": 1345,
+      "digest": "sha256:370bcbd6c443b24e8d72454c38bf6b916471e902d4b01a7a4d9c4e37f7901995"
+    }
+  ]
+}

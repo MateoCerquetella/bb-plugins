@@ -1,0 +1,25 @@
+Mac host: Mateo's MacBook Pro (Intel x86_64), macOS Tahoe 26.2
+Observed: 2026-09-04
+
+Native build and installation:
+- Swift/AppKit compilation completed successfully with warnings treated as errors.
+- package version: 0.1.0-unreadalert.1
+- package SHA-256: bd8484ecb0265f2fef6355907549e329dff0f160fbf60cef87785414fb242691
+- Homebrew upgraded the private local-tap Cask from 0.1.0-wakefix.1.
+- Gatekeeper quarantine was removed only from /Applications/BB Touch Bar.app.
+- The running executable is /Applications/BB Touch Bar.app/Contents/MacOS/BBTouchBar.
+- A real bb touchbar snapshot succeeds after installation.
+
+Unread transition exercise:
+- The app was restarted against a controlled one-thread unread snapshot.
+- The installed app logged: presented unread completion alert for 1 agent(s)
+- The fixture was then removed.
+- The bb-path configuration was restored to /usr/local/bin/bb.
+- The installed app was restarted against the real BB server and remains running.
+
+Behavioral contract:
+- New unread thread ids trigger once per unread transition.
+- The alert occupies the modal Touch Bar with a full-width orange button.
+- The orange fill pulses every 0.55 seconds unless Reduce Motion is enabled.
+- Tapping the alert stops the pulse and reveals the normal thread panel.
+- Clearing all unread state dismisses an automatically opened alert.
