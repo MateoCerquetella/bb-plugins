@@ -472,6 +472,8 @@ function MachineDashboard({
   saving: boolean;
   thresholds: Fleet["thresholds"];
 }) {
+  const [draggedWidgetKey, setDraggedWidgetKey] = useState<string | null>(null);
+
   if (machine == null) {
     return (
       <section className="host-monitor__dashboard host-monitor__dashboard--empty">
@@ -482,6 +484,17 @@ function MachineDashboard({
   const snapshot = machine.snapshot;
   const renderedConfig = editing && draft != null ? draft : config;
   const panels = renderedConfig == null ? [] : visibleDashboardPanels(renderedConfig);
+
+  const moveDashboardWidget = (fromKey: string, toKey: string) => {
+    if (!editing || draft == null || fromKey === toKey) return;
+    const from = draft.panels.findIndex((panel) => dashboardPanelKey(panel) === fromKey);
+    const to = draft.panels.findIndex((panel) => dashboardPanelKey(panel) === toKey);
+    if (from < 0 || to < 0) return;
+    const moved = draft.panels[from];
+    if (moved == null) return;
+    onChangeDraft(moveDashboardPanel(draft, from, to));
+    onAnnouncement(`${DASHBOARD_CATALOG[moved.metric].label} ${presentationLabel(moved)} moved on the dashboard.`);
+  };
 
   return (
     <section className="host-monitor__dashboard" aria-labelledby="machine-heading">
@@ -528,20 +541,57 @@ function MachineDashboard({
         <div className="host-monitor__empty"><strong>No widgets shown</strong><span>Customize the dashboard to choose visible metrics.</span></div>
       ) : (
         <div className="host-monitor__panel-grid" data-editing={editing}>
-          {panels.map((panel) => (
-            <MetricPanel
-              key={dashboardPanelKey(panel)}
-              machine={machine}
-              panel={panel}
-              points={points}
-              rangeHours={rangeHours}
-              thresholds={thresholds}
-            />
-          ))}
+          {panels.map((panel) => {
+            const key = dashboardPanelKey(panel);
+            return (
+              <div
+                className="host-monitor__grid-item"
+                data-accent={panel.metric}
+                data-dragging={draggedWidgetKey === key}
+                data-span={widgetSpan(panel)}
+                data-widget-key={key}
+                draggable={editing}
+                key={key}
+                onDragEnd={() => setDraggedWidgetKey(null)}
+                onDragOver={(event) => {
+                  if (editing && draggedWidgetKey != null) event.preventDefault();
+                }}
+                onDragStart={(event) => {
+                  if (!editing) return;
+                  setDraggedWidgetKey(key);
+                  event.dataTransfer.effectAllowed = "move";
+                  event.dataTransfer.setData("text/plain", key);
+                }}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  const source = draggedWidgetKey ?? event.dataTransfer.getData("text/plain");
+                  if (source !== "") moveDashboardWidget(source, key);
+                  setDraggedWidgetKey(null);
+                }}
+              >
+                {editing && (
+                  <span aria-hidden="true" className="host-monitor__widget-drag-handle" title="Drag widget to reorder">⠿ Drag</span>
+                )}
+                <MetricPanel
+                  machine={machine}
+                  panel={panel}
+                  points={points}
+                  rangeHours={rangeHours}
+                  thresholds={thresholds}
+                />
+              </div>
+            );
+          })}
         </div>
       )}
     </section>
   );
+}
+
+function widgetSpan(panel: DashboardPanel): "single" | "wide" | "full" {
+  if (panel.metric === "processes") return "full";
+  if (panel.metric === "system" || panel.visualization === "timeseries") return "wide";
+  return "single";
 }
 
 function MetricPanel({

@@ -24,6 +24,7 @@ const modalPath = join(outputDir, "mini-modal-desktop.png");
 const processPath = join(outputDir, "process-widget-wide.png");
 const processDialogPath = join(outputDir, "process-confirmation.png");
 const comboPath = join(outputDir, "history-combobox.png");
+const dashboardDragPath = join(outputDir, "dashboard-drag.png");
 
 try {
   let pages;
@@ -140,7 +141,7 @@ try {
   })`);
   if (navigationState.marker !== documentMarker || navigationState.visiblePageRows !== 0 || navigationState.settingsRoute) throw new Error(`Navigation reloaded or exposed the row: ${JSON.stringify(navigationState)}`);
   await waitFor("document.querySelectorAll('.host-monitor__machine-card').length >= 2");
-  await waitFor("document.querySelectorAll('.host-monitor__panel-grid > article').length > 0");
+  await waitFor("document.querySelectorAll('.host-monitor__grid-item > article').length > 0");
   const comboboxSummary = await evaluate(`({
     role: document.querySelector('.bb-select__trigger')?.getAttribute('role'),
     label: document.querySelector('.bb-select__trigger')?.getAttribute('aria-labelledby'),
@@ -173,13 +174,15 @@ try {
 
   const initial = await evaluate(`({
     machines: document.querySelectorAll('.host-monitor__machine-card').length,
-    panels: document.querySelectorAll('.host-monitor__panel-grid > article').length,
+    panels: document.querySelectorAll('.host-monitor__grid-item > article').length,
     selected: document.querySelector('#machine-heading')?.textContent ?? null,
     alerts: document.querySelectorAll('[role="alert"]').length,
-    settingsRoute: location.pathname.includes('/settings')
+    settingsRoute: location.pathname.includes('/settings'),
+    monitorFont: getComputedStyle(document.querySelector('.host-monitor')).fontFamily,
+    nativeFont: getComputedStyle(Array.from(document.querySelectorAll('button')).find((button) => button.textContent?.trim() === 'New thread') ?? document.body).fontFamily
   })`);
   initial.footerActionsBefore = footerActionsBefore;
-  if (initial.footerActionsBefore !== 1 || initial.alerts !== 0 || initial.settingsRoute) throw new Error(`Unexpected dedicated page: ${JSON.stringify(initial)}`);
+  if (initial.footerActionsBefore !== 1 || initial.alerts !== 0 || initial.settingsRoute || initial.monitorFont !== initial.nativeFont) throw new Error(`Unexpected dedicated page: ${JSON.stringify(initial)}`);
   await screenshot(monitorPath);
 
   const processHostName = await evaluate(`Array.from(document.querySelectorAll('.host-monitor__machine-card')).find((button) => button.querySelector('strong')?.textContent === 'dyaus' && !button.disabled)?.querySelector('strong')?.textContent ?? null`);
@@ -225,6 +228,26 @@ try {
   const changedKey = originalWidgets[0].key;
   await evaluate("document.querySelector('.host-monitor__editor')?.scrollIntoView({ block: 'start' })");
   await screenshot(desktopPath);
+  const gridDragKey = await evaluate("document.querySelectorAll('.host-monitor__grid-item')[0]?.dataset.widgetKey ?? null");
+  if (gridDragKey == null) throw new Error("No visible dashboard widget was available to drag.");
+  await evaluate(`(() => {
+    const transfer = new DataTransfer();
+    window.__hostMonitorGridQaTransfer = transfer;
+    document.querySelectorAll('.host-monitor__grid-item')[0]?.dispatchEvent(new DragEvent('dragstart', { bubbles: true, dataTransfer: transfer }));
+  })()`);
+  await waitFor("document.querySelectorAll('.host-monitor__grid-item')[0]?.dataset.dragging === 'true'");
+  await evaluate(`(() => {
+    const transfer = window.__hostMonitorGridQaTransfer;
+    const target = document.querySelectorAll('.host-monitor__grid-item')[1];
+    target?.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true, dataTransfer: transfer }));
+    target?.dispatchEvent(new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer: transfer }));
+    delete window.__hostMonitorGridQaTransfer;
+  })()`);
+  await waitFor(`document.querySelectorAll('.host-monitor__grid-item')[1]?.dataset.widgetKey === ${JSON.stringify(gridDragKey)}`);
+  await evaluate("document.querySelector('.host-monitor__panel-grid')?.scrollIntoView({ block: 'start' })");
+  await screenshot(dashboardDragPath);
+  await evaluate(`document.querySelector('.host-monitor__editor-list [data-widget-key="${gridDragKey}"] button[aria-label*=" earlier"]')?.click()`);
+  await waitFor(`document.querySelectorAll('.host-monitor__grid-item')[0]?.dataset.widgetKey === ${JSON.stringify(gridDragKey)}`);
   await evaluate(`(() => {
     const transfer = new DataTransfer();
     window.__hostMonitorQaTransfer = transfer;
@@ -239,10 +262,10 @@ try {
     delete window.__hostMonitorQaTransfer;
   })()`);
   await waitFor(`document.querySelectorAll('.host-monitor__editor-list > li')[1]?.dataset.widgetKey === ${JSON.stringify(changedKey)}`);
-  await evaluate(`document.querySelector('[data-widget-key="${changedKey}"] button[aria-label*=" earlier"]')?.click()`);
+  await evaluate(`document.querySelector('.host-monitor__editor-list [data-widget-key="${changedKey}"] button[aria-label*=" earlier"]')?.click()`);
   await waitFor(`document.querySelectorAll('.host-monitor__editor-list > li')[0]?.dataset.widgetKey === ${JSON.stringify(changedKey)}`);
-  await evaluate(`document.querySelector('[data-widget-key="${changedKey}"] input[type=checkbox]')?.click()`);
-  await evaluate(`document.querySelector('[data-widget-key="${changedKey}"] button[aria-label*=" later"]')?.click()`);
+  await evaluate(`document.querySelector('.host-monitor__editor-list [data-widget-key="${changedKey}"] input[type=checkbox]')?.click()`);
+  await evaluate(`document.querySelector('.host-monitor__editor-list [data-widget-key="${changedKey}"] button[aria-label*=" later"]')?.click()`);
   await evaluate(`Array.from(document.querySelectorAll('.host-monitor__editor button')).find((button) => button.textContent?.trim() === 'Save layout')?.click()`);
   await waitFor("document.querySelector('.host-monitor__editor') === null");
   await evaluate("new Promise((resolve) => setTimeout(resolve, 300))");
@@ -257,8 +280,8 @@ try {
   await waitFor("document.querySelector('.host-monitor__editor') !== null");
   const persistedWidgets = await evaluate(`Array.from(document.querySelectorAll('.host-monitor__editor-list > li')).map((row) => ({ key: row.dataset.widgetKey, visible: row.querySelector('input[type=checkbox]')?.checked ?? false }))`);
   if (persistedWidgets[1]?.key !== changedKey || persistedWidgets[1]?.visible === originalWidgets[0]?.visible) throw new Error(`Widget layout did not persist: ${JSON.stringify({ changedKey, originalWidgets, persistedWidgets })}`);
-  await evaluate(`document.querySelector('[data-widget-key="${changedKey}"] input[type=checkbox]')?.click()`);
-  await evaluate(`document.querySelector('[data-widget-key="${changedKey}"] button[aria-label*=" earlier"]')?.click()`);
+  await evaluate(`document.querySelector('.host-monitor__editor-list [data-widget-key="${changedKey}"] input[type=checkbox]')?.click()`);
+  await evaluate(`document.querySelector('.host-monitor__editor-list [data-widget-key="${changedKey}"] button[aria-label*=" earlier"]')?.click()`);
   await evaluate(`Array.from(document.querySelectorAll('.host-monitor__editor button')).find((button) => button.textContent?.trim() === 'Save layout')?.click()`);
   await waitFor("document.querySelector('.host-monitor__editor') === null");
 
@@ -266,7 +289,7 @@ try {
   if (targetName == null) throw new Error("A second host was not available.");
   await evaluate(`Array.from(document.querySelectorAll('.host-monitor__machine-card')).find((button) => button.querySelector('strong')?.textContent === ${JSON.stringify(targetName)})?.click()`);
   await waitFor(`document.querySelector('.host-monitor__machine-card[data-selected="true"] strong')?.textContent === ${JSON.stringify(targetName)}`);
-  await waitFor("document.querySelectorAll('.host-monitor__panel-grid > article').length > 0");
+  await waitFor("document.querySelectorAll('.host-monitor__grid-item > article').length > 0");
 
   await call("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 1, mobile: false });
   await call("Page.navigate", { url: `${serverUrl}/plugins/host-monitor/host-monitor` });
@@ -297,7 +320,7 @@ try {
   if (narrow.overflow || narrow.rows < 10 || narrow.hostStripOverflow !== 'auto' || narrow.processTableDisplay !== 'none' || narrow.processListDisplay !== 'grid' || narrow.rangeRight > narrow.viewport[0] || narrow.rangeWidth < 96) throw new Error(`Invalid narrow layout: ${JSON.stringify(narrow)}`);
   await screenshot(narrowPath);
 
-  console.log(JSON.stringify({ modal: modalSummary, navigation: navigationState, combobox: { ...comboboxSummary, options: comboOptions, keyboardFocusRestored: true, narrowBounds: narrowCombo }, initial, widgets: { original: originalWidgets.length, persisted: persistedWidgets.length, changedKey }, processes: processSummary, switchedTo: targetName, narrow, artifacts: [sidebarPath, modalPath, monitorPath, comboPath, processPath, processDialogPath, desktopPath, narrowPath] }));
+  console.log(JSON.stringify({ modal: modalSummary, navigation: navigationState, combobox: { ...comboboxSummary, options: comboOptions, keyboardFocusRestored: true, narrowBounds: narrowCombo }, initial, widgets: { original: originalWidgets.length, persisted: persistedWidgets.length, changedKey, gridDragKey }, processes: processSummary, switchedTo: targetName, narrow, artifacts: [sidebarPath, modalPath, monitorPath, comboPath, dashboardDragPath, processPath, processDialogPath, desktopPath, narrowPath] }));
   socket.close();
 } finally {
   browser.kill("SIGTERM");

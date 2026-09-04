@@ -51,6 +51,24 @@ test("widget editor exposes pointer and keyboard-accessible reorder paths", () =
   assert.match(app, /Save layout/u);
 });
 
+test("live dashboard widgets are draggable in customization mode", () => {
+  assert.match(app, /className="host-monitor__grid-item"/u);
+  assert.match(app, /draggable=\{editing\}/u);
+  assert.match(app, /moveDashboardWidget\(source, key\)/u);
+  assert.match(app, /className="host-monitor__widget-drag-handle"/u);
+  assert.match(styles, /\.host-monitor__panel-grid\[data-editing="true"\]\s+\.host-monitor__grid-item/u);
+  assert.match(styles, /\.host-monitor__grid-item\[data-dragging="true"\]/u);
+});
+
+test("typography and restrained accents use BB theme conventions", () => {
+  assert.match(styles, /font-family:\s*"Inter Variable",\s*Inter,\s*sans-serif/u);
+  assert.match(styles, /--host-monitor-widget-accent:\s*var\(--muted-foreground\)/u);
+  assert.match(styles, /data-accent="cpu"[\s\S]*var\(--primary\)/u);
+  assert.match(styles, /data-accent="memory"[\s\S]*var\(--success\)/u);
+  assert.match(styles, /data-accent="disk"[\s\S]*var\(--warning\)/u);
+  assert.doesNotMatch(styles, /#[0-9a-f]{3,8}\b/iu);
+});
+
 test("process widget is selected-host scoped and uses explicit confirmation", () => {
   assert.match(app, /machine\.host\.id/u);
   assert.match(app, /machine\.host\.status !== "connected"/u);
