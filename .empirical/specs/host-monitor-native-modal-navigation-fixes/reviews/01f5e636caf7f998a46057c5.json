@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:70718d40f06a32cfbb7d8b5b20ff4ddff177fd6dc96b07d7991afb3ff2ea2ae9",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "a6391be14058735b3aebe1769edb313f20100014",
+  "headCommit": "b0afe44b1a9f789a701b6393022532ddc81bf0e7",
+  "diffDigest": "sha256:da4c4ce7f4a2a30b11cf213af519038cf7ae102db593ec2544ea313e58f3bea1",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "isolated-empirical-reviewer",
+  "reviewerInvocationId": "prior_feature_formal_review",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- PASS AC-UI-1: Exactly one footer action is registered; the exact semantic nav row is hidden without removal, remounts are observed, and prior hidden state is restored on disposal.\n- PASS AC-UI-2: Open Host Monitor clicks the hidden native row button with no hard reload or Settings fallback; browser evidence preserves document identity.\n- PASS AC-UI-3: CPU/RAM guides are strictly parsed and expose accessible over, below, stale, offline, and unavailable states without alerts.\n- PASS AC-UI-4: The committed CSS uses BB tokens, compact controls, focus treatment, constrained scrolling, and responsive behavior verified at 390px.\n- PASS AC-1: Suppression is exact, reversible, remount-aware, and does not delete or reorder host nodes.\n- PASS AC-2: Fleet RPC, row count, polling, abort behavior, parsing, text bounds, and safe DOM rendering are bounded.\n- PASS AC-3: Fleet, sampling, realtime, history, and independently keyed dashboard persistence are retained.\n- PASS AC-4: No notifications, warning badges, IP/process UI, Settings monitor, hard navigation, overlay, or floating monitor remains.\n- FAIL AC-5: Focused checks and browser evidence exist, but immutable root workspace-check and reproducible final-diff evidence were absent from the reviewed packet.\n\n## Security / correctness\n\nNo blocking security or runtime-correctness defect was found. The requested change is blocked only by incomplete AC-5 evidence.\n\n## Design / maintainability\n\nResponsibilities are separated and tested. Exact dependency on BB semantic navigation markup is appropriately contained by reversible cleanup and inline failure.",
+  "bodyDigest": "sha256:43bdd8427958277d328b0405b10066be0189dc88704a6df75eeb55080684bf1f",
+  "digest": "sha256:01f5e636caf7f998a46057c59f7d004835f7f36c9c0cad26b7855f7e78fee0e7"
+}
