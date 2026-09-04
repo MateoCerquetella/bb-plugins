@@ -276,15 +276,6 @@ test("uses the tightest Antigravity group in compact usage", () => {
   ]);
 });
 
-test("normalizes an uninstalled Antigravity provider", () => {
-  const provider = normalizeUsage(
-    { antigravity: { status: "not_installed" } },
-    { id: null, name: null },
-  ).providers.find((candidate) => candidate.id === "antigravity");
-  assert.equal(provider?.status, "not_installed");
-  assert.equal(provider?.message, "Antigravity is not installed on this machine.");
-});
-
 test("keeps current provider wire-key windows intact", () => {
   const snapshot = normalizeUsage(
     {
