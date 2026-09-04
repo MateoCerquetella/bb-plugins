@@ -269,12 +269,6 @@ function metric(label: string, value: number | null, threshold: number | null, i
   wrapper.setAttribute("aria-label", presentation.accessibleLabel);
   const term = document.createElement("dt");
   term.textContent = label;
-  if (threshold !== null) {
-    const guide = document.createElement("small");
-    guide.textContent = `${threshold}%`;
-    guide.setAttribute("aria-hidden", "true");
-    term.append(" ", guide);
-  }
   const detail = document.createElement("dd");
   detail.textContent = value === null ? "—" : `${value.toFixed(1)}%`;
   wrapper.append(term, detail);

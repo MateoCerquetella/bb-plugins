@@ -33,7 +33,7 @@ test("restores the bottom modal and dedicated Host Monitor page", () => {
   assert.doesNotMatch(app, /experimental_sidebarAccessory/u);
 });
 
-test("ships per-host history and metrics-only host sources", () => {
+test("ships per-host history and bounded process host sources", () => {
   assert.equal(manifest.dependencies.echarts, "6.1.0");
   assert.ok(manifest.dependencies["better-sqlite3"]);
   for (const source of ["chart-data.ts", "dashboard-config.ts", "sidebar-modal.ts", "contract.ts", "host.ts", "store.ts", "lib/"]) {
@@ -43,7 +43,7 @@ test("ships per-host history and metrics-only host sources", () => {
   assert.ok(manifest.files.includes("dist/host.meta.json"));
 });
 
-test("keeps the modal and page notification-free", () => {
+test("keeps the modal and page notification-free while restoring guarded processes", () => {
   for (const source of [app, server]) {
     assert.doesNotMatch(
       source,
@@ -52,15 +52,20 @@ test("keeps the modal and page notification-free", () => {
   }
   assert.doesNotMatch(app, /role="alert"/u);
   assert.match(app, /role="status"/u);
-  assert.doesNotMatch(server, /terminateProcess|listProcesses|primaryIpAddress/u);
+  assert.doesNotMatch(server, /primaryIpAddress/u);
+  assert.match(server, /ProcessConfirmationStore/u);
+  assert.match(server, /prepareProcessTermination/u);
+  assert.match(server, /executeProcessTermination/u);
   assert.match(app, /<DashboardEditor/u);
+  assert.match(app, /<ProcessesWidget/u);
+  assert.match(app, /<AlertDialog\.Root/u);
   assert.match(app, /rpc\.call\("saveDashboardConfig"/u);
 });
 
 test("imports only public SDK and declared third-party surfaces", () => {
   const scan = experimental_scanPublicSdkOnly(
     new URL("..", import.meta.url).pathname,
-    { allow: [/^better-sqlite3$/u, /^echarts(?:\/.*)?$/u, /^react$/u] },
+    { allow: [/^better-sqlite3$/u, /^echarts(?:\/.*)?$/u, /^react$/u, /^@radix-ui\/react-alert-dialog$/u] },
   );
   assert.deepEqual(scan.violations, []);
   assert.deepEqual(scan.privateDependencies, []);

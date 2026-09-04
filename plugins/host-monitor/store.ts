@@ -1,7 +1,7 @@
 import type Database from "better-sqlite3";
 
 import { dashboardConfigSchema, type DashboardConfig, type HistoryPoint, type MachineSnapshot } from "./contract.ts";
-import { defaultDashboardConfig } from "./dashboard-config.ts";
+import { defaultDashboardConfig, normalizeDashboardConfig } from "./dashboard-config.ts";
 
 export const MAX_RENDER_POINTS = 720;
 export const RETENTION_MS = 30 * 24 * 60 * 60_000;
@@ -121,8 +121,7 @@ export class HostMonitorStore {
       .get(hostId) as { configJson: string } | undefined;
     if (row === undefined) return defaultDashboardConfig();
     try {
-      const parsed = dashboardConfigSchema.safeParse(JSON.parse(row.configJson));
-      return parsed.success ? parsed.data : defaultDashboardConfig();
+      return dashboardConfigSchema.parse(normalizeDashboardConfig(JSON.parse(row.configJson)));
     } catch {
       return defaultDashboardConfig();
     }

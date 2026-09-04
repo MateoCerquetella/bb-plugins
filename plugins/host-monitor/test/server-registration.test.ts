@@ -4,6 +4,7 @@ import type { BbPluginApi } from "@get-bb/plugin-sdk";
 import { createFakePluginHost } from "@get-bb/plugin-sdk/testing";
 
 import { type Fleet, type MachineSnapshot } from "../contract.ts";
+import { defaultDashboardConfig } from "../dashboard-config.ts";
 import plugin from "../server.ts";
 
 type HostRecord = Awaited<ReturnType<BbPluginApi["sdk"]["hosts"]["list"]>>[number];
@@ -147,8 +148,10 @@ test("dashboard configuration is isolated by enrolled host and survives plugin r
   t.after(() => fake.harness.lifecycle.dispose());
   await plugin(fake.bb);
 
-  const alpha = { version: 1, panels: [{ metric: "cpu", visualization: "timeseries" }] } as const;
-  const bravo = { version: 1, panels: [{ metric: "uptime", visualization: "stat" }] } as const;
+  const alpha = defaultDashboardConfig();
+  alpha.panels.reverse();
+  const bravo = defaultDashboardConfig();
+  bravo.panels[0]!.visible = false;
   assert.deepEqual(await fake.harness.behavior.callRpc("saveDashboardConfig", { hostId: "host-alpha", config: alpha }), alpha);
   assert.deepEqual(await fake.harness.behavior.callRpc("saveDashboardConfig", { hostId: "host-bravo", config: bravo }), bravo);
   assert.deepEqual(await fake.harness.behavior.callRpc("dashboardConfig", { hostId: "host-alpha" }), alpha);

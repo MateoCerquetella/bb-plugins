@@ -5,6 +5,7 @@ import {
   DASHBOARD_METRICS,
   DASHBOARD_PANEL_LIMIT,
   DASHBOARD_VISUALIZATIONS,
+  isCompleteDashboardConfig,
   supportsVisualization,
 } from "./dashboard-config.ts";
 
@@ -62,10 +63,128 @@ export const machineSnapshotSchema = z.object({
 
 export type MachineSnapshot = z.infer<typeof machineSnapshotSchema>;
 
+export const processSortBySchema = z.enum(["cpu", "memory", "name"]);
+export const processTerminationModeSchema = z.enum(["graceful", "force"]);
+export const processOwnerCategorySchema = z.enum(["same-user", "different-user", "unknown"]);
+export const processBlockedReasonSchema = z.enum([
+  "elevated-session",
+  "ancestry-unavailable",
+  "system-process",
+  "monitor-process",
+  "monitor-ancestor",
+  "different-owner",
+  "unknown-owner",
+  "identity-unavailable",
+  "mode-unsupported",
+  "unsupported-platform",
+]);
+
+const opaqueProcessIdentitySchema = z.string().regex(/^[A-Za-z0-9_-]{43}$/u, "Invalid opaque process identity.");
+
+export const processRowSchema = z.object({
+  pid: z.number().int().nonnegative(),
+  name: z.string().min(1).max(120),
+  identity: opaqueProcessIdentitySchema.nullable(),
+  cpuPercent: percent,
+  rssBytes: bytes,
+  memoryPercent: percent,
+  startedAtMs: timestamp.nullable(),
+  ownerCategory: processOwnerCategorySchema,
+  allowedTerminationModes: z.array(processTerminationModeSchema).max(2)
+    .refine((modes) => new Set(modes).size === modes.length, { message: "Termination modes must be unique." }),
+  blockedReason: processBlockedReasonSchema.nullable(),
+}).strict().superRefine((row, context) => {
+  if ((row.blockedReason === null) !== (row.allowedTerminationModes.length > 0)) {
+    context.addIssue({ code: "custom", message: "A process must have either allowed termination modes or a blocked reason." });
+  }
+  if (row.identity === null && row.blockedReason === null) {
+    context.addIssue({ code: "custom", message: "A process without a lifetime identity cannot be actionable." });
+  }
+});
+
+export type ProcessSortBy = z.infer<typeof processSortBySchema>;
+export type ProcessTerminationMode = z.infer<typeof processTerminationModeSchema>;
+export type ProcessOwnerCategory = z.infer<typeof processOwnerCategorySchema>;
+export type ProcessBlockedReason = z.infer<typeof processBlockedReasonSchema>;
+export type ProcessRow = z.infer<typeof processRowSchema>;
+
+const processPlatformSchema = z.enum(["linux", "darwin", "win32"]);
+const hostProcessListSchema = z.object({
+  sampledAtMs: timestamp,
+  platform: processPlatformSchema,
+  elevated: z.boolean(),
+  totalCount: z.number().int().nonnegative(),
+  truncated: z.boolean(),
+  processes: z.array(processRowSchema).max(200),
+}).strict().superRefine((result, context) => {
+  if (result.totalCount < result.processes.length) {
+    context.addIssue({ code: "custom", message: "The process total cannot be smaller than the returned page." });
+  }
+  if (result.truncated !== (result.totalCount > result.processes.length)) {
+    context.addIssue({ code: "custom", message: "The process truncated flag must match the returned page." });
+  }
+});
+
+const processTerminationCandidateSchema = z.object({
+  pid: z.number().int().nonnegative(),
+  name: z.string().min(1).max(120),
+  identity: opaqueProcessIdentitySchema,
+  mode: processTerminationModeSchema,
+  cpuPercent: percent,
+  rssBytes: bytes,
+  memoryPercent: percent,
+  startedAtMs: timestamp.nullable(),
+}).strict();
+
+const terminationBlockedSchema = z.object({
+  outcome: z.literal("blocked"),
+  reason: processBlockedReasonSchema,
+  message: z.string().min(1).max(240),
+}).strict();
+
+const terminationUnavailableSchema = z.discriminatedUnion("outcome", [
+  z.object({ outcome: z.literal("not-found"), message: z.string().min(1).max(240) }).strict(),
+  z.object({ outcome: z.literal("identity-changed"), message: z.string().min(1).max(240) }).strict(),
+]);
+
+const hostPrepareTerminationResultSchema = z.union([
+  z.object({ outcome: z.literal("ready"), process: processTerminationCandidateSchema }).strict(),
+  terminationBlockedSchema,
+  terminationUnavailableSchema,
+]);
+
+const hostExecuteTerminationResultSchema = z.union([
+  z.object({ outcome: z.literal("signal-sent"), message: z.string().min(1).max(240) }).strict(),
+  z.object({ outcome: z.literal("still-running"), message: z.string().min(1).max(240) }).strict(),
+  terminationBlockedSchema,
+  terminationUnavailableSchema,
+  z.object({ outcome: z.literal("signal-failed"), message: z.string().min(1).max(240) }).strict(),
+]);
+
 export const hostContract = defineRpcContract({
   snapshot: {
     input: z.object({ cpuSampleMs: z.number().int().min(100).max(1_000) }).strict(),
     output: machineSnapshotSchema,
+  },
+  listProcesses: {
+    input: z.object({ sortBy: processSortBySchema, limit: z.number().int().min(1).max(200) }).strict(),
+    output: hostProcessListSchema,
+  },
+  inspectProcessTermination: {
+    input: z.object({
+      pid: z.number().int().nonnegative(),
+      identity: opaqueProcessIdentitySchema,
+      mode: processTerminationModeSchema,
+    }).strict(),
+    output: hostPrepareTerminationResultSchema,
+  },
+  terminateProcess: {
+    input: z.object({
+      pid: z.number().int().nonnegative(),
+      identity: opaqueProcessIdentitySchema,
+      mode: processTerminationModeSchema,
+    }).strict(),
+    output: hostExecuteTerminationResultSchema,
   },
 });
 
@@ -116,6 +235,7 @@ const rangeHoursSchema = z.union([
 export const dashboardPanelSchema = z.object({
   metric: z.enum(DASHBOARD_METRICS),
   visualization: z.enum(DASHBOARD_VISUALIZATIONS),
+  visible: z.boolean(),
 }).strict().superRefine((panel, context) => {
   if (!supportsVisualization(panel.metric, panel.visualization)) {
     context.addIssue({
@@ -127,8 +247,8 @@ export const dashboardPanelSchema = z.object({
 });
 
 export const dashboardConfigSchema = z.object({
-  version: z.literal(1),
-  panels: z.array(dashboardPanelSchema).min(1).max(DASHBOARD_PANEL_LIMIT),
+  version: z.literal(2),
+  panels: z.array(dashboardPanelSchema).length(DASHBOARD_PANEL_LIMIT),
 }).strict().superRefine((config, context) => {
   const keys = new Set<string>();
   for (const [index, panel] of config.panels.entries()) {
@@ -138,9 +258,80 @@ export const dashboardConfigSchema = z.object({
     }
     keys.add(key);
   }
+  if (!isCompleteDashboardConfig(config)) {
+    context.addIssue({ code: "custom", path: ["panels"], message: "Dashboard must contain every supported widget exactly once." });
+  }
 });
 
 const dashboardHostInputSchema = z.object({ hostId: z.string().min(1).max(256) }).strict();
+
+const processListHostSchema = z.object({
+  id: z.string().min(1).max(256),
+  name: z.string().min(1),
+  status: z.literal("connected"),
+  platform: processPlatformSchema,
+}).strict();
+
+export const processListResultSchema = z.union([
+  z.object({
+    outcome: z.literal("ok"),
+    host: processListHostSchema,
+    sampledAtMs: timestamp,
+    elevated: z.boolean(),
+    totalCount: z.number().int().nonnegative(),
+    truncated: z.boolean(),
+    processes: z.array(processRowSchema).max(200),
+  }).strict(),
+  z.object({
+    outcome: z.enum(["not-found", "offline", "unavailable", "unsupported"]),
+    message: z.string().min(1).max(240),
+  }).strict(),
+]);
+
+const preparedTerminationHostSchema = z.object({
+  id: z.string().min(1).max(256),
+  name: z.string().min(1),
+}).strict();
+
+export const preparedTerminationSchema = z.union([
+  z.object({
+    outcome: z.literal("ready"),
+    confirmationToken: z.string().regex(/^[A-Za-z0-9_-]{43}$/u, "Invalid confirmation token."),
+    expiresAtMs: timestamp,
+    host: preparedTerminationHostSchema,
+    process: processTerminationCandidateSchema,
+  }).strict(),
+  terminationBlockedSchema,
+  terminationUnavailableSchema,
+  z.object({ outcome: z.literal("unavailable"), message: z.string().min(1).max(240) }).strict(),
+]);
+
+const executedProcessSchema = processTerminationCandidateSchema.pick({ pid: true, name: true, mode: true });
+
+export const executeTerminationResultSchema = z.union([
+  z.object({
+    outcome: z.literal("signal-sent"),
+    host: preparedTerminationHostSchema,
+    process: executedProcessSchema,
+    message: z.string().min(1).max(240),
+  }).strict(),
+  z.object({
+    outcome: z.literal("still-running"),
+    host: preparedTerminationHostSchema,
+    process: executedProcessSchema,
+    message: z.string().min(1).max(240),
+  }).strict(),
+  terminationBlockedSchema,
+  terminationUnavailableSchema,
+  z.object({
+    outcome: z.enum(["signal-failed", "confirmation-expired", "confirmation-invalid", "outcome-unknown"]),
+    message: z.string().min(1).max(240),
+  }).strict(),
+]);
+
+export type ProcessListResult = z.infer<typeof processListResultSchema>;
+export type PreparedTermination = z.infer<typeof preparedTerminationSchema>;
+export type ExecuteTerminationResult = z.infer<typeof executeTerminationResultSchema>;
 
 export const rpcContract = defineRpcContract({
   fleet: { input: z.null(), output: fleetSchema },
@@ -159,6 +350,27 @@ export const rpcContract = defineRpcContract({
   saveDashboardConfig: {
     input: dashboardHostInputSchema.extend({ config: dashboardConfigSchema }).strict(),
     output: dashboardConfigSchema,
+  },
+  listProcesses: {
+    input: dashboardHostInputSchema.extend({
+      sortBy: processSortBySchema,
+      limit: z.number().int().min(1).max(200),
+    }).strict(),
+    output: processListResultSchema,
+  },
+  prepareProcessTermination: {
+    input: dashboardHostInputSchema.extend({
+      pid: z.number().int().nonnegative(),
+      identity: opaqueProcessIdentitySchema,
+      mode: processTerminationModeSchema,
+    }).strict(),
+    output: preparedTerminationSchema,
+  },
+  executeProcessTermination: {
+    input: z.object({
+      confirmationToken: z.string().regex(/^[A-Za-z0-9_-]{43}$/u, "Invalid confirmation token."),
+    }).strict(),
+    output: executeTerminationResultSchema,
   },
   refresh: {
     input: z.object({ hostId: z.string().min(1).max(256).nullable() }).strict(),

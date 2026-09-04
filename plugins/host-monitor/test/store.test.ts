@@ -49,13 +49,25 @@ test("dashboard configuration persists independently per host and corrupt rows f
   try {
     for (const migration of hostMonitorMigrations) db.exec(migration);
     const store = new HostMonitorStore(db);
-    const alpha: DashboardConfig = { version: 1, panels: [{ metric: "cpu", visualization: "timeseries" }] };
-    const bravo: DashboardConfig = { version: 1, panels: [{ metric: "uptime", visualization: "stat" }] };
+    const alpha: DashboardConfig = defaultDashboardConfig();
+    alpha.panels.reverse();
+    alpha.panels[0]!.visible = false;
+    const bravo: DashboardConfig = defaultDashboardConfig();
+    bravo.panels[0]!.visible = false;
     assert.deepEqual(store.dashboardConfig("host-alpha"), defaultDashboardConfig());
     store.saveDashboardConfig("host-alpha", alpha, 1);
     store.saveDashboardConfig("host-bravo", bravo, 2);
     assert.deepEqual(new HostMonitorStore(db).dashboardConfig("host-alpha"), alpha);
     assert.deepEqual(store.dashboardConfig("host-bravo"), bravo);
+
+    db.prepare("UPDATE host_dashboard_configs SET config_json = ? WHERE host_id = ?").run(
+      JSON.stringify({ version: 1, panels: [{ metric: "network", visualization: "timeseries" }] }),
+      "host-bravo",
+    );
+    const migrated = store.dashboardConfig("host-bravo");
+    assert.equal(migrated.version, 2);
+    assert.equal(migrated.panels[0]?.metric, "network");
+    assert.equal(migrated.panels[0]?.visible, true);
 
     db.prepare("UPDATE host_dashboard_configs SET config_json = ? WHERE host_id = ?").run("not json", "host-alpha");
     assert.deepEqual(store.dashboardConfig("host-alpha"), defaultDashboardConfig());

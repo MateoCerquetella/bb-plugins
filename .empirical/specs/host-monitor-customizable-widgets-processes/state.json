@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 5,
+  "revision": 7,
+  "activeFeature": "host-monitor-customizable-widgets-processes",
+  "request": "Improve Host Monitor dashboard with BB-native UI, restored per-host process controls, and persisted customizable widget layout; preserve existing committed baseline and do not merge/deploy.",
+  "profile": "complex",
+  "workflow": "complex",
+  "mode": "normal",
+  "phase": "verify",
+  "status": "waiting",
+  "repairAttempts": 0,
+  "message": "Refreshed repository context after implementation; all managed context pages are present, current, valid, and require no refinement.",
+  "implementationActor": "agent",
+  "workStartedAt": "2026-09-04T16:04:00.718Z",
+  "specDigest": "sha256:0f675990300c9c0db81b1e9c546fcb6c5535bdfbba824c9c0ed513f2f64a697e",
+  "approvedSpecRevision": 3,
+  "capabilityArchiveRequired": true,
+  "capabilityDeltaDigest": "sha256:aa291476de377d476479eca2117c07e71faea79324a7bcdbcb25f1bc4c613630",
+  "impactDigest": "sha256:5a2e04a8694489b8ddc3ab5b09ad21acfe4d45a28200bf02ad381631b0189ed5",
+  "capabilityClaimId": "host-monitor-customizable-widgets-processes-73cb5622e3c9",
+  "authorizationDigest": null,
+  "evidence": [],
+  "evidenceReceiptIds": [],
+  "legacyEvidenceCount": 0,
+  "completion": {
+    "implemented": true,
+    "verified": false,
+    "integrated": false,
+    "delivered": false,
+    "published": false,
+    "highest": "implemented",
+    "reasons": {
+      "verified": "verified has not been proven by a durable receipt.",
+      "integrated": "integrated has not been proven by a durable receipt.",
+      "delivered": "delivered has not been proven by a durable receipt.",
+      "published": "published has not been proven by a durable receipt."
+    }
+  },
+  "updatedAt": "2026-09-04T16:36:52.834Z"
+}

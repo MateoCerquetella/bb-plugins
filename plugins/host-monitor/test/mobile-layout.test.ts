@@ -13,21 +13,41 @@ test("page owns constrained-height vertical scrolling", () => {
   assert.match(root, /overscroll-behavior-y:\s*contain/u);
 });
 
-test("fleet is searchable, bounded, and selected by cards", () => {
+test("fleet is searchable, selected by cards, and protects dirty drafts", () => {
   assert.match(app, /placeholder="Name, id, or platform"/u);
   assert.match(app, /setSelectedHostId\(machine\.host\.id\)/u);
-  assert.match(styles, /\.host-monitor__machine-grid\s*\{[^}]*max-height:/su);
-  assert.match(styles, /\.host-monitor__machine-grid\s*\{[^}]*overflow-y:\s*auto/su);
+  assert.match(app, /dirtyDashboard/u);
+  assert.match(app, /beforeunload/u);
+  assert.match(app, /Save or cancel dashboard changes before switching hosts/u);
 });
 
-test("390px layout stacks controls, stats, facts, and keeps chart height", () => {
-  const compact = styles.match(/@container\s*\(max-width:\s*390px\)\s*\{([\s\S]*?)\n\}/u)?.[1] ?? "";
-  assert.match(compact, /\.host-monitor__panel-grid[\s\S]*grid-template-columns:\s*1fr/u);
-  assert.match(compact, /\.host-monitor__facts[\s\S]*grid-template-columns:\s*1fr/u);
-  assert.match(compact, /\.host-monitor__chart[\s\S]*grid-column:\s*auto/u);
-  assert.match(compact, /\.host-monitor__chart\s*>\s*div[\s\S]*min-height:\s*210px/u);
-  assert.match(styles, /@container\s*\(max-width:\s*460px\)[\s\S]*\.host-monitor__toolbar\s*\{\s*grid-template-columns:\s*1fr/u);
-  assert.match(styles, /@container\s*\(max-width:\s*460px\)[\s\S]*\.host-monitor__editor-list\s*>\s*li\s*\{\s*grid-template-columns:\s*1fr/u);
+test("narrow layout uses a snap host strip, one widget column, and compact processes", () => {
+  assert.match(styles, /@container\s*\(max-width:\s*560px\)[\s\S]*\.host-monitor__machine-grid\s*\{[^}]*overflow-x:\s*auto[^}]*scroll-snap-type:\s*x\s+mandatory/su);
+  assert.match(styles, /@container\s*\(max-width:\s*560px\)[\s\S]*\.host-monitor__panel-grid\s*\{[^}]*grid-template-columns:\s*1fr/su);
+  assert.match(styles, /@container\s*\(max-width:\s*560px\)[\s\S]*\.host-monitor__process-table-wrap\s*\{[^}]*display:\s*none/su);
+  assert.match(styles, /@container\s*\(max-width:\s*560px\)[\s\S]*\.host-monitor__process-list\s*\{[^}]*display:\s*grid/su);
+  assert.match(styles, /\.host-monitor__dialog\s*\{[^}]*max-height:\s*min\(680px,\s*calc\(100dvh\s*-\s*24px\)\)/su);
+});
+
+test("widget editor exposes pointer and keyboard-accessible reorder paths", () => {
+  assert.match(app, /draggable/u);
+  assert.match(app, /onDragStart/u);
+  assert.match(app, /onDrop/u);
+  assert.match(app, /Move .* earlier/u);
+  assert.match(app, /Move .* later/u);
+  assert.match(app, /moved to position/u);
+  assert.match(app, /Reset draft/u);
+  assert.match(app, /Save layout/u);
+});
+
+test("process widget is selected-host scoped and uses explicit confirmation", () => {
+  assert.match(app, /machine\.host\.id/u);
+  assert.match(app, /machine\.host\.status !== "connected"/u);
+  assert.match(app, /prepareProcessTermination/u);
+  assert.match(app, /executeProcessTermination/u);
+  assert.match(app, /Terminate process\?/u);
+  assert.match(app, /Force terminate process\?/u);
+  assert.match(app, /requestGeneration/u);
 });
 
 test("charts preserve page scrolling and expose textual summaries", () => {

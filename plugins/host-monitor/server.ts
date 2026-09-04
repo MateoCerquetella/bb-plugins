@@ -8,7 +8,15 @@ import {
   type Fleet,
   type MachineRow,
   type MachineSnapshot,
+  type ProcessListResult,
+  type ProcessSortBy,
+  type ProcessTerminationMode,
 } from "./contract.ts";
+import { ProcessConfirmationStore } from "./lib/process-confirmations.ts";
+import {
+  HostProcessOperationGate,
+  ProcessOperationBusyError,
+} from "./lib/process-operation-gate.ts";
 import {
   HostMonitorStore,
   hostMonitorMigrations,
@@ -18,6 +26,8 @@ import {
 
 const CPU_SAMPLE_MS = 300;
 const HOST_CALL_TIMEOUT_MS = 5_000;
+export const PROCESS_HOST_CALL_TIMEOUT_MS = 20_000;
+export const PROCESS_TERMINATION_HOST_CALL_TIMEOUT_MS = 30_000;
 const REALTIME_CHANNEL = "host-monitor-machines-changed";
 const STALE_AFTER_INTERVALS = 2;
 
@@ -94,6 +104,15 @@ export default async function hostMonitorPlugin(bb: BbPluginApi): Promise<void> 
   bb.storage.migrate(db, hostMonitorMigrations);
   const store = new HostMonitorStore(db);
   const hostClient = bb.hosts.experimental_client({ contract: hostContract });
+  const processConfirmations = new ProcessConfirmationStore();
+  const processOperations = new HostProcessOperationGate();
+  const processLifecycleController = new AbortController();
+  const processListInFlight = new Map<string, Promise<ProcessListResult>>();
+  bb.onDispose(() => {
+    processLifecycleController.abort(new DOMException("Host Monitor is shutting down.", "AbortError"));
+    processOperations.close();
+    processConfirmations.clear();
+  });
 
   let thresholds = await readThresholds();
   let hosts: MachineHost[] = [];
@@ -261,6 +280,86 @@ export default async function hostMonitorPlugin(bb: BbPluginApi): Promise<void> 
     }
   }
 
+  async function enrolledProcessHost(hostId: string) {
+    const signal = AbortSignal.any([
+      AbortSignal.timeout(PROCESS_HOST_CALL_TIMEOUT_MS),
+      processLifecycleController.signal,
+    ]);
+    const availableHosts = await bb.sdk.hosts.list({ signal });
+    return availableHosts.find((host) => host.id === hostId) ?? null;
+  }
+
+  function processHostSignal(timeoutMs = PROCESS_HOST_CALL_TIMEOUT_MS): AbortSignal {
+    return AbortSignal.any([
+      AbortSignal.timeout(timeoutMs),
+      processLifecycleController.signal,
+    ]);
+  }
+
+  function unsupportedProcessError(error: unknown): boolean {
+    return /unsupported (?:on|operating system)|unsupported platform/iu.test(errorMessage(error));
+  }
+
+  async function loadProcessList({
+    hostId,
+    sortBy,
+    limit,
+  }: {
+    hostId: string;
+    sortBy: ProcessSortBy;
+    limit: number;
+  }): Promise<ProcessListResult> {
+    let machine;
+    try {
+      machine = await enrolledProcessHost(hostId);
+    } catch (error) {
+      bb.log.warn(`Could not resolve process host ${hostId}: ${errorMessage(error)}`);
+      return { outcome: "unavailable", message: "Process information is temporarily unavailable from this machine." };
+    }
+    if (machine === null) return { outcome: "not-found", message: "That enrolled machine no longer exists." };
+    if (machine.status !== "connected") {
+      return { outcome: "offline", message: "Connect this machine before inspecting its processes." };
+    }
+    try {
+      const result = await processOperations.run(hostId, () => hostClient.call(
+        "listProcesses",
+        { sortBy, limit },
+        { hostId, signal: processHostSignal() },
+      ));
+      return {
+        outcome: "ok",
+        host: { id: machine.id, name: machine.name, status: "connected", platform: result.platform },
+        sampledAtMs: result.sampledAtMs,
+        elevated: result.elevated,
+        totalCount: result.totalCount,
+        truncated: result.truncated,
+        processes: result.processes,
+      };
+    } catch (error) {
+      bb.log.warn(`Could not inspect processes on host ${hostId}: ${errorMessage(error)}`);
+      return unsupportedProcessError(error)
+        ? { outcome: "unsupported", message: "Process inspection is unsupported on this operating system." }
+        : { outcome: "unavailable", message: "Process information is temporarily unavailable from this machine." };
+    }
+  }
+
+  async function coalescedProcessList(input: {
+    hostId: string;
+    sortBy: ProcessSortBy;
+    limit: number;
+  }): Promise<ProcessListResult> {
+    const key = `${input.hostId}\0${input.sortBy}\0${input.limit}`;
+    const existing = processListInFlight.get(key);
+    if (existing !== undefined) return existing;
+    const pending = loadProcessList(input);
+    processListInFlight.set(key, pending);
+    try {
+      return await pending;
+    } finally {
+      if (processListInFlight.get(key) === pending) processListInFlight.delete(key);
+    }
+  }
+
   bb.rpc.register(rpcContract, {
     async fleet() {
       if (hosts.length === 0) await listHosts();
@@ -291,6 +390,97 @@ export default async function hostMonitorPlugin(bb: BbPluginApi): Promise<void> 
       const saved = store.saveDashboardConfig(hostId, config);
       publish([hostId]);
       return saved;
+    },
+    listProcesses: coalescedProcessList,
+    async prepareProcessTermination({ hostId, pid, identity, mode }) {
+      let machine;
+      try {
+        machine = await enrolledProcessHost(hostId);
+      } catch (error) {
+        bb.log.warn(`Could not resolve process host ${hostId}: ${errorMessage(error)}`);
+        return { outcome: "unavailable" as const, message: "The machine could not be reached for a safety check." };
+      }
+      if (machine === null) return { outcome: "not-found" as const, message: "That enrolled machine no longer exists." };
+      if (machine.status !== "connected") {
+        return { outcome: "unavailable" as const, message: "Reconnect the machine before stopping a process." };
+      }
+      try {
+        const inspected = await processOperations.run(hostId, () => hostClient.call(
+          "inspectProcessTermination",
+          { pid, identity, mode },
+          { hostId, signal: processHostSignal() },
+        ));
+        if (inspected.outcome !== "ready") return inspected;
+        const challenge = processConfirmations.issue({
+          hostId,
+          hostName: machine.name,
+          pid: inspected.process.pid,
+          name: inspected.process.name,
+          identity: inspected.process.identity,
+          mode: inspected.process.mode,
+        });
+        return {
+          outcome: "ready" as const,
+          ...challenge,
+          host: { id: machine.id, name: machine.name },
+          process: inspected.process,
+        };
+      } catch (error) {
+        bb.log.warn(`Could not prepare process ${pid} on host ${hostId}: ${errorMessage(error)}`);
+        return { outcome: "unavailable" as const, message: "The process could not be rechecked on this machine." };
+      }
+    },
+    async executeProcessTermination({ confirmationToken }) {
+      const consumed = processConfirmations.consume(confirmationToken);
+      if (consumed.outcome === "invalid") {
+        return { outcome: "confirmation-invalid" as const, message: "This confirmation has already been used or is no longer valid." };
+      }
+      if (consumed.outcome === "expired") {
+        return { outcome: "confirmation-expired" as const, message: "This confirmation expired. Recheck the process and try again." };
+      }
+      const { confirmation } = consumed;
+      let machine;
+      try {
+        machine = await enrolledProcessHost(confirmation.hostId);
+      } catch (error) {
+        bb.log.warn(`Could not resolve confirmed process host ${confirmation.hostId}: ${errorMessage(error)}`);
+        bb.log.warn(`Process control host=${confirmation.hostId} pid=${confirmation.pid} mode=${confirmation.mode} outcome=preflight-failed`);
+        return { outcome: "signal-failed" as const, message: "The machine could not be reached, so no stop request was sent." };
+      }
+      if (machine === null || machine.status !== "connected") {
+        bb.log.warn(`Process control host=${confirmation.hostId} pid=${confirmation.pid} mode=${confirmation.mode} outcome=preflight-offline`);
+        return { outcome: "signal-failed" as const, message: "The machine is offline, so no stop request was sent." };
+      }
+      const input: { pid: number; identity: string; mode: ProcessTerminationMode } = {
+        pid: confirmation.pid,
+        identity: confirmation.identity,
+        mode: confirmation.mode,
+      };
+      try {
+        const result = await processOperations.run(confirmation.hostId, () => hostClient.call(
+          "terminateProcess",
+          input,
+          { hostId: confirmation.hostId, signal: processHostSignal(PROCESS_TERMINATION_HOST_CALL_TIMEOUT_MS) },
+        ));
+        const auditMessage = `Process control host=${confirmation.hostId} pid=${confirmation.pid} mode=${confirmation.mode} outcome=${result.outcome}`;
+        if (result.outcome === "signal-sent" || result.outcome === "still-running") bb.log.info(auditMessage);
+        else bb.log.warn(auditMessage);
+        if (result.outcome === "signal-sent" || result.outcome === "still-running") {
+          return {
+            ...result,
+            host: { id: confirmation.hostId, name: confirmation.hostName },
+            process: { pid: confirmation.pid, name: confirmation.name, mode: confirmation.mode },
+          };
+        }
+        return result;
+      } catch (error) {
+        if (error instanceof ProcessOperationBusyError) {
+          bb.log.warn(`Process control host=${confirmation.hostId} pid=${confirmation.pid} mode=${confirmation.mode} outcome=busy`);
+          return { outcome: "signal-failed" as const, message: "This machine is busy with another process operation. Refresh and try again." };
+        }
+        bb.log.warn(`Process stop outcome is unknown for PID ${confirmation.pid} on host ${confirmation.hostId}: ${errorMessage(error)}`);
+        return { outcome: "outcome-unknown" as const, message: "The connection dropped during the stop request. Refresh before trying again." };
+      }
     },
     async refresh({ hostId }) {
       if (hostId === null) await refreshAll();

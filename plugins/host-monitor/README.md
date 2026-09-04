@@ -30,11 +30,12 @@ sidebar.
 
 CPU and RAM values use the existing configured guides. A fresh reading at or
 above its guide receives passive visual treatment and explicit accessible
-wording inside the mini-modal; it does not create a badge or notification.
+wording inside the mini-modal; numeric guide chips are not shown and it does
+not create a badge or notification.
 
 The mini-modal is quick telemetry and navigation—not a warning surface. It has
-no notification badge, toast, alert banner, IP/process controls, or draggable
-floating mode.
+no notification badge, toast, alert banner, IP controls, or draggable floating
+mode. Process controls live only in the selected host's full dashboard.
 
 ## Dashboard
 
@@ -53,13 +54,14 @@ and displays collection gaps as breaks instead of zeroes.
 
 ## Per-machine dashboards
 
-Select any machine—including a disconnected one—and choose **Edit dashboard**.
+Select any machine—including a disconnected one—and choose **Customize**.
 Each machine keeps its own ordered dashboard. You can:
 
-- Add CPU, RAM, root disk, load, network, or uptime panels.
-- Show supported metrics as a current stat or time-series visualization.
-- Move panels earlier or later and remove panels you do not need.
-- Cancel a draft or save it explicitly.
+- Show or hide CPU, RAM, root disk, load, network, uptime, system, and process
+  widgets backed by the host's existing data sources.
+- Choose the supported stat, time-series, details, and table widgets.
+- Drag widgets or use the accessible move-earlier/move-later controls.
+- Reset a draft to defaults, cancel it, or save it explicitly.
 
 Saved layouts use BB's stable machine id and the plugin database, so they
 survive Host Monitor reloads and stay independent between machines. A missing
@@ -85,20 +87,26 @@ Guides only tint in-page panels and chart lines. Host Monitor deliberately has:
 - No warning badge or resource alert banner.
 - No warning popup or draggable floating monitor; the footer icon opens only
   the explicit telemetry mini-modal described above.
-- No automatic or destructive process actions.
+- No automatic process actions; every available termination requires a fresh
+  safety preflight and an explicit confirmation.
 
 Sampling failures stay inline on the affected machine while other machines
 continue updating.
 
 ## Privacy and safety
 
-Host Monitor uses BB's authenticated enrolled-host connection and a
-metrics-only host worker. It does not manage SSH credentials or send telemetry
-to third parties.
+Host Monitor uses BB's authenticated enrolled-host connection and its host
+worker. It does not manage SSH credentials or send telemetry to third parties.
 
 Snapshots exclude IP addresses, MAC addresses, interface names, netmasks,
-processes, command lines, environment variables, and credentials. The worker
-has no process-control methods.
+processes, command lines, environment variables, and credentials. The process
+widget separately collects a bounded list containing only sanitized names,
+PIDs, CPU, RAM, safe owner categories, and opaque lifetime identities while the
+widget is visible. It never captures command lines or environment variables.
+System, monitor, ancestor, differently owned, elevated, or unverifiable
+processes are protected. Available actions are serialized per host and use an
+expiring, single-use server confirmation before the worker rechecks identity
+and sends a fixed graceful or force termination operation.
 
 ## Install
 

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "host-monitor-customizable-dashboard"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:5a2e04a8694489b8ddc3ab5b09ad21acfe4d45a28200bf02ad381631b0189ed5"
+}

@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sequence": 6,
+  "previousDigest": "sha256:31d5b9c11fee88903aa017c518e2944eb142f7443cb30afa85cea7868ba6fe2f",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Implemented BB-native responsive dashboard composition, version-2 per-host widget order/visibility persistence and migration, removed numeric guide chips, restored bounded selected-host process inspection and two-step protected controls, and added focused tests/browser QA.",
+  "createdAt": "2026-09-04T16:36:39.170Z",
+  "stateBeforeDigest": "sha256:5d2116be42c0fa8b3f9fd06ed629ef1348c64d3988438ee45289ff9a17cb7380",
+  "stateAfterDigest": "sha256:349f673a8037e57d2e63730282ad848c9bcfff6624094018e091e6ad4242c57e",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 6,
+    "activeFeature": "host-monitor-customizable-widgets-processes",
+    "request": "Improve Host Monitor dashboard with BB-native UI, restored per-host process controls, and persisted customizable widget layout; preserve existing committed baseline and do not merge/deploy.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "context",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Implemented BB-native responsive dashboard composition, version-2 per-host widget order/visibility persistence and migration, removed numeric guide chips, restored bounded selected-host process inspection and two-step protected controls, and added focused tests/browser QA.",
+    "implementationActor": "agent",
+    "workStartedAt": "2026-09-04T16:04:00.718Z",
+    "specDigest": "sha256:0f675990300c9c0db81b1e9c546fcb6c5535bdfbba824c9c0ed513f2f64a697e",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:aa291476de377d476479eca2117c07e71faea79324a7bcdbcb25f1bc4c613630",
+    "impactDigest": "sha256:5a2e04a8694489b8ddc3ab5b09ad21acfe4d45a28200bf02ad381631b0189ed5",
+    "capabilityClaimId": "host-monitor-customizable-widgets-processes-73cb5622e3c9",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-04T16:36:39.170Z"
+  },
+  "digest": "sha256:6b1fa9f34387c1a410005a2c39e0fc1a0ede69f9cfdcd00c8ab815a629d5a221"
+}

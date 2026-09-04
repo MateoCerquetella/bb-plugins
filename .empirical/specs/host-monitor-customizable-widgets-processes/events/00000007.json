@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sequence": 7,
+  "previousDigest": "sha256:6b1fa9f34387c1a410005a2c39e0fc1a0ede69f9cfdcd00c8ab815a629d5a221",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Refreshed repository context after implementation; all managed context pages are present, current, valid, and require no refinement.",
+  "createdAt": "2026-09-04T16:36:52.834Z",
+  "stateBeforeDigest": "sha256:349f673a8037e57d2e63730282ad848c9bcfff6624094018e091e6ad4242c57e",
+  "stateAfterDigest": "sha256:b0fb85977ac69bc9b87216d397900cbd0b66b8407e8c8cfbea1509ae5bf7acbc",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 7,
+    "activeFeature": "host-monitor-customizable-widgets-processes",
+    "request": "Improve Host Monitor dashboard with BB-native UI, restored per-host process controls, and persisted customizable widget layout; preserve existing committed baseline and do not merge/deploy.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "verify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Refreshed repository context after implementation; all managed context pages are present, current, valid, and require no refinement.",
+    "implementationActor": "agent",
+    "workStartedAt": "2026-09-04T16:04:00.718Z",
+    "specDigest": "sha256:0f675990300c9c0db81b1e9c546fcb6c5535bdfbba824c9c0ed513f2f64a697e",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:aa291476de377d476479eca2117c07e71faea79324a7bcdbcb25f1bc4c613630",
+    "impactDigest": "sha256:5a2e04a8694489b8ddc3ab5b09ad21acfe4d45a28200bf02ad381631b0189ed5",
+    "capabilityClaimId": "host-monitor-customizable-widgets-processes-73cb5622e3c9",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-04T16:36:52.834Z"
+  },
+  "digest": "sha256:86770f8d99c78909b2701a139f1b0ef4d9d66088b098b777a489f1c13842ecf1"
+}

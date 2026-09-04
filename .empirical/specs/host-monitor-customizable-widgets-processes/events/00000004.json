@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "sequence": 4,
+  "previousDigest": "sha256:1784873c86627323657e35183369d93c9dacb980a1e3a0fa323bd369829797ef",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Designed a BB-native dashboard editor, deterministic config migration, safe restored per-host process workflow, responsive states, and incorporated the UI/UX advisory.",
+  "createdAt": "2026-09-04T16:11:44.324Z",
+  "stateBeforeDigest": "sha256:e04fc23e412ea445249ffdeed33916864bb4cb44711ea0db0894523e4386a635",
+  "stateAfterDigest": "sha256:7ffed93d7658101c5a0c56900e90ca8f694bd505890675b47a64dd5b61ca33b4",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 4,
+    "activeFeature": "host-monitor-customizable-widgets-processes",
+    "request": "Improve Host Monitor dashboard with BB-native UI, restored per-host process controls, and persisted customizable widget layout; preserve existing committed baseline and do not merge/deploy.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "plan",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Designed a BB-native dashboard editor, deterministic config migration, safe restored per-host process workflow, responsive states, and incorporated the UI/UX advisory.",
+    "implementationActor": null,
+    "workStartedAt": "2026-09-04T16:04:00.718Z",
+    "specDigest": "sha256:0f675990300c9c0db81b1e9c546fcb6c5535bdfbba824c9c0ed513f2f64a697e",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:aa291476de377d476479eca2117c07e71faea79324a7bcdbcb25f1bc4c613630",
+    "impactDigest": "sha256:5a2e04a8694489b8ddc3ab5b09ad21acfe4d45a28200bf02ad381631b0189ed5",
+    "capabilityClaimId": "host-monitor-customizable-widgets-processes-73cb5622e3c9",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-04T16:11:44.324Z"
+  },
+  "digest": "sha256:fc54f4afccf83c0003df68bb2dab0c8ebbdd4710c0f8f4768cbe0031d30a7615"
+}
