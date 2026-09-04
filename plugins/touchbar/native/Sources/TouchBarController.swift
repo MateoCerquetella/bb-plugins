@@ -1,4 +1,5 @@
 import AppKit
+import QuartzCore
 
 extension NSTouchBarItem.Identifier {
     static let bbStrip = NSTouchBarItem.Identifier("app.getbb.touchbar.strip")
@@ -721,15 +722,15 @@ private final class UnreadAlertView: NSView {
 
     func update(count: Int) {
         let title = count == 1
-            ? "✓ AGENT FINISHED — TAP TO VIEW"
-            : "✓ \(count) AGENTS FINISHED — TAP TO VIEW"
+            ? "✓ AGENT FINISHED — TAP TO DISMISS"
+            : "✓ \(count) AGENTS FINISHED — TAP TO DISMISS"
         button.attributedTitle = NSAttributedString(string: title, attributes: [
             .font: NSFont.monospacedSystemFont(ofSize: 13, weight: .heavy),
             .foregroundColor: NSColor.white,
         ])
         let accessibilityLabel = count == 1
-            ? "One agent finished with unread results. Tap to view."
-            : "\(count) agents finished with unread results. Tap to view."
+            ? "One agent finished with unread results. Tap to dismiss."
+            : "\(count) agents finished with unread results. Tap to dismiss."
         button.setAccessibilityLabel(accessibilityLabel)
         setAccessibilityLabel(accessibilityLabel)
         needsDisplay = true
@@ -1372,22 +1373,31 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
     private func beginUnreadAlertTransition() {
         stopUnreadFlash()
         unreadAlertView.setPulse(bright: false)
+        unreadAlertView.alphaValue = 1
+        unreadAlertView.layer?.removeAnimation(forKey: "unread-center-expansion")
         guard !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion else {
-            unreadAlertView.alphaValue = 1
             unreadAlertView.setPulse(bright: true)
             return
         }
-        unreadAlertView.alphaValue = 0
-        DispatchQueue.main.async { [weak self] in
+
+        let duration = 0.38
+        let expansion = CABasicAnimation(keyPath: "transform.scale.x")
+        expansion.fromValue = 0.06
+        expansion.toValue = 1
+        let fade = CABasicAnimation(keyPath: "opacity")
+        fade.fromValue = 0.18
+        fade.toValue = 1
+        let entrance = CAAnimationGroup()
+        entrance.animations = [expansion, fade]
+        entrance.duration = duration
+        entrance.timingFunction = CAMediaTimingFunction(name: .easeOut)
+        unreadAlertView.layer?.add(
+            entrance,
+            forKey: "unread-center-expansion"
+        )
+        DispatchQueue.main.asyncAfter(deadline: .now() + duration) { [weak self] in
             guard let self, self.unreadAlertVisible else { return }
-            NSAnimationContext.runAnimationGroup { context in
-                context.duration = 0.32
-                context.allowsImplicitAnimation = true
-                self.unreadAlertView.animator().alphaValue = 1
-            } completionHandler: { [weak self] in
-                guard let self, self.unreadAlertVisible else { return }
-                self.startUnreadFlash()
-            }
+            self.startUnreadFlash()
         }
     }
 
@@ -1555,11 +1565,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         guard unreadAlertVisible else { return }
         NativeLog.info("unread alert touch dispatched")
         NativeLog.info("unread completion alert acknowledged")
-        let firstUnread = organized(store.snapshot.agents).first {
-            $0.status == .done
-        }
-        dismissUnreadAlert(showThreads: true)
-        if let firstUnread { AgentStore.focus(firstUnread) }
+        dismissUnreadAlert(showThreads: false)
     }
 
     @objc private func settingsTapped(_ sender: NSButton) {

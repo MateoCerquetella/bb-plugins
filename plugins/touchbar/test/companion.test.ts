@@ -184,7 +184,7 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(controller, /private let button = NSButton\(title: "", target: nil, action: nil\)/u);
   assert.match(controller, /NSSize\(width: 1_000, height: 30\)/u);
   assert.match(controller, /0\.48, blue: 0\.02/u);
-  assert.match(controller, /AGENT FINISHED — TAP TO VIEW/u);
+  assert.match(controller, /AGENT FINISHED — TAP TO DISMISS/u);
   assert.match(controller, /func syncUnreadAlert/u);
   assert.match(controller, /unreadIds\.subtracting\(knownUnreadIds\)/u);
   assert.match(controller, /bar\.defaultItemIdentifiers = \[\.bbUnreadAlert\]/u);
@@ -197,10 +197,15 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(controller, /recognizer\.allowedTouchTypes = \[\.direct\]/u);
   assert.match(controller, /guard unreadAlertVisible else \{ return \}/u);
   assert.match(controller, /func beginUnreadAlertTransition/u);
-  assert.match(controller, /context\.duration = 0\.32/u);
-  assert.match(controller, /unreadAlertView\.animator\(\)\.alphaValue = 1/u);
-  assert.match(controller, /dismissUnreadAlert\(showThreads: true\)/u);
-  assert.match(controller, /AgentStore\.focus\(firstUnread\)/u);
+  assert.match(controller, /CABasicAnimation\(keyPath: "transform\.scale\.x"\)/u);
+  assert.match(controller, /expansion\.fromValue = 0\.06/u);
+  assert.match(controller, /CABasicAnimation\(keyPath: "opacity"\)/u);
+  assert.match(controller, /entrance\.duration = duration/u);
+  assert.match(controller, /CAMediaTimingFunction\(name: \.easeOut\)/u);
+  assert.match(controller, /forKey: "unread-center-expansion"/u);
+  assert.match(controller, /asyncAfter\(deadline: \.now\(\) \+ duration\)/u);
+  assert.match(controller, /dismissUnreadAlert\(showThreads: false\)/u);
+  assert.doesNotMatch(controller, /AgentStore\.focus\(firstUnread\)/u);
   assert.match(controller, /case \.bbUnreadAlert: return unreadAlertItem/u);
   assert.match(controller, /projectInitials/u);
   assert.match(controller, /provider == "cursor" \|\| provider == "acp-cursor"/u);

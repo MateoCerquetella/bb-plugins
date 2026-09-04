@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-1411deee155b92918823071c",
+  "criteria": [
+    "AC-4",
+    "AC-5",
+    "AC-7",
+    "AC-8"
+  ],
+  "evidenceKinds": [
+    "human",
+    "test"
+  ],
+  "summary": "Center-expansion center.2 Mac build/install evidence, two-unread no-crash observation, physical two-unread tap, and final dismiss-only interaction.",
+  "passed": true,
+  "startedAt": "2026-09-04T16:12:32.677Z",
+  "completedAt": "2026-09-04T16:12:32.677Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "implement-a-new-independently-installable-bb-touch-bar-plugin-for",
+    "specRevision": 2,
+    "specDigest": "sha256:2cb81eb836af98d280d0660ae933e1f9672f2d1932631e43bef9d4f04b55ef08",
+    "treeDigest": "sha256:2a9a4c7257fec5013dfe5d22d8c9469983f0b585c85a35afc47d490da9437630",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf"
+  },
+  "digest": "sha256:a3c5cb9b73c6b8f30a2500a7b3a8a525ac63ea67e4e7a300c2bc9217d322391d",
+  "kind": "collected",
+  "collector": "codex-and-user-mac-verification",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/implement-a-new-independently-installable-bb-touch-bar-plugin-for/artifacts/mac-unread-alert-verification.txt",
+      "mediaType": "text/plain",
+      "bytes": 2039,
+      "digest": "sha256:b21eaa49248b08cc1492d34c3279a1354326f9b0fda1f46c047dae9ff0c98571"
+    }
+  ]
+}
