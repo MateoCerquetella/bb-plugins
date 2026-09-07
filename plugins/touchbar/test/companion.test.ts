@@ -8,6 +8,23 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const companion = join(root, "companion");
 
+test("Host Monitor still provides every command consumed by Touch Bar", () => {
+  const hostMonitorServer = readFileSync(
+    join(root, "..", "host-monitor", "server.ts"),
+    "utf8",
+  );
+  const touchBarModel = readFileSync(
+    join(root, "native", "Sources", "AgentModel.swift"),
+    "utf8",
+  );
+
+  for (const command of ["open", "snapshot"]) {
+    assert.match(touchBarModel, new RegExp(`\\["host-monitor", "${command}"`));
+    assert.match(hostMonitorServer, new RegExp(`name: "${command}"`));
+  }
+  assert.match(hostMonitorServer, /bb\.cli\.register\(/u);
+});
+
 test("BetterTouchTool preset is global, persistent, bounded, and action-safe", () => {
   const preset = JSON.parse(
     readFileSync(join(companion, "BB-Agent-Monitor.bttpreset"), "utf8"),
@@ -216,7 +233,12 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(model, /maximumDelay: TimeInterval = 30/u);
   assert.match(model, /BB entering reconnecting after/u);
   assert.match(model, /BB reconnected after/u);
-  assert.match(model, /output\.fileHandleForReading\.closeFile\(\)/u);
+  assert.match(model, /posixPermissions: 0o600/u);
+  assert.match(model, /terminateDeadline/u);
+  assert.match(model, /kill\(process\.processIdentifier, SIGKILL\)/u);
+  assert.match(model, /killDeadline/u);
+  assert.match(model, /size <= 1_048_576/u);
+  assert.doesNotMatch(model, /waitUntilExit|readDataToEndOfFile/u);
   assert.match(model, /lastGoodSnapshot/u);
   assert.match(model, /stale\.connected = false/u);
   assert.match(model, /\["host-monitor", "snapshot"\]/u);

@@ -149,7 +149,7 @@ bb plugin remove host-monitor
 Install the latest immutable Save My Model release directly from this monorepo:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.2 --subdirectory plugins/save-my-model --tag-prefix save-my-model/
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.3 --subdirectory plugins/save-my-model --tag-prefix save-my-model/
 ```
 
 After [the BB Community entry](https://github.com/get-bb/marketplace/pull/154)
@@ -159,9 +159,11 @@ is merged and live, install it by its short name:
 bb plugin install save-my-model
 ```
 
-Save My Model keeps provider defaults separate for each host and keeps model
-and reasoning separate for each host and provider. Open **Settings → Save My Model** to inspect or clear saved
-values. See the [Save My Model README](./plugins/save-my-model) for details.
+Save My Model lists every machine enrolled in BB and routes BB's native
+provider/model/reasoning picker through the selected host. It persists each
+coherent choice separately by host and provider while keeping the built-in New
+Thread defaults unchanged. Open **Settings → Save My Model** to configure,
+review, or clear saved values. See the [Save My Model README](./plugins/save-my-model) for details.
 
 Update or remove it with BB:
 

@@ -26,7 +26,7 @@ export const saveMyModelRpcContract = defineRpcContract({
   listHosts: {
     input: z.null(),
     output: z.object({
-      hosts: z.array(hostSchema).max(500),
+      hosts: z.array(hostSchema),
       error: z.string().min(1).max(320).nullable(),
     }).strict(),
   },

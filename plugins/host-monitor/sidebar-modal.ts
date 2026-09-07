@@ -3,6 +3,8 @@ export const HOST_MONITOR_PAGE_PATH = "/plugins/host-monitor/host-monitor";
 export const HOST_MONITOR_NAV_ROW_SELECTOR = '[data-sidebar-navigation-item="host-monitor/host-monitor"]';
 export const HOST_MONITOR_FOOTER_SELECTOR = '[data-testid="plugin-sidebar-footer-action-host-monitor-host-monitor"]';
 export const MINI_MODAL_REFRESH_MS = 10_000;
+export const NATIVE_OPEN_POLL_MS = 1_000;
+export const NATIVE_OPEN_HOST_KEY = "host-monitor:native-open-host";
 export const MINI_MODAL_MACHINE_LIMIT = 128;
 export const DEFAULT_MINI_MODAL_THRESHOLD = 90;
 
@@ -110,6 +112,7 @@ export function mountHostMonitorMiniModal(pluginId: string, signal: AbortSignal)
   let modal: HTMLElement | null = null;
   let trigger: HTMLButtonElement | null = null;
   let interval: ReturnType<typeof setInterval> | null = null;
+  let nativeOpenInterval: ReturnType<typeof setInterval> | null = null;
   let request: Promise<void> | null = null;
   let requestController: AbortController | null = null;
   let disposed = false;
@@ -127,12 +130,30 @@ export function mountHostMonitorMiniModal(pluginId: string, signal: AbortSignal)
     }
   };
 
-  const openPage = (): boolean => {
+  const openPage = (hostId: string | null = null): boolean => {
     const row = document.querySelector<HTMLElement>(HOST_MONITOR_NAV_ROW_SELECTOR);
     const button = row?.querySelector<HTMLButtonElement>('button:not([disabled])');
     if (button === null || button === undefined) return false;
+    if (hostId !== null) sessionStorage.setItem(NATIVE_OPEN_HOST_KEY, hostId);
     button.click();
     return true;
+  };
+
+  const claimNativeOpen = (): void => {
+    void fetch(`/api/v1/plugins/${encodeURIComponent(pluginId)}/rpc/claimNativeOpen`, {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "content-type": "application/json" },
+      body: "null",
+    }).then((response) => response.json()).then((value: unknown) => {
+      if (typeof value !== "object" || value === null) return;
+      const envelope = value as { ok?: unknown; result?: unknown };
+      if (envelope.ok !== true || typeof envelope.result !== "object" || envelope.result === null) return;
+      const result = envelope.result as { open?: unknown; hostId?: unknown };
+      if (result.open !== true) return;
+      const hostId = typeof result.hostId === "string" && result.hostId.length <= 256 ? result.hostId : null;
+      openPage(hostId);
+    }).catch(() => undefined);
   };
 
   const position = (): void => {
@@ -220,6 +241,8 @@ export function mountHostMonitorMiniModal(pluginId: string, signal: AbortSignal)
   hideNavRows();
   const navObserver = new MutationObserver(hideNavRows);
   navObserver.observe(document.body, { childList: true, subtree: true });
+  nativeOpenInterval = setInterval(claimNativeOpen, NATIVE_OPEN_POLL_MS);
+  claimNativeOpen();
 
   const dispose = (): void => {
     if (disposed) return;
@@ -232,6 +255,7 @@ export function mountHostMonitorMiniModal(pluginId: string, signal: AbortSignal)
     window.removeEventListener("popstate", onNavigation);
     window.removeEventListener("hashchange", onNavigation);
     navObserver.disconnect();
+    if (nativeOpenInterval !== null) clearInterval(nativeOpenInterval);
     for (const [row, wasHidden] of hiddenNavRows) {
       if (row.isConnected) row.hidden = wasHidden;
     }

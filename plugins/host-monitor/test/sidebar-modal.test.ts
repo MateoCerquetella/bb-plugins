@@ -7,6 +7,8 @@ import {
   HOST_MONITOR_NAV_ROW_SELECTOR,
   HOST_MONITOR_PAGE_PATH,
   MINI_MODAL_MACHINE_LIMIT,
+  NATIVE_OPEN_HOST_KEY,
+  NATIVE_OPEN_POLL_MS,
   miniModalPosition,
   miniMetricPresentation,
   parseMiniModalFleet,
@@ -52,6 +54,8 @@ test("anchors above the footer trigger and clamps narrow viewports", () => {
   assert.deepEqual(miniModalPosition({ left: 380, top: 740 }, { width: 390, height: 800 }), { left: 22, bottom: 68 });
   assert.equal(HOST_MONITOR_PAGE_PATH, "/plugins/host-monitor/host-monitor");
   assert.equal(HOST_MONITOR_NAV_ROW_SELECTOR, '[data-sidebar-navigation-item="host-monitor/host-monitor"]');
+  assert.equal(NATIVE_OPEN_POLL_MS, 1_000);
+  assert.equal(NATIVE_OPEN_HOST_KEY, "host-monitor:native-open-host");
 });
 
 test("owns a cleanup-safe DOM lifecycle without unsafe HTML or legacy features", async () => {
@@ -61,6 +65,9 @@ test("owns a cleanup-safe DOM lifecycle without unsafe HTML or legacy features",
   assert.match(source, /request === pending/u);
   assert.match(source, /requestController === controller/u);
   assert.match(source, /clearInterval\(interval\)/u);
+  assert.match(source, /clearInterval\(nativeOpenInterval\)/u);
+  assert.match(source, /rpc\/claimNativeOpen/u);
+  assert.match(source, /sessionStorage\.setItem\(NATIVE_OPEN_HOST_KEY, hostId\)/u);
   assert.match(source, /removeEventListener/u);
   assert.match(source, /new MutationObserver\(hideNavRows\)/u);
   assert.match(source, /hiddenNavRows\.set\(row, row\.hidden\)/u);

@@ -1,4 +1,5 @@
 import AppKit
+import Darwin
 
 enum AgentStatus: String, Decodable {
     case blocked, error, working, done, idle, waiting, unknown
@@ -325,7 +326,20 @@ enum BBCommand {
     static func run(_ arguments: [String], timeout: TimeInterval = 1.5) -> Data? {
         guard let executable = NativeConfig.bbExecutable else { return nil }
         let process = Process()
-        let output = Pipe()
+        let outputURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("bb-touchbar-\(UUID().uuidString).out")
+        guard FileManager.default.createFile(
+            atPath: outputURL.path,
+            contents: nil,
+            attributes: [.posixPermissions: 0o600]
+        ), let output = try? FileHandle(forWritingTo: outputURL) else {
+            NativeLog.error("could not create bounded bb output file")
+            return nil
+        }
+        defer {
+            try? output.close()
+            try? FileManager.default.removeItem(at: outputURL)
+        }
         process.executableURL = URL(fileURLWithPath: executable)
         process.arguments = arguments
         var environment = ProcessInfo.processInfo.environment
@@ -348,14 +362,32 @@ enum BBCommand {
         if process.isRunning {
             NativeLog.error("bb command timed out: \(arguments.first ?? "unknown")")
             process.terminate()
-            process.waitUntilExit()
-            // A BB wrapper can leave a helper child holding the pipe open.
-            // Do not block the only polling loop waiting for that child.
-            output.fileHandleForReading.closeFile()
+            let terminateDeadline = Date().addingTimeInterval(0.5)
+            while process.isRunning && Date() < terminateDeadline {
+                Thread.sleep(forTimeInterval: 0.02)
+            }
+            if process.isRunning {
+                kill(process.processIdentifier, SIGKILL)
+                let killDeadline = Date().addingTimeInterval(0.5)
+                while process.isRunning && Date() < killDeadline {
+                    Thread.sleep(forTimeInterval: 0.02)
+                }
+            }
+            if process.isRunning {
+                NativeLog.error("bb command did not exit after bounded termination")
+            }
             return nil
         }
-        process.waitUntilExit()
-        let data = output.fileHandleForReading.readDataToEndOfFile()
+        try? output.synchronize()
+        let attributes = try? FileManager.default.attributesOfItem(
+            atPath: outputURL.path
+        )
+        let size = (attributes?[.size] as? NSNumber)?.intValue ?? 0
+        guard size <= 1_048_576,
+              let data = try? Data(contentsOf: outputURL) else {
+            NativeLog.error("bb command output exceeded the 1 MiB limit")
+            return nil
+        }
         guard process.terminationStatus == 0 else {
             NativeLog.error("bb exited with status \(process.terminationStatus)")
             return nil

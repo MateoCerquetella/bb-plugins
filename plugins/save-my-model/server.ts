@@ -12,10 +12,12 @@ export default function plugin(bb: BbPluginApi): void {
         return {
           hosts: hosts
             .map(({ id, name, status }) => ({ id, name, status }))
-            .sort((left, right) =>
-              Number(right.status === "connected") - Number(left.status === "connected") ||
-              left.name.localeCompare(right.name))
-            .slice(0, 500),
+            .sort(
+              (left, right) =>
+                Number(right.status === "connected") -
+                  Number(left.status === "connected") ||
+                left.name.localeCompare(right.name),
+            ),
           error: null,
         };
       } catch {

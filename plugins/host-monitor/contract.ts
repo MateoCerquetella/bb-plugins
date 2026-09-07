@@ -334,6 +334,13 @@ export type PreparedTermination = z.infer<typeof preparedTerminationSchema>;
 export type ExecuteTerminationResult = z.infer<typeof executeTerminationResultSchema>;
 
 export const rpcContract = defineRpcContract({
+  claimNativeOpen: {
+    input: z.null(),
+    output: z.object({
+      open: z.boolean(),
+      hostId: z.string().min(1).max(256).nullable(),
+    }).strict(),
+  },
   fleet: { input: z.null(), output: fleetSchema },
   sidebarSummary: {
     input: z.null(),

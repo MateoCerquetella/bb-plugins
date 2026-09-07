@@ -90,6 +90,28 @@ test("refresh represents every host, samples connected hosts, and isolates failu
   const history = await fake.harness.behavior.callRpc("machineHistory", { hostId: "host-alpha", rangeHours: 1 }) as { points: Array<{ collectedAtMs: number }> };
   assert.equal(history.points.length, 1);
   assert.ok((history.points[0]?.collectedAtMs ?? 0) > 0);
+
+  const snapshotResult = await fake.harness.behavior.runCli(["snapshot"]);
+  assert.equal(snapshotResult.exitCode, 0, snapshotResult.stderr);
+  const compact = JSON.parse(snapshotResult.stdout ?? "null") as {
+    schemaVersion: number;
+    hosts: Array<{ id: string; cpuPercent: number | null }>;
+    thresholds: { attentionPercent: number; criticalPercent: number };
+  };
+  assert.equal(compact.schemaVersion, 1);
+  assert.equal(compact.hosts.find((host) => host.id === "host-alpha")?.cpuPercent, 31);
+  assert.ok(compact.thresholds.criticalPercent >= compact.thresholds.attentionPercent);
+
+  const openResult = await fake.harness.behavior.runCli(["open", "host-alpha"]);
+  assert.equal(openResult.exitCode, 0, openResult.stderr);
+  assert.deepEqual(await fake.harness.behavior.callRpc("claimNativeOpen", null), {
+    open: true,
+    hostId: "host-alpha",
+  });
+  assert.deepEqual(await fake.harness.behavior.callRpc("claimNativeOpen", null), {
+    open: false,
+    hostId: null,
+  });
 });
 
 test("simultaneous fleet refreshes coalesce host calls", async (t) => {
@@ -174,4 +196,15 @@ test("settings are passive in-page threshold guides", async (t) => {
   assert.equal(descriptors.ramWarningPercent?.default, "90");
   assert.equal(descriptors.diskWarningPercent?.default, "90");
   assert.match(descriptors.cpuWarningPercent?.description ?? "", /not a notification/u);
+});
+
+test("host monitor CLI rejects unknown open targets and malformed verbs", async (t) => {
+  const fake = createFakePluginHost({
+    pluginId: "host-monitor",
+    sdk: { hosts: { list: async () => [hostRecord("host-alpha", "Alpha")] } },
+  });
+  t.after(() => fake.harness.lifecycle.dispose());
+  await plugin(fake.bb);
+  assert.equal((await fake.harness.behavior.runCli(["open", "missing"])).exitCode, 1);
+  assert.equal((await fake.harness.behavior.runCli(["snapshot", "--bad"])).exitCode, 1);
 });

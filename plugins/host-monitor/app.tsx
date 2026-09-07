@@ -54,7 +54,11 @@ import {
   sortProcessRows,
   summarizeProcessRows,
 } from "./lib/process-presentation.ts";
-import { mountHostMonitorMiniModal, toggleHostMonitorMiniModal } from "./sidebar-modal.ts";
+import {
+  mountHostMonitorMiniModal,
+  NATIVE_OPEN_HOST_KEY,
+  toggleHostMonitorMiniModal,
+} from "./sidebar-modal.ts";
 import "./app.css";
 
 echarts.use([
@@ -142,6 +146,11 @@ function FleetDashboard() {
       setError(null);
       setSelectedHostId((current) => {
         if (current != null && next.machines.some((machine) => machine.host.id === current)) return current;
+        const requested = sessionStorage.getItem(NATIVE_OPEN_HOST_KEY);
+        if (requested !== null) {
+          sessionStorage.removeItem(NATIVE_OPEN_HOST_KEY);
+          if (next.machines.some((machine) => machine.host.id === requested)) return requested;
+        }
         return next.machines.find((machine) => machine.host.status === "connected")?.host.id
           ?? next.machines[0]?.host.id
           ?? null;

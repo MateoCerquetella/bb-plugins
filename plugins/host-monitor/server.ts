@@ -30,6 +30,8 @@ export const PROCESS_HOST_CALL_TIMEOUT_MS = 20_000;
 export const PROCESS_TERMINATION_HOST_CALL_TIMEOUT_MS = 30_000;
 const REALTIME_CHANNEL = "host-monitor-machines-changed";
 const STALE_AFTER_INTERVALS = 2;
+const HOST_SNAPSHOT_LIMIT = 100;
+const NATIVE_OPEN_REQUEST_TTL_MS = 15_000;
 
 type MachineHost = MachineRow["host"];
 type MachineRecord = {
@@ -73,6 +75,33 @@ function compareHosts(left: MachineHost, right: MachineHost): number {
   if (status !== 0) return status;
   return left.name.localeCompare(right.name, undefined, { sensitivity: "base" }) ||
     left.id.localeCompare(right.id);
+}
+
+export function compactFleetSnapshot(current: Fleet) {
+  const attentionPercent = Math.min(
+    current.thresholds.cpu,
+    current.thresholds.ram,
+    current.thresholds.disk,
+  );
+  return {
+    schemaVersion: 1 as const,
+    generatedAtMs: current.generatedAtMs,
+    thresholds: {
+      attentionPercent,
+      criticalPercent: Math.max(95, attentionPercent),
+    },
+    hosts: current.machines.slice(0, HOST_SNAPSHOT_LIMIT).map((machine) => ({
+      id: machine.host.id,
+      name: machine.host.name,
+      status: machine.host.status,
+      sampleState: machine.sampleState,
+      cpuPercent: machine.snapshot?.cpu.usagePercent ?? null,
+      memoryPercent: machine.snapshot?.memory.usagePercent ?? null,
+      diskPercent: machine.snapshot?.disk?.usagePercent ?? null,
+      receiveBytesPerSecond: machine.snapshot?.network.receiveBytesPerSecond ?? null,
+      sendBytesPerSecond: machine.snapshot?.network.sendBytesPerSecond ?? null,
+    })),
+  };
 }
 
 export default async function hostMonitorPlugin(bb: BbPluginApi): Promise<void> {
@@ -122,6 +151,7 @@ export default async function hostMonitorPlugin(bb: BbPluginApi): Promise<void> 
   const sampleInFlight = new Map<string, Promise<void>>();
   let refreshRequested = true;
   let wakeWaiter: (() => void) | null = null;
+  let nativeOpenRequest: { requestedAt: number; hostId: string | null } | null = null;
 
   async function readThresholds() {
     const configured = await settings.get();
@@ -361,6 +391,12 @@ export default async function hostMonitorPlugin(bb: BbPluginApi): Promise<void> 
   }
 
   bb.rpc.register(rpcContract, {
+    async claimNativeOpen() {
+      const request = nativeOpenRequest;
+      nativeOpenRequest = null;
+      const open = request !== null && Date.now() - request.requestedAt <= NATIVE_OPEN_REQUEST_TTL_MS;
+      return { open, hostId: open ? request.hostId : null };
+    },
     async fleet() {
       if (hosts.length === 0) await listHosts();
       return fleet();
@@ -486,6 +522,46 @@ export default async function hostMonitorPlugin(bb: BbPluginApi): Promise<void> 
       if (hostId === null) await refreshAll();
       else await refreshOne(hostId);
       return fleet();
+    },
+  });
+
+  bb.cli.register({
+    name: "host-monitor",
+    summary: "Open Host Monitor or read its bounded resource snapshot",
+    commands: [
+      { name: "open", summary: "Open Host Monitor or one enrolled host", usage: "bb host-monitor open [host-id]" },
+      { name: "snapshot", summary: "Print bounded host metrics as JSON", usage: "bb host-monitor snapshot [--pretty]" },
+    ],
+    async run(argv, context) {
+      const [command, ...args] = argv;
+      if (command === "open" && args.length <= 1) {
+        const hostId = args[0] ?? null;
+        if (hosts.length === 0) await listHosts(context.signal);
+        if (hostId !== null && !hosts.some((host) => host.id === hostId)) {
+          return { exitCode: 1, stderr: `Unknown enrolled host: ${hostId}` };
+        }
+        nativeOpenRequest = { requestedAt: Date.now(), hostId };
+        return {
+          exitCode: 0,
+          stdout: hostId === null
+            ? "Host Monitor open requested.\n"
+            : `Host Monitor open requested for ${hostId}.\n`,
+        };
+      }
+      if (command !== "snapshot" || args.some((argument) => argument !== "--pretty")) {
+        return {
+          exitCode: 1,
+          stderr: "Usage: bb host-monitor open [host-id] | bb host-monitor snapshot [--pretty]",
+        };
+      }
+      if (hosts.length === 0) await refreshAll(context.signal);
+      const projected = compactFleetSnapshot(fleet());
+      return {
+        exitCode: 0,
+        stdout: args.includes("--pretty")
+          ? JSON.stringify(projected, null, 2)
+          : JSON.stringify(projected),
+      };
     },
   });
 
