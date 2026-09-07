@@ -56,14 +56,14 @@
           "end-to-end"
         ],
         "criteria": [
-          "AC-1",
-          "AC-2",
-          "AC-3",
-          "AC-4",
-          "AC-5",
-          "AC-6",
-          "AC-7",
-          "AC-UI-1"
+          "AC-TASKBOARD-DRAG-1",
+          "AC-TASKBOARD-DRAG-2",
+          "AC-TASKBOARD-DRAG-3",
+          "AC-TASKBOARD-DRAG-4",
+          "AC-TASKBOARD-DRAG-5",
+          "AC-TASKBOARD-DRAG-6",
+          "AC-TASKBOARD-DRAG-7",
+          "AC-TASKBOARD-DRAG-UI-1"
         ]
       },
       {
