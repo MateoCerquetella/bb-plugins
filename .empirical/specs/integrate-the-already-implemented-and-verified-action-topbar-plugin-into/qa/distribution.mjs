@@ -43,6 +43,12 @@ const visit = (path) => {
 visit(".");
 for (const path of authoredFiles) assert.doesNotMatch(read(path), /orca/i, path);
 
+const built = spawnSync("npm", ["run", "build", "--workspace=bb-plugin-action-topbar"], {
+  cwd: process.cwd(),
+  encoding: "utf8",
+});
+assert.equal(built.status, 0, built.stderr || built.stdout);
+
 const packed = spawnSync("npm", ["pack", "--dry-run", "--json", "--workspace=bb-plugin-action-topbar"], {
   cwd: process.cwd(),
   encoding: "utf8"
