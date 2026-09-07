@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 10,
+  "revision": 11,
   "activeFeature": "marketplace-plugin-repair",
   "request": "Fix Save My Model so its per-machine provider, model, and reasoning preference is connected to BB 0.42.1's supported model-selection flow and resolve marketplace PR #154. Reconcile Host Monitor v0.1.5 onto main, repair the Usage Tracker marketplace update, prepare Action Topbar and Touch Bar for release and marketplace submission without publishing until separately approved, and fix Action Topbar launcher stacking so its popover renders above BB page content while remaining below host-owned modal and dialog layers. Preserve unrelated plugin behavior and verify focused tests, workspace checks, managed installation, and live BB behavior.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "verify",
+  "phase": "review",
   "status": "waiting",
   "repairAttempts": 1,
-  "message": "Refreshed repository knowledge after reviewer fixes; all context pages are present, current, evidence-backed, and have no refinement-required markers.",
+  "message": "Post-review verification passes every Verify-gate check with fresh immutable test receipts, collected real-browser light/dark/narrow screenshots, live BB multi-host and SPA navigation evidence, and an advisory-only security consult.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:59cfbff4a78984eaf37743b90145987e6d4e757818622efcb124665919a73a87",
@@ -20,21 +20,31 @@
   "capabilityClaimId": "marketplace-plugin-repair-bed3181a7b26",
   "authorizationDigest": null,
   "evidence": [],
-  "evidenceReceiptIds": [],
+  "evidenceReceiptIds": [
+    "qa-10eec1ac853dd34c3365e2fd",
+    "qa-670902c8b93621185a864dfd",
+    "qa-af26d421d024f9bad33079d7",
+    "qa-bef4abca2beef77857f65803",
+    "qa-3f422a8f6233cf2a887353fc",
+    "qa-70326841802145d317937051",
+    "qa-8dd39d4b51b532a911a7a3ce",
+    "qa-ccf3111591e64a58446656ea",
+    "qa-6a9fb0e77d855f6a3e3806b9",
+    "collected-75c168ca323ab1a2b91d39f1"
+  ],
   "legacyEvidenceCount": 0,
   "completion": {
     "implemented": true,
-    "verified": false,
+    "verified": true,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "implemented",
+    "highest": "verified",
     "reasons": {
-      "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-07T20:13:51.114Z"
+  "updatedAt": "2026-09-07T20:22:47.693Z"
 }
