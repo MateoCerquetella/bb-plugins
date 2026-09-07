@@ -323,6 +323,9 @@ final class AgentStore {
 }
 
 enum BBCommand {
+    private static let maximumOutputBytes = 65_536
+    private static let terminationGraceInterval: TimeInterval = 0.4
+
     static func run(_ arguments: [String], timeout: TimeInterval = 1.5) -> Data? {
         guard let executable = NativeConfig.bbExecutable else { return nil }
         let process = Process()
@@ -362,19 +365,20 @@ enum BBCommand {
         if process.isRunning {
             NativeLog.error("bb command timed out: \(arguments.first ?? "unknown")")
             process.terminate()
-            let terminateDeadline = Date().addingTimeInterval(0.5)
+            let terminateDeadline = Date().addingTimeInterval(terminationGraceInterval)
             while process.isRunning && Date() < terminateDeadline {
                 Thread.sleep(forTimeInterval: 0.02)
             }
             if process.isRunning {
-                kill(process.processIdentifier, SIGKILL)
-                let killDeadline = Date().addingTimeInterval(0.5)
+                NativeLog.error("bb did not terminate; forcing exit")
+                Darwin.kill(process.processIdentifier, SIGKILL)
+                let killDeadline = Date().addingTimeInterval(terminationGraceInterval)
                 while process.isRunning && Date() < killDeadline {
-                    Thread.sleep(forTimeInterval: 0.02)
+                    Thread.sleep(forTimeInterval: 0.01)
                 }
             }
             if process.isRunning {
-                NativeLog.error("bb command did not exit after bounded termination")
+                NativeLog.error("bb process remained alive after forced exit")
             }
             return nil
         }
@@ -383,9 +387,9 @@ enum BBCommand {
             atPath: outputURL.path
         )
         let size = (attributes?[.size] as? NSNumber)?.intValue ?? 0
-        guard size <= 1_048_576,
+        guard size <= maximumOutputBytes,
               let data = try? Data(contentsOf: outputURL) else {
-            NativeLog.error("bb command output exceeded the 1 MiB limit")
+            NativeLog.error("bb output too large")
             return nil
         }
         guard process.terminationStatus == 0 else {

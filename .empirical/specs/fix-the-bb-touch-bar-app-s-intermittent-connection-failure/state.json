@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 5,
+  "revision": 7,
+  "activeFeature": "fix-the-bb-touch-bar-app-s-intermittent-connection-failure",
+  "request": "Fix the BB Touch Bar app's intermittent connection failure where it shows reconnecting indefinitely; diagnose the lifecycle, implement a robust recovery, and verify the UI and connection behavior.",
+  "profile": "complex",
+  "workflow": "complex",
+  "mode": "normal",
+  "phase": "review",
+  "status": "waiting",
+  "repairAttempts": 0,
+  "message": "Focused Touch Bar verification passed all 18 tests, SDK/type checks, and build; fresh-context audit confirmed bounded runner recovery. The repository-wide command also ran but failed only in unrelated pre-existing Taskboard tests. Native AppKit/physical Touch Bar execution is unavailable on this Linux host.",
+  "implementationActor": "agent",
+  "workStartedAt": null,
+  "specDigest": "sha256:1f805f32b9de8256dd8255cff3272d5b063f5a33912a3512914fd1241b1a330c",
+  "approvedSpecRevision": 2,
+  "capabilityArchiveRequired": true,
+  "capabilityDeltaDigest": "sha256:e78f716bb4dfa6db4d4ec6472c2d152f5064b1329d887ce15059691518d270e4",
+  "impactDigest": "sha256:67072cd8f29c5d52d1d71f84adc498a58a1db1330a8a60a5580749d6884f77c4",
+  "capabilityClaimId": "fix-the-bb-touch-bar-app-s-intermittent-connection-failure-3dc13adec0db",
+  "authorizationDigest": null,
+  "evidence": [],
+  "evidenceReceiptIds": [
+    "qa-c29f87345041605fcb8d5f1c",
+    "qa-9efa5b0abbaadd5adab23945"
+  ],
+  "legacyEvidenceCount": 0,
+  "completion": {
+    "implemented": true,
+    "verified": true,
+    "integrated": false,
+    "delivered": false,
+    "published": false,
+    "highest": "verified",
+    "reasons": {
+      "integrated": "integrated has not been proven by a durable receipt.",
+      "delivered": "delivered has not been proven by a durable receipt.",
+      "published": "published has not been proven by a durable receipt."
+    }
+  },
+  "updatedAt": "2026-09-07T18:02:26.966Z"
+}

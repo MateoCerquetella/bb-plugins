@@ -33,15 +33,18 @@
     "touchbar": {
       "localCommit": "5a153b2f646f0da2348e70b30f81339fd0c6fafb",
       "sourceRange": "^0.1.0",
+      "nextRelease": "touchbar/v0.1.2",
       "build": "passed",
       "tests": 35,
       "v1Gate": "passed-new-entry",
-      "remoteSourceCheck": "awaiting-touchbar/v0.1.0"
+      "remoteSourceCheck": "awaiting-touchbar/v0.1.2"
     }
   },
   "hostMonitor": {
-    "immutableTag": "host-monitor/v0.1.5",
+    "priorImmutableTag": "host-monitor/v0.1.5",
     "tagCommit": "382785fdd50b94bb7feba7dddf52114a13559015",
-    "reconciliation": "complete release plus additive Touch Bar CLI compatibility"
+    "reconciliation": "complete release plus additive Touch Bar CLI compatibility",
+    "nextRelease": "host-monitor/v0.1.6",
+    "remoteSourceCheck": "awaiting-host-monitor/v0.1.6"
   }
 }

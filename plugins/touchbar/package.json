@@ -1,6 +1,6 @@
 {
   "name": "bb-plugin-touchbar",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "private": true,
   "description": "Native persistent BB agent and thread status for MacBook Pro Touch Bars.",
   "license": "MIT",

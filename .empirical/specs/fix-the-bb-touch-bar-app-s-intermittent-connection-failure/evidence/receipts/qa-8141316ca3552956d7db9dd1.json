@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-8141316ca3552956d7db9dd1",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Run the complete Touch Bar plugin check, including native command-runner regression contracts.",
+  "passed": false,
+  "startedAt": "2026-09-07T18:00:20.634Z",
+  "completedAt": "2026-09-07T18:00:49.625Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "fix-the-bb-touch-bar-app-s-intermittent-connection-failure",
+    "specRevision": 2,
+    "specDigest": "sha256:1f805f32b9de8256dd8255cff3272d5b063f5a33912a3512914fd1241b1a330c",
+    "treeDigest": "sha256:ffcbf01b6d684c3d99b4b00b3521f8206f589cb43b3dd03933f5d1b4020dd6cb",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf",
+    "workflowRevision": 6,
+    "gitCommit": "29861c4d1990ad0df51e20b8b0f0df718191a00b"
+  },
+  "digest": "sha256:8fd64b3838f9894f8fdefc4100ef50ddb2bd82d951fa6a3300c3b048ef175c4b",
+  "kind": "qa",
+  "matrixDigest": "sha256:3bbc47fbf87aff859b500b418b5f67ea2608a92043d982311ac6350dc95e998f",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "failed",
+      "summary": "Run the complete Touch Bar plugin check, including native command-runner regression contracts.",
+      "startedAt": "2026-09-07T18:00:20.634Z",
+      "completedAt": "2026-09-07T18:00:49.625Z",
+      "durationMs": 28991,
+      "collector": null,
+      "command": {
+        "argv": [
+          "npm",
+          "run",
+          "check"
+        ],
+        "cwd": ".",
+        "timeoutMs": 900000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "NO_COLOR",
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 1,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:ee1d6e3e77deca507f66bce4a352b329b968c6c04af99c7cdb6403c360957e01",
+        "stderrDigest": "sha256:8e1c3afa9d91f6559bd13d3b91acc4780c3d24d1729c70791e04fc55ec184e93",
+        "stdoutTail": "\n  type: 'test'\n  ...\n# Subtest: normalizes Antigravity quota groups\nok 2 - normalizes Antigravity quota groups\n  ---\n  duration_ms: 10.285214\n  type: 'test'\n  ...\n# Subtest: normalizes agy command-data buckets\nok 3 - normalizes agy command-data buckets\n  ---\n  duration_ms: 0.176511\n  type: 'test'\n  ...\n# Subtest: keeps Grok and OpenCode independently configurable\nok 4 - keeps Grok and OpenCode independently configurable\n  ---\n  duration_ms: 0.577462\n  type: 'test'\n  ...\n# Subtest: emits semantic severity for compact, rail, and detail presentation\nok 5 - emits semantic severity for compact, rail, and detail presentation\n  ---\n  duration_ms: 0.155864\n  type: 'test'\n  ...\n# Subtest: summarizes larger provider sets and exposes the complete overview\nok 6 - summarizes larger provider sets and exposes the complete overview\n  ---\n  duration_ms: 0.116192\n  type: 'test'\n  ...\n# Subtest: preserves provider-specific details and focus restoration\nok 7 - preserves provider-specific details and focus restoration\n  ---\n  duration_ms: 0.116923\n  type: 'test'\n  ...\n# Subtest: preparing a reset never invokes the consuming callback\nok 8 - preparing a reset never invokes the consuming callback\n  ---\n  duration_ms: 0.942608\n  type: 'test'\n  ...\n# Subtest: reset confirmation is one-shot and idempotent\nok 9 - reset confirmation is one-shot and idempotent\n  ---\n  duration_ms: 0.250517\n  type: 'test'\n  ...\n# Subtest: reset confirmation expires without invoking the consuming callback\nok 10 - reset confirmation expires without invoking the consuming callback\n  ---\n  duration_ms: 0.136128\n  type: 'test'\n  ...\n# Subtest: reset preparation refuses zero or unknown availability\nok 11 - reset preparation refuses zero or unknown availability\n  ---\n  duration_ms: 0.125098\n  type: 'test'\n  ...\n# Subtest: reads the authoritative Codex reset count\nok 12 - reads the authoritative Codex reset count\n  ---\n  duration_ms: 2.065064\n  type: 'test'\n  ...\n# Subtest: attaches reset availability to Codex only\nok 13 - attaches reset availability to Codex only\n  ---\n  duration_ms: 0.772808\n  type: 'test'\n  ...\n# Subtest: rejects invalid reset counts before they reach the UI\nok 14 - rejects invalid reset counts before they reach the UI\n  ---\n  duration_ms: 0.388508\n  type: 'test'\n  ...\n# Subtest: enables sidebar providers independently in display order\nok 15 - enables sidebar providers independently in display order\n  ---\n  duration_ms: 1.111366\n  type: 'test'\n  ...\n# Subtest: normalizes compact limit preferences to the weekly default\nok 16 - normalizes compact limit preferences to the weekly default\n  ---\n  duration_ms: 0.120129\n  type: 'test'\n  ...\n# Subtest: normalizes providers in stable order with every usage window\nok 17 - normalizes providers in stable order with every usage window\n  ---\n  duration_ms: 0.608519\n  type: 'test'\n  ...\n# Subtest: normalizes Antigravity fractional quotas across both groups\nok 18 - normalizes Antigravity fractional quotas across both groups\n  ---\n  duration_ms: 0.448507\n  type: 'test'\n  ...\n# Subtest: normalizes agy command-data buckets\nok 19 - normalizes agy command-data buckets\n  ---\n  duration_ms: 0.251609\n  type: 'test'\n  ...\n# Subtest: uses the tightest Antigravity group in compact usage\nok 20 - uses the tightest Antigravity group in compact usage\n  ---\n  duration_ms: 8.288146\n  type: 'test'\n  ...\n# Subtest: keeps current provider wire-key windows intact\nok 21 - keeps current provider wire-key windows intact\n  ---\n  duration_ms: 0.240598\n  type: 'test'\n  ...\n# Subtest: keeps healthy legacy provider windows intact\nok 22 - keeps healthy legacy provider windows intact\n  ---\n  duration_ms: 0.138652\n  type: 'test'\n  ...\n# Subtest: accepts legacy provider keys and normalizes explicit statuses\nok 23 - accepts legacy provider keys and normalizes explicit statuses\n  ---\n  duration_ms: 0.528553\n  type: 'test'\n  ...\n# Subtest: prefers current provider keys over legacy aliases\nok 24 - prefers current provider keys over legacy aliases\n  ---\n  duration_ms: 0.632743\n  type: 'test'\n  ...\n# Subtest: isolates an omitted provider response\nok 25 - isolates an omitted provider response\n  ---\n  duration_ms: 0.308833\n  type: 'test'\n  ...\n# Subtest: normalizes Grok and OpenCode and isolates an omitted new provider\nok 26 - normalizes Grok and OpenCode and isolates an omitted new provider\n  ---\n  duration_ms: 0.201007\n  type: 'test'\n  ...\n# Subtest: clamps progress geometry and rejects non-finite values\nok 27 - clamps progress geometry and rejects non-finite values\n  ---\n  duration_ms: 0.311558\n  type: 'test'\n  ...\n# Subtest: classifies exact usage warning and critical thresholds\nok 28 - classifies exact usage warning and critical thresholds\n  ---\n  duration_ms: 0.082671\n  type: 'test'\n  ...\n# Subtest: provides Grok and layered OpenCode provider marks\nok 29 - provides Grok and layered OpenCode provider marks\n  ---\n  duration_ms: 0.083973\n  type: 'test'\n  ...\n# Subtest: formats reset, update, percentage, and cost copy safely\nok 30 - formats reset, update, percentage, and cost copy safely\n  ---\n  duration_ms: 2.736827\n  type: 'test'\n  ...\n# Subtest: selects the configured compact usage window\nok 31 - selects the configured compact usage window\n  ---\n  duration_ms: 0.23075\n  type: 'test'\n  ...\n# Subtest: selects the highest available compact usage for an overview summary\nok 32 - selects the highest available compact usage for an overview summary\n  ---\n  duration_ms: 0.153881\n  type: 'test'\n  ...\n# Subtest: keeps additional provider windows in expanded details only\nok 33 - keeps additional provider windows in expanded details only\n  ---\n  duration_ms: 0.270984\n  type: 'test'\n  ...\n# Subtest: falls back when the configured compact window is unavailable\nok 34 - falls back when the configured compact window is unavailable\n  ---\n  duration_ms: 0.667417\n  type: 'test'\n  ...\n# Subtest: hides the Codex Pro five-hour row when it is not reported\nok 35 - hides the Codex Pro five-hour row when it is not reported\n  ---\n  duration_ms: 0.313291\n  type: 'test'\n  ...\n# Subtest: prefers a fresh alternative before merged last-known compact windows\nok 36 - prefers a fresh alternative before merged last-known compact windows\n  ---\n  duration_ms: 0.124587\n  type: 'test'\n  ...\n# Subtest: describes configured, actual, and fallback compact windows accessibly\nok 37 - describes configured, actual, and fallback compact windows accessibly\n  ---\n  duration_ms: 0.325353\n  type: 'test'\n  ...\n# Subtest: keeps last-known sidebar windows through partial and failed refreshes\nok 38 - keeps last-known sidebar windows through partial and failed refreshes\n  ---\n  duration_ms: 0.229378\n  type: 'test'\n  ...\n# Subtest: keeps additional last-known windows without stale duplicates\nok 39 - keeps additional last-known windows without stale duplicates\n  ---\n  duration_ms: 0.218278\n  type: 'test'\n  ...\n# Subtest: resolves the thread environment host\nok 40 - resolves the thread environment host\n  ---\n  duration_ms: 0.125378\n  type: 'test'\n  ...\n# Subtest: falls back when a thread has no environment or lookup fails\nok 41 - falls back when a thread has no environment or lookup fails\n  ---\n  duration_ms: 0.118496\n  type: 'test'\n  ...\n# Subtest: loads usage for the resolved host and tolerates missing host metadata\nok 42 - loads usage for the resolved host and tolerates missing host metadata\n  ---\n  duration_ms: 0.170361\n  type: 'test'\n  ...\n# Subtest: omits host override for primary-machine fallback\nok 43 - omits host override for primary-machine fallback\n  ---\n  duration_ms: 0.10989\n  type: 'test'\n  ...\n# Subtest: loads the primary machine directly for the sidebar strip\nok 44 - loads the primary machine directly for the sidebar strip\n  ---\n  duration_ms: 0.094252\n  type: 'test'\n  ...\n# Subtest: propagates thread and request-level usage failures\nok 45 - propagates thread and request-level usage failures\n  ---\n  duration_ms: 0.185969\n  type: 'test'\n  ...\n1..45\n# tests 45\n# suites 0\n# pass 45\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 117.905263\n\n> bb-plugin-usage-tracker@0.1.8 build\n> env -u BB_CLI bb plugin build .\n\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\n",
+        "stderrTail": "This plugin pins @get-bb/plugin-sdk 0.4.40; this bb's SDK is 0.4.21 — `bb plugin types` updates the pin.\nnpm error Lifecycle script `test` failed with error:\nnpm error code 1\nnpm error path /home/dyaus/.bb/worktrees/env_3zxdgx5rfx/bb-plugins/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.3\nnpm error location /home/dyaus/.bb/worktrees/env_3zxdgx5rfx/bb-plugins/plugins/taskboard\nnpm error command failed\nnpm error command sh -c node --test --experimental-strip-types test/*.test.ts\nnpm error Lifecycle script `check` failed with error:\nnpm error code 1\nnpm error path /home/dyaus/.bb/worktrees/env_3zxdgx5rfx/bb-plugins/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.3\nnpm error location /home/dyaus/.bb/worktrees/env_3zxdgx5rfx/bb-plugins/plugins/taskboard\nnpm error command failed\nnpm error command sh -c npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build\n\n",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:ffcbf01b6d684c3d99b4b00b3521f8206f589cb43b3dd03933f5d1b4020dd6cb",
+      "sourceTreeAfter": "sha256:ffcbf01b6d684c3d99b4b00b3521f8206f589cb43b3dd03933f5d1b4020dd6cb",
+      "artifacts": []
+    }
+  ],
+  "anomalies": [
+    "outcome-failed"
+  ]
+}

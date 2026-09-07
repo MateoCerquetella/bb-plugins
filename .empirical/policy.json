@@ -127,6 +127,31 @@
         "criteria": []
       },
       {
+        "id": "touchbar-focused",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-touchbar"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "evidenceKinds": [
+          "test"
+        ],
+        "checks": [
+          "unit"
+        ],
+        "criteria": [
+          "AC-1",
+          "AC-2",
+          "AC-3",
+          "AC-4"
+        ]
+      },
+      {
         "id": "workspace-check",
         "argv": [
           "npm",

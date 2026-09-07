@@ -235,9 +235,9 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(model, /BB reconnected after/u);
   assert.match(model, /posixPermissions: 0o600/u);
   assert.match(model, /terminateDeadline/u);
-  assert.match(model, /kill\(process\.processIdentifier, SIGKILL\)/u);
+  assert.match(model, /Darwin\.kill\(process\.processIdentifier, SIGKILL\)/u);
   assert.match(model, /killDeadline/u);
-  assert.match(model, /size <= 1_048_576/u);
+  assert.match(model, /size <= maximumOutputBytes/u);
   assert.doesNotMatch(model, /waitUntilExit|readDataToEndOfFile/u);
   assert.match(model, /lastGoodSnapshot/u);
   assert.match(model, /stale\.connected = false/u);
@@ -329,6 +329,11 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(model, /dev\.bb\.desktop/u);
   assert.match(model, /activateBB/u);
   assert.match(model, /\["host-monitor", "open", hostId\]/u);
+  assert.doesNotMatch(model, /readabilityHandler\s*=/u);
+  assert.match(model, /maximumOutputBytes = 65_536/u);
+  assert.match(model, /terminationGraceInterval/u);
+  assert.match(model, /Darwin\.kill\(process\.processIdentifier, SIGKILL\)/u);
+  assert.doesNotMatch(model, /readDataToEndOfFile/u);
   assert.match(controller, /width: 44, action: action/u);
   assert.match(controller, /width: 28,[\s\S]*height: 28/u);
   assert.match(controller, /iconView\.frame = NSRect\(x: 4, y: 3, width: 24, height: 24\)/u);

@@ -247,7 +247,7 @@ Generated `build/`, `dist/`, and `node_modules/` directories remain untracked.
 Create the universal ZIP and matching Cask checksum on a Mac:
 
 ```sh
-./plugins/touchbar/native/package.sh 0.1.0
+./plugins/touchbar/native/package.sh 0.1.2
 ```
 
 For a public release, sign and notarize with Keychain-managed credentials:
@@ -255,13 +255,13 @@ For a public release, sign and notarize with Keychain-managed credentials:
 ```sh
 BB_TOUCHBAR_SIGN_IDENTITY="Developer ID Application: Example (TEAMID)" \
 BB_TOUCHBAR_NOTARY_PROFILE="bb-touchbar" \
-  ./plugins/touchbar/native/package.sh 0.1.0
+  ./plugins/touchbar/native/package.sh 0.1.2
 ```
 
 `package.sh` prints the archive path and SHA-256. Put that exact SHA in
 [`Casks/bb-touch-bar.rb`](../../Casks/bb-touch-bar.rb), commit it, create the
-matching `touchbar/v0.1.0` tag, and attach the unchanged ZIP as
-`BBTouchBar-0.1.0-universal.zip`. Publishing the tag/release remains a separate
+matching `touchbar/v0.1.2` tag, and attach the unchanged ZIP as
+`BBTouchBar-0.1.2-universal.zip`. Publishing the tag/release remains a separate
 remote action.
 
 ## License
