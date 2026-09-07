@@ -79,10 +79,10 @@ function Settings() {
           ? current
           : result.hosts[0]?.id ?? null,
       );
-    }).catch((error: unknown) => {
+    }).catch(() => {
       if (!active) return;
       setHosts([]);
-      setHostError(error instanceof Error ? error.message : "BB could not list machines.");
+      setHostError("BB could not list machines.");
     });
     return () => { active = false; };
   }, [rpc, refreshKey]);
@@ -106,9 +106,9 @@ function Settings() {
         writePreference({ hostId: selectedHostId, ...result.selection });
         setRecordsRevision((value) => value + 1);
       }
-    }).catch((error: unknown) => {
+    }).catch(() => {
       if (!active) return;
-      setSelectionError(error instanceof Error ? error.message : "BB could not load this machine's model catalog.");
+      setSelectionError("BB could not load this machine's model catalog.");
     }).finally(() => {
       if (active) setResolving(false);
     });

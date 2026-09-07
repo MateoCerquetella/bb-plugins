@@ -44,7 +44,7 @@ test("contains host-list failures", async () => {
     error: string | null;
   };
   assert.deepEqual(result.hosts, []);
-  assert.match(result.error ?? "", /offline/u);
+  assert.equal(result.error, "BB could not list machines.");
   await harness.lifecycle.dispose();
 });
 
@@ -55,4 +55,26 @@ test("imports only public SDK and declared package surfaces", () => {
   );
   assert.deepEqual(result.violations, []);
   assert.deepEqual(result.privateDependencies, []);
+});
+
+test("rejects a catalog request for a host BB no longer enrolls", async () => {
+  const { bb, harness } = createFakePluginHost({
+    pluginId: "save-my-model",
+    sdk: {
+      hosts: { get: async () => { throw new Error("unknown host /private/path"); } },
+      system: { executionOptions: async () => { throw new Error("must not run"); } },
+    },
+  });
+  plugin(bb);
+  const result = await harness.behavior.callRpc("resolveSelection", {
+    hostId: "host-gone",
+    preferred: null,
+  }) as { selection: unknown; error: { code: string; message: string } | null };
+  assert.equal(result.selection, null);
+  assert.deepEqual(result.error, {
+    code: "host-unavailable",
+    message: "This machine is no longer enrolled in BB.",
+  });
+  assert.equal(harness.inspection.sdk.callsTo("system.executionOptions").length, 0);
+  await harness.lifecycle.dispose();
 });

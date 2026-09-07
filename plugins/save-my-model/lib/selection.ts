@@ -27,13 +27,6 @@ function resolutionError(code: SelectionResolutionError["code"], message: string
   return { selection: null, error: { code, message } };
 }
 
-function errorMessage(error: unknown): string {
-  const detail = error instanceof Error ? error.message.trim() : "";
-  return detail.length > 0
-    ? `BB could not load this machine's model catalog: ${detail.slice(0, 240)}`
-    : "BB could not load this machine's model catalog.";
-}
-
 export async function resolveSupportedSelection(
   sdk: SelectionResolverSdk,
   hostId: string,
@@ -80,7 +73,7 @@ export async function resolveSupportedSelection(
       },
       error: null,
     };
-  } catch (error) {
-    return resolutionError("failed", errorMessage(error));
+  } catch {
+    return resolutionError("failed", "BB could not load this machine's model catalog.");
   }
 }
