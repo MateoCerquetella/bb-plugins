@@ -32,5 +32,10 @@ describe("workspace filter UI contract", () => {
     assert.match(select, /focus:bg-state-hover/);
     assert.match(inbox, /filterPreset === "status"/);
     assert.match(inbox, /statusGroups\.map/);
+    const statusGroup = await readFile(
+      new URL("../components/inbox/status-group.tsx", import.meta.url),
+      "utf8",
+    );
+    assert.match(statusGroup, /leadingVisual="provider"/);
   });
 });
