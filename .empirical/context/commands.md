@@ -19,7 +19,7 @@ Commands below are verified from workspace and plugin manifests.
 - `bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.0 --subdirectory plugins/taskboard --tag-prefix taskboard/`
   — install the released Taskboard Git range directly.
 - `bb plugin install ./plugins/usage-tracker` — register Usage Tracker locally.
-- `bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.3 --subdirectory plugins/usage-tracker --tag-prefix usage-tracker/`
+- `bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.8 --subdirectory plugins/usage-tracker --tag-prefix usage-tracker/`
   — install the released Usage Tracker Git range directly.
 - `bb plugin install ./plugins/host-monitor` — register Host Monitor locally.
 - `bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.0 --subdirectory plugins/host-monitor --tag-prefix host-monitor/`

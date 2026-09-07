@@ -60,7 +60,7 @@ const activeContext = await Promise.all([
 const directGitInstall =
   'bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.3 --subdirectory plugins/taskboard --tag-prefix taskboard/';
 const usageGitInstall =
-  'bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.3 --subdirectory plugins/usage-tracker --tag-prefix usage-tracker/';
+  'bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.8 --subdirectory plugins/usage-tracker --tag-prefix usage-tracker/';
 
 test('keeps Taskboard private and Git-buildable without npm publication hooks', () => {
   assert.equal(rootManifest.private, true);
