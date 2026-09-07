@@ -82,7 +82,7 @@
         "id": "action-topbar-distribution",
         "argv": [
           "node",
-          ".empirical/specs/integrate-the-already-implemented-and-verified-action-topbar-plugin-into/qa/distribution.mjs"
+          ".github/qa/action-topbar-distribution.mjs"
         ],
         "cwd": ".",
         "timeoutMs": 60000,
