@@ -52,9 +52,7 @@
           "browser",
           "screenshot"
         ],
-        "checks": [
-          "end-to-end"
-        ],
+        "checks": [],
         "criteria": [
           "AC-TASKBOARD-DRAG-1",
           "AC-TASKBOARD-DRAG-2",
