@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-9def882e2a4e859bcde3523f",
+  "criteria": [
+    "AC-1",
+    "AC-10",
+    "AC-2",
+    "AC-3",
+    "AC-5",
+    "AC-UI-1",
+    "AC-UI-2"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Live Chromium evidence shows Save My Model using BB's native host-routed picker across three connected and one disconnected machine, and Action Topbar at z-index 40 with its right edge unobscured above thread content.",
+  "passed": true,
+  "startedAt": "2026-09-07T18:39:19.426Z",
+  "completedAt": "2026-09-07T18:39:19.426Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "marketplace-plugin-repair",
+    "specRevision": 2,
+    "specDigest": "sha256:59cfbff4a78984eaf37743b90145987e6d4e757818622efcb124665919a73a87",
+    "treeDigest": "sha256:c7317e99d34050d73bdd8d62dfcd724a8baa110ce2309517970600c3c2e1520f",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf"
+  },
+  "digest": "sha256:e1ff88ee59b948169cf49e937ad69fe3daf508da653f5f321046035049f44831",
+  "kind": "collected",
+  "collector": "codex-live-chromium",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/marketplace-plugin-repair/evidence/action-topbar-launcher.png",
+      "mediaType": "image/png",
+      "bytes": 192064,
+      "digest": "sha256:b8ce0b2f14a0dbd26bd98fe7cdbf49f570f62e9fcf7196d675de9599097090fd"
+    },
+    {
+      "path": ".empirical/specs/marketplace-plugin-repair/evidence/live-result.json",
+      "mediaType": "application/json",
+      "bytes": 204,
+      "digest": "sha256:57e2307689d61c0ee063c3886e2a4aa7629ac90f538783420782c296584c3792"
+    },
+    {
+      "path": ".empirical/specs/marketplace-plugin-repair/evidence/save-my-model-settings.png",
+      "mediaType": "image/png",
+      "bytes": 110325,
+      "digest": "sha256:d5ca1f6390e6506a2526374f55bf41e5f2f8a1dfe11a8192d7506c259a742da1"
+    }
+  ]
+}
