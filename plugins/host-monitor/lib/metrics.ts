@@ -138,40 +138,6 @@ function isUsefulIpv6(address: string): boolean {
   );
 }
 
-/**
- * Select one useful host-local address without returning interface names,
- * hardware addresses, netmasks, or other network configuration details.
- * IPv4 is preferred for a compact, broadly usable primary address; otherwise
- * the first global/unique-local IPv6 address is returned in canonical form.
- */
-export function selectPrimaryIpAddress(
-  interfaces: NetworkInterfacesLike,
-): string | null {
-  const candidates: NormalizedIpAddress[] = [];
-  const seen = new Set<string>();
-
-  for (const addresses of Object.values(interfaces)) {
-    for (const entry of addresses ?? []) {
-      if (entry.internal) continue;
-      const normalized = normalizeIpAddress(entry.address);
-      if (normalized === null) continue;
-      const useful =
-        normalized.family === 4
-          ? isUsefulIpv4(normalized.address)
-          : isUsefulIpv6(normalized.address);
-      if (!useful || seen.has(normalized.address)) continue;
-      seen.add(normalized.address);
-      candidates.push(normalized);
-    }
-  }
-
-  return (
-    candidates.find((candidate) => candidate.family === 4)?.address ??
-    candidates[0]?.address ??
-    null
-  );
-}
-
 /** Restrict throughput to interfaces that own a useful, non-internal address. */
 export function selectThroughputInterfaceNames(
   interfaces: NetworkInterfacesLike,
@@ -189,14 +155,6 @@ export function selectThroughputInterfaceNames(
     if (hasUsefulAddress) selected.add(name);
   }
   return selected;
-}
-
-function readPrimaryIpAddress(): string | null {
-  try {
-    return selectPrimaryIpAddress(os.networkInterfaces());
-  } catch {
-    return null;
-  }
 }
 
 function readLoopbackInterfaceNames(): ReadonlySet<string> {
@@ -1180,10 +1138,7 @@ export async function collectMachineSnapshot({
     sampledAtMs,
     durationMs: Math.max(0, Math.round(performance.now() - startedAt)),
     system: buildSystem(platform, sampledAtMs, osNameOverride, issues),
-    network: {
-      primaryIpAddress: readPrimaryIpAddress(),
-      ...networkThroughput,
-    },
+    network: networkThroughput,
     cpu,
     memory,
     swap,

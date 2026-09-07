@@ -1,75 +1,51 @@
-import type { BbPluginApi } from "@get-bb/plugin-sdk";
 import { setTimeout as delay } from "node:timers/promises";
+
+import type { BbPluginApi } from "@get-bb/plugin-sdk";
+
 import {
   hostContract,
   rpcContract,
-  type Dashboard,
+  type Fleet,
+  type MachineRow,
   type MachineSnapshot,
   type ProcessListResult,
   type ProcessSortBy,
   type ProcessTerminationMode,
-} from "./contract.js";
-import {
-  buildDashboard,
-  mergeLastGoodRecords,
-  type LastGoodMachineRecord,
-  type MachineHost,
-  type MachineSampleUpdate,
-} from "./lib/dashboard.js";
-import {
-  resolveHealthThresholds,
-  sameHealthThresholds,
-  type HealthThresholds,
-} from "./lib/thresholds.js";
-import { ProcessConfirmationStore } from "./lib/process-confirmations.js";
+} from "./contract.ts";
+import { ProcessConfirmationStore } from "./lib/process-confirmations.ts";
 import {
   HostProcessOperationGate,
   ProcessOperationBusyError,
-} from "./lib/process-operation-gate.js";
+} from "./lib/process-operation-gate.ts";
+import {
+  HostMonitorStore,
+  hostMonitorMigrations,
+  RETENTION_MS,
+  SAMPLE_INTERVAL_MS,
+} from "./store.ts";
 
-const REFRESH_INTERVAL_MS = 10_000;
 const CPU_SAMPLE_MS = 300;
 const HOST_CALL_TIMEOUT_MS = 5_000;
 export const PROCESS_HOST_CALL_TIMEOUT_MS = 20_000;
 export const PROCESS_TERMINATION_HOST_CALL_TIMEOUT_MS = 30_000;
-const REALTIME_CHANNEL = "machines-changed";
-const HOST_SNAPSHOT_LIMIT = 100;
-const NATIVE_OPEN_REQUEST_TTL_MS = 15_000;
+const REALTIME_CHANNEL = "host-monitor-machines-changed";
+const STALE_AFTER_INTERVALS = 2;
 
-export function compactHostDashboard(current: Dashboard) {
-  return {
-    schemaVersion: 1 as const,
-    generatedAtMs: current.generatedAtMs,
-    thresholds: current.thresholds,
-    hosts: current.machines.slice(0, HOST_SNAPSHOT_LIMIT).map((machine) => ({
-      id: machine.host.id,
-      name: machine.host.name,
-      status: machine.host.status,
-      sampleState: machine.sampleState,
-      cpuPercent: machine.snapshot?.cpu.usagePercent ?? null,
-      memoryPercent: machine.snapshot?.memory.usagePercent ?? null,
-      diskPercent: machine.snapshot?.disk?.usagePercent ?? null,
-      receiveBytesPerSecond:
-        machine.snapshot?.network.receiveBytesPerSecond ?? null,
-      sendBytesPerSecond:
-        machine.snapshot?.network.sendBytesPerSecond ?? null,
-    })),
-  };
-}
+type MachineHost = MachineRow["host"];
+type MachineRecord = {
+  snapshot: MachineSnapshot | null;
+  receivedAtMs: number | null;
+  error: string | null;
+  sampling: boolean;
+};
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-function isTimeout(error: unknown): boolean {
-  return (
-    error instanceof Error &&
-    (error.name === "TimeoutError" || /timed?\s*out/iu.test(error.message))
-  );
-}
-
 function publicSampleError(error: unknown): string {
-  return isTimeout(error)
+  return error instanceof Error &&
+    (error.name === "TimeoutError" || /timed?\s*out/iu.test(error.message))
     ? "Sampling timed out. The machine may be busy or reconnecting."
     : "Could not collect metrics from this machine.";
 }
@@ -88,77 +64,72 @@ function projectHost(host: {
   };
 }
 
-function nextCpuHighStreak(
-  previous: LastGoodMachineRecord | undefined,
-  snapshot: MachineSnapshot,
-  thresholds: HealthThresholds,
-): number {
-  return snapshot.cpu.usagePercent >= thresholds.attentionPercent
-    ? Math.min((previous?.cpuHighStreak ?? 0) + 1, Number.MAX_SAFE_INTEGER)
-    : 0;
+function emptyRecord(host: MachineHost): MachineRecord {
+  return { snapshot: null, receivedAtMs: null, error: null, sampling: host.status === "connected" };
 }
 
-export default async function hostMonitorPlugin(
-  bb: BbPluginApi,
-): Promise<void> {
-  let nativeOpenRequest: {
-    requestedAt: number;
-    hostId: string | null;
-  } | null = null;
+function compareHosts(left: MachineHost, right: MachineHost): number {
+  const status = Number(right.status === "connected") - Number(left.status === "connected");
+  if (status !== 0) return status;
+  return left.name.localeCompare(right.name, undefined, { sensitivity: "base" }) ||
+    left.id.localeCompare(right.id);
+}
+
+export default async function hostMonitorPlugin(bb: BbPluginApi): Promise<void> {
   const settings = bb.settings.define({
-    sidebarThresholdColors: {
-      type: "boolean",
-      label: "Threshold colors",
-      description:
-        "Color CPU, memory, and disk percentage values green, yellow, or red across the Host Monitor page, sidebar popover, and floating window.",
-      default: true,
+    cpuWarningPercent: {
+      type: "select" as const,
+      label: "CPU guide",
+      description: "Highlight CPU panels at this percentage. This is an in-page visual guide, not a notification.",
+      options: ["70", "80", "90", "95"],
+      default: "90",
     },
-    attentionThresholdPercent: {
-      type: "string",
-      label: "Yellow threshold (%)",
-      description:
-        "CPU, memory, and disk turn yellow at this usage percentage. Enter 1–99, below the red threshold; invalid values use 85%.",
-      default: "85",
+    ramWarningPercent: {
+      type: "select" as const,
+      label: "RAM guide",
+      description: "Highlight RAM panels at this percentage. This is an in-page visual guide, not a notification.",
+      options: ["70", "80", "90", "95"],
+      default: "90",
     },
-    criticalThresholdPercent: {
-      type: "string",
-      label: "Red threshold (%)",
-      description:
-        "CPU, memory, and disk turn red at this usage percentage. Enter 2–100, above the yellow threshold; invalid values use 95%.",
-      default: "95",
+    diskWarningPercent: {
+      type: "select" as const,
+      label: "Disk guide",
+      description: "Highlight root-disk panels at this percentage. This is an in-page visual guide, not a notification.",
+      options: ["70", "80", "90", "95"],
+      default: "90",
     },
   });
-  const initialSettings = await settings.get();
-  let sidebarThresholdColors = initialSettings.sidebarThresholdColors;
-  let thresholds = resolveHealthThresholds(initialSettings);
+
+  const db = bb.storage.database();
+  bb.storage.migrate(db, hostMonitorMigrations);
+  const store = new HostMonitorStore(db);
   const hostClient = bb.hosts.experimental_client({ contract: hostContract });
   const processConfirmations = new ProcessConfirmationStore();
   const processOperations = new HostProcessOperationGate();
   const processLifecycleController = new AbortController();
   const processListInFlight = new Map<string, Promise<ProcessListResult>>();
   bb.onDispose(() => {
-    processLifecycleController.abort(
-      new DOMException("Host Monitor is shutting down.", "AbortError"),
-    );
+    processLifecycleController.abort(new DOMException("Host Monitor is shutting down.", "AbortError"));
     processOperations.close();
     processConfirmations.clear();
   });
+
+  let thresholds = await readThresholds();
   let hosts: MachineHost[] = [];
-  let records = new Map<string, LastGoodMachineRecord>();
+  let records = new Map<string, MachineRecord>();
   let hostListInFlight: Promise<MachineHost[]> | null = null;
   let fullRefreshInFlight: Promise<void> | null = null;
   const sampleInFlight = new Map<string, Promise<void>>();
   let refreshRequested = true;
   let wakeWaiter: (() => void) | null = null;
 
-  function dashboard(): Dashboard {
-    return buildDashboard(
-      hosts,
-      records,
-      Date.now(),
-      REFRESH_INTERVAL_MS,
-      thresholds,
-    );
+  async function readThresholds() {
+    const configured = await settings.get();
+    return {
+      cpu: Number(configured.cpuWarningPercent),
+      ram: Number(configured.ramWarningPercent),
+      disk: Number(configured.diskWarningPercent),
+    };
   }
 
   function publish(hostIds: readonly string[]): void {
@@ -173,110 +144,116 @@ export default async function hostMonitorPlugin(
     wakeWaiter?.();
   }
 
-  settings.onChange((next) => {
-    const nextThresholds = resolveHealthThresholds(next);
-    const thresholdsChanged = !sameHealthThresholds(
-      thresholds,
-      nextThresholds,
-    );
-    sidebarThresholdColors = next.sidebarThresholdColors;
-    thresholds = nextThresholds;
-    if (thresholdsChanged) {
-      records = new Map(
-        [...records].map(([hostId, record]) => [
-          hostId,
-          { ...record, cpuHighStreak: 0 },
-        ]),
-      );
-      requestRefresh();
-    }
+  settings.onChange(async () => {
+    thresholds = await readThresholds();
     publish(hosts.map((host) => host.id));
   });
+
+  function fleet(): Fleet {
+    const now = Date.now();
+    const machines = [...hosts].sort(compareHosts).map((host): MachineRow => {
+      const record = records.get(host.id) ?? emptyRecord(host);
+      const sampleState: MachineRow["sampleState"] =
+        host.status === "disconnected"
+          ? "offline"
+          : record.sampling
+            ? "sampling"
+            : record.error !== null
+              ? "error"
+              : record.snapshot === null
+                ? "sampling"
+                : record.receivedAtMs === null || now - record.receivedAtMs > SAMPLE_INTERVAL_MS * STALE_AFTER_INTERVALS
+                  ? "stale"
+                  : "fresh";
+      return {
+        host,
+        sampleState,
+        snapshot: record.snapshot,
+        receivedAtMs: record.receivedAtMs,
+        error: record.error,
+      };
+    });
+    return {
+      generatedAtMs: now,
+      refreshIntervalMs: SAMPLE_INTERVAL_MS,
+      refreshing: fullRefreshInFlight !== null || sampleInFlight.size > 0,
+      connected: machines.filter((machine) => machine.host.status === "connected").length,
+      total: machines.length,
+      thresholds: { ...thresholds },
+      machines,
+    };
+  }
 
   async function listHosts(signal?: AbortSignal): Promise<MachineHost[]> {
     if (hostListInFlight !== null) return hostListInFlight;
     const pending = bb.sdk.hosts
       .list(signal === undefined ? undefined : { signal })
-      .then((availableHosts) => availableHosts.map(projectHost));
+      .then((available) => available.map(projectHost));
     hostListInFlight = pending;
     try {
       hosts = await pending;
-      records = mergeLastGoodRecords(hosts, records, new Map());
+      const enrolled = new Set(hosts.map((host) => host.id));
+      records = new Map([...records].filter(([hostId]) => enrolled.has(hostId)));
+      for (const host of hosts) {
+        if (!records.has(host.id)) records.set(host.id, emptyRecord(host));
+      }
       return hosts;
     } finally {
       if (hostListInFlight === pending) hostListInFlight = null;
     }
   }
 
-  async function sampleHost(
-    machine: MachineHost,
-    signal?: AbortSignal,
-  ): Promise<void> {
-    if (machine.status !== "connected") return;
-    const existing = sampleInFlight.get(machine.id);
+  async function sampleHost(host: MachineHost, signal?: AbortSignal): Promise<void> {
+    if (host.status !== "connected") return;
+    const existing = sampleInFlight.get(host.id);
     if (existing !== undefined) return existing;
 
+    const previous = records.get(host.id) ?? emptyRecord(host);
+    records.set(host.id, { ...previous, sampling: true, error: null });
+
     const timeoutSignal = AbortSignal.timeout(HOST_CALL_TIMEOUT_MS);
-    const callSignal =
-      signal === undefined
-        ? timeoutSignal
-        : AbortSignal.any([signal, timeoutSignal]);
+    const callSignal = signal === undefined
+      ? timeoutSignal
+      : AbortSignal.any([signal, timeoutSignal]);
     const pending = (async () => {
       try {
         const snapshot = await hostClient.call(
           "snapshot",
           { cpuSampleMs: CPU_SAMPLE_MS },
-          { hostId: machine.id, signal: callSignal },
+          { hostId: host.id, signal: callSignal },
         );
-        const update: MachineSampleUpdate = {
-          kind: "success",
-          snapshot,
-          cpuHighStreak: nextCpuHighStreak(
-            records.get(machine.id),
-            snapshot,
-            thresholds,
-          ),
-        };
-        records = mergeLastGoodRecords(
-          hosts,
-          records,
-          new Map([[machine.id, update]]),
-        );
+        const receivedAtMs = Date.now();
+        store.insert(host.id, snapshot, receivedAtMs);
+        records.set(host.id, { snapshot, receivedAtMs, error: null, sampling: false });
       } catch (error) {
         if (signal?.aborted) return;
-        bb.log.warn(
-          `Could not sample host ${machine.id}: ${errorMessage(error)}`,
-        );
-        records = mergeLastGoodRecords(
-          hosts,
-          records,
-          new Map([
-            [
-              machine.id,
-              { kind: "error", error: publicSampleError(error) } as const,
-            ],
-          ]),
-        );
+        bb.log.warn(`Could not sample host ${host.id}: ${errorMessage(error)}`);
+        records.set(host.id, {
+          snapshot: previous.snapshot,
+          receivedAtMs: previous.receivedAtMs,
+          error: publicSampleError(error),
+          sampling: false,
+        });
       }
     })();
-    sampleInFlight.set(machine.id, pending);
+
+    sampleInFlight.set(host.id, pending);
     try {
       await pending;
     } finally {
-      if (sampleInFlight.get(machine.id) === pending) {
-        sampleInFlight.delete(machine.id);
-      }
+      if (sampleInFlight.get(host.id) === pending) sampleInFlight.delete(host.id);
     }
   }
 
   async function refreshAll(signal?: AbortSignal): Promise<void> {
     if (fullRefreshInFlight !== null) return fullRefreshInFlight;
     const pending = (async () => {
-      const availableHosts = await listHosts(signal);
-      await Promise.all(
-        availableHosts.map((machine) => sampleHost(machine, signal)),
-      );
-      publish(availableHosts.map((machine) => machine.id));
+      const available = await listHosts(signal);
+      const samples = available.map((host) => sampleHost(host, signal));
+      publish(available.map((host) => host.id));
+      await Promise.all(samples);
+      store.prune(Date.now() - RETENTION_MS);
+      publish(available.map((host) => host.id));
     })();
     fullRefreshInFlight = pending;
     try {
@@ -287,14 +264,23 @@ export default async function hostMonitorPlugin(
   }
 
   async function refreshOne(hostId: string): Promise<void> {
-    const availableHosts = await listHosts();
-    const machine = availableHosts.find((candidate) => candidate.id === hostId);
-    if (machine === undefined) return;
-    await sampleHost(machine);
-    publish([hostId]);
+    const available = await listHosts();
+    const host = available.find((candidate) => candidate.id === hostId);
+    if (host === undefined) throw new Error("That enrolled machine no longer exists.");
+    const sample = sampleHost(host);
+    publish([host.id]);
+    await sample;
+    publish([host.id]);
   }
 
-  async function enrolledHost(hostId: string) {
+  async function requireEnrolledHost(hostId: string): Promise<void> {
+    const available = await listHosts();
+    if (!available.some((host) => host.id === hostId)) {
+      throw new Error("That enrolled machine no longer exists.");
+    }
+  }
+
+  async function enrolledProcessHost(hostId: string) {
     const signal = AbortSignal.any([
       AbortSignal.timeout(PROCESS_HOST_CALL_TIMEOUT_MS),
       processLifecycleController.signal,
@@ -303,23 +289,15 @@ export default async function hostMonitorPlugin(
     return availableHosts.find((host) => host.id === hostId) ?? null;
   }
 
-  function processHostSignal(
-    timeoutMs = PROCESS_HOST_CALL_TIMEOUT_MS,
-  ): AbortSignal {
+  function processHostSignal(timeoutMs = PROCESS_HOST_CALL_TIMEOUT_MS): AbortSignal {
     return AbortSignal.any([
       AbortSignal.timeout(timeoutMs),
       processLifecycleController.signal,
     ]);
   }
 
-  function processHostUnavailableMessage(): string {
-    return "Process information is temporarily unavailable from this machine.";
-  }
-
   function unsupportedProcessError(error: unknown): boolean {
-    return /unsupported (?:on|operating system)|unsupported platform/iu.test(
-      errorMessage(error),
-    );
+    return /unsupported (?:on|operating system)|unsupported platform/iu.test(errorMessage(error));
   }
 
   async function loadProcessList({
@@ -333,44 +311,24 @@ export default async function hostMonitorPlugin(
   }): Promise<ProcessListResult> {
     let machine;
     try {
-      machine = await enrolledHost(hostId);
+      machine = await enrolledProcessHost(hostId);
     } catch (error) {
-      bb.log.warn(
-        `Could not resolve process host ${hostId}: ${errorMessage(error)}`,
-      );
-      return {
-        outcome: "unavailable",
-        message: processHostUnavailableMessage(),
-      };
+      bb.log.warn(`Could not resolve process host ${hostId}: ${errorMessage(error)}`);
+      return { outcome: "unavailable", message: "Process information is temporarily unavailable from this machine." };
     }
-    if (machine === null) {
-      return {
-        outcome: "not-found",
-        message: "That enrolled machine no longer exists.",
-      };
-    }
+    if (machine === null) return { outcome: "not-found", message: "That enrolled machine no longer exists." };
     if (machine.status !== "connected") {
-      return {
-        outcome: "offline",
-        message: "Connect this machine before inspecting its processes.",
-      };
+      return { outcome: "offline", message: "Connect this machine before inspecting its processes." };
     }
     try {
-      const result = await processOperations.run(hostId, () =>
-        hostClient.call(
-          "listProcesses",
-          { sortBy, limit },
-          { hostId, signal: processHostSignal() },
-        ),
-      );
+      const result = await processOperations.run(hostId, () => hostClient.call(
+        "listProcesses",
+        { sortBy, limit },
+        { hostId, signal: processHostSignal() },
+      ));
       return {
         outcome: "ok",
-        host: {
-          id: machine.id,
-          name: machine.name,
-          status: "connected",
-          platform: result.platform,
-        },
+        host: { id: machine.id, name: machine.name, status: "connected", platform: result.platform },
         sampledAtMs: result.sampledAtMs,
         elevated: result.elevated,
         totalCount: result.totalCount,
@@ -378,19 +336,10 @@ export default async function hostMonitorPlugin(
         processes: result.processes,
       };
     } catch (error) {
-      bb.log.warn(
-        `Could not inspect processes on host ${hostId}: ${errorMessage(error)}`,
-      );
+      bb.log.warn(`Could not inspect processes on host ${hostId}: ${errorMessage(error)}`);
       return unsupportedProcessError(error)
-        ? {
-            outcome: "unsupported",
-            message:
-              "Process inspection is unsupported on this operating system.",
-          }
-        : {
-            outcome: "unavailable",
-            message: processHostUnavailableMessage(),
-          };
+        ? { outcome: "unsupported", message: "Process inspection is unsupported on this operating system." }
+        : { outcome: "unavailable", message: "Process information is temporarily unavailable from this machine." };
     }
   }
 
@@ -407,71 +356,60 @@ export default async function hostMonitorPlugin(
     try {
       return await pending;
     } finally {
-      if (processListInFlight.get(key) === pending) {
-        processListInFlight.delete(key);
-      }
+      if (processListInFlight.get(key) === pending) processListInFlight.delete(key);
     }
   }
 
   bb.rpc.register(rpcContract, {
-    async claimNativeOpen() {
-      const request = nativeOpenRequest;
-      nativeOpenRequest = null;
-      const open =
-        request !== null &&
-        Date.now() - request.requestedAt <= NATIVE_OPEN_REQUEST_TTL_MS;
+    async fleet() {
+      if (hosts.length === 0) await listHosts();
+      return fleet();
+    },
+    async sidebarSummary() {
+      if (hosts.length === 0) await listHosts();
       return {
-        open,
-        hostId: open ? request.hostId : null,
+        connected: hosts.filter((host) => host.status === "connected").length,
+        total: hosts.length,
       };
     },
-    async getPreferences() {
-      return { sidebarThresholdColors, thresholds };
+    async machineHistory({ hostId, rangeHours }) {
+      await requireEnrolledHost(hostId);
+      const now = Date.now();
+      return {
+        hostId,
+        rangeHours,
+        points: store.history(hostId, now - rangeHours * 60 * 60_000, now),
+      };
     },
-    async dashboard() {
-      if (hosts.length === 0) await listHosts();
-      return dashboard();
+    async dashboardConfig({ hostId }) {
+      await requireEnrolledHost(hostId);
+      return store.dashboardConfig(hostId);
     },
-    async refresh({ hostId }) {
-      if (hostId === null) await refreshAll();
-      else await refreshOne(hostId);
-      return dashboard();
+    async saveDashboardConfig({ hostId, config }) {
+      await requireEnrolledHost(hostId);
+      const saved = store.saveDashboardConfig(hostId, config);
+      publish([hostId]);
+      return saved;
     },
     listProcesses: coalescedProcessList,
     async prepareProcessTermination({ hostId, pid, identity, mode }) {
       let machine;
       try {
-        machine = await enrolledHost(hostId);
+        machine = await enrolledProcessHost(hostId);
       } catch (error) {
-        bb.log.warn(
-          `Could not resolve process host ${hostId}: ${errorMessage(error)}`,
-        );
-        return {
-          outcome: "unavailable" as const,
-          message: "The machine could not be reached for a safety check.",
-        };
+        bb.log.warn(`Could not resolve process host ${hostId}: ${errorMessage(error)}`);
+        return { outcome: "unavailable" as const, message: "The machine could not be reached for a safety check." };
       }
-      if (machine === null) {
-        return {
-          outcome: "not-found" as const,
-          message: "That enrolled machine no longer exists.",
-        };
-      }
+      if (machine === null) return { outcome: "not-found" as const, message: "That enrolled machine no longer exists." };
       if (machine.status !== "connected") {
-        return {
-          outcome: "unavailable" as const,
-          message: "Reconnect the machine before stopping a process.",
-        };
+        return { outcome: "unavailable" as const, message: "Reconnect the machine before stopping a process." };
       }
-
       try {
-        const inspected = await processOperations.run(hostId, () =>
-          hostClient.call(
-            "inspectProcessTermination",
-            { pid, identity, mode },
-            { hostId, signal: processHostSignal() },
-          ),
-        );
+        const inspected = await processOperations.run(hostId, () => hostClient.call(
+          "inspectProcessTermination",
+          { pid, identity, mode },
+          { hostId, signal: processHostSignal() },
+        ));
         if (inspected.outcome !== "ready") return inspected;
         const challenge = processConfirmations.issue({
           hostId,
@@ -488,181 +426,66 @@ export default async function hostMonitorPlugin(
           process: inspected.process,
         };
       } catch (error) {
-        bb.log.warn(
-          `Could not prepare process ${pid} on host ${hostId}: ${errorMessage(error)}`,
-        );
-        return {
-          outcome: "unavailable" as const,
-          message: "The process could not be rechecked on this machine.",
-        };
+        bb.log.warn(`Could not prepare process ${pid} on host ${hostId}: ${errorMessage(error)}`);
+        return { outcome: "unavailable" as const, message: "The process could not be rechecked on this machine." };
       }
     },
     async executeProcessTermination({ confirmationToken }) {
       const consumed = processConfirmations.consume(confirmationToken);
       if (consumed.outcome === "invalid") {
-        return {
-          outcome: "confirmation-invalid" as const,
-          message:
-            "This confirmation has already been used or is no longer valid.",
-        };
+        return { outcome: "confirmation-invalid" as const, message: "This confirmation has already been used or is no longer valid." };
       }
       if (consumed.outcome === "expired") {
-        return {
-          outcome: "confirmation-expired" as const,
-          message: "This confirmation expired. Recheck the process and try again.",
-        };
+        return { outcome: "confirmation-expired" as const, message: "This confirmation expired. Recheck the process and try again." };
       }
       const { confirmation } = consumed;
       let machine;
       try {
-        machine = await enrolledHost(confirmation.hostId);
+        machine = await enrolledProcessHost(confirmation.hostId);
       } catch (error) {
-        bb.log.warn(
-          `Could not resolve confirmed process host ${confirmation.hostId}: ${errorMessage(error)}`,
-        );
-        bb.log.warn(
-          `Process control host=${confirmation.hostId} pid=${confirmation.pid} mode=${confirmation.mode} outcome=preflight-failed`,
-        );
-        return {
-          outcome: "signal-failed" as const,
-          message:
-            "The machine could not be reached, so no stop request was sent.",
-        };
+        bb.log.warn(`Could not resolve confirmed process host ${confirmation.hostId}: ${errorMessage(error)}`);
+        bb.log.warn(`Process control host=${confirmation.hostId} pid=${confirmation.pid} mode=${confirmation.mode} outcome=preflight-failed`);
+        return { outcome: "signal-failed" as const, message: "The machine could not be reached, so no stop request was sent." };
       }
       if (machine === null || machine.status !== "connected") {
-        bb.log.warn(
-          `Process control host=${confirmation.hostId} pid=${confirmation.pid} mode=${confirmation.mode} outcome=preflight-offline`,
-        );
-        return {
-          outcome: "signal-failed" as const,
-          message:
-            "The machine is offline, so no stop request was sent.",
-        };
+        bb.log.warn(`Process control host=${confirmation.hostId} pid=${confirmation.pid} mode=${confirmation.mode} outcome=preflight-offline`);
+        return { outcome: "signal-failed" as const, message: "The machine is offline, so no stop request was sent." };
       }
-
-      const input: {
-        pid: number;
-        identity: string;
-        mode: ProcessTerminationMode;
-      } = {
+      const input: { pid: number; identity: string; mode: ProcessTerminationMode } = {
         pid: confirmation.pid,
         identity: confirmation.identity,
         mode: confirmation.mode,
       };
       try {
-        const result = await processOperations.run(confirmation.hostId, () =>
-          hostClient.call(
-            "terminateProcess",
-            input,
-            {
-              hostId: confirmation.hostId,
-              signal: processHostSignal(
-                PROCESS_TERMINATION_HOST_CALL_TIMEOUT_MS,
-              ),
-            },
-          ),
-        );
+        const result = await processOperations.run(confirmation.hostId, () => hostClient.call(
+          "terminateProcess",
+          input,
+          { hostId: confirmation.hostId, signal: processHostSignal(PROCESS_TERMINATION_HOST_CALL_TIMEOUT_MS) },
+        ));
         const auditMessage = `Process control host=${confirmation.hostId} pid=${confirmation.pid} mode=${confirmation.mode} outcome=${result.outcome}`;
-        if (
-          result.outcome === "signal-sent" ||
-          result.outcome === "still-running"
-        ) {
-          bb.log.info(auditMessage);
-        } else {
-          bb.log.warn(auditMessage);
-        }
-        if (
-          result.outcome === "signal-sent" ||
-          result.outcome === "still-running"
-        ) {
+        if (result.outcome === "signal-sent" || result.outcome === "still-running") bb.log.info(auditMessage);
+        else bb.log.warn(auditMessage);
+        if (result.outcome === "signal-sent" || result.outcome === "still-running") {
           return {
             ...result,
             host: { id: confirmation.hostId, name: confirmation.hostName },
-            process: {
-              pid: confirmation.pid,
-              name: confirmation.name,
-              mode: confirmation.mode,
-            },
+            process: { pid: confirmation.pid, name: confirmation.name, mode: confirmation.mode },
           };
         }
         return result;
       } catch (error) {
         if (error instanceof ProcessOperationBusyError) {
-          bb.log.warn(
-            `Process control host=${confirmation.hostId} pid=${confirmation.pid} mode=${confirmation.mode} outcome=busy`,
-          );
-          return {
-            outcome: "signal-failed" as const,
-            message:
-              "This machine is busy with another process operation. Refresh and try again.",
-          };
+          bb.log.warn(`Process control host=${confirmation.hostId} pid=${confirmation.pid} mode=${confirmation.mode} outcome=busy`);
+          return { outcome: "signal-failed" as const, message: "This machine is busy with another process operation. Refresh and try again." };
         }
-        bb.log.warn(
-          `Process stop outcome is unknown for PID ${confirmation.pid} on host ${confirmation.hostId}: ${errorMessage(error)}`,
-        );
-        return {
-          outcome: "outcome-unknown" as const,
-          message:
-            "The connection dropped during the stop request. Refresh before trying again.",
-        };
+        bb.log.warn(`Process stop outcome is unknown for PID ${confirmation.pid} on host ${confirmation.hostId}: ${errorMessage(error)}`);
+        return { outcome: "outcome-unknown" as const, message: "The connection dropped during the stop request. Refresh before trying again." };
       }
     },
-  });
-
-  bb.cli.register({
-    name: "host-monitor",
-    summary: "Open Host Monitor or read its cached resource snapshot",
-    commands: [
-      {
-        name: "open",
-        summary: "Open Host Monitor or one enrolled host in the BB desktop app",
-        usage: "bb host-monitor open [host-id]",
-      },
-      {
-        name: "snapshot",
-        summary: "Print bounded CPU, memory, disk, and network JSON",
-        usage: "bb host-monitor snapshot [--pretty]",
-      },
-    ],
-    async run(argv, context) {
-      const [command, ...args] = argv;
-      if (command === "open" && args.length <= 1) {
-        const hostId = args[0] ?? null;
-        if (hostId !== null) {
-          if (hosts.length === 0) await listHosts();
-          if (!hosts.some((host) => host.id === hostId)) {
-            return {
-              exitCode: 1,
-              stderr: `Unknown enrolled host: ${hostId}`,
-            };
-          }
-        }
-        nativeOpenRequest = { requestedAt: Date.now(), hostId };
-        return {
-          exitCode: 0,
-          stdout: hostId === null
-            ? "Host Monitor open requested.\n"
-            : `Host Monitor open requested for ${hostId}.\n`,
-        };
-      }
-      if (
-        command !== "snapshot" ||
-        args.some((argument) => argument !== "--pretty")
-      ) {
-        return {
-          exitCode: 1,
-          stderr:
-            "Usage: bb host-monitor open [host-id] | bb host-monitor snapshot [--pretty]",
-        };
-      }
-      if (hosts.length === 0) await refreshAll(context.signal);
-      const projected = compactHostDashboard(dashboard());
-      return {
-        exitCode: 0,
-        stdout: args.includes("--pretty")
-          ? JSON.stringify(projected, null, 2)
-          : JSON.stringify(projected),
-      };
+    async refresh({ hostId }) {
+      if (hostId === null) await refreshAll();
+      else await refreshOne(hostId);
+      return fleet();
     },
   });
 
@@ -672,7 +495,7 @@ export default async function hostMonitorPlugin(
     const wake = (): void => wakeController.abort();
     wakeWaiter = wake;
     try {
-      await delay(REFRESH_INTERVAL_MS, undefined, {
+      await delay(SAMPLE_INTERVAL_MS, undefined, {
         signal: AbortSignal.any([signal, wakeController.signal]),
       });
     } catch (error) {
@@ -682,13 +505,17 @@ export default async function hostMonitorPlugin(
     }
   }
 
-  const unsubscribeWorkerExit = hostClient.experimental_onWorkerExit(
-    ({ hostId }) => {
-      bb.log.warn(
-        `Host Monitor worker exited unexpectedly on host ${hostId}; the next poll will restart it`,
-      );
-    },
-  );
+  const unsubscribeWorkerExit = hostClient.experimental_onWorkerExit(({ hostId }) => {
+    const previous = records.get(hostId);
+    if (previous !== undefined) {
+      records.set(hostId, {
+        ...previous,
+        sampling: false,
+        error: "The machine monitor worker stopped; the next refresh will restart it.",
+      });
+      publish([hostId]);
+    }
+  });
   bb.onDispose(unsubscribeWorkerExit);
 
   bb.background.service("machine-sampler", {
@@ -700,12 +527,9 @@ export default async function hostMonitorPlugin(
       const unsubscribeRealtime = bb.sdk.subscribe({
         event: "realtime:connection",
         callback: (event) => {
-          if (event.state === "connected" && event.reconnected) {
-            requestRefresh();
-          }
+          if (event.state === "connected" && event.reconnected) requestRefresh();
         },
       });
-
       try {
         while (!signal.aborted) {
           refreshRequested = false;

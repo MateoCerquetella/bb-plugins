@@ -1,2672 +1,1500 @@
-import "./app.css";
 import {
+  memo,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
-  useSyncExternalStore,
-  type ReactNode,
-  type RefObject,
+  type DragEvent as ReactDragEvent,
 } from "react";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
-import { toast } from "sonner";
-import {
-  definePluginApp,
-  experimental_useAppPanel as useAppPanel,
-  experimental_useFixedTabTarget as useFixedTabTarget,
-  useRealtime,
-  useRealtimeConnectionState,
-  useRpc,
-  useSettings,
-  type ExperimentalPluginFixedTabReference,
-  type JsonValue,
-} from "@get-bb/plugin-sdk/app";
+import { LineChart } from "echarts/charts";
+import { AriaComponent, DatasetComponent, GridComponent, MarkLineComponent, TooltipComponent } from "echarts/components";
+import * as echarts from "echarts/core";
+import { SVGRenderer } from "echarts/renderers";
+import { definePluginApp, useRealtime, useRpc } from "@get-bb/plugin-sdk/app";
+
+import { Badge } from "./components/ui/badge.tsx";
+import { Button } from "./components/ui/button.tsx";
+import { Input } from "./components/ui/input.tsx";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/ui/select.tsx";
+import { Skeleton } from "./components/ui/skeleton.tsx";
+import { expectedSampleInterval, withChartGaps } from "./chart-data.ts";
 import type {
-  Dashboard,
+  DashboardConfig,
+  DashboardPanel,
+  Fleet,
+  HistoryPoint,
+  MachineHistory,
   MachineRow,
   PreparedTermination,
   ProcessListResult,
   ProcessRow,
   ProcessSortBy,
   ProcessTerminationMode,
+  RangeHours,
   rpcContract,
-} from "./contract";
+} from "./contract.ts";
 import {
-  fleetCounts,
-  machineBadgePresentation,
-  machineMatchesFleetFilter,
-  type FleetFilter,
-} from "./lib/fleet-presentation";
-import {
-  FLEET_VIEW_STORAGE_KEY,
-  parseFleetViewPreference,
-  readFleetViewPreference,
-  writeFleetViewPreference,
-  type FleetViewMode,
-} from "./lib/fleet-view-preference";
-import { primaryIpAddressPresentation } from "./lib/ip-address-presentation";
-import { networkRateSummary } from "./lib/network-presentation";
+  DASHBOARD_CATALOG,
+  cloneDashboardConfig,
+  dashboardDropIndex,
+  type DashboardDropPosition,
+  dashboardPanelKey,
+  defaultDashboardConfig,
+  moveDashboardPanel,
+  setDashboardPanelVisibility,
+  visibleDashboardPanels,
+} from "./dashboard-config.ts";
 import {
   blockedProcessReason,
   filterProcessRows,
-  processActionPresentation,
   processOwnerLabel,
   sortProcessRows,
   summarizeProcessRows,
-} from "./lib/process-presentation";
-import { usePortalScopeProps } from "./lib/portal-scope";
-import {
-  thresholdColorsEnabled,
-  thresholdToneAccessibleLabel,
-  thresholdToneForReading,
-  type ThresholdTone,
-} from "./lib/threshold-presentation";
-import {
-  hostIdFromFleetSubPath,
-  mountHostMonitorSidebar,
-  toggleHostMonitorPopover,
-} from "./lib/sidebar-host-monitor";
+} from "./lib/process-presentation.ts";
+import { mountHostMonitorMiniModal, toggleHostMonitorMiniModal } from "./sidebar-modal.ts";
+import "./app.css";
 
-type RpcClient = ReturnType<typeof useRpc<typeof rpcContract>>;
-type RequestKind = "dashboard" | "refresh-all" | "refresh-host";
-type HealthThresholds = Dashboard["thresholds"];
+echarts.use([
+  AriaComponent,
+  DatasetComponent,
+  GridComponent,
+  LineChart,
+  MarkLineComponent,
+  SVGRenderer,
+  TooltipComponent,
+]);
 
-interface DashboardViewState {
-  dashboard: Dashboard | null;
-  requestKind: RequestKind | null;
-  requestHostId: string | null;
-  error: string | null;
-}
+const RANGE_OPTIONS: ReadonlyArray<{ value: RangeHours; label: string }> = [
+  { value: 1, label: "1 hour" },
+  { value: 6, label: "6 hours" },
+  { value: 24, label: "1 day" },
+  { value: 24 * 7, label: "7 days" },
+  { value: 24 * 30, label: "30 days" },
+];
+const REALTIME_CHANNEL = "host-monitor-machines-changed";
+const PROCESS_PAGE_LIMIT = 100;
+const PROCESS_REFRESH_MS = 10_000;
 
-interface InspectTarget extends Record<string, JsonValue> {
-  hostId: string;
-}
+type PreparedTerminationReady = Extract<PreparedTermination, { outcome: "ready" }>;
 
-interface ProcessesTarget extends Record<string, JsonValue> {
-  hostId: string;
-  initialSort: "cpu" | "memory";
-}
-
-const RECONCILE_INTERVAL_MS = 30_000;
-const CONTROL_BUTTON_CLASS =
-  "inline-flex h-8 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-input bg-transparent px-2.5 text-xs font-medium text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50";
-
-function getClientStorage(): Storage | null {
-  try {
-    return window.localStorage;
-  } catch {
-    return null;
-  }
-}
-
-const inspectTargetContract = {
-  validate(value: JsonValue): value is InspectTarget {
-    if (typeof value !== "object" || value === null || Array.isArray(value)) {
-      return false;
-    }
-    return (
-      Object.keys(value).length === 1 &&
-      "hostId" in value &&
-      typeof value.hostId === "string" &&
-      value.hostId.length > 0
-    );
-  },
+type ChartTheme = {
+  foreground: string;
+  muted: string;
+  border: string;
+  surface: string;
+  primary: string;
+  secondary: string;
+  tertiary: string;
+  warning: string;
 };
 
-const INSPECT_TAB = {
-  panelId: "machines",
-  id: "inspect",
-  experimental_target: inspectTargetContract,
-} satisfies ExperimentalPluginFixedTabReference<InspectTarget>;
-
-const processesTargetContract = {
-  validate(value: JsonValue): value is ProcessesTarget {
-    if (typeof value !== "object" || value === null || Array.isArray(value)) {
-      return false;
-    }
-    return (
-      Object.keys(value).length === 2 &&
-      "hostId" in value &&
-      typeof value.hostId === "string" &&
-      value.hostId.length > 0 &&
-      "initialSort" in value &&
-      (value.initialSort === "cpu" || value.initialSort === "memory")
-    );
-  },
+type MetricChart = {
+  dimensions: string[];
+  rows: Array<Array<number | null>>;
+  series: string[];
+  thresholds: Record<string, number>;
+  percentChart: boolean;
+  valueFormatter?: (value: number | null | undefined) => string;
 };
 
-const PROCESSES_TAB = {
-  panelId: "machines",
-  id: "processes",
-  experimental_target: processesTargetContract,
-} satisfies ExperimentalPluginFixedTabReference<ProcessesTarget>;
+function FleetDashboard() {
+  const rpc = useRpc<typeof rpcContract>();
+  const [fleet, setFleet] = useState<Fleet | null>(null);
+  const [history, setHistory] = useState<MachineHistory | null>(null);
+  const [selectedHostId, setSelectedHostId] = useState<string | null>(null);
+  const [rangeHours, setRangeHours] = useState<RangeHours>(24);
+  const [query, setQuery] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [dashboardConfig, setDashboardConfig] = useState<DashboardConfig | null>(null);
+  const [dashboardDraft, setDashboardDraft] = useState<DashboardConfig | null>(null);
+  const [dashboardLoading, setDashboardLoading] = useState(false);
+  const [dashboardError, setDashboardError] = useState<string | null>(null);
+  const [editingDashboard, setEditingDashboard] = useState(false);
+  const [savingDashboard, setSavingDashboard] = useState(false);
+  const [dashboardAnnouncement, setDashboardAnnouncement] = useState("");
+  const historyRequest = useRef(0);
+  const dashboardRequest = useRef(0);
+  const selectedHost = useRef<string | null>(null);
+  selectedHost.current = selectedHostId;
 
-let dashboardState: DashboardViewState = {
-  dashboard: null,
-  requestKind: null,
-  requestHostId: null,
-  error: null,
-};
-let activeRequest: Promise<void> | null = null;
-let requestSequence = 0;
-const dashboardListeners = new Set<() => void>();
+  const dirtyDashboard = editingDashboard && dashboardConfig != null && dashboardDraft != null &&
+    JSON.stringify(dashboardConfig) !== JSON.stringify(dashboardDraft);
 
-function getDashboardState(): DashboardViewState {
-  return dashboardState;
-}
+  useEffect(() => {
+    if (!dirtyDashboard) return;
+    const warn = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirtyDashboard]);
 
-function subscribeDashboard(listener: () => void): () => void {
-  dashboardListeners.add(listener);
-  return () => dashboardListeners.delete(listener);
-}
-
-function setDashboardState(next: DashboardViewState): void {
-  dashboardState = next;
-  for (const listener of dashboardListeners) listener();
-}
-
-function useDashboardState(): DashboardViewState {
-  return useSyncExternalStore(
-    subscribeDashboard,
-    getDashboardState,
-    getDashboardState,
-  );
-}
-
-function errorMessage(cause: unknown): string {
-  return cause instanceof Error ? cause.message : String(cause);
-}
-
-function requestDashboard(
-  rpc: RpcClient,
-  kind: RequestKind,
-  hostId: string | null = null,
-): Promise<void> {
-  if (activeRequest !== null) return activeRequest;
-
-  const sequence = ++requestSequence;
-  setDashboardState({
-    ...dashboardState,
-    requestKind: kind,
-    requestHostId: hostId,
-    error: dashboardState.dashboard === null ? null : dashboardState.error,
-  });
-
-  const request = (async () => {
+  const loadFleet = useCallback(async () => {
     try {
-      const dashboard =
-        kind === "dashboard"
-          ? await rpc.call("dashboard")
-          : await rpc.call("refresh", {
-              hostId: kind === "refresh-all" ? null : hostId,
-            });
-      if (sequence !== requestSequence) return;
-      setDashboardState({
-        dashboard,
-        requestKind: kind,
-        requestHostId: hostId,
-        error: null,
+      const next = await rpc.call("fleet");
+      setFleet(next);
+      setError(null);
+      setSelectedHostId((current) => {
+        if (current != null && next.machines.some((machine) => machine.host.id === current)) return current;
+        return next.machines.find((machine) => machine.host.status === "connected")?.host.id
+          ?? next.machines[0]?.host.id
+          ?? null;
       });
     } catch (cause) {
-      if (sequence !== requestSequence) return;
-      setDashboardState({
-        ...dashboardState,
-        requestKind: kind,
-        requestHostId: hostId,
-        error: errorMessage(cause),
-      });
-    } finally {
-      if (sequence === requestSequence) {
-        activeRequest = null;
-        setDashboardState({
-          ...dashboardState,
-          requestKind: null,
-          requestHostId: null,
-        });
-      }
+      setError(cause instanceof Error ? cause.message : "Could not load the machine fleet.");
     }
-  })();
-  activeRequest = request;
-  return request;
-}
-
-function RefreshIcon({ active = false }: { active?: boolean }) {
-  return (
-    <svg
-      aria-hidden="true"
-      className="host-monitor-refresh-icon size-3.5"
-      data-active={active ? "true" : "false"}
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <path
-        d="M20 6v5h-5M4 18v-5h5M6.1 9a7 7 0 0 1 11.7-2.5L20 11M4 13l2.2 4.5A7 7 0 0 0 18 15"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.8"
-      />
-    </svg>
-  );
-}
-
-function ChevronIcon() {
-  return (
-    <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
-      <path
-        d="m9 5 7 7-7 7"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.8"
-      />
-    </svg>
-  );
-}
-
-function CardsIcon() {
-  return (
-    <svg aria-hidden="true" className="size-3.5" fill="none" viewBox="0 0 24 24">
-      <rect height="7" rx="1.5" stroke="currentColor" strokeWidth="1.7" width="7" x="3" y="3" />
-      <rect height="7" rx="1.5" stroke="currentColor" strokeWidth="1.7" width="7" x="14" y="3" />
-      <rect height="7" rx="1.5" stroke="currentColor" strokeWidth="1.7" width="7" x="3" y="14" />
-      <rect height="7" rx="1.5" stroke="currentColor" strokeWidth="1.7" width="7" x="14" y="14" />
-    </svg>
-  );
-}
-
-function RowsIcon() {
-  return (
-    <svg aria-hidden="true" className="size-3.5" fill="none" viewBox="0 0 24 24">
-      <rect height="4" rx="1.25" stroke="currentColor" strokeWidth="1.7" width="18" x="3" y="4" />
-      <rect height="4" rx="1.25" stroke="currentColor" strokeWidth="1.7" width="18" x="3" y="10" />
-      <rect height="4" rx="1.25" stroke="currentColor" strokeWidth="1.7" width="18" x="3" y="16" />
-    </svg>
-  );
-}
-
-function EyeIcon({ revealed }: { revealed: boolean }) {
-  return (
-    <svg aria-hidden="true" className="size-3.5" fill="none" viewBox="0 0 24 24">
-      <path
-        d="M3.5 12s3.1-5 8.5-5 8.5 5 8.5 5-3.1 5-8.5 5-8.5-5-8.5-5Z"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.7"
-      />
-      <circle cx="12" cy="12" r="2.4" stroke="currentColor" strokeWidth="1.7" />
-      {!revealed ? (
-        <path
-          d="m4 4 16 16"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeWidth="1.7"
-        />
-      ) : null}
-    </svg>
-  );
-}
-
-function AlertIcon({ className = "size-4" }: { className?: string }) {
-  return (
-    <svg aria-hidden="true" className={className} fill="none" viewBox="0 0 24 24">
-      <path
-        d="M10.25 4.65 3.4 17a2 2 0 0 0 1.75 3h13.7a2 2 0 0 0 1.75-3L13.75 4.65a2 2 0 0 0-3.5 0Z"
-        stroke="currentColor"
-        strokeLinejoin="round"
-        strokeWidth="1.7"
-      />
-      <path d="M12 9v4.25M12 16.5v.1" stroke="currentColor" strokeLinecap="round" strokeWidth="1.7" />
-    </svg>
-  );
-}
-
-function ProcessesIcon({ className = "size-3.5" }: { className?: string }) {
-  return (
-    <svg aria-hidden="true" className={className} fill="none" viewBox="0 0 24 24">
-      <path
-        d="M4 7.5h16M4 12h16M4 16.5h16"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="1.6"
-      />
-      <circle cx="7" cy="7.5" fill="currentColor" r="1" />
-      <circle cx="12.5" cy="12" fill="currentColor" r="1" />
-      <circle cx="17" cy="16.5" fill="currentColor" r="1" />
-    </svg>
-  );
-}
-
-function SearchIcon({ className = "size-3.5" }: { className?: string }) {
-  return (
-    <svg aria-hidden="true" className={className} fill="none" viewBox="0 0 24 24">
-      <circle cx="10.5" cy="10.5" r="5.75" stroke="currentColor" strokeWidth="1.7" />
-      <path d="m15 15 4.25 4.25" stroke="currentColor" strokeLinecap="round" strokeWidth="1.7" />
-    </svg>
-  );
-}
-
-function ShieldIcon({ className = "size-3.5" }: { className?: string }) {
-  return (
-    <svg aria-hidden="true" className={className} fill="none" viewBox="0 0 24 24">
-      <path
-        d="M12 3.75 19 6.5v4.85c0 4.35-2.65 7.45-7 8.9-4.35-1.45-7-4.55-7-8.9V6.5l7-2.75Z"
-        stroke="currentColor"
-        strokeLinejoin="round"
-        strokeWidth="1.6"
-      />
-      <path d="M9.5 12.1 11.25 14l3.5-4" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.6" />
-    </svg>
-  );
-}
-
-function EndProcessIcon({ className = "size-3" }: { className?: string }) {
-  return (
-    <svg aria-hidden="true" className={className} fill="none" viewBox="0 0 24 24">
-      <path
-        d="M6 6l12 12M18 6 6 18"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="2"
-      />
-    </svg>
-  );
-}
-
-function Spinner({ className = "size-3.5" }: { className?: string }) {
-  return (
-    <svg aria-hidden="true" className={`host-monitor-spinner ${className}`} fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="2" />
-      <path d="M12 4a8 8 0 0 1 8 8" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
-    </svg>
-  );
-}
-
-const percentWhole = new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 });
-const percentPrecise = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 });
-const byteNumber = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 });
-
-function formatPercent(value: number): string {
-  const formatter = value > 0 && value < 10 ? percentPrecise : percentWhole;
-  return `${formatter.format(value)}%`;
-}
-
-function boundedPercent(percent: number | null): number | null {
-  if (percent === null || !Number.isFinite(percent)) return null;
-  return Math.min(100, Math.max(0, percent));
-}
-
-function metricAccessibleText(
-  label: string,
-  percent: number | null,
-  tone: ThresholdTone,
-): string {
-  if (percent === null) return `${label}: unavailable`;
-  const value = formatPercent(percent);
-  if (tone === "attention" || tone === "critical") {
-    return `${label}: ${value}, ${thresholdToneAccessibleLabel(tone)} for this reading`;
-  }
-  if (tone === "neutral") {
-    return `${label}: ${value}, ${thresholdToneAccessibleLabel(tone)}`;
-  }
-  return `${label}: ${value}`;
-}
-
-function formatBytes(bytes: number): string {
-  const units = ["B", "KB", "MB", "GB", "TB", "PB"] as const;
-  let value = bytes;
-  let unitIndex = 0;
-  while (value >= 1_024 && unitIndex < units.length - 1) {
-    value /= 1_024;
-    unitIndex += 1;
-  }
-  return `${byteNumber.format(value)} ${units[unitIndex]}`;
-}
-
-function formatByteUsage(usedBytes: number, totalBytes: number): string {
-  const units = ["B", "KB", "MB", "GB", "TB", "PB"] as const;
-  let divisor = 1;
-  let unitIndex = 0;
-  while (totalBytes / divisor >= 1_024 && unitIndex < units.length - 1) {
-    divisor *= 1_024;
-    unitIndex += 1;
-  }
-  return `${byteNumber.format(usedBytes / divisor)} / ${byteNumber.format(totalBytes / divisor)} ${units[unitIndex]}`;
-}
-
-function formatDuration(seconds: number): string {
-  const days = Math.floor(seconds / 86_400);
-  const hours = Math.floor((seconds % 86_400) / 3_600);
-  const minutes = Math.floor((seconds % 3_600) / 60);
-  if (days > 0) return `${days}d ${hours}h`;
-  if (hours > 0) return `${hours}h ${minutes}m`;
-  if (minutes > 0) return `${minutes}m`;
-  return `${Math.floor(seconds)}s`;
-}
-
-function formatRelativeTime(timestamp: number | null): string {
-  if (timestamp === null) return "never";
-  const seconds = Math.floor(Math.max(0, Date.now() - timestamp) / 1_000);
-  if (seconds < 5) return "now";
-  if (seconds < 60) return `${seconds}s`;
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h`;
-  return `${Math.floor(hours / 24)}d`;
-}
-
-function formatDate(timestamp: number): string {
-  return new Date(timestamp).toLocaleString(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
-}
-
-function HealthBadge({
-  machine,
-  showIndicator = true,
-}: {
-  machine: MachineRow;
-  showIndicator?: boolean;
-}) {
-  const presentation = machineBadgePresentation(machine);
-  return (
-    <span
-      className="host-monitor-health-badge"
-      data-tone={presentation.tone}
-    >
-      {presentation.busy ? (
-        <Spinner className="size-2.5" />
-      ) : showIndicator ? (
-        <span aria-hidden="true" className="size-1.5 rounded-full bg-current opacity-70" />
-      ) : null}
-      {presentation.label}
-    </span>
-  );
-}
-
-function MetricRuler({
-  isFresh,
-  label,
-  percent,
-  thresholds,
-}: {
-  isFresh: boolean;
-  label: string;
-  percent: number | null;
-  thresholds: HealthThresholds;
-}) {
-  const bounded = boundedPercent(percent);
-  const tone = thresholdToneForReading(percent, isFresh, thresholds);
-  const accessibleText = metricAccessibleText(label, bounded, tone);
-  return (
-    <div
-      className="host-monitor-metric-ruler"
-      data-tone={tone}
-    >
-      <span className="sr-only">{accessibleText}</span>
-      <span
-        aria-hidden="true"
-        className="host-monitor-metric-ruler__percentage font-mono text-xs font-medium"
-      >
-        {bounded === null ? "—" : formatPercent(bounded)}
-      </span>
-      <span aria-hidden="true" className="relative mt-1 block h-1 rounded-full bg-muted">
-        {bounded !== null ? (
-          <span
-            className="absolute top-1/2 size-1.5 -translate-y-1/2 rounded-full bg-current"
-            style={{ left: `calc(${bounded}% - 3px)` }}
-          />
-        ) : null}
-      </span>
-    </div>
-  );
-}
-
-function CardMetric({
-  detail,
-  isFresh,
-  label,
-  percent,
-  thresholds,
-}: {
-  detail?: string;
-  isFresh: boolean;
-  label: string;
-  percent: number | null;
-  thresholds: HealthThresholds;
-}) {
-  const bounded = boundedPercent(percent);
-  const tone = thresholdToneForReading(percent, isFresh, thresholds);
-  const accessibleText = metricAccessibleText(label, bounded, tone);
-
-  return (
-    <span
-      className="host-monitor-host-card__metric"
-      data-tone={tone}
-    >
-      <span className="sr-only">
-        {detail === undefined ? accessibleText : `${accessibleText}; ${detail} used`}
-      </span>
-      <span
-        aria-hidden="true"
-        className="host-monitor-host-card__metric-heading"
-      >
-        <span className="host-monitor-host-card__metric-label">{label}</span>
-        <span className="host-monitor-host-card__metric-value">
-          {bounded === null ? "—" : formatPercent(bounded)}
-        </span>
-        <span
-          aria-hidden="true"
-          className="host-monitor-host-card__metric-detail"
-          data-empty={detail === undefined ? "true" : "false"}
-          title={detail}
-        >
-          {detail ?? "\u00a0"}
-        </span>
-      </span>
-      <span aria-hidden="true" className="host-monitor-host-card__metric-rail">
-        {bounded === null ? null : (
-          <span
-            className="host-monitor-host-card__metric-fill"
-            style={{ width: `${bounded}%` }}
-          />
-        )}
-      </span>
-    </span>
-  );
-}
-
-function machinePercent(machine: MachineRow, metric: "cpu" | "memory" | "disk"): number | null {
-  if (machine.snapshot === null) return null;
-  if (metric === "cpu") return machine.snapshot.cpu.usagePercent;
-  if (metric === "memory") return machine.snapshot.memory.usagePercent;
-  return machine.snapshot.disk?.usagePercent ?? null;
-}
-
-function machineSampleLabel(machine: MachineRow): string {
-  if (machine.sampleState === "offline") return `last seen ${formatRelativeTime(machine.host.lastSeenAt)}`;
-  if (machine.snapshot === null) return machine.sampleState === "sampling" ? "sampling" : "no sample";
-  const age = formatRelativeTime(machine.snapshot.sampledAtMs);
-  if (machine.sampleState === "stale") return `stale · ${age}`;
-  if (machine.sampleState === "error") return `last known · ${age}`;
-  return age;
-}
-
-function cardSampleLabel(machine: MachineRow): string {
-  const label = machineSampleLabel(machine);
-  if (machine.sampleState === "fresh" && machine.snapshot !== null) {
-    return `Updated ${label}`;
-  }
-  return `${label.charAt(0).toUpperCase()}${label.slice(1)}`;
-}
-
-function machineDescription(machine: MachineRow): string {
-  if (machine.snapshot !== null) {
-    return `${machine.snapshot.system.osName} · ${machine.snapshot.system.arch}`;
-  }
-  return machine.host.status === "connected"
-    ? "Connected · waiting for telemetry"
-    : "Disconnected · no live telemetry";
-}
-
-function MachineIdentity({ machine }: { machine: MachineRow }) {
-  const statusTone = machineBadgePresentation(machine).tone;
-  const description = machineDescription(machine);
-  return (
-    <span className="flex min-w-0 items-center gap-2.5">
-      <span
-        aria-hidden="true"
-        className="host-monitor-machine-identity__status"
-        data-connected={machine.host.status === "connected" ? "true" : "false"}
-        data-tone={statusTone}
-      />
-      <span className="min-w-0">
-        <span className="block truncate text-sm font-medium text-foreground">{machine.host.name}</span>
-        <span className="block truncate text-[11px] text-muted-foreground" title={description}>{description}</span>
-      </span>
-    </span>
-  );
-}
-
-function CardMachineIdentity({ machine }: { machine: MachineRow }) {
-  const description = machineDescription(machine);
-
-  return (
-    <span className="host-monitor-host-card__identity">
-      <span
-        aria-hidden="true"
-        className="host-monitor-host-card__status"
-        data-connected={machine.host.status === "connected" ? "true" : "false"}
-      />
-      <span className="host-monitor-host-card__identity-copy">
-        <span className="host-monitor-host-card__name">
-          {machine.host.name}
-        </span>
-        <span className="host-monitor-host-card__system" title={description}>
-          {description}
-        </span>
-      </span>
-    </span>
-  );
-}
-
-function IpAddressValue({
-  machine,
-  revealed,
-  className = "",
-}: {
-  machine: MachineRow;
-  revealed: boolean;
-  className?: string;
-}) {
-  const presentation = primaryIpAddressPresentation(
-    machine.snapshot?.network.primaryIpAddress ?? null,
-    revealed,
-  );
-
-  return (
-    <span
-      className={`flex min-w-0 items-center gap-1.5 text-[10px] text-muted-foreground ${className}`}
-      data-ip-address-state={presentation.state}
-    >
-      <span aria-hidden="true" className="shrink-0 uppercase tracking-wider">
-        IP
-      </span>
-      <span
-        aria-hidden="true"
-        className={`min-w-0 font-mono text-[11px] text-foreground/75 ${
-          presentation.state === "revealed" ? "break-all" : "truncate"
-        }`}
-        title={
-          presentation.state === "revealed"
-            ? presentation.displayText
-            : undefined
-        }
-      >
-        {presentation.displayText}
-      </span>
-      <span className="sr-only">{presentation.accessibleText}</span>
-    </span>
-  );
-}
-
-function IpAddressVisibilityToggle({
-  revealed,
-  onChange,
-}: {
-  revealed: boolean;
-  onChange(revealed: boolean): void;
-}) {
-  const label = revealed ? "Hide IP addresses" : "Show IP addresses";
-
-  return (
-    <button
-      aria-controls="host-monitor-fleet-results"
-      aria-label={label}
-      aria-pressed={revealed}
-      className={CONTROL_BUTTON_CLASS}
-      onClick={() => onChange(!revealed)}
-      title={label}
-      type="button"
-    >
-      <EyeIcon revealed={revealed} />
-      <span className="hidden sm:inline">{revealed ? "Hide IPs" : "Show IPs"}</span>
-    </button>
-  );
-}
-
-function NetworkRateValue({ machine }: { machine: MachineRow }) {
-  const network = networkRateSummary(
-    machine.snapshot?.network.receiveBytesPerSecond ?? null,
-    machine.snapshot?.network.sendBytesPerSecond ?? null,
-  );
-
-  return (
-    <span
-      className="grid min-w-0 gap-0.5 text-[11px] text-muted-foreground"
-      data-network-state={network.available ? "available" : "unavailable"}
-      title={network.accessibleText}
-    >
-      <span className="sr-only">{network.accessibleText}</span>
-      <span
-        aria-hidden="true"
-        className="host-monitor-network-rate flex min-w-0 items-center gap-1.5"
-        data-network-direction="down"
-      >
-        <span className="host-monitor-network-rate__arrow shrink-0">↓</span>
-        <span className="host-monitor-network-rate__value truncate font-mono">
-          {network.receive}
-        </span>
-      </span>
-      <span
-        aria-hidden="true"
-        className="host-monitor-network-rate flex min-w-0 items-center gap-1.5"
-        data-network-direction="up"
-      >
-        <span className="host-monitor-network-rate__arrow shrink-0">↑</span>
-        <span className="host-monitor-network-rate__value truncate font-mono">
-          {network.send}
-        </span>
-      </span>
-    </span>
-  );
-}
-
-function FleetHeader() {
-  const rpc = useRpc<typeof rpcContract>();
-  const state = useDashboardState();
-  const connection = useRealtimeConnectionState();
-  const counts = fleetCounts(state.dashboard);
-  const busy = state.requestKind !== null;
-
-  useEffect(() => {
-    void requestDashboard(rpc, "dashboard");
   }, [rpc]);
 
-  return (
-    <div className="flex min-w-0 items-center gap-2">
-      <output className="sr-only">
-        {connection === "connected" ? "Live updates connected" : "Live updates reconnecting"}
-      </output>
-      <span className="hidden truncate text-xs text-muted-foreground sm:inline">
-        {state.dashboard === null ? "Loading hosts…" : `${counts.connected}/${counts.total} connected`}
-      </span>
-      <button
-        aria-label="Refresh all host metrics"
-        className={CONTROL_BUTTON_CLASS}
-        disabled={busy}
-        onClick={() => void requestDashboard(rpc, "refresh-all")}
-        title="Refresh all host metrics"
-        type="button"
-      >
-        <RefreshIcon active={state.requestKind === "refresh-all"} />
-        <span className="hidden sm:inline">{state.requestKind === "refresh-all" ? "Refreshing…" : "Refresh"}</span>
-      </button>
-    </div>
-  );
-}
-
-function FleetSidebarAccessory() {
-  const rpc = useRpc<typeof rpcContract>();
-  const state = useDashboardState();
-  const counts = fleetCounts(state.dashboard);
-  const critical =
-    state.dashboard?.machines.filter(
-      (machine) => machineBadgePresentation(machine).tone === "critical",
-    ).length ?? 0;
-  useEffect(() => {
-    if (state.dashboard === null) void requestDashboard(rpc, "dashboard");
-  }, [rpc, state.dashboard]);
-
-  if (state.dashboard === null) return <Spinner className="size-3" />;
-  if (counts.attention > 0) {
-    const label =
-      critical > 0
-        ? `${counts.attention} hosts need attention, including ${critical} critical`
-        : `${counts.attention} hosts need attention`;
-    return (
-      <output
-        aria-label={label}
-        className="host-monitor-sidebar-accessory"
-        title={label}
-      >
-        <span aria-hidden="true" className="size-1.5 rounded-full bg-current" />
-        <span aria-hidden="true">{counts.attention}</span>
-      </output>
-    );
-  }
-  const allHealthy =
-    counts.total > 0 &&
-    state.dashboard.machines.every(
-      (machine) => machineBadgePresentation(machine).tone === "healthy",
-    );
-  const label =
-    counts.total === 0
-      ? "No hosts enrolled"
-      : allHealthy
-        ? `${counts.connected} of ${counts.total} hosts connected, all healthy`
-        : `${counts.connected} of ${counts.total} hosts connected`;
-  return (
-    <output
-      aria-label={label}
-      className="host-monitor-sidebar-accessory"
-      title={label}
-    >
-      <span aria-hidden="true" className="size-1.5 rounded-full bg-current" />
-      <span aria-hidden="true">{counts.connected}/{counts.total}</span>
-    </output>
-  );
-}
-
-function FilterPill({ active, count, label, onClick }: { active: boolean; count: number; label: string; onClick(): void }) {
-  return (
-    <button
-      aria-pressed={active}
-      className={`inline-flex h-7 cursor-pointer items-center gap-1.5 rounded-full border px-2.5 text-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${
-        active ? "border-foreground/20 bg-foreground text-background" : "border-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground"
-      }`}
-      onClick={onClick}
-      type="button"
-    >
-      {label}
-      <span className="font-mono text-[10px] opacity-70">{count}</span>
-    </button>
-  );
-}
-
-function FleetViewToggle({
-  mode,
-  onChange,
-}: {
-  mode: FleetViewMode;
-  onChange(mode: FleetViewMode): void;
-}) {
-  return (
-    <fieldset
-      aria-label="Host layout"
-      className="host-monitor-view-toggle m-0 inline-flex h-8 min-w-0 items-center rounded-md border border-border bg-muted/35 p-0.5"
-    >
-      <button
-        aria-label="Show hosts as cards"
-        aria-pressed={mode === "cards"}
-        className="host-monitor-view-toggle__button"
-        onClick={() => onChange("cards")}
-        title="Cards"
-        type="button"
-      >
-        <CardsIcon />
-        <span>Cards</span>
-      </button>
-      <button
-        aria-label="Show hosts as rows"
-        aria-pressed={mode === "rows"}
-        className="host-monitor-view-toggle__button"
-        onClick={() => onChange("rows")}
-        title="Rows"
-        type="button"
-      >
-        <RowsIcon />
-        <span>Rows</span>
-      </button>
-    </fieldset>
-  );
-}
-
-function FleetSkeleton({ mode }: { mode: FleetViewMode }) {
-  if (mode === "cards") {
-    return (
-      <output
-        aria-busy="true"
-        aria-label="Loading hosts"
-        className="host-monitor-card-grid"
-      >
-        <span className="sr-only">Loading hosts…</span>
-        {Array.from({ length: 4 }, (_, index) => (
-          <span
-            key={index}
-            className="host-monitor-card-skeleton"
-          >
-            <span className="host-monitor-card-skeleton__header">
-              <span className="host-monitor-skeleton block size-2 shrink-0 rounded-full" />
-              <span className="min-w-0 flex-1 space-y-1.5">
-                <span className="host-monitor-skeleton block h-3.5 w-3/5 rounded" />
-                <span className="host-monitor-skeleton block h-2.5 w-2/5 rounded" />
-              </span>
-              <span className="host-monitor-skeleton block h-5 w-16 rounded-full" />
-            </span>
-            <span className="host-monitor-card-skeleton__metadata">
-              <span className="host-monitor-skeleton block h-2.5 w-24 rounded" />
-              <span className="host-monitor-skeleton block h-2.5 w-16 rounded" />
-            </span>
-            <span className="host-monitor-card-skeleton__metrics">
-              {Array.from({ length: 3 }, (_, metricIndex) => (
-                <span key={metricIndex} className="host-monitor-card-skeleton__metric">
-                  <span className="host-monitor-skeleton block h-2 w-8 rounded" />
-                  <span className="host-monitor-skeleton block h-4 w-12 rounded" />
-                  <span className="host-monitor-skeleton block h-2 w-16 rounded" />
-                  <span className="host-monitor-skeleton block h-[3px] w-full rounded-full" />
-                </span>
-              ))}
-            </span>
-            <span className="host-monitor-card-skeleton__footer">
-              <span className="host-monitor-skeleton block h-2 w-14 rounded" />
-              <span className="host-monitor-card-skeleton__network">
-                <span className="space-y-1.5">
-                  <span className="host-monitor-skeleton block h-2 w-12 rounded" />
-                  <span className="host-monitor-skeleton block h-3 w-16 rounded" />
-                </span>
-                <span className="space-y-1.5">
-                  <span className="host-monitor-skeleton block h-2 w-10 rounded" />
-                  <span className="host-monitor-skeleton block h-3 w-16 rounded" />
-                </span>
-              </span>
-            </span>
-          </span>
-        ))}
-      </output>
-    );
-  }
-
-  return (
-    <output aria-busy="true" aria-label="Loading hosts" className="block rounded-lg border border-border bg-card">
-      <span className="sr-only">Loading hosts…</span>
-      {Array.from({ length: 4 }, (_, index) => (
-        <span key={index} className="flex items-center gap-4 border-b border-border p-4 last:border-b-0">
-          <span className="host-monitor-skeleton block h-4 w-36 rounded" />
-          <span className="host-monitor-skeleton ml-auto block h-4 w-16 rounded" />
-          <span className="host-monitor-skeleton block h-4 w-16 rounded" />
-          <span className="host-monitor-skeleton block h-4 w-16 rounded" />
-        </span>
-      ))}
-    </output>
-  );
-}
-
-function ErrorNotice({
-  hasLastKnown,
-  rpc,
-}: {
-  hasLastKnown: boolean;
-  rpc: RpcClient;
-}) {
-  return (
-    <div className="flex items-center gap-2 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive" role="alert">
-      <AlertIcon className="size-3.5 shrink-0" />
-      <span className="min-w-0 flex-1 truncate">
-        {hasLastKnown
-          ? "Couldn’t update hosts. Last-known readings remain visible."
-          : "Couldn’t load hosts. Try again."}
-      </span>
-      <button className="cursor-pointer font-medium hover:underline" onClick={() => void requestDashboard(rpc, "dashboard")} type="button">Retry</button>
-    </div>
-  );
-}
-
-function EmptyFleet() {
-  return (
-    <div className="rounded-lg border border-dashed border-border px-6 py-12 text-center">
-      <p className="text-sm font-medium text-foreground">No hosts enrolled</p>
-      <p className="mx-auto mt-1 max-w-md text-xs text-muted-foreground">Enrolled hosts will appear here automatically.</p>
-    </div>
-  );
-}
-
-function FleetCardGrid({
-  machines,
-  onInspect,
-  selectedHostId,
-  showIpAddresses,
-  thresholds,
-}: {
-  machines: MachineRow[];
-  onInspect(machine: MachineRow): void;
-  selectedHostId: string | null;
-  showIpAddresses: boolean;
-  thresholds: HealthThresholds;
-}) {
-  return (
-    <ul className="host-monitor-card-grid">
-      {machines.map((machine) => {
-        const selected = selectedHostId === machine.host.id;
-        const network = networkRateSummary(
-          machine.snapshot?.network.receiveBytesPerSecond ?? null,
-          machine.snapshot?.network.sendBytesPerSecond ?? null,
-        );
-        const sampleLabel = cardSampleLabel(machine);
-        return (
-          <li key={machine.host.id} className="min-w-0">
-            <button
-              aria-current={selected ? "true" : undefined}
-              className="host-monitor-host-card"
-              onClick={() => onInspect(machine)}
-              type="button"
-            >
-              <span className="host-monitor-host-card__header">
-                <CardMachineIdentity machine={machine} />
-                <span className="host-monitor-host-card__header-actions">
-                  <HealthBadge machine={machine} showIndicator={false} />
-                  <span className="host-monitor-host-card__details">
-                    <ChevronIcon />
-                  </span>
-                </span>
-              </span>
-              <span className="host-monitor-host-card__metadata">
-                <IpAddressValue
-                  className="host-monitor-host-card__ip"
-                  machine={machine}
-                  revealed={showIpAddresses}
-                />
-                <span aria-hidden="true" className="host-monitor-host-card__separator" />
-                <span
-                  className="host-monitor-host-card__sample"
-                  title={sampleLabel}
-                >
-                  {sampleLabel}
-                </span>
-              </span>
-
-              <span className="host-monitor-host-card__metrics">
-                {(["cpu", "memory", "disk"] as const).map((metric) => (
-                  <CardMetric
-                    isFresh={machine.sampleState === "fresh"}
-                    key={metric}
-                    label={metric === "cpu" ? "CPU" : metric === "memory" ? "RAM" : "Disk"}
-                    detail={
-                      metric === "memory" && machine.snapshot !== null
-                        ? formatByteUsage(
-                            machine.snapshot.memory.usedBytes,
-                            machine.snapshot.memory.totalBytes,
-                          )
-                        : undefined
-                    }
-                    percent={machinePercent(machine, metric)}
-                    thresholds={thresholds}
-                  />
-                ))}
-              </span>
-
-              <span className="host-monitor-host-card__footer">
-                <span
-                  className="host-monitor-host-card__network"
-                  data-network-state={network.available ? "available" : "unavailable"}
-                >
-                  <span className="sr-only">{network.accessibleText}</span>
-                  <span aria-hidden="true" className="host-monitor-host-card__network-label">Network</span>
-                  <span aria-hidden="true" className="host-monitor-host-card__network-rates">
-                    <span className="host-monitor-host-card__network-lane">
-                      <span className="host-monitor-host-card__network-direction">Download</span>
-                      <span
-                        className="host-monitor-network-rate host-monitor-host-card__network-rate"
-                        data-network-direction="down"
-                      >
-                        <span className="host-monitor-network-rate__arrow">↓</span>
-                        <span className="host-monitor-network-rate__value font-mono">{network.receive}</span>
-                      </span>
-                    </span>
-                    <span className="host-monitor-host-card__network-lane">
-                      <span className="host-monitor-host-card__network-direction">Upload</span>
-                      <span
-                        className="host-monitor-network-rate host-monitor-host-card__network-rate"
-                        data-network-direction="up"
-                      >
-                        <span className="host-monitor-network-rate__arrow">↑</span>
-                        <span className="host-monitor-network-rate__value font-mono">{network.send}</span>
-                      </span>
-                    </span>
-                  </span>
-                </span>
-              </span>
-            </button>
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
-
-function DesktopFleetTable({ machines, onInspect, selectedHostId, showIpAddresses, thresholds }: { machines: MachineRow[]; onInspect(machine: MachineRow): void; selectedHostId: string | null; showIpAddresses: boolean; thresholds: HealthThresholds }) {
-  return (
-    <div className="host-monitor-desktop-fleet overflow-hidden rounded-lg border border-border bg-card">
-      <table className="w-full table-fixed border-collapse text-left">
-        <thead className="bg-muted/35 text-[10px] uppercase tracking-wider text-muted-foreground">
-          <tr>
-            <th className="w-[27%] px-4 py-2.5 font-medium" scope="col">Host</th>
-            <th className="w-[11%] px-3 py-2.5 font-medium" scope="col">CPU</th>
-            <th className="w-[11%] px-3 py-2.5 font-medium" scope="col">Memory</th>
-            <th className="w-[11%] px-3 py-2.5 font-medium" scope="col">Disk</th>
-            <th className="w-[19%] px-3 py-2.5 font-medium" scope="col">Network</th>
-            <th className="w-[14%] px-3 py-2.5 font-medium" scope="col">Sample</th>
-            <th className="w-[7%] px-3 py-2.5"><span className="sr-only">Inspect</span></th>
-          </tr>
-        </thead>
-        <tbody>
-          {machines.map((machine) => {
-            const selected = selectedHostId === machine.host.id;
-            return (
-              <tr key={machine.host.id} className={`border-t border-border transition-colors hover:bg-accent/40 ${selected ? "bg-accent/50" : ""}`}>
-                <td className="px-4 py-3">
-                  <button aria-current={selected ? "true" : undefined} className="block w-full cursor-pointer text-left focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" onClick={() => onInspect(machine)} type="button">
-                    <MachineIdentity machine={machine} />
-                    <IpAddressValue
-                      className="mt-1 pl-[1.125rem]"
-                      machine={machine}
-                      revealed={showIpAddresses}
-                    />
-                  </button>
-                </td>
-                <td className="px-3 py-3"><MetricRuler isFresh={machine.sampleState === "fresh"} label="CPU" percent={machinePercent(machine, "cpu")} thresholds={thresholds} /></td>
-                <td className="px-3 py-3"><MetricRuler isFresh={machine.sampleState === "fresh"} label="Memory" percent={machinePercent(machine, "memory")} thresholds={thresholds} /></td>
-                <td className="px-3 py-3"><MetricRuler isFresh={machine.sampleState === "fresh"} label="Disk" percent={machinePercent(machine, "disk")} thresholds={thresholds} /></td>
-                <td className="px-3 py-3"><NetworkRateValue machine={machine} /></td>
-                <td className="px-3 py-3">
-                  <span className="flex min-w-0 flex-col items-start gap-1">
-                    <HealthBadge machine={machine} />
-                    <span className="block max-w-full truncate text-[11px] text-muted-foreground" title={machineSampleLabel(machine)}>{machineSampleLabel(machine)}</span>
-                  </span>
-                </td>
-                <td className="px-3 py-3 text-right">
-                  <button aria-label={`View ${machine.host.name} details`} className="inline-flex size-7 cursor-pointer items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" onClick={() => onInspect(machine)} type="button"><ChevronIcon /></button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function CompactFleetList({ machines, onInspect, selectedHostId, showIpAddresses, thresholds }: { machines: MachineRow[]; onInspect(machine: MachineRow): void; selectedHostId: string | null; showIpAddresses: boolean; thresholds: HealthThresholds }) {
-  return (
-    <ul className="host-monitor-compact-fleet overflow-hidden rounded-lg border border-border bg-card">
-      {machines.map((machine) => {
-        const selected = selectedHostId === machine.host.id;
-        return (
-          <li key={machine.host.id} className="border-b border-border last:border-b-0">
-            <button aria-current={selected ? "true" : undefined} className={`w-full cursor-pointer p-3 text-left transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring ${selected ? "bg-accent/50" : ""}`} onClick={() => onInspect(machine)} type="button">
-              <span className="flex items-start justify-between gap-3">
-                <MachineIdentity machine={machine} />
-                <span className="flex shrink-0 items-center gap-1.5"><HealthBadge machine={machine} /><ChevronIcon /></span>
-              </span>
-              <IpAddressValue
-                className="mt-1 pl-[1.125rem]"
-                machine={machine}
-                revealed={showIpAddresses}
-              />
-              <span className="mt-3 grid grid-cols-3 gap-4">
-                <span><span className="block text-[10px] uppercase text-muted-foreground">CPU</span><MetricRuler isFresh={machine.sampleState === "fresh"} label="CPU" percent={machinePercent(machine, "cpu")} thresholds={thresholds} /></span>
-                <span><span className="block text-[10px] uppercase text-muted-foreground">Memory</span><MetricRuler isFresh={machine.sampleState === "fresh"} label="Memory" percent={machinePercent(machine, "memory")} thresholds={thresholds} /></span>
-                <span><span className="block text-[10px] uppercase text-muted-foreground">Disk</span><MetricRuler isFresh={machine.sampleState === "fresh"} label="Disk" percent={machinePercent(machine, "disk")} thresholds={thresholds} /></span>
-              </span>
-              <span className="mt-3 flex min-w-0 items-start justify-between gap-3 border-t border-border pt-2.5">
-                <span
-                  aria-hidden="true"
-                  className="shrink-0 text-[10px] uppercase tracking-wider text-muted-foreground"
-                >
-                  Network
-                </span>
-                <NetworkRateValue machine={machine} />
-              </span>
-            </button>
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
-
-function FleetMatrix({ subPath }: { subPath: string }) {
-  const rpc = useRpc<typeof rpcContract>();
-  const settings = useSettings();
-  const state = useDashboardState();
-  const connection = useRealtimeConnectionState();
-  const previousConnection = useRef(connection);
-  const panel = useAppPanel();
-  const [filter, setFilter] = useState<FleetFilter>("all");
-  const [viewMode, setViewMode] = useState<FleetViewMode>(() =>
-    readFleetViewPreference(getClientStorage()),
-  );
-  const [showIpAddresses, setShowIpAddresses] = useState(false);
-  const [selectedHostId, setSelectedHostId] = useState<string | null>(null);
-  const openedRouteTarget = useRef<string | null>(null);
-  const routeHostId = useMemo(() => hostIdFromFleetSubPath(subPath), [subPath]);
-  const showThresholdColors = thresholdColorsEnabled(
-    settings.values,
-    settings.isLoading,
-  );
-
-  const reconcile = useCallback(() => {
-    void requestDashboard(rpc, "dashboard");
-  }, [rpc]);
-
-  useEffect(() => {
-    reconcile();
-    const interval = window.setInterval(reconcile, RECONCILE_INTERVAL_MS);
-    return () => window.clearInterval(interval);
-  }, [reconcile]);
-  useRealtime("machines-changed", reconcile);
-  useEffect(() => {
-    const previous = previousConnection.current;
-    previousConnection.current = connection;
-    if (previous === "reconnecting" && connection === "connected") reconcile();
-  }, [connection, reconcile]);
-  useEffect(() => {
-    const onStorage = (event: StorageEvent) => {
-      if (event.key === FLEET_VIEW_STORAGE_KEY || event.key === null) {
-        setViewMode(parseFleetViewPreference(event.newValue));
+  const loadHistory = useCallback(async () => {
+    if (selectedHostId == null) {
+      setHistory(null);
+      setHistoryLoading(false);
+      return;
+    }
+    const request = ++historyRequest.current;
+    setHistoryLoading(true);
+    try {
+      const next = await rpc.call("machineHistory", { hostId: selectedHostId, rangeHours });
+      if (historyRequest.current === request) {
+        setHistory(next);
+        setError(null);
       }
-    };
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
+    } catch (cause) {
+      if (historyRequest.current === request) {
+        setHistory(null);
+        setError(cause instanceof Error ? cause.message : "Could not load machine history.");
+      }
+    } finally {
+      if (historyRequest.current === request) setHistoryLoading(false);
+    }
+  }, [rangeHours, rpc, selectedHostId]);
 
-  const counts = fleetCounts(state.dashboard);
-  const machines = useMemo(() => {
-    const all = state.dashboard?.machines ?? [];
-    return all.filter((machine) => machineMatchesFleetFilter(machine, filter));
-  }, [filter, state.dashboard]);
+  const loadDashboardConfig = useCallback(async () => {
+    if (selectedHostId == null) {
+      setDashboardConfig(null);
+      setDashboardDraft(null);
+      setDashboardLoading(false);
+      return;
+    }
+    const request = ++dashboardRequest.current;
+    setDashboardLoading(true);
+    try {
+      const next = await rpc.call("dashboardConfig", { hostId: selectedHostId });
+      if (dashboardRequest.current === request) {
+        setDashboardConfig(next);
+        setDashboardDraft(cloneDashboardConfig(next));
+        setDashboardError(null);
+      }
+    } catch (cause) {
+      if (dashboardRequest.current === request) {
+        setDashboardConfig(null);
+        setDashboardDraft(null);
+        setDashboardError(cause instanceof Error ? cause.message : "Could not load this dashboard configuration.");
+      }
+    } finally {
+      if (dashboardRequest.current === request) setDashboardLoading(false);
+    }
+  }, [rpc, selectedHostId]);
 
-  const inspect = useCallback((machine: MachineRow) => {
-    const accepted = panel.openFixedTab({
-      surface: { kind: "current" },
-      tab: INSPECT_TAB,
-      target: { hostId: machine.host.id },
-    });
-    if (accepted) setSelectedHostId(machine.host.id);
-  }, [panel]);
-
+  useEffect(() => { void loadFleet(); }, [loadFleet]);
+  useEffect(() => { void loadHistory(); }, [loadHistory]);
   useEffect(() => {
-    if (
-      routeHostId === null ||
-      routeHostId === openedRouteTarget.current ||
-      state.dashboard === null
-    ) return;
-    const machine = state.dashboard.machines.find(
-      (candidate) => candidate.host.id === routeHostId,
-    );
-    if (machine === undefined) return;
-    openedRouteTarget.current = routeHostId;
-    inspect(machine);
-  }, [inspect, routeHostId, state.dashboard]);
+    setEditingDashboard(false);
+    setSavingDashboard(false);
+    setDashboardError(null);
+    setDashboardConfig(null);
+    setDashboardDraft(null);
+    setDashboardAnnouncement("");
+    void loadDashboardConfig();
+  }, [loadDashboardConfig]);
 
-  const selectViewMode = useCallback((nextMode: FleetViewMode) => {
-    setViewMode(nextMode);
-    writeFleetViewPreference(nextMode, getClientStorage());
-  }, []);
+  useRealtime(REALTIME_CHANNEL, useCallback(() => {
+    void loadFleet();
+    void loadHistory();
+  }, [loadFleet, loadHistory]));
+
+  const refreshAll = useCallback(async () => {
+    if (refreshing) return;
+    setRefreshing(true);
+    try {
+      const next = await rpc.call("refresh", { hostId: null });
+      setFleet(next);
+      await loadHistory();
+      setError(null);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Could not refresh the fleet.");
+    } finally {
+      setRefreshing(false);
+    }
+  }, [loadHistory, refreshing, rpc]);
+
+  const normalizedQuery = query.trim().toLocaleLowerCase();
+  const visibleMachines = useMemo(() => {
+    if (fleet == null || normalizedQuery === "") return fleet?.machines ?? [];
+    return fleet.machines.filter((machine) =>
+      [machine.host.name, machine.host.id, machine.snapshot?.system.osName, machine.snapshot?.system.platform]
+        .some((value) => value?.toLocaleLowerCase().includes(normalizedQuery)),
+    );
+  }, [fleet, normalizedQuery]);
+
+  const selected = fleet?.machines.find((machine) => machine.host.id === selectedHostId) ?? null;
+  const points = history?.hostId === selectedHostId && history.rangeHours === rangeHours ? history.points : [];
+
+  const saveDashboard = useCallback(async () => {
+    if (selectedHostId == null || dashboardDraft == null || savingDashboard || !dirtyDashboard) return;
+    const hostId = selectedHostId;
+    setSavingDashboard(true);
+    setDashboardError(null);
+    try {
+      const saved = await rpc.call("saveDashboardConfig", { hostId, config: dashboardDraft });
+      if (selectedHost.current !== hostId) return;
+      setDashboardConfig(saved);
+      setDashboardDraft(cloneDashboardConfig(saved));
+      setEditingDashboard(false);
+      setDashboardAnnouncement("Dashboard layout saved.");
+    } catch (cause) {
+      setDashboardError(cause instanceof Error ? cause.message : "Could not save this dashboard configuration.");
+    } finally {
+      setSavingDashboard(false);
+    }
+  }, [dashboardDraft, dirtyDashboard, rpc, savingDashboard, selectedHostId]);
 
   return (
-    <main
-      className="host-monitor-dashboard host-monitor-fleet h-full overflow-y-auto"
-      data-host-monitor-threshold-colors={showThresholdColors ? "true" : "false"}
-    >
-      <div className="mx-auto w-full max-w-6xl space-y-4 p-4 md:p-5">
-        {connection !== "connected" ? (
-          <output className="flex items-center gap-2 rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground"><Spinner />Live updates are reconnecting. Last-known readings are shown.</output>
-        ) : null}
-        {state.dashboard !== null && state.error !== null ? (
-          <ErrorNotice hasLastKnown rpc={rpc} />
-        ) : null}
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-1.5" aria-label="Host filter">
-            <FilterPill active={filter === "all"} count={counts.total} label="All" onClick={() => setFilter("all")} />
-            <FilterPill active={filter === "attention"} count={counts.attention} label="Attention" onClick={() => setFilter("attention")} />
-            <FilterPill active={filter === "offline"} count={counts.offline} label="Offline" onClick={() => setFilter("offline")} />
-          </div>
-          <div className="flex flex-wrap items-center justify-end gap-3">
-            <p className="text-xs text-muted-foreground">{counts.connected} connected · select a host for details</p>
-            <IpAddressVisibilityToggle
-              onChange={setShowIpAddresses}
-              revealed={showIpAddresses}
-            />
-            <FleetViewToggle mode={viewMode} onChange={selectViewMode} />
+    <main className="host-monitor">
+      <output aria-live="polite" className="host-monitor__sr-only">{dashboardAnnouncement}</output>
+      <header className="host-monitor__page-header">
+        <div className="host-monitor__page-title">
+          <span className="host-monitor__brand-mark" aria-hidden="true">⌁</span>
+          <div>
+            <h1>Machine monitor</h1>
+            <p>{fleet == null ? "Loading enrolled hosts…" : `${fleet.connected} of ${fleet.total} connected · updated ${relativeTime(fleet.generatedAtMs)}`}</p>
           </div>
         </div>
-        <div id="host-monitor-fleet-results">
-          {state.dashboard === null ? (
-            state.error !== null && state.requestKind === null ? (
-              <ErrorNotice hasLastKnown={false} rpc={rpc} />
-            ) : (
-              <FleetSkeleton mode={viewMode} />
-            )
-          ) : state.dashboard.machines.length === 0 ? (
-            <EmptyFleet />
-          ) : machines.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-border px-6 py-10 text-center text-sm text-muted-foreground">No hosts match this filter.</div>
-          ) : viewMode === "cards" ? (
-            <FleetCardGrid
-              machines={machines}
-              onInspect={inspect}
-              selectedHostId={selectedHostId}
-              showIpAddresses={showIpAddresses}
-              thresholds={state.dashboard.thresholds}
-            />
-          ) : (
-            <>
-              <DesktopFleetTable
-                machines={machines}
-                onInspect={inspect}
-                selectedHostId={selectedHostId}
-                showIpAddresses={showIpAddresses}
-                thresholds={state.dashboard.thresholds}
-              />
-              <CompactFleetList
-                machines={machines}
-                onInspect={inspect}
-                selectedHostId={selectedHostId}
-                showIpAddresses={showIpAddresses}
-                thresholds={state.dashboard.thresholds}
-              />
-            </>
-          )}
+        <div className="host-monitor__page-controls">
+          <label className="host-monitor__search">
+            <span>Find machine</span>
+            <Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Name, id, or platform" type="search" />
+          </label>
+          <HistoryRangeSelect onChange={setRangeHours} value={rangeHours} />
+          <Button disabled={refreshing || fleet?.refreshing === true} onClick={() => void refreshAll()} variant="outline">
+            {refreshing || fleet?.refreshing ? "Refreshing…" : "Refresh all"}
+          </Button>
         </div>
-      </div>
+      </header>
+
+      {error != null && <p className="host-monitor__inline-status" role="status">{error}</p>}
+
+      <section className="host-monitor__fleet" aria-labelledby="fleet-heading">
+        <header>
+          <div><h2 id="fleet-heading">Hosts</h2><p>Every machine enrolled in BB</p></div>
+          <Badge>{visibleMachines.length} of {fleet?.total ?? 0}</Badge>
+        </header>
+        {fleet == null ? <FleetSkeleton /> : visibleMachines.length === 0 ? (
+          <div className="host-monitor__empty">
+            <strong>{fleet.total === 0 ? "No machines enrolled" : "No matching machines"}</strong>
+            <span>{fleet.total === 0 ? "Connect a machine to BB to begin monitoring." : `Nothing matches “${query.trim()}”.`}</span>
+          </div>
+        ) : (
+          <ul className="host-monitor__machine-grid">
+            {visibleMachines.map((machine) => (
+              <li key={machine.host.id}>
+                <MachineCard
+                  disabled={dirtyDashboard && machine.host.id !== selectedHostId}
+                  machine={machine}
+                  onSelect={() => {
+                    if (!dirtyDashboard) setSelectedHostId(machine.host.id);
+                    else setDashboardAnnouncement("Save or cancel dashboard changes before switching hosts.");
+                  }}
+                  selected={machine.host.id === selectedHostId}
+                  thresholds={fleet.thresholds}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {dirtyDashboard && (
+        <p className="host-monitor__draft-note" role="status">
+          Finish or cancel dashboard changes before switching hosts.
+        </p>
+      )}
+
+      <MachineDashboard
+        config={dashboardConfig}
+        configError={dashboardError}
+        configLoading={dashboardLoading}
+        dirty={dirtyDashboard}
+        draft={dashboardDraft}
+        editing={editingDashboard}
+        historyLoading={historyLoading}
+        machine={selected}
+        onAnnouncement={setDashboardAnnouncement}
+        onCancelEdit={() => {
+          setDashboardDraft(dashboardConfig == null ? null : cloneDashboardConfig(dashboardConfig));
+          setDashboardError(null);
+          setEditingDashboard(false);
+          setDashboardAnnouncement("Dashboard changes discarded.");
+        }}
+        onChangeDraft={setDashboardDraft}
+        onEdit={() => {
+          if (dashboardConfig != null) setDashboardDraft(cloneDashboardConfig(dashboardConfig));
+          setDashboardError(null);
+          setEditingDashboard(true);
+          setDashboardAnnouncement("Dashboard customization opened.");
+        }}
+        onReset={() => {
+          setDashboardDraft(defaultDashboardConfig());
+          setDashboardAnnouncement("Draft reset to defaults. Save to persist it.");
+        }}
+        onSave={() => void saveDashboard()}
+        points={points}
+        rangeHours={rangeHours}
+        saving={savingDashboard}
+        thresholds={fleet?.thresholds ?? { cpu: 90, ram: 90, disk: 90 }}
+      />
     </main>
   );
 }
 
-function TelemetryGauge({
-  isFresh,
-  label,
-  percent,
+const HistoryRangeSelect = memo(function HistoryRangeSelect({
+  onChange,
+  value,
+}: {
+  onChange(value: RangeHours): void;
+  value: RangeHours;
+}) {
+  return (
+    <div className="host-monitor__range">
+      <span id="host-monitor-history-label">History</span>
+      <Select onValueChange={(next) => onChange(Number(next) as RangeHours)} value={String(value)}>
+        <SelectTrigger aria-labelledby="host-monitor-history-label">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent align="end">
+          {RANGE_OPTIONS.map((option) => (
+            <SelectItem key={option.value} value={String(option.value)}>{option.label}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+});
+
+const MachineCard = memo(function MachineCard({
+  disabled,
+  machine,
+  onSelect,
+  selected,
   thresholds,
 }: {
-  isFresh: boolean;
-  label: string;
-  percent: number | null;
-  thresholds: HealthThresholds;
-}) {
-  const bounded = boundedPercent(percent);
-  const tone = thresholdToneForReading(percent, isFresh, thresholds);
-  const accessibleText = metricAccessibleText(label, bounded, tone);
-  const circumference = 2 * Math.PI * 26;
-  const offset = bounded === null ? circumference : circumference * (1 - bounded / 100);
-  return (
-    <div
-      className="host-monitor-telemetry-gauge"
-      data-tone={tone}
-    >
-      <span className="sr-only">{accessibleText}</span>
-      <div className="relative aspect-square w-full max-w-24">
-        <svg aria-hidden="true" className="size-full -rotate-90" viewBox="0 0 64 64">
-          <circle className="text-muted" cx="32" cy="32" fill="none" r="26" stroke="currentColor" strokeWidth="5" />
-          <circle className="host-monitor-gauge" cx="32" cy="32" fill="none" r="26" stroke="currentColor" strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" strokeWidth="5" />
-        </svg>
-        <span
-          aria-hidden="true"
-          className="host-monitor-telemetry-gauge__percentage absolute inset-0 flex items-center justify-center font-mono text-sm font-semibold"
-        >
-          {bounded === null ? "—" : formatPercent(bounded)}
-        </span>
-      </div>
-      <span aria-hidden="true" className="mt-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">{label}</span>
-    </div>
-  );
-}
-
-function DetailItem({
-  label,
-  value,
-  title,
-  valueClassName = "",
-  valueNetworkDirection,
-}: {
-  label: string;
-  value: string;
-  title?: string;
-  valueClassName?: string;
-  valueNetworkDirection?: "down" | "up";
-}) {
-  return (
-    <div className="min-w-0 border-b border-border py-2.5 last:border-b-0">
-      <dt className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</dt>
-      <dd
-        className={`mt-0.5 break-words text-xs text-foreground ${valueClassName}`}
-        data-network-direction={valueNetworkDirection}
-        title={title ?? value}
-      >
-        {value}
-      </dd>
-    </div>
-  );
-}
-
-function NetworkRateDetails({ machine }: { machine: MachineRow }) {
-  const network = networkRateSummary(
-    machine.snapshot?.network.receiveBytesPerSecond ?? null,
-    machine.snapshot?.network.sendBytesPerSecond ?? null,
-  );
-  const unavailable = "Unavailable";
-
-  return (
-    <>
-      <DetailItem
-        label="Network receive"
-        value={network.available ? `↓ ${network.receive}` : unavailable}
-        valueClassName="host-monitor-network-detail"
-        valueNetworkDirection={network.available ? "down" : undefined}
-      />
-      <DetailItem
-        label="Network send"
-        value={network.available ? `↑ ${network.send}` : unavailable}
-        valueClassName="host-monitor-network-detail"
-        valueNetworkDirection={network.available ? "up" : undefined}
-      />
-    </>
-  );
-}
-
-function IpAddressDetail({
-  hostName,
-  primaryIpAddress,
-  revealed,
-  onChange,
-}: {
-  hostName: string;
-  primaryIpAddress: string | null;
-  revealed: boolean;
-  onChange(revealed: boolean): void;
-}) {
-  const presentation = primaryIpAddressPresentation(
-    primaryIpAddress,
-    revealed,
-  );
-  const actionLabel = revealed
-    ? `Hide IP address for ${hostName}`
-    : `Show IP address for ${hostName}`;
-
-  return (
-    <div className="min-w-0 border-b border-border py-2.5 last:border-b-0">
-      <dt className="text-[10px] uppercase tracking-wider text-muted-foreground">
-        IP address
-      </dt>
-      <dd className="mt-0.5 flex min-w-0 items-center justify-between gap-3">
-        <span
-          className={`min-w-0 font-mono text-xs text-foreground ${
-            presentation.state === "revealed" ? "break-all" : "truncate"
-          }`}
-          title={
-            presentation.state === "revealed"
-              ? presentation.displayText
-              : undefined
-          }
-        >
-          <span aria-hidden="true">{presentation.displayText}</span>
-          <span className="sr-only">{presentation.accessibleText}</span>
-        </span>
-        {presentation.state === "unavailable" ? null : (
-          <button
-            aria-label={actionLabel}
-            aria-pressed={revealed}
-            className="inline-flex h-7 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-md px-2 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            onClick={() => onChange(!revealed)}
-            title={actionLabel}
-            type="button"
-          >
-            <EyeIcon revealed={revealed} />
-            {revealed ? "Hide" : "Show"}
-          </button>
-        )}
-      </dd>
-    </div>
-  );
-}
-
-type ProcessListOk = Extract<ProcessListResult, { outcome: "ok" }>;
-type PreparedTerminationReady = Extract<
-  PreparedTermination,
-  { outcome: "ready" }
->;
-type ForceDialogContext = "platform" | "persisted";
-
-const PROCESS_POLL_INTERVAL_MS = 5_000;
-const PROCESS_PAGE_LIMIT = 200;
-const PROCESS_SKELETON_ROWS = [
-  "process-skeleton-1",
-  "process-skeleton-2",
-  "process-skeleton-3",
-  "process-skeleton-4",
-  "process-skeleton-5",
-  "process-skeleton-6",
-  "process-skeleton-7",
-] as const;
-
-function ProcessSortIcon({ active, descending }: { active: boolean; descending: boolean }) {
-  return (
-    <svg
-      aria-hidden="true"
-      className={`host-monitor-process-sort-icon size-3 transition-opacity ${active ? "opacity-100" : "opacity-0"}`}
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <path
-        d={descending ? "m7 14 5 5 5-5M12 5v14" : "m7 10 5-5 5 5M12 5v14"}
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.8"
-      />
-    </svg>
-  );
-}
-
-function ProcessTableSortHeader({
-  active,
-  children,
-  direction,
-  disabled,
-  onClick,
-}: {
-  active: boolean;
-  children: string;
-  direction: "ascending" | "descending";
   disabled: boolean;
-  onClick(): void;
+  machine: MachineRow;
+  onSelect(): void;
+  selected: boolean;
+  thresholds: Fleet["thresholds"];
 }) {
-  const directionLabel =
-    direction === "descending" ? "highest first" : "A to Z";
-  return (
-    <th
-      aria-sort={active ? direction : undefined}
-      className="host-monitor-process-table__sortable"
-      scope="col"
-    >
-      <button
-        aria-label={`Sort by ${children}, ${directionLabel}${active ? ", selected" : ""}`}
-        className="host-monitor-process-column-sort"
-        data-active={active ? "true" : "false"}
-        disabled={disabled}
-        onClick={onClick}
-        type="button"
-      >
-        {children}
-        <ProcessSortIcon active={active} descending={direction === "descending"} />
-      </button>
-    </th>
-  );
-}
-
-function ProcessSortButton({
-  active,
-  children,
-  disabled,
-  direction,
-  onClick,
-}: {
-  active: boolean;
-  children: string;
-  disabled?: boolean;
-  direction: "ascending" | "descending";
-  onClick(): void;
-}) {
+  const snapshot = machine.snapshot;
   return (
     <button
-      aria-label={`${children}, ${direction === "descending" ? "highest first" : "A to Z"}${active ? ", selected" : ""}`}
-      aria-pressed={active}
-      className="host-monitor-process-sort"
-      data-active={active ? "true" : "false"}
+      aria-label={`Open dashboard for ${machine.host.name}, ${sampleStateLabel(machine)}`}
+      aria-pressed={selected}
+      className="host-monitor__machine-card"
+      data-selected={selected}
       disabled={disabled}
-      onClick={onClick}
+      onClick={onSelect}
       type="button"
     >
-      {children}
-      <ProcessSortIcon active={active} descending={direction === "descending"} />
-    </button>
-  );
-}
-
-function ProcessListSkeleton() {
-  return (
-    <output
-      aria-label="Loading processes"
-      className="host-monitor-process-skeleton"
-    >
-      {PROCESS_SKELETON_ROWS.map((rowId) => (
-        <span className="host-monitor-process-skeleton__row" key={rowId}>
-          <span className="host-monitor-process-skeleton__line host-monitor-process-skeleton__line--name" />
-          <span className="host-monitor-process-skeleton__line" />
-          <span className="host-monitor-process-skeleton__line" />
-          <span className="host-monitor-process-skeleton__line host-monitor-process-skeleton__line--action" />
-        </span>
-      ))}
-    </output>
-  );
-}
-
-function ProcessStateMessage({
-  action,
-  message,
-  title,
-}: {
-  action?: ReactNode;
-  message: string;
-  title: string;
-}) {
-  return (
-    <div className="host-monitor-process-state">
-      <ProcessesIcon className="size-5" />
-      <strong>{title}</strong>
-      <p>{message}</p>
-      {action}
-    </div>
-  );
-}
-
-function ProcessAction({
-  actionsBusy,
-  onPrepare,
-  pending,
-  row,
-}: {
-  actionsBusy: boolean;
-  onPrepare(row: ProcessRow, mode: ProcessTerminationMode, trigger: HTMLElement): void;
-  pending: boolean;
-  row: ProcessRow;
-}) {
-  const action = processActionPresentation(row);
-  if (action.disabled) {
-    return (
-      <button
-        aria-disabled="true"
-        aria-label={`${row.name}, PID ${row.pid}: ${action.reason}`}
-        className="host-monitor-process-action"
-        data-protected="true"
-        title={action.reason ?? undefined}
-        type="button"
-      >
-        <ShieldIcon />
-        <span className="sr-only">{action.label}</span>
-      </button>
-    );
-  }
-  return (
-    <button
-      aria-label={`${action.label} ${row.name}, PID ${row.pid}`}
-      className="host-monitor-process-action"
-      data-protected="false"
-      disabled={actionsBusy}
-      onClick={(event) => {
-        if (action.mode !== null) {
-          onPrepare(row, action.mode, event.currentTarget);
-        }
-      }}
-      title={action.reason ?? `${action.label} ${row.name}`}
-      type="button"
-    >
-      {pending ? <Spinner className="size-3" /> : <EndProcessIcon />}
-      {pending ? "Checking…" : action.label}
-    </button>
-  );
-}
-
-function ProcessMetric({
-  detail,
-  maximum,
-  value,
-}: {
-  detail?: string;
-  maximum: number;
-  value: number;
-}) {
-  const relativeWidth =
-    maximum > 0 ? Math.max(0, Math.min(100, (value / maximum) * 100)) : 0;
-  return (
-    <span className="host-monitor-process-metric">
-      <span className="host-monitor-process-metric__readout">
-        <strong>{formatPercent(value)}</strong>
-        {detail === undefined ? null : <small>{detail}</small>}
-      </span>
-      <span aria-hidden="true" className="host-monitor-process-metric__track">
-        <span style={{ width: `${relativeWidth}%` }} />
-      </span>
-    </span>
-  );
-}
-
-function ProcessSummaryStrip({ rows, totalCount }: { rows: ProcessRow[]; totalCount: number }) {
-  const summary = summarizeProcessRows(rows);
-  const actionableCount = rows.length - summary.protectedCount;
-  return (
-    <dl aria-label="Process summary" className="host-monitor-process-summary">
-      <div>
-        <dt>Shown</dt>
-        <dd>
-          <strong>{rows.length}</strong>
-          <span>{rows.length === totalCount ? "processes" : `of ${totalCount} total`}</span>
-        </dd>
-      </div>
-      <div>
-        <dt>Top CPU</dt>
-        <dd>
-          <span className="host-monitor-process-summary__name" title={summary.topCpu?.name}>
-            {summary.topCpu?.name ?? "—"}
-          </span>
-          <strong>{summary.topCpu === null ? "—" : formatPercent(summary.topCpu.cpuPercent)}</strong>
-        </dd>
-      </div>
-      <div>
-        <dt>Top RAM</dt>
-        <dd>
-          <span className="host-monitor-process-summary__name" title={summary.topMemory?.name}>
-            {summary.topMemory?.name ?? "—"}
-          </span>
-          <strong>{summary.topMemory === null ? "—" : formatPercent(summary.topMemory.memoryPercent)}</strong>
-        </dd>
-      </div>
-      <div>
-        <dt>Actions</dt>
-        <dd>
-          <strong>{actionableCount}</strong>
-          <span>available · {summary.protectedCount} protected</span>
-        </dd>
-      </div>
-    </dl>
-  );
-}
-
-function ProcessRows({
-  actionsBusy,
-  maximumCpu,
-  maximumMemory,
-  onPrepare,
-  onSort,
-  pendingIdentity,
-  rows,
-  sortBy,
-  sortDisabled,
-}: {
-  actionsBusy: boolean;
-  maximumCpu: number;
-  maximumMemory: number;
-  onPrepare(row: ProcessRow, mode: ProcessTerminationMode, trigger: HTMLElement): void;
-  onSort(sort: ProcessSortBy): void;
-  pendingIdentity: string | null;
-  rows: ProcessRow[];
-  sortBy: ProcessSortBy;
-  sortDisabled: boolean;
-}) {
-  return (
-    <>
-      <div className="host-monitor-process-table">
-        <table>
-          <thead>
-            <tr>
-              <ProcessTableSortHeader
-                active={sortBy === "name"}
-                direction="ascending"
-                disabled={sortDisabled}
-                onClick={() => onSort("name")}
-              >
-                Process
-              </ProcessTableSortHeader>
-              <ProcessTableSortHeader
-                active={sortBy === "cpu"}
-                direction="descending"
-                disabled={sortDisabled}
-                onClick={() => onSort("cpu")}
-              >
-                CPU
-              </ProcessTableSortHeader>
-              <ProcessTableSortHeader
-                active={sortBy === "memory"}
-                direction="descending"
-                disabled={sortDisabled}
-                onClick={() => onSort("memory")}
-              >
-                RAM
-              </ProcessTableSortHeader>
-              <th scope="col"><span className="sr-only">Action</span></th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row, index) => (
-              <tr key={`${row.pid}:${row.identity ?? "protected"}`}>
-                <th aria-label={`${row.name}, PID ${row.pid}`} scope="row">
-                  <span className="host-monitor-process-primary">
-                    <span aria-hidden="true" className="host-monitor-process-rank">{String(index + 1).padStart(2, "0")}</span>
-                    <span className="host-monitor-process-identity">
-                      <span className="host-monitor-process-name" title={row.name}>{row.name}</span>
-                      <span className="host-monitor-process-pid">PID {row.pid} · {processOwnerLabel(row.ownerCategory)}</span>
-                      {row.blockedReason === null ? null : (
-                        <span className="host-monitor-process-protected-reason">
-                          {blockedProcessReason(row.blockedReason)}
-                        </span>
-                      )}
-                    </span>
-                  </span>
-                </th>
-                <td>
-                  <ProcessMetric maximum={maximumCpu} value={row.cpuPercent} />
-                </td>
-                <td>
-                  <ProcessMetric
-                    detail={formatBytes(row.rssBytes)}
-                    maximum={maximumMemory}
-                    value={row.memoryPercent}
-                  />
-                </td>
-                <td className="host-monitor-process-action-cell">
-                  <ProcessAction
-                    actionsBusy={actionsBusy}
-                    onPrepare={onPrepare}
-                    pending={row.identity !== null && pendingIdentity === row.identity}
-                    row={row}
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <ol className="host-monitor-process-list">
-        {rows.map((row, index) => (
-          <li key={`${row.pid}:${row.identity ?? "protected"}`}>
-            <span aria-hidden="true" className="host-monitor-process-rank">{String(index + 1).padStart(2, "0")}</span>
-            <div className="host-monitor-process-list__body">
-              <div className="host-monitor-process-list__header">
-                <span className="min-w-0">
-                  <span className="host-monitor-process-name" title={row.name}>{row.name}</span>
-                  <span className="host-monitor-process-pid">PID {row.pid} · {processOwnerLabel(row.ownerCategory)}</span>
-                  {row.blockedReason === null ? null : (
-                    <span className="host-monitor-process-protected-reason">
-                      {blockedProcessReason(row.blockedReason)}
-                    </span>
-                  )}
-                </span>
-                <ProcessAction
-                  actionsBusy={actionsBusy}
-                  onPrepare={onPrepare}
-                  pending={row.identity !== null && pendingIdentity === row.identity}
-                  row={row}
-                />
-              </div>
-              <dl className="host-monitor-process-list__metrics">
-                <div><dt>CPU</dt><dd><ProcessMetric maximum={maximumCpu} value={row.cpuPercent} /></dd></div>
-                <div><dt>RAM</dt><dd><ProcessMetric detail={formatBytes(row.rssBytes)} maximum={maximumMemory} value={row.memoryPercent} /></dd></div>
-              </dl>
-            </div>
-          </li>
-        ))}
-      </ol>
-    </>
-  );
-}
-
-function ProcessTerminationDialog({
-  challenge,
-  executing,
-  fallbackFocus,
-  forceContext,
-  onCancel,
-  onExecute,
-  returnFocus,
-}: {
-  challenge: PreparedTerminationReady | null;
-  executing: boolean;
-  fallbackFocus: RefObject<HTMLElement | null>;
-  forceContext: ForceDialogContext | null;
-  onCancel(): void;
-  onExecute(): void;
-  returnFocus: RefObject<HTMLElement | null>;
-}) {
-  const cancelRef = useRef<HTMLButtonElement>(null);
-  const scopeProps = usePortalScopeProps();
-  const force = challenge?.process.mode === "force";
-  const description = force
-    ? forceContext === "persisted"
-      ? "The process did not exit after a graceful request. Force stop can discard unsaved work and leave dependent work incomplete."
-      : "This platform only supports a force stop. Unsaved work can be lost immediately."
-    : "Ask the process to exit gracefully. If it remains running, Host Monitor will offer a separate force-stop confirmation.";
-
-  return (
-    <AlertDialog.Root
-      onOpenChange={(open) => {
-        if (!open && !executing) onCancel();
-      }}
-      open={challenge !== null}
-    >
-      <AlertDialog.Portal>
-        <AlertDialog.Overlay
-          {...scopeProps}
-          className="host-monitor-process-dialog__overlay"
-        />
-        <AlertDialog.Content
-          {...scopeProps}
-          aria-busy={executing}
-          className="host-monitor-process-dialog"
-          onCloseAutoFocus={(event) => {
-            event.preventDefault();
-            const preferred = returnFocus.current;
-            const preferredDisabled =
-              preferred instanceof HTMLButtonElement
-                ? preferred.disabled || preferred.getAttribute("aria-disabled") === "true"
-                : preferred?.getAttribute("aria-disabled") === "true";
-            if (preferred?.isConnected && !preferredDisabled) preferred.focus();
-            else if (fallbackFocus.current?.isConnected) fallbackFocus.current.focus();
-          }}
-          onOpenAutoFocus={(event) => {
-            event.preventDefault();
-            cancelRef.current?.focus();
-          }}
-        >
-          {challenge === null ? null : (
-            <>
-              <div className="host-monitor-process-dialog__icon" data-force={force ? "true" : "false"}>
-                <AlertIcon />
-              </div>
-              <div className="min-w-0">
-                <AlertDialog.Title className="host-monitor-process-dialog__title">
-                  {force ? "Force stop process?" : "End process?"}
-                </AlertDialog.Title>
-                <AlertDialog.Description className="host-monitor-process-dialog__description">
-                  {description}
-                </AlertDialog.Description>
-              </div>
-              <dl className="host-monitor-process-dialog__facts">
-                <div><dt>Host</dt><dd>{challenge.host.name}</dd></div>
-                <div><dt>Process</dt><dd>{challenge.process.name}</dd></div>
-                <div><dt>PID</dt><dd>{challenge.process.pid}</dd></div>
-                <div><dt>CPU</dt><dd>{formatPercent(challenge.process.cpuPercent)}</dd></div>
-                <div><dt>Memory</dt><dd>{formatPercent(challenge.process.memoryPercent)} · {formatBytes(challenge.process.rssBytes)}</dd></div>
-              </dl>
-              <p className="host-monitor-process-dialog__freshness">
-                Checked just now · confirmation expires at {new Date(challenge.expiresAtMs).toLocaleTimeString()}
-              </p>
-              <div className="host-monitor-process-dialog__actions">
-                <AlertDialog.Cancel asChild>
-                  <button
-                    className="host-monitor-process-dialog__cancel"
-                    disabled={executing}
-                    ref={cancelRef}
-                    type="button"
-                  >
-                    Cancel
-                  </button>
-                </AlertDialog.Cancel>
-                <AlertDialog.Action asChild>
-                  <button
-                    className="host-monitor-process-dialog__confirm"
-                    data-force={force ? "true" : "false"}
-                    disabled={executing}
-                    onClick={(event) => {
-                      event.preventDefault();
-                      onExecute();
-                    }}
-                    type="button"
-                  >
-                    {executing ? <Spinner className="size-3.5" /> : null}
-                    {executing ? "Sending…" : force ? "Force stop" : "End process"}
-                  </button>
-                </AlertDialog.Action>
-              </div>
-            </>
-          )}
-        </AlertDialog.Content>
-      </AlertDialog.Portal>
-    </AlertDialog.Root>
-  );
-}
-
-function ProcessesPanel() {
-  const rpc = useRpc<typeof rpcContract>();
-  const dashboard = useDashboardState();
-  const targetState = useFixedTabTarget(PROCESSES_TAB);
-  const target = targetState?.target ?? null;
-  const targetHostId = target?.hostId ?? null;
-  const targetInitialSort = target?.initialSort ?? null;
-  const [sortBy, setSortBy] = useState<ProcessSortBy>(
-    () => target?.initialSort ?? "cpu",
-  );
-  const [processQuery, setProcessQuery] = useState("");
-  const [result, setResult] = useState<ProcessListResult | null>(null);
-  const [requestError, setRequestError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [pendingIdentity, setPendingIdentity] = useState<string | null>(null);
-  const [challenge, setChallenge] = useState<PreparedTerminationReady | null>(null);
-  const [forceContext, setForceContext] = useState<ForceDialogContext | null>(null);
-  const [executing, setExecuting] = useState(false);
-  const [announcement, setAnnouncement] = useState("");
-  const targetGeneration = useRef(0);
-  const listGeneration = useRef(0);
-  const listInFlight = useRef(false);
-  const listQueued = useRef(false);
-  const listParams = useRef<{
-    generation: number;
-    hostId: string | null;
-    sortBy: ProcessSortBy;
-  }>({ generation: 0, hostId: targetHostId, sortBy });
-  const prepareInFlight = useRef(false);
-  const prepareSequence = useRef(0);
-  const executeSequence = useRef(0);
-  const consumedTokens = useRef(new Set<string>());
-  const returnFocus = useRef<HTMLElement | null>(null);
-  const fallbackFocus = useRef<HTMLElement | null>(null);
-  const actionBusy = pendingIdentity !== null || challenge !== null || executing;
-  const destructiveActionsBusy = actionBusy || loading;
-  const actionBusyRef = useRef(actionBusy);
-  actionBusyRef.current = actionBusy;
-  listParams.current = {
-    generation: listGeneration.current,
-    hostId: targetHostId,
-    sortBy,
-  };
-
-  const loadProcesses = useCallback(async function loadProcessesNow(): Promise<ProcessListResult | null> {
-    if (listInFlight.current) {
-      listQueued.current = true;
-      return null;
-    }
-    const params = { ...listParams.current };
-    if (params.hostId === null) return null;
-    listInFlight.current = true;
-    setLoading(true);
-    try {
-      const next = await rpc.call("listProcesses", {
-        hostId: params.hostId,
-        limit: PROCESS_PAGE_LIMIT,
-        sortBy: params.sortBy,
-      });
-      if (
-        params.generation === listGeneration.current &&
-        params.hostId === listParams.current.hostId &&
-        params.sortBy === listParams.current.sortBy
-      ) {
-        setResult(next);
-        setRequestError(null);
-      }
-      return next;
-    } catch {
-      if (
-        params.generation === listGeneration.current &&
-        params.hostId === listParams.current.hostId &&
-        params.sortBy === listParams.current.sortBy
-      ) {
-        setRequestError("Host Monitor could not reach the process service.");
-      }
-      return null;
-    } finally {
-      const current =
-        params.generation === listGeneration.current &&
-        params.hostId === listParams.current.hostId &&
-        params.sortBy === listParams.current.sortBy;
-      if (current) setLoading(false);
-      listInFlight.current = false;
-      if (listQueued.current) {
-        listQueued.current = false;
-        const queued = listParams.current;
-        if (
-          !actionBusyRef.current &&
-          queued.hostId !== null &&
-          queued.generation === listGeneration.current
-        ) {
-          window.queueMicrotask(() => void loadProcessesNow());
-        }
-      }
-    }
-  }, [rpc]);
-
-  useEffect(() => {
-    targetGeneration.current += 1;
-    listGeneration.current += 1;
-    prepareSequence.current += 1;
-    executeSequence.current += 1;
-    prepareInFlight.current = false;
-    listQueued.current = false;
-    listParams.current = {
-      generation: listGeneration.current,
-      hostId: targetHostId,
-      sortBy: targetInitialSort ?? listParams.current.sortBy,
-    };
-    setResult(null);
-    setRequestError(null);
-    setLoading(false);
-    setChallenge(null);
-    setPendingIdentity(null);
-    setExecuting(false);
-    setProcessQuery("");
-    if (targetInitialSort !== null) setSortBy(targetInitialSort);
-    return () => {
-      targetGeneration.current += 1;
-      listGeneration.current += 1;
-      prepareSequence.current += 1;
-      executeSequence.current += 1;
-      prepareInFlight.current = false;
-      listQueued.current = false;
-    };
-  }, [targetHostId, targetInitialSort]);
-
-  useEffect(() => {
-    if (targetHostId === null) return;
-    void loadProcesses();
-    const interval = window.setInterval(() => {
-      if (!actionBusyRef.current) void loadProcesses();
-    }, PROCESS_POLL_INTERVAL_MS);
-    return () => window.clearInterval(interval);
-  }, [loadProcesses, sortBy, targetHostId]);
-
-  const prepareTermination = useCallback(async (
-    row: ProcessRow,
-    mode: ProcessTerminationMode,
-    trigger: HTMLElement,
-    context: ForceDialogContext | null = mode === "force" ? "platform" : null,
-  ) => {
-    if (
-      targetHostId === null ||
-      row.identity === null ||
-      prepareInFlight.current
-    ) return;
-    if (listInFlight.current) {
-      const message = "Wait for the current process refresh to finish.";
-      setAnnouncement(message);
-      toast.info(message);
-      return;
-    }
-    const sequence = ++prepareSequence.current;
-    const generation = targetGeneration.current;
-    const hostId = targetHostId;
-    prepareInFlight.current = true;
-    returnFocus.current = trigger;
-    setPendingIdentity(row.identity);
-    try {
-      const prepared = await rpc.call("prepareProcessTermination", {
-        hostId,
-        identity: row.identity,
-        mode,
-        pid: row.pid,
-      });
-      if (
-        sequence !== prepareSequence.current ||
-        generation !== targetGeneration.current
-      ) return;
-      if (prepared.outcome === "ready") {
-        setForceContext(context);
-        setChallenge(prepared);
-        setAnnouncement(`${prepared.process.name} is ready for confirmation.`);
-      } else {
-        setAnnouncement(prepared.message);
-        toast.error(prepared.message);
-        void loadProcesses();
-      }
-    } catch {
-      if (
-        sequence !== prepareSequence.current ||
-        generation !== targetGeneration.current
-      ) return;
-      const message = "Host Monitor could not safely check this process.";
-      setAnnouncement(message);
-      toast.error(message);
-    } finally {
-      if (sequence === prepareSequence.current) {
-        prepareInFlight.current = false;
-        if (generation === targetGeneration.current) setPendingIdentity(null);
-      }
-    }
-  }, [loadProcesses, rpc, targetHostId]);
-
-  const executeTermination = useCallback(async () => {
-    if (challenge === null || executing) return;
-    const token = challenge.confirmationToken;
-    if (consumedTokens.current.has(token)) return;
-    consumedTokens.current.add(token);
-    const sequence = ++executeSequence.current;
-    const generation = targetGeneration.current;
-    setExecuting(true);
-    try {
-      const executed = await rpc.call("executeProcessTermination", {
-        confirmationToken: token,
-      });
-      if (
-        sequence !== executeSequence.current ||
-        generation !== targetGeneration.current
-      ) return;
-      if (executed.outcome === "still-running" && challenge.process.mode === "graceful") {
-        const forceRow: ProcessRow = {
-          ...challenge.process,
-          allowedTerminationModes: ["force"],
-          blockedReason: null,
-          ownerCategory: "same-user",
-        };
-        setChallenge(null);
-        setAnnouncement(executed.message);
-        toast.warning(executed.message);
-        await prepareTermination(forceRow, "force", returnFocus.current ?? document.body, "persisted");
-        return;
-      }
-
-      setExecuting(false);
-      setChallenge(null);
-      setAnnouncement(executed.message);
-      if (executed.outcome === "signal-sent") {
-        toast.info(executed.message);
-      } else if (executed.outcome === "outcome-unknown") {
-        toast.warning(executed.message);
-      } else {
-        toast.error(executed.message);
-      }
-      await loadProcesses();
-    } catch {
-      if (
-        sequence !== executeSequence.current ||
-        generation !== targetGeneration.current
-      ) return;
-      const message =
-        "Host Monitor could not confirm whether the stop request completed. Refresh before trying again.";
-      setExecuting(false);
-      setChallenge(null);
-      setAnnouncement(`Process outcome unknown. ${message}`);
-      toast.warning(message);
-      await loadProcesses();
-    } finally {
-      consumedTokens.current.delete(token);
-      if (
-        sequence === executeSequence.current &&
-        generation === targetGeneration.current
-      ) setExecuting(false);
-    }
-  }, [challenge, executing, loadProcesses, prepareTermination, rpc]);
-
-  const selectSort = useCallback((nextSort: ProcessSortBy) => {
-    setSortBy(nextSort);
-    setAnnouncement(
-      nextSort === "name"
-        ? "Sorted by Process, A to Z."
-        : `Sorted by ${nextSort === "cpu" ? "CPU" : "RAM"}, highest first.`,
-    );
-  }, []);
-
-  const okResult: ProcessListOk | null = result?.outcome === "ok" ? result : null;
-  const sortedRows = useMemo(
-    () => sortProcessRows(okResult?.processes ?? [], sortBy),
-    [okResult?.processes, sortBy],
-  );
-  const rows = useMemo(
-    () => filterProcessRows(sortedRows, processQuery),
-    [processQuery, sortedRows],
-  );
-  const maximumCpu = useMemo(
-    () => Math.max(0, ...sortedRows.map((row) => row.cpuPercent)),
-    [sortedRows],
-  );
-  const maximumMemory = useMemo(
-    () => Math.max(0, ...sortedRows.map((row) => row.memoryPercent)),
-    [sortedRows],
-  );
-  const knownHostName =
-    dashboard.dashboard?.machines.find(
-      (machine) => machine.host.id === targetHostId,
-    )?.host.name ?? null;
-  const hostName = okResult?.host.name ?? knownHostName ?? "Selected host";
-  const firstLoad = result === null && requestError === null;
-
-  if (target === null) {
-    return (
-      <section className="host-monitor-processes" ref={fallbackFocus} tabIndex={-1}>
-        <ProcessStateMessage
-          message="Open Processes from a specific host. Host Monitor never guesses which machine to control."
-          title="Choose a host first"
-        />
-      </section>
-    );
-  }
-
-  return (
-    <section
-      aria-label={`Processes on ${hostName}`}
-      className="host-monitor-processes"
-      ref={fallbackFocus}
-      tabIndex={-1}
-    >
-      <output aria-live="polite" className="sr-only">{announcement}</output>
-      <header className="host-monitor-processes__header">
-        <div className="min-w-0">
-          <div className="flex min-w-0 items-center gap-2">
-            <ProcessesIcon className="size-4 shrink-0 text-muted-foreground" />
-            <h2
-              className="truncate text-sm font-semibold text-foreground"
-            >
-              {hostName}
-            </h2>
-          </div>
-          <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
-            {okResult === null
-              ? "Live processes"
-              : `${okResult.totalCount} processes · sampled ${formatRelativeTime(okResult.sampledAtMs)}`}
-          </p>
-        </div>
-        <button
-          aria-label={`Refresh processes on ${hostName}`}
-          className={CONTROL_BUTTON_CLASS}
-          disabled={loading || actionBusy}
-          onClick={() => void loadProcesses()}
-          title="Refresh processes"
-          type="button"
-        >
-          <RefreshIcon active={loading} />
-          <span className="hidden sm:inline">Refresh</span>
-        </button>
+      <header>
+        <span className="host-monitor__state-dot" data-state={machine.sampleState} aria-hidden="true" />
+        <span><strong>{machine.host.name}</strong><small>{snapshot?.system.osName ?? machine.host.id}</small></span>
+        <Badge tone={machine.host.status === "connected" ? "success" : "neutral"}>{sampleStateLabel(machine)}</Badge>
       </header>
-
-      <div className="host-monitor-processes__toolbar">
-        <label className="host-monitor-process-search">
-          <SearchIcon />
-          <span className="sr-only">Search shown processes by name or PID</span>
-          <input
-            aria-keyshortcuts="Escape"
-            onChange={(event) => setProcessQuery(event.currentTarget.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Escape" && processQuery.length > 0) {
-                event.preventDefault();
-                setProcessQuery("");
-              }
-            }}
-            placeholder={okResult?.truncated ? "Search shown processes" : "Search name or PID"}
-            type="search"
-            value={processQuery}
-          />
-        </label>
-        {processQuery.length > 0 ? (
-          <button
-            aria-label="Clear process search"
-            className="host-monitor-process-search__clear"
-            onClick={() => setProcessQuery("")}
-            type="button"
-          >
-            Clear
-          </button>
-        ) : null}
-        <fieldset
-          aria-label="Sort processes; Process is A to Z, CPU and RAM are highest first"
-          className="host-monitor-process-sort-group"
-        >
-          <ProcessSortButton active={sortBy === "name"} direction="ascending" disabled={actionBusy} onClick={() => selectSort("name")}>Process</ProcessSortButton>
-          <ProcessSortButton active={sortBy === "cpu"} direction="descending" disabled={actionBusy} onClick={() => selectSort("cpu")}>CPU</ProcessSortButton>
-          <ProcessSortButton active={sortBy === "memory"} direction="descending" disabled={actionBusy} onClick={() => selectSort("memory")}>RAM</ProcessSortButton>
-        </fieldset>
-        <output aria-live="polite" className="host-monitor-processes__toolbar-status">
-          {loading && okResult !== null ? <><Spinner className="size-3" />Updating</> : null}
-          {!loading && processQuery.length > 0 && okResult !== null
-            ? `${rows.length} ${rows.length === 1 ? "match" : "matches"}`
-            : null}
-        </output>
-      </div>
-
-      <div className="host-monitor-processes__content">
-        {requestError !== null && okResult !== null ? (
-          <div className="host-monitor-process-notice" role="alert">
-            <AlertIcon className="size-3.5 shrink-0" />
-            <span>Could not refresh processes: {requestError}</span>
-          </div>
-        ) : null}
-        {okResult?.elevated ? (
-          <output className="host-monitor-process-notice">
-            <AlertIcon className="size-3.5 shrink-0" />
-            <span>Process actions are protected while Host Monitor is running with elevated privileges.</span>
-          </output>
-        ) : null}
-
-        {firstLoad ? (
-          <ProcessListSkeleton />
-        ) : result !== null && result.outcome !== "ok" ? (
-          <ProcessStateMessage
-            action={
-              <button className={CONTROL_BUTTON_CLASS} onClick={() => void loadProcesses()} type="button">
-                Try again
-              </button>
-            }
-            message={result.message}
-            title={
-              result.outcome === "offline"
-                ? "Host is offline"
-                : result.outcome === "unsupported"
-                  ? "Processes are unsupported"
-                  : result.outcome === "not-found"
-                    ? "Host not found"
-                    : "Processes unavailable"
-            }
-          />
-        ) : okResult !== null && sortedRows.length === 0 ? (
-          <ProcessStateMessage
-            message="No user-visible processes were reported by this host."
-            title="No processes to show"
-          />
-        ) : okResult !== null ? (
-          <div className="host-monitor-process-surface">
-            <ProcessSummaryStrip rows={sortedRows} totalCount={okResult.totalCount} />
-            {rows.length === 0 ? (
-              <ProcessStateMessage
-                action={
-                  <button className={CONTROL_BUTTON_CLASS} onClick={() => setProcessQuery("")} type="button">
-                    Clear search
-                  </button>
-                }
-                message={`No shown process matches “${processQuery.trim()}”.`}
-                title="No matching processes"
-              />
-            ) : (
-              <ProcessRows
-                actionsBusy={destructiveActionsBusy}
-                maximumCpu={maximumCpu}
-                maximumMemory={maximumMemory}
-                onPrepare={(row, mode, trigger) => void prepareTermination(row, mode, trigger)}
-                onSort={selectSort}
-                pendingIdentity={pendingIdentity}
-                rows={rows}
-                sortBy={sortBy}
-                sortDisabled={actionBusy}
-              />
-            )}
-            {okResult.truncated ? (
-              <p className="host-monitor-processes__truncated">
-                Search covers these {okResult.processes.length} shown processes; {okResult.totalCount} exist on the host.
-              </p>
-            ) : null}
-          </div>
-        ) : requestError !== null ? (
-          <ProcessStateMessage
-            action={<button className={CONTROL_BUTTON_CLASS} onClick={() => void loadProcesses()} type="button">Try again</button>}
-            message={requestError}
-            title="Could not load processes"
-          />
-        ) : null}
-      </div>
-
-      <ProcessTerminationDialog
-        challenge={challenge}
-        executing={executing}
-        fallbackFocus={fallbackFocus}
-        forceContext={forceContext}
-        onCancel={() => {
-          setChallenge(null);
-          setForceContext(null);
-          setAnnouncement("Process action cancelled.");
-          void loadProcesses();
-        }}
-        onExecute={() => void executeTermination()}
-        returnFocus={returnFocus}
-      />
-    </section>
+      <dl>
+        <CardValue label="CPU" value={percent(snapshot?.cpu.usagePercent)} warning={isOver(snapshot?.cpu.usagePercent, thresholds.cpu)} />
+        <CardValue label="RAM" value={percent(snapshot?.memory.usagePercent)} warning={isOver(snapshot?.memory.usagePercent, thresholds.ram)} />
+        <CardValue label="Disk" value={percent(snapshot?.disk?.usagePercent)} warning={isOver(snapshot?.disk?.usagePercent, thresholds.disk)} />
+        <CardValue label="Load" value={number(snapshot?.cpu.loadAverage?.[1])} warning={false} />
+      </dl>
+      <footer>
+        <span>↓ {rate(snapshot?.network.receiveBytesPerSecond)}</span>
+        <span>↑ {rate(snapshot?.network.sendBytesPerSecond)}</span>
+        <small>{machine.receivedAtMs == null ? "No sample yet" : relativeTime(machine.receivedAtMs)}</small>
+      </footer>
+    </button>
   );
+});
+
+function CardValue({ label, value, warning }: { label: string; value: string; warning: boolean }) {
+  return <div data-warning={warning}><dt>{label}</dt><dd>{value}</dd></div>;
 }
 
-function InspectorEmpty({ message }: { message: string }) {
-  return <div className="flex h-full min-h-48 items-center justify-center text-center text-sm text-muted-foreground">{message}</div>;
-}
+function MachineDashboard({
+  config,
+  configError,
+  configLoading,
+  dirty,
+  draft,
+  editing,
+  historyLoading,
+  machine,
+  onAnnouncement,
+  onCancelEdit,
+  onChangeDraft,
+  onEdit,
+  onReset,
+  onSave,
+  points,
+  rangeHours,
+  saving,
+  thresholds,
+}: {
+  config: DashboardConfig | null;
+  configError: string | null;
+  configLoading: boolean;
+  dirty: boolean;
+  draft: DashboardConfig | null;
+  editing: boolean;
+  historyLoading: boolean;
+  machine: MachineRow | null;
+  onAnnouncement(message: string): void;
+  onCancelEdit(): void;
+  onChangeDraft(config: DashboardConfig): void;
+  onEdit(): void;
+  onReset(): void;
+  onSave(): void;
+  points: HistoryPoint[];
+  rangeHours: RangeHours;
+  saving: boolean;
+  thresholds: Fleet["thresholds"];
+}) {
+  const [draggedWidgetKey, setDraggedWidgetKey] = useState<string | null>(null);
+  const [dashboardDropTarget, setDashboardDropTarget] = useState<{
+    key: string;
+    position: DashboardDropPosition;
+  } | null>(null);
 
-function MachineInspector() {
-  const rpc = useRpc<typeof rpcContract>();
-  const settings = useSettings();
-  const state = useDashboardState();
-  const panel = useAppPanel();
-  const targetState = useFixedTabTarget(INSPECT_TAB);
-  const activeHostId =
-    targetState?.target.hostId ?? state.dashboard?.machines[0]?.host.id ?? null;
-  const [revealedIpHostId, setRevealedIpHostId] = useState<string | null>(null);
-  const showIpAddress =
-    activeHostId !== null && revealedIpHostId === activeHostId;
-  const showThresholdColors = thresholdColorsEnabled(
-    settings.values,
-    settings.isLoading,
-  );
-
-  useEffect(() => {
-    if (state.dashboard === null) void requestDashboard(rpc, "dashboard");
-  }, [rpc, state.dashboard]);
-  useEffect(() => {
-    if (revealedIpHostId !== null && revealedIpHostId !== activeHostId) {
-      setRevealedIpHostId(null);
-    }
-  }, [activeHostId, revealedIpHostId]);
-
-  if (state.dashboard === null) {
+  if (machine == null) {
     return (
-      <section
-        className="host-monitor-inspector h-full"
-        data-host-monitor-threshold-colors={showThresholdColors ? "true" : "false"}
-      >
-        <InspectorEmpty message="Loading host telemetry…" />
-      </section>
-    );
-  }
-  const machine = state.dashboard.machines.find((candidate) => candidate.host.id === activeHostId) ?? null;
-  if (machine === null) {
-    return (
-      <section
-        className="host-monitor-inspector h-full"
-        data-host-monitor-threshold-colors={showThresholdColors ? "true" : "false"}
-      >
-        <InspectorEmpty message="Select a host to inspect its telemetry." />
+      <section className="host-monitor__dashboard host-monitor__dashboard--empty">
+        <div className="host-monitor__empty"><strong>Select a machine</strong><span>Choose a host above to inspect its dashboard.</span></div>
       </section>
     );
   }
   const snapshot = machine.snapshot;
-  const refreshing = state.requestKind === "refresh-host" && state.requestHostId === machine.host.id;
-  const openProcesses = (initialSort: "cpu" | "memory") => {
-    panel.openFixedTab({
-      surface: { kind: "current" },
-      tab: PROCESSES_TAB,
-      target: { hostId: machine.host.id, initialSort },
-    });
+  const renderedConfig = editing && draft != null ? draft : config;
+  const panels = renderedConfig == null ? [] : visibleDashboardPanels(renderedConfig);
+
+  const moveDashboardWidget = (
+    fromKey: string,
+    toKey: string,
+    position: DashboardDropPosition,
+  ) => {
+    if (!editing || draft == null || fromKey === toKey) return;
+    const from = draft.panels.findIndex((panel) => dashboardPanelKey(panel) === fromKey);
+    const to = draft.panels.findIndex((panel) => dashboardPanelKey(panel) === toKey);
+    if (from < 0 || to < 0) return;
+    const moved = draft.panels[from];
+    if (moved == null) return;
+    const destination = dashboardDropIndex(draft.panels.length, from, to, position);
+    onChangeDraft(moveDashboardPanel(draft, from, destination));
+    onAnnouncement(`${DASHBOARD_CATALOG[moved.metric].label} ${presentationLabel(moved)} moved to position ${destination + 1} of ${draft.panels.length}.`);
   };
 
   return (
-    <section
-      className="host-monitor-inspector space-y-4"
-      data-host-monitor-threshold-colors={showThresholdColors ? "true" : "false"}
-    >
-      <header className="flex items-start gap-3">
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <h2 className="truncate text-sm font-semibold text-foreground">{machine.host.name}</h2>
-            <HealthBadge machine={machine} />
+    <section className="host-monitor__dashboard" aria-labelledby="machine-heading">
+      <header className="host-monitor__machine-heading">
+        <div>
+          <span className="host-monitor__state-dot" data-state={machine.sampleState} aria-hidden="true" />
+          <div>
+            <h2 id="machine-heading">{machine.host.name}</h2>
+            <p>{snapshot == null ? machine.host.id : `${snapshot.system.osName} · ${snapshot.system.arch}`}</p>
           </div>
-          <p className="mt-1 truncate text-xs text-muted-foreground">{snapshot ? `${snapshot.system.osName} · ${snapshot.system.arch}` : machine.host.status === "connected" ? "Connected · waiting for telemetry" : "Disconnected · no live telemetry"}</p>
         </div>
-        <span className="flex shrink-0 items-center gap-1.5">
-          <button
-            aria-label={`View processes on ${machine.host.name}`}
-            className={CONTROL_BUTTON_CLASS}
-            onClick={() => openProcesses("cpu")}
-            title="View processes"
-            type="button"
-          >
-            <ProcessesIcon />
-            <span className="hidden sm:inline">Processes</span>
-          </button>
-          <button aria-label={`Refresh ${machine.host.name}`} className={CONTROL_BUTTON_CLASS} disabled={state.requestKind !== null} onClick={() => void requestDashboard(rpc, "refresh-host", machine.host.id)} title="Refresh this host" type="button"><RefreshIcon active={refreshing} /></button>
-        </span>
+        <div className="host-monitor__machine-actions">
+          <span>{sampleStateLabel(machine)}{machine.receivedAtMs == null ? "" : ` · received ${relativeTime(machine.receivedAtMs)}`}{historyLoading ? " · loading history…" : ""}</span>
+          {!editing && <Button disabled={configLoading || config == null} onClick={onEdit} variant="outline">Customize</Button>}
+        </div>
       </header>
 
-      {machine.alert !== null ? (
-        <div
-          className="host-monitor-threshold-alert"
-          data-tone={
-            machine.sampleState !== "fresh"
-              ? "neutral"
-              : machine.health === "critical"
-                ? "critical"
-                : "attention"
-          }
-          role="alert"
-        >
-          <AlertIcon className="mt-0.5 size-3.5 shrink-0" />
-          <span className="min-w-0 flex-1">{machine.alert.message}</span>
-          {machine.alert.metric === "cpu" || machine.alert.metric === "memory" ? (
-            <button
-              className="host-monitor-threshold-alert__action"
-              onClick={() => openProcesses(machine.alert?.metric === "memory" ? "memory" : "cpu")}
-              type="button"
-            >
-              View {machine.alert.metric === "memory" ? "memory" : "CPU"} processes
-            </button>
-          ) : null}
-        </div>
-      ) : null}
-      {machine.error !== null ? <p className="text-xs text-destructive">{machine.error}</p> : null}
+      {machine.error != null && <p className="host-monitor__inline-status" role="status">{machine.error}</p>}
+      {snapshot?.issues.map((issue) => (
+        <p className="host-monitor__inline-status host-monitor__inline-status--quiet" role="status" key={`${issue.metric}:${issue.message}`}>
+          {issue.metric}: {issue.message}
+        </p>
+      ))}
+      {configError != null && <p className="host-monitor__inline-status" role="status">{configError}</p>}
 
-      {snapshot === null ? (
-        <InspectorEmpty message={machine.sampleState === "offline" ? `This host is offline. Last seen ${formatRelativeTime(machine.host.lastSeenAt)}.` : "Waiting for the first telemetry sample."} />
+      {editing && draft != null && (
+        <DashboardEditor
+          config={draft}
+          dirty={dirty}
+          onAnnouncement={onAnnouncement}
+          onCancel={onCancelEdit}
+          onChange={onChangeDraft}
+          onReset={onReset}
+          onSave={onSave}
+          saving={saving}
+        />
+      )}
+
+      {configLoading && config == null ? (
+        <DashboardSkeleton />
+      ) : renderedConfig == null ? (
+        <div className="host-monitor__empty"><strong>Dashboard unavailable</strong><span>Try refreshing this host.</span></div>
+      ) : panels.length === 0 ? (
+        <div className="host-monitor__empty"><strong>No widgets shown</strong><span>Customize the dashboard to choose visible metrics.</span></div>
       ) : (
-        <>
-          <div className="host-monitor-gauge-grid grid grid-cols-3 gap-2 rounded-lg border border-border bg-card p-3">
-            <TelemetryGauge isFresh={machine.sampleState === "fresh"} label="CPU" percent={snapshot.cpu.usagePercent} thresholds={state.dashboard.thresholds} />
-            <TelemetryGauge isFresh={machine.sampleState === "fresh"} label="Memory" percent={snapshot.memory.usagePercent} thresholds={state.dashboard.thresholds} />
-            <TelemetryGauge isFresh={machine.sampleState === "fresh"} label="Disk" percent={snapshot.disk?.usagePercent ?? null} thresholds={state.dashboard.thresholds} />
-          </div>
-
-          <dl className="rounded-lg border border-border bg-card px-3">
-            <DetailItem label="Memory" value={`${formatBytes(snapshot.memory.usedBytes)} used · ${formatBytes(snapshot.memory.availableBytes)} available`} />
-            <DetailItem label="System volume" value={snapshot.disk ? `${formatBytes(snapshot.disk.usedBytes)} used · ${formatBytes(snapshot.disk.availableBytes)} free` : "Unavailable"} />
-            <DetailItem label="Load · 1 / 5 / 15 min" value={snapshot.cpu.loadAverage ? snapshot.cpu.loadAverage.map((value) => value.toFixed(2)).join(" / ") : "Unavailable"} />
-            <DetailItem label="Swap" value={snapshot.swap ? `${formatPercent(snapshot.swap.usagePercent)} · ${formatBytes(snapshot.swap.usedBytes)} used` : "Not configured"} />
-            <DetailItem label="Uptime" value={`${formatDuration(snapshot.system.uptimeSeconds)} · rebooted ${formatRelativeTime(snapshot.system.bootedAtMs)}`} title={`Rebooted ${formatDate(snapshot.system.bootedAtMs)}`} />
-            <DetailItem label="Processor" value={`${snapshot.cpu.logicalCores} logical cores · ${snapshot.cpu.model || "Unknown model"}`} />
-            <DetailItem label="Kernel" value={snapshot.system.kernelRelease} />
-            <NetworkRateDetails machine={machine} />
-            <IpAddressDetail
-              hostName={machine.host.name}
-              onChange={(revealed) =>
-                setRevealedIpHostId(revealed ? machine.host.id : null)
-              }
-              primaryIpAddress={snapshot.network.primaryIpAddress}
-              revealed={showIpAddress}
-            />
-            {snapshot.system.hostname !== machine.host.name ? <DetailItem label="Hostname" value={snapshot.system.hostname} /> : null}
-          </dl>
-
-          {snapshot.issues.length > 0 ? (
-            <div className="rounded-md border border-dashed border-border px-3 py-2">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Partial readings</p>
-              <ul className="mt-1 space-y-1 text-xs text-muted-foreground">
-                {snapshot.issues.map((issue) => <li key={`${issue.metric}:${issue.message}`}>{issue.message}</li>)}
-              </ul>
-            </div>
-          ) : null}
-
-          <p className="text-right text-[10px] text-muted-foreground">{machine.sampleState === "stale" || machine.sampleState === "error" ? "Last known" : "Sampled"} {formatRelativeTime(snapshot.sampledAtMs)}</p>
-        </>
+        <div className="host-monitor__panel-grid" data-editing={editing}>
+          {panels.map((panel) => {
+            const key = dashboardPanelKey(panel);
+            return (
+              <div
+                className="host-monitor__grid-item"
+                data-accent={panel.metric}
+                data-dragging={draggedWidgetKey === key}
+                data-drop-position={dashboardDropTarget?.key === key ? dashboardDropTarget.position : undefined}
+                data-span={widgetSpan(panel)}
+                data-widget-key={key}
+                draggable={editing}
+                key={key}
+                onDragEnd={() => {
+                  setDraggedWidgetKey(null);
+                  setDashboardDropTarget(null);
+                }}
+                onDragLeave={(event) => {
+                  if (event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget)) return;
+                  setDashboardDropTarget((current) => current?.key === key ? null : current);
+                }}
+                onDragOver={(event) => {
+                  if (!editing || draggedWidgetKey == null) return;
+                  if (draggedWidgetKey === key) {
+                    setDashboardDropTarget(null);
+                    return;
+                  }
+                  event.preventDefault();
+                  const position = dashboardPointerDropPosition(event.currentTarget, event.clientY);
+                  setDashboardDropTarget((current) =>
+                    current?.key === key && current.position === position ? current : { key, position });
+                }}
+                onDragStart={(event) => {
+                  if (!editing) return;
+                  setDraggedWidgetKey(key);
+                  event.dataTransfer.effectAllowed = "move";
+                  event.dataTransfer.setData("text/plain", key);
+                  setDashboardDropTarget(null);
+                  setDashboardDragPreview(event.dataTransfer, DASHBOARD_CATALOG[panel.metric].label, presentationLabel(panel));
+                }}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  const source = draggedWidgetKey ?? event.dataTransfer.getData("text/plain");
+                  const position = dashboardPointerDropPosition(event.currentTarget, event.clientY);
+                  if (source !== "") moveDashboardWidget(source, key, position);
+                  setDraggedWidgetKey(null);
+                  setDashboardDropTarget(null);
+                }}
+              >
+                {editing && (
+                  <span aria-hidden="true" className="host-monitor__widget-drag-handle" title="Drag widget to reorder">⠿ Drag</span>
+                )}
+                <MetricPanel
+                  machine={machine}
+                  panel={panel}
+                  points={points}
+                  rangeHours={rangeHours}
+                  thresholds={thresholds}
+                />
+              </div>
+            );
+          })}
+        </div>
       )}
     </section>
   );
 }
 
+function widgetSpan(panel: DashboardPanel): "single" | "wide" | "full" {
+  if (panel.metric === "processes") return "full";
+  if (panel.metric === "system" || panel.visualization === "timeseries") return "wide";
+  return "single";
+}
+
+function dashboardPointerDropPosition(target: HTMLElement, clientY: number): DashboardDropPosition {
+  const bounds = target.getBoundingClientRect();
+  return clientY >= bounds.top + bounds.height / 2 ? "after" : "before";
+}
+
+function setDashboardDragPreview(
+  transfer: DataTransfer,
+  label: string,
+  presentation: string,
+): void {
+  const preview = document.createElement("div");
+  preview.className = "host-monitor__drag-preview";
+  preview.textContent = `${label} · ${presentation}`;
+  document.body.append(preview);
+  transfer.setDragImage(preview, 18, 16);
+  requestAnimationFrame(() => preview.remove());
+}
+
+function MetricPanel({
+  machine,
+  panel,
+  points,
+  rangeHours,
+  thresholds,
+}: {
+  machine: MachineRow;
+  panel: DashboardPanel;
+  points: HistoryPoint[];
+  rangeHours: RangeHours;
+  thresholds: Fleet["thresholds"];
+}) {
+  if (panel.metric === "processes") return <ProcessesWidget machine={machine} />;
+  if (panel.metric === "system") return <SystemWidget machine={machine} />;
+  const definition = DASHBOARD_CATALOG[panel.metric];
+  if (panel.visualization === "stat") {
+    const reading = metricStat(machine, panel.metric, thresholds);
+    return <StatPanel detail={reading.detail} label={definition.label} value={reading.value} warning={reading.warning} />;
+  }
+  if (panel.metric === "uptime") return null;
+  const interval = expectedSampleInterval(rangeHours);
+  const chart = metricChart(panel.metric, points, thresholds);
+  return (
+    <Chart
+      description={`${definition.description} history for ${machine.host.name}`}
+      dimensions={chart.dimensions}
+      percentChart={chart.percentChart}
+      rows={withChartGaps(chart.rows, interval)}
+      series={chart.series}
+      thresholds={chart.thresholds}
+      title={definition.label}
+      valueFormatter={chart.valueFormatter}
+    />
+  );
+}
+
+function metricStat(
+  machine: MachineRow,
+  metric: Exclude<DashboardPanel["metric"], "system" | "processes">,
+  thresholds: Fleet["thresholds"],
+) {
+  const snapshot = machine.snapshot;
+  if (metric === "cpu") return { value: percent(snapshot?.cpu.usagePercent), detail: snapshot == null ? "Unavailable" : `${snapshot.cpu.logicalCores} logical cores`, warning: isOver(snapshot?.cpu.usagePercent, thresholds.cpu) };
+  if (metric === "memory") return { value: percent(snapshot?.memory.usagePercent), detail: snapshot == null ? "Unavailable" : `${bytes(snapshot.memory.usedBytes)} / ${bytes(snapshot.memory.totalBytes)}`, warning: isOver(snapshot?.memory.usagePercent, thresholds.ram) };
+  if (metric === "disk") return { value: percent(snapshot?.disk?.usagePercent), detail: snapshot?.disk == null ? "Unavailable" : `${bytes(snapshot.disk.availableBytes)} free`, warning: isOver(snapshot?.disk?.usagePercent, thresholds.disk) };
+  if (metric === "load") return { value: number(snapshot?.cpu.loadAverage?.[1]), detail: snapshot?.cpu.loadAverage == null ? "Unavailable" : snapshot.cpu.loadAverage.map(number).join(" / "), warning: false };
+  if (metric === "network") return { value: `↓ ${rate(snapshot?.network.receiveBytesPerSecond)}`, detail: `↑ ${rate(snapshot?.network.sendBytesPerSecond)}`, warning: false };
+  return { value: snapshot == null ? "—" : uptime(snapshot.system.uptimeSeconds), detail: snapshot == null ? "Unavailable" : "Since last boot", warning: false };
+}
+
+function metricChart(
+  metric: Exclude<DashboardPanel["metric"], "system" | "processes" | "uptime">,
+  points: HistoryPoint[],
+  thresholds: Fleet["thresholds"],
+): MetricChart {
+  if (metric === "cpu") return { dimensions: ["time", "CPU"], rows: points.map((point) => [point.collectedAtMs, point.cpuPercent]), series: ["CPU"], thresholds: { CPU: thresholds.cpu }, percentChart: true };
+  if (metric === "memory") return { dimensions: ["time", "RAM"], rows: points.map((point) => [point.collectedAtMs, point.memoryPercent]), series: ["RAM"], thresholds: { RAM: thresholds.ram }, percentChart: true };
+  if (metric === "disk") return { dimensions: ["time", "Disk"], rows: points.map((point) => [point.collectedAtMs, point.diskPercent]), series: ["Disk"], thresholds: { Disk: thresholds.disk }, percentChart: true };
+  if (metric === "load") return { dimensions: ["time", "1m", "5m", "15m"], rows: points.map((point) => [point.collectedAtMs, point.load1, point.load5, point.load15]), series: ["1m", "5m", "15m"], thresholds: {}, percentChart: false };
+  return { dimensions: ["time", "Receive", "Send"], rows: points.map((point) => [point.collectedAtMs, point.receiveBytesPerSecond, point.sendBytesPerSecond]), series: ["Receive", "Send"], thresholds: {}, percentChart: false, valueFormatter: rate };
+}
+
+function DashboardEditor({
+  config,
+  dirty,
+  onAnnouncement,
+  onCancel,
+  onChange,
+  onReset,
+  onSave,
+  saving,
+}: {
+  config: DashboardConfig;
+  dirty: boolean;
+  onAnnouncement(message: string): void;
+  onCancel(): void;
+  onChange(config: DashboardConfig): void;
+  onReset(): void;
+  onSave(): void;
+  saving: boolean;
+}) {
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const rows = useRef(new Map<string, HTMLLIElement>());
+
+  const move = (from: number, to: number) => {
+    if (from === to || to < 0 || to >= config.panels.length) return;
+    const panel = config.panels[from];
+    if (panel == null) return;
+    const key = dashboardPanelKey(panel);
+    onChange(moveDashboardPanel(config, from, to));
+    onAnnouncement(`${DASHBOARD_CATALOG[panel.metric].label} ${presentationLabel(panel)} moved to position ${to + 1} of ${config.panels.length}.`);
+    requestAnimationFrame(() => rows.current.get(key)?.focus());
+  };
+
+  const drop = (event: ReactDragEvent<HTMLLIElement>, targetIndex: number) => {
+    event.preventDefault();
+    if (draggedIndex != null) move(draggedIndex, targetIndex);
+    setDraggedIndex(null);
+  };
+
+  return (
+    <section className="host-monitor__editor" aria-labelledby="dashboard-editor-heading">
+      <header>
+        <div>
+          <h3 id="dashboard-editor-heading">Customize dashboard</h3>
+          <p>Order and visibility save only for this machine.</p>
+        </div>
+        <Badge>{config.panels.filter((panel) => panel.visible).length} shown</Badge>
+      </header>
+      <ol className="host-monitor__editor-list">
+        {config.panels.map((panel, index) => {
+          const key = dashboardPanelKey(panel);
+          const definition = DASHBOARD_CATALOG[panel.metric];
+          return (
+            <li
+              data-dragging={draggedIndex === index}
+              data-widget-key={key}
+              draggable
+              key={key}
+              onDragEnd={() => setDraggedIndex(null)}
+              onDragOver={(event) => event.preventDefault()}
+              onDragStart={(event) => {
+                setDraggedIndex(index);
+                event.dataTransfer.effectAllowed = "move";
+                event.dataTransfer.setData("text/plain", key);
+              }}
+              onDrop={(event) => drop(event, index)}
+              ref={(node) => {
+                if (node == null) rows.current.delete(key);
+                else rows.current.set(key, node);
+              }}
+              tabIndex={-1}
+            >
+              <button
+                aria-label={`Drag ${definition.label} ${presentationLabel(panel)} widget`}
+                className="host-monitor__drag-handle"
+                tabIndex={-1}
+                title="Drag to reorder"
+                type="button"
+              >⠿</button>
+              <label className="host-monitor__visibility">
+                <input
+                  checked={panel.visible}
+                  onChange={(event) => {
+                    onChange(setDashboardPanelVisibility(config, index, event.target.checked));
+                    onAnnouncement(`${event.target.checked ? "Showing" : "Hiding"} ${definition.label} ${presentationLabel(panel)}.`);
+                  }}
+                  type="checkbox"
+                />
+                <span>Show</span>
+              </label>
+              <span className="host-monitor__editor-name">
+                <strong>{definition.label}</strong>
+                <small>{definition.description}</small>
+              </span>
+              <Badge>{presentationLabel(panel)}</Badge>
+              <div className="host-monitor__editor-order">
+                <Button aria-label={`Move ${definition.label} ${presentationLabel(panel)} earlier`} disabled={index === 0} onClick={() => move(index, index - 1)} size="icon" variant="ghost">↑</Button>
+                <Button aria-label={`Move ${definition.label} ${presentationLabel(panel)} later`} disabled={index === config.panels.length - 1} onClick={() => move(index, index + 1)} size="icon" variant="ghost">↓</Button>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+      <footer className="host-monitor__editor-actions">
+        <Button disabled={saving} onClick={onCancel} variant="ghost">Cancel</Button>
+        <Button disabled={saving} onClick={onReset} variant="outline">Reset draft</Button>
+        <Button disabled={saving || !dirty} onClick={onSave}>{saving ? "Saving…" : "Save layout"}</Button>
+      </footer>
+    </section>
+  );
+}
+
+function presentationLabel(panel: Pick<DashboardPanel, "visualization">): string {
+  if (panel.visualization === "timeseries") return "Time series";
+  if (panel.visualization === "details") return "Details";
+  if (panel.visualization === "table") return "Table";
+  return "Stat";
+}
+
+function StatPanel({ label, value, detail, warning }: { label: string; value: string; detail: string; warning: boolean }) {
+  return (
+    <article className="host-monitor__stat host-monitor__widget" data-warning={warning}>
+      <header><span>{label}</span>{warning && <Badge tone="warning">High</Badge>}</header>
+      <strong>{value}</strong>
+      <small>{detail}</small>
+    </article>
+  );
+}
+
+function SystemWidget({ machine }: { machine: MachineRow }) {
+  const snapshot = machine.snapshot;
+  return (
+    <article className="host-monitor__widget host-monitor__system-widget" data-span="wide">
+      <header><div><h3>System</h3><p>Host identity and runtime</p></div><Badge>{snapshot == null ? "Unavailable" : snapshot.system.platform}</Badge></header>
+      {snapshot == null ? (
+        <div className="host-monitor__widget-state"><strong>No system details</strong><span>Waiting for a host sample.</span></div>
+      ) : (
+        <dl>
+          <Fact label="Processor" value={snapshot.cpu.model || "Unavailable"} />
+          <Fact label="Platform" value={`${snapshot.system.platform} · ${snapshot.system.arch}`} />
+          <Fact label="Kernel" value={snapshot.system.kernelRelease} />
+          <Fact label="Uptime" value={uptime(snapshot.system.uptimeSeconds)} />
+        </dl>
+      )}
+    </article>
+  );
+}
+
+function Fact({ label, value }: { label: string; value: string }) {
+  return <div><dt>{label}</dt><dd>{value}</dd></div>;
+}
+
+function ProcessesWidget({ machine }: { machine: MachineRow }) {
+  const rpc = useRpc<typeof rpcContract>();
+  const [expanded, setExpanded] = useState(true);
+  const [sortBy, setSortBy] = useState<ProcessSortBy>("cpu");
+  const [query, setQuery] = useState("");
+  const [result, setResult] = useState<ProcessListResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [pendingIdentity, setPendingIdentity] = useState<string | null>(null);
+  const [challenge, setChallenge] = useState<PreparedTerminationReady | null>(null);
+  const [executing, setExecuting] = useState(false);
+  const [status, setStatus] = useState("");
+  const [refreshCount, setRefreshCount] = useState(0);
+  const hostGeneration = useRef(0);
+  const listRequest = useRef(0);
+  const cancelRef = useRef<HTMLButtonElement>(null);
+
+  const loadProcesses = useCallback(async () => {
+    if (machine.host.status !== "connected") return;
+    const generation = hostGeneration.current;
+    const request = ++listRequest.current;
+    setLoading(true);
+    setError(null);
+    try {
+      const next = await rpc.call("listProcesses", {
+        hostId: machine.host.id,
+        sortBy,
+        limit: PROCESS_PAGE_LIMIT,
+      });
+      if (hostGeneration.current !== generation || listRequest.current !== request) return;
+      setResult(next);
+      if (next.outcome !== "ok") setStatus(next.message);
+      else {
+        setRefreshCount((current) => current + 1);
+        setStatus(`${next.processes.length} processes refreshed.`);
+      }
+    } catch (cause) {
+      if (hostGeneration.current !== generation || listRequest.current !== request) return;
+      setError(cause instanceof Error ? cause.message : "Could not load processes.");
+    } finally {
+      if (hostGeneration.current === generation && listRequest.current === request) setLoading(false);
+    }
+  }, [machine.host.id, machine.host.status, rpc, sortBy]);
+
+  useEffect(() => {
+    hostGeneration.current += 1;
+    listRequest.current += 1;
+    setResult(null);
+    setError(null);
+    setChallenge(null);
+    setPendingIdentity(null);
+    setStatus("");
+    setRefreshCount(0);
+    setLoading(false);
+    return () => {
+      hostGeneration.current += 1;
+      listRequest.current += 1;
+    };
+  }, [machine.host.id, machine.host.status]);
+
+  useEffect(() => {
+    if (!expanded || machine.host.status !== "connected") return;
+    void loadProcesses();
+    const timer = window.setInterval(() => void loadProcesses(), PROCESS_REFRESH_MS);
+    return () => {
+      listRequest.current += 1;
+      window.clearInterval(timer);
+    };
+  }, [expanded, loadProcesses, machine.host.status]);
+
+  const prepareTermination = useCallback(async (
+    pid: number,
+    identity: string,
+    mode: ProcessTerminationMode,
+  ) => {
+    const generation = hostGeneration.current;
+    setPendingIdentity(identity);
+    setStatus("Rechecking process identity and permissions…");
+    try {
+      const prepared = await rpc.call("prepareProcessTermination", {
+        hostId: machine.host.id,
+        pid,
+        identity,
+        mode,
+      });
+      if (hostGeneration.current !== generation) return;
+      if (prepared.outcome === "ready") {
+        setChallenge(prepared);
+        setStatus(`${prepared.process.name} is ready for confirmation.`);
+      } else {
+        setStatus(prepared.message);
+        void loadProcesses();
+      }
+    } catch (cause) {
+      if (hostGeneration.current === generation) {
+        setStatus(cause instanceof Error ? cause.message : "Could not safely recheck this process.");
+      }
+    } finally {
+      if (hostGeneration.current === generation) setPendingIdentity(null);
+    }
+  }, [loadProcesses, machine.host.id, rpc]);
+
+  const executeTermination = useCallback(async () => {
+    if (challenge == null || executing) return;
+    const current = challenge;
+    const generation = hostGeneration.current;
+    setExecuting(true);
+    try {
+      const executed = await rpc.call("executeProcessTermination", {
+        confirmationToken: current.confirmationToken,
+      });
+      if (hostGeneration.current !== generation) return;
+      setChallenge(null);
+      setStatus(executed.message);
+      if (executed.outcome === "still-running" && current.process.mode === "graceful") {
+        await prepareTermination(current.process.pid, current.process.identity, "force");
+      } else {
+        void loadProcesses();
+      }
+    } catch (cause) {
+      if (hostGeneration.current === generation) {
+        setChallenge(null);
+        setStatus(cause instanceof Error ? cause.message : "The process action could not be completed.");
+      }
+    } finally {
+      if (hostGeneration.current === generation) setExecuting(false);
+    }
+  }, [challenge, executing, loadProcesses, prepareTermination, rpc]);
+
+  const ok = result?.outcome === "ok" ? result : null;
+  const sortedRows = useMemo(() => sortProcessRows(ok?.processes ?? [], sortBy), [ok?.processes, sortBy]);
+  const rows = useMemo(() => filterProcessRows(sortedRows, query), [query, sortedRows]);
+  const summary = useMemo(() => summarizeProcessRows(sortedRows), [sortedRows]);
+  const panelState = processPanelState(machine, result, error, expanded, loading);
+  const processFooterMessage = !expanded
+    ? null
+    : error != null
+      ? ok == null ? null : error
+      : status || null;
+
+  const toggleExpanded = () => {
+    if (expanded) {
+      listRequest.current += 1;
+      setLoading(false);
+    }
+    setExpanded((current) => !current);
+  };
+
+  return (
+    <article className="host-monitor__widget host-monitor__process-widget" data-expanded={expanded} data-refresh-count={refreshCount} data-refreshing={loading} data-span="full">
+      <output aria-live="polite" className="host-monitor__sr-only">{status}</output>
+      <header className="host-monitor__widget-header">
+        <div>
+          <div className="host-monitor__process-title">
+            <h3>Processes</h3>
+            <span className="host-monitor__process-state" data-state={panelState.tone}>
+              <span aria-hidden="true" />{panelState.label}
+            </span>
+          </div>
+          <p>{ok == null ? "Resource usage and protected actions" : `${ok.totalCount} reported · sampled ${relativeTime(ok.sampledAtMs)}`}</p>
+        </div>
+        <div className="host-monitor__widget-actions">
+          {expanded && loading && ok != null && <Badge>Updating</Badge>}
+          {expanded && <Button disabled={loading || executing || machine.host.status !== "connected"} onClick={() => void loadProcesses()} size="sm" variant="outline">Refresh</Button>}
+          <Button aria-controls="host-monitor-process-content" aria-expanded={expanded} disabled={executing || pendingIdentity != null} onClick={toggleExpanded} size="sm" variant="ghost">
+            {expanded ? "Collapse" : "Expand"}<span aria-hidden="true">{expanded ? "⌃" : "⌄"}</span>
+          </Button>
+        </div>
+      </header>
+
+      <div className="host-monitor__process-content" id="host-monitor-process-content">
+      {!expanded ? (
+        <>
+        <ProcessSummaryStrip
+          protectedCount={summary.protectedCount}
+          shownCount={ok?.processes.length ?? 0}
+          topCpu={summary.topCpu}
+          topMemory={summary.topMemory}
+          totalCount={ok?.totalCount ?? null}
+        />
+        {machine.host.status !== "connected" && <p className="host-monitor__widget-status">Reconnect this machine to inspect its processes.</p>}
+        {machine.host.status === "connected" && result != null && result.outcome !== "ok" && <p className="host-monitor__widget-status">{result.message}</p>}
+        {error != null && <p className="host-monitor__widget-status">{error}</p>}
+        {ok?.truncated && <p className="host-monitor__widget-status">Top usage and protected counts are based on the {ok.processes.length} shown processes.</p>}
+        </>
+      ) : machine.host.status !== "connected" ? (
+        <ProcessState title="Machine disconnected" message="Reconnect this machine to inspect or control its processes." />
+      ) : result == null && loading ? (
+        <ProcessSkeleton />
+      ) : result != null && result.outcome !== "ok" ? (
+        <ProcessState title={result.outcome === "unsupported" ? "Processes unsupported" : "Processes unavailable"} message={result.message} />
+      ) : error != null && ok == null ? (
+        <ProcessState action={<Button onClick={() => void loadProcesses()} variant="outline">Try again</Button>} title="Could not load processes" message={error} />
+      ) : ok != null && sortedRows.length === 0 ? (
+        <ProcessState title="No processes to show" message="This host reported no user-visible processes." />
+      ) : ok != null ? (
+        <>
+          <ProcessSummaryStrip
+            protectedCount={summary.protectedCount}
+            shownCount={ok.processes.length}
+            topCpu={summary.topCpu}
+            topMemory={summary.topMemory}
+            totalCount={ok.totalCount}
+          />
+          <div className="host-monitor__process-toolbar">
+            <label>
+              <span>Filter processes</span>
+              <Input aria-controls="host-monitor-process-list" onChange={(event) => setQuery(event.target.value)} placeholder="Name or PID" type="search" value={query} />
+            </label>
+            <fieldset aria-label="Sort processes">
+              {(["cpu", "memory", "name"] as const).map((sort) => (
+                <Button aria-pressed={sortBy === sort} key={sort} onClick={() => setSortBy(sort)} size="sm" variant={sortBy === sort ? "default" : "ghost"}>
+                  {sort === "memory" ? "RAM" : sort === "name" ? "Name" : "CPU"}
+                </Button>
+              ))}
+            </fieldset>
+            <span>{rows.length} visible</span>
+          </div>
+          {rows.length === 0 ? (
+            <ProcessState action={<Button onClick={() => setQuery("")} variant="outline">Clear filter</Button>} title="No matching processes" message={`Nothing matches “${query.trim()}”.`} />
+          ) : (
+            <ProcessRows
+              pendingIdentity={pendingIdentity}
+              rows={rows}
+              sortBy={sortBy}
+              onPrepare={(row, mode) => {
+                if (row.identity != null) void prepareTermination(row.pid, row.identity, mode);
+              }}
+            />
+          )}
+          {ok.truncated && <p className="host-monitor__widget-status">Summary and filter use these {ok.processes.length} shown processes; {ok.totalCount} exist on the host.</p>}
+          {ok.elevated && <p className="host-monitor__widget-status">Process actions are protected while Host Monitor runs with elevated privileges.</p>}
+        </>
+      ) : null}
+      {processFooterMessage != null && <p className="host-monitor__widget-status" role="status">{processFooterMessage}</p>}
+      </div>
+
+      <AlertDialog.Root open={challenge != null} onOpenChange={(open) => {
+        if (!open && !executing) setChallenge(null);
+      }}>
+        <AlertDialog.Portal>
+          <AlertDialog.Overlay className="host-monitor__dialog-overlay" />
+          <AlertDialog.Content
+            className="host-monitor__dialog"
+            onOpenAutoFocus={(event) => {
+              event.preventDefault();
+              requestAnimationFrame(() => cancelRef.current?.focus());
+            }}
+          >
+            {challenge != null && (
+              <>
+                <Badge tone="destructive">{challenge.process.mode === "force" ? "Force action" : "Process action"}</Badge>
+                <AlertDialog.Title>{challenge.process.mode === "force" ? "Force terminate process?" : "Terminate process?"}</AlertDialog.Title>
+                <AlertDialog.Description>
+                  {challenge.process.mode === "force"
+                    ? "Force termination can immediately discard unsaved work and leave dependent work incomplete."
+                    : "A graceful termination asks the process to exit. If it remains running, a separate force confirmation will be required."}
+                </AlertDialog.Description>
+                <dl className="host-monitor__dialog-facts">
+                  <Fact label="Host" value={challenge.host.name} />
+                  <Fact label="Process" value={challenge.process.name} />
+                  <Fact label="PID" value={String(challenge.process.pid)} />
+                  <Fact label="CPU" value={percent(challenge.process.cpuPercent)} />
+                  <Fact label="RAM" value={`${percent(challenge.process.memoryPercent)} · ${bytes(challenge.process.rssBytes)}`} />
+                </dl>
+                <p className="host-monitor__dialog-expiry">Freshly checked · expires {new Date(challenge.expiresAtMs).toLocaleTimeString()}</p>
+                <div className="host-monitor__dialog-actions">
+                  <AlertDialog.Cancel asChild>
+                    <Button disabled={executing} ref={cancelRef} variant="outline">Cancel</Button>
+                  </AlertDialog.Cancel>
+                  <AlertDialog.Action asChild>
+                    <Button
+                      disabled={executing}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        void executeTermination();
+                      }}
+                      variant="destructive"
+                    >
+                      {executing ? "Sending…" : challenge.process.mode === "force" ? "Force terminate" : "Terminate process"}
+                    </Button>
+                  </AlertDialog.Action>
+                </div>
+              </>
+            )}
+          </AlertDialog.Content>
+        </AlertDialog.Portal>
+      </AlertDialog.Root>
+    </article>
+  );
+}
+
+function processPanelState(
+  machine: MachineRow,
+  result: ProcessListResult | null,
+  error: string | null,
+  expanded: boolean,
+  loading: boolean,
+): { label: string; tone: "neutral" | "success" | "warning" } {
+  if (machine.host.status !== "connected") return { label: "Offline", tone: "neutral" };
+  if (error != null || (result != null && result.outcome !== "ok")) return { label: "Unavailable", tone: "warning" };
+  if (!expanded) return { label: "Paused", tone: "neutral" };
+  if (loading && result == null) return { label: "Loading", tone: "neutral" };
+  return { label: "Live", tone: "success" };
+}
+
+function ProcessRows({
+  onPrepare,
+  pendingIdentity,
+  rows,
+  sortBy,
+}: {
+  onPrepare(row: ProcessRow, mode: ProcessTerminationMode): void;
+  pendingIdentity: string | null;
+  rows: ProcessRow[];
+  sortBy: ProcessSortBy;
+}) {
+  return (
+    <div className="host-monitor__process-surfaces" id="host-monitor-process-list">
+      <div className="host-monitor__process-table-wrap">
+        <table className="host-monitor__process-table">
+          <thead><tr>
+            <th aria-sort={sortBy === "name" ? "ascending" : "none"}>Process</th>
+            <th aria-sort={sortBy === "cpu" ? "descending" : "none"}>CPU</th>
+            <th aria-sort={sortBy === "memory" ? "descending" : "none"}>RAM</th>
+            <th><span className="host-monitor__sr-only">Actions</span></th>
+          </tr></thead>
+          <tbody>
+            {rows.map((row) => <ProcessTableRow key={`${row.pid}:${row.identity ?? "protected"}`} onPrepare={onPrepare} pending={pendingIdentity === row.identity} row={row} />)}
+          </tbody>
+        </table>
+      </div>
+      <ol className="host-monitor__process-list">
+        {rows.map((row) => (
+          <li key={`${row.pid}:${row.identity ?? "protected"}`}>
+            <ProcessIdentity row={row} />
+            <dl><Fact label="CPU" value={percent(row.cpuPercent)} /><Fact label="RAM" value={`${percent(row.memoryPercent)} · ${bytes(row.rssBytes)}`} /></dl>
+            <ProcessAction onPrepare={onPrepare} pending={pendingIdentity === row.identity} row={row} />
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+function ProcessTableRow({ onPrepare, pending, row }: { onPrepare(row: ProcessRow, mode: ProcessTerminationMode): void; pending: boolean; row: ProcessRow }) {
+  return (
+    <tr>
+      <td><ProcessIdentity row={row} /></td>
+      <td>{percent(row.cpuPercent)}</td>
+      <td>{percent(row.memoryPercent)}<small>{bytes(row.rssBytes)}</small></td>
+      <td><ProcessAction onPrepare={onPrepare} pending={pending} row={row} /></td>
+    </tr>
+  );
+}
+
+function ProcessIdentity({ row }: { row: ProcessRow }) {
+  const reason = blockedProcessReason(row.blockedReason);
+  return (
+    <span className="host-monitor__process-identity">
+      <strong title={row.name}>{row.name}</strong>
+      <small>PID {row.pid} · {processOwnerLabel(row.ownerCategory)}</small>
+      {reason != null && (
+        <span className="host-monitor__process-protection">
+          <Badge>Protected</Badge><small title={reason}>{reason}</small>
+        </span>
+      )}
+    </span>
+  );
+}
+
+function ProcessSummaryStrip({
+  protectedCount,
+  shownCount,
+  topCpu,
+  topMemory,
+  totalCount,
+}: {
+  protectedCount: number;
+  shownCount: number;
+  topCpu: ProcessRow | null;
+  topMemory: ProcessRow | null;
+  totalCount: number | null;
+}) {
+  return (
+    <dl className="host-monitor__process-summary">
+      <Fact label="Processes" value={totalCount == null ? "—" : String(totalCount)} />
+      <Fact label="Shown" value={String(shownCount)} />
+      <Fact label="Top CPU" value={topCpu == null ? "—" : `${topCpu.name} · ${percent(topCpu.cpuPercent)}`} />
+      <Fact label="Top RAM" value={topMemory == null ? "—" : `${topMemory.name} · ${percent(topMemory.memoryPercent)}`} />
+      <Fact label="Protected" value={String(protectedCount)} />
+    </dl>
+  );
+}
+
+function ProcessAction({ onPrepare, pending, row }: { onPrepare(row: ProcessRow, mode: ProcessTerminationMode): void; pending: boolean; row: ProcessRow }) {
+  const mode = row.allowedTerminationModes.includes("graceful")
+    ? "graceful"
+    : row.allowedTerminationModes.includes("force")
+      ? "force"
+      : null;
+  if (row.identity == null || mode == null || row.blockedReason != null) return null;
+  return (
+    <Button
+      aria-label={`${mode === "force" ? "Force terminate" : "Terminate"} ${row.name}, PID ${row.pid}`}
+      disabled={pending}
+      onClick={() => onPrepare(row, mode)}
+      size="sm"
+      variant={mode === "force" ? "destructive" : "outline"}
+    >
+      {pending ? "Checking…" : mode === "force" ? "Force terminate" : "Terminate"}
+    </Button>
+  );
+}
+
+function ProcessState({ action, message, title }: { action?: React.ReactNode; message: string; title: string }) {
+  return <div className="host-monitor__widget-state"><strong>{title}</strong><span>{message}</span>{action}</div>;
+}
+
+function ProcessSkeleton() {
+  return <div className="host-monitor__process-skeleton" aria-label="Loading processes">{[0, 1, 2, 3].map((index) => <Skeleton key={index} />)}</div>;
+}
+
+function FleetSkeleton() {
+  return <div className="host-monitor__machine-grid" aria-label="Loading machines">{[0, 1, 2].map((index) => <Skeleton className="host-monitor__machine-skeleton" key={index} />)}</div>;
+}
+
+function DashboardSkeleton() {
+  return <div className="host-monitor__panel-grid" aria-label="Loading dashboard">{[0, 1, 2, 3].map((index) => <Skeleton className="host-monitor__dashboard-skeleton" key={index} />)}</div>;
+}
+
+const Chart = memo(function Chart({
+  description,
+  dimensions,
+  percentChart = false,
+  rows,
+  series,
+  thresholds,
+  title,
+  valueFormatter,
+}: {
+  description: string;
+  dimensions: string[];
+  percentChart?: boolean;
+  rows: Array<Array<number | null>>;
+  series: string[];
+  thresholds: Record<string, number>;
+  title: string;
+  valueFormatter?: (value: number | null | undefined) => string;
+}) {
+  const target = useRef<HTMLDivElement | null>(null);
+  const latest = useRef({ description, dimensions, percentChart, rows, series, thresholds, title, valueFormatter });
+  latest.current = { description, dimensions, percentChart, rows, series, thresholds, title, valueFormatter };
+  const applyRef = useRef<(() => void) | null>(null);
+  const summary = chartSummary(rows, valueFormatter ?? (percentChart ? percent : number));
+
+  useLayoutEffect(() => {
+    const element = target.current;
+    if (element == null) return;
+    let chart: ReturnType<typeof echarts.init> | null = null;
+    let frame = 0;
+    let width = 0;
+    let height = 0;
+    let themeKey = "";
+    const apply = (initial = false) => {
+      const bounds = element.getBoundingClientRect();
+      if (bounds.width <= 0 || bounds.height <= 0) return;
+      chart ??= echarts.init(element, undefined, { renderer: "svg", useDirtyRect: true });
+      const current = latest.current;
+      const theme = readTheme(element);
+      themeKey = JSON.stringify(theme);
+      chart.setOption(chartOption(current, theme), { notMerge: initial, lazyUpdate: !initial, silent: true });
+    };
+    const resize = new ResizeObserver(([entry]) => {
+      if (entry == null) return;
+      const nextWidth = Math.round(entry.contentRect.width);
+      const nextHeight = Math.round(entry.contentRect.height);
+      if (nextWidth <= 0 || nextHeight <= 0 || (nextWidth === width && nextHeight === height)) return;
+      width = nextWidth;
+      height = nextHeight;
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => chart == null ? apply(true) : chart.resize({ width, height, silent: true }));
+    });
+    const observer = new MutationObserver(() => {
+      if (JSON.stringify(readTheme(element)) !== themeKey) apply();
+    });
+    resize.observe(element);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "style", "data-theme"] });
+    applyRef.current = () => apply(false);
+    apply(true);
+    return () => {
+      applyRef.current = null;
+      cancelAnimationFrame(frame);
+      resize.disconnect();
+      observer.disconnect();
+      chart?.dispose();
+    };
+  }, []);
+
+  useEffect(() => { applyRef.current?.(); }, [description, dimensions, percentChart, rows, series, thresholds, title, valueFormatter]);
+
+  return <article className="host-monitor__chart"><header><div><h3>{title}</h3><p>{rows.length} points · stats: {series[0]}</p></div><dl><div><dt>Latest</dt><dd>{summary.latest}</dd></div><div><dt>Min</dt><dd>{summary.min}</dd></div><div><dt>Max</dt><dd>{summary.max}</dd></div></dl></header><div ref={target} role="img" aria-label={description} /></article>;
+});
+
+function chartOption(current: {
+  description: string;
+  dimensions: string[];
+  percentChart: boolean;
+  rows: Array<Array<number | null>>;
+  series: string[];
+  thresholds: Record<string, number>;
+  title: string;
+  valueFormatter?: (value: number | null | undefined) => string;
+}, theme: ChartTheme) {
+  const colors = [theme.primary, theme.secondary, theme.tertiary];
+  return {
+    aria: { enabled: true, description: current.description },
+    animation: false,
+    backgroundColor: "transparent",
+    dataset: { id: `${current.title}-data`, dimensions: current.dimensions, source: current.rows },
+    grid: { left: 8, right: 12, top: 14, bottom: 10, outerBoundsMode: "same", outerBoundsContain: "axisLabel" },
+    tooltip: { trigger: "axis", confine: true, renderMode: "richText", backgroundColor: theme.surface, borderColor: theme.border, textStyle: { color: theme.foreground, fontSize: 11 } },
+    xAxis: { type: "time", axisLabel: { color: theme.muted, fontSize: 10, hideOverlap: true }, axisLine: { lineStyle: { color: theme.border } } },
+    yAxis: { type: "value", min: 0, max: current.percentChart ? 100 : undefined, axisLabel: { color: theme.muted, fontSize: 10, formatter: (value: number) => current.valueFormatter?.(value) ?? `${value.toFixed(value >= 10 ? 0 : 1)}${current.percentChart ? "%" : ""}` }, splitLine: { lineStyle: { color: theme.border } } },
+    series: current.series.map((name, index) => ({
+      id: `${current.title}-${name}`,
+      type: "line",
+      name,
+      datasetId: `${current.title}-data`,
+      encode: { x: "time", y: name },
+      showSymbol: false,
+      connectNulls: false,
+      sampling: "lttb",
+      lineStyle: { width: 1.6, color: colors[index], opacity: 1 },
+      itemStyle: { color: colors[index], opacity: 1 },
+      emphasis: { focus: "none", lineStyle: { width: 1.8, color: colors[index] } },
+      markLine: current.thresholds[name] == null ? undefined : { silent: true, symbol: "none", label: { show: false }, lineStyle: { color: theme.warning, type: "dashed", opacity: 0.7 }, data: [{ yAxis: current.thresholds[name] }] },
+    })),
+  };
+}
+
+function readTheme(target: HTMLElement): ChartTheme {
+  const probe = document.createElement("i");
+  probe.className = "host-monitor__theme";
+  target.append(probe);
+  const style = getComputedStyle(probe);
+  const theme = {
+    foreground: style.color,
+    muted: style.borderTopColor,
+    border: style.borderRightColor,
+    surface: style.backgroundColor,
+    primary: style.borderBottomColor,
+    secondary: style.outlineColor,
+    tertiary: style.textDecorationColor,
+    warning: style.borderLeftColor,
+  };
+  probe.remove();
+  return theme;
+}
+
+function chartSummary(rows: Array<Array<number | null>>, formatter: (value: number | null | undefined) => string) {
+  const values = rows
+    .map((row) => row[1])
+    .filter((value): value is number => typeof value === "number" && Number.isFinite(value));
+  return {
+    latest: formatter(values.at(-1)),
+    min: formatter(values.length === 0 ? null : Math.min(...values)),
+    max: formatter(values.length === 0 ? null : Math.max(...values)),
+  };
+}
+
+function sampleStateLabel(machine: MachineRow): string {
+  if (machine.sampleState === "offline") return "Offline";
+  if (machine.sampleState === "sampling") return "Sampling";
+  if (machine.sampleState === "error") return "Error";
+  if (machine.sampleState === "stale") return "Stale";
+  return "Live";
+}
+
+function percent(value: number | null | undefined): string {
+  return value == null || !Number.isFinite(value) ? "—" : `${value.toFixed(1)}%`;
+}
+
+function number(value: number | null | undefined): string {
+  return value == null || !Number.isFinite(value) ? "—" : value.toFixed(value >= 10 ? 0 : 1);
+}
+
+function bytes(value: number | null | undefined): string {
+  if (value == null || !Number.isFinite(value)) return "—";
+  const units = ["B", "KiB", "MiB", "GiB", "TiB"];
+  let amount = value;
+  let index = 0;
+  while (amount >= 1024 && index < units.length - 1) {
+    amount /= 1024;
+    index += 1;
+  }
+  return `${amount.toFixed(amount >= 10 ? 0 : 1)} ${units[index]}`;
+}
+
+function rate(value: number | null | undefined): string {
+  return value == null || !Number.isFinite(value) ? "—" : `${bytes(value)}/s`;
+}
+
+function uptime(seconds: number): string {
+  const days = Math.floor(seconds / 86_400);
+  const hours = Math.floor((seconds % 86_400) / 3_600);
+  return days > 0 ? `${days}d ${hours}h` : `${hours}h`;
+}
+
+function relativeTime(timestamp: number): string {
+  const seconds = Math.max(0, Math.round((Date.now() - timestamp) / 1_000));
+  if (seconds < 5) return "now";
+  if (seconds < 60) return `${seconds}s ago`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  return `${Math.floor(minutes / 60)}h ago`;
+}
+
+function isOver(value: number | null | undefined, threshold: number): boolean {
+  return value != null && Number.isFinite(value) && value >= threshold;
+}
+
 export default definePluginApp((app) => {
   app.contentScripts.register({
     id: "host-monitor-sidebar",
-    mount: ({ pluginId, signal }) => mountHostMonitorSidebar(pluginId, signal),
+    mount: ({ pluginId, signal }) => mountHostMonitorMiniModal(pluginId, signal),
   });
   app.slots.sidebarFooterAction({
-    id: "machines",
+    id: "host-monitor",
     title: "Host Monitor",
     icon: "Terminal",
-    run: toggleHostMonitorPopover,
+    run: toggleHostMonitorMiniModal,
   });
   app.slots.navPanel({
-    id: "machines",
+    id: "host-monitor",
     title: "Host Monitor",
-    icon: "Terminal",
-    path: "machines",
-    component: FleetMatrix,
-    headerContent: FleetHeader,
-    experimental_sidebarAccessory: FleetSidebarAccessory,
-    fixedTabs: [
-      {
-        ...INSPECT_TAB,
-        title: "Host details",
-        icon: "Terminal",
-        component: MachineInspector,
-        layout: "padded",
-      },
-      {
-        ...PROCESSES_TAB,
-        title: "Processes",
-        icon: "Activity",
-        component: ProcessesPanel,
-        layout: "flush",
-      },
-    ],
+    icon: "Activity",
+    path: "host-monitor",
+    component: FleetDashboard,
   });
 });

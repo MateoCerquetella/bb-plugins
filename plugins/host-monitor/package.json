@@ -1,8 +1,8 @@
 {
   "name": "bb-plugin-host-monitor",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": true,
-  "description": "Live CPU, memory, disk, network throughput, load, and uptime across every host enrolled in bb.",
+  "description": "Grafana-inspired CPU, memory, disk, network, load, and history dashboards for every machine enrolled in BB.",
   "license": "MIT",
   "author": "Mateo Cerquetella",
   "homepage": "https://github.com/MateoCerquetella/bb-plugins/tree/main/plugins/host-monitor#readme",
@@ -31,7 +31,7 @@
   },
   "bb": {
     "name": "Host Monitor",
-    "description": "Live resource health across every host enrolled in bb.",
+    "description": "Monitor current and historical resource health across every machine enrolled in BB.",
     "branding": {
       "icon": "./assets/icon.svg",
       "logo": {
@@ -59,11 +59,18 @@
     "server.ts",
     "app.tsx",
     "app.css",
+    "chart-data.ts",
+    "dashboard-config.ts",
+    "sidebar-modal.ts",
     "host.ts",
     "contract.ts",
+    "store.ts",
+    "components/",
     "lib/"
   ],
   "dependencies": {
+    "better-sqlite3": "^12.0.0",
+    "echarts": "6.1.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
@@ -84,11 +91,8 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "bb-app": "^0.40.0",
-    "better-sqlite3": "^12.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "cron-parser": "^5.5.0",
-    "hono": "^4.11.9",
     "sonner": "^1.7.4",
     "tailwind-merge": "^3.4.0",
     "tsx": "^4.23.12",
@@ -101,7 +105,8 @@
     "typecheck": "tsc --noEmit",
     "types:check": "env -u BB_CLI bb plugin types --check .",
     "types:refresh": "env -u BB_CLI bb plugin types .",
-    "test": "node --import tsx --import ./test/register-css.mjs --test test/*.test.ts",
+    "test": "node --test --experimental-strip-types test/*.test.ts",
+    "verify": "npm run typecheck && npm test && npm run build",
     "check": "npm run types:check && npm run typecheck && npm test && npm run build"
   }
 }

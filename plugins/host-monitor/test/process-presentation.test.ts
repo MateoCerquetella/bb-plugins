@@ -8,7 +8,7 @@ import {
   sortProcessRows,
   summarizeProcessRows,
   type ProcessPresentationRow,
-} from "../lib/process-presentation";
+} from "../lib/process-presentation.ts";
 
 function processRow(
   overrides: Partial<ProcessPresentationRow> & Pick<ProcessPresentationRow, "pid" | "name">,

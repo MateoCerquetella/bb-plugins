@@ -1,20 +1,20 @@
 import { experimental_defineHostEntry } from "@get-bb/plugin-sdk/host";
-import { hostContract } from "./contract.js";
-import { collectMachineSnapshot } from "./lib/metrics.js";
+
+import { hostContract } from "./contract.ts";
+import { collectMachineSnapshot } from "./lib/metrics.ts";
 import {
   collectProcessList,
   inspectProcessTermination,
   terminateProcess,
-} from "./lib/processes.js";
+} from "./lib/processes.ts";
 
 export default experimental_defineHostEntry({
   contract: hostContract,
   handlers: {
-    snapshot: ({ cpuSampleMs }, context) =>
-      collectMachineSnapshot({
-        cpuSampleMs,
-        signal: context.signal,
-      }),
+    snapshot: ({ cpuSampleMs }, context) => collectMachineSnapshot({
+      cpuSampleMs,
+      signal: context.signal,
+    }),
     listProcesses: ({ sortBy, limit }, context) =>
       collectProcessList({ sortBy, limit, signal: context.signal }),
     inspectProcessTermination: (input, context) =>

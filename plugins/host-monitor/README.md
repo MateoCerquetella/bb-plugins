@@ -8,63 +8,109 @@
 <h1 align="center">Host Monitor</h1>
 
 <p align="center">
-  Live resource health and guarded process controls for every machine enrolled in bb.
+  Grafana-inspired current and historical health for every machine enrolled in BB.
 </p>
 
 <p align="center">
   <strong>bb 0.40+</strong> · <strong>macOS, Linux, and Windows</strong> · <strong>MIT</strong>
 </p>
 
-![Host Monitor dashboard with a four-machine fleet and selected host details](./assets/screenshots/dashboard.png)
+Host Monitor turns BB's enrolled machines into one dense observability page.
+The fleet overview keeps every connected, disconnected, stale, loading, and
+failed machine visible. Select a machine card to inspect its current telemetry
+and up to 30 days of utilization, load, and network history without leaving the
+page.
 
-Host Monitor turns bb's enrolled machines into one live fleet view. Track CPU,
-RAM, disk, network throughput, load, uptime, connection state, and sample
-freshness without leaving the app. Open a machine for deeper telemetry or
-inspect its current processes when resource pressure needs attention.
+The bottom-left Host Monitor icon opens a compact machine mini-modal with every
+enrolled host's current state, CPU, RAM, and disk. Choose **Open Host Monitor**
+there to enter the dedicated full dashboard page. The monitor never redirects
+you into plugin Settings and the transition does not reload BB. The dedicated
+route stays available without adding a second Host Monitor row to the main
+sidebar.
 
-## Highlights
+CPU and RAM values use the existing configured guides. A fresh reading at or
+above its guide receives passive visual treatment and explicit accessible
+wording inside the mini-modal; numeric guide chips are not shown and it does
+not create a badge or notification.
 
-- Responsive card and row views with independent loading, offline, stale, and
-  error states for every machine.
-- CPU, RAM used/total, disk, download, upload, load average, swap, uptime, OS,
-  kernel, and processor details.
-- A compact sidebar summary plus a movable floating monitor for keeping fleet
-  pressure visible anywhere in bb.
-- Adjustable green/yellow/red percentage thresholds, enabled by default and
-  shared across the page, sidebar, and floating window.
-- A searchable, sortable process ledger with protected-process explanations
-  and deliberately guarded stop actions.
-- A bounded read-only `bb host-monitor snapshot` command for native companion
-  surfaces such as the BB Touch Bar monitor.
+The mini-modal is quick telemetry and navigation—not a warning surface. It has
+no notification badge, toast, alert banner, IP controls, or draggable floating
+mode. Process controls live only in the selected host's full dashboard.
 
-## Processes when pressure matters
+## Dashboard
 
-![Host Monitor process ledger with sortable resource columns and guarded stop actions](./assets/screenshots/processes.png)
+Each machine reports:
 
-Open **Processes** from Host details or directly from a CPU or memory pressure
-alert. The ledger refreshes only while its explicitly targeted tab is open and
-supports safe name/PID search plus Process, CPU, and RAM sorting.
+- CPU utilization, model, logical cores, and 1/5/15-minute load.
+- RAM used, available, total, and utilization.
+- Root-disk used, available, total, and utilization.
+- Aggregate download and upload throughput.
+- Uptime, operating system, architecture, and kernel.
+- Independent connection, sampling, freshness, and inline error state.
 
-Host Monitor returns a bounded projection: process basename, PID, CPU,
-resident memory, percentage of host RAM, and a coarse ownership category. It
-does not return command lines, executable paths, working directories,
-environment variables, or usernames.
+The page offers 1 hour, 6 hours, 1 day, 7 days, and 30 days. Per-machine
+history is persisted in the plugin database, aggregated to at most 720 points,
+and displays collection gaps as breaks instead of zeroes.
 
-## Quick view anywhere
+## Per-machine dashboards
 
-![Movable Host Monitor window showing CPU, RAM, download, and upload across four machines](./assets/screenshots/floating-monitor.png)
+Select any machine—including a disconnected one—and choose **Customize**.
+Each machine keeps its own ordered dashboard. You can:
 
-Click the circular sidebar control for a compact summary. Drag it into the
-workspace—or choose **Float monitor** for the keyboard-accessible equivalent—to
-open one movable window with CPU, RAM, download, and upload readings.
+- Show or hide CPU, RAM, root disk, load, network, uptime, system, and process
+  widgets backed by the host's existing data sources.
+- Choose the supported stat, time-series, details, and table widgets.
+- Drag widgets or use the accessible move-earlier/move-later controls.
+- Reset a draft to defaults, cancel it, or save it explicitly.
+
+Saved layouts use BB's stable machine id and the plugin database, so they
+survive Host Monitor reloads and stay independent between machines. A missing
+or unreadable saved layout safely falls back to the default dashboard.
+
+## Grafana-inspired, BB-native
+
+The interface borrows the useful dashboard grammar—compact toolbars, fleet
+variables, dense stat tiles, bordered panels, tabular values, and time-series
+charts—without copying Grafana branding. Colors come from the active BB theme,
+and every state has text so color is never the only signal. The dashboard
+collapses into a single readable column on narrow/mobile views.
+
+## Threshold guides and notifications
+
+Configure CPU, RAM, and root-disk guides in **Extensions → Plugins → Host
+Monitor**. Each guide offers 70%, 80%, 90%, or 95%.
+
+Guides only tint in-page panels and chart lines. Host Monitor deliberately has:
+
+- No toast notifications.
+- No browser or desktop notifications.
+- No warning badge or resource alert banner.
+- No warning popup or draggable floating monitor; the footer icon opens only
+  the explicit telemetry mini-modal described above.
+- No automatic process actions; every available termination requires a fresh
+  safety preflight and an explicit confirmation.
+
+Sampling failures stay inline on the affected machine while other machines
+continue updating.
+
+## Privacy and safety
+
+Host Monitor uses BB's authenticated enrolled-host connection and its host
+worker. It does not manage SSH credentials or send telemetry to third parties.
+
+Snapshots exclude IP addresses, MAC addresses, interface names, netmasks,
+processes, command lines, environment variables, and credentials. The process
+widget separately collects a bounded list containing only sanitized names,
+PIDs, CPU, RAM, safe owner categories, and opaque lifetime identities while the
+widget is visible. It never captures command lines or environment variables.
+System, monitor, ancestor, differently owned, elevated, or unverifiable
+processes are protected. Available actions are serialized per host and use an
+expiring, single-use server confirmation before the worker rechecks identity
+and sends a fixed graceful or force termination operation.
 
 ## Install
 
 ### BB Community marketplace
-
-This shorthand becomes available after
-[marketplace PR #128](https://github.com/get-bb/marketplace/pull/128) is merged
-and live:
 
 ```sh
 bb plugin install host-monitor
@@ -78,103 +124,19 @@ bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.0 
   --tag-prefix host-monitor/
 ```
 
-The Git source tracks compatible `host-monitor/vX.Y.Z` releases. BB still
-stages, validates, and rolls back plugin updates through its normal install
-pipeline.
-
-An installation made under Host Monitor's retired plugin id cannot update
-across the rename. Remove that earlier Host Monitor entry, then install
-`host-monitor`; threshold settings are scoped to the plugin id and must be
-applied again.
-
-## Requirements and platform support
-
-- bb 0.40 or later.
-- At least one machine enrolled in bb.
-
-| Platform | Resource telemetry | Process inspection | Process stop behavior |
-| --- | --- | --- | --- |
-| Linux | CPU, RAM, swap, disk, network, load, uptime, OS/kernel | Yes | Graceful first; separately confirmed force stop if still running |
-| macOS | CPU, RAM, swap, disk, network, load, uptime, OS/kernel | Yes | Graceful first; separately confirmed force stop if still running |
-| Windows | CPU, RAM, disk, network, uptime, OS/kernel | Yes | Explicit force stop only |
-
-Swap appears only when the platform exposes a reliable system value. One
-machine failing or disconnecting never blocks the rest of the fleet; the last
-good sample stays visible and is marked stale or offline.
-
-## Thresholds and network colors
-
-Threshold colors apply only to percentage values. Defaults are:
-
-- Green below 85%.
-- Yellow from 85% to below 95%.
-- Red at 95% and above.
-
-Both cutoffs are adjustable in Host Monitor settings, and coloring can be
-disabled without hiding readings. Download is always red and upload is always
-blue; labels and arrows keep direction understandable without relying on color
-alone.
-
-## Privacy and safety
-
-Host Monitor reuses bb's existing enrolled-host connection. It does not manage
-SSH connections or credentials, persist readings in a plugin database, or
-send telemetry to third-party services. Its sampler runs as a bb host worker
-on each targeted enrolled machine.
-
-One validated primary IP address may be sampled through bb's authenticated
-host RPC. It is masked by default in the UI and revealed only after an explicit
-action. Masking is a presentation safeguard, not encryption. Host Monitor does
-not collect MAC addresses, interface lists, netmasks, or connection
-credentials.
-
-Process actions are one-at-a-time and require a fresh process identity,
-ownership, ancestry, lifetime, and elevation check before a confirmation can
-open. Each confirmation uses a 60-second, one-use token that is consumed before
-remote work begins. System processes, other/unknown owners, Host Monitor and
-its ancestors, unverifiable identities, and all processes while Host Monitor
-is elevated remain protected.
-
-Linux and macOS request a graceful exit first. A separate, freshly checked
-**Force stop** confirmation appears only if the process remains alive. Windows
-uses an explicit force-stop label because it has no equivalent graceful
-signal. There are no bulk, process-tree, or automatic stop actions.
-
 ## Development
 
 From the repository root:
 
 ```sh
 npm install
-bb plugin install ./plugins/host-monitor
-npm run dev --workspace bb-plugin-host-monitor
-```
-
-The workspace dev loop rebuilds and reloads Host Monitor after source changes.
-Run its complete focused check with:
-
-```sh
 npm run check --workspace bb-plugin-host-monitor
+bb plugin install ./plugins/host-monitor
+bb plugin reload host-monitor
 ```
-
-The compact machine snapshot is available as JSON:
-
-```sh
-bb host-monitor open
-bb host-monitor open <host-id>
-bb host-monitor snapshot [--pretty]
-```
-
-`bb host-monitor open` sends one short-lived request to the installed BB
-desktop app and opens `/plugins/host-monitor/machines`. Native companions use
-this command so Host Monitor opens inside BB instead of in a browser. Passing
-an enrolled host id opens that host's detail tab directly.
-
-It exposes only the effective attention/critical thresholds plus host
-id/name/status, freshness, CPU/RAM/disk percentages, and aggregate
-download/upload rates. It excludes IPs, interfaces, processes, and other
-detailed system fields.
 
 ## License
 
-[MIT](./LICENSE) © Mateo Cerquetella
+[MIT](./LICENSE) © Mateo Cerquetella. The chart presentation adapts ideas and
+code from the MIT-licensed Phosphor Machine Monitor; see
+[THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).
