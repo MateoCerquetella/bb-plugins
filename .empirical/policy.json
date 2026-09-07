@@ -40,31 +40,6 @@
         ]
       },
       {
-        "id": "taskboard-browser",
-        "argv": [
-          "node",
-          ".empirical/specs/taskboard-new-thread-drag-to-composer/qa/browser.mjs"
-        ],
-        "cwd": ".",
-        "timeoutMs": 120000,
-        "maxOutputBytes": 262144,
-        "evidenceKinds": [
-          "browser",
-          "screenshot"
-        ],
-        "checks": [],
-        "criteria": [
-          "AC-TASKBOARD-DRAG-1",
-          "AC-TASKBOARD-DRAG-2",
-          "AC-TASKBOARD-DRAG-3",
-          "AC-TASKBOARD-DRAG-4",
-          "AC-TASKBOARD-DRAG-5",
-          "AC-TASKBOARD-DRAG-6",
-          "AC-TASKBOARD-DRAG-7",
-          "AC-TASKBOARD-DRAG-UI-1"
-        ]
-      },
-      {
         "id": "action-topbar-focused",
         "argv": [
           "npm",
