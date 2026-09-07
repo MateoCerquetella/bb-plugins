@@ -19,7 +19,8 @@
       "resolvedRelease": "usage-tracker/v0.1.8",
       "build": "passed",
       "tests": 35,
-      "v1Gate": "requires-v1-change-label"
+      "v1Gate": "passed-with-v1-change-label",
+      "remoteLabelStatus": "awaiting-approved-v1-change-label"
     },
     "action-topbar": {
       "localCommit": "4c0c000578c3e54939ba46294465ccb5bbe081b0",

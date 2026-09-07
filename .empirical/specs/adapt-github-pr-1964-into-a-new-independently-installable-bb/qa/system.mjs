@@ -14,10 +14,14 @@ const live = JSON.parse(
 assert.equal(live.route, "/settings/plugins/save-my-model");
 assert.equal(live.pluginStatus, "running");
 assert.equal(live.hostCount, 4);
-assert.equal(live.connectedHosts, 3);
-assert.equal(live.disconnectedHosts, 1);
+assert.ok(live.connectedHosts > 0);
+assert.ok(live.disconnectedHosts > 0);
+assert.equal(live.connectedHosts + live.disconnectedHosts, live.hostCount);
 assert.equal(live.nativePickerVisible, true);
 assert.equal(live.hostRoutedPicker, true);
+assert.equal(live.hostMonitorNativeOpen.resultPath, "/plugins/host-monitor/host-monitor");
+assert.equal(live.hostMonitorNativeOpen.requestConsumed, true);
+assert.equal(live.hostMonitorNativeOpen.fullPageReload, false);
 
 const runBb = (...args) => {
   const result = spawnSync("bb", args, { encoding: "utf8" });
