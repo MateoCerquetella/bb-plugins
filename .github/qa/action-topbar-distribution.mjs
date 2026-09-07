@@ -7,6 +7,7 @@ const manifest = JSON.parse(read("plugins/action-topbar/package.json"));
 const collection = JSON.parse(read(".bb/plugins.json"));
 const rootReadme = read("README.md");
 const pluginReadme = read("plugins/action-topbar/README.md");
+const forbiddenProductName = new RegExp(["or", "ca"].join(""), "iu");
 
 assert.equal(manifest.name, "bb-plugin-action-topbar");
 assert.equal(manifest.engines.bbPluginSdk, ">=0.4.33");
@@ -20,8 +21,8 @@ assert.match(pluginReadme, /Action split-drag API introduced in Plugin SDK 0\.4\
 assert.match(pluginReadme, /git:https:\/\/github\.com\/MateoCerquetella\/bb-plugins\.git@\^0\.1\.0/);
 assert.match(pluginReadme, /--tag-prefix action-topbar\//);
 assert.match(pluginReadme, /path:\/absolute\/path\/to\/bb-plugins\/plugins\/action-topbar/);
-assert.doesNotMatch(manifest.description, /orca/iu);
-assert.doesNotMatch(manifest.bb.description, /orca/iu);
+assert.doesNotMatch(manifest.description, forbiddenProductName);
+assert.doesNotMatch(manifest.bb.description, forbiddenProductName);
 
 for (const path of ["docs/media/action-topbar-light.png", "docs/media/action-topbar-dark.png"]) {
   const png = readFileSync(path);
@@ -41,7 +42,7 @@ const visit = (path) => {
   }
 };
 visit(".");
-for (const path of authoredFiles) assert.doesNotMatch(read(path), /orca/iu, path);
+for (const path of authoredFiles) assert.doesNotMatch(read(path), forbiddenProductName, path);
 
 const built = spawnSync("npm", ["run", "build", "--workspace=bb-plugin-action-topbar"], {
   cwd: process.cwd(),
