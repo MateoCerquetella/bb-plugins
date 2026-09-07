@@ -29,19 +29,19 @@
 | <img src="./plugins/touchbar/assets/icon.svg" width="128" height="128" alt="" /> | [Touch Bar Agent Monitor](./plugins/touchbar) | [Git release](#touch-bar-agent-monitor-quick-start) | Adds a native persistent Control Strip badge and fullscreen BB agent panel to Touch Bar Macs. Requires BB 0.40+. |
 | <img src="./plugins/usage-tracker/assets/icon.svg" width="128" height="128" alt="" /> | [Usage Tracker](./plugins/usage-tracker) | [Git release](#usage-tracker-quick-start) | Keeps Codex and Claude Code 5-hour and weekly limits beside BB's sidebar utility icons. |
 
-## Action Topbar experimental install
+## Action Topbar quick start
 
 > [!WARNING]
-> Action Topbar is not being submitted to the BB Marketplace yet. It requires
-> the matching BB core changes and experimental Plugin SDK 0.4.33 Action
+> Action Topbar requires the matching BB core changes and experimental Plugin SDK 0.4.33 Action
 > split-drag API. Stock BB releases without that API cannot provide its native
 > main-workspace panes.
 
 Install it from this repository on a compatible BB build:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@main \
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.0 \
   --subdirectory plugins/action-topbar \
+  --tag-prefix action-topbar/ \
   --yes
 ```
 

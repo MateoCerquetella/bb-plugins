@@ -1,9 +1,8 @@
 # Action Topbar
 
 > [!WARNING]
-> This plugin is experimental and is not being submitted to the BB
-> Marketplace yet. It requires the matching BB core changes and the
-> experimental Action split-drag API introduced in Plugin SDK 0.4.33. Install
+> This plugin is experimental. It requires the matching BB core changes and
+> the Action split-drag API introduced in Plugin SDK 0.4.33. Install
 > it only on a compatible BB build; older BB releases cannot provide its native
 > main-workspace panes.
 
@@ -55,8 +54,9 @@ plugin.
 Install from Git on a compatible BB build:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@main \
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.0 \
   --subdirectory plugins/action-topbar \
+  --tag-prefix action-topbar/ \
   --yes
 ```
 

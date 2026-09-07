@@ -1,0 +1,9 @@
+{
+  "route": "/settings/plugins/save-my-model",
+  "pluginStatus": "running",
+  "hostCount": 4,
+  "connectedHosts": 3,
+  "disconnectedHosts": 1,
+  "nativePickerVisible": true,
+  "hostRoutedPicker": true
+}
