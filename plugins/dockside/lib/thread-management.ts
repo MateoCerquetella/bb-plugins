@@ -15,6 +15,25 @@ export const THREAD_FILTER_PRESETS = [
 
 export type ThreadFilterPreset = (typeof THREAD_FILTER_PRESETS)[number];
 
+export type ThreadFilterGroup = "status" | "inactivity";
+
+export interface ThreadFilterOption {
+  preset: ThreadFilterPreset;
+  label: string;
+  description: string;
+  group: ThreadFilterGroup | null;
+}
+
+export const THREAD_FILTER_OPTIONS = [
+  { preset: "all", label: "All", description: "Every active workspace", group: null },
+  { preset: "working", label: "Working", description: "Workspaces with active runs", group: "status" },
+  { preset: "needs-you", label: "Needs you", description: "Waiting for your response", group: "status" },
+  { preset: "unread", label: "Unread", description: "Workspaces with new activity", group: "status" },
+  { preset: "quiet", label: "Quiet", description: "No active or unread work", group: "inactivity" },
+  { preset: "quiet-1d", label: "Quiet 1d+", description: "Inactive for at least one day", group: "inactivity" },
+  { preset: "quiet-7d", label: "Quiet 7d+", description: "Inactive for at least one week", group: "inactivity" },
+] as const satisfies readonly ThreadFilterOption[];
+
 export const THREAD_FILTER_LABELS: Readonly<
   Record<ThreadFilterPreset, string>
 > = {

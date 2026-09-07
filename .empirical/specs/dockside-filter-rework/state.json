@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 5,
+  "revision": 7,
+  "activeFeature": "dockside-filter-rework",
+  "request": "Update the Dockside plugin by reworking its thread filter system into a compact, reference-inspired workspace filter control: replace the current preset-only select with a clearer filter experience accessible from the filter icon beside Workspaces, preserving existing filtering behavior and matching Dockside/BB visual conventions. Add focused tests and verify the plugin UI.",
+  "profile": "complex",
+  "workflow": "complex",
+  "mode": "normal",
+  "phase": "review",
+  "status": "waiting",
+  "repairAttempts": 0,
+  "message": "Verified all criteria with 204 passing Dockside tests, the repository system contract, a fresh-context browser exercise of keyboard selection/dismissal and active state, and two immutable live Chromium screenshots.",
+  "implementationActor": "agent",
+  "workStartedAt": null,
+  "specDigest": "sha256:771c67af2e916ffb9a824e56b5d75a13c587ef3d88466fae90427c589e446570",
+  "approvedSpecRevision": 2,
+  "capabilityArchiveRequired": true,
+  "capabilityDeltaDigest": "sha256:4f2ad938f492004c2d85d8c3137a6d09341f184c224648319f9d885c003db8bb",
+  "impactDigest": "sha256:098d8f4282d3aa8aa1199db02f8764b35ce7c00b3b450ece444b4a46892aec3f",
+  "capabilityClaimId": "dockside-filter-rework-05e687f8a283",
+  "authorizationDigest": null,
+  "evidence": [],
+  "evidenceReceiptIds": [
+    "qa-4402eebbb67e476125fd1a12",
+    "qa-9cf697bbc0d24a7b02489a9c",
+    "qa-fe69c95c0ae64e8262638d32",
+    "collected-590a00773c07c7af7278f2ec"
+  ],
+  "legacyEvidenceCount": 0,
+  "completion": {
+    "implemented": true,
+    "verified": true,
+    "integrated": false,
+    "delivered": false,
+    "published": false,
+    "highest": "verified",
+    "reasons": {
+      "integrated": "integrated has not been proven by a durable receipt.",
+      "delivered": "delivered has not been proven by a durable receipt.",
+      "published": "published has not been proven by a durable receipt."
+    }
+  },
+  "updatedAt": "2026-09-07T17:39:37.399Z"
+}

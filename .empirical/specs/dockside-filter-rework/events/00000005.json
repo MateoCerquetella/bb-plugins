@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sequence": 5,
+  "previousDigest": "sha256:cb70599e09705c5597c92a86f3dbe5c3eaf8cc21eb8d9592a27287bba04668c0",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Implemented typed filter presentation metadata, a grouped descriptive Workspaces filter menu with an explicit bounded active label, supporting Select primitives, and focused behavior/UI contract tests; focused tests, typecheck, and plugin build pass.",
+  "createdAt": "2026-09-07T17:23:20.757Z",
+  "stateBeforeDigest": "sha256:e7ea7a0d51ab94d63681f9f82b27de8441611275644e27f39ceb8ac58b7cb1c8",
+  "stateAfterDigest": "sha256:c28b9a033d78ec4e7f7a06ddd856c1cafc6cde9a8a8ecca9b3f0651381ffa2a8",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 5,
+    "activeFeature": "dockside-filter-rework",
+    "request": "Update the Dockside plugin by reworking its thread filter system into a compact, reference-inspired workspace filter control: replace the current preset-only select with a clearer filter experience accessible from the filter icon beside Workspaces, preserving existing filtering behavior and matching Dockside/BB visual conventions. Add focused tests and verify the plugin UI.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "context",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Implemented typed filter presentation metadata, a grouped descriptive Workspaces filter menu with an explicit bounded active label, supporting Select primitives, and focused behavior/UI contract tests; focused tests, typecheck, and plugin build pass.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:771c67af2e916ffb9a824e56b5d75a13c587ef3d88466fae90427c589e446570",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:4f2ad938f492004c2d85d8c3137a6d09341f184c224648319f9d885c003db8bb",
+    "impactDigest": "sha256:098d8f4282d3aa8aa1199db02f8764b35ce7c00b3b450ece444b4a46892aec3f",
+    "capabilityClaimId": "dockside-filter-rework-05e687f8a283",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-07T17:23:20.757Z"
+  },
+  "digest": "sha256:26acbe0ccf08f71a081518b0e2b74c9419510d590778c20e3cb6f89e6ba24f1f"
+}

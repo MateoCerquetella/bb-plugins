@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-edba65c64c7d5a815d8438e2",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Dockside system verification confirms the installed plugin contract remains independently runnable after the workspace-filter presentation change.",
+  "passed": false,
+  "startedAt": "2026-09-07T17:37:43.642Z",
+  "completedAt": "2026-09-07T17:38:49.056Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "dockside-filter-rework",
+    "specRevision": 2,
+    "specDigest": "sha256:771c67af2e916ffb9a824e56b5d75a13c587ef3d88466fae90427c589e446570",
+    "treeDigest": "sha256:a4f686354285893d19a5b7c68d5a1d3f74b1fb00253d6f7c1cea2de550df9a44",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf",
+    "workflowRevision": 6,
+    "gitCommit": "29861c4d1990ad0df51e20b8b0f0df718191a00b"
+  },
+  "digest": "sha256:8a5feb98d3b8d7e6805cfd6265656ec47759b9a2e90fe6b0e12b9e0d3ff0afad",
+  "kind": "qa",
+  "matrixDigest": "sha256:b383cddb578c9305c7d5e754bbbb56329097af98d6c8b72a17f3cab076546f54",
+  "check": {
+    "id": "qa-end-to-end",
+    "kind": "end-to-end"
+  },
+  "coveredChecks": [
+    "end-to-end"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "failed",
+      "summary": "Dockside system verification confirms the installed plugin contract remains independently runnable after the workspace-filter presentation change.",
+      "startedAt": "2026-09-07T17:37:43.642Z",
+      "completedAt": "2026-09-07T17:37:43.780Z",
+      "durationMs": 138,
+      "collector": null,
+      "command": {
+        "argv": [
+          "node",
+          ".empirical/specs/dockside-main-reconciliation/qa/system.mjs"
+        ],
+        "cwd": ".",
+        "timeoutMs": 60000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "NO_COLOR",
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 1,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrDigest": "sha256:8ed560be4e77e7f3734f30eafd693b56f67534bd620fb0f6a946914b4959b5ca",
+        "stdoutTail": "",
+        "stderrTail": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'action-topbar',\n+   'clean-my-context',\n    'dockside',\n    'host-monitor',\n    'save-my-model',\n    'taskboard',\n    'touchbar',\n\n    at file:///home/dyaus/.bb/worktrees/env_n53qyg7uih/bb-plugins/.empirical/specs/dockside-main-reconciliation/qa/system.mjs:54:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: [\n    'action-topbar',\n    'clean-my-context',\n    'dockside',\n    'host-monitor',\n    'save-my-model',\n    'taskboard',\n    'touchbar',\n    'usage-tracker'\n  ],\n  expected: [\n    'action-topbar',\n    'dockside',\n    'host-monitor',\n    'save-my-model',\n    'taskboard',\n    'touchbar',\n    'usage-tracker'\n  ],\n  operator: 'deepStrictEqual',\n  diff: 'simple'\n}\n\nNode.js v22.23.1\n",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:a4f686354285893d19a5b7c68d5a1d3f74b1fb00253d6f7c1cea2de550df9a44",
+      "sourceTreeAfter": "sha256:a4f686354285893d19a5b7c68d5a1d3f74b1fb00253d6f7c1cea2de550df9a44",
+      "artifacts": []
+    },
+    {
+      "number": 2,
+      "outcome": "passed",
+      "summary": "Dockside system verification confirms the installed plugin contract remains independently runnable after the workspace-filter presentation change.",
+      "startedAt": "2026-09-07T17:38:48.821Z",
+      "completedAt": "2026-09-07T17:38:49.056Z",
+      "durationMs": 235,
+      "collector": null,
+      "command": {
+        "argv": [
+          "node",
+          ".empirical/specs/dockside-main-reconciliation/qa/system.mjs"
+        ],
+        "cwd": ".",
+        "timeoutMs": 60000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "NO_COLOR",
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:356f03768a1d33ba0d0ddbc765cb4beac0132fff6dbf784cb2def8e96e84f580",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "Dockside system check passed: normal main merge, six-plugin npm inventory, six semantic states, live activity colors, two-row cards, persistent guarded family order, semantic PR backgrounds, and no stale t3sidebar or conflict markers.\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:a4f686354285893d19a5b7c68d5a1d3f74b1fb00253d6f7c1cea2de550df9a44",
+      "sourceTreeAfter": "sha256:a4f686354285893d19a5b7c68d5a1d3f74b1fb00253d6f7c1cea2de550df9a44",
+      "artifacts": []
+    }
+  ],
+  "anomalies": [
+    "prior-nonpassing-attempt",
+    "retry-history-present"
+  ]
+}

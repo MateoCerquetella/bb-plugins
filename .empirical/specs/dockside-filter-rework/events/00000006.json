@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sequence": 6,
+  "previousDigest": "sha256:26acbe0ccf08f71a081518b0e2b74c9419510d590778c20e3cb6f89e6ba24f1f",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Refreshed repository knowledge and derived the missing design-language context from Dockside's host-token UI, typography, spacing, responsive, component, and accessibility conventions; no stale or refinement-required pages remain.",
+  "createdAt": "2026-09-07T17:24:29.343Z",
+  "stateBeforeDigest": "sha256:c28b9a033d78ec4e7f7a06ddd856c1cafc6cde9a8a8ecca9b3f0651381ffa2a8",
+  "stateAfterDigest": "sha256:0c88dff850367fc46791201103d6d843d7e5ed512db2ffebf63190f82cc63f43",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 6,
+    "activeFeature": "dockside-filter-rework",
+    "request": "Update the Dockside plugin by reworking its thread filter system into a compact, reference-inspired workspace filter control: replace the current preset-only select with a clearer filter experience accessible from the filter icon beside Workspaces, preserving existing filtering behavior and matching Dockside/BB visual conventions. Add focused tests and verify the plugin UI.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "verify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Refreshed repository knowledge and derived the missing design-language context from Dockside's host-token UI, typography, spacing, responsive, component, and accessibility conventions; no stale or refinement-required pages remain.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:771c67af2e916ffb9a824e56b5d75a13c587ef3d88466fae90427c589e446570",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:4f2ad938f492004c2d85d8c3137a6d09341f184c224648319f9d885c003db8bb",
+    "impactDigest": "sha256:098d8f4282d3aa8aa1199db02f8764b35ce7c00b3b450ece444b4a46892aec3f",
+    "capabilityClaimId": "dockside-filter-rework-05e687f8a283",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-07T17:24:29.343Z"
+  },
+  "digest": "sha256:96e3c0b068a67cdf30886a0351bcacf0df6a732336d30aa6861e523081e43a5e"
+}

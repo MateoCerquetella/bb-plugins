@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "sequence": 4,
+  "previousDigest": "sha256:710445b4ecdaae17fd8afcef55971695082aa8134c98f556ac0f8165c8a780f0",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Planned the metadata, grouped Select UI, Workspaces header, focused tests, repository verification, and live screenshot evidence in executable order.",
+  "createdAt": "2026-09-07T17:18:39.061Z",
+  "stateBeforeDigest": "sha256:ec891aebd17f9f833d1320711312b6b847f6c3d21fa48ca6fc9e27ce40dd966c",
+  "stateAfterDigest": "sha256:e7ea7a0d51ab94d63681f9f82b27de8441611275644e27f39ceb8ac58b7cb1c8",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 4,
+    "activeFeature": "dockside-filter-rework",
+    "request": "Update the Dockside plugin by reworking its thread filter system into a compact, reference-inspired workspace filter control: replace the current preset-only select with a clearer filter experience accessible from the filter icon beside Workspaces, preserving existing filtering behavior and matching Dockside/BB visual conventions. Add focused tests and verify the plugin UI.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Planned the metadata, grouped Select UI, Workspaces header, focused tests, repository verification, and live screenshot evidence in executable order.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:771c67af2e916ffb9a824e56b5d75a13c587ef3d88466fae90427c589e446570",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:4f2ad938f492004c2d85d8c3137a6d09341f184c224648319f9d885c003db8bb",
+    "impactDigest": "sha256:098d8f4282d3aa8aa1199db02f8764b35ce7c00b3b450ece444b4a46892aec3f",
+    "capabilityClaimId": "dockside-filter-rework-05e687f8a283",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-07T17:18:39.061Z"
+  },
+  "digest": "sha256:cb70599e09705c5597c92a86f3dbe5c3eaf8cc21eb8d9592a27287bba04668c0"
+}

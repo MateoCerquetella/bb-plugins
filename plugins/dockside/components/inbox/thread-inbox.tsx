@@ -605,7 +605,7 @@ export function ThreadInbox({
         <div className="flex h-8 items-center gap-2 px-2.5 pb-1 text-muted-foreground">
           <Icon name="Folder" className="size-3.5" aria-hidden />
           <span className="text-2xs font-semibold uppercase tracking-wider">
-            Projects
+            Workspaces
           </span>
           <span className="tabular-nums text-2xs text-muted-foreground/70">
             {projectGroups.length}

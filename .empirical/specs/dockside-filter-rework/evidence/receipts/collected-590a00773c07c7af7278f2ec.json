@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-590a00773c07c7af7278f2ec",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Real Chromium inspection of the locally installed Dockside bundle verified the closed active-filter control and the fully opened grouped filter menu; screenshots capture both states.",
+  "passed": true,
+  "startedAt": "2026-09-07T17:39:26.184Z",
+  "completedAt": "2026-09-07T17:39:26.184Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "dockside-filter-rework",
+    "specRevision": 2,
+    "specDigest": "sha256:771c67af2e916ffb9a824e56b5d75a13c587ef3d88466fae90427c589e446570",
+    "treeDigest": "sha256:a4f686354285893d19a5b7c68d5a1d3f74b1fb00253d6f7c1cea2de550df9a44",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf"
+  },
+  "digest": "sha256:ba7dbf1e6dee3c176b29160e67adaf4cb074447a463abbae3c530ece59d5f424",
+  "kind": "collected",
+  "collector": "playwright-chromium-live-bb",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/dockside-filter-rework/artifacts/dockside-filter-active.png",
+      "mediaType": "image/png",
+      "bytes": 31197,
+      "digest": "sha256:e1dbbda0ca60b5e94efa742cc3549608815afa5c705873edc2a370080bf0e6fe"
+    },
+    {
+      "path": ".empirical/specs/dockside-filter-rework/artifacts/dockside-filter-open.png",
+      "mediaType": "image/png",
+      "bytes": 65840,
+      "digest": "sha256:c2325a4a63affd6ed4ac37d1ba0fca198a922f291b135a87a882f05ae2719529"
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-fe69c95c0ae64e8262638d32",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "Fresh browser inspection of the locally installed Dockside bundle at 1180x820 confirmed the Workspaces heading, fixed adjacent actions, explicit Quiet 7d+ closed label, opaque grouped menu, seven described options, visible selected check, keyboard open/dismiss/select behavior, and complete Status/Inactivity hierarchy.",
+  "passed": true,
+  "startedAt": "2026-09-07T17:38:10.431Z",
+  "completedAt": "2026-09-07T17:38:10.431Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "dockside-filter-rework",
+    "specRevision": 2,
+    "specDigest": "sha256:771c67af2e916ffb9a824e56b5d75a13c587ef3d88466fae90427c589e446570",
+    "treeDigest": "sha256:a4f686354285893d19a5b7c68d5a1d3f74b1fb00253d6f7c1cea2de550df9a44",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf",
+    "workflowRevision": 6,
+    "gitCommit": "29861c4d1990ad0df51e20b8b0f0df718191a00b"
+  },
+  "digest": "sha256:e281251ccd97c1f67940111e14210609b9ff16fd43685fce5aba70e99acb2fcf",
+  "kind": "qa",
+  "matrixDigest": "sha256:b383cddb578c9305c7d5e754bbbb56329097af98d6c8b72a17f3cab076546f54",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Fresh browser inspection of the locally installed Dockside bundle at 1180x820 confirmed the Workspaces heading, fixed adjacent actions, explicit Quiet 7d+ closed label, opaque grouped menu, seven described options, visible selected check, keyboard open/dismiss/select behavior, and complete Status/Inactivity hierarchy.",
+      "startedAt": "2026-09-07T17:38:10.431Z",
+      "completedAt": "2026-09-07T17:38:10.431Z",
+      "durationMs": 0,
+      "collector": "codex-fresh-browser-inspection",
+      "command": null,
+      "result": null,
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:a4f686354285893d19a5b7c68d5a1d3f74b1fb00253d6f7c1cea2de550df9a44",
+      "sourceTreeAfter": "sha256:a4f686354285893d19a5b7c68d5a1d3f74b1fb00253d6f7c1cea2de550df9a44",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/dockside-filter-rework/artifacts/dockside-filter-active.png",
+          "mediaType": "image/png",
+          "bytes": 31197,
+          "digest": "sha256:e1dbbda0ca60b5e94efa742cc3549608815afa5c705873edc2a370080bf0e6fe"
+        },
+        {
+          "path": ".empirical/specs/dockside-filter-rework/artifacts/dockside-filter-open.png",
+          "mediaType": "image/png",
+          "bytes": 65840,
+          "digest": "sha256:c2325a4a63affd6ed4ac37d1ba0fca198a922f291b135a87a882f05ae2719529"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}
