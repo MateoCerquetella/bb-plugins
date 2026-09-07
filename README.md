@@ -67,16 +67,15 @@ and development commands.
 
 ## Dockside quick start
 
-Install Dockside directly from this repository branch while PR #26 is under
-review:
+Install the latest compatible immutable Dockside release:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@feature/dockside-thread-filters-bulk-delete --subdirectory plugins/dockside
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.2 --subdirectory plugins/dockside --tag-prefix dockside/
 ```
 
-Dockside groups threads by project, keeps root/child families together, adds
-working/needs-you/unread/quiet filters, and protects current, active, waiting,
-unread, and pinned families from permanent bulk deletion. Open
+Dockside groups threads by project or semantic status, keeps root/child families
+together, adds working/needs-you/unread/quiet filters, and protects current,
+active, waiting, unread, and pinned families from permanent bulk deletion. Open
 **Settings → Dockside** to choose semantic status and PR colors, density,
 default child expansion, and optional metadata. See the
 [Dockside README](./plugins/dockside) for behavior and development details.

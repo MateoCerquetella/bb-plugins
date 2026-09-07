@@ -62,8 +62,8 @@ bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.0 
   --tag-prefix dockside/
 ```
 
-The range currently resolves [`dockside/v0.1.0`](https://github.com/MateoCerquetella/bb-plugins/tree/dockside/v0.1.0)
-at the code merged by [plugin PR #26](https://github.com/MateoCerquetella/bb-plugins/pull/26).
+The range currently resolves [`dockside/v0.1.2`](https://github.com/MateoCerquetella/bb-plugins/tree/dockside/v0.1.2),
+which adds the selectable status-grouped sidebar and provider-identity row icons.
 The [BB Community marketplace submission](https://github.com/get-bb/marketplace/pull/162)
 is validated and awaiting maintainer merge. Until it lands, use the Git command
 above rather than a bare npm package or marketplace name.
