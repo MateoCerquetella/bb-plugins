@@ -39,6 +39,25 @@ test("keeps lifecycle and drag work event-driven and reversible", () => {
   assert.match(source, /window\.removeEventListener\("pointermove"/);
 });
 
+test("places plugin overlays above panes and below BB host dialogs", () => {
+  const overlayTier = Number(
+    styles.match(/--action-topbar-overlay-z-index:\s*(\d+)/)?.[1],
+  );
+  const dragTier = Number(
+    styles.match(/--action-topbar-drag-overlay-z-index:\s*(\d+)/)?.[1],
+  );
+  assert.ok(overlayTier > 30 && overlayTier < 50);
+  assert.ok(dragTier >= overlayTier && dragTier < 50);
+  assert.match(
+    styles,
+    /\.action-topbar__launcher\s*\{[^}]*z-index:\s*var\(--action-topbar-overlay-z-index\)/s,
+  );
+  assert.match(
+    styles,
+    /\.action-topbar__(?:drag-ghost|drop-overlay)\s*\{[^}]*z-index:\s*var\(--action-topbar-drag-overlay-z-index\)/s,
+  );
+});
+
 test("preserves keyboard focus and the bounded cross-pane relaunch path", () => {
   assert.match(source, /closeLauncher\(true\)/);
   assert.match(source, /"ArrowLeft"/);

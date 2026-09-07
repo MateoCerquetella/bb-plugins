@@ -260,9 +260,14 @@
   font: inherit;
 }
 
+:root {
+  --action-topbar-overlay-z-index: 40;
+  --action-topbar-drag-overlay-z-index: 41;
+}
+
 .action-topbar__launcher {
   position: fixed;
-  z-index: 120;
+  z-index: var(--action-topbar-overlay-z-index);
   max-width: calc(100vw - 1rem);
   overflow: hidden;
   padding: 0.25rem;
@@ -427,7 +432,7 @@
 
 .action-topbar__drag-ghost {
   position: fixed;
-  z-index: 131;
+  z-index: var(--action-topbar-drag-overlay-z-index);
   left: -9999px;
   top: -9999px;
   display: flex;
@@ -459,7 +464,7 @@
 
 .action-topbar__drop-overlay {
   position: fixed;
-  z-index: 130;
+  z-index: var(--action-topbar-drag-overlay-z-index);
   display: flex;
   pointer-events: none;
   align-items: center;
