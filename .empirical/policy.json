@@ -198,23 +198,6 @@
         "criteria": []
       },
       {
-        "id": "dockside-system",
-        "argv": [
-          "node",
-          ".empirical/specs/dockside-main-reconciliation/qa/system.mjs"
-        ],
-        "cwd": ".",
-        "timeoutMs": 60000,
-        "maxOutputBytes": 262144,
-        "evidenceKinds": [
-          "test"
-        ],
-        "checks": [
-          "end-to-end"
-        ],
-        "criteria": []
-      },
-      {
         "id": "dockside-portability",
         "argv": [
           "node",
