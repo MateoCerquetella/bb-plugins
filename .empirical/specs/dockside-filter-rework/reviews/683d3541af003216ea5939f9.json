@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:c0d721d07c42dbae16fb895da9ea223a9259b760eed7ecc609623630eda9e9a2",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "a6391be14058735b3aebe1769edb313f20100014",
+  "headCommit": "3c57a8d3088e9b88138446037ba4e6081012e95a",
+  "diffDigest": "sha256:469293e087877061695c92cf9741b3a4aaa5f35ac08a38db78b008b4b9f802f3",
+  "verdict": "APPROVED",
+  "reviewerActor": "codex-fresh-context-reviewer",
+  "reviewerInvocationId": "review-1788802900840-do3dnpj49s",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: The committed diff renames the sidebar heading to Workspaces while leaving the adjacent projectGroups count and surrounding selection/filter controls intact; the trigger remains a compact 24px-high control with a fixed minimum icon target.\n- PASS AC-2: The Select content adds the Filter workspaces title, renders All first, then explicit Status and Inactivity groups, and sources a non-empty description for every option from exhaustive typed metadata.\n- PASS AC-3: The existing ordered THREAD_FILTER_PRESETS and matching/filtering implementation are unchanged; added metadata follows the exact All, Working, Needs you, Unread, Quiet, Quiet 1d+, Quiet 7d order, so matching, hierarchy, ordering, and search composition remain preserved.\n- PASS AC-4: Radix SelectItem retains its ItemIndicator check state, the trigger aria-label now names both Filter workspaces and the selected label, and non-All values render a bounded max-w-20 truncated label beside the fixed filter icon.\n- PASS AC-5: The All branch renders no active label, and no existing all-filter, parked-shelf, or reorder-eligibility logic is modified; selecting All therefore preserves the prior restoration behavior.\n- PASS AC-UI-1: The controls remain Radix Select primitives (keyboard operable), use host semantic tokens and focus styling, employ legible compact text, and bound the closed label while keeping the icon fixed; the open menu uses a compact bounded width and descriptive rows.\n\n## Security / correctness\n\nNo security-sensitive data flow, privilege boundary, external input handling, or command execution is introduced. The feature is presentation-only apart from immutable typed option metadata; filter semantics remain unchanged, and the packet includes contract tests for exhaustive ordering, grouping, descriptions, labels, indicator presence, and compact styling.\n\n## Design / maintainability\n\nThe implementation follows accepted decision D-000: presentation metadata is exhaustive and typed, behavior stays in the existing filter model, and reusable Select group/label/separator primitives avoid one-off menu markup. The generic Select viewport change from fixed height to min-height is appropriate for multi-line options, while existing width/trigger constraints remain intact. No criterion-focused maintainability blocker is visible in the packet diff.",
+  "bodyDigest": "sha256:54071303940ba7a44c2b79545ba98f2a10e34c0a9a91f8e12dd321e554d11e32",
+  "digest": "sha256:683d3541af003216ea5939f93a8a02d827f899928be81464554b951bd35b4ce4"
+}

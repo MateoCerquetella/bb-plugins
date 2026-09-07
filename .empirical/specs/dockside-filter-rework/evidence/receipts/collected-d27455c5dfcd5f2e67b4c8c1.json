@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-d27455c5dfcd5f2e67b4c8c1",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-09-07T17:42:29.467Z",
+  "completedAt": "2026-09-07T17:42:29.467Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "dockside-filter-rework",
+    "specRevision": 2,
+    "specDigest": "sha256:771c67af2e916ffb9a824e56b5d75a13c587ef3d88466fae90427c589e446570",
+    "treeDigest": "sha256:a4f686354285893d19a5b7c68d5a1d3f74b1fb00253d6f7c1cea2de550df9a44",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf"
+  },
+  "digest": "sha256:c8664757ef73cfdeb11c625f9d5447631e460cac1cd476185de4c3c12ea31a86",
+  "kind": "collected",
+  "collector": "empirical-review:codex-fresh-context-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/dockside-filter-rework/reviews/683d3541af003216ea5939f9.json",
+      "mediaType": "application/json",
+      "bytes": 3119,
+      "digest": "sha256:6a9eccf2d5dd6dc21ec090484f6b94c43456ad70a169fbab5005375681696f48"
+    },
+    {
+      "path": ".empirical/specs/dockside-filter-rework/reviews/683d3541af003216ea5939f9.md",
+      "mediaType": "text/markdown",
+      "bytes": 2374,
+      "digest": "sha256:6d1dc9b0ea98c3ab0886915c436f0f91a9ccb3a2db8e0dbe9e91c115092f5039"
+    }
+  ]
+}

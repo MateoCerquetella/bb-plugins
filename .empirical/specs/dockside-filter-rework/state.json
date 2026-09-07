@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 7,
+  "revision": 8,
   "activeFeature": "dockside-filter-rework",
   "request": "Update the Dockside plugin by reworking its thread filter system into a compact, reference-inspired workspace filter control: replace the current preset-only select with a clearer filter experience accessible from the filter icon beside Workspaces, preserving existing filtering behavior and matching Dockside/BB visual conventions. Add focused tests and verify the plugin UI.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "review",
+  "phase": "integrate",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Verified all criteria with 204 passing Dockside tests, the repository system contract, a fresh-context browser exercise of keyboard selection/dismissal and active state, and two immutable live Chromium screenshots.",
+  "message": "An isolated fresh-context reviewer approved every acceptance criterion and found no security, correctness, design, or maintainability blocker in the exact committed diff.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:771c67af2e916ffb9a824e56b5d75a13c587ef3d88466fae90427c589e446570",
@@ -24,7 +24,8 @@
     "qa-4402eebbb67e476125fd1a12",
     "qa-9cf697bbc0d24a7b02489a9c",
     "qa-fe69c95c0ae64e8262638d32",
-    "collected-590a00773c07c7af7278f2ec"
+    "collected-590a00773c07c7af7278f2ec",
+    "collected-d27455c5dfcd5f2e67b4c8c1"
   ],
   "legacyEvidenceCount": 0,
   "completion": {
@@ -40,5 +41,5 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-07T17:39:37.399Z"
+  "updatedAt": "2026-09-07T17:42:37.602Z"
 }
