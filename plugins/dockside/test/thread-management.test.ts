@@ -111,6 +111,14 @@ describe("filterProjectThreadGroups", () => {
   }
 
   it("supports attention and quiet presets", () => {
+    assert.deepEqual(ids("status"), [
+      "quiet-day",
+      "quiet-new",
+      "unread",
+      "waiting",
+      "working",
+      "quiet-week",
+    ]);
     assert.deepEqual(ids("working"), ["working"]);
     assert.deepEqual(ids("needs-you"), ["waiting"]);
     assert.deepEqual(ids("unread"), ["unread"]);

@@ -6,10 +6,10 @@
 
 ## Goal
 
-Make Dockside's thread filters easy to understand at a glance without adding
-permanent sidebar chrome. The Workspaces header exposes one compact filter
-button; opening it presents the existing filters as a deliberately grouped,
-described menu, and an active filter remains visible from the closed control.
+Make Dockside's thread filters change how the sidebar is organized, not merely
+which project groups remain. The Workspaces header exposes a compact filter
+button with a new Status view that groups families under visible semantic
+status headings like the supplied reference.
 
 ## Acceptance Criteria
 
@@ -26,6 +26,12 @@ described menu, and an active filter remains visible from the closed control.
   a compact active-filter label beside the icon.
 - [ ] [AC-5] Choosing All removes the active label and restores parked shelves
   and reorder eligibility exactly as before.
+- [ ] [AC-6] Choosing Status replaces project sections with ordered semantic
+  sections for Failed, Needs you, Working, Unread, Inactive, and Stale; empty
+  sections are omitted and every family appears exactly once.
+- [ ] [AC-7] Status sections show the existing semantic icon/color, label, and
+  family count, preserve row interactions and child expansion, and compose with
+  host search without changing the underlying family status rules.
 - [ ] [AC-UI-1] [UI] The closed and open controls are legible in BB's sidebar,
   keyboard operable, token-themed, and remain compact at narrow width.
 
@@ -40,9 +46,8 @@ described menu, and an active filter remains visible from the closed control.
 
 ## Non-goals
 
-- Adding, removing, combining, or persisting filter selections.
-- Replacing Dockside's project-first hierarchy with status-grouped thread
-  sections from the visual reference.
+- Combining or persisting filter selections.
+- Replacing project view permanently; Status is a selectable alternate view.
 - Changing thread lifecycle, bulk deletion, search, ordering, settings, or
   backend APIs.
 

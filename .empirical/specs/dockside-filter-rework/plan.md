@@ -14,3 +14,6 @@
    filter states in BB, and capture screenshot evidence.
 7. Review the diff against the spec, integrate the capability delta, and report
    the highest evidenced completion level without publishing.
+8. Incorporate the user correction by adding a Status option, derive ordered
+   semantic groups from the existing family-status resolver, render collapsible
+   status sections with unchanged thread cards, and re-run focused/live/full CI.

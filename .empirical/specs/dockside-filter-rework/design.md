@@ -22,6 +22,13 @@ description. The existing check indicator remains at the trailing edge. Radix
 continues to provide focus management, keyboard selection, dismissal, and
 portaling into BB's overlay scope.
 
+`Status` is a standalone choice beside `All`. While selected, `ThreadInbox`
+flattens the already searched project families and partitions them by the
+existing `familyStatus` result. It renders non-empty sections in semantic
+priority order (Failed, Needs you, Working, Unread, Inactive, Stale). Each
+section uses the existing status presentation icon/color, count, disclosure,
+and unchanged `ThreadCard` rows. Project view remains the All default.
+
 ## Data contract
 
 Move display metadata into `thread-management.ts` as typed option records:

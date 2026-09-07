@@ -5,6 +5,7 @@ export const DAY_MS = 24 * 60 * 60 * 1_000;
 
 export const THREAD_FILTER_PRESETS = [
   "all",
+  "status",
   "working",
   "needs-you",
   "unread",
@@ -26,6 +27,7 @@ export interface ThreadFilterOption {
 
 export const THREAD_FILTER_OPTIONS = [
   { preset: "all", label: "All", description: "Every active workspace", group: null },
+  { preset: "status", label: "Status", description: "Group workspaces by current status", group: null },
   { preset: "working", label: "Working", description: "Workspaces with active runs", group: "status" },
   { preset: "needs-you", label: "Needs you", description: "Waiting for your response", group: "status" },
   { preset: "unread", label: "Unread", description: "Workspaces with new activity", group: "status" },
@@ -38,6 +40,7 @@ export const THREAD_FILTER_LABELS: Readonly<
   Record<ThreadFilterPreset, string>
 > = {
   all: "All",
+  status: "Status",
   working: "Working",
   "needs-you": "Needs you",
   unread: "Unread",
@@ -165,7 +168,7 @@ export function filterProjectThreadGroups(
   preset: ThreadFilterPreset,
   now: number,
 ): ProjectThreadGroup[] {
-  if (preset === "all") return [...groups];
+  if (preset === "all" || preset === "status") return [...groups];
 
   return groups.flatMap((group) => {
     const families = group.families.filter((family) =>
@@ -284,7 +287,7 @@ export function includeSelectedFamilies(
 
 function familyMatchesPreset(
   family: ThreadFamily,
-  preset: Exclude<ThreadFilterPreset, "all">,
+  preset: Exclude<ThreadFilterPreset, "all" | "status">,
   now: number,
 ): boolean {
   switch (preset) {

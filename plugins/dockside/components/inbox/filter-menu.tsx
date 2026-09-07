@@ -63,6 +63,7 @@ export function FilterMenu({
           Filter workspaces
         </div>
         <FilterOption preset="all" />
+        <FilterOption preset="status" />
         {FILTER_GROUPS.map((group) => (
           <SelectGroup key={group}>
             <SelectSeparator />

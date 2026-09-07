@@ -72,3 +72,36 @@ the live BB sidebar at normal and narrow widths.
 - Evidence: the change is frontend presentation plus typed static metadata.
 - Decision: cover metadata and source contract, retain existing behavioral
   tests, and require live browser inspection because visual evidence is enabled.
+
+## D-005: Status is a selectable alternate organization
+
+Status: Accepted
+
+### Evidence
+
+The user's correction explicitly requires status headings in the sidebar like
+the reference, not only a richer preset menu. Dockside already resolves one
+semantic family status with a defined precedence.
+
+### Options
+
+- Replace project grouping permanently.
+- Add Status as a selectable alternate view.
+- Keep the preset-only menu.
+
+### Chosen approach
+
+Add Status as a standalone filter choice. Flatten searched active families,
+group them by the existing family-status resolver, omit empty groups, and keep
+All as the project-first default.
+
+### Trade-offs and risks
+
+Project create/reorder controls are unavailable in Status view because the same
+family can no longer be manipulated within a visible project context. Rows,
+selection, lifecycle actions, children, and navigation remain intact.
+
+### Verification
+
+Unit-test grouping precedence and uniqueness, exercise Status in a live browser,
+and capture the resulting sidebar.
