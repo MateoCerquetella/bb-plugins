@@ -9,8 +9,6 @@ extension NSTouchBarItem.Identifier {
     static let bbProject = NSTouchBarItem.Identifier("app.getbb.touchbar.project")
     static let bbDock = NSTouchBarItem.Identifier("app.getbb.touchbar.dock")
     static let bbCarousel = NSTouchBarItem.Identifier("app.getbb.touchbar.carousel")
-    static let bbPreviousProject = NSTouchBarItem.Identifier("app.getbb.touchbar.previous-project")
-    static let bbNextProject = NSTouchBarItem.Identifier("app.getbb.touchbar.next-project")
     static let bbUsage = NSTouchBarItem.Identifier("app.getbb.touchbar.usage")
     static let bbHostMonitor = NSTouchBarItem.Identifier("app.getbb.touchbar.host-monitor")
     static let bbUsageToggle = NSTouchBarItem.Identifier("app.getbb.touchbar.usage-toggle")
@@ -189,12 +187,7 @@ private final class GroupDividerView: NSButton {
     }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        bounds.contains(point) ? self : nil
-    }
-
-    override func mouseDown(with event: NSEvent) {
-        guard isEnabled, let action else { return }
-        NSApp.sendAction(action, to: target, from: self)
+        return bounds.contains(point) ? self : nil
     }
 
     func setSelected(_ selected: Bool) {
@@ -237,6 +230,8 @@ private final class ProjectGroupView: NSView {
         stack = nestedStack
         measuredWidth = nestedStack.fittingSize.width + 8
         super.init(frame: .zero)
+        allowedTouchTypes = .direct
+        nestedStack.allowedTouchTypes = .direct
         wantsLayer = true
         layer?.cornerRadius = 6
         layer?.borderWidth = 1
@@ -414,17 +409,7 @@ private final class HostMetricView: NSButton {
     override var intrinsicContentSize: NSSize { NSSize(width: measuredWidth, height: 30) }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        bounds.contains(point) ? self : nil
-    }
-
-    override func mouseDown(with event: NSEvent) {
-        guard isEnabled, let action else { return }
-        let resting = layer?.backgroundColor
-        layer?.backgroundColor = NSColor(white: 0.16, alpha: 1).cgColor
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { [weak self] in
-            self?.layer?.backgroundColor = resting
-        }
-        NSApp.sendAction(action, to: target, from: self)
+        return bounds.contains(point) ? self : nil
     }
 
     override func layout() {
@@ -625,12 +610,7 @@ private final class SettingsControlButton: NSButton {
     }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        bounds.contains(point) ? self : nil
-    }
-
-    override func mouseDown(with event: NSEvent) {
-        guard isEnabled, let action else { return }
-        NSApp.sendAction(action, to: target, from: self)
+        return bounds.contains(point) ? self : nil
     }
 
     override func draw(_ dirtyRect: NSRect) {
@@ -678,12 +658,7 @@ private final class CompactNativeButton: NSButton {
     override var intrinsicContentSize: NSSize { NSSize(width: fixedWidth, height: 30) }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        bounds.contains(point) ? self : nil
-    }
-
-    override func mouseDown(with event: NSEvent) {
-        guard isEnabled, let action else { return }
-        NSApp.sendAction(action, to: target, from: self)
+        return bounds.contains(point) ? self : nil
     }
 }
 
@@ -695,10 +670,10 @@ private final class SettingsGroupView: NSView {
 
     init(title: String, controls: [SettingsControlButton]) {
         sectionTitle = title
-        let titleFont = NSFont.monospacedSystemFont(ofSize: 5.8, weight: .bold)
+        let titleFont = NSFont.monospacedSystemFont(ofSize: 7, weight: .bold)
         let titleWidth = max(
-            38,
-            ceil((title as NSString).size(withAttributes: [.font: titleFont]).width) + 12
+            44,
+            ceil((title as NSString).size(withAttributes: [.font: titleFont]).width) + 14
         )
         sectionTitleWidth = titleWidth
         self.controls = controls
@@ -706,6 +681,7 @@ private final class SettingsGroupView: NSView {
             controls.reduce(CGFloat(8)) { $0 + $1.intrinsicContentSize.width } +
             CGFloat(max(controls.count - 1, 0) * 3)
         super.init(frame: .zero)
+        allowedTouchTypes = .direct
         wantsLayer = true
         layer?.cornerRadius = 6
         layer?.borderWidth = 1
@@ -716,6 +692,7 @@ private final class SettingsGroupView: NSView {
     }
 
     required init?(coder: NSCoder) { fatalError("init(coder:) is unsupported") }
+
     override var intrinsicContentSize: NSSize { NSSize(width: measuredWidth, height: 30) }
 
     override func layout() {
@@ -728,24 +705,10 @@ private final class SettingsGroupView: NSView {
         }
     }
 
-    override func hitTest(_ point: NSPoint) -> NSView? {
-        bounds.contains(point) ? self : nil
-    }
-
-    override func mouseDown(with event: NSEvent) {
-        let point = convert(event.locationInWindow, from: nil)
-        guard let control = controls.first(where: {
-            !$0.isHidden && $0.frame.contains(point)
-        }) else { return }
-        guard let action = control.action else { return }
-        NativeLog.info("settings control tapped \(sectionTitle)")
-        NSApp.sendAction(action, to: control.target, from: control)
-    }
-
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
         let attributes: [NSAttributedString.Key: Any] = [
-            .font: NSFont.monospacedSystemFont(ofSize: 5.8, weight: .bold),
+            .font: NSFont.monospacedSystemFont(ofSize: 7, weight: .bold),
             .foregroundColor: NSColor(white: 0.68, alpha: 1),
         ]
         let string = sectionTitle as NSString
@@ -761,42 +724,6 @@ private final class SettingsGroupView: NSView {
 }
 
 private final class TouchBarScrollView: NSScrollView {
-    override func hitTest(_ point: NSPoint) -> NSView? {
-        bounds.contains(point) ? self : nil
-    }
-
-    override func mouseDown(with event: NSEvent) {
-        guard let documentView else { return }
-        let point = documentView.convert(event.locationInWindow, from: nil)
-        guard let button = deepestButton(in: documentView, at: point),
-              let action = button.action else { return }
-        NativeLog.info("touch dispatch (button.identifier?.rawValue ?? \"button\")")
-        NSApp.sendAction(action, to: button.target, from: button)
-    }
-
-    private func deepestButton(in root: NSView, at point: NSPoint) -> NSButton? {
-        var match: NSButton?
-        var matchArea = CGFloat.greatestFiniteMagnitude
-        func visit(_ view: NSView) {
-            guard !view.isHidden, view.alphaValue > 0 else { return }
-            if let button = view as? NSButton, button.isEnabled {
-                let frame = button.convert(button.bounds, to: root)
-                if frame.contains(point), frame.width * frame.height < matchArea {
-                    match = button
-                    matchArea = frame.width * frame.height
-                }
-            }
-            for child in view.subviews { visit(child) }
-        }
-        visit(root)
-        return match
-    }
-
-    func scrollPage(_ direction: Int) {
-        let distance = max(contentView.bounds.width * 0.72, 140)
-        scrollHorizontally(by: CGFloat(direction) * distance)
-    }
-
     override func scrollWheel(with event: NSEvent) {
         let horizontal = abs(event.scrollingDeltaX) >= abs(event.scrollingDeltaY)
             ? event.scrollingDeltaX
@@ -896,7 +823,7 @@ private final class AgentButton: NSButton {
     }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        bounds.contains(point) ? self : nil
+        return bounds.contains(point) ? self : nil
     }
 
     func setGrouped(_ value: Bool) {
@@ -952,8 +879,6 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
     private let projectItem = NSCustomTouchBarItem(identifier: .bbProject)
     private let dockItem = NSCustomTouchBarItem(identifier: .bbDock)
     private let carouselItem = NSCustomTouchBarItem(identifier: .bbCarousel)
-    private let previousProjectItem = NSCustomTouchBarItem(identifier: .bbPreviousProject)
-    private let nextProjectItem = NSCustomTouchBarItem(identifier: .bbNextProject)
     private let usageItem = NSCustomTouchBarItem(identifier: .bbUsage)
     private let hostMonitorItem = NSCustomTouchBarItem(identifier: .bbHostMonitor)
     private let usageToggleItem = NSCustomTouchBarItem(identifier: .bbUsageToggle)
@@ -967,8 +892,6 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
     private let projectButton = SettingsControlButton(title: "PROJECT", width: 48)
     private let dockButton = SettingsControlButton(title: "DOCK", width: 36)
     private let carouselButton = SettingsControlButton(title: "CAROUSEL", width: 54)
-    private let previousProjectButton = NSButton(title: "‹", target: nil, action: nil)
-    private let nextProjectButton = NSButton(title: "›", target: nil, action: nil)
     private let usageIconsView = UsageIconStripView()
     private let hostMonitorButton = CompactNativeButton(title: "", width: 34)
     private let usageToggleButton = SettingsControlButton(title: "SHOW", width: 38)
@@ -978,7 +901,6 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
     private let cursorToggleButton = SettingsControlButton(title: "", width: 25)
     private let closeButton = CompactNativeButton(title: "✕", width: 34)
     private var panelTouchBar: NSTouchBar?
-    private weak var panelScrollView: TouchBarScrollView?
     private var panelVisible = false
     private var agentButtons: [String: AgentButton] = [:]
     private var onScreenOrder: [String] = []
@@ -1008,6 +930,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
     }()
 
     private static let barHeight: CGFloat = 30
+    private static let contentWidth: CGFloat = 850
 
     func menuState() -> TouchBarMenuState {
         TouchBarMenuState(
@@ -1090,7 +1013,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         store.onChange = { [weak self] snapshot in self?.apply(snapshot) }
         store.start()
         apply(store.snapshot)
-        NativeLog.info("native Control Strip item installed")
+        NativeLog.info("native Control Strip item installed (finger-scroll-ui 2026-09-02)")
     }
 
     private func configurePanelControls() {
@@ -1122,12 +1045,6 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         carouselButton.target = self
         carouselButton.action = #selector(carouselTapped(_:))
         carouselButton.font = .monospacedSystemFont(ofSize: 5.8, weight: .bold)
-        previousProjectButton.target = self
-        previousProjectButton.action = #selector(previousProjectTapped(_:))
-        previousProjectButton.font = .systemFont(ofSize: 17, weight: .bold)
-        nextProjectButton.target = self
-        nextProjectButton.action = #selector(nextProjectTapped(_:))
-        nextProjectButton.font = .systemFont(ofSize: 17, weight: .bold)
         hostMonitorButton.target = self
         hostMonitorButton.action = #selector(hostMonitorTapped(_:))
         hostMonitorButton.setAccessibilityLabel("Show Host Monitor metrics")
@@ -1171,8 +1088,6 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         closeButton.setAccessibilityLabel("Close BB agent panel")
 
         settingsItem.view = settingsButton
-        previousProjectItem.view = previousProjectButton
-        nextProjectItem.view = nextProjectButton
         usageItem.view = usageIconsView
         hostMonitorItem.view = hostMonitorButton
         closeItem.view = closeButton
@@ -1180,12 +1095,6 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     private func updateControlColors() {
-        previousProjectButton.setAccessibilityLabel(
-            sortMode == .carousel ? "Previous project" : "Scroll left"
-        )
-        nextProjectButton.setAccessibilityLabel(
-            sortMode == .carousel ? "Next project" : "Scroll right"
-        )
         settingsButton.bezelColor = configurationVisible
             ? .systemIndigo
             : NSColor(white: 0.18, alpha: 1)
@@ -1384,22 +1293,27 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     @objc private func priorityTapped(_ sender: NSButton) {
+        NativeLog.info("settings priority tapped")
         selectSortMode(.status)
     }
 
     @objc private func projectTapped(_ sender: NSButton) {
+        NativeLog.info("settings project tapped")
         selectSortMode(.project)
     }
 
     @objc private func dockTapped(_ sender: NSButton) {
+        NativeLog.info("settings dock tapped")
         selectSortMode(.dock)
     }
 
     @objc private func carouselTapped(_ sender: NSButton) {
+        NativeLog.info("settings carousel tapped")
         selectSortMode(.carousel)
     }
 
     @objc private func hostMonitorTapped(_ sender: NSButton) {
+        NativeLog.info("settings host monitor tapped")
         hostViewVisible.toggle()
         updateControlColors()
         schedulePanelRender()
@@ -1423,22 +1337,27 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
     }
 
     @objc private func usageVisibilityTapped(_ sender: NSButton) {
+        NativeLog.info("settings usage visibility tapped")
         setUsageVisibilityFromMenu(!showUsage)
     }
 
     @objc private func hostVisibilityTapped(_ sender: NSButton) {
+        NativeLog.info("settings host visibility tapped")
         setHostVisibilityFromMenu(!showHostMonitor)
     }
 
     @objc private func codexVisibilityTapped(_ sender: NSButton) {
+        NativeLog.info("settings codex visibility tapped")
         toggleUsageProvider("codex")
     }
 
     @objc private func claudeVisibilityTapped(_ sender: NSButton) {
+        NativeLog.info("settings claude visibility tapped")
         toggleUsageProvider("claudeCode")
     }
 
     @objc private func cursorVisibilityTapped(_ sender: NSButton) {
+        NativeLog.info("settings cursor visibility tapped")
         toggleUsageProvider("cursor")
     }
 
@@ -1447,30 +1366,11 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         setProviderVisibilityFromMenu(id, visible: next)
     }
 
-    @objc private func previousProjectTapped(_ sender: NSButton) {
-        if sortMode == .carousel { moveProject(by: -1) }
-        else { panelScrollView?.scrollPage(-1) }
-    }
-
-    @objc private func nextProjectTapped(_ sender: NSButton) {
-        if sortMode == .carousel { moveProject(by: 1) }
-        else { panelScrollView?.scrollPage(1) }
-    }
-
     @objc private func projectDockTapped(_ sender: NSButton) {
         guard let project = sender.identifier?.rawValue else { return }
+        NativeLog.info("settings project dock tapped \(project)")
         selectedProject = project
         UserDefaults.standard.set(project, forKey: "BBTouchBarSelectedProject")
-        schedulePanelRender()
-    }
-
-    private func moveProject(by offset: Int) {
-        let projects = orderedProjects(in: organized(store.snapshot.agents))
-        guard !projects.isEmpty else { return }
-        let current = selectedProject.flatMap { projects.firstIndex(of: $0) } ?? 0
-        let next = (current + offset + projects.count) % projects.count
-        selectedProject = projects[next]
-        UserDefaults.standard.set(projects[next], forKey: "BBTouchBarSelectedProject")
         schedulePanelRender()
     }
 
@@ -1494,6 +1394,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
     @objc private func agentTapped(_ sender: NSButton) {
         guard let id = sender.identifier?.rawValue,
               let entry = store.snapshot.agents.first(where: { $0.id == id }) else { return }
+        NativeLog.info("thread card tapped \(id)")
         AgentStore.focus(entry)
     }
 
@@ -1509,8 +1410,6 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         case .bbProject: return projectItem
         case .bbDock: return dockItem
         case .bbCarousel: return carouselItem
-        case .bbPreviousProject: return previousProjectItem
-        case .bbNextProject: return nextProjectItem
         case .bbUsage: return usageItem
         case .bbHostMonitor: return hostMonitorItem
         case .bbUsageToggle: return usageToggleItem
@@ -1529,12 +1428,14 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         onScreenOrder = entries.map(\.id)
 
         if configurationVisible {
-            settingsPanelItem.view = scrollContainer(settingsGroups())
+            let groups = settingsGroups()
+            settingsPanelItem.view = scrollContainer(groups)
             return
         }
 
+        var views: [NSView] = []
         if hostViewVisible {
-            let views: [NSView] = snapshot.hosts.isEmpty
+            views = snapshot.hosts.isEmpty
                 ? [message("Host metrics are loading…")]
                 : snapshot.hosts.map {
                     HostMetricView(
@@ -1545,10 +1446,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
                 }
             panelItem.view = scrollContainer(views)
             return
-        }
-
-        var views: [NSView] = []
-        if entries.isEmpty {
+        } else if entries.isEmpty {
             views.append(message(snapshot.connected ? "No BB threads" : "BB is offline"))
         } else {
             if !snapshot.connected {
@@ -1558,36 +1456,37 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
                 views.append(contentsOf: entries.map { button(for: $0) })
             } else if sortMode == .project {
                 views.append(contentsOf: projectGroups(for: entries))
-            } else if let project = resolvedProject(in: entries) {
-                let projectEntries = entries.filter { $0.project == project }
-                if sortMode == .dock {
-                    for name in orderedProjects(in: entries) {
-                        guard let first = entries.first(where: { $0.project == name }) else {
-                            continue
-                        }
-                        let badge = GroupDividerView(
-                            status: first.status,
-                            project: name,
-                            count: entries.filter { $0.project == name }.count,
-                            projectFirst: true,
-                            threadId: name,
-                            target: self,
-                            action: #selector(projectDockTapped(_:))
-                        )
-                        badge.setSelected(name == project)
-                        views.append(badge)
-                    }
-                } else if let first = projectEntries.first {
-                    let badge = GroupDividerView(
+            } else if sortMode == .carousel {
+                for name in orderedProjects(in: entries) {
+                    let projectEntries = entries.filter { $0.project == name }
+                    guard let first = projectEntries.first else { continue }
+                    views.append(GroupDividerView(
                         status: first.status,
-                        project: project,
+                        project: name,
                         count: projectEntries.count,
                         projectFirst: true,
                         threadId: first.id,
                         target: self,
                         action: #selector(agentTapped(_:))
+                    ))
+                    views.append(contentsOf: projectEntries.map { button(for: $0) })
+                }
+            } else if let project = resolvedProject(in: entries) {
+                let projectEntries = entries.filter { $0.project == project }
+                for name in orderedProjects(in: entries) {
+                    guard let first = entries.first(where: { $0.project == name }) else {
+                        continue
+                    }
+                    let badge = GroupDividerView(
+                        status: first.status,
+                        project: name,
+                        count: entries.filter { $0.project == name }.count,
+                        projectFirst: true,
+                        threadId: name,
+                        target: self,
+                        action: #selector(projectDockTapped(_:))
                     )
-                    badge.setSelected(true)
+                    badge.setSelected(name == project)
                     views.append(badge)
                 }
                 views.append(contentsOf: projectEntries.map { button(for: $0) })
@@ -1598,27 +1497,27 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
 
     private func settingsGroups() -> [NSView] {
         let priority = settingControl(
-            title: "PRIORITY", width: 58,
+            title: "PRIORITY", width: 74,
             action: #selector(priorityTapped(_:)),
             selected: sortMode == .status, color: .systemBlue
         )
         let project = settingControl(
-            title: "PROJECT", width: 54,
+            title: "PROJECT", width: 72,
             action: #selector(projectTapped(_:)),
             selected: sortMode == .project, color: .systemOrange
         )
         let dock = settingControl(
-            title: "DOCK", width: 42,
+            title: "DOCK", width: 56,
             action: #selector(dockTapped(_:)),
             selected: sortMode == .dock, color: .systemTeal
         )
         let carousel = settingControl(
-            title: "CAROUSEL", width: 60,
+            title: "CAROUSEL", width: 84,
             action: #selector(carouselTapped(_:)),
             selected: sortMode == .carousel, color: .systemPurple
         )
         let usage = settingControl(
-            title: showUsage ? "ON" : "OFF", width: 42,
+            title: showUsage ? "ON" : "OFF", width: 56,
             action: #selector(usageVisibilityTapped(_:)),
             selected: showUsage, color: .systemBlue
         )
@@ -1638,10 +1537,17 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
             color: .systemPurple
         )
         let host = settingControl(
-            title: showHostMonitor ? "ON" : "OFF", width: 42,
+            title: showHostMonitor ? "ON" : "OFF", width: 56,
             action: #selector(hostVisibilityTapped(_:)),
             selected: showHostMonitor, color: .systemGreen
         )
+        let close = settingControl(
+            title: "✕", width: 64,
+            action: #selector(closeTapped(_:)),
+            selected: true, color: .systemRed
+        )
+        close.font = .systemFont(ofSize: 15, weight: .bold)
+        close.setAccessibilityLabel("Close settings and panel")
         return [
             SettingsGroupView(
                 title: "FILTERS",
@@ -1654,6 +1560,10 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
             SettingsGroupView(
                 title: "HOST MONITOR",
                 controls: [host]
+            ),
+            SettingsGroupView(
+                title: "PANEL",
+                controls: [close]
             ),
         ]
     }
@@ -1668,7 +1578,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         let button = SettingsControlButton(title: title, width: width)
         button.target = self
         button.action = action
-        button.font = .monospacedSystemFont(ofSize: 6.8, weight: .bold)
+        button.font = .monospacedSystemFont(ofSize: 9, weight: .bold)
         button.bezelColor = selected
             ? color
             : NSColor(white: 0.18, alpha: 1)
@@ -1805,9 +1715,10 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         stack.spacing = 5
         stack.alignment = .centerY
         stack.translatesAutoresizingMaskIntoConstraints = true
+        stack.allowedTouchTypes = .direct
 
         let fitting = stack.fittingSize
-        let visible = min(max(fitting.width, 100), 850)
+        let visible = min(max(fitting.width, 100), Self.contentWidth)
         stack.frame = NSRect(
             x: 0,
             y: 0,
@@ -1822,12 +1733,13 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
             height: Self.barHeight
         ))
         scroll.drawsBackground = false
+        scroll.allowedTouchTypes = .direct
         scroll.hasHorizontalScroller = false
         scroll.hasVerticalScroller = false
         scroll.horizontalScrollElasticity = .allowed
         scroll.verticalScrollElasticity = .none
         scroll.documentView = stack
-        panelScrollView = scroll
         return scroll
     }
+
 }

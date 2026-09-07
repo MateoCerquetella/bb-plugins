@@ -7,7 +7,7 @@ The BB plugin owns the bounded thread snapshot and guarded commands. A small
 Swift/AppKit background app owns the physical Touch Bar:
 
 - an always-present BB badge in the Control Strip;
-- tap the badge to expand a fullscreen, horizontally scrollable agent panel;
+- tap the badge to expand a fullscreen, horizontally finger-scrollable agent panel;
 - one outlined two-line card per thread with provider, project, status colour,
   badge and activity spinner;
 - tap a card to open that exact BB thread;
@@ -22,6 +22,24 @@ Swift/AppKit background app owns the physical Touch Bar:
 No subscription, developer account, external runtime, telemetry, or proprietary
 companion is required. The source builds and ad-hoc signs locally.
 
+## Screenshots
+
+### Agent threads
+
+![Finger-scrollable BB agent threads on an Intel MacBook Pro Touch Bar](../../docs/media/touchbar-threads.png)
+
+### Host Monitor
+
+![Live host metrics on the Touch Bar](../../docs/media/touchbar-host-monitor.png)
+
+### Settings
+
+![Touch Bar filters, subscriptions, providers, and Host Monitor settings](../../docs/media/touchbar-settings.png)
+
+### Running on an Intel MacBook Pro
+
+![BB Touch Bar companion running on an Intel MacBook Pro](../../docs/media/touchbar-intel-macbook-pro.jpg)
+
 ## Requirements
 
 - BB 0.40 or newer.
@@ -33,6 +51,23 @@ The persistent Control Strip and fullscreen system-modal modes rely on Apple's
 private `DFRFoundation` Touch Bar entry points. They are not App Store APIs and
 may require adaptation after a macOS update. The app tears down modal state
 before termination so it does not strand a black Touch Bar.
+
+## BetterTouchTool alternative
+
+If you prefer the public Touch Bar extension path, install BetterTouchTool and
+use the included All Apps companion instead of the standalone native app:
+
+```sh
+cd ~/Downloads/touchbar
+chmod +x companion/*.sh
+./companion/install.sh
+```
+
+Approve **Compile & Load** in BetterTouchTool, then open **All Apps → Touch
+Bar** and add one **BB Agent Monitor** plugin widget. To import the text-only
+fallback preset directly, run `./companion/install.sh --preset`. The BTT path
+keeps the monitor visible across applications without linking DFRFoundation;
+it requires BetterTouchTool and Xcode Command Line Tools on the Intel Mac.
 
 ## Install the BB plugin
 
@@ -129,8 +164,12 @@ Host CPU, RAM, and disk rings use Host Monitor's current configurable yellow
 and red thresholds. Changing those settings automatically changes Touch Bar
 gauge colors on the next sample; download remains red and upload blue.
 
-Trackpad or finger horizontal scrolling moves the card lane; paging arrows are
-intentionally omitted to preserve card space.
+Swipe directly across the card or settings lane to move it horizontally. The
+scroll container leaves hit-testing to its native child controls, so a short tap
+opens a thread or setting while a drag scrolls; no paging arrows consume space.
+Errors whose BB attention has already been read stay available in BB but are
+removed from the compact lane, so old failures do not remain pinned as new red
+alerts.
 
 ## Controls
 

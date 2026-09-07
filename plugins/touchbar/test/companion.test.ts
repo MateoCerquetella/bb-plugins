@@ -136,7 +136,10 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(controller, /dismissSystemModalTouchBar/u);
   assert.match(controller, /minimizeSystemModalTouchBar/u);
   assert.doesNotMatch(controller, /SummaryButton|labelWithString: "BB"/u);
+  assert.match(controller, /private final class TouchBarScrollView: NSScrollView/u);
   assert.match(controller, /hasHorizontalScroller = false/u);
+  assert.match(controller, /allowedTouchTypes = \.direct/u);
+  assert.match(controller, /stack\.allowedTouchTypes = \.direct/u);
   assert.match(controller, /GroupDividerView/u);
   assert.match(controller, /projectEntries\.map/u);
   assert.match(controller, /project\.localizedCaseInsensitiveCompare/u);
@@ -159,8 +162,14 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(controller, /projectTapped/u);
   assert.match(controller, /dockTapped/u);
   assert.match(controller, /carouselTapped/u);
-  assert.match(controller, /previousProjectTapped/u);
-  assert.match(controller, /nextProjectTapped/u);
+  assert.match(controller, /settings priority tapped/u);
+  assert.match(controller, /settings project tapped/u);
+  assert.match(controller, /settings dock tapped/u);
+  assert.match(controller, /settings carousel tapped/u);
+  assert.match(controller, /settings host monitor tapped/u);
+  assert.match(controller, /settings usage visibility tapped/u);
+  assert.doesNotMatch(controller, /bbPreviousProject|bbNextProject/u);
+  assert.doesNotMatch(controller, /title: "[‹›]"/u);
   assert.match(controller, /projectDockTapped/u);
   assert.match(controller, /BBTouchBarSelectedProject/u);
   assert.match(controller, /private final class GroupDividerView: NSButton/u);
@@ -172,7 +181,9 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(controller, /compactWidth = projectFirst\s*\? 32/su);
   assert.match(controller, /action: #selector\(agentTapped/u);
   assert.match(controller, /bounds\.contains\(point\) \? self : nil/u);
-  assert.match(controller, /NSApp\.sendAction\(action, to: target, from: self\)/u);
+  assert.equal((controller.match(/convert\(point, from: superview\)/gu) ?? []).length, 0);
+  assert.equal((controller.match(/bounds\.contains\(point\)/gu) ?? []).length, 5);
+  assert.doesNotMatch(controller, /override func mouseDown/u);
   assert.match(controller, /close control tapped/u);
   assert.match(controller, /projectInitials/u);
   assert.match(controller, /provider == "cursor" \|\| provider == "acp-cursor"/u);
@@ -202,6 +213,10 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(model, /\["touchbar", "snapshot"\]/u);
   assert.match(model, /timeout: 5/u);
   assert.match(model, /offlineFailureThreshold = 3/u);
+  assert.match(model, /maximumDelay: TimeInterval = 30/u);
+  assert.match(model, /BB entering reconnecting after/u);
+  assert.match(model, /BB reconnected after/u);
+  assert.match(model, /output\.fileHandleForReading\.closeFile\(\)/u);
   assert.match(model, /lastGoodSnapshot/u);
   assert.match(model, /stale\.connected = false/u);
   assert.match(model, /\["host-monitor", "snapshot"\]/u);
@@ -234,19 +249,15 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(controller, /control\.frame = NSRect\(x: x, y: 0, width: width, height: 30\)/u);
   assert.match(controller, /private func settingsGroups\(\)/u);
   assert.match(controller, /override func hitTest\(_ point: NSPoint\) -> NSView\?/u);
-  assert.ok(controller.includes("settings control tapped \\(sectionTitle)"));
-  assert.match(controller, /NSApp\.sendAction\(action, to: control\.target, from: control\)/u);
-  assert.match(controller, /private final class TouchBarScrollView/u);
-  assert.match(controller, /override func mouseDown\(with event: NSEvent\)/u);
-  assert.match(controller, /private func deepestButton\(in root: NSView, at point: NSPoint\)/u);
-  assert.ok(controller.includes("touch dispatch (button.identifier"));
-  assert.match(controller, /NSApp\.sendAction\(action, to: button\.target, from: button\)/u);
-  assert.match(controller, /func scrollPage/u);
-  assert.match(controller, /override func scrollWheel/u);
-  assert.match(controller, /panelScrollView\?\.scrollPage\(-1\)/u);
-  assert.match(controller, /panelScrollView\?\.scrollPage\(1\)/u);
+  const scrollViewSource = controller.slice(
+    controller.indexOf("private final class TouchBarScrollView"),
+    controller.indexOf("private final class AgentStatusPill"),
+  );
+  assert.match(scrollViewSource, /override func scrollWheel/u);
+  assert.doesNotMatch(scrollViewSource, /override func hitTest|override func mouseDown/u);
+  assert.match(controller, /bar\.defaultItemIdentifiers = panelIdentifiers\(\)/u);
   assert.match(controller, /configurationVisible \? \.bbSettingsPanel : \.bbList/u);
-  assert.match(controller, /settingsPanelItem\.view = scrollContainer\(settingsGroups\(\)\)/u);
+  assert.match(controller, /settingsPanelItem\.view = scrollContainer\(groups\)/u);
   assert.match(controller, /title: "FILTERS"/u);
   assert.match(controller, /title: "SUBSCRIPTIONS"/u);
   assert.match(controller, /title: "HOST MONITOR"/u);
@@ -254,7 +265,12 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(controller, /appendArc/u);
   assert.match(controller, /progress\.lineCapStyle = \.round/u);
   assert.match(controller, /usageItem\.view = usageIconsView/u);
-  assert.match(controller, /scrollContainer\(settingsGroups\(\)\)/u);
+  assert.match(controller, /private func scrollContainer\(_ views: \[NSView\]\)/u);
+  assert.match(controller, /scroll\.documentView = stack/u);
+  assert.match(controller, /else if sortMode == \.carousel/u);
+  assert.match(controller, /for name in orderedProjects\(in: entries\)/u);
+  assert.match(controller, /title: "PANEL"/u);
+  assert.match(controller, /selected: true, color: \.systemRed/u);
   assert.doesNotMatch(controller, /usageButton\.title/u);
   assert.match(controller, /BBTouchBarShowUsage/u);
   assert.match(controller, /BBTouchBarShowHostMonitor/u);
@@ -286,7 +302,8 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(controller, /case \.bbHostMonitor: return hostMonitorItem/u);
   assert.match(controller, /message\("Reconnecting…"\)/u);
   assert.match(controller, /snapshot\.connected \? "No BB threads" : "BB is offline"/u);
-  assert.match(model, /\["touchbar", "open", entry\.id\]/u);
+  assert.match(model, /\["touchbar", "open", entry\.id\], timeout: 5/u);
+  assert.ok(model.includes("opened thread \\(entry.id) in BB"));
   assert.match(model, /dev\.bb\.desktop/u);
   assert.match(model, /activateBB/u);
   assert.match(model, /\["host-monitor", "open", hostId\]/u);

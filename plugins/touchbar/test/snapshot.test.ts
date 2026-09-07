@@ -63,6 +63,8 @@ test("snapshot prioritizes attention and active work deterministically", () => {
       }),
       thread("input", { hasPendingInteraction: true, updatedAt: 100 }),
       thread("error", {
+        lastReadAt: 100,
+        latestAttentionAt: 101,
         runtime: { displayStatus: "error" },
         status: "error",
         updatedAt: 300,
@@ -92,6 +94,36 @@ test("snapshot prioritizes attention and active work deterministically", () => {
   assert.deepEqual(snapshot.summary, { active: 1, attention: 4, visible: 6 });
   assert.equal(snapshot.generatedAtMs, 900);
   assert.equal(snapshot.threads[0]?.project, "Workspace");
+});
+
+test("acknowledged failures do not remain as phantom Touch Bar errors", () => {
+  const snapshot = buildSnapshot(
+    [
+      thread("acknowledged-error", {
+        lastReadAt: 200,
+        latestAttentionAt: 150,
+        runtime: { displayStatus: "error" },
+        status: "error",
+      }),
+      thread("new-error", {
+        lastReadAt: 100,
+        latestAttentionAt: 150,
+        runtime: { displayStatus: "error" },
+        status: "error",
+      }),
+      thread("active", {
+        runtime: { displayStatus: "active" },
+        status: "active",
+      }),
+    ],
+    { cardLimit: 6, includeHidden: false },
+  );
+
+  assert.deepEqual(snapshot.threads.map((item) => item.id), [
+    "new-error",
+    "active",
+  ]);
+  assert.deepEqual(snapshot.summary, { active: 1, attention: 1, visible: 2 });
 });
 
 test("hidden, archived, and deleted threads are excluded by default", () => {
