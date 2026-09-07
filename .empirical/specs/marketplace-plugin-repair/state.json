@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 14,
+  "revision": 15,
   "activeFeature": "marketplace-plugin-repair",
   "request": "Fix Save My Model so its per-machine provider, model, and reasoning preference is connected to BB 0.42.1's supported model-selection flow and resolve marketplace PR #154. Reconcile Host Monitor v0.1.5 onto main, repair the Usage Tracker marketplace update, prepare Action Topbar and Touch Bar for release and marketplace submission without publishing until separately approved, and fix Action Topbar launcher stacking so its popover renders above BB page content while remaining below host-owned modal and dialog layers. Preserve unrelated plugin behavior and verify focused tests, workspace checks, managed installation, and live BB behavior.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "review",
+  "phase": "integrate",
   "status": "waiting",
   "repairAttempts": 2,
-  "message": "Final review-fix tree passes all Verify-gate checks with a stable live-host system check, locally passing marketplace required-label validation, fresh full-workspace/portability/contract receipts, and renewed browser/screenshot evidence.",
+  "message": "A genuinely isolated reviewer approved all twelve criteria at exact committed head 660c404 with no blocking security, correctness, design, or maintainability finding.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:59cfbff4a78984eaf37743b90145987e6d4e757818622efcb124665919a73a87",
@@ -30,7 +30,8 @@
     "qa-1bbcbe656d899120c64bbb21",
     "qa-a2c46f5b2dfcc100eeb5e6ec",
     "qa-2c42bc0d304ebc8bc6b98b1a",
-    "collected-543e6d91d56935953ebb8837"
+    "collected-543e6d91d56935953ebb8837",
+    "collected-60840921b170296bf8cf4b34"
   ],
   "legacyEvidenceCount": 0,
   "completion": {
@@ -46,5 +47,5 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-07T20:40:01.749Z"
+  "updatedAt": "2026-09-07T20:50:46.952Z"
 }

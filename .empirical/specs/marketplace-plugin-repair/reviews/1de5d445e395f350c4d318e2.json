@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:deb6465e693453e4e4170cbcbd2dc82253adf8e49bd0f6de1ccf45bad5e80d25",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "235147a554a9f5f48287766ae461acace0877bd3",
+  "headCommit": "660c4043884c91ad7277cb7ff371775400058643",
+  "diffDigest": "sha256:80f24b0fb47fb9ebeea53c048119ea962f6c04ea36014b44fe3966ed5c9897d7",
+  "verdict": "APPROVED",
+  "reviewerActor": "fresh-context-reviewer",
+  "reviewerInvocationId": "marketplace-plugin-repair-660c404-fcr-20260907-04",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: BB complete host list is preserved with identity, name, and connection state.\n- PASS AC-2: The BB-owned picker is host-routed and coherent changes persist and restore per host.\n- PASS AC-3: Host/provider isolation and malformed, unavailable, and obsolete-selection reconciliation are covered.\n- PASS AC-UI-1: BB-native responsive controls and required loading, empty, connection, and unavailable states are implemented and evidenced.\n- PASS AC-4: Documentation and metadata accurately describe the settings workflow and disclaim New Thread override.\n- PASS AC-UI-2: Intermediate overlay tiers and committed light, dark, and narrow evidence satisfy page/dialog ordering.\n- PASS AC-5: Focused contracts preserve launcher keyboard, dismissal, positioning, activation, and drag behavior.\n- PASS AC-6: Host Monitor 0.1.5 is reconciled with immutable-tag provenance and Touch Bar CLI compatibility.\n- PASS AC-7: Usage Tracker resolves 0.1.8 and passes the current marketplace contract under the required v1-change condition.\n- PASS AC-8: Submission status, manifests, immutable-source plans, entries, icons, screenshots, and compatibility disclosures are complete and truthful.\n- PASS AC-9: Final-tree receipts cover focused tests, typechecks, builds, workspace checks, packaging, portability, and installation contracts.\n- PASS AC-10: Live evidence records all changed plugins running with mixed host states, host-routed selection, and no-reload Host Monitor navigation.\n\n## Security / correctness\n\nNo blocking finding. Typed RPC validation, enrolled-host checks, bounded public errors and storage, guarded process operations, and time-bounded Touch Bar execution constrain the changed paths.\n\n## Design / maintainability\n\nD-001 is followed. Typed backend and pure adapter boundaries own host identity and selection resolution, BB owns the picker, shared semantic tiers define overlays, and cross-plugin contracts protect interoperability.",
+  "bodyDigest": "sha256:f13872c8a484cdfaba19de9bcfbd676ac34dd15a0b03cc0101990d0b6c005cab",
+  "digest": "sha256:1de5d445e395f350c4d318e2a93600e41a20aff6501c3c7e4006b79e2e8b3266"
+}
