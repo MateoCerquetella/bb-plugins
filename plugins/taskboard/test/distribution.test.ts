@@ -60,7 +60,7 @@ const activeContext = await Promise.all([
 const directGitInstall =
   'bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.3 --subdirectory plugins/taskboard --tag-prefix taskboard/';
 const usageGitInstall =
-  'bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.3 --subdirectory plugins/usage-tracker --tag-prefix usage-tracker/';
+  'bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.8 --subdirectory plugins/usage-tracker --tag-prefix usage-tracker/';
 
 test('keeps Taskboard private and Git-buildable without npm publication hooks', () => {
   assert.equal(rootManifest.private, true);
@@ -109,7 +109,7 @@ test('documents only BB Community and direct Git installation for Taskboard', ()
 test('keeps Usage Tracker private and documents its Git release too', async () => {
   assert.equal(usageManifest.private, true);
   assert.equal(usageManifest.name, 'bb-plugin-usage-tracker');
-  assert.equal(usageManifest.version, '0.1.5');
+  assert.equal(usageManifest.version, '0.1.8');
   assert.equal('publishConfig' in usageManifest, false);
   assert.equal('files' in usageManifest, false);
   assert.equal('prepack' in usageManifest.scripts, false);
