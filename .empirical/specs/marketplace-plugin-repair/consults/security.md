@@ -1,4 +1,4 @@
-# Security Advisory
+# Security consult
 
 Specialist: security
 
@@ -6,51 +6,40 @@ Verdict: advisory
 
 ## Findings
 
-### Finding 1
-- Severity: high
-- Category: information disclosure
-- Location: Save My Model RPC and frontend error handling
-- Recommendation: Never return raw host/provider exception text because it may
-  contain executable paths, usernames, or local configuration details. Return
-  fixed bounded messages for host-list, enrollment, and catalog failures.
-- Resolution: Implemented fixed messages on both RPC and frontend transport
-  boundaries.
-
-### Finding 2
-- Severity: medium
-- Category: authorization and routing
-- Location: `resolveSelection` RPC
-- Recommendation: Verify the requested host through `bb.sdk.hosts.get` before
-  routing provider discovery. Reject missing or identity-mismatched hosts and do
-  not invoke `system.executionOptions` for them.
-- Resolution: Implemented and covered by a no-dispatch regression test.
-
-### Finding 3
-- Severity: medium
-- Category: untrusted persistence
-- Location: browser localStorage preferences
-- Recommendation: Continue treating every stored field as untrusted. Bound
-  host/provider/model lengths, reject controls and unknown reasoning values,
-  cap listing work, and reconcile only against a successful live BB catalog.
-- Resolution: Existing validation remains active and now accepts BB's current
-  `ultracode` reasoning value.
-
-### Finding 4
-- Severity: medium
-- Category: UI integrity
-- Location: Action Topbar overlay
-- Recommendation: Keep the plugin overlay beneath BB-owned approval/dialog
-  tiers so it cannot visually obscure a security decision. Do not use the
-  browser top layer or an unbounded maximum z-index.
-- Resolution: The body-mounted launcher and drag overlays use tiers 40/41,
-  above ordinary panes and below host portals beginning at 50.
-
-### Finding 5
 - Severity: low
-- Category: release integrity
-- Location: Git tags and marketplace source ranges
-- Recommendation: Resolve only immutable plugin-prefixed tags, verify manifest
-  versions and commits before publication, and never move the existing Host
-  Monitor v0.1.5 tag.
-- Resolution: Release and marketplace commands remain behind separate exact
-  approval; Host Monitor's tag is unchanged.
+  Category: local navigation coordination
+  Location: `plugins/host-monitor/server.ts`, `plugins/host-monitor/sidebar-modal.ts`
+  Finding: the one-use Host Monitor open request is process-global, so another
+  authenticated BB tab could consume it first. The request only causes an
+  in-app navigation to an already enrolled host and expires after 15 seconds;
+  it does not grant access, execute host work, or expose a credential.
+  Recommendation: keep the one-use TTL and enrolled-host validation. Add a
+  tab/session correlation field only if BB later exposes a public requester
+  identity through the CLI or RPC surface.
+
+- Severity: low
+  Category: local data exposure and resource exhaustion
+  Location: `plugins/host-monitor/server.ts`, `plugins/touchbar/native/Sources/AgentModel.swift`
+  Finding: Touch Bar reads host resource summaries through the local BB CLI.
+  The projection contains no process names, command lines, addresses, prompt
+  text, or credentials, caps the host list at 100, caps native output at 1 MiB,
+  and bounds command execution and termination waits.
+  Recommendation: retain these projection, size, and timeout bounds when adding
+  future Touch Bar fields.
+
+- Severity: informational
+  Category: preference integrity
+  Location: `plugins/save-my-model/server.ts`, `plugins/save-my-model/lib/preferences.ts`
+  Finding: Save My Model derives hosts and execution options from BB public SDK
+  calls, validates explicit enrolled hosts, bounds persisted records, and does
+  not create or modify threads. No independent registry or transport expands
+  the trust boundary.
+  Recommendation: continue reconciling stored preferences against the selected
+  host's live catalog before presenting them as supported.
+
+- Severity: informational
+  Category: publication boundary
+  Location: `.empirical/specs/marketplace-plugin-repair/spec.md`
+  Finding: tags, releases, pushes, marketplace updates, and labels remain
+  unexecuted pending an exact user approval naming the remote mutations.
+  Recommendation: preserve that gate and use immutable plugin-prefixed tags.

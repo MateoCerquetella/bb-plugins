@@ -2,8 +2,9 @@
 
 ## Save My Model
 
-The backend registers a small typed RPC contract. `listHosts` returns bounded
-`id`, `name`, and `status` rows directly from `bb.sdk.hosts.list()`.
+The backend registers a small typed RPC contract. `listHosts` returns every
+`id`, `name`, and `status` row directly from `bb.sdk.hosts.list()` without a
+second registry or an arbitrary list cap.
 `resolveSelection` calls `bb.sdk.system.executionOptions()` for one explicit
 host and optional preferred provider, then returns one coherent supported
 provider/model/reasoning value or a bounded error state. No host or provider
@@ -24,8 +25,8 @@ single panel at narrow widths. Status uses a restrained green connected dot and
 muted disconnected treatment. Existing records and Clear all remain available
 as a secondary disclosure rather than the primary interaction.
 
-The package moves to the exact SDK version supplied by the live BB 0.41 server
-(SDK 0.4.46) and uses only
+The package declares compatibility with BB 0.41 and Plugin SDK 0.4.46 while
+its release build uses the published BB 0.42.1 / SDK 0.4.47 toolchain and only
 public SDK exports. Documentation explicitly says the plugin configures its own
 host-scoped records through BB's picker and does not override the root composer.
 
@@ -66,6 +67,7 @@ verification. No remote mutation occurs during implementation.
 
 Use pure resolver tests, storage tests, frontend SDK harness tests, CSS/DOM
 contract tests, plugin checks/builds, isolated managed installs, full workspace
-CI, and a live BB 0.41/SDK 0.4.46 exercise with connected and disconnected machines. Compare
+CI, and a live compatibility-floor BB 0.41/SDK 0.4.46 exercise with connected
+and disconnected machines. Compare
 the launcher against the supplied marketplace screenshot and capture final
 light/dark/narrow evidence before release approval.
