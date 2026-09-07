@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "sequence": 1,
+  "previousDigest": "sha256:c220624f1b224bb037bac16c903b280ca3a2396709adf2838d65cbc636d1997a",
+  "actor": "empirical-start",
+  "type": "transition",
+  "summary": "Started fix-the-bb-touch-bar-app-s-intermittent-connection-failure",
+  "createdAt": "2026-09-07T17:51:05.083Z",
+  "stateBeforeDigest": "sha256:74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+  "stateAfterDigest": "sha256:8356e9d52f6ca5206979f55e7a7fa43731ba96657da38dbbb055dc75cc7498a0",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 1,
+    "activeFeature": "fix-the-bb-touch-bar-app-s-intermittent-connection-failure",
+    "request": "Fix the BB Touch Bar app's intermittent connection failure where it shows reconnecting indefinitely; diagnose the lifecycle, implement a robust recovery, and verify the UI and connection behavior.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": null,
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:12c871e10ea2652a89544602c940dfa6fe7066990cd772d6aeffb1b0d3d16e83",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": null,
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-07T17:51:05.083Z"
+  },
+  "digest": "sha256:ec7889fb2e4d9fd6a3636d025185c04c806a3f9d4a4a163a1b6ab55281aa6e63"
+}

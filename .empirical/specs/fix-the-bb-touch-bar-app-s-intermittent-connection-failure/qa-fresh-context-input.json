@@ -1,0 +1,13 @@
+{
+  "checkId": "qa-fresh-context",
+  "criteria": ["AC-1", "AC-2", "AC-3", "AC-4"],
+  "outcome": "passed",
+  "summary": "Fresh outcome audit found no remaining blocking or recovery defect in the scoped native runner; focused verification passes, with physical AppKit validation unavailable on Linux.",
+  "collector": "Codex Touch Bar recovery audit",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/fix-the-bb-touch-bar-app-s-intermittent-connection-failure/fresh-context-result.json",
+      "mediaType": "application/json"
+    }
+  ]
+}

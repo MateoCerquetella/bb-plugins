@@ -1,0 +1,6 @@
+{
+  "checkId": "qa-unit",
+  "commandId": "touchbar-focused",
+  "criteria": ["AC-1", "AC-2", "AC-3", "AC-4"],
+  "summary": "Run the complete Touch Bar plugin check, including native command-runner regression contracts."
+}

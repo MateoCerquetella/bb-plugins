@@ -1,4 +1,5 @@
 import AppKit
+import Darwin
 
 enum AgentStatus: String, Decodable {
     case blocked, error, working, done, idle, waiting, unknown
@@ -294,6 +295,9 @@ final class AgentStore {
 }
 
 enum BBCommand {
+    private static let maximumOutputBytes = 65_536
+    private static let terminationGraceInterval: TimeInterval = 0.4
+
     static func run(_ arguments: [String], timeout: TimeInterval = 1.5) -> Data? {
         guard let executable = NativeConfig.bbExecutable else { return nil }
         let process = Process()
@@ -309,7 +313,26 @@ enum BBCommand {
         process.standardOutput = output
         process.standardError = FileHandle.nullDevice
 
+        let outputLock = NSLock()
+        var captured = Data()
+        var outputTooLarge = false
+        output.fileHandleForReading.readabilityHandler = { handle in
+            let chunk = handle.availableData
+            guard !chunk.isEmpty else { return }
+            outputLock.lock()
+            defer { outputLock.unlock() }
+            guard !outputTooLarge else { return }
+            let remaining = maximumOutputBytes - captured.count
+            guard chunk.count <= remaining else {
+                outputTooLarge = true
+                captured.removeAll(keepingCapacity: false)
+                return
+            }
+            captured.append(chunk)
+        }
+
         do { try process.run() } catch {
+            output.fileHandleForReading.readabilityHandler = nil
             NativeLog.error("could not launch bb: \(error.localizedDescription)")
             return nil
         }
@@ -322,9 +345,34 @@ enum BBCommand {
             NativeLog.error("bb snapshot timed out")
             timedOut = true
             process.terminate()
+            let terminationDeadline = Date().addingTimeInterval(terminationGraceInterval)
+            while process.isRunning && Date() < terminationDeadline {
+                Thread.sleep(forTimeInterval: 0.02)
+            }
+            if process.isRunning {
+                NativeLog.error("bb did not terminate; forcing exit")
+                Darwin.kill(process.processIdentifier, SIGKILL)
+                let killDeadline = Date().addingTimeInterval(terminationGraceInterval)
+                while process.isRunning && Date() < killDeadline {
+                    Thread.sleep(forTimeInterval: 0.01)
+                }
+            }
+        }
+        guard !process.isRunning else {
+            output.fileHandleForReading.readabilityHandler = nil
+            NativeLog.error("bb process remained alive after forced exit")
+            return nil
         }
         process.waitUntilExit()
-        let data = output.fileHandleForReading.readDataToEndOfFile()
+        output.fileHandleForReading.readabilityHandler = nil
+        outputLock.lock()
+        let data = captured
+        let exceededOutputLimit = outputTooLarge
+        outputLock.unlock()
+        guard !exceededOutputLimit else {
+            NativeLog.error("bb output too large")
+            return nil
+        }
         guard process.terminationStatus == 0 else {
             // The BB CLI can leave a helper child alive after writing its JSON.
             // Preserve a complete snapshot even when the wrapper is terminated.
