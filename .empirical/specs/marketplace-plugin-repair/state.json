@@ -1,16 +1,16 @@
 {
   "schemaVersion": 5,
-  "revision": 4,
+  "revision": 5,
   "activeFeature": "marketplace-plugin-repair",
   "request": "Fix Save My Model so its per-machine provider, model, and reasoning preference is connected to BB 0.42.1's supported model-selection flow and resolve marketplace PR #154. Reconcile Host Monitor v0.1.5 onto main, repair the Usage Tracker marketplace update, prepare Action Topbar and Touch Bar for release and marketplace submission without publishing until separately approved, and fix Action Topbar launcher stacking so its popover renders above BB page content while remaining below host-owned modal and dialog layers. Preserve unrelated plugin behavior and verify focused tests, workspace checks, managed installation, and live BB behavior.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "implement",
+  "phase": "context",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Planned SDK reconciliation, Save My Model implementation, Action Topbar layering, release alignment, marketplace preparation, exact approval boundary, and verification.",
-  "implementationActor": null,
+  "message": "Implemented the approved Save My Model, Action Topbar, Host Monitor, Usage Tracker, Touch Bar, marketplace preparation, live-install, and compatibility criteria without remote publication.",
+  "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:59cfbff4a78984eaf37743b90145987e6d4e757818622efcb124665919a73a87",
   "approvedSpecRevision": 2,
@@ -23,19 +23,18 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": false,
+    "implemented": true,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "none",
+    "highest": "implemented",
     "reasons": {
-      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-07T17:29:50.774Z"
+  "updatedAt": "2026-09-07T18:21:33.837Z"
 }

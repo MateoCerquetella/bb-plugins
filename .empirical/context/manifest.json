@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "generator": "empirical-0.31.0",
-  "sourceDigest": "sha256:df1092b3f2aba2da0dcb3290f4d5585fff846f4324e78f49c4c1813265411e27",
+  "sourceDigest": "sha256:95e77637fd23289ec4c794326c6491aed82c83e87f0413cf0c579b422daeefdd",
   "files": [
     {
       "path": ".agents/skills/empirical/SKILL.md",
@@ -96,7 +96,7 @@
     {
       "path": "README.md",
       "size": 13404,
-      "digest": "sha256:e43fd01c63893c622be0c4647f8165c7b85bbffe4bfed70db120ef149c224bf4"
+      "digest": "sha256:bd9c9d5d848c2e92e5104954a0fcdc77d3f44d25f855f1cbce4afbda840c5c53"
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -115,8 +115,8 @@
     },
     {
       "path": "package-lock.json",
-      "size": 298190,
-      "digest": "sha256:ade780293289402116c161c2d6e2205ff22513d1579a1886991fabc9c6eeadf2"
+      "size": 363291,
+      "digest": "sha256:eac1d3b69216485eb1122e4b14b6645a22f00a9432a93cc0adecb64918d5f451"
     },
     {
       "path": "package.json",
@@ -145,8 +145,8 @@
     },
     {
       "path": "plugins/action-topbar/app.css",
-      "size": 10472,
-      "digest": "sha256:10f4a58f196f33178aa13b49ccb84d03061554498b623e5c4cbcbfef2e85a614"
+      "size": 10675,
+      "digest": "sha256:535794d1f32558ac232038293bfd5c14faf34f5f90ce2a8f81f5855d4750f418"
     },
     {
       "path": "plugins/action-topbar/app.tsx",
@@ -175,8 +175,8 @@
     },
     {
       "path": "plugins/action-topbar/package.json",
-      "size": 2499,
-      "digest": "sha256:25b4b5f1b1301e7d64a1272c26e4f8c106c2346a342b8c22996785025d09b244"
+      "size": 2524,
+      "digest": "sha256:b8d3c19a970b050f5c8529681a2157f18179ea6d6a398c8c8f671cf8b258a8b9"
     },
     {
       "path": "plugins/action-topbar/server.ts",
@@ -190,8 +190,8 @@
     },
     {
       "path": "plugins/action-topbar/test/content-script-contract.test.ts",
-      "size": 3545,
-      "digest": "sha256:6c862f8d13d802ec97884ea2249b8ae857d6ed282ed94e3bc0dc510650fffa1e"
+      "size": 4215,
+      "digest": "sha256:d58383a169897434e5470e98faf5177630f20893e757adb6cd5538937d243a15"
     },
     {
       "path": "plugins/action-topbar/test/server.test.ts",
@@ -670,23 +670,23 @@
     },
     {
       "path": "plugins/host-monitor/README.md",
-      "size": 7019,
-      "digest": "sha256:a75519493491d8b3f1d022d79b2a607fa2160d441f4d38a11427c9dc5ae80e2c"
+      "size": 5631,
+      "digest": "sha256:0e329e4f9fc1cc028ead5454b3073c8141852a0ae22609e672cfe75fe172bbc9"
     },
     {
       "path": "plugins/host-monitor/THIRD_PARTY_NOTICES.md",
-      "size": 2012,
-      "digest": "sha256:2564c76f9eb205d4b60a6042e56faacd48ba1719697c36cccec7f665eb801770"
+      "size": 2908,
+      "digest": "sha256:3afb5802a06d0455697cb10afaaf47df8cea72dcba1b41c15587b00f28f50576"
     },
     {
       "path": "plugins/host-monitor/app.css",
-      "size": 52694,
-      "digest": "sha256:fe65da9ba527de0254a5d25a3f88f1d03055da345e77226f8b32f27669925074"
+      "size": 38082,
+      "digest": "sha256:ebe249980906f93ac6525aa06f706091c87b0ef530750ea01a8f24f1132153b0"
     },
     {
       "path": "plugins/host-monitor/app.tsx",
-      "size": 97197,
-      "digest": "sha256:140917866ebbb95d00bdad2b0e6e3591572b5fe60c014be501336a0092377565"
+      "size": 62652,
+      "digest": "sha256:1c31c0a921f5d0e01008aa4ce6d3449fe3e73449a70f3b1ea5307594e26a57e4"
     },
     {
       "path": "plugins/host-monitor/assets/icon.svg",
@@ -704,54 +704,59 @@
       "digest": "sha256:cc57f1269248347b6c938fa05c60c1a3ef27503f8485fe9438c4b56e5582adb4"
     },
     {
+      "path": "plugins/host-monitor/chart-data.ts",
+      "size": 1036,
+      "digest": "sha256:0e25679779c77810044f91b09fc7c2e4277ef2149b44d05fd192bf263a593f3d"
+    },
+    {
+      "path": "plugins/host-monitor/components/ui/badge.tsx",
+      "size": 313,
+      "digest": "sha256:d46e51adc99e91a24a5e654d3429c8ebe30026522db751dcb1f2598dc3489876"
+    },
+    {
+      "path": "plugins/host-monitor/components/ui/button.tsx",
+      "size": 672,
+      "digest": "sha256:cc337d65d4889227e85ed0844b447e1847f701eaef55b5247edcca90c472a4b8"
+    },
+    {
+      "path": "plugins/host-monitor/components/ui/input.tsx",
+      "size": 301,
+      "digest": "sha256:91161f962a64f3bbaf9e9dec0d06cb4ac60d96bcb35a60efdb3c86b5c32be5f3"
+    },
+    {
+      "path": "plugins/host-monitor/components/ui/select.tsx",
+      "size": 2775,
+      "digest": "sha256:a4e3578fecfc44fc68d5940385a3cf346236a6a5fdba61286f67231311adb66a"
+    },
+    {
+      "path": "plugins/host-monitor/components/ui/skeleton.tsx",
+      "size": 231,
+      "digest": "sha256:f5aa460d3578305c0e5876eebf0d3d9dabb480fb691ba593bc0407565d039008"
+    },
+    {
       "path": "plugins/host-monitor/contract.ts",
-      "size": 13888,
-      "digest": "sha256:e6de91e16318e4bb2b22ab6b09f377e930b595aa35f8a4e73df941bfe20994e2"
+      "size": 14015,
+      "digest": "sha256:66cb89ff9cc9219e907535379ccc8fc78a7c870cb2451fe71e3f0b8eaecb9280"
+    },
+    {
+      "path": "plugins/host-monitor/dashboard-config.ts",
+      "size": 8159,
+      "digest": "sha256:0a9e2076d9fddd81d1de57017255ab53d5c91d87371b1e8c389a7655fe9880e2"
     },
     {
       "path": "plugins/host-monitor/host.ts",
-      "size": 836,
-      "digest": "sha256:8a6816e7a1cf5957b224846c92f331501021568971732fe33bbebb9f07abe0fc"
-    },
-    {
-      "path": "plugins/host-monitor/lib/dashboard.ts",
-      "size": 10317,
-      "digest": "sha256:ed60f47f814c6edf601d16bb7a52f43a445161beefbd84099fc2e051bdfcdd09"
-    },
-    {
-      "path": "plugins/host-monitor/lib/fleet-presentation.ts",
-      "size": 2284,
-      "digest": "sha256:7ddd8279abb35ee8a2134eee4974efb2c0881f964c8fb53aa5dfde3888a29070"
-    },
-    {
-      "path": "plugins/host-monitor/lib/fleet-view-preference.ts",
-      "size": 1112,
-      "digest": "sha256:2d6e645e5b4a10e3e7bdc69382b48010dd7efe7a0b9653f656479c273146f6ee"
-    },
-    {
-      "path": "plugins/host-monitor/lib/ip-address-presentation.ts",
-      "size": 858,
-      "digest": "sha256:1368b736c42dd732231ba11004b0202a18a29e99959a938c3ba91d088fb03ebc"
+      "size": 825,
+      "digest": "sha256:3cfe0bc6afa723bfa9c123cb18e347c70c5828829d525f49e1b9a6c80a8e2e34"
     },
     {
       "path": "plugins/host-monitor/lib/metrics.ts",
-      "size": 36084,
-      "digest": "sha256:98d23a7d31bd4d54bb2879c95ad937afb97ecfa1504513b390cfd25187c51079"
-    },
-    {
-      "path": "plugins/host-monitor/lib/network-presentation.ts",
-      "size": 1354,
-      "digest": "sha256:2dab59ffa3ded56cbc20d9530ce4cc6b9847366f96f6e6b2f1231e93021d2648"
+      "size": 34725,
+      "digest": "sha256:7620a0014b1db54e79644a33b0b50bebe42b9bc6048094dcdf8d0660382c0ae4"
     },
     {
       "path": "plugins/host-monitor/lib/network-throughput.ts",
       "size": 9500,
       "digest": "sha256:4314bbf314e2a4f9d065772f5d67c39dcbc3b0fa5106cbc1fc0a45c73fd66a26"
-    },
-    {
-      "path": "plugins/host-monitor/lib/portal-scope.ts",
-      "size": 604,
-      "digest": "sha256:88411fff670098cdbedd95dafafef52c5cb8da2a686029dcdc23c804949a3b54"
     },
     {
       "path": "plugins/host-monitor/lib/process-confirmations.ts",
@@ -774,79 +779,59 @@
       "digest": "sha256:08d3a9f534e2a8ea46924df95748476a928916026a5b790449e53cf4e77acad1"
     },
     {
-      "path": "plugins/host-monitor/lib/sidebar-host-monitor.ts",
-      "size": 61835,
-      "digest": "sha256:ab666a5ee5c1eeb8f888be1249b0660b41d684b51f644f0e7bf1bccaf51247bb"
-    },
-    {
-      "path": "plugins/host-monitor/lib/threshold-presentation.ts",
-      "size": 1820,
-      "digest": "sha256:52bcfde16c8b2670f5885fae346eae51af4ddab4e3789d9b3c42a8baeb9d7f58"
-    },
-    {
-      "path": "plugins/host-monitor/lib/thresholds.ts",
-      "size": 1713,
-      "digest": "sha256:88dd2c1d09db528e3a22ccf2c4de7ef3b9fd172090044d6ec125f19afdfa14db"
-    },
-    {
       "path": "plugins/host-monitor/package.json",
-      "size": 2995,
-      "digest": "sha256:a7d9482b24fabdc3b5f2e5d148e9d4fb8ceb98187d36e05e1e971ad49233bebb"
+      "size": 3161,
+      "digest": "sha256:189ae5ad32fa5a2dc46c7e48ffe09dd324f65c1ab96f90f3b1f7eacece225824"
     },
     {
       "path": "plugins/host-monitor/server.ts",
-      "size": 22532,
-      "digest": "sha256:083c07030572f73a74d3e95796f9f37d07193a6bd227ff7f568048bbf337fb6a"
+      "size": 20483,
+      "digest": "sha256:3dd5bd1bca0f09cfaa7d26409b7955d7b37ab103b9f8c25b798cbc9580729a43"
+    },
+    {
+      "path": "plugins/host-monitor/sidebar-modal.ts",
+      "size": 14530,
+      "digest": "sha256:88b7c57e3d4ab4c62c061db7683b393f4a4f21e22b3c18e97665abd9140b1c7a"
+    },
+    {
+      "path": "plugins/host-monitor/store.ts",
+      "size": 5892,
+      "digest": "sha256:22c61c06f7939b5e08421b46f60f7d101997cc3c965e8dea1428fc2a27ea64f4"
     },
     {
       "path": "plugins/host-monitor/test/app-registration.test.ts",
-      "size": 15715,
-      "digest": "sha256:39126ee5fca7fc169ea2986242ea37e452afc72045b03536b6ac73a91727f986"
+      "size": 3171,
+      "digest": "sha256:720479a36a56c056a3c24226a70b14bcc114feaecf6489ce63bcb4d136abdabb"
     },
     {
-      "path": "plugins/host-monitor/test/contract.test.ts",
-      "size": 4314,
-      "digest": "sha256:ddd04dc7dc8a24e2ef70b7bde11adf5805bae53406f4a53391343e2792d69dde"
+      "path": "plugins/host-monitor/test/chart-data.test.ts",
+      "size": 694,
+      "digest": "sha256:a39a1ad9d30916dbe5aa3f7941e5ce8f939a4ca774a17df8476fb2e5aee2bed7"
     },
     {
-      "path": "plugins/host-monitor/test/css-loader.mjs",
-      "size": 228,
-      "digest": "sha256:5827fd7856c49706d05259e2d74e6c366f4dbb730acbe8bbf09d64c2389160e2"
+      "path": "plugins/host-monitor/test/dashboard-config.test.ts",
+      "size": 5640,
+      "digest": "sha256:4d6d0a5cbc994e7c8ef7772fb7d3e01b57265c37ee01641585d474d9aa780f69"
     },
     {
-      "path": "plugins/host-monitor/test/dashboard.test.ts",
-      "size": 11601,
-      "digest": "sha256:43800a3f3a962ebbb5a8402204c26c7ada03fc4c42d64e70b6581aacb3c9874c"
+      "path": "plugins/host-monitor/test/echarts-hover.test.ts",
+      "size": 1878,
+      "digest": "sha256:cf24abd6ff6f6c9f1e392b16d7a7fece0ac695c293595a2965355ad863c36c36"
     },
     {
-      "path": "plugins/host-monitor/test/fleet-presentation.test.ts",
-      "size": 3977,
-      "digest": "sha256:cbae77c4548e6c6f7b0794d217afcd31d74041b6a31efa9995263d16c088631a"
-    },
-    {
-      "path": "plugins/host-monitor/test/fleet-view-preference.test.ts",
-      "size": 1842,
-      "digest": "sha256:04fb1beced170f5d509e93ab59bbfab81d76f28d2635108e2e00e78ce10765df"
-    },
-    {
-      "path": "plugins/host-monitor/test/ip-address-presentation.test.ts",
-      "size": 1325,
-      "digest": "sha256:a4b6f7f62f0da406cd85c38f4140af21344cec740695e946e03adfa2fd0d8378"
+      "path": "plugins/host-monitor/test/host.test.ts",
+      "size": 832,
+      "digest": "sha256:2e75972186f88875de4a3df8f2a5c55499cd70d4401951ad55c8d3cba9e1de2a"
     },
     {
       "path": "plugins/host-monitor/test/metrics.test.ts",
-      "size": 10587,
-      "digest": "sha256:f9f1840e8ad6aadf6f6281ac13c93c8a31ebf943a61b912c309a311b80551df4"
+      "size": 1964,
+      "digest": "sha256:d7a62e68ad9e75d9014bd9a940b02400edeb6b254f3116bfc12b5c447edf6c61"
     },
     {
-      "path": "plugins/host-monitor/test/network-presentation.test.ts",
-      "size": 1398,
-      "digest": "sha256:3df04b600bf5aba207fd42354a5770ecf02efcf40780f92e4f0ac19ce07156dc"
-    },
-    {
-      "path": "plugins/host-monitor/test/network-throughput.test.ts",
-      "size": 5814,
-      "digest": "sha256:d0d094d848048d59503b1d088a400ab6330d1d6786a13b7e38d0d3a8c5679ba2"
+      "path": "plugins/host-monitor/test/mobile-layout.test.ts",
+      "size": 7754,
+      "digest": "sha256:3a8769f11c50ced35c2dd824b03ff6273eec1948a3bca7b0ff7ce21c7766875e"
     },
     {
       "path": "plugins/host-monitor/test/process-confirmations.test.ts",
@@ -860,8 +845,8 @@
     },
     {
       "path": "plugins/host-monitor/test/process-presentation.test.ts",
-      "size": 3934,
-      "digest": "sha256:c31b258c08883017bb9499246b4f87e353869f321d0206a5dc261cceeee9db56"
+      "size": 3937,
+      "digest": "sha256:f79ddd3396863ebd43ee50ee27ee5eb4a3222260ec79b2bab27f200f1eb3cd77"
     },
     {
       "path": "plugins/host-monitor/test/process-server.test.ts",
@@ -874,29 +859,19 @@
       "digest": "sha256:fa586c33b418c91f9ba1712111eb99f2820e60d33a1095a48fdf0336817948f8"
     },
     {
-      "path": "plugins/host-monitor/test/register-css.mjs",
-      "size": 88,
-      "digest": "sha256:b22ca9935a50a43a5293b4437a5179bfe53541e3b7f4144de15fe56d9b7131a0"
+      "path": "plugins/host-monitor/test/server-registration.test.ts",
+      "size": 7218,
+      "digest": "sha256:4297a443553f187ff7a2ffa25154daefa494b7b84f66f36fca07a65d7ec7875b"
     },
     {
-      "path": "plugins/host-monitor/test/server.test.ts",
-      "size": 12013,
-      "digest": "sha256:e9a426660781ff68bba8dc2805a0a408c0fd734a78e1b3b62ae3276599f0e5f2"
+      "path": "plugins/host-monitor/test/sidebar-modal.test.ts",
+      "size": 4314,
+      "digest": "sha256:d95186d35672419172f8ff54716401e77aad3ed2313f4eec5cb5c1f889a1b362"
     },
     {
-      "path": "plugins/host-monitor/test/sidebar-summary.test.ts",
-      "size": 20134,
-      "digest": "sha256:12fad353d458804c79a16ca5064a63d6f6f2044a8236613cd05364b51493d141"
-    },
-    {
-      "path": "plugins/host-monitor/test/threshold-presentation.test.ts",
-      "size": 2956,
-      "digest": "sha256:2ce0ba9ceadcabd7aa5313e4e70bdcf1b000dd45fdc847acacae2bf744c58832"
-    },
-    {
-      "path": "plugins/host-monitor/test/thresholds.test.ts",
-      "size": 2127,
-      "digest": "sha256:37584645daaf87e4cf3ecc77e9838a071d12f26f6fd82a74ba5c3bb16414d462"
+      "path": "plugins/host-monitor/test/store.test.ts",
+      "size": 4278,
+      "digest": "sha256:883ac53340b587ccb2c508cf57258b9d9d244c1704c0969b047a8d3cfe316196"
     },
     {
       "path": "plugins/host-monitor/tsconfig.json",
@@ -910,38 +885,68 @@
     },
     {
       "path": "plugins/save-my-model/README.md",
-      "size": 1103,
-      "digest": "sha256:def73b0b0a0842a08a85cfe2f07fbe91dc4de7db43113f02c68e2b59649a3c08"
+      "size": 1528,
+      "digest": "sha256:5470485029616fd8434ca7f3bf2b975905ce42f5a4c7814919f7fcc4a9c2bc74"
+    },
+    {
+      "path": "plugins/save-my-model/app.css",
+      "size": 4518,
+      "digest": "sha256:89710554c3f834f37b4048a940f8dc0a1554bc5c9ef6cea2e12d70793beb1266"
     },
     {
       "path": "plugins/save-my-model/app.tsx",
-      "size": 1396,
-      "digest": "sha256:b95e2bec6669d0f1769d791c441107bafa29355c551e9d8b54f7528667746474"
+      "size": 8577,
+      "digest": "sha256:741ac0bb4e887283b6e432479c1d32f4ed2903467a16b5bf6ee72504c1519a8d"
     },
     {
       "path": "plugins/save-my-model/assets/icon.svg",
-      "size": 260,
-      "digest": "sha256:c51e37f877b54a14dc908b71966c4333f269f3b936e559501ec4a1a6f0737e0e"
+      "size": 402,
+      "digest": "sha256:3e4cd1b90a7208ed2368193c11539f9b796f766793f26047d174828d74f3acf4"
+    },
+    {
+      "path": "plugins/save-my-model/contract.ts",
+      "size": 1425,
+      "digest": "sha256:0dabd751a3d3d256e3bc706babe8ee59f8b58760dbc3ebbd4a2aaaf15478b70d"
     },
     {
       "path": "plugins/save-my-model/lib/preferences.ts",
-      "size": 8948,
-      "digest": "sha256:69f0b590f00aa31b0dd61d937a2f20ed1ac3bec25d3cf89781387308de916e44"
+      "size": 8979,
+      "digest": "sha256:0a0857e75dfcafc3273305fe478e46da15f4585b3fd08db0dae9bcb2d0d8deee"
+    },
+    {
+      "path": "plugins/save-my-model/lib/selection.ts",
+      "size": 3255,
+      "digest": "sha256:e5901c1be8e17f01cd1f9dcd71553924390bae8b2babc065d94e9d3dafbbca8c"
     },
     {
       "path": "plugins/save-my-model/package.json",
-      "size": 1764,
-      "digest": "sha256:dce02c7c6de4244005056eaaf4b561df641ec1207006d210c53edf044b156808"
+      "size": 2299,
+      "digest": "sha256:42a00cbd1588d6917d90be30264694203632fc76c9cee29e3ec34e1ee4a36980"
     },
     {
       "path": "plugins/save-my-model/server.ts",
-      "size": 107,
-      "digest": "sha256:e172744c193a756087835ab1d72cee0f6f6a3808e5c31726b83ce9a4ca2cc35f"
+      "size": 1237,
+      "digest": "sha256:785d85fc00dbca4b483cb200eb5488e249d3782d933b2dd5937cfd2344893dee"
+    },
+    {
+      "path": "plugins/save-my-model/test/app.test.tsx",
+      "size": 2642,
+      "digest": "sha256:41107279b3b086f644e1208cba9cd2ae4d6d8cdb823cf47e5060a43f63900a79"
     },
     {
       "path": "plugins/save-my-model/test/preferences.test.ts",
       "size": 8291,
       "digest": "sha256:cbdb920e235a28b1548cb3d300cdedc8304064a05fe4795239eb3ee858107312"
+    },
+    {
+      "path": "plugins/save-my-model/test/selection.test.ts",
+      "size": 2834,
+      "digest": "sha256:9caba4a866da8bfdefe22337f4853b4b6c470980085bea1f0d14b77d565fe8ce"
+    },
+    {
+      "path": "plugins/save-my-model/test/server.test.ts",
+      "size": 1846,
+      "digest": "sha256:b17f319fa46fe352ca361d06bfff3f0bf4fa93dcf71a39eb7984fb49d24d94c7"
     },
     {
       "path": "plugins/save-my-model/tsconfig.json",
@@ -1211,7 +1216,7 @@
     {
       "path": "plugins/taskboard/test/distribution.test.ts",
       "size": 6759,
-      "digest": "sha256:f94572780a9e7b3c68c928b61a12170f9678551c9a9dbf9db305953d9b08da74"
+      "digest": "sha256:330ff90c1110f50af295e43d11dc1ec58bdaf1668268ce29e6b63397b021ceae"
     },
     {
       "path": "plugins/taskboard/test/filter-presets-backend.test.ts",
@@ -1255,8 +1260,8 @@
     },
     {
       "path": "plugins/touchbar/README.md",
-      "size": 8519,
-      "digest": "sha256:5b6594fb787db8d870088667404a968269f560ba5a56dbf6784e3f2122ee5b6e"
+      "size": 9980,
+      "digest": "sha256:76314ae90071399f1cd0f31ebe7e09e62b0bcb024f3e30d5dbbeb0094c91d989"
     },
     {
       "path": "plugins/touchbar/assets/icon.svg",
@@ -1285,8 +1290,8 @@
     },
     {
       "path": "plugins/touchbar/lib/snapshot.ts",
-      "size": 6229,
-      "digest": "sha256:3e6cd6df7c8a84f64d2796cbc56743069db9d618f34cb74b8d570fbfc145b688"
+      "size": 6636,
+      "digest": "sha256:7eab72b9178913855a7ce47ec6fb397d3573be04accb5eec779d887c0faeec25"
     },
     {
       "path": "plugins/touchbar/native/Assets/NOTICE.md",
@@ -1335,8 +1340,8 @@
     },
     {
       "path": "plugins/touchbar/native/Sources/AgentModel.swift",
-      "size": 11265,
-      "digest": "sha256:a30177835e58b66b3cd3bbfb828cdd7a2cfb4c15ffeb076850bdc647439ad5d2"
+      "size": 12514,
+      "digest": "sha256:962976497bd53d173554c363a327f5ed1ae6c28df2f842774f19c8b4033db409"
     },
     {
       "path": "plugins/touchbar/native/Sources/BBTouchBarPrivate.h",
@@ -1350,13 +1355,13 @@
     },
     {
       "path": "plugins/touchbar/native/Sources/Support.swift",
-      "size": 6397,
-      "digest": "sha256:3852452a4be89fc91d66711d1039a2e9aa23d112c93dd889a6e152d79526f2ee"
+      "size": 6464,
+      "digest": "sha256:1192e6258165c519b15514b85ab513588da609efba71e6ec5c3052aa8177b025"
     },
     {
       "path": "plugins/touchbar/native/Sources/TouchBarController.swift",
-      "size": 70341,
-      "digest": "sha256:e0cbdfa4b4f8bba4e74eb517acdd212ecb018b9730719dbd7b0b567e5d6ce9ec"
+      "size": 66579,
+      "digest": "sha256:c1baba41fa3200457ebbcb559fee8f552ec13d32d7696ac69d7ea70f66392c86"
     },
     {
       "path": "plugins/touchbar/native/Sources/main.swift",
@@ -1420,8 +1425,8 @@
     },
     {
       "path": "plugins/touchbar/test/companion.test.ts",
-      "size": 17643,
-      "digest": "sha256:b88d60c058e38b0984900dea31aa965ed3fb65532e0261559bde7d4868dba37a"
+      "size": 18601,
+      "digest": "sha256:d3084b8fd4d77737093d5a39383b6203f37394a68ca9a69fce3b10dfc4d0e7ec"
     },
     {
       "path": "plugins/touchbar/test/live-smoke.mjs",
@@ -1440,8 +1445,8 @@
     },
     {
       "path": "plugins/touchbar/test/snapshot.test.ts",
-      "size": 3976,
-      "digest": "sha256:24ed87ceef5e75f50d28f72a5f1aeef5e66dab5e55de3233dda86df7004d9015"
+      "size": 4839,
+      "digest": "sha256:766b8fc9b957851348d5df491ac7a632700b61cca6bea8ec36337f16e52a009b"
     },
     {
       "path": "plugins/touchbar/test/verification-check.sh",
@@ -1735,54 +1740,55 @@
         "plugins/host-monitor/assets/icon.svg",
         "plugins/host-monitor/assets/logo-dark.svg",
         "plugins/host-monitor/assets/logo.svg",
+        "plugins/host-monitor/chart-data.ts",
+        "plugins/host-monitor/components/ui/badge.tsx",
+        "plugins/host-monitor/components/ui/button.tsx",
+        "plugins/host-monitor/components/ui/input.tsx",
+        "plugins/host-monitor/components/ui/select.tsx",
+        "plugins/host-monitor/components/ui/skeleton.tsx",
         "plugins/host-monitor/contract.ts",
+        "plugins/host-monitor/dashboard-config.ts",
         "plugins/host-monitor/host.ts",
-        "plugins/host-monitor/lib/dashboard.ts",
-        "plugins/host-monitor/lib/fleet-presentation.ts",
-        "plugins/host-monitor/lib/fleet-view-preference.ts",
-        "plugins/host-monitor/lib/ip-address-presentation.ts",
         "plugins/host-monitor/lib/metrics.ts",
-        "plugins/host-monitor/lib/network-presentation.ts",
         "plugins/host-monitor/lib/network-throughput.ts",
-        "plugins/host-monitor/lib/portal-scope.ts",
         "plugins/host-monitor/lib/process-confirmations.ts",
         "plugins/host-monitor/lib/process-operation-gate.ts",
         "plugins/host-monitor/lib/process-presentation.ts",
         "plugins/host-monitor/lib/processes.ts",
-        "plugins/host-monitor/lib/sidebar-host-monitor.ts",
-        "plugins/host-monitor/lib/threshold-presentation.ts",
-        "plugins/host-monitor/lib/thresholds.ts",
         "plugins/host-monitor/package.json",
         "plugins/host-monitor/server.ts",
+        "plugins/host-monitor/sidebar-modal.ts",
+        "plugins/host-monitor/store.ts",
         "plugins/host-monitor/test/app-registration.test.ts",
-        "plugins/host-monitor/test/contract.test.ts",
-        "plugins/host-monitor/test/css-loader.mjs",
-        "plugins/host-monitor/test/dashboard.test.ts",
-        "plugins/host-monitor/test/fleet-presentation.test.ts",
-        "plugins/host-monitor/test/fleet-view-preference.test.ts",
-        "plugins/host-monitor/test/ip-address-presentation.test.ts",
+        "plugins/host-monitor/test/chart-data.test.ts",
+        "plugins/host-monitor/test/dashboard-config.test.ts",
+        "plugins/host-monitor/test/echarts-hover.test.ts",
+        "plugins/host-monitor/test/host.test.ts",
         "plugins/host-monitor/test/metrics.test.ts",
-        "plugins/host-monitor/test/network-presentation.test.ts",
-        "plugins/host-monitor/test/network-throughput.test.ts",
+        "plugins/host-monitor/test/mobile-layout.test.ts",
         "plugins/host-monitor/test/process-confirmations.test.ts",
         "plugins/host-monitor/test/process-operation-gate.test.ts",
         "plugins/host-monitor/test/process-presentation.test.ts",
         "plugins/host-monitor/test/process-server.test.ts",
         "plugins/host-monitor/test/processes.test.ts",
-        "plugins/host-monitor/test/register-css.mjs",
-        "plugins/host-monitor/test/server.test.ts",
-        "plugins/host-monitor/test/sidebar-summary.test.ts",
-        "plugins/host-monitor/test/threshold-presentation.test.ts",
-        "plugins/host-monitor/test/thresholds.test.ts",
+        "plugins/host-monitor/test/server-registration.test.ts",
+        "plugins/host-monitor/test/sidebar-modal.test.ts",
+        "plugins/host-monitor/test/store.test.ts",
         "plugins/host-monitor/tsconfig.json",
         "plugins/host-monitor/types/css-modules.d.ts",
         "plugins/save-my-model/README.md",
+        "plugins/save-my-model/app.css",
         "plugins/save-my-model/app.tsx",
         "plugins/save-my-model/assets/icon.svg",
+        "plugins/save-my-model/contract.ts",
         "plugins/save-my-model/lib/preferences.ts",
+        "plugins/save-my-model/lib/selection.ts",
         "plugins/save-my-model/package.json",
         "plugins/save-my-model/server.ts",
+        "plugins/save-my-model/test/app.test.tsx",
         "plugins/save-my-model/test/preferences.test.ts",
+        "plugins/save-my-model/test/selection.test.ts",
+        "plugins/save-my-model/test/server.test.ts",
         "plugins/save-my-model/tsconfig.json",
         "plugins/taskboard/LICENSE",
         "plugins/taskboard/README.md",
@@ -1913,8 +1919,8 @@
         "plugins/usage-tracker/tsconfig.json",
         "plugins/usage-tracker/types/css-modules.d.ts"
       ],
-      "sourceDigest": "sha256:df1092b3f2aba2da0dcb3290f4d5585fff846f4324e78f49c4c1813265411e27",
-      "digest": "sha256:eed9cfd95fdecbf70535c9b9bfdb204011bdad5af0a5418d4d923f3a99f354f2",
+      "sourceDigest": "sha256:95e77637fd23289ec4c794326c6491aed82c83e87f0413cf0c579b422daeefdd",
+      "digest": "sha256:79de616543c9f1dbc16919d4fe441aa54b81f8c786d666cba883b00bf4a269b3",
       "freshness": "fresh"
     },
     {
@@ -1950,8 +1956,8 @@
         "plugins/usage-tracker/README.md",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:c99a0c20f49cf68d97062ca317334d591a8d08407b13230a315d87a1d488aa5d",
-      "digest": "sha256:37f1b782a0e88dee101030bf6ac6aa2742c329ca37daf764d5022e793ce6bc15",
+      "sourceDigest": "sha256:e0b5d0ee3ed493edfb3e527e277d13781e5b775a76eb921948d67b73957be7fc",
+      "digest": "sha256:6b86f7f119ad78e594aadd27b355bc971298a9545996dc63573e85dbe5a93b7d",
       "freshness": "fresh"
     },
     {
@@ -1969,8 +1975,8 @@
         "plugins/touchbar/package.json",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:842609399b970981507f83cc34f893b8146fc676f478ebf525b58847571d0b63",
-      "digest": "sha256:6a3333fdbbcffff93c96400aab0596932dc23cce823061cdedacad5e44ef7bd7",
+      "sourceDigest": "sha256:8a92c7e33d3e1ffe67ccad1b1668ea9b87d1a83ecfbb121477c0107fca75b9ab",
+      "digest": "sha256:0c70409e370800e5520546eb4e504b51baf0abf858c204eb578652d9b7f33457",
       "freshness": "fresh"
     },
     {
@@ -1989,8 +1995,8 @@
         "plugins/touchbar/package.json",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:b8a72a9e4c0606b2c5567d72c1c6fb7b6d6df8100b2e28785ebd5b0639bba88b",
-      "digest": "sha256:06a7a6d07d2649e2d00a93cf62beef749d2f5dada25077c225726f81ec2eeed3",
+      "sourceDigest": "sha256:8ad3cbc5e3ba0e7f71f18bea8159cca2bd80577445d5645628ca93547a9b779d",
+      "digest": "sha256:61fbb25bc42115aa24d147e84156bd0707fdd3f3a5f991d5e98fb857d04c1e98",
       "freshness": "fresh"
     },
     {
@@ -2015,7 +2021,7 @@
     {
       "path": ".empirical/context/design-language.md",
       "generator": "empirical-0.31.0",
-      "managed": true,
+      "managed": false,
       "dependencies": [
         "plugins/action-topbar/app.css",
         "plugins/action-topbar/app.tsx",
@@ -2045,7 +2051,14 @@
         "plugins/dockside/components/ui/select.tsx",
         "plugins/host-monitor/app.css",
         "plugins/host-monitor/app.tsx",
+        "plugins/host-monitor/components/ui/badge.tsx",
+        "plugins/host-monitor/components/ui/button.tsx",
+        "plugins/host-monitor/components/ui/input.tsx",
+        "plugins/host-monitor/components/ui/select.tsx",
+        "plugins/host-monitor/components/ui/skeleton.tsx",
+        "plugins/save-my-model/app.css",
         "plugins/save-my-model/app.tsx",
+        "plugins/save-my-model/test/app.test.tsx",
         "plugins/taskboard/app.css",
         "plugins/taskboard/app.tsx",
         "plugins/taskboard/components/ui/badge.tsx",
@@ -2065,11 +2078,11 @@
         "plugins/usage-tracker/app.css",
         "plugins/usage-tracker/app.tsx"
       ],
-      "sourceDigest": "sha256:007db7655fb06377fc181f23c1905af6b73e53fe1a581b887164aafa93922e44",
-      "digest": "sha256:5e965195fbef9c208f83e253e499b58315876d853e7c7032aa5de65748b68bd7",
+      "sourceDigest": "sha256:53ed22b584b910971784ba987d790c49abc0484c2c15321206a926419383f5e8",
+      "digest": "sha256:397630cb45bff6227b2e28987bb472cead9e35ad071b60054a6021c95efceed0",
       "freshness": "fresh"
     }
   ],
   "truncated": false,
-  "digest": "sha256:a01a41509ea495c902ce099b020338615a2f9cb70be81efb9350fd4814312ad9"
+  "digest": "sha256:67f8b613e79e2c9f4d08ac7228a057c8c2ff9137bc0d6e98154ecdcf1ca9851f"
 }

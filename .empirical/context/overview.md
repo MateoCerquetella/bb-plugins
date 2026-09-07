@@ -9,17 +9,23 @@
 - Dockside replaces BB's thread list with a compact project-first sidebar,
   root/child thread families, semantic activity states, filters, and guarded
   multi-select deletion.
-- Save My Model provides the host-scoped provider and host/provider-scoped
-  model/reasoning persistence contract proposed by BB PR #1964, plus a settings
-  section for inspecting and clearing plugin-owned browser storage.
+- Save My Model lists BB's enrolled machines, resolves a coherent selection
+  through BB's host-routed provider/model picker, and stores provider plus
+  model/reasoning preferences independently per machine/provider. Its settings
+  also reviews and clears plugin-owned browser storage.
 - Taskboard gives each BB project one GitHub, Linear, or Jira-backed List/Kanban
   board with cached browsing, live detail, status changes, issue creation,
   remembered and named project views, mentions, CLI access, and agent handoff.
-- Usage Tracker places Codex and Claude Code quota windows in BB's sidebar
+- Usage Tracker places Codex, Claude Code, Cursor, Grok, OpenCode, and
+  Antigravity quota windows in BB's sidebar
   footer and lets the user choose the weekly or five-hour compact reading.
 - Host Monitor presents live CPU, RAM, disk, network, load, uptime, connection,
   and sample-health data for every enrolled BB host, with guarded on-demand
   process inspection and termination.
+- Touch Bar exposes bounded BB thread/provider/host state to a native macOS
+  Touch Bar companion with guarded open/stop commands and no prompt content.
+- Clean My Context resets visible/provider context in an existing BB thread
+  while preserving its workspace and durable thread identity.
 
 ## Boundaries
 
@@ -34,14 +40,15 @@
 - Taskboard's current browse state stays versioned and device-local; named
   project presets store validated snapshots in the plugin database and apply
   explicitly through that same browse store.
-- All six indexed plugins are private/non-publishable workspaces. Releases use
+- The root indexes eight independently installable plugins. Git-distributed
+  release workspaces that are private use
   immutable plugin-specific Git tags plus the BB Community marketplace.
-- Action Topbar is not marketplace-ready. It requires the matching BB core and
+- Action Topbar requires the matching BB core and
   experimental Plugin SDK 0.4.33 Action split-drag API; stock BB releases that
   lack that API cannot render its native main-workspace panes.
-- Save My Model cannot intercept BB's built-in new-thread picker through the
-  current Plugin SDK. It owns only its localStorage contract and settings UI;
-  native picker integration remains upstream in BB PR #1964.
+- Save My Model uses BB's supported controlled picker in its own settings but
+  cannot intercept the built-in new-thread picker. It does not claim that its
+  records change root-composer defaults.
 - Generated `dist/` and `node_modules/` are build/install products, not authored
   source and are not committed.
 - Empirical tracker integration is explicitly disabled in this checkout, so

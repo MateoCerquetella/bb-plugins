@@ -12,10 +12,14 @@
   and project/thread data assembly. `app.tsx` owns the replacement sidebar,
   compact root/child families, navigation, status presentation, preferences,
   and multi-selection interactions.
-- `plugins/save-my-model/lib/preferences.ts` owns bounded localStorage records:
+- `plugins/save-my-model/server.ts` adapts `bb.sdk.hosts.list` and
+  `bb.sdk.system.executionOptions` into a bounded typed RPC contract.
+  `lib/selection.ts` reconciles stored choices with a live host catalog and
+  `lib/preferences.ts` owns bounded localStorage records:
   selected provider per normalized host, model/reasoning per host and provider,
   and exact provider-scoped then matching-unscoped legacy fallback. `app.tsx`
-  exposes inspect/clear settings; it does not replace BB's native picker.
+  renders BB's controlled host-routed picker plus inspect/clear settings; it
+  does not replace BB's root composer.
 - `plugins/taskboard/server.ts` is the backend composition root. It wires typed
   RPC handlers, project-scoped configuration and credentials, the local cache,
   provider adapters, background sync, mentions, CLI commands, and hidden helper
@@ -38,7 +42,7 @@
   strict privacy-bounded telemetry/process projection on an enrolled machine;
   `app.tsx` owns the dashboard, sidebar summary, floating monitor, inspector,
   settings, and guarded process-confirmation UI.
-- All six indexed plugin manifests remain workspace/build manifests but are
+- The indexed plugin manifests remain workspace/build manifests; private ones are
   private. BB resolves releases from the monorepo's plugin-specific Git tags
   and the corresponding plugin subdirectory.
 

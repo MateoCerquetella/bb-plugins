@@ -19,10 +19,10 @@ Commands below are verified from workspace and plugin manifests.
 - `bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.0 --subdirectory plugins/taskboard --tag-prefix taskboard/`
   — install the released Taskboard Git range directly.
 - `bb plugin install ./plugins/usage-tracker` — register Usage Tracker locally.
-- `bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.3 --subdirectory plugins/usage-tracker --tag-prefix usage-tracker/`
+- `bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.8 --subdirectory plugins/usage-tracker --tag-prefix usage-tracker/`
   — install the released Usage Tracker Git range directly.
 - `bb plugin install ./plugins/host-monitor` — register Host Monitor locally.
-- `bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.0 --subdirectory plugins/host-monitor --tag-prefix host-monitor/`
+- `bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.5 --subdirectory plugins/host-monitor --tag-prefix host-monitor/`
   — install the released Host Monitor Git range directly.
 
 ## Run, test, and build
@@ -38,7 +38,9 @@ Commands below are verified from workspace and plugin manifests.
   typecheck, tests, and BB build; root `check:dockside` additionally enforces its
   repository contract.
 - `npm run check --workspace bb-plugin-save-my-model` — Save My Model SDK-type
-  check, typecheck, preference tests, and BB build.
+  check, typecheck, storage/resolver/server/frontend-harness tests, and BB build.
+- `npm run check --workspace bb-plugin-touchbar` — Touch Bar typecheck, bounded
+  server/companion tests, and BB build.
 - `npm run dev --workspace bb-plugin-taskboard` — Taskboard watch/build/reload
   loop after the local path is installed.
 - `npm run typecheck --workspace bb-plugin-taskboard` and
