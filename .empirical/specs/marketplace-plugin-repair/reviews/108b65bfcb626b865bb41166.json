@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:1cebd585d5b3f3fdc3e76cfc57ad75a108e3597f5ca9e3282707410811f36922",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "235147a554a9f5f48287766ae461acace0877bd3",
+  "headCommit": "da3b8826a4a071c76b34c15e96df8c51858ad1b7",
+  "diffDigest": "sha256:a3a932056414f46df94b722ad39bc214c83e228e524fe9ccdbaf06f2037c77fd",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "fresh-context-reviewer",
+  "reviewerInvocationId": "marketplace-plugin-repair-da3b882-fcr-20260907-02",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- PASS AC-1: Save My Model returns the complete BB host list without a second registry or cap.\n- PASS AC-2: The controlled BB picker is host-routed, reconciled through typed RPC, and persists coherent host-scoped changes.\n- PASS AC-3: Bounded storage and resolution preserve host/provider isolation and recover malformed or obsolete selections.\n- PASS AC-UI-1: Source and browser evidence cover BB-native responsive controls and required host/catalog states.\n- PASS AC-4: Documentation truthfully describes the settings workflow and disclaims changing New Thread defaults.\n- PASS AC-UI-2: Action Topbar uses tiers 40/41 with committed light, dark, and narrow evidence below host dialog tiers.\n- PASS AC-5: The stacking change retains launcher interactions with focused contract coverage.\n- PASS AC-6: Host Monitor 0.1.5 is reconciled and restores open/snapshot compatibility consumed by Touch Bar.\n- FAIL AC-7: marketplace-validation.json still records the Usage Tracker v1-change label gate as unmet; validate the required-label condition or supersede the pending change.\n- PASS AC-8: Prepared entries, icons, screenshots, manifests, immutable tag plans, and compatibility disclosures are present and publication remains gated.\n- FAIL AC-9: The Save My Model system check hardcodes three connected hosts while committed live evidence now records two; make it assert stable connection-state invariants and rerun end-to-end evidence.\n- PASS AC-10: Live evidence shows all four plugins running and multi-host plus no-reload Host Monitor navigation behavior.\n\n## Security / correctness\n\nNo blocking security flaw was found. Typed RPC schemas, enrolled-host validation, bounded public errors, scoped storage, and Touch Bar process timeouts constrain the new paths. Correctness is blocked only by the Usage Tracker validation status and stale exact host-count fixture.\n\n## Design / maintainability\n\nD-001 is followed. Replace duplicated exact host-count assertions with invariant checks for total hosts and the presence of connected and disconnected states; then record the marketplace required-label validation truthfully.",
+  "bodyDigest": "sha256:3b1181f2630f3580a8bc9d53b58380d7819d330b35240936ccc037fc57233712",
+  "digest": "sha256:108b65bfcb626b865bb4116633dc78f16e9a81aaeeea23f756fbe27bc197f58e"
+}
