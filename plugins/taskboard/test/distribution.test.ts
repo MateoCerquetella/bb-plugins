@@ -109,7 +109,7 @@ test('documents only BB Community and direct Git installation for Taskboard', ()
 test('keeps Usage Tracker private and documents its Git release too', async () => {
   assert.equal(usageManifest.private, true);
   assert.equal(usageManifest.name, 'bb-plugin-usage-tracker');
-  assert.equal(usageManifest.version, '0.1.5');
+  assert.equal(usageManifest.version, '0.1.8');
   assert.equal('publishConfig' in usageManifest, false);
   assert.equal('files' in usageManifest, false);
   assert.equal('prepack' in usageManifest.scripts, false);
