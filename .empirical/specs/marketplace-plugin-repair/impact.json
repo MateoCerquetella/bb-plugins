@@ -4,11 +4,11 @@
   "capabilities": [
     "action-topbar-distribution",
     "machine-model-preferences",
-    "plugin-git-distribution"
+    "marketplace-release-alignment"
   ],
   "surfaces": [
     "workflow"
   ],
   "regressionRationale": null,
-  "digest": "sha256:10772a9acc6e39bace364754bf28be89bbb267287ca2b33786a21520b33a6167"
+  "digest": "sha256:1a3836834d8d9e1e709f8eaa1f8edd3fd173ebf9f591cb093daf15c7152688cc"
 }
