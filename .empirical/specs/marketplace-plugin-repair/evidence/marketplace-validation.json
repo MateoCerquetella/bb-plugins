@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "preparedAt": "2026-09-07",
+  "marketplaceSchemaVersion": 2,
+  "entries": {
+    "save-my-model": {
+      "pullRequest": 154,
+      "localCommit": "3c00a5e27a19e1b46672dbe39d996ff534da02ca",
+      "sourceRange": "^0.1.3",
+      "build": "passed",
+      "tests": 35,
+      "v1Gate": "passed-new-entry",
+      "remoteSourceCheck": "awaiting-save-my-model/v0.1.3"
+    },
+    "usage-tracker": {
+      "pullRequest": 175,
+      "localCommit": "3172342c6bebbc03fa048faa3465a0a133994cb7",
+      "sourceRange": "^0.1.6",
+      "resolvedRelease": "usage-tracker/v0.1.8",
+      "build": "passed",
+      "tests": 35,
+      "v1Gate": "requires-v1-change-label"
+    },
+    "action-topbar": {
+      "localCommit": "4c0c000578c3e54939ba46294465ccb5bbe081b0",
+      "sourceRange": "^0.1.0",
+      "build": "passed",
+      "tests": 35,
+      "v1Gate": "passed-new-entry",
+      "remoteSourceCheck": "awaiting-action-topbar/v0.1.0"
+    },
+    "touchbar": {
+      "localCommit": "5a153b2f646f0da2348e70b30f81339fd0c6fafb",
+      "sourceRange": "^0.1.0",
+      "build": "passed",
+      "tests": 35,
+      "v1Gate": "passed-new-entry",
+      "remoteSourceCheck": "awaiting-touchbar/v0.1.0"
+    }
+  },
+  "hostMonitor": {
+    "immutableTag": "host-monitor/v0.1.5",
+    "tagCommit": "382785fdd50b94bb7feba7dddf52114a13559015",
+    "reconciliation": "complete release plus additive Touch Bar CLI compatibility"
+  }
+}

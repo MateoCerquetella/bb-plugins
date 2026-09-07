@@ -2,8 +2,26 @@
   "route": "/settings/plugins/save-my-model",
   "pluginStatus": "running",
   "hostCount": 4,
-  "connectedHosts": 3,
-  "disconnectedHosts": 1,
+  "connectedHosts": 2,
+  "disconnectedHosts": 2,
   "nativePickerVisible": true,
-  "hostRoutedPicker": true
+  "hostRoutedPicker": true,
+  "changedPlugins": {
+    "action-topbar": "running",
+    "host-monitor": "running",
+    "save-my-model": "running",
+    "touchbar": "running"
+  },
+  "hostMonitorSnapshot": {
+    "schemaVersion": 1,
+    "hostCount": 4,
+    "attentionPercent": 90,
+    "criticalPercent": 95
+  },
+  "hostMonitorNativeOpen": {
+    "requestedHost": "host_j7482kf9zh",
+    "resultPath": "/plugins/host-monitor/host-monitor",
+    "requestConsumed": true,
+    "fullPageReload": false
+  }
 }
