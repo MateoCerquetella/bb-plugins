@@ -22,7 +22,7 @@ marketplace entry either live or backed by a validated, truthful submission.
 - [ ] [AC-5] Action Topbar's stacking fix preserves launcher keyboard control, outside-click dismissal, positioning, action activation, and drag behavior.
 - [ ] [AC-6] The complete Host Monitor v0.1.5 release source is reconciled onto the repository's default-branch line without changing the immutable release tag or losing unrelated main-line work.
 - [ ] [AC-7] Usage Tracker's live marketplace source continues resolving the latest compatible v0.1.8 tag, and its pending metadata update validates against the current marketplace contract.
-- [ ] [AC-8] Dockside, Clean My Context, and Save My Model submissions have accurate status and passing validation; Action Topbar and Touch Bar have release-ready manifests, immutable-source plans, marketplace entries, icons, screenshots, and truthful compatibility requirements.
+- [ ] [AC-8] Save My Model's submission has accurate status and passing validation; Action Topbar and Touch Bar have release-ready manifests, immutable-source plans, marketplace entries, icons, screenshots, and truthful compatibility requirements.
 - [ ] [AC-9] Focused tests cover Save My Model picker persistence/reconciliation and Action Topbar stacking. Every changed plugin passes typecheck, tests, build, managed-install checks where applicable, and the root workspace check.
 - [ ] [AC-10] The changed plugins are installed or moved to this checkout, reloaded in BB 0.42.1, and exercised against connected and disconnected machines without regressing existing plugin behavior.
 
@@ -43,4 +43,4 @@ Risks include persisting a picker value unsupported by the selected host, confus
 
 ## Capability Deltas
 
-See `deltas/machine-model-preferences.md`, `deltas/action-topbar-distribution.md`, and `deltas/plugin-git-distribution.md`.
+See `deltas/machine-model-preferences.md`, `deltas/action-topbar-distribution.md`, and `deltas/marketplace-release-alignment.md`.

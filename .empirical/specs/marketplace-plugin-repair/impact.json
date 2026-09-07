@@ -1,11 +1,14 @@
 {
   "schemaVersion": 1,
-  "status": "draft",
   "classification": "behavioral",
-  "capabilities": [],
+  "capabilities": [
+    "action-topbar-distribution",
+    "machine-model-preferences",
+    "plugin-git-distribution"
+  ],
   "surfaces": [
     "workflow"
   ],
   "regressionRationale": null,
-  "digest": "sha256:50cdf659d260b3862fa5d4114b18e620487a9024681daa6489af839cd84aa470"
+  "digest": "sha256:10772a9acc6e39bace364754bf28be89bbb267287ca2b33786a21520b33a6167"
 }

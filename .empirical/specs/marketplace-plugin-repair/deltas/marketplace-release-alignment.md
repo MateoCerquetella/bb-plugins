@@ -1,4 +1,4 @@
-# Plugin Git Distribution Delta
+# Marketplace Release Alignment Delta
 
 ## MODIFIED Requirements
 
