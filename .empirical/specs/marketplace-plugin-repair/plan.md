@@ -1,7 +1,8 @@
 # Plan
 
 1. Reconcile baselines and current contracts.
-   - Install workspace dependencies and repin Save My Model to BB 0.42.1's
+   - Install workspace dependencies and repin Save My Model to the live BB
+     0.41 server's
      exact Plugin SDK.
    - Compare Host Monitor v0.1.5 with `origin/main` and inventory the smallest
      released delta.
@@ -41,7 +42,8 @@
 5. Verify and hand off the release boundary.
    - Run configured focused, contract, portability, clean-consumer, and full-CI
      checks through Empirical receipts.
-   - Install/reload changed plugins from this checkout in BB 0.42.1 and exercise
+   - Install/reload changed plugins from this checkout in the live BB 0.41
+     server/SDK 0.4.46 runtime and exercise
      Save My Model with multiple connected/disconnected hosts and Action Topbar
      over ordinary content plus a host dialog.
    - Capture light, dark, and narrow screenshots where required; perform

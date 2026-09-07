@@ -9,7 +9,7 @@ Status: Accepted
 
 ### Evidence
 
-- BB 0.42.1 exposes `bb.sdk.hosts.list`,
+- The live BB 0.41 server with SDK 0.4.46 exposes `bb.sdk.hosts.list`,
   `bb.sdk.system.executionOptions`, and the host-owned controlled
   `experimental_ProviderModelPicker` with explicit host routing.
 - Save My Model v0.1.2 persists records but imports only list/clear helpers in
@@ -51,4 +51,4 @@ semantic layer ordering, so a contract test and live visual check guard it.
 Exercise two host identities and provider switches in the frontend harness;
 inject catalog failures and malformed storage; assert the public-SDK import
 boundary; verify launcher/page/dialog relative stacking; run focused plugin and
-workspace checks; install/reload in BB 0.42.1 and capture visible evidence.
+workspace checks; install/reload in the live BB 0.41/SDK 0.4.46 runtime and capture visible evidence.

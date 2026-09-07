@@ -24,7 +24,8 @@ single panel at narrow widths. Status uses a restrained green connected dot and
 muted disconnected treatment. Existing records and Clear all remain available
 as a secondary disclosure rather than the primary interaction.
 
-The package moves to the exact SDK version supplied by BB 0.42.1 and uses only
+The package moves to the exact SDK version supplied by the live BB 0.41 server
+(SDK 0.4.46) and uses only
 public SDK exports. Documentation explicitly says the plugin configures its own
 host-scoped records through BB's picker and does not override the root composer.
 
@@ -65,6 +66,6 @@ verification. No remote mutation occurs during implementation.
 
 Use pure resolver tests, storage tests, frontend SDK harness tests, CSS/DOM
 contract tests, plugin checks/builds, isolated managed installs, full workspace
-CI, and a BB 0.42.1 exercise with connected and disconnected machines. Compare
+CI, and a live BB 0.41/SDK 0.4.46 exercise with connected and disconnected machines. Compare
 the launcher against the supplied marketplace screenshot and capture final
 light/dark/narrow evidence before release approval.
