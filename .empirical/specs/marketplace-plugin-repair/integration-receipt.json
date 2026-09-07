@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "feature": "marketplace-plugin-repair",
+  "claimId": "marketplace-plugin-repair-bed3181a7b26",
+  "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+  "baseCommit": "bc1872812d91afb5458393dc5222ed4def2c4855",
+  "baseTree": "a8396ac390b7cd3a87091749ea5b3b558e81208c",
+  "featureTree": "sha256:a071952cd346cf21ef0f6ebe39173ea9a1ae48da6bda56c0a4232d3418d7f410",
+  "targetCommit": "51addbae03531ec41c136da1336f0374d98e8770",
+  "targetTree": "5541501c991241d516ede555715ccdf5c062b786",
+  "capabilityBaseDigests": {
+    "action-topbar-distribution": "sha256:bf598e17d291f7c478d63be9524f5ca42de72f57d1967898ba61b8a14ebda120",
+    "machine-model-preferences": "sha256:9b4fd5c9960117719947136c08522be068b19c18f96319c3264cda9494835930",
+    "marketplace-release-alignment": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "deltaDigest": "sha256:186505b5f610913a5dbdd832b9855a4c7d9e9b9ac327ff8fb125cfee090c3f57",
+  "resultDigests": {
+    "action-topbar-distribution": "sha256:d7e62eaba736689ab8d9918802d3326ef831515fcd74b6287b03a48075ca4ce1",
+    "machine-model-preferences": "sha256:31bfb6dde25d6d4e8c492afad8e7de08d75fe526abc073f6ff8b0715d1edfcb0",
+    "marketplace-release-alignment": "sha256:268c4cc5bcd0ad0255956b62b1b29144f1c158e5b4b03c3d8011077f4e9ea43c"
+  },
+  "verificationReceiptDigests": [
+    "sha256:0977e1138bcec4109d215c1f8ffb617e83d2214b0ccc929312cfc2ae140c2ca6",
+    "sha256:204891bcf98d7ef4edfdac4b2feb4a325d957e95eb2a5ee9600c1763af395dbd",
+    "sha256:2d6c906764c074c672070030c00a96779424976d9716e8e4c308e635974827c7",
+    "sha256:2d9e608bb320745813c0cc8e0038e62ec2b29a749cc4fbb4c851fd8c27dd974c",
+    "sha256:7737858cfac1d034b12b1a0bdc997ee9d0b54d06565875a2b484fc3e3b5bb20e",
+    "sha256:7dbc0d19d332f94505482b2aad1138c61a9215430882f460ac17b48fd7119d01",
+    "sha256:9563c1ccd6847cb3c9b6b4ade03f413389da8bd9b0a3bfe5ad0b41ed59301168",
+    "sha256:985f9290d5d173fff1fe222274cda407918325424d5e693701593f1de782fb30",
+    "sha256:a1eb36923819a99236a5c6d87116183c9dfda86b7a2571802d21c4e3e9803ea8",
+    "sha256:a1ff58ed7116129ef1a82bfb92090fb827c3127944b7de017119aad6c7c2687d",
+    "sha256:acdf5716c6b09ee6b36a74981b56bcde49f053726bc7c90f5ca87a58c66922dd",
+    "sha256:ace4a84fa0e256d122ca148245787a5fdda31f789c5d0a4e2c21490f33aeed06",
+    "sha256:d892428753663a51ed4d17446839e236d3aa6a30ec02dc36e6f5e781b043b991",
+    "sha256:e0ceb2204ca61e4c7e8e3e54577a07e123403818eb69d4048a2b5ac33303f1d5"
+  ],
+  "integratedAt": "2026-09-07T21:22:50.944Z",
+  "digest": "sha256:2ac59fffc2bf5993be5744a8c09450e10e5008be92de56408187a782f3104e75"
+}

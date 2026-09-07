@@ -1,25 +1,21 @@
 {
   "schemaVersion": 1,
-  "sequence": 6,
-  "previousDigest": "sha256:2dba649c05e5665a9a8ebea67194f68dedc109ec5b5cc31f73a59dc3ad5c36cf",
-  "actor": "agent",
-  "type": "transition",
-  "summary": "Refreshed repository knowledge for eight plugins, the native Save My Model flow, current release ranges, Touch Bar, and BB-derived design language with no stale or refinement-required context.",
-  "createdAt": "2026-09-07T18:23:59.659Z",
-  "stateBeforeDigest": "sha256:0a6834937614ee159395a31c7d607c42e4a9b3bafb256636fdfc81ee4cd0a43b",
-  "stateAfterDigest": "sha256:5e3089626596f7a47de1bcec07f07a328cd8d2e34ff59038a2c77621ccf1fd8c",
+  "feature": "marketplace-plugin-repair",
+  "lastSequence": 16,
+  "lastEventDigest": "sha256:6a93b24a24e0d602dae5da6a8a6129beb3f8b283e00bd29c357ed31c902b75e9",
+  "stateDigest": "sha256:a1df30a4192153b021334c1bff742dbe538845b64ddc341fdff505a42cbe3874",
   "state": {
     "schemaVersion": 5,
-    "revision": 6,
+    "revision": 16,
     "activeFeature": "marketplace-plugin-repair",
     "request": "Fix Save My Model so its per-machine provider, model, and reasoning preference is connected to BB 0.42.1's supported model-selection flow and resolve marketplace PR #154. Reconcile Host Monitor v0.1.5 onto main, repair the Usage Tracker marketplace update, prepare Action Topbar and Touch Bar for release and marketplace submission without publishing until separately approved, and fix Action Topbar launcher stacking so its popover renders above BB page content while remaining below host-owned modal and dialog layers. Preserve unrelated plugin behavior and verify focused tests, workspace checks, managed installation, and live BB behavior.",
     "profile": "complex",
     "workflow": "complex",
     "mode": "normal",
-    "phase": "verify",
-    "status": "waiting",
+    "phase": "done",
+    "status": "done",
     "repairAttempts": 0,
-    "message": "Refreshed repository knowledge for eight plugins, the native Save My Model flow, current release ranges, Touch Bar, and BB-derived design language with no stale or refinement-required context.",
+    "message": "Integrated capability changes: action-topbar-distribution, machine-model-preferences, marketplace-release-alignment",
     "implementationActor": "agent",
     "workStartedAt": null,
     "specDigest": "sha256:59cfbff4a78984eaf37743b90145987e6d4e757818622efcb124665919a73a87",
@@ -30,23 +26,35 @@
     "capabilityClaimId": "marketplace-plugin-repair-bed3181a7b26",
     "authorizationDigest": null,
     "evidence": [],
-    "evidenceReceiptIds": [],
+    "evidenceReceiptIds": [
+      "qa-a5d81efc7917a7d45bc1851b",
+      "qa-0028c3fb71c1f71a4fdd036d",
+      "qa-f8d697d4d86d4a43e6e236c7",
+      "qa-98e0927e88f8420f844c0f47",
+      "qa-c404e37e762b49282afc3317",
+      "qa-4769b51184e85ce60e9309d0",
+      "qa-1bbcbe656d899120c64bbb21",
+      "qa-a2c46f5b2dfcc100eeb5e6ec",
+      "qa-2c42bc0d304ebc8bc6b98b1a",
+      "collected-543e6d91d56935953ebb8837",
+      "collected-60840921b170296bf8cf4b34",
+      "qa-53b6f5f85d8e06f972b96e59"
+    ],
     "legacyEvidenceCount": 0,
     "completion": {
       "implemented": true,
-      "verified": false,
-      "integrated": false,
+      "verified": true,
+      "integrated": true,
       "delivered": false,
       "published": false,
-      "highest": "implemented",
+      "highest": "integrated",
       "reasons": {
-        "verified": "verified has not been proven by a durable receipt.",
-        "integrated": "integrated has not been proven by a durable receipt.",
         "delivered": "delivered has not been proven by a durable receipt.",
         "published": "published has not been proven by a durable receipt."
       }
     },
-    "updatedAt": "2026-09-07T18:23:59.659Z"
+    "updatedAt": "2026-09-07T21:22:50.975Z"
   },
-  "digest": "sha256:5f1eb2b99a2fc4d49026ca99f7a869528d58753e063caff249c27e46abe37b31"
+  "compactedAt": "2026-09-07T21:22:50.996Z",
+  "digest": "sha256:4ac14ca6077169343cf4e22b7e95d65a70ec819e7f742ebdc7815e1206d6152a"
 }
