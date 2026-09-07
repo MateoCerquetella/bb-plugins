@@ -4,6 +4,7 @@ export type ReasoningLevel =
   | "medium"
   | "high"
   | "xhigh"
+  | "ultracode"
   | "max"
   | "ultra";
 
@@ -43,6 +44,7 @@ const validReasoning = new Set<ReasoningLevel>([
   "medium",
   "high",
   "xhigh",
+  "ultracode",
   "max",
   "ultra",
 ]);

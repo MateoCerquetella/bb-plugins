@@ -1,0 +1,40 @@
+.save-model-shell { display: grid; gap: 1rem; color: var(--foreground); font-family: inherit; }
+.save-model-header, .save-model-footer, .save-model-config-heading, .save-model-picker-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.save-model-header h2, .save-model-picker-row h3 { margin: 0; font-size: 0.875rem; font-weight: 600; }
+.save-model-header p, .save-model-picker-row p { margin: 0.25rem 0 0; color: var(--muted-foreground); font-size: 0.75rem; line-height: 1.45; }
+.save-model-button { min-height: 2rem; padding: 0 0.75rem; border: 1px solid var(--border); border-radius: 0.5rem; background: var(--background); color: var(--foreground); font: inherit; font-size: 0.75rem; cursor: pointer; }
+.save-model-button:hover:not(:disabled) { background: var(--accent); }
+.save-model-button:disabled { cursor: default; opacity: 0.45; }
+.save-model-button--danger { color: var(--destructive); }
+.save-model-workspace { display: grid; grid-template-columns: minmax(11rem, 0.34fr) minmax(0, 1fr); min-height: 15rem; overflow: hidden; border: 1px solid var(--border); border-radius: 0.75rem; background: var(--card); }
+.save-model-hosts { display: flex; flex-direction: column; gap: 0.25rem; padding: 0.5rem; border-right: 1px solid var(--border); background: color-mix(in srgb, var(--muted) 35%, transparent); }
+.save-model-host { display: flex; width: 100%; min-width: 0; align-items: center; gap: 0.625rem; padding: 0.625rem; border: 0; border-radius: 0.5rem; background: transparent; color: var(--muted-foreground); text-align: left; font: inherit; cursor: pointer; }
+.save-model-host:hover { background: var(--accent); color: var(--foreground); }
+.save-model-host[aria-current="true"] { background: var(--background); color: var(--foreground); box-shadow: 0 0 0 1px var(--border); }
+.save-model-host-copy { display: grid; min-width: 0; gap: 0.125rem; }
+.save-model-host-copy strong { overflow: hidden; font-size: 0.75rem; text-overflow: ellipsis; white-space: nowrap; }
+.save-model-host-copy small { color: var(--muted-foreground); font-size: 0.6875rem; }
+.save-model-dot { display: inline-block; width: 0.5rem; height: 0.5rem; flex: none; border-radius: 999px; background: var(--muted-foreground); }
+.save-model-dot--connected { background: var(--success, #22a06b); box-shadow: 0 0 0 3px color-mix(in srgb, var(--success, #22a06b) 14%, transparent); }
+.save-model-config { display: grid; align-content: start; gap: 1rem; padding: 1rem; }
+.save-model-config-heading { padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); color: var(--muted-foreground); font-size: 0.6875rem; }
+.save-model-config-heading > div { display: flex; align-items: center; gap: 0.5rem; color: var(--foreground); font-size: 0.8125rem; }
+.save-model-picker-row { min-height: 4rem; }
+.save-model-state { padding: 1rem; border: 1px dashed var(--border); border-radius: 0.625rem; color: var(--muted-foreground); font-size: 0.75rem; }
+.save-model-state--error, .save-model-state--inline { border-style: solid; background: color-mix(in srgb, var(--destructive) 7%, transparent); color: var(--destructive); }
+.save-model-state--inline { padding: 0.75rem; }
+.save-model-footer { align-items: flex-start; padding-top: 0.25rem; }
+.save-model-records { min-width: 0; flex: 1; }
+.save-model-records summary { width: fit-content; cursor: pointer; color: var(--muted-foreground); font-size: 0.75rem; }
+.save-model-records summary span { margin-left: 0.25rem; padding: 0.0625rem 0.375rem; border-radius: 999px; background: var(--muted); }
+.save-model-record-list { display: grid; gap: 0.375rem; margin-top: 0.625rem; }
+.save-model-record { display: grid; grid-template-columns: minmax(7rem, 0.8fr) minmax(8rem, 1fr) minmax(7rem, 0.8fr) minmax(8rem, 1fr); gap: 0.75rem; padding: 0.5rem 0.625rem; border: 1px solid var(--border); border-radius: 0.5rem; color: var(--muted-foreground); font-size: 0.6875rem; }
+.save-model-record strong { color: var(--foreground); }
+.save-model-record code { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.save-model-muted { color: var(--muted-foreground); font-size: 0.75rem; }
+@media (max-width: 640px) {
+  .save-model-header, .save-model-footer, .save-model-picker-row { align-items: stretch; flex-direction: column; }
+  .save-model-workspace { grid-template-columns: 1fr; }
+  .save-model-hosts { max-height: 11rem; overflow-y: auto; border-right: 0; border-bottom: 1px solid var(--border); }
+  .save-model-record { grid-template-columns: 1fr 1fr; }
+}
