@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-ccdbbb5abc383398545a4b31",
+  "criteria": [
+    "AC-1",
+    "AC-10",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8",
+    "AC-9",
+    "AC-UI-1",
+    "AC-UI-2"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Run the portable release contract as the matrix-wide cross-platform gate.",
+  "passed": true,
+  "startedAt": "2026-09-07T18:47:24.398Z",
+  "completedAt": "2026-09-07T18:47:24.633Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "marketplace-plugin-repair",
+    "specRevision": 2,
+    "specDigest": "sha256:59cfbff4a78984eaf37743b90145987e6d4e757818622efcb124665919a73a87",
+    "treeDigest": "sha256:c7317e99d34050d73bdd8d62dfcd724a8baa110ce2309517970600c3c2e1520f",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf",
+    "workflowRevision": 6,
+    "gitCommit": "a7b13e466bd69389830909131840c22cb6b41083"
+  },
+  "digest": "sha256:3b35e5894ff07ea23191aa5f58f6ec31378928ec2dd49c05cfb29d280386c5bf",
+  "kind": "qa",
+  "matrixDigest": "sha256:731fb900de2ea8d1e48497d3a4b487b81a13616cb5343f7aad1da7041bbdadcb",
+  "check": {
+    "id": "qa-cross-platform",
+    "kind": "cross-platform"
+  },
+  "coveredChecks": [
+    "clean-clone",
+    "cross-platform",
+    "end-to-end",
+    "integration",
+    "package-consumer"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Run the portable release contract as the matrix-wide cross-platform gate.",
+      "startedAt": "2026-09-07T18:47:24.398Z",
+      "completedAt": "2026-09-07T18:47:24.633Z",
+      "durationMs": 235,
+      "collector": null,
+      "command": {
+        "argv": [
+          "node",
+          ".empirical/specs/integrate-the-already-implemented-and-verified-action-topbar-plugin-into/qa/distribution.mjs"
+        ],
+        "cwd": ".",
+        "timeoutMs": 60000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:50d6ec132b4a6858bf2fa0692abfc42a1e232a929ba85d2637207c4ef9ccc539",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "Action Topbar distribution contract passed.\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:c7317e99d34050d73bdd8d62dfcd724a8baa110ce2309517970600c3c2e1520f",
+      "sourceTreeAfter": "sha256:c7317e99d34050d73bdd8d62dfcd724a8baa110ce2309517970600c3c2e1520f",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}
