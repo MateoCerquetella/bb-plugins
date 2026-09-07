@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-f6c4a7db91c03d57fd9d56c0",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-9"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Exercise malformed storage, unavailable providers, missing hosts, and bounded failure paths.",
+  "passed": true,
+  "startedAt": "2026-09-07T18:37:05.898Z",
+  "completedAt": "2026-09-07T18:37:07.278Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "marketplace-plugin-repair",
+    "specRevision": 2,
+    "specDigest": "sha256:59cfbff4a78984eaf37743b90145987e6d4e757818622efcb124665919a73a87",
+    "treeDigest": "sha256:c7317e99d34050d73bdd8d62dfcd724a8baa110ce2309517970600c3c2e1520f",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf",
+    "workflowRevision": 6,
+    "gitCommit": "fa13fd5ada7aeda69de13764bfae006cd0078259"
+  },
+  "digest": "sha256:2885a863eff142ccdce144cb5a802946f99178c67dcec981c9c9db5a4b7eddc0",
+  "kind": "qa",
+  "matrixDigest": "sha256:731fb900de2ea8d1e48497d3a4b487b81a13616cb5343f7aad1da7041bbdadcb",
+  "check": {
+    "id": "qa-fault-injection",
+    "kind": "fault-injection"
+  },
+  "coveredChecks": [
+    "fault-injection",
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Exercise malformed storage, unavailable providers, missing hosts, and bounded failure paths.",
+      "startedAt": "2026-09-07T18:37:05.898Z",
+      "completedAt": "2026-09-07T18:37:07.278Z",
+      "durationMs": 1380,
+      "collector": null,
+      "command": {
+        "argv": [
+          "npm",
+          "test",
+          "--workspace",
+          "bb-plugin-save-my-model"
+        ],
+        "cwd": ".",
+        "timeoutMs": 60000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:6e103fc4747c25ce25e77b3083410c24db20ef34b17adc3f6e7e3d322b522baf",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "\n> bb-plugin-save-my-model@0.1.3 test\n> node --import tsx --test test/*.test.ts && vitest run test/*.test.tsx\n\nTAP version 13\n# Subtest: round-trips the selected provider and its execution preference per host\nok 1 - round-trips the selected provider and its execution preference per host\n  ---\n  duration_ms: 1.004832\n  type: 'test'\n  ...\n# Subtest: isolates host and provider execution selections\nok 2 - isolates host and provider execution selections\n  ---\n  duration_ms: 0.249384\n  type: 'test'\n  ...\n# Subtest: normalizes empty and malformed hosts to one browser-wide scope\nok 3 - normalizes empty and malformed hosts to one browser-wide scope\n  ---\n  duration_ms: 0.116863\n  type: 'test'\n  ...\n# Subtest: recovers the selected provider from the legacy unscoped key\nok 4 - recovers the selected provider from the legacy unscoped key\n  ---\n  duration_ms: 0.067252\n  type: 'test'\n  ...\n# Subtest: reads provider-scoped legacy values before matching unscoped values\nok 5 - reads provider-scoped legacy values before matching unscoped values\n  ---\n  duration_ms: 0.127833\n  type: 'test'\n  ...\n# Subtest: recovers a complete unscoped legacy selection without a provider argument\nok 6 - recovers a complete unscoped legacy selection without a provider argument\n  ---\n  duration_ms: 0.085946\n  type: 'test'\n  ...\n# Subtest: uses unscoped legacy values only for their owning provider\nok 7 - uses unscoped legacy values only for their owning provider\n  ---\n  duration_ms: 0.106344\n  type: 'test'\n  ...\n# Subtest: keeps a legacy model when no reasoning was stored\nok 8 - keeps a legacy model when no reasoning was stored\n  ---\n  duration_ms: 0.078974\n  type: 'test'\n  ...\n# Subtest: changing the selected provider does not leak another provider's execution\nok 9 - changing the selected provider does not leak another provider's execution\n  ---\n  duration_ms: 0.231282\n  type: 'test'\n  ...\n# Subtest: rejects an explicitly invalid provider instead of using selected fallback\nok 10 - rejects an explicitly invalid provider instead of using selected fallback\n  ---\n  duration_ms: 0.230861\n  type: 'test'\n  ...\n# Subtest: contains malformed and oversized storage while listing\nok 11 - contains malformed and oversized storage while listing\n  ---\n  duration_ms: 2.328786\n  type: 'test'\n  ...\n# Subtest: listing never turns an invalid explicit key into provider fallback\nok 12 - listing never turns an invalid explicit key into provider fallback\n  ---\n  duration_ms: 0.328299\n  type: 'test'\n  ...\n# Subtest: bounds examined plugin records independently of valid results\nok 13 - bounds examined plugin records independently of valid results\n  ---\n  duration_ms: 4.420078\n  type: 'test'\n  ...\n# Subtest: lists and clears a selected provider even before a model is saved\nok 14 - lists and clears a selected provider even before a model is saved\n  ---\n  duration_ms: 0.166474\n  type: 'test'\n  ...\n# Subtest: ignores malformed values and clears only plugin-owned keys\nok 15 - ignores malformed values and clears only plugin-owned keys\n  ---\n  duration_ms: 0.088472\n  type: 'test'\n  ...\n# Subtest: preserves a supported host selection\nok 16 - preserves a supported host selection\n  ---\n  duration_ms: 0.850671\n  type: 'test'\n  ...\n# Subtest: falls back from an unavailable provider and obsolete model\nok 17 - falls back from an unavailable provider and obsolete model\n  ---\n  duration_ms: 0.207598\n  type: 'test'\n  ...\n# Subtest: returns bounded unavailable and thrown failure states\nok 18 - returns bounded unavailable and thrown failure states\n  ---\n  duration_ms: 0.195597\n  type: 'test'\n  ...\n# Subtest: reports no provider without inventing a selection\nok 19 - reports no provider without inventing a selection\n  ---\n  duration_ms: 0.082771\n  type: 'test'\n  ...\n# Subtest: lists BB hosts in connected-first order through the public SDK\nok 20 - lists BB hosts in connected-first order through the public SDK\n  ---\n  duration_ms: 3.613117\n  type: 'test'\n  ...\n# Subtest: contains host-list failures\nok 21 - contains host-list failures\n  ---\n  duration_ms: 0.373642\n  type: 'test'\n  ...\n# Subtest: imports only public SDK and declared package surfaces\nok 22 - imports only public SDK and declared package surfaces\n  ---\n  duration_ms: 1.217861\n  type: 'test'\n  ...\n# Subtest: rejects a catalog request for a host BB no longer enrolls\nok 23 - rejects a catalog request for a host BB no longer enrolls\n  ---\n  duration_ms: 0.72947\n  type: 'test'\n  ...\n1..23\n# tests 23\n# suites 0\n# pass 23\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 200.931838\n\n RUN  v3.2.7 /home/dyaus/.bb/worktrees/env_hggwvausj4/bb-plugins-marketplace-plugin-repair/plugins/save-my-model\n\n ✓ test/app.test.tsx (2 tests) 126ms\n\n Test Files  1 passed (1)\n      Tests  2 passed (2)\n   Start at  15:37:06\n   Duration  829ms (transform 53ms, setup 0ms, collect 137ms, tests 126ms, environment 424ms, prepare 35ms)\n\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:c7317e99d34050d73bdd8d62dfcd724a8baa110ce2309517970600c3c2e1520f",
+      "sourceTreeAfter": "sha256:c7317e99d34050d73bdd8d62dfcd724a8baa110ce2309517970600c3c2e1520f",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}
