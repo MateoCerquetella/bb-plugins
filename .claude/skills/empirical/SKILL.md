@@ -44,6 +44,12 @@ the user does not need to mention Empirical or choose a profile.
    fallback is `empirical __internal yolo`.
 6. Show any worktree proposal exactly and wait for approval before calling the
    approved creation operation. Never stash, force, or replace selected work.
+   Once that exact proposal is approved and creation returns a handoff, the
+   approval is sufficient to enter its path and resume its returned action;
+   continue without asking for another confirmation or "go" message. If the
+   host must restart or begin a new turn to change directories, resume the same
+   durable action automatically when that lifecycle continues. Commit the new
+   journal state before the tracker sync required below.
 7. Treat Empirical's local journal as authoritative. If .empirical/tracker.json
    is absent or ticket behavior is off, remain local-only/off and make no
    provider requests. In manual mode use `empirical_tracker_bind` only for the
@@ -56,11 +62,20 @@ the user does not need to mention Empirical or choose a profile.
    access and MUST NOT trigger a question about creating a ticket. Off work
    makes no provider request. Multiple references are a real ambiguity and
    require an exact choice; Empirical never guesses.
-   After each local workflow mutation is durably committed, call
-   `empirical_tracker_sync`. It publishes only configured milestone comments
+   After each local workflow mutation is durably committed, inspect the tracker
+   policy. For Linear Policy v2 with `connection: "linear-mcp"`, call
+   `empirical_tracker_linear_mcp_prepare` with the exact feature id, execute
+   only its returned `linear.*` tool/arguments, submit the bounded normalized
+   result through `empirical_tracker_linear_mcp_accept`, and repeat until
+   synced. For every other policy, call `empirical_tracker_sync` with the
+   action's exact feature id. Tracking publishes only configured milestone comments
    and receipt-approved safe evidence, preserves user-authored descriptions,
-   and retries durable unacknowledged effects. A remote failure leaves local
-   progress intact; report local-only, off, synced, pending, or failed health.
+   and retries durable unacknowledged effects. Read effective `enforcement` and
+   `gate` from every action. When a strict required gate is blocked, stop all
+   source edits, evidence, handoff, and phase work; later mutation prompts may
+   only report/retry the exact tracker recovery until a fresh action shows the
+   gate open. Best-effort remote failure leaves local progress intact. Report
+   local-only, off, synced, pending, or failed health truthfully.
    Tracker operations are granular MCP tools, not additional skills or user
    commands. OAuth authorization is out-of-band through negotiated URL mode.
    Raw credentials are never chat text or tool arguments/results. If OAuth is
@@ -68,15 +83,28 @@ the user does not need to mention Empirical or choose a profile.
    for direct host-file configuration at
    `${XDG_CONFIG_HOME:-$HOME/.config}/empirical/secrets.env` on POSIX or
    `%APPDATA%\Empirical\secrets.env` on Windows.
-8. Execute every returned action, create immutable evidence receipts with the
-   configured commands or collected artifacts, complete its exact revision with
+8. Execute every returned action. When a verification matrix is present, use
+   `empirical_qa_plan`, run its applicable checks with
+   `empirical_qa_execute` or record only an explicit applicable human step with
+   `empirical_qa_record`, and keep retries/skips/missing environments visible.
+   Use ordinary executed or collected receipts for compatible focused, browser,
+   screenshot, and independent review evidence. Complete the exact revision with
    receipt ids, consume the response as the next action, and integrate reviewed
    capability deltas against an independent target. When Context is returned,
    call empirical_context, inspect repository evidence, replace every reported
    refinement-required topic, remove its managed marker, call empirical_context
    again, and complete only when stale, missing, and refinementRequired are all
-   empty. Report the exact highest completion level. Stop only at Done, Blocked,
-   or Awaiting Human.
+   empty. When Review is returned, call `empirical_review` without a submission,
+   honor bot setup-required guidance or start the required fresh isolated
+   reviewer invocation, then record its packet-bound canonical result and use
+   that receipt. A credential value is never a review tool input or chat text.
+   If the user declines bot setup, call `empirical_configure` with review mode
+   `fresh-context` and report that explicit fallback before preparing review;
+   never degrade silently.
+   When Deliver returns a source/evidence review-required packet, run the same
+   isolated boundary on that exact remote base/head diff; request changes keep
+   the PR draft and a new head requires a new packet. Report the exact highest
+   completion level. Stop only at Done, Blocked, or Awaiting Human.
 9. After Complex Specify passes, `empirical_handoff` may offer Continue here,
    Save for later, or one detected agent. Detection and Save launch nothing;
    another runtime requires explicit approval of its exact target, cwd, and argv.
