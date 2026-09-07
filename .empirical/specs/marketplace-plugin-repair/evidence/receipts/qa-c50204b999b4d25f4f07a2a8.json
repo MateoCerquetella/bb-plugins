@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-c50204b999b4d25f4f07a2a8",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-9"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Typecheck Save My Model's public host, RPC, picker, and persistence contracts.",
+  "passed": true,
+  "startedAt": "2026-09-07T18:36:39.142Z",
+  "completedAt": "2026-09-07T18:36:43.285Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "marketplace-plugin-repair",
+    "specRevision": 2,
+    "specDigest": "sha256:59cfbff4a78984eaf37743b90145987e6d4e757818622efcb124665919a73a87",
+    "treeDigest": "sha256:c7317e99d34050d73bdd8d62dfcd724a8baa110ce2309517970600c3c2e1520f",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf",
+    "workflowRevision": 6,
+    "gitCommit": "bc45c1c68d0d64b654a650ae7f94e968da17d656"
+  },
+  "digest": "sha256:dd753835154e02458059c18749989cf907bdbe18c701c8ab32db35e000d048a6",
+  "kind": "qa",
+  "matrixDigest": "sha256:731fb900de2ea8d1e48497d3a4b487b81a13616cb5343f7aad1da7041bbdadcb",
+  "check": {
+    "id": "qa-adapter-contract",
+    "kind": "adapter-contract"
+  },
+  "coveredChecks": [
+    "adapter-contract"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Typecheck Save My Model's public host, RPC, picker, and persistence contracts.",
+      "startedAt": "2026-09-07T18:36:39.142Z",
+      "completedAt": "2026-09-07T18:36:43.285Z",
+      "durationMs": 4143,
+      "collector": null,
+      "command": {
+        "argv": [
+          "npm",
+          "run",
+          "typecheck",
+          "--workspace",
+          "bb-plugin-save-my-model"
+        ],
+        "cwd": ".",
+        "timeoutMs": 60000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:f59acb16b43a287ee9bcaff985606e7e000e802844f51af29c6785d081bc8331",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "\n> bb-plugin-save-my-model@0.1.3 typecheck\n> tsc --noEmit\n\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:c7317e99d34050d73bdd8d62dfcd724a8baa110ce2309517970600c3c2e1520f",
+      "sourceTreeAfter": "sha256:c7317e99d34050d73bdd8d62dfcd724a8baa110ce2309517970600c3c2e1520f",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}
