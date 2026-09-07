@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 12,
+  "revision": 13,
   "activeFeature": "marketplace-plugin-repair",
   "request": "Fix Save My Model so its per-machine provider, model, and reasoning preference is connected to BB 0.42.1's supported model-selection flow and resolve marketplace PR #154. Reconcile Host Monitor v0.1.5 onto main, repair the Usage Tracker marketplace update, prepare Action Topbar and Touch Bar for release and marketplace submission without publishing until separately approved, and fix Action Topbar launcher stacking so its popover renders above BB page content while remaining below host-owned modal and dialog layers. Preserve unrelated plugin behavior and verify focused tests, workspace checks, managed installation, and live BB behavior.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "implement",
+  "phase": "verify",
   "status": "waiting",
   "repairAttempts": 2,
-  "message": "Fresh-context review requested two evidence fixes: validate Usage Tracker under its required v1-change label condition and replace the stale exact connected-host count with stable multi-state invariants.",
+  "message": "Replaced volatile exact host-state counts with stable all-host and mixed-connection invariants, verified Host Monitor SPA navigation in the system check, and proved Usage Tracker passes the current marketplace build, 35-test suite, v1-change label gate, and liveness check without mutating the remote PR.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:59cfbff4a78984eaf37743b90145987e6d4e757818622efcb124665919a73a87",
@@ -36,5 +36,5 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-07T20:31:27.099Z"
+  "updatedAt": "2026-09-07T20:36:29.773Z"
 }
