@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-75c168ca323ab1a2b91d39f1",
+  "criteria": [
+    "AC-1",
+    "AC-10",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8",
+    "AC-9",
+    "AC-UI-1",
+    "AC-UI-2"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Real isolated Chromium evidence for Save My Model and Action Topbar plus live BB multi-host and no-reload Host Monitor navigation results.",
+  "passed": true,
+  "startedAt": "2026-09-07T20:22:32.246Z",
+  "completedAt": "2026-09-07T20:22:32.246Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "marketplace-plugin-repair",
+    "specRevision": 2,
+    "specDigest": "sha256:59cfbff4a78984eaf37743b90145987e6d4e757818622efcb124665919a73a87",
+    "treeDigest": "sha256:ae0ffb0960a960e866c66273960c4d5356e11c3fb64568e51a78a0ea4aa9dadc",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf"
+  },
+  "digest": "sha256:d604697970976b0a33a3fe71d29e4acacb27f68f272b4f35eef40e4b1bb3e547",
+  "kind": "collected",
+  "collector": "Codex isolated Chromium 151 via CDP",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/marketplace-plugin-repair/evidence/action-topbar-dark.png",
+      "mediaType": "image/png",
+      "bytes": 214990,
+      "digest": "sha256:18ab3077787a6c76b00f6bd1ae41f00f70180ce17bbdc3ff53b76c89488ae368"
+    },
+    {
+      "path": ".empirical/specs/marketplace-plugin-repair/evidence/action-topbar-light.png",
+      "mediaType": "image/png",
+      "bytes": 192432,
+      "digest": "sha256:4692f8793fe149ec1b5a2a5ddf3cc610221a5b343c3d8b63e46066d653cd0052"
+    },
+    {
+      "path": ".empirical/specs/marketplace-plugin-repair/evidence/action-topbar-narrow.png",
+      "mediaType": "image/png",
+      "bytes": 94722,
+      "digest": "sha256:16b4f619b89097706787d77b79b88278616bf572b37ff23d0fcabee64f185c4e"
+    },
+    {
+      "path": ".empirical/specs/marketplace-plugin-repair/evidence/live-result.json",
+      "mediaType": "application/json",
+      "bytes": 669,
+      "digest": "sha256:f4ccac4ce55a8ee647e3f3b36547a9a0b3c67fe0f6cd007855183ff033e8deaa"
+    },
+    {
+      "path": ".empirical/specs/marketplace-plugin-repair/evidence/save-my-model-settings.png",
+      "mediaType": "image/png",
+      "bytes": 110325,
+      "digest": "sha256:d5ca1f6390e6506a2526374f55bf41e5f2f8a1dfe11a8192d7506c259a742da1"
+    }
+  ]
+}
