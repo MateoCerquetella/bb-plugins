@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-4af1998cc3cc809b00459d8c",
+  "criteria": [
+    "AC-1",
+    "AC-10",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8",
+    "AC-9",
+    "AC-UI-1",
+    "AC-UI-2"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-09-07T20:46:04.861Z",
+  "completedAt": "2026-09-07T20:46:04.861Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "marketplace-plugin-repair",
+    "specRevision": 2,
+    "specDigest": "sha256:59cfbff4a78984eaf37743b90145987e6d4e757818622efcb124665919a73a87",
+    "treeDigest": "sha256:ae0ffb0960a960e866c66273960c4d5356e11c3fb64568e51a78a0ea4aa9dadc",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf"
+  },
+  "digest": "sha256:4fe914b596496a32866c27683bcb2a41bdfe18482f7042861374b1ad3708403d",
+  "kind": "collected",
+  "collector": "empirical-review:fresh-context-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/marketplace-plugin-repair/reviews/063d5003bfd9841127e095b0.json",
+      "mediaType": "application/json",
+      "bytes": 2910,
+      "digest": "sha256:c007a01d72f9902ee95c2d6dd83a79136edba552ed4ec86e2c675c64b78bcacd"
+    },
+    {
+      "path": ".empirical/specs/marketplace-plugin-repair/reviews/063d5003bfd9841127e095b0.md",
+      "mediaType": "text/markdown",
+      "bytes": 2147,
+      "digest": "sha256:dcd9d2d7ef796f7bf484ada936cecb6dbef10a3d472f3bb4b8f57943f69384b4"
+    }
+  ]
+}
