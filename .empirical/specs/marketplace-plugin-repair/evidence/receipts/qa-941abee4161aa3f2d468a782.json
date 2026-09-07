@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-941abee4161aa3f2d468a782",
+  "criteria": [
+    "AC-1",
+    "AC-10",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8",
+    "AC-9",
+    "AC-UI-1",
+    "AC-UI-2"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "An isolated fresh Chromium profile rendered the final BB surfaces. Save My Model showed BB-native typography, three connected and one disconnected machine, host-specific native picker routing, and responsive bounded layout. Action Topbar's launcher was fully visible above thread content at z-index 40 with unobscured hit testing; host dialog tiers remain above it by contract. Release/source and marketplace artifacts were separately inspected and validated locally.",
+  "passed": true,
+  "startedAt": "2026-09-07T18:43:10.744Z",
+  "completedAt": "2026-09-07T18:43:10.744Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "marketplace-plugin-repair",
+    "specRevision": 2,
+    "specDigest": "sha256:59cfbff4a78984eaf37743b90145987e6d4e757818622efcb124665919a73a87",
+    "treeDigest": "sha256:c7317e99d34050d73bdd8d62dfcd724a8baa110ce2309517970600c3c2e1520f",
+    "policyDigest": "sha256:1350f5e1ba8310f598eaaf2665c5c1ad685f84d5547160e5ca40955435befcdf",
+    "workflowRevision": 6,
+    "gitCommit": "75493aedc161843920d127a5fc3db854ad4e141f"
+  },
+  "digest": "sha256:2ffb68fda38d4aea15dbb2ead107ace8a0af92ab812700f40c9e65b6d5f8cb47",
+  "kind": "qa",
+  "matrixDigest": "sha256:731fb900de2ea8d1e48497d3a4b487b81a13616cb5343f7aad1da7041bbdadcb",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "An isolated fresh Chromium profile rendered the final BB surfaces. Save My Model showed BB-native typography, three connected and one disconnected machine, host-specific native picker routing, and responsive bounded layout. Action Topbar's launcher was fully visible above thread content at z-index 40 with unobscured hit testing; host dialog tiers remain above it by contract. Release/source and marketplace artifacts were separately inspected and validated locally.",
+      "startedAt": "2026-09-07T18:43:10.744Z",
+      "completedAt": "2026-09-07T18:43:10.744Z",
+      "durationMs": 0,
+      "collector": "codex-isolated-browser-qa",
+      "command": null,
+      "result": null,
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:c7317e99d34050d73bdd8d62dfcd724a8baa110ce2309517970600c3c2e1520f",
+      "sourceTreeAfter": "sha256:c7317e99d34050d73bdd8d62dfcd724a8baa110ce2309517970600c3c2e1520f",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/marketplace-plugin-repair/evidence/action-topbar-launcher.png",
+          "mediaType": "image/png",
+          "bytes": 192064,
+          "digest": "sha256:b8ce0b2f14a0dbd26bd98fe7cdbf49f570f62e9fcf7196d675de9599097090fd"
+        },
+        {
+          "path": ".empirical/specs/marketplace-plugin-repair/evidence/live-result.json",
+          "mediaType": "application/json",
+          "bytes": 204,
+          "digest": "sha256:57e2307689d61c0ee063c3886e2a4aa7629ac90f538783420782c296584c3792"
+        },
+        {
+          "path": ".empirical/specs/marketplace-plugin-repair/evidence/save-my-model-settings.png",
+          "mediaType": "image/png",
+          "bytes": 110325,
+          "digest": "sha256:d5ca1f6390e6506a2526374f55bf41e5f2f8a1dfe11a8192d7506c259a742da1"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}
