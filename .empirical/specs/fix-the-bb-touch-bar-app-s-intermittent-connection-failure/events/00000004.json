@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "sequence": 4,
+  "previousDigest": "sha256:436f43c63e38e58021bbd7f9de4279e3d635220d050e3de7a39d643e56a6d7a0",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Created an executable test-first plan covering regression contracts, bounded command execution, full plugin verification, review, and integration.",
+  "createdAt": "2026-09-07T17:55:12.767Z",
+  "stateBeforeDigest": "sha256:d67dd0ba3d34a6777c587f5be93857baf9ac9be3a04edd79105a2da9ee76ebb1",
+  "stateAfterDigest": "sha256:6f1f7911efbe5b2c9f83fe7244c12d6fc627ba3eb6ebd42421781381e6389d72",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 4,
+    "activeFeature": "fix-the-bb-touch-bar-app-s-intermittent-connection-failure",
+    "request": "Fix the BB Touch Bar app's intermittent connection failure where it shows reconnecting indefinitely; diagnose the lifecycle, implement a robust recovery, and verify the UI and connection behavior.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Created an executable test-first plan covering regression contracts, bounded command execution, full plugin verification, review, and integration.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:1f805f32b9de8256dd8255cff3272d5b063f5a33912a3512914fd1241b1a330c",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:e78f716bb4dfa6db4d4ec6472c2d152f5064b1329d887ce15059691518d270e4",
+    "impactDigest": "sha256:67072cd8f29c5d52d1d71f84adc498a58a1db1330a8a60a5580749d6884f77c4",
+    "capabilityClaimId": "fix-the-bb-touch-bar-app-s-intermittent-connection-failure-3dc13adec0db",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-07T17:55:12.767Z"
+  },
+  "digest": "sha256:b8c267b246ec5a5c5261121f562e5c30a957d4563f679eb1edbdd4ab5deed785"
+}

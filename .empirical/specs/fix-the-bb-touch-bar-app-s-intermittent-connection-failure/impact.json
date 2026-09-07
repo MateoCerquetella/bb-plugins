@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "native-connection-recovery"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:67072cd8f29c5d52d1d71f84adc498a58a1db1330a8a60a5580749d6884f77c4"
+}

@@ -290,6 +290,11 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(model, /dev\.bb\.desktop/u);
   assert.match(model, /activateBB/u);
   assert.match(model, /\["host-monitor", "open", hostId\]/u);
+  assert.match(model, /readabilityHandler\s*=/u);
+  assert.match(model, /maximumOutputBytes = 65_536/u);
+  assert.match(model, /terminationGraceInterval/u);
+  assert.match(model, /Darwin\.kill\(process\.processIdentifier, SIGKILL\)/u);
+  assert.doesNotMatch(model, /readDataToEndOfFile/u);
   assert.match(controller, /width: 44, action: action/u);
   assert.match(controller, /width: 28,[\s\S]*height: 28/u);
   assert.match(controller, /iconView\.frame = NSRect\(x: 4, y: 3, width: 24, height: 24\)/u);

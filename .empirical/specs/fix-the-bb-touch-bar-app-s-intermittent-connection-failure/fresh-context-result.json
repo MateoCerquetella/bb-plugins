@@ -1,0 +1,16 @@
+{
+  "outcome": "passed",
+  "scope": [
+    "plugins/touchbar/native/Sources/AgentModel.swift",
+    "plugins/touchbar/test/companion.test.ts"
+  ],
+  "findings": [],
+  "observations": [
+    "The previous EOF-dependent read could remain blocked when a descendant retained the stdout writer.",
+    "The new readability handler drains output while the command runs and retains at most 65536 bytes.",
+    "TERM and exact-PID SIGKILL waits are bounded before the runner returns failure.",
+    "AgentStore remains single-threaded and retries after failures, preserving last-good cards and clearing disconnected state on success.",
+    "The focused Touch Bar check passed all 18 tests, typecheck, SDK contract check, and build."
+  ],
+  "platformLimitation": "This Linux QA host cannot compile AppKit or exercise physical Touch Bar hardware."
+}
