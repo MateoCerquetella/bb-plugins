@@ -1,5 +1,5 @@
 import type { PluginSidebarThreadIndicator } from "@bb/plugin-sdk";
-import { Icon } from "@/components/ui/icon";
+import { StatusMark, type StatusMarkKind } from "@/components/inbox/status-mark";
 import { cn } from "@/lib/utils";
 import {
   statusColorRole,
@@ -19,20 +19,6 @@ function statusColor(role: ThreadStatusColorRole): string {
             : "var(--muted-foreground)";
   return `var(--dockside-status-${role}, ${fallback})`;
 }
-
-/**
- * This plugin's status glyphs, matching bb's own sidebar shape for shape: the
- * red circle-x for a failure, the circle-question for a raised hand, the
- * spinner for live work, and a dot for a finished thread you have not read.
- *
- * The SDK ships `indicator` as data and no status component on purpose, so a
- * replaced sidebar can choose its own look. This one deliberately does not:
- * the two lists sit in the same window, and a user who switches between them
- * should not have to learn a second vocabulary.
- *
- * An unrecognized indicator draws nothing: bb adds kinds over time, and a
- * plugin built today must not break on a kind shipped tomorrow.
- */
 
 /**
  * Whether this indicator draws a glyph that speaks for the row.
@@ -77,91 +63,16 @@ export function StatusGlyph({
   const role = statusColorRole(indicator);
   const style = role === null ? undefined : { color: statusColor(role) };
 
-  switch (indicator) {
-    case "unread-error":
-      return (
-        <Icon
-          name="CircleX"
-          aria-label={aria}
-          className={shared}
-          style={style}
-        />
-      );
-    case "waiting-for-input":
-      return (
-        <Icon
-          name="CircleQuestion"
-          aria-label={aria}
-          className={shared}
-          style={style}
-        />
-      );
-    case "runtime":
-      return (
-        <Icon
-          name="Loading"
-          aria-label={aria}
-          className={cn(shared, "animate-spin")}
-          style={style}
-        />
-      );
-    case "workflow":
-      return <ShineIcon name="Workflow" label={aria} className={shared} />;
-    case "background-agent":
-      return <ShineIcon name="UserRoundPlus" label={aria} className={shared} />;
-    case "background-command":
-      return <ShineIcon name="Terminal" label={aria} className={shared} />;
-    case "plan-mode":
-      return <ShineIcon name="ListTodo" label={aria} className={shared} />;
-    case "goal":
-      return <ShineIcon name="Target" label={aria} className={shared} />;
-    case "draft":
-    case "working-draft":
-      return (
-        <Icon
-          name="Edit"
-          aria-label={aria}
-          className={shared}
-          style={style}
-        />
-      );
-    case "unread-success":
-      // A ring is legible beside the animated working spinner while staying
-      // quieter than a second filled status colour.
-      return (
-        <span
-          aria-label={aria}
-          title={aria}
-          className={cn("flex items-center justify-center", shared)}
-        >
-          <span
-            className="size-2.5 rounded-full border-2"
-            style={{ borderColor: statusColor("unread") }}
-          />
-        </span>
-      );
-    case "none":
-      return null;
-    default:
-      return null;
-  }
-}
-
-function ShineIcon({
-  name,
-  label,
-  className,
-}: {
-  name: "Workflow" | "UserRoundPlus" | "Terminal" | "ListTodo" | "Target";
-  label: string | undefined;
-  className: string;
-}) {
+  const kind: StatusMarkKind | null =
+    role === "working" ? "working" :
+    role === "error" ? "failed" :
+    role === "waiting" ? "needs-you" :
+    role === "unread" ? "unread" :
+    role === "inactive" ? "draft" : null;
+  if (kind === null) return null;
   return (
-    <Icon
-      name={name}
-      aria-label={label}
-      className={cn("animate-shine-icon", className)}
-      style={{ color: statusColor("working") }}
-    />
+    <span role={aria ? "img" : undefined} aria-label={aria} title={aria} className={shared}>
+      <StatusMark kind={kind} style={style} />
+    </span>
   );
 }

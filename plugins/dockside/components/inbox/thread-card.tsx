@@ -56,6 +56,7 @@ export function ThreadCard({
   onReorderDragOver,
   onReorderDrop,
   preferences,
+  leadingVisual = "status",
 }: {
   thread: PluginSidebarThread;
   childThreads: readonly PluginSidebarThread[];
@@ -82,6 +83,8 @@ export function ThreadCard({
   onReorderDragOver: (event: DragEvent<HTMLLIElement>) => void;
   onReorderDrop: (event: DragEvent<HTMLLIElement>) => void;
   preferences: DocksidePreferences;
+  /** Status views put semantic state on the section and provider identity on rows. */
+  leadingVisual?: "status" | "provider";
 }) {
   const actions = useSidebarThreadActions();
   const { splitProps, layout } = useSidebarThreadSplit(thread.id);
@@ -245,7 +248,13 @@ export function ThreadCard({
               />
             ) : null}
 
-            {selectionMode ? null : (
+            {selectionMode ? null : leadingVisual === "provider" ? (
+              <ProviderGlyph
+                providerId={thread.providerId}
+                provider={providerInfoById.get(thread.providerId)}
+                className="col-start-1 row-start-1 size-5"
+              />
+            ) : (
               <FamilyStatusIcon
                 status={familyState}
                 className="col-start-1 row-start-1"
@@ -321,12 +330,15 @@ export function ThreadCard({
               <span
                 data-dockside-root-time=""
                 className={cn(
-                  "flex h-4 items-center justify-end",
+                  "flex h-4 items-center justify-end gap-1.5",
                   canPark && !selectionMode && "group-hover/root:hidden",
                 )}
               >
                 {preferences.showRelativeTime ? (
                   <ThreadStatusLabel thread={thread} now={now} />
+                ) : null}
+                {preferences.statusDisplay === "Icons" && leadingVisual === "provider" ? (
+                  <FamilyStatusIcon status={familyState} />
                 ) : null}
               </span>
               {canPark && !selectionMode ? (
@@ -410,14 +422,16 @@ export function ThreadCard({
                       {childDisclosureLabel}
                     </span>
                   </button>
-                ) : preferences.showProviderIcons ? (
+                ) : preferences.showProviderIcons && leadingVisual === "status" ? (
                   <ProviderGlyph
                     providerId={thread.providerId}
                     provider={providerInfoById.get(thread.providerId)}
                     className="size-3 opacity-75"
                   />
                 ) : null}
-                <FamilyStatusBadge status={familyState} />
+                {preferences.statusDisplay === "Verbose" ? (
+                  <FamilyStatusBadge status={familyState} />
+                ) : null}
               </div>
             </div>
           </div>

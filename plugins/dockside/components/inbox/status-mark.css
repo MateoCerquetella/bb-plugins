@@ -1,0 +1,31 @@
+@keyframes dockside-status-turn {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes dockside-status-attention {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes dockside-status-arrive {
+  from { transform: scale(0.75); opacity: 0.4; }
+  65% { transform: scale(1.12); opacity: 1; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dockside-status-mark-working {
+    transform-origin: center;
+    animation: dockside-status-turn 2s linear infinite;
+  }
+
+  .dockside-status-mark-needs-you,
+  .dockside-status-mark-failed {
+    animation: dockside-status-attention 2.4s ease-in-out infinite;
+  }
+
+  .dockside-status-mark-unread {
+    transform-origin: center;
+    animation: dockside-status-arrive 350ms ease-out;
+  }
+}

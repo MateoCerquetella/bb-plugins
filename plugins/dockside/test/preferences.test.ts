@@ -16,7 +16,9 @@ describe("resolveDocksidePreferences", () => {
     assert.equal(loading.showProviderIcons, true);
     assert.equal(loading.showPullRequestMetadata, true);
     assert.equal(loading.showRelativeTime, true);
-    assert.equal(loading.colors.working, "#34A853");
+    assert.equal(loading.colors.working, "#E9D84A");
+    assert.equal(loading.colors.waiting, "#F58220");
+    assert.equal(loading.colors.unread, "#34A853");
     assert.equal(loading.colors.prReady, "#34A853");
 
     const malformed = resolveDocksidePreferences({
@@ -29,6 +31,14 @@ describe("resolveDocksidePreferences", () => {
     assert.equal(malformed.density, "comfortable");
     assert.equal(malformed.defaultChildrenExpanded, true);
     assert.equal(malformed.showProviderIcons, true);
+  });
+
+  it("accepts either status display mode and safely defaults invalid saved values", () => {
+    assert.equal(resolveDocksidePreferences(undefined).statusDisplay, "Icons");
+    assert.equal(resolveDocksidePreferences({ statusDisplay: "Verbose" }).statusDisplay, "Verbose");
+    assert.equal(resolveDocksidePreferences({ statusDisplay: "Icons" }).statusDisplay, "Icons");
+    assert.equal(resolveDocksidePreferences({ statusDisplay: "unknown" }).statusDisplay, "Icons");
+    assert.equal(resolveDocksidePreferences({ statusDisplay: true }).statusDisplay, "Icons");
   });
 
   it("resolves distinct high-contrast and colorblind-friendly presets", () => {

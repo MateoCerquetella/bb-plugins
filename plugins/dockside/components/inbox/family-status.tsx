@@ -1,4 +1,4 @@
-import { Icon } from "@/components/ui/icon";
+import { StatusMark } from "@/components/inbox/status-mark";
 import type { DragEventHandler, KeyboardEventHandler } from "react";
 import type { FamilyStatusPresentation } from "@/lib/family-status";
 import { cn } from "@/lib/utils";
@@ -43,15 +43,7 @@ export function FamilyStatusIcon({
       )}
       style={{ color: familyStatusColor(status) }}
     >
-      <Icon
-        name={status.icon}
-        aria-hidden
-        className={cn(
-          "size-3.5",
-          status.animated &&
-            (status.icon === "Loading" ? "animate-spin" : "animate-pulse"),
-        )}
-      />
+      <StatusMark kind={status.kind} />
       <span
         role="tooltip"
         className="pointer-events-none absolute bottom-full left-0 z-40 mb-1 w-max max-w-56 translate-y-0.5 rounded-md border border-border bg-popover px-2 py-1.5 text-left text-2xs leading-tight text-popover-foreground opacity-0 shadow-md transition-all group-hover/family-status:translate-y-0 group-hover/family-status:opacity-100 group-focus/family-status:translate-y-0 group-focus/family-status:opacity-100"

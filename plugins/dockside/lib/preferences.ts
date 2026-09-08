@@ -5,6 +5,9 @@ export const PALETTE_PRESET_OPTIONS = [
   "Custom",
 ] as const;
 
+export const STATUS_DISPLAY_OPTIONS = ["Icons", "Verbose"] as const;
+export type StatusDisplay = (typeof STATUS_DISPLAY_OPTIONS)[number];
+
 export const ROW_DENSITY_OPTIONS = ["Comfortable", "Compact"] as const;
 export const CHILD_EXPANSION_OPTIONS = ["Expanded", "Collapsed"] as const;
 
@@ -39,6 +42,7 @@ export interface DocksidePreferences {
   palettePreset: PalettePreset;
   colors: SemanticPalette;
   density: RowDensity;
+  statusDisplay: StatusDisplay;
   defaultChildrenExpanded: boolean;
   showProviderIcons: boolean;
   showPullRequestMetadata: boolean;
@@ -46,14 +50,14 @@ export interface DocksidePreferences {
 }
 
 export const CUSTOM_COLOR_DEFAULTS = {
-  working: "#34A853",
+  working: "#E9D84A",
   workflow: "#8B5CF6",
   agent: "#0891B2",
   command: "#EA6A20",
   plan: "#6366F1",
   goal: "#DB3F8D",
-  waiting: "#D9911A",
-  unread: "#3B82C4",
+  waiting: "#F58220",
+  unread: "#34A853",
   error: "#D94B4B",
   inactive: "#A1A8B3",
   stale: "#69717D",
@@ -67,14 +71,14 @@ export const CUSTOM_COLOR_DEFAULTS = {
 } as const satisfies SemanticPalette;
 
 const DEFAULT_PALETTE = {
-  working: "#34A853",
+  working: "#E9D84A",
   workflow: "#8B5CF6",
   agent: "#0891B2",
   command: "#EA6A20",
   plan: "#6366F1",
   goal: "#DB3F8D",
-  waiting: "var(--warning-text, var(--warning, #F59E0B))",
-  unread: "var(--primary, #3B82F6)",
+  waiting: "#F58220",
+  unread: "#34A853",
   error: "var(--destructive, #EF4444)",
   inactive: "color-mix(in srgb, var(--muted-foreground, #A1A8B3) 72%, transparent)",
   stale: "color-mix(in srgb, var(--muted-foreground, #69717D) 50%, transparent)",
@@ -165,6 +169,7 @@ export function resolveDocksidePreferences(
   return {
     palettePreset,
     colors,
+    statusDisplay: readOption(values?.statusDisplay, STATUS_DISPLAY_OPTIONS, "Icons"),
     density:
       readOption(values?.rowDensity, ROW_DENSITY_OPTIONS, "Comfortable") ===
       "Compact"

@@ -62,8 +62,8 @@ bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.0 
   --tag-prefix dockside/
 ```
 
-The range currently resolves [`dockside/v0.1.0`](https://github.com/MateoCerquetella/bb-plugins/tree/dockside/v0.1.0)
-at the code merged by [plugin PR #26](https://github.com/MateoCerquetella/bb-plugins/pull/26).
+The range currently resolves [`dockside/v0.1.2`](https://github.com/MateoCerquetella/bb-plugins/tree/dockside/v0.1.2),
+which adds the selectable status-grouped sidebar and provider-identity row icons.
 The [BB Community marketplace submission](https://github.com/get-bb/marketplace/pull/162)
 is validated and awaiting maintainer merge. Until it lands, use the Git command
 above rather than a bare npm package or marketplace name.
@@ -231,3 +231,7 @@ bun run --filter 'bb-plugin-dockside' test
 ```
 
 The test script needs Node 22.6+.
+
+Choose **Status display → Icons** (default) in Dockside settings for compact status marks, or **Verbose** to also show status labels. Working uses a half-filled circle, Needs you a filled exclamation mark, and unread results a filled check. Errors retain a distinct cross; inactive and stale threads keep their clock and hourglass. Hover or focus an icon for its full meaning. The default palette uses yellow for working, orange for attention, and green for unread results; custom and accessibility palettes remain available.
+
+Working marks rotate, attention and error marks pulse gently, and unread checks pop into view once. Inactive marks stay still. Animations are disabled when your system requests reduced motion.

@@ -18,6 +18,7 @@ import type { docksideRpcContract } from "@/server";
 import { Icon } from "@/components/ui/icon";
 import { cn } from "@/lib/utils";
 import { ProjectGroup } from "@/components/inbox/project-group";
+import { StatusGroup } from "@/components/inbox/status-group";
 import type { ProviderGlyphInfo } from "@/components/inbox/provider-glyph";
 import { SlimRow } from "@/components/inbox/slim-row";
 import { FilterMenu } from "@/components/inbox/filter-menu";
@@ -70,6 +71,7 @@ import {
   writeProjectOrder,
   type ProjectMoveResult,
 } from "@/lib/project-order";
+import { groupFamiliesByStatus } from "@/lib/status-groups";
 
 const EMPTY_STATE_CLASS = "px-2 py-6 text-center text-xs text-muted-foreground";
 
@@ -261,6 +263,14 @@ export function ThreadInbox({
         0,
       ),
     0,
+  );
+  const statusGroups = useMemo(
+    () =>
+      groupFamiliesByStatus(
+        projectGroups.flatMap((group) => group.families),
+        now,
+      ),
+    [now, projectGroups],
   );
   const showParkedShelves = filterPreset === "all" && !selectionMode;
   const visibleTotal = showParkedShelves
@@ -605,7 +615,7 @@ export function ThreadInbox({
         <div className="flex h-8 items-center gap-2 px-2.5 pb-1 text-muted-foreground">
           <Icon name="Folder" className="size-3.5" aria-hidden />
           <span className="text-2xs font-semibold uppercase tracking-wider">
-            Projects
+            Workspaces
           </span>
           <span className="tabular-nums text-2xs text-muted-foreground/70">
             {projectGroups.length}
@@ -736,7 +746,25 @@ export function ThreadInbox({
           </p>
         ) : (
           <>
-            {projectGroups.map((group) => (
+            {filterPreset === "status"
+              ? statusGroups.map((group) => (
+                  <StatusGroup
+                    key={group.kind}
+                    group={group}
+                    providerInfoById={providerInfoById}
+                    activeThreadId={activeThreadId}
+                    forceExpanded={searching}
+                    lifecycle={lifecycle}
+                    onNavigate={onNavigate}
+                    now={now}
+                    selectionMode={selectionMode}
+                    selectedRootIds={selectedRootIds}
+                    selectionHintId={selectionHintId}
+                    onToggleRoot={changeSelectedRoot}
+                    preferences={preferences}
+                  />
+                ))
+              : projectGroups.map((group) => (
               <ProjectGroup
                 key={group.project.id}
                 group={group}

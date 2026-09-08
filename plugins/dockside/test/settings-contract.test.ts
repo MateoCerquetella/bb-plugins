@@ -49,6 +49,7 @@ describe("Dockside settings contract", () => {
       "prBlockedColor",
       "prClosedColor",
       "rowDensity",
+      "statusDisplay",
       "defaultChildExpansion",
       "showProviderIcons",
       "showPullRequestMetadata",

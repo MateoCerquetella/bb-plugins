@@ -1,6 +1,6 @@
 {
   "name": "bb-plugin-dockside",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A project-first sidebar with stable threads and inline child agents.",
   "license": "MIT",
   "author": "Mateo Cerquetella",
