@@ -47,7 +47,7 @@ bb plugin reload aura
 Install the Git release after publication:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.2.0 \
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.2.1 \
   --subdirectory plugins/aura --tag-prefix aura/
 ```
 
@@ -73,7 +73,8 @@ never image bytes.
 ## Reading and composing
 
 Existing conversations have an opaque, theme-colored reading column. Background
-images remain undimmed in the side margins, never directly behind message text.
+images remain undimmed in the side margins all the way to the bottom, including
+beside the composer, never directly behind message text.
 Wide Markdown tables get an opaque backing across their entire width, including
 where they extend beyond the normal reading column.
 Half-wallpaper mode applies only to the New thread screen.

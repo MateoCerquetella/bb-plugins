@@ -1,6 +1,6 @@
 {
   "name": "bb-plugin-aura",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Custom image backgrounds and softly faded pixel patterns for BB threads.",
   "license": "MIT",
   "type": "module",
@@ -28,7 +28,8 @@
     "README.md",
     "LICENSE",
     "licenses/",
-    "THIRD_PARTY_NOTICES.md"
+    "THIRD_PARTY_NOTICES.md",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "env -u BB_CLI bb plugin build .",

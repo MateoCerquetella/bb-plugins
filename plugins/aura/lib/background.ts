@@ -24,6 +24,17 @@ export const READING_SURFACE = `
 [id="thread-detail-timeline-panel"] .thread-scrollbar > div > .mx-auto {
   background-color:var(--background); box-shadow:0 0 0 1px var(--border);
 }
+/* Continue the wallpaper beside the sticky composer instead of covering
+   the bottom of the whole pane with the host's full-width footer paint. */
+[id="thread-detail-timeline-panel"] [data-scroll-footer] > .bg-background:has(> .mx-auto) {
+  background-color:transparent;
+}
+[id="thread-detail-timeline-panel"] [data-scroll-footer] > .bg-background > .mx-auto {
+  background-color:var(--background);
+}
+[id="thread-detail-timeline-panel"] [data-scroll-footer] > .bg-background:has(> .mx-auto) > [data-overflow-fade] {
+  left:50%; right:auto; width:min(760px,100%); transform:translateX(-50%);
+}
 /* BB intentionally lets wide Markdown tables extend beyond the text column.
    Paint the whole scrollable table surface, including its overflow area. */
 [id="thread-detail-timeline-panel"] [data-markdown-preview] table,

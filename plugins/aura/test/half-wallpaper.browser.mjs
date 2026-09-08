@@ -32,6 +32,14 @@ try {
   await page.goto(base+process.env.BB_TEST_THREAD_PATH);
   const chat=page.locator('#thread-detail-timeline-panel .aura-capy-ink');await chat.waitFor();
   assert.equal(await chat.evaluate(e=>getComputedStyle(e).maskImage),'none');
+  const footer=page.locator('#thread-detail-timeline-panel [data-scroll-footer] > .bg-background');
+  assert.equal(await footer.evaluate(e=>getComputedStyle(e).backgroundColor),'rgba(0, 0, 0, 0)','Footer margins must show the wallpaper');
+  assert.notEqual(await footer.locator(':scope > .mx-auto').evaluate(e=>getComputedStyle(e).backgroundColor),'rgba(0, 0, 0, 0)','Composer must keep its readable background');
+  const fade=await footer.locator(':scope > [data-overflow-fade]').boundingBox();
+  const column=await footer.locator(':scope > .mx-auto').boundingBox();
+  assert.ok(Math.abs(fade.width-column.width)<2 && Math.abs(fade.x-column.x)<2,'Footer fade must stay inside the reading column');
+  await page.screenshot({path:shots+'/chat-full-height.jpg',type:'jpeg',quality:88});
+
   assert.equal(await page.getByRole('button',{name:'Dim background',exact:true}).count(),0);
  }
  console.log('PASS: settings-only half/full toggle; wallpaper ends at midpoint when on; no composer button; chats always full.');
