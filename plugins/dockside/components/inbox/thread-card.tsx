@@ -248,40 +248,13 @@ export function ThreadCard({
               />
             ) : null}
 
-            {selectionMode ? null : leadingVisual === "provider" ? (
+            {!selectionMode && leadingVisual === "provider" && preferences.showProviderIcons ? (
               <ProviderGlyph
                 providerId={thread.providerId}
                 provider={providerInfoById.get(thread.providerId)}
                 className="col-start-1 row-start-1 size-5"
               />
-            ) : (
-              <FamilyStatusIcon
-                status={familyState}
-                className="col-start-1 row-start-1"
-                draggable={reorderEnabled}
-                reorderHelp={
-                  reorderEnabled
-                    ? "Drag this status icon to reorder. Press Alt+Up or Alt+Down to move the family."
-                    : (reorderDisabledReason ?? "Reordering is unavailable.")
-                }
-                onDragStart={(event) => {
-                  event.stopPropagation();
-                  if (!reorderEnabled) {
-                    event.preventDefault();
-                    return;
-                  }
-                  onReorderDragStart(event);
-                }}
-                onKeyDown={(event) => {
-                  if (!event.altKey) return;
-                  if (event.key === "ArrowUp" || event.key === "ArrowDown") {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    onMoveByKeyboard(event.key === "ArrowUp" ? -1 : 1);
-                  }
-                }}
-              />
-            )}
+            ) : null}
 
             <div className="pointer-events-none relative col-start-2 row-span-2 min-w-0">
               <div
@@ -327,39 +300,66 @@ export function ThreadCard({
                 selectionMode && "pointer-events-none",
               )}
             >
-              <span
-                data-dockside-root-time=""
-                className={cn(
-                  "flex h-4 items-center justify-end gap-1.5",
-                  canPark && !selectionMode && "group-hover/root:hidden",
-                )}
-              >
-                {preferences.showRelativeTime ? (
-                  <ThreadStatusLabel thread={thread} now={now} />
+              <div data-dockside-root-status-row="" className="flex h-4 items-center justify-end gap-1.5">
+                <span
+                  data-dockside-root-time=""
+                  className={cn(
+                    "flex h-4 items-center justify-end gap-1.5",
+                    canPark && !selectionMode && "group-hover/root:hidden",
+                  )}
+                >
+                  {preferences.showRelativeTime ? (
+                    <ThreadStatusLabel thread={thread} now={now} />
+                  ) : null}
+                </span>
+                {canPark && !selectionMode ? (
+                  <span className="hidden h-4 items-center gap-0.5 group-hover/root:flex">
+                    <ParkButton
+                      label="Snooze until tomorrow"
+                      icon="Clock"
+                      onActivate={() => {
+                        const tomorrow = resolveSnoozePresets(new Date()).find(
+                          (preset) => preset.id === "tomorrow",
+                        );
+                        if (tomorrow) onSnooze(tomorrow.snoozedUntil);
+                      }}
+                    />
+                    <ParkButton
+                      label="Settle thread"
+                      icon="Archive"
+                      onActivate={onSettle}
+                    />
+                  </span>
                 ) : null}
-                {preferences.statusDisplay === "Icons" && leadingVisual === "provider" ? (
-                  <FamilyStatusIcon status={familyState} />
-                ) : null}
-              </span>
-              {canPark && !selectionMode ? (
-                <span className="hidden h-4 items-center gap-0.5 group-hover/root:flex">
-                  <ParkButton
-                    label="Snooze until tomorrow"
-                    icon="Clock"
-                    onActivate={() => {
-                      const tomorrow = resolveSnoozePresets(new Date()).find(
-                        (preset) => preset.id === "tomorrow",
-                      );
-                      if (tomorrow) onSnooze(tomorrow.snoozedUntil);
+                {!selectionMode ? (
+                  <FamilyStatusIcon
+                    status={familyState}
+                    tooltipAlign="right"
+                    draggable={reorderEnabled}
+                    reorderHelp={
+                      reorderEnabled
+                        ? "Drag this status icon to reorder. Press Alt+Up or Alt+Down to move the family."
+                        : (reorderDisabledReason ?? "Reordering is unavailable.")
+                    }
+                    onDragStart={(event) => {
+                      event.stopPropagation();
+                      if (!reorderEnabled) {
+                        event.preventDefault();
+                        return;
+                      }
+                      onReorderDragStart(event);
+                    }}
+                    onKeyDown={(event) => {
+                      if (!event.altKey) return;
+                      if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        onMoveByKeyboard(event.key === "ArrowUp" ? -1 : 1);
+                      }
                     }}
                   />
-                  <ParkButton
-                    label="Settle thread"
-                    icon="Archive"
-                    onActivate={onSettle}
-                  />
-                </span>
-              ) : null}
+                ) : null}
+              </div>
               <div
                 data-dockside-root-metadata=""
                 className="flex h-4 max-w-full items-center justify-end gap-1 whitespace-nowrap"
@@ -541,7 +541,6 @@ function ChildThreadRow({
               className="relative mt-0.5"
             />
           ) : null}
-          <ThreadStateGlyph thread={thread} className="relative mt-0.5" />
           <div className="pointer-events-none relative min-w-0 flex-1">
             <div className="flex min-w-0 items-center gap-1.5">
               <span
@@ -565,6 +564,7 @@ function ChildThreadRow({
               <ThreadLocation thread={thread} />
             </div>
           </div>
+          <ThreadStateGlyph thread={thread} className="relative mt-0.5" />
         </div>
       </li>
     </RowContextMenu>
@@ -612,7 +612,7 @@ function ThreadStateGlyph({
       {glyph}
       <span
         role="tooltip"
-        className="pointer-events-none absolute bottom-full left-0 z-30 mb-1 w-max max-w-56 translate-y-0.5 rounded-md border border-border bg-popover px-2 py-1.5 text-2xs leading-tight text-popover-foreground opacity-0 shadow-md transition-all group-hover/child-status:translate-y-0 group-hover/child-status:opacity-100 group-focus-visible/child-status:translate-y-0 group-focus-visible/child-status:opacity-100"
+        className="pointer-events-none absolute bottom-full right-0 z-30 mb-1 w-max max-w-56 translate-y-0.5 rounded-md border border-border bg-popover px-2 py-1.5 text-2xs leading-tight text-popover-foreground opacity-0 shadow-md transition-all group-hover/child-status:translate-y-0 group-hover/child-status:opacity-100 group-focus-visible/child-status:translate-y-0 group-focus-visible/child-status:opacity-100"
       >
         {label}
       </span>
