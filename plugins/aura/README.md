@@ -66,6 +66,8 @@ never image bytes.
 
 Existing conversations have an opaque, theme-colored reading column. Background
 images remain undimmed in the side margins, never directly behind message text.
+Wide Markdown tables get an opaque backing across their entire width, including
+where they extend beyond the normal reading column.
 Composer dimming applies only to the New thread screen.
 The New thread composer is vertically centered on the full compose screen; short
 windows and long drafts remain scrollable. These styles follow Aura's enable and

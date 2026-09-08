@@ -24,6 +24,12 @@ export const READING_SURFACE = `
 [id="thread-detail-timeline-panel"] .thread-scrollbar > div > .mx-auto {
   background-color:var(--background); box-shadow:0 0 0 1px var(--border);
 }
+/* BB intentionally lets wide Markdown tables extend beyond the text column.
+   Paint the whole scrollable table surface, including its overflow area. */
+[id="thread-detail-timeline-panel"] [data-markdown-preview] table,
+[id="thread-detail-timeline-panel"] [data-markdown-preview] div:has(> table) {
+  background-color:var(--background);
+}
 `;
 
 export function notifyChange(snapshot: Snapshot): void {
