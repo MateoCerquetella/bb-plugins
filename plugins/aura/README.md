@@ -43,8 +43,8 @@ bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.2.0 
   --subdirectory plugins/aura --tag-prefix aura/
 ```
 
-![Alpine wallpaper in Aura](../../docs/media/aura/aura-alpine.jpg)
-![Moonlight wallpaper in Aura](../../docs/media/aura/aura-moonlight.jpg)
+![Alpine wallpaper in Aura](../../docs/media/aura/01-alpine-half.jpg)
+![Moonlight wallpaper in Aura](../../docs/media/aura/02-moonlight-full.jpg)
 
 ## CLI
 
