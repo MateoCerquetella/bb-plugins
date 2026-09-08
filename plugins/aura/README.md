@@ -5,15 +5,19 @@ slots for BB. Open **Settings → Aura**, or **+ → Actions → Aura** in a thr
 
 ## Use Aura
 
-Use the **◐ Dim** button beside the New thread composer controls to switch
-center dimming on or off immediately. Conversations always show the full
-wallpaper in their margins; the toggle never dims chat backgrounds.
+In **Settings → Aura**, use **Half wallpaper on New thread**:
+
+- **On:** the wallpaper appears in the upper half and fades out at the midpoint.
+- **Off:** New thread shows the full wallpaper.
+- Chats always show the full wallpaper in their margins, with readable message
+  and table backgrounds. There is no dimmer button in the composer.
+
+Select **Apply background** to save the setting.
 
 - Choose or drop a PNG/JPG (up to 32 MB). Large images are resized automatically
   to fit the 2 MB stored-image limit. The preview shows the result before saving.
-- Adjust image visibility (0–100%), dimming behind the composer, fit, and Capy dithering.
-  Image dimming follows the centered composer; the wallpaper remains visible
-  at the bottom and edges. Photo dithering now animates with a gentle threshold wave.
+- Adjust image visibility (0–100%), half-wallpaper mode, fit, and Capy dithering.
+  The half-wallpaper setting affects New thread only. Photo dithering now animates with a gentle threshold wave.
 - Select **Apply background** to apply the current draft.
 - Choose a slot, enter a name, and select **Save slot** to save and apply the draft.
   Occupied slots have an explicit **Replace slot** button. Each slot keeps its
@@ -72,7 +76,7 @@ Existing conversations have an opaque, theme-colored reading column. Background
 images remain undimmed in the side margins, never directly behind message text.
 Wide Markdown tables get an opaque backing across their entire width, including
 where they extend beyond the normal reading column.
-Composer dimming applies only to the New thread screen.
+Half-wallpaper mode applies only to the New thread screen.
 The New thread composer is vertically centered on the full compose screen; short
 windows and long drafts remain scrollable. These styles follow Aura's enable and
 scope settings and are removed when Aura is disabled.

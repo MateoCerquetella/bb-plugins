@@ -2,15 +2,12 @@ import { VERTEX_SHADER, DITHERING_SHADER } from "./capy-shaders.ts";
 import { ANIMATED_PHOTO_SHADER } from "./photo-shader.ts";
 import type { BackgroundSettings } from "./model.ts";
 
-// Exact masks and shader parameters from capy.ai/new; see THIRD_PARTY_NOTICES.md.
-const edgeMask = "radial-gradient(ellipse 150% 135% at 50% 110%, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 42%, rgba(0,0,0,0.45) 66%, rgba(0,0,0,1) 92%)";
-const composerMask = "radial-gradient(ellipse 780px 520px at 50% 46%, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0.55) 62%, rgba(0,0,0,1) 88%)";
 export const CAPY_CSS = `
 .aura-capy-layer { position:absolute; inset:0; z-index:-1; pointer-events:none; overflow:hidden; border-radius:inherit; }
 .aura-capy-air, .aura-capy-ink, .aura-capy-fade { position:absolute; inset:0; pointer-events:none; }
 .aura-capy-air { background:linear-gradient(180deg in oklab, var(--aura-panel, #f9fafc) 0%, var(--background, #fff) 100%); }
 .aura-capy-ink { background-position:center; background-repeat:no-repeat; background-size:var(--aura-fit, cover); }
-.aura-capy-ink:not([data-image])[data-center-dim] { mask-image:${edgeMask},${composerMask}; mask-size:100% 100%,100% 100%; mask-repeat:no-repeat,no-repeat; mask-composite:intersect; -webkit-mask-image:${edgeMask},${composerMask}; -webkit-mask-size:100% 100%,100% 100%; -webkit-mask-repeat:no-repeat,no-repeat; -webkit-mask-composite:source-in; }
+
 .aura-capy-ink canvas { display:block; position:absolute; inset:0; width:100%; height:100%; image-rendering:pixelated; }
 .aura-capy-focus { position:absolute; top:46%; left:50%; width:1360px; height:680px; transform:translate(-50%,-50%); }
 .aura-capy-focus::after { content:""; position:absolute; inset:160px; border-radius:48px; background:rgba(255,255,255,.88); filter:blur(88px); }
@@ -18,10 +15,11 @@ export const CAPY_CSS = `
 .dark .aura-capy-air { display:none; }
 .dark .aura-capy-focus::after { background:rgba(0,0,0,.9); }
 .dark .aura-capy-fade { background:linear-gradient(to bottom,rgba(0,0,0,0) 12%,rgba(0,0,0,.3) 34%,rgba(0,0,0,.68) 52%,rgba(0,0,0,.92) 70%,#000 88%); }
-.aura-capy-ink[data-image][data-center-dim] {
-  -webkit-mask-image:radial-gradient(ellipse 70% 42% at 50% 50%, rgba(0,0,0,var(--aura-center-visibility,0)) 0%, rgba(0,0,0,var(--aura-center-visibility,0)) 28%, #000 70%);
-  mask-image:radial-gradient(ellipse 70% 42% at 50% 50%, rgba(0,0,0,var(--aura-center-visibility,0)) 0%, rgba(0,0,0,var(--aura-center-visibility,0)) 28%, #000 70%);
+.aura-capy-ink[data-half-wallpaper] {
+  -webkit-mask-image:linear-gradient(to bottom, #000 0%, #000 25%, transparent 50%, transparent 100%);
+  mask-image:linear-gradient(to bottom, #000 0%, #000 25%, transparent 50%, transparent 100%);
 }
+
 `;
 
 export interface CapyEffect { update(settings: BackgroundSettings, image: string | null): void; dispose(): void; }
@@ -51,13 +49,13 @@ export function mountCapyEffect(parent: HTMLElement, initial: BackgroundSettings
     ink.style.opacity = String(image ? settings.imageOpacity : Math.min(1, settings.intensity * (dark ? 1.1 : 1)));
     ink.style.mixBlendMode = image ? "normal" : dark ? "screen" : "multiply";
     ink.style.backgroundSize = settings.fit;
-    // Photos dim around the centered composer, never into a white lower half.
-    // The original Capy noise-only fade remains unchanged.
+    // The settings toggle affects New thread only: show the top half of the
+    // wallpaper with a fade to the theme background at the midpoint.
     const conversation = parent.id === "thread-detail-timeline-panel";
-    fade.style.opacity = conversation || image || !settings.dimmerEnabled ? "0" : "1";
-    focus.style.opacity = conversation || image || !settings.dimmerEnabled ? "0" : "1";
-    if (settings.dimmerEnabled && !conversation) ink.dataset.centerDim = ""; else delete ink.dataset.centerDim;
-    ink.style.setProperty("--aura-center-visibility", String(1 - settings.fade));
+    fade.style.opacity = "0";
+    focus.style.opacity = "0";
+    if (settings.dimmerEnabled && !conversation) ink.dataset.halfWallpaper = "";
+    else delete ink.dataset.halfWallpaper;
     if (image) { ink.dataset.image = ""; ink.style.backgroundImage = `url("${image}")`; }
     else { delete ink.dataset.image; ink.style.backgroundImage = "none"; }
     if (image !== currentImage || refresh || wasEffect !== settings.effect || wasEnabled !== settings.enabled || wasTint !== settings.tint || wasFit !== settings.fit) {

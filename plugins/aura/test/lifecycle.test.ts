@@ -32,13 +32,13 @@ test("applies scoped backgrounds, disables cleanly and ignores a late fetch afte
     const photo = { version: "a".repeat(24), name: "wallpaper.png", mime: "image/png" as const, bytes: 100 };
     notifyChange({ settings: defaults, image: photo, slots: [], activeSlot: null });
     const reused = document.querySelector<HTMLElement>('#root-compose-main-panel')!;
-    assert.ok(reused.querySelector('.aura-capy-ink[data-center-dim]'));
+    assert.ok(reused.querySelector('.aura-capy-ink[data-half-wallpaper]'));
     reused.id = 'thread-detail-timeline-panel';
     await new Promise(resolve => setTimeout(resolve, 0));
-    assert.equal(reused.querySelector('.aura-capy-ink[data-center-dim]'), null);
+    assert.equal(reused.querySelector('.aura-capy-ink[data-half-wallpaper]'), null);
     reused.id = 'root-compose-main-panel';
     await new Promise(resolve => setTimeout(resolve, 0));
-    assert.ok(reused.querySelector('.aura-capy-ink[data-center-dim]'), 'Reused New thread panels must regain their center dimmer');
+    assert.ok(reused.querySelector('.aura-capy-ink[data-half-wallpaper]'), 'Reused New thread panels must regain their half-wallpaper fade');
 
 
     notifyChange({ settings: { ...defaults, enabled: false }, image: null, slots: [], activeSlot: null });

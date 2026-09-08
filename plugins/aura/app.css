@@ -69,10 +69,3 @@
 .aura-slot-save :is(select,input) { width:100%; min-height:36px; font:inherit; background:var(--background); color:var(--foreground); border:1px solid var(--aura-border); border-radius:7px; padding:7px; }
 .aura-save-slot { background:var(--muted); color:var(--foreground); border:1px solid var(--aura-border); border-radius:7px; min-height:36px; padding:7px 12px; font-size:12px !important; }
 @container (max-width:380px) { .aura-slots { grid-template-columns:repeat(2,minmax(0,1fr)); } .aura-save-slot { width:100%; } }
-.aura-dimmer-control { position:relative; display:inline-flex; }
-.aura-dimmer-toggle { display:inline-flex; align-items:center; gap:4px; height:28px; padding:0 7px; border:1px solid transparent; border-radius:6px; color:var(--muted-foreground); background:transparent; font:inherit; font-size:11px; cursor:pointer; }
-.aura-dimmer-toggle[aria-pressed="true"] { color:var(--foreground); border-color:var(--border); background:var(--muted); }
-.aura-dimmer-toggle:hover { color:var(--foreground); background:var(--muted); }
-.aura-dimmer-toggle:focus-visible { outline:2px solid var(--primary); outline-offset:2px; }
-.aura-dimmer-toggle:disabled { opacity:.5; cursor:wait; }
-.aura-dimmer-error { position:absolute; bottom:34px; right:0; width:220px; padding:8px; border:1px solid var(--destructive); border-radius:6px; background:var(--background); color:var(--destructive); font-size:12px; }
