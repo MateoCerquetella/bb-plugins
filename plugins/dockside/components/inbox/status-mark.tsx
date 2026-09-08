@@ -11,7 +11,7 @@ export function StatusMark({ kind, className, style }: {
   className?: string;
   style?: CSSProperties;
 }) {
-  const shared = cn("size-3.5 shrink-0", `dockside-status-mark-${kind}`, className);
+  const shared = cn("shrink-0", kind === "working" ? "size-4" : "size-3.5", `dockside-status-mark-${kind}`, className);
   if (kind === "inactive" || kind === "stale" || kind === "draft") {
     return <Icon name={kind === "inactive" ? "Clock" : kind === "stale" ? "Hourglass" : "Edit"} aria-hidden className={shared} style={style} />;
   }
@@ -20,9 +20,10 @@ export function StatusMark({ kind, className, style }: {
     <svg aria-hidden="true" viewBox="0 0 20 20" className={shared} style={style} fill="none">
       {kind === "working" ? (
         <>
-          <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="2" opacity="0.2" />
-          <circle cx="10" cy="10" r="2" fill="currentColor" />
-          <circle className="dockside-status-orbit" cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeDasharray="14 30" />
+          <circle cx="10" cy="10" r="3.25" stroke="currentColor" strokeWidth="1.7" />
+          <g className="dockside-status-sun-rays" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
+            <path d="M10 1v2M10 17v2M1 10h2M17 10h2M3.64 3.64l1.42 1.42M14.94 14.94l1.42 1.42M3.64 16.36l1.42-1.42M14.94 5.06l1.42-1.42" />
+          </g>
         </>
       ) : (
         <>

@@ -1,4 +1,4 @@
-@keyframes dockside-status-orbit {
+@keyframes dockside-status-sun-rays {
   to { transform: rotate(360deg); }
 }
 
@@ -14,9 +14,9 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .dockside-status-orbit {
+  .dockside-status-sun-rays {
     transform-origin: 10px 10px;
-    animation: dockside-status-orbit 1.6s linear infinite;
+    animation: dockside-status-sun-rays 6s linear infinite;
   }
 
   .dockside-status-mark-needs-you,
