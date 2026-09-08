@@ -1,4 +1,4 @@
-@keyframes dockside-status-sun-rays {
+@keyframes dockside-status-loader {
   to { transform: rotate(360deg); }
 }
 
@@ -14,9 +14,9 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .dockside-status-sun-rays {
-    transform-origin: 10px 10px;
-    animation: dockside-status-sun-rays 6s linear infinite;
+  .dockside-status-mark-working {
+    transform-origin: center;
+    animation: dockside-status-loader 1s linear infinite;
   }
 
   .dockside-status-mark-needs-you,
