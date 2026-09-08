@@ -62,8 +62,8 @@ bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.0 
   --tag-prefix dockside/
 ```
 
-The range currently resolves [`dockside/v0.1.3`](https://github.com/MateoCerquetella/bb-plugins/tree/dockside/v0.1.3),
-which adds animated status icons, the Icons/Verbose display setting, and agent logos beside thread titles.
+The range currently resolves [`dockside/v0.1.4`](https://github.com/MateoCerquetella/bb-plugins/tree/dockside/v0.1.4),
+which restores the segmented progress spinner with heavier strokes and a stronger gold color for better visibility.
 The [BB Community marketplace submission](https://github.com/get-bb/marketplace/pull/162)
 is validated and awaiting maintainer merge. Until it lands, use the Git command
 above rather than a bare npm package or marketplace name.

@@ -70,7 +70,7 @@ and development commands.
 Install the latest compatible Dockside Git release:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.3 --subdirectory plugins/dockside --tag-prefix dockside/
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.4 --subdirectory plugins/dockside --tag-prefix dockside/
 ```
 
 Dockside groups threads by project, keeps root/child families together, adds
