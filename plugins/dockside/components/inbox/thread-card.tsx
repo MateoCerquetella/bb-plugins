@@ -331,34 +331,7 @@ export function ThreadCard({
                     />
                   </span>
                 ) : null}
-                {!selectionMode ? (
-                  <FamilyStatusIcon
-                    status={familyState}
-                    tooltipAlign="right"
-                    draggable={reorderEnabled}
-                    reorderHelp={
-                      reorderEnabled
-                        ? "Drag this status icon to reorder. Press Alt+Up or Alt+Down to move the family."
-                        : (reorderDisabledReason ?? "Reordering is unavailable.")
-                    }
-                    onDragStart={(event) => {
-                      event.stopPropagation();
-                      if (!reorderEnabled) {
-                        event.preventDefault();
-                        return;
-                      }
-                      onReorderDragStart(event);
-                    }}
-                    onKeyDown={(event) => {
-                      if (!event.altKey) return;
-                      if (event.key === "ArrowUp" || event.key === "ArrowDown") {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        onMoveByKeyboard(event.key === "ArrowUp" ? -1 : 1);
-                      }
-                    }}
-                  />
-                ) : null}
+
               </div>
               <div
                 data-dockside-root-metadata=""
@@ -431,6 +404,35 @@ export function ThreadCard({
                 ) : null}
                 {preferences.statusDisplay === "Verbose" ? (
                   <FamilyStatusBadge status={familyState} />
+                ) : null}
+                {!selectionMode ? (
+                  <FamilyStatusIcon
+                    status={familyState}
+                    tooltipAlign="right"
+                    className="size-3.5"
+                    draggable={reorderEnabled}
+                    reorderHelp={
+                      reorderEnabled
+                        ? "Drag this status icon to reorder. Press Alt+Up or Alt+Down to move the family."
+                        : (reorderDisabledReason ?? "Reordering is unavailable.")
+                    }
+                    onDragStart={(event) => {
+                      event.stopPropagation();
+                      if (!reorderEnabled) {
+                        event.preventDefault();
+                        return;
+                      }
+                      onReorderDragStart(event);
+                    }}
+                    onKeyDown={(event) => {
+                      if (!event.altKey) return;
+                      if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        onMoveByKeyboard(event.key === "ArrowUp" ? -1 : 1);
+                      }
+                    }}
+                  />
                 ) : null}
               </div>
             </div>

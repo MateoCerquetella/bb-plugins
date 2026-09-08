@@ -234,4 +234,4 @@ The test script needs Node 22.6+.
 
 Choose **Status display → Icons** (default) in Dockside settings for compact status marks, or **Verbose** to also show status labels. Working uses a half-filled circle, Needs you a filled exclamation mark, and unread results a filled check. Errors retain a distinct cross; inactive and stale threads keep their clock and hourglass. Hover or focus an icon for its full meaning. The default palette uses yellow for working, orange for attention, and green for unread results; custom and accessibility palettes remain available.
 
-Working marks rotate, attention and error marks pulse gently, and unread checks pop into view once. Inactive marks stay still. Animations are disabled when your system requests reduced motion.
+Working marks breathe subtly without spinning, attention and error marks pulse gently, and unread checks pop into view once. Inactive marks stay still. Animations are disabled when your system requests reduced motion.

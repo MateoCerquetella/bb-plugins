@@ -1,5 +1,6 @@
-@keyframes dockside-status-turn {
-  to { transform: rotate(360deg); }
+@keyframes dockside-status-working {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 
 @keyframes dockside-status-attention {
@@ -15,8 +16,7 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .dockside-status-mark-working {
-    transform-origin: center;
-    animation: dockside-status-turn 2s linear infinite;
+    animation: dockside-status-working 3s ease-in-out infinite;
   }
 
   .dockside-status-mark-needs-you,
