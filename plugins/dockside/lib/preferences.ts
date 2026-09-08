@@ -50,7 +50,7 @@ export interface DocksidePreferences {
 }
 
 export const CUSTOM_COLOR_DEFAULTS = {
-  working: "#E9D84A",
+  working: "#D99B00",
   workflow: "#8B5CF6",
   agent: "#0891B2",
   command: "#EA6A20",
@@ -71,7 +71,7 @@ export const CUSTOM_COLOR_DEFAULTS = {
 } as const satisfies SemanticPalette;
 
 const DEFAULT_PALETTE = {
-  working: "#E9D84A",
+  working: "#D99B00",
   workflow: "#8B5CF6",
   agent: "#0891B2",
   command: "#EA6A20",

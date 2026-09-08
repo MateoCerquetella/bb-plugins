@@ -1,3 +1,10 @@
+/* Use heavier, fully opaque strokes to keep progress readable at sidebar size. */
+.dockside-status-mark-working path {
+  stroke-width: 2.5;
+  opacity: 1;
+  stroke-opacity: 1;
+}
+
 @keyframes dockside-status-loader {
   to { transform: rotate(360deg); }
 }
