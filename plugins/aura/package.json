@@ -1,0 +1,61 @@
+{
+  "name": "bb-plugin-aura",
+  "version": "0.2.0",
+  "description": "Custom image backgrounds and softly faded pixel patterns for BB threads.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "bb": ">=0.40",
+    "bbPluginSdk": ">=0.4.21"
+  },
+  "bb": {
+    "name": "Aura",
+    "description": "Personal backgrounds, Capy dithering, and six saved slots for your conversations.",
+    "branding": {
+      "icon": "./assets/icon.svg"
+    },
+    "server": "./server.ts",
+    "app": "./app.tsx",
+    "skills": []
+  },
+  "files": [
+    "dist/",
+    "assets/",
+    "lib/",
+    "server.ts",
+    "app.tsx",
+    "app.css",
+    "README.md",
+    "LICENSE",
+    "licenses/",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "scripts": {
+    "build": "env -u BB_CLI bb plugin build .",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test test/*.test.ts",
+    "check": "npm run typecheck && npm test && npm run build"
+  },
+  "dependencies": {
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@get-bb/plugin-sdk": "0.4.21",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.7.0",
+    "@playwright/test": "^1.51.0",
+    "jsdom": "^26.1.0",
+    "@types/jsdom": "^21.1.7",
+    "better-sqlite3": "^12.0.0",
+    "@types/better-sqlite3": "^7.6.12"
+  },
+  "author": "Mateo Cerquetella",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MateoCerquetella/bb-plugins.git",
+    "directory": "plugins/aura"
+  },
+  "homepage": "https://github.com/MateoCerquetella/bb-plugins/tree/main/plugins/aura"
+}
