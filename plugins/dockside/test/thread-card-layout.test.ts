@@ -77,14 +77,14 @@ describe("compact root card contract", () => {
     assert.match(rootSource, /reorderHelp=/);
     assert.match(familyStatusSource, /aria-keyshortcuts=/);
     assert.match(rootSource, /application\/x-dockside-family|onReorderDragStart/);
-    assert.match(rootSource, /interactive=\{false\}/);
     assert.doesNotMatch(rootSource, /function ReorderHandle|group\/reorder/);
     assert.match(familyStatusSource, /w-14/);
     assert.match(familyStatusSource, /px-0/);
     const metadataStart = rootSource.indexOf("data-dockside-root-metadata");
     const badgeStart = rootSource.indexOf("<FamilyStatusBadge", metadataStart);
-    const providerStart = rootSource.indexOf("<ProviderGlyph", metadataStart);
-    assert.ok(badgeStart > providerStart, "fixed-width status badge owns the right edge");
+    assert.ok(badgeStart > metadataStart);
+    assert.equal(rootSource.indexOf("<ProviderGlyph", metadataStart), -1, "provider identity stays out of the trailing metadata");
+    assert.ok(rootSource.indexOf("<ProviderGlyph") < rootSource.indexOf("data-dockside-root-title-row"));
   });
 
   it("keeps child status and disclosure-provider help keyboard-readable", () => {

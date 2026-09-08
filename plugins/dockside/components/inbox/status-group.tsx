@@ -91,7 +91,6 @@ export function StatusGroup({
                 onReorderDragOver={() => {}}
                 onReorderDrop={(event) => event.preventDefault()}
                 preferences={preferences}
-                leadingVisual="provider"
               />
             );
           })}

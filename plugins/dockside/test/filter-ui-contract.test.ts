@@ -36,6 +36,6 @@ describe("workspace filter UI contract", () => {
       new URL("../components/inbox/status-group.tsx", import.meta.url),
       "utf8",
     );
-    assert.match(statusGroup, /leadingVisual="provider"/);
+    assert.match(statusGroup, /<ThreadCard/);
   });
 });

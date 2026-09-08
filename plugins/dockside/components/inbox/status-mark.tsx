@@ -20,8 +20,9 @@ export function StatusMark({ kind, className, style }: {
     <svg aria-hidden="true" viewBox="0 0 20 20" className={shared} style={style} fill="none">
       {kind === "working" ? (
         <>
-          <circle cx="10" cy="10" r="7.5" stroke="currentColor" strokeWidth="2" />
-          <path d="M10 2.5a7.5 7.5 0 0 0 0 15Z" fill="currentColor" />
+          <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="2" opacity="0.2" />
+          <circle cx="10" cy="10" r="2" fill="currentColor" />
+          <circle className="dockside-status-orbit" cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeDasharray="14 30" />
         </>
       ) : (
         <>

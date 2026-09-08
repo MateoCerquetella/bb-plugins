@@ -56,7 +56,6 @@ export function ThreadCard({
   onReorderDragOver,
   onReorderDrop,
   preferences,
-  leadingVisual = "status",
 }: {
   thread: PluginSidebarThread;
   childThreads: readonly PluginSidebarThread[];
@@ -83,8 +82,6 @@ export function ThreadCard({
   onReorderDragOver: (event: DragEvent<HTMLLIElement>) => void;
   onReorderDrop: (event: DragEvent<HTMLLIElement>) => void;
   preferences: DocksidePreferences;
-  /** Status views put semantic state on the section and provider identity on rows. */
-  leadingVisual?: "status" | "provider";
 }) {
   const actions = useSidebarThreadActions();
   const { splitProps, layout } = useSidebarThreadSplit(thread.id);
@@ -248,11 +245,11 @@ export function ThreadCard({
               />
             ) : null}
 
-            {!selectionMode && leadingVisual === "provider" && preferences.showProviderIcons ? (
+            {!selectionMode && preferences.showProviderIcons ? (
               <ProviderGlyph
                 providerId={thread.providerId}
                 provider={providerInfoById.get(thread.providerId)}
-                className="col-start-1 row-start-1 size-5"
+                className="col-start-1 row-start-1 size-3.5 self-center"
               />
             ) : null}
 
@@ -375,19 +372,6 @@ export function ThreadCard({
                       aria-hidden
                     />
                     <span className="tabular-nums">{childThreads.length}</span>
-                    {preferences.showProviderIcons ? (
-                      <span className="flex items-center -space-x-0.5">
-                        {childProviderIds.map((providerId) => (
-                          <ProviderGlyph
-                            key={providerId}
-                            providerId={providerId}
-                            provider={providerInfoById.get(providerId)}
-                            className="size-3 opacity-80"
-                            interactive={false}
-                          />
-                        ))}
-                      </span>
-                    ) : null}
                     <span
                       role="tooltip"
                       className="pointer-events-none absolute bottom-full right-0 z-30 mb-1 w-max max-w-56 translate-y-0.5 rounded-md border border-border bg-popover px-2 py-1.5 text-2xs leading-tight text-popover-foreground opacity-0 shadow-md transition-all group-hover/children:translate-y-0 group-hover/children:opacity-100 group-focus-visible/children:translate-y-0 group-focus-visible/children:opacity-100"
@@ -395,12 +379,6 @@ export function ThreadCard({
                       {childDisclosureLabel}
                     </span>
                   </button>
-                ) : preferences.showProviderIcons && leadingVisual === "status" ? (
-                  <ProviderGlyph
-                    providerId={thread.providerId}
-                    provider={providerInfoById.get(thread.providerId)}
-                    className="size-3 opacity-75"
-                  />
                 ) : null}
                 {preferences.statusDisplay === "Verbose" ? (
                   <FamilyStatusBadge status={familyState} />

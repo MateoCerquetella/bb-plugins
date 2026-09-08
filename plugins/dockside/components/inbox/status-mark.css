@@ -1,6 +1,5 @@
-@keyframes dockside-status-working {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+@keyframes dockside-status-orbit {
+  to { transform: rotate(360deg); }
 }
 
 @keyframes dockside-status-attention {
@@ -15,8 +14,9 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .dockside-status-mark-working {
-    animation: dockside-status-working 3s ease-in-out infinite;
+  .dockside-status-orbit {
+    transform-origin: 10px 10px;
+    animation: dockside-status-orbit 1.6s linear infinite;
   }
 
   .dockside-status-mark-needs-you,
