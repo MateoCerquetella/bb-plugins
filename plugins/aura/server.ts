@@ -7,6 +7,7 @@ import { decodeImage } from "./lib/image.ts";
 export const rpcContract = defineRpcContract({
   get: { input: z.null(), output: snapshotSchema },
   apply: { input: applySchema, output: snapshotSchema },
+  setDimmer: { input: z.object({ enabled: z.boolean() }).strict(), output: snapshotSchema },
   activateSlot: { input: z.object({ slot: slotNumberSchema }).strict(), output: snapshotSchema },
   deleteSlot: { input: z.object({ slot: slotNumberSchema }).strict(), output: snapshotSchema },
   reset: { input: z.null(), output: snapshotSchema },
@@ -41,7 +42,7 @@ export default function aura(bb: BbPluginApi): void {
         info = JSON.stringify({ version: randomBytes(12).toString("hex"), name: value.image.name, mime: decoded.mime, bytes: bytes.length });
       }
       const settings = JSON.stringify(value.settings);
-      const appearance = ({ enabled, newThreadOnly, ...rest }: Snapshot["settings"]) => JSON.stringify(rest);
+      const appearance = ({ enabled, newThreadOnly, dimmerEnabled, ...rest }: Snapshot["settings"]) => JSON.stringify(rest);
       const sameAppearance = value.image.action === "keep" && appearance(settingsSchema.parse(JSON.parse(previous.settings))) === appearance(value.settings);
       const activeSlot = value.saveSlot?.slot ?? (sameAppearance ? previous.active_slot : null);
       db.prepare("UPDATE background SET settings = ?, image_info = ?, image_bytes = ?, active_slot = ? WHERE id = 1")
@@ -56,7 +57,7 @@ export default function aura(bb: BbPluginApi): void {
       const saved = db.prepare("SELECT settings, image_info, image_bytes FROM aura_slots WHERE slot = ?").get(slot) as Stored | undefined;
       if (!saved) throw new Error(`Slot ${slot} is empty.`);
       const current = read().settings;
-      const settings = settingsSchema.parse({ ...JSON.parse(saved.settings), enabled: current.enabled, newThreadOnly: current.newThreadOnly });
+      const settings = settingsSchema.parse({ ...JSON.parse(saved.settings), enabled: current.enabled, newThreadOnly: current.newThreadOnly, dimmerEnabled: current.dimmerEnabled });
       db.prepare("UPDATE background SET settings = ?, image_info = ?, image_bytes = ?, active_slot = ? WHERE id = 1")
         .run(JSON.stringify(settings), saved.image_info, saved.image_bytes, slot);
     })();
@@ -71,9 +72,12 @@ export default function aura(bb: BbPluginApi): void {
   }
   function reset(): Snapshot {
     const current = read().settings;
-    return apply({ settings: { ...defaults, enabled: current.enabled, newThreadOnly: current.newThreadOnly }, image: { action: "remove" } });
+    return apply({ settings: { ...defaults, enabled: current.enabled, newThreadOnly: current.newThreadOnly, dimmerEnabled: current.dimmerEnabled }, image: { action: "remove" } });
   }
-  bb.rpc.register(rpcContract, { get: read, apply, activateSlot: ({slot}) => activate(slot), deleteSlot: ({slot}) => deleteSlot(slot), reset });
+  bb.rpc.register(rpcContract, { get: read, apply, setDimmer: ({ enabled }) => {
+    const current = read().settings;
+    return apply({ settings: { ...current, dimmerEnabled: enabled, fade: enabled && current.fade === 0 ? 1 : current.fade }, image: { action: "keep" } });
+  }, activateSlot: ({slot}) => activate(slot), deleteSlot: ({slot}) => deleteSlot(slot), reset });
   bb.http.route("GET", "/image", c => {
     const version = c.req.query("v");
     if (!version || !/^[a-f0-9]{24}$/.test(version)) return c.notFound();

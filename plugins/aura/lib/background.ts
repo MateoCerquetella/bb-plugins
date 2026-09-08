@@ -54,7 +54,11 @@ export function mountBackground(signal: AbortSignal): () => void {
     }
     if (!current?.settings.enabled) return;
     for (const element of document.querySelectorAll<HTMLElement>(targetsFor(current))) {
-      if (!effects.has(element)) effects.set(element, mountCapyEffect(element, current.settings, imageUrl(current.image)));
+      const existing = effects.get(element);
+      // BB can reuse the same panel element when navigating between a
+      // conversation and New thread. Reapply its surface-specific dimming.
+      if (existing) existing.update(current.settings, imageUrl(current.image));
+      else effects.set(element, mountCapyEffect(element, current.settings, imageUrl(current.image)));
     }
   }
   const observer = new MutationObserver(records => {
@@ -71,7 +75,6 @@ export function mountBackground(signal: AbortSignal): () => void {
     const target = targetsFor(snapshot);
     const css = snapshot.settings.enabled ? `${backgroundRules(target)}\n${CAPY_CSS}\n${COMPOSE_LAYOUT}\n${snapshot.settings.newThreadOnly ? "" : READING_SURFACE}` : "";
     if (css !== lastCss) { style.textContent = css; lastCss = css; }
-    for (const effect of effects.values()) effect.update(snapshot.settings, imageUrl(snapshot.image));
     reconcile();
   }
 

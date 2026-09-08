@@ -6,6 +6,7 @@ export const SLOT_COUNT = 6;
 export const settingsSchema = z.object({
   enabled: z.boolean(),
   newThreadOnly: z.boolean().default(false),
+  dimmerEnabled: z.boolean().default(true),
   effect: z.enum(["pixels", "none"]),
   tint: z.enum(["lavender", "theme"]),
   intensity: z.number().min(0).max(1),
@@ -15,7 +16,7 @@ export const settingsSchema = z.object({
 }).strict();
 export type BackgroundSettings = z.infer<typeof settingsSchema>;
 export const defaults: BackgroundSettings = {
-  enabled: true, newThreadOnly: false, effect: "pixels", tint: "lavender", intensity: 0.5,
+  enabled: true, newThreadOnly: false, dimmerEnabled: true, effect: "pixels", tint: "lavender", intensity: 0.5,
   imageOpacity: 0.7, fit: "cover", fade: 0.35,
 };
 export const imageInfoSchema = z.object({

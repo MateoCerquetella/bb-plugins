@@ -76,3 +76,23 @@ test("image type must match bytes; legacy settings get the new scope default", a
     assert.equal((await host.harness.callRpc("get", null) as Snapshot).settings.newThreadOnly, false);
   } finally { await host.harness.dispose(); }
 });
+
+test("New thread dimmer toggles without replacing images or saved slots", async () => {
+  const host = createFakePluginHost(); plugin(host.bb);
+  try {
+    const saved = await host.harness.callRpc("apply", { settings: { ...defaults, fade: .4 }, image: replace, saveSlot: { slot: 1, name: "Photo" } }) as Snapshot;
+    const off = await host.harness.callRpc("setDimmer", { enabled: false }) as Snapshot;
+    assert.equal(off.settings.dimmerEnabled, false);
+    assert.equal(off.settings.fade, .4);
+    assert.equal(off.image?.version, saved.image?.version);
+    assert.equal(off.activeSlot, 1);
+    const switched = await host.harness.callRpc("activateSlot", { slot: 1 }) as Snapshot;
+    assert.equal(switched.settings.dimmerEnabled, false);
+    const on = await host.harness.callRpc("setDimmer", { enabled: true }) as Snapshot;
+    assert.equal(on.settings.dimmerEnabled, true); assert.equal(on.settings.fade, .4);
+    assert.deepEqual(on.slots, saved.slots);
+    await host.harness.callRpc("apply", { settings: { ...defaults, fade: 0 }, image: { action: "keep" } });
+    const visible = await host.harness.callRpc("setDimmer", { enabled: true }) as Snapshot;
+    assert.equal(visible.settings.fade, 1);
+  } finally { await host.harness.dispose(); }
+});

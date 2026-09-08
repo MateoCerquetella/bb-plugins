@@ -10,7 +10,7 @@ export const CAPY_CSS = `
 .aura-capy-air, .aura-capy-ink, .aura-capy-fade { position:absolute; inset:0; pointer-events:none; }
 .aura-capy-air { background:linear-gradient(180deg in oklab, var(--aura-panel, #f9fafc) 0%, var(--background, #fff) 100%); }
 .aura-capy-ink { background-position:center; background-repeat:no-repeat; background-size:var(--aura-fit, cover); }
-.aura-capy-ink:not([data-image]) { mask-image:${edgeMask},${composerMask}; mask-size:100% 100%,100% 100%; mask-repeat:no-repeat,no-repeat; mask-composite:intersect; -webkit-mask-image:${edgeMask},${composerMask}; -webkit-mask-size:100% 100%,100% 100%; -webkit-mask-repeat:no-repeat,no-repeat; -webkit-mask-composite:source-in; }
+.aura-capy-ink:not([data-image])[data-center-dim] { mask-image:${edgeMask},${composerMask}; mask-size:100% 100%,100% 100%; mask-repeat:no-repeat,no-repeat; mask-composite:intersect; -webkit-mask-image:${edgeMask},${composerMask}; -webkit-mask-size:100% 100%,100% 100%; -webkit-mask-repeat:no-repeat,no-repeat; -webkit-mask-composite:source-in; }
 .aura-capy-ink canvas { display:block; position:absolute; inset:0; width:100%; height:100%; image-rendering:pixelated; }
 .aura-capy-focus { position:absolute; top:46%; left:50%; width:1360px; height:680px; transform:translate(-50%,-50%); }
 .aura-capy-focus::after { content:""; position:absolute; inset:160px; border-radius:48px; background:rgba(255,255,255,.88); filter:blur(88px); }
@@ -18,8 +18,10 @@ export const CAPY_CSS = `
 .dark .aura-capy-air { display:none; }
 .dark .aura-capy-focus::after { background:rgba(0,0,0,.9); }
 .dark .aura-capy-fade { background:linear-gradient(to bottom,rgba(0,0,0,0) 12%,rgba(0,0,0,.3) 34%,rgba(0,0,0,.68) 52%,rgba(0,0,0,.92) 70%,#000 88%); }
-.aura-capy-focus[data-image] { top:50%; width:min(100%,1080px); height:clamp(280px,42%,480px); }
-.aura-capy-focus[data-image]::after { inset:0 60px; border-radius:48px; background:var(--background,#fff); filter:blur(60px); }
+.aura-capy-ink[data-image][data-center-dim] {
+  -webkit-mask-image:radial-gradient(ellipse 70% 42% at 50% 50%, rgba(0,0,0,var(--aura-center-visibility,0)) 0%, rgba(0,0,0,var(--aura-center-visibility,0)) 28%, #000 70%);
+  mask-image:radial-gradient(ellipse 70% 42% at 50% 50%, rgba(0,0,0,var(--aura-center-visibility,0)) 0%, rgba(0,0,0,var(--aura-center-visibility,0)) 28%, #000 70%);
+}
 `;
 
 export interface CapyEffect { update(settings: BackgroundSettings, image: string | null): void; dispose(): void; }
@@ -52,9 +54,10 @@ export function mountCapyEffect(parent: HTMLElement, initial: BackgroundSettings
     // Photos dim around the centered composer, never into a white lower half.
     // The original Capy noise-only fade remains unchanged.
     const conversation = parent.id === "thread-detail-timeline-panel";
-    fade.style.opacity = conversation || image ? "0" : "1";
-    focus.style.opacity = conversation ? "0" : image ? String(settings.fade) : "1";
-    if (image) focus.dataset.image = ""; else delete focus.dataset.image;
+    fade.style.opacity = conversation || image || !settings.dimmerEnabled ? "0" : "1";
+    focus.style.opacity = conversation || image || !settings.dimmerEnabled ? "0" : "1";
+    if (settings.dimmerEnabled && !conversation) ink.dataset.centerDim = ""; else delete ink.dataset.centerDim;
+    ink.style.setProperty("--aura-center-visibility", String(1 - settings.fade));
     if (image) { ink.dataset.image = ""; ink.style.backgroundImage = `url("${image}")`; }
     else { delete ink.dataset.image; ink.style.backgroundImage = "none"; }
     if (image !== currentImage || refresh || wasEffect !== settings.effect || wasEnabled !== settings.enabled || wasTint !== settings.tint || wasFit !== settings.fit) {

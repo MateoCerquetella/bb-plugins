@@ -5,6 +5,10 @@ slots for BB. Open **Settings → Aura**, or **+ → Actions → Aura** in a thr
 
 ## Use Aura
 
+Use the **◐ Dim** button beside the New thread composer controls to switch
+center dimming on or off immediately. Conversations always show the full
+wallpaper in their margins; the toggle never dims chat backgrounds.
+
 - Choose or drop a PNG/JPG (up to 32 MB). Large images are resized automatically
   to fit the 2 MB stored-image limit. The preview shows the result before saving.
 - Adjust image visibility (0–100%), dimming behind the composer, fit, and Capy dithering.

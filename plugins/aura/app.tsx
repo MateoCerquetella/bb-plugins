@@ -135,7 +135,7 @@ export function BackgroundEditor() {
           <div className="aura-field"><label className="aura-field-title" htmlFor={`${id}-effect`}>Texture</label><select id={`${id}-effect`} value={draft.effect} onChange={e => change("effect", e.target.value as BackgroundSettings["effect"])}><option value="pixels">Capy dithering</option><option value="none">No texture</option></select></div>
           {draft.effect === "pixels" && !currentImage && <><div className="aura-field"><label className="aura-field-title" htmlFor={`${id}-tint`}>Pixel color</label><select id={`${id}-tint`} value={draft.tint} onChange={e => change("tint", e.target.value as BackgroundSettings["tint"])}><option value="lavender">Lavender</option><option value="theme">Follow BB theme</option></select></div>
           <Slider id={`${id}-strength`} label="Texture strength" value={draft.intensity} onChange={v => change("intensity", v)} /></>}
-          {currentImage && <><Slider id={`${id}-opacity`} label="Image visibility" value={draft.imageOpacity} max={1} onChange={v => change("imageOpacity", v)} /><Slider id={`${id}-fade`} label="Dim behind composer" value={draft.fade} onChange={v => change("fade", v)} /><div className="aura-field"><label className="aura-field-title" htmlFor={`${id}-fit`}>Image fit</label><select id={`${id}-fit`} value={draft.fit} onChange={e => change("fit", e.target.value as BackgroundSettings["fit"])}><option value="cover">Fill the conversation</option><option value="contain">Show the whole image</option></select></div></>}
+          {currentImage && <><Slider id={`${id}-opacity`} label="Image visibility" value={draft.imageOpacity} max={1} onChange={v => change("imageOpacity", v)} /><Slider id={`${id}-fade`} label="Dim behind composer" value={draft.fade} onChange={v => { change("fade", v); change("dimmerEnabled", v > 0); }} /><div className="aura-field"><label className="aura-field-title" htmlFor={`${id}-fit`}>Image fit</label><select id={`${id}-fit`} value={draft.fit} onChange={e => change("fit", e.target.value as BackgroundSettings["fit"])}><option value="cover">Fill the conversation</option><option value="contain">Show the whole image</option></select></div></>}
         </fieldset>
       </div>
       <section className="aura-library" aria-label="Saved backgrounds">
@@ -180,7 +180,34 @@ function CapyPreview({ settings, image }: { settings: BackgroundSettings; image:
 function Slider({ id, label, value, max = 1, onChange }: { id: string; label: string; value: number; max?: number; onChange: (value: number) => void }) {
   return <div className="aura-field"><label className="aura-field-title" htmlFor={id}>{label}<output htmlFor={id}>{Math.round(value * 100)}%</output></label><input id={id} type="range" min="0" max={max} step="0.01" value={value} onChange={e => onChange(Number(e.target.value))} /></div>;
 }
+function NewThreadDimmer() {
+  const rpc = useRpc<typeof rpcContract>();
+  const [value, setValue] = useState<Snapshot | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const mounted = useRef(false);
+  const locked = useRef(false);
+  const refresh = useCallback(() => {
+    void rpc.call("get", null).then(result => { if (mounted.current && !locked.current) setValue(result); }).catch(() => {});
+  }, [rpc]);
+  useEffect(() => { mounted.current = true; refresh(); return () => { mounted.current = false; }; }, [refresh]);
+  useRealtime(CHANGED, refresh);
+  const dimmed = !!value && value.settings.dimmerEnabled && (!value.image || value.settings.fade > 0);
+  async function toggle() {
+    if (!value || locked.current) return;
+    locked.current = true; setBusy(true); setError(null);
+    try {
+      const result = await rpc.call("setDimmer", { enabled: !dimmed });
+      notifyChange(result);
+      if (mounted.current) setValue(result);
+    } catch (cause) { if (mounted.current) setError(message(cause)); }
+    finally { locked.current = false; if (mounted.current) setBusy(false); }
+  }
+  if (!value?.settings.enabled) return null;
+  return <span className="aura-dimmer-control"><button type="button" className="aura-dimmer-toggle" aria-label="Dim background" aria-pressed={dimmed} title={dimmed ? "Show full wallpaper" : "Dim wallpaper behind the composer"} disabled={busy} onMouseDown={e=>e.preventDefault()} onClick={()=>void toggle()}><span aria-hidden="true">◐</span><span>Dim</span></button>{error && <span role="alert" className="aura-dimmer-error">{error}</span>}</span>;
+}
 export default definePluginApp(app => {
+  app.composer.customize({ id: "new-thread-dimmer", scopes: ["new-thread"], actions: [{ id: "dimmer", component: NewThreadDimmer }] });
   app.contentScripts.register({ id: "aura-background", mount: ({ signal }) => mountBackground(signal) });
   app.slots.settingsSection({ id: "backgrounds", title: "Aura", component: BackgroundEditor });
   app.slots.threadPanelAction({ id: "backgrounds", title: "Aura", icon: "Image", component: BackgroundEditor, layout: "flush" });
