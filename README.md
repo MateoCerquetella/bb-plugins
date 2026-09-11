@@ -8,6 +8,8 @@
   Focused extensions for <a href="https://github.com/get-bb/bb">BB</a>, kept together in one extensible workspace.
 </p>
 
+All plugins in this repository are independently installable.
+
 <p align="center">
   <a href="https://github.com/MateoCerquetella/bb-plugins/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/MateoCerquetella/bb-plugins/ci.yml?branch=main&style=flat-square&label=CI" alt="CI status" /></a>
   <img src="https://img.shields.io/badge/BB-%E2%89%A5%200.38-7c3aed?style=flat-square" alt="BB 0.38 or newer" />
