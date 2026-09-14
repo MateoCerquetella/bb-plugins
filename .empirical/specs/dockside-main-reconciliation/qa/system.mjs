@@ -53,6 +53,8 @@ const trackedPlugins = run("git", ["ls-files", "plugins/*/package.json"])
   .sort();
 assert.deepEqual(trackedPlugins, [
   "action-topbar",
+  "aura",
+  "clean-my-context",
   "dockside",
   "host-monitor",
   "save-my-model",
@@ -159,5 +161,5 @@ const conflicts = spawnSync(
 assert.equal(conflicts.status, 1, conflicts.stdout || conflicts.stderr);
 
 console.log(
-  "Dockside system check passed: normal main merge, six-plugin npm inventory, six semantic states, live activity colors, two-row cards, persistent guarded family order, semantic PR backgrounds, and no stale t3sidebar or conflict markers.",
+  "Dockside system check passed: normal main merge, current plugin npm inventory, six semantic states, live activity colors, two-row cards, persistent guarded family order, semantic PR backgrounds, and no stale t3sidebar or conflict markers.",
 );

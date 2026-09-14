@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-fa24e2e68c46761580304b2f",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-09-14T17:09:54.394Z",
+  "completedAt": "2026-09-14T17:09:54.394Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "taskboard-prepare-work",
+    "specRevision": 4,
+    "specDigest": "sha256:4674b7f1dcd881b61476dfa00bdbbf6c8942b1e88f42afce8702e62ff8e330e9",
+    "treeDigest": "sha256:50284733b3514a247d27202e71ce52bd5205af90b4ff5b52dfc2d3a5305962f1",
+    "policyDigest": "sha256:6939b9647917fab393f834ea036e732502efe15237727328ab199cc38f1718dd"
+  },
+  "digest": "sha256:ebf193fef359c9d1036500ade19df1cf4feb8a9f35406d5455f7e945fc489b47",
+  "kind": "collected",
+  "collector": "empirical-review:independent-preparation-guard-review",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/taskboard-prepare-work/reviews/bfcdd6ad5c601ee7f87261cf.json",
+      "mediaType": "application/json",
+      "bytes": 2923,
+      "digest": "sha256:01ce91049fbb40ccbfde3ad03e6e06f28bc1dcedf7fc4dde9d0a4d32391152bd"
+    },
+    {
+      "path": ".empirical/specs/taskboard-prepare-work/reviews/bfcdd6ad5c601ee7f87261cf.md",
+      "mediaType": "text/markdown",
+      "bytes": 2168,
+      "digest": "sha256:1519643f3dfdb069955ea40196c3f23a78369e74eaea448e79588d802a30fb90"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:d74720e58842d87ed054d9a4532be727f459c0c6463922a3aafe6af65d855659",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "235147a554a9f5f48287766ae461acace0877bd3",
+  "headCommit": "13c5e96d716a0fd231b730db4b4fe926ac29ae3d",
+  "diffDigest": "sha256:95a0f18266df1eaf696b0ded4c0e8d3d351200cc6f09a5210fc0e2634b81a1ab",
+  "verdict": "APPROVED",
+  "reviewerActor": "independent-preparation-guard-review",
+  "reviewerInvocationId": "/root/preparation_guard_review",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: Native submission binds actual thread, project/environment/host and execution settings without duplicate controls.\n- PASS AC-2: Bounded host context, path/content credential exclusions, symlink checks, source hashes/ranges and read-only target collection satisfy the context contract.\n- PASS AC-3: Agent-generated editable briefs, original/submitted requests, saved edits, conversations, history and stale-result proposals persist.\n- PASS AC-4: Default 2 and validated 1–4 counts, distinct interaction directions, immutable versions, individual retry and parent-version refinement implemented.\n- PASS AC-5: Trusted outer frame restricts child navigation to about:, inner escaped sandboxed HTML blocks resources/forms/frames; no same-origin/popups/top navigation. Selection records brief revision.\n- PASS AC-6: Durable SQLite records, complete paginated workers, ambiguous-start recovery, empty-output grace, server revision checks and client request/identity guards preserve work.\n- PASS AC-7: Ready/export includes source-backed brief, selected HTML, request/decisions/questions and no implementation or gate claims.\n- PASS AC-8: Optional existing Taskboard configuration/list/item adapter reuse stores safe references without duplicate credentials or remote writes.\n- PASS AC-UI-1: Committed real-BB acceptance assertions/screenshots/exported data cover the flow; reviewer independently compared all 555 target file hashes and recorded environmental limits.\n\n## Security / correctness\n\nIndependent reviewer verified exact committed diff SHA256 95a0f18266df1eaf696b0ded4c0e8d3d351200cc6f09a5210fc0e2634b81a1ab. No concrete material security/correctness defect found. Workspace isolation is not an OS sandbox, as documented in D-001. Used only packet/diff, no authoring context.\n\n## Design / maintainability\n\nClear separation of contracts, context, persistence, jobs, request guards and UI. Explicit routing, durable snapshots/versions and revision checks support accepted decisions. Focused tests cover filters, parsing, settings, partial failures/retries, pagination and stale responses. No blocking maintainability defect found.",
+  "bodyDigest": "sha256:df94587077f0b5b68a1ea9f8f1b9a4bc13c698b15d79f28402fbaecda590dfb4",
+  "digest": "sha256:bfcdd6ad5c601ee7f87261cf39e45ba958bd199a7589e25746b40e98f865f230"
+}

@@ -1,25 +1,21 @@
 {
   "schemaVersion": 1,
-  "sequence": 9,
-  "previousDigest": "sha256:5a596099825853f5067aef31cbffe9135a4d2d1464d62a4fc9748c8a553475d8",
-  "actor": "agent",
-  "type": "transition",
-  "summary": "Full workspace checks, real BB flow, screenshot artifacts, immutable packet download and independent fresh-context QA passed. Target tracked-file digests unchanged.",
-  "createdAt": "2026-09-14T16:32:15.892Z",
-  "stateBeforeDigest": "sha256:7b383759da7d0daed76cb0257a50dbb9104bf227b1d94749068b16221d71fbb1",
-  "stateAfterDigest": "sha256:8f1bb60b3f3ce0c831bac49d7979bc011e780f2d9c26c60fc8b14a8e7d8d7e60",
+  "feature": "taskboard-prepare-work",
+  "lastSequence": 19,
+  "lastEventDigest": "sha256:8b7a24cb2d2a0c39a1e095df29c134a004870a55e933e51475d22a670888f040",
+  "stateDigest": "sha256:1467d30796139555afb735cd3259f131714556bf821ed4586ca833d9e9d13c99",
   "state": {
     "schemaVersion": 5,
-    "revision": 9,
+    "revision": 19,
     "activeFeature": "taskboard-prepare-work",
     "request": "Enhance Taskboard in the existing bb-plugins repository, separate from empirical-sdd, with a smallest complete Prepare work flow: project-scoped New thread action; explicitly resolved local or remote project environment; repository-informed editable versioned brief preserving request and edits and showing bounded safe sources; conversation refinement using configured BB agents; 1-4 (default 2) distinct interactive isolated versioned prototype alternatives with progress, partial failures, individual retry and refinement; selection feeds brief; persisted workspace linked to project/thread; readiness and readable preparation packet export without starting implementation or asserting Empirical gates. Inspect current SDK extension/composer capabilities and tryhamster.com discovery-to-brief reference, own design. Exclude tracker features. Exercise actual BB flow including two prototypes, refinement/selection/reopen/export and verify target production files unchanged; plugin checks and working UI. Do not modify empirical-sdd or implement changes in target repositories.",
     "profile": "complex",
     "workflow": "complex",
     "mode": "normal",
-    "phase": "review",
-    "status": "waiting",
+    "phase": "done",
+    "status": "done",
     "repairAttempts": 0,
-    "message": "Full workspace checks, real BB flow, screenshot artifacts, immutable packet download and independent fresh-context QA passed. Target tracked-file digests unchanged.",
+    "message": "Integrated capability changes: taskboard-preparation",
     "implementationActor": "agent",
     "workStartedAt": null,
     "specDigest": "sha256:4674b7f1dcd881b61476dfa00bdbbf6c8942b1e88f42afce8702e62ff8e330e9",
@@ -31,26 +27,28 @@
     "authorizationDigest": null,
     "evidence": [],
     "evidenceReceiptIds": [
-      "qa-a49a28e67418ecbe3daca7be",
-      "qa-e456f284313c40d549b934b4",
-      "qa-d351bf3583d9bb2edce5f6f5",
-      "collected-850f4cc20869516d7f056ca0"
+      "qa-d7cf6bfa3307fb8881562402",
+      "qa-b8b5d1b5f05cf11249962f8c",
+      "qa-0d3f8444b62c019688c13132",
+      "collected-a1154ecef85ea9aa9b57b256",
+      "collected-fa24e2e68c46761580304b2f",
+      "qa-fa7feee5e633235741d9141b"
     ],
     "legacyEvidenceCount": 0,
     "completion": {
       "implemented": true,
       "verified": true,
-      "integrated": false,
+      "integrated": true,
       "delivered": false,
       "published": false,
-      "highest": "verified",
+      "highest": "integrated",
       "reasons": {
-        "integrated": "integrated has not been proven by a durable receipt.",
         "delivered": "delivered has not been proven by a durable receipt.",
         "published": "published has not been proven by a durable receipt."
       }
     },
-    "updatedAt": "2026-09-14T16:32:15.892Z"
+    "updatedAt": "2026-09-14T17:35:53.419Z"
   },
-  "digest": "sha256:ae40202064e96e74345cc25051ce971524b0650429cade7d010b7676de44ea50"
+  "compactedAt": "2026-09-14T17:35:53.597Z",
+  "digest": "sha256:440e07b7dab3a34f7e6c75b0f852264c415902e647b578cf58d8bfaeed4e2fcb"
 }
