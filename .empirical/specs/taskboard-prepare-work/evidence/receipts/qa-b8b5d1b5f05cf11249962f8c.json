@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-b8b5d1b5f05cf11249962f8c",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "Independent fresh-context rerun confirms actual BB saved flow, sandbox attacks, reopen/download and identity/stale input protection. 122 tests pass; documented environment coverage limits retained.",
+  "passed": true,
+  "startedAt": "2026-09-14T17:03:56.743Z",
+  "completedAt": "2026-09-14T17:03:56.743Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "taskboard-prepare-work",
+    "specRevision": 4,
+    "specDigest": "sha256:4674b7f1dcd881b61476dfa00bdbbf6c8942b1e88f42afce8702e62ff8e330e9",
+    "treeDigest": "sha256:50284733b3514a247d27202e71ce52bd5205af90b4ff5b52dfc2d3a5305962f1",
+    "policyDigest": "sha256:6939b9647917fab393f834ea036e732502efe15237727328ab199cc38f1718dd",
+    "workflowRevision": 16,
+    "gitCommit": "f1de2f04a4445a8cc7c3ebcdad81c11fdfff472c"
+  },
+  "digest": "sha256:37a623039380626f34589f829cf60c17563247c1d45d01a92cd6ee81c38b06d7",
+  "kind": "qa",
+  "matrixDigest": "sha256:6f3262e759948bf680f32f6ffacfc80cf295465b33aa8753725039966261e56e",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Independent fresh-context rerun confirms actual BB saved flow, sandbox attacks, reopen/download and identity/stale input protection. 122 tests pass; documented environment coverage limits retained.",
+      "startedAt": "2026-09-14T17:03:56.743Z",
+      "completedAt": "2026-09-14T17:03:56.743Z",
+      "durationMs": 0,
+      "collector": "independent-agent:/root/preparation_acceptance/identity-rerun",
+      "command": null,
+      "result": null,
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:50284733b3514a247d27202e71ce52bd5205af90b4ff5b52dfc2d3a5305962f1",
+      "sourceTreeAfter": "sha256:50284733b3514a247d27202e71ce52bd5205af90b4ff5b52dfc2d3a5305962f1",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/taskboard-prepare-work/qa/fresh-context.json",
+          "mediaType": "application/json",
+          "bytes": 1888,
+          "digest": "sha256:04215318310939f503fd30b6b71b676d0b8a15a7bfead87d64d9454ab10d8ae1"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}

@@ -3,7 +3,7 @@
   "reviewer": "/root/preparation_acceptance",
   "method": "Independent agent with no conversation history; only frozen criteria, real BB API/DOM/frames and bounded acceptance artifacts. No implementation source or prior review judgment inspected.",
   "outcome": "passed",
-  "conclusion": "Independent rerun passed the demonstrated preparation flow and repaired preview isolation. All seven network attack cases denied requests; normal prototype interactions still work.",
+  "conclusion": "Independent rerun passed after frontend identity protection: settings, three versions, selection, reopening, prototype interactions, download and invalid/stale inputs remain correct; seven preview security cases produce no requests.",
   "observed": [
     "Native selected settings and explicit thread/environment/host binding",
     "Bounded sources and references; 555 target tracked files unchanged",
@@ -15,7 +15,7 @@
     "Optional/no-task tracker state",
     "Independent rerun of live-acceptance.mjs including adversarial preview-security.mjs passed after repair"
   ],
-  "testEvidence": "121 passing Taskboard tests including unquoted credentials, idle output settling/failure, 330 pending records with mutation during pagination, old thread lookup and immutable retry.",
+  "testEvidence": "122 passing Taskboard tests, including deferred response identity, mutation invalidation and unmount cleanup protection.",
   "limits": [
     "Original immutable source snapshot has limited Taskboard/token coverage; corrected reader was not rerun live",
     "Remote host execution not exercised live",

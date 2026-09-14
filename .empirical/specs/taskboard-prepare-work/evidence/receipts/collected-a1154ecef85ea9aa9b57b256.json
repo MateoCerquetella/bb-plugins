@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-a1154ecef85ea9aa9b57b256",
+  "criteria": [
+    "AC-5",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Real BB preparation remains functional after request identity correction: sandbox attacks blocked, interactive versions/reload/selected HTML download pass, target tracked hashes unchanged.",
+  "passed": true,
+  "startedAt": "2026-09-14T17:05:57.094Z",
+  "completedAt": "2026-09-14T17:05:57.094Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "taskboard-prepare-work",
+    "specRevision": 4,
+    "specDigest": "sha256:4674b7f1dcd881b61476dfa00bdbbf6c8942b1e88f42afce8702e62ff8e330e9",
+    "treeDigest": "sha256:50284733b3514a247d27202e71ce52bd5205af90b4ff5b52dfc2d3a5305962f1",
+    "policyDigest": "sha256:6939b9647917fab393f834ea036e732502efe15237727328ab199cc38f1718dd"
+  },
+  "digest": "sha256:457f387d5a474ceb43b8219742c8aea9a68264aaa43b4ad159dfdaf1954b6da4",
+  "kind": "collected",
+  "collector": "real-bb-playwright-final",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/taskboard-prepare-work/qa/final-brief.png",
+      "mediaType": "image/png",
+      "bytes": 200648,
+      "digest": "sha256:e28d748a4d1cc379b1636855b258c5c8193ada40f0f1f2d1082badd61f6357a5"
+    },
+    {
+      "path": ".empirical/specs/taskboard-prepare-work/qa/final-prototypes.png",
+      "mediaType": "image/png",
+      "bytes": 194841,
+      "digest": "sha256:a2cb4604559a5c295168681e9f2d18863e5e5b712d8fc3b8ea2c1a2d2a8c9fa1"
+    },
+    {
+      "path": ".empirical/specs/taskboard-prepare-work/qa/live-acceptance.json",
+      "mediaType": "application/json",
+      "bytes": 1164,
+      "digest": "sha256:3fc6ab0dd696c7feeae09493f944899d4214ecdd127f85fb0c418e0a839d8b2e"
+    },
+    {
+      "path": ".empirical/specs/taskboard-prepare-work/qa/preview-security.json",
+      "mediaType": "application/json",
+      "bytes": 700,
+      "digest": "sha256:6786da936682f5fd8698fc9d918a3850dd4b7bbc4ec980dc3f765732bdc5334c"
+    }
+  ]
+}

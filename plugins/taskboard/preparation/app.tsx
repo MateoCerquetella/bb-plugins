@@ -1,3 +1,4 @@
+import { preparationRequestGate } from './request-gate.js';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   useBbContext,
@@ -26,24 +27,63 @@ function download(name: string, content: string, type: string) {
 }
 function usePreparation(id: string | null, projectId: string | null) {
   const rpc = useRpc<typeof preparationRpc>();
-  const [p, setP] = useState<Preparation | null>(null);
+  const [value, setValue] = useState<Preparation | null>(null);
   const [error, setError] = useState('');
-  const refresh = useCallback(async () => {
-    if (!id || !projectId) return;
-    try {
-      setP(await rpc.call('prepareGet', { id, projectId }));
-      setError('');
-    } catch (e) {
-      setError(errorText(e));
-    }
-  }, [rpc, id, projectId]);
+  const gate = useRef(preparationRequestGate());
+  const setP = useCallback(
+    (next: Preparation) => {
+      if (next.id !== id || next.projectId !== projectId) return;
+      gate.current.invalidate(); // In-flight reads must not undo this mutation.
+      setValue((current) =>
+        current?.id === next.id &&
+        (current.brief.revision > next.brief.revision ||
+          current.updatedAt > next.updatedAt)
+          ? current
+          : next
+      );
+    },
+    [id, projectId]
+  );
   useEffect(() => {
-    setP(null);
+    let alive = true;
+    let loading = false;
+    setValue(null);
+    setError('');
+    gate.current.invalidate();
+    const refresh = async () => {
+      if (!id || !projectId || loading) return;
+      loading = true;
+      const accept = gate.current.begin({ id, projectId });
+      try {
+        const next = await rpc.call('prepareGet', { id, projectId });
+        if (alive && accept(next)) {
+          setValue((current) =>
+            current?.id === next.id &&
+            (current.brief.revision > next.brief.revision ||
+              current.updatedAt > next.updatedAt)
+              ? current
+              : next
+          );
+          setError('');
+        }
+      } catch (e) {
+        if (alive && accept()) setError(errorText(e));
+      } finally {
+        loading = false;
+      }
+    };
     void refresh();
-    const t = setInterval(() => void refresh(), 2500);
-    return () => clearInterval(t);
-  }, [refresh]);
-  return { p, setP, error, refresh };
+    const timer = setInterval(() => void refresh(), 2500);
+    return () => {
+      alive = false;
+      gate.current.invalidate();
+      clearInterval(timer);
+    };
+  }, [rpc, id, projectId]);
+  // Never render an editor unless its displayed document matches mutation scope,
+  // even during the render before an effect cleanup has run.
+  const p = value?.id === id && value?.projectId === projectId ? value : null;
+  return { p, setP, error };
 }
 function ArmPreparation({
   onCreated
@@ -99,7 +139,10 @@ function ArmPreparation({
     </span>
   );
 }
-function PrepareNew({ projectId }: PluginNewThreadPanelProps) {
+function PrepareNew(props: PluginNewThreadPanelProps) {
+  return <PrepareNewBody key={props.projectId ?? 'no-project'} {...props} />;
+}
+function PrepareNewBody({ projectId }: PluginNewThreadPanelProps) {
   const rpc = useRpc<typeof preparationRpc>();
   const navigate = useBbNavigate();
   const [list, setList] = useState<
@@ -192,7 +235,11 @@ function PrepareNew({ projectId }: PluginNewThreadPanelProps) {
               >
                 Open linked conversation
               </Button>
-              <PreparationWorkspace id={selected} projectId={projectId} />
+              <PreparationWorkspace
+                key={`${projectId}:${selected}`}
+                id={selected}
+                projectId={projectId}
+              />
             </>
           )}
         </>
@@ -222,8 +269,12 @@ function PrepareThread({ threadId }: PluginThreadPanelProps) {
       clearInterval(t);
     };
   }, [threadId, rpc]);
-  return p ? (
-    <PreparationWorkspace id={p.id} projectId={p.projectId} />
+  return p?.threadId === threadId ? (
+    <PreparationWorkspace
+      key={`${p.projectId}:${p.id}`}
+      id={p.id}
+      projectId={p.projectId}
+    />
   ) : (
     <div className="prep">
       <h2>Prepare work</h2>
@@ -586,6 +637,7 @@ function PreparationWorkspace({
             Title
             <input
               aria-label="Brief title"
+              disabled={busy}
               value={title}
               onChange={(e) => {
                 setTitle(e.target.value);
@@ -597,6 +649,7 @@ function PreparationWorkspace({
             Description
             <textarea
               aria-label="Brief description"
+              disabled={busy}
               rows={17}
               value={description}
               onChange={(e) => {
@@ -874,6 +927,7 @@ function PreparationWorkspace({
           <textarea
             id={`prep-message-${id}`}
             aria-label="Preparation refinement"
+            disabled={busy}
             rows={3}
             value={message}
             onChange={(e) => setMessage(e.target.value)}

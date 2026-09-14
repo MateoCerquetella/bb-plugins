@@ -506,3 +506,53 @@ test('old preparations remain discoverable and every pending record is reconcile
     db.close();
   }
 });
+
+test('deferred preparation responses cannot cross selection identity or undo a mutation', async () => {
+  const { preparationRequestGate } = await import(
+    '../preparation/request-gate.ts'
+  );
+  const gate = preparationRequestGate();
+  const a = { id: 'a', projectId: 'project', description: 'A content' };
+  const b = { id: 'b', projectId: 'project', description: 'B content' };
+  let displayed: typeof a | null = null;
+  let resolveA!: (value: typeof a) => void;
+  let resolveB!: (value: typeof a) => void;
+  const deferredA = new Promise<typeof a>((resolve) => {
+    resolveA = resolve;
+  });
+  const deferredB = new Promise<typeof a>((resolve) => {
+    resolveB = resolve;
+  });
+  const acceptA = gate.begin(a);
+  const pendingA = deferredA.then((value) => {
+    if (acceptA(value)) displayed = value;
+  });
+  const acceptB = gate.begin(b);
+  const pendingB = deferredB.then((value) => {
+    if (acceptB(value)) displayed = value;
+  });
+  resolveB(b);
+  await pendingB;
+  resolveA(a);
+  await pendingA;
+  assert.deepEqual(displayed, b, 'Late A cannot populate B editor');
+  assert.equal(
+    acceptB({ ...b, projectId: 'other' }),
+    false,
+    'Reject wrong project response'
+  );
+  const acceptOldRead = gate.begin(b);
+  gate.invalidate();
+  assert.equal(
+    acceptOldRead(b),
+    false,
+    'A completed mutation invalidates earlier reads'
+  );
+  const acceptBeforeUnmount = gate.begin(b);
+  gate.invalidate();
+  assert.equal(
+    acceptBeforeUnmount(b),
+    false,
+    'Unmount invalidates pending reads'
+  );
+});

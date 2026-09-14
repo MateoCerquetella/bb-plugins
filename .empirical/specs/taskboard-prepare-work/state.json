@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 13,
+  "revision": 17,
   "activeFeature": "taskboard-prepare-work",
   "request": "Enhance Taskboard in the existing bb-plugins repository, separate from empirical-sdd, with a smallest complete Prepare work flow: project-scoped New thread action; explicitly resolved local or remote project environment; repository-informed editable versioned brief preserving request and edits and showing bounded safe sources; conversation refinement using configured BB agents; 1-4 (default 2) distinct interactive isolated versioned prototype alternatives with progress, partial failures, individual retry and refinement; selection feeds brief; persisted workspace linked to project/thread; readiness and readable preparation packet export without starting implementation or asserting Empirical gates. Inspect current SDK extension/composer capabilities and tryhamster.com discovery-to-brief reference, own design. Exclude tracker features. Exercise actual BB flow including two prototypes, refinement/selection/reopen/export and verify target production files unchanged; plugin checks and working UI. Do not modify empirical-sdd or implement changes in target repositories.",
   "profile": "complex",
@@ -8,8 +8,8 @@
   "mode": "normal",
   "phase": "review",
   "status": "waiting",
-  "repairAttempts": 1,
-  "message": "All review repairs pass workspace tests, real-BB browser acceptance, adversarial network tests, screenshot evidence and independently rerun fresh-context QA.",
+  "repairAttempts": 2,
+  "message": "122 tests, type/build verification, independently rerun real BB acceptance, sandbox security and screenshot evidence all pass after identity/race fix.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:4674b7f1dcd881b61476dfa00bdbbf6c8942b1e88f42afce8702e62ff8e330e9",
@@ -21,10 +21,10 @@
   "authorizationDigest": null,
   "evidence": [],
   "evidenceReceiptIds": [
-    "qa-26b55458255a98bcda1124e6",
-    "qa-2534b0b2ffb685b87dc62a0b",
-    "qa-c145ffedcb5ae4916554ef42",
-    "collected-666701ba3c3a19a44ae66901"
+    "qa-d7cf6bfa3307fb8881562402",
+    "qa-b8b5d1b5f05cf11249962f8c",
+    "qa-0d3f8444b62c019688c13132",
+    "collected-a1154ecef85ea9aa9b57b256"
   ],
   "legacyEvidenceCount": 0,
   "completion": {
@@ -40,5 +40,5 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-14T16:52:43.848Z"
+  "updatedAt": "2026-09-14T17:05:57.564Z"
 }

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:603eec76885fc2c7390f9cbe3d566aaafb95ece5897ea5efca7dfdef00ec1026",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "235147a554a9f5f48287766ae461acace0877bd3",
+  "headCommit": "f1de2f04a4445a8cc7c3ebcdad81c11fdfff472c",
+  "diffDigest": "sha256:59161ce35ac503b3ba8ccf6cb49fc0a73cb17b3c9d4d1ce41c5bfd4507927699",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "independent-preparation-final-review",
+  "reviewerInvocationId": "/root/preparation_final_review",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- PASS AC-1: Independent review accepted the implementation of this criterion in the exact committed packet.\n- PASS AC-2: Independent review accepted the implementation of this criterion in the exact committed packet.\n- PASS AC-3: Independent review accepted the implementation of this criterion in the exact committed packet.\n- PASS AC-4: Independent review accepted the implementation of this criterion in the exact committed packet.\n- PASS AC-5: Independent review accepted the implementation of this criterion in the exact committed packet.\n- FAIL AC-6: app.tsx:31–45 accepts obsolete GET responses. A slow A response after switching to B can populate B's editor with A content; mutation scope remains B, allowing overwrite when revisions coincide. Discard obsolete/superseded responses, guard displayed identity and test deferred A/B ordering.\n- PASS AC-7: Independent review accepted the implementation of this criterion in the exact committed packet.\n- PASS AC-8: Independent review accepted the implementation of this criterion in the exact committed packet.\n- PASS AC-UI-1: Independent review accepted the implementation of this criterion in the exact committed packet.\n\n## Security / correctness\n\nExact committed diff digest verified. P2 cross-preparation stale-response race reproduced from committed refresh body: request A, switch B, resolve B then A displays A while mutations target B.\n\n## Design / maintainability\n\nGuard frontend request identity/supersession like durable backend revisions; ensure editor state is scoped to preparation identity. Other criteria accepted.",
+  "bodyDigest": "sha256:9ad2534e0914f84445128c32cc96bbae96c18bdeaec68d1784b039ba86242557",
+  "digest": "sha256:a62f0f64bc7990699a0510824356db0e1fe7b52a49c5a8e41db19f837c3acffa"
+}

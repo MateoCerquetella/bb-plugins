@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-d7cf6bfa3307fb8881562402",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "122 Taskboard tests, types/build and artifact checks including deferred A/B response rejection, mutation invalidation, old-record reconciliation and preview/context hardening.",
+  "passed": true,
+  "startedAt": "2026-09-14T17:02:51.479Z",
+  "completedAt": "2026-09-14T17:03:09.317Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "taskboard-prepare-work",
+    "specRevision": 4,
+    "specDigest": "sha256:4674b7f1dcd881b61476dfa00bdbbf6c8942b1e88f42afce8702e62ff8e330e9",
+    "treeDigest": "sha256:50284733b3514a247d27202e71ce52bd5205af90b4ff5b52dfc2d3a5305962f1",
+    "policyDigest": "sha256:6939b9647917fab393f834ea036e732502efe15237727328ab199cc38f1718dd",
+    "workflowRevision": 16,
+    "gitCommit": "f1de2f04a4445a8cc7c3ebcdad81c11fdfff472c"
+  },
+  "digest": "sha256:1fc634571ccf3e8475621d9d9032faeb30180b688cac9d2a9080083dfb6fdbaa",
+  "kind": "qa",
+  "matrixDigest": "sha256:6f3262e759948bf680f32f6ffacfc80cf295465b33aa8753725039966261e56e",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "122 Taskboard tests, types/build and artifact checks including deferred A/B response rejection, mutation invalidation, old-record reconciliation and preview/context hardening.",
+      "startedAt": "2026-09-14T17:02:51.479Z",
+      "completedAt": "2026-09-14T17:03:09.317Z",
+      "durationMs": 17838,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:3102e0660c5a28fb09072a92af73601c0704a8badb5519082e7545d1f876aa50",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-taskboard"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:0878f306f9bb5c7d1d3dfafdcc3c70041a5ed7613891f1913196169cca10480e",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": " and atomic\n  ---\n  duration_ms: 6.664006\n  type: 'test'\n  ...\n# Subtest: enforces the per-project preset limit without blocking updates\nok 85 - enforces the per-project preset limit without blocking updates\n  ---\n  duration_ms: 15.346453\n  type: 'test'\n  ...\n# Subtest: bounds reads and fails closed when raw rows exceed the preset limit\nok 86 - bounds reads and fails closed when raw rows exceed the preset limit\n  ---\n  duration_ms: 10.105199\n  type: 'test'\n  ...\n# Subtest: rejects --from-state on wrong verbs and preserves explicit precedence\nok 87 - rejects --from-state on wrong verbs and preserves explicit precedence\n  ---\n  duration_ms: 0.841194\n  type: 'test'\n  ...\n# Subtest: keeps maximum aggregate preset JSON compact and under the CLI cap\nok 88 - keeps maximum aggregate preset JSON compact and under the CLI cap\n  ---\n  duration_ms: 12.813386\n  type: 'test'\n  ...\n# Subtest: enforces a transactional aggregate state-byte limit per project\nok 89 - enforces a transactional aggregate state-byte limit per project\n  ---\n  duration_ms: 30.253164\n  type: 'test'\n  ...\n# Subtest: accepts a complete strict project browse preference snapshot\nok 90 - accepts a complete strict project browse preference snapshot\n  ---\n  duration_ms: 5.858569\n  type: 'test'\n  ...\n# Subtest: requires a project provider and matching source\nok 91 - requires a project provider and matching source\n  ---\n  duration_ms: 0.873241\n  type: 'test'\n  ...\n# Subtest: bounds names, ids, positions, order size, and state fields\nok 92 - bounds names, ids, positions, order size, and state fields\n  ---\n  duration_ms: 1.071262\n  type: 'test'\n  ...\n# Subtest: rejects control characters in preset identity and state\nok 93 - rejects control characters in preset identity and state\n  ---\n  duration_ms: 0.560041\n  type: 'test'\n  ...\n# Subtest: rejects oversized adversarial containers before inspecting elements\nok 94 - rejects oversized adversarial containers before inspecting elements\n  ---\n  duration_ms: 0.279519\n  type: 'test'\n  ...\n# Subtest: accepts the maximum valid browse state inside the UTF-8 envelope\nok 95 - accepts the maximum valid browse state inside the UTF-8 envelope\n  ---\n  duration_ms: 30.022082\n  type: 'test'\n  ...\n# Subtest: normalizes unique names without depending on locale\nok 96 - normalizes unique names without depending on locale\n  ---\n  duration_ms: 0.308002\n  type: 'test'\n  ...\n# Subtest: resolves only exact preset order permutations\nok 97 - resolves only exact preset order permutations\n  ---\n  duration_ms: 0.390011\n  type: 'test'\n  ...\n# Subtest: repository context excludes credentials, generated content and symlink escapes\nok 98 - repository context excludes credentials, generated content and symlink escapes\n  ---\n  duration_ms: 34.264145\n  type: 'test'\n  ...\n# Subtest: context and generation boundaries reject dangerous and malformed input\nok 99 - context and generation boundaries reject dangerous and malformed input\n  ---\n  duration_ms: 2.10718\n  type: 'test'\n  ...\n# Subtest: real SQLite preparation retains direct edits, project isolation, jobs and settings after reload\nok 100 - real SQLite preparation retains direct edits, project isolation, jobs and settings after reload\n  ---\n  duration_ms: 6.485852\n  type: 'test'\n  ...\n# Subtest: job service routes context to the remote host and preserves partial success and immutable retries\nok 101 - job service routes context to the remote host and preserves partial success and immutable retries\n  ---\n  duration_ms: 10023.317599\n  type: 'test'\n  ...\n# Subtest: old preparations remain discoverable and every pending record is reconciled beyond presentation limits\nok 102 - old preparations remain discoverable and every pending record is reconciled beyond presentation limits\n  ---\n  duration_ms: 29.979896\n  type: 'test'\n  ...\n# Subtest: deferred preparation responses cannot cross selection identity or undo a mutation\nok 103 - deferred preparation responses cannot cross selection identity or undo a mutation\n  ---\n  duration_ms: 0.959118\n  type: 'test'\n  ...\n# Subtest: selects the active thread project only when it still exists\nok 104 - selects the active thread project only when it still exists\n  ---\n  duration_ms: 0.602969\n  type: 'test'\n  ...\n# Subtest: treats a different thread in the same project as new context\nok 105 - treats a different thread in the same project as new context\n  ---\n  duration_ms: 0.149923\n  type: 'test'\n  ...\n# Subtest: reads the project and thread from a BB project route\nok 106 - reads the project and thread from a BB project route\n  ---\n  duration_ms: 0.558257\n  type: 'test'\n  ...\n# Subtest: uses only the immediately previous navigation entry as source context\nok 107 - uses only the immediately previous navigation entry as source context\n  ---\n  duration_ms: 0.244857\n  type: 'test'\n  ...\n# Subtest: never replaces an explicit Taskboard project selection with route context\nok 108 - never replaces an explicit Taskboard project selection with route context\n  ---\n  duration_ms: 0.191019\n  type: 'test'\n  ...\n# Subtest: writes project credentials atomically with owner-only permissions\nok 109 - writes project credentials atomically with owner-only permissions\n  ---\n  duration_ms: 5.258956\n  type: 'test'\n  ...\n# Subtest: deleting a missing credential is harmless\nok 110 - deleting a missing credential is harmless\n  ---\n  duration_ms: 0.908416\n  type: 'test'\n  ...\n# Subtest: cached summaries never retain provider comments\nok 111 - cached summaries never retain provider comments\n  ---\n  duration_ms: 0.897135\n  type: 'test'\n  ...\n# Subtest: provider creation results carry strict native assignee confirmation\nok 112 - provider creation results carry strict native assignee confirmation\n  ---\n  duration_ms: 0.107856\n  type: 'test'\n  ...\n# Subtest: metadata failures expose only a fixed server-safe message\nok 113 - metadata failures expose only a fixed server-safe message\n  ---\n  duration_ms: 0.217126\n  type: 'test'\n  ...\n# Subtest: finds Jira project keys from common configured JQL scopes\nok 114 - finds Jira project keys from common configured JQL scopes\n  ---\n  duration_ms: 0.501294\n  type: 'test'\n  ...\n# Subtest: binds issue creation to the tracker reviewed in the modal\nok 115 - binds issue creation to the tracker reviewed in the modal\n  ---\n  duration_ms: 0.289909\n  type: 'test'\n  ...\n# Subtest: refreshes authoritative provider data after successful issue creation\nok 116 - refreshes authoritative provider data after successful issue creation\n  ---\n  duration_ms: 0.156105\n  type: 'test'\n  ...\n# Subtest: refreshes authoritative provider data after ambiguous issue creation failure\nok 117 - refreshes authoritative provider data after ambiguous issue creation failure\n  ---\n  duration_ms: 0.172674\n  type: 'test'\n  ...\n# Subtest: keeps structural headers on neutral host theme surfaces\nok 118 - keeps structural headers on neutral host theme surfaces\n  ---\n  duration_ms: 1.524468\n  type: 'test'\n  ...\n# Subtest: uses restrained state glyph, focus, and conversation treatments\nok 119 - uses restrained state glyph, focus, and conversation treatments\n  ---\n  duration_ms: 0.376647\n  type: 'test'\n  ...\n# Subtest: keeps constrained filter values inside the vertical menu measure\nok 120 - keeps constrained filter values inside the vertical menu measure\n  ---\n  duration_ms: 0.244987\n  type: 'test'\n  ...\n# Subtest: keeps assignee avatars compact with six theme-safe identity tones\nok 121 - keeps assignee avatars compact with six theme-safe identity tones\n  ---\n  duration_ms: 0.407743\n  type: 'test'\n  ...\n# Subtest: shows restrained composer drop feedback and discoverable drag grips\nok 122 - shows restrained composer drop feedback and discoverable drag grips\n  ---\n  duration_ms: 0.418282\n  type: 'test'\n  ...\n1..122\n# tests 122\n# suites 0\n# pass 122\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 10423.902417\n\n> bb-plugin-taskboard@0.3.3 build\n> env -u BB_CLI bb plugin build .\n\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\ndist/host.js\ndist/host.js.map\ndist/host.meta.json\n\n> bb-plugin-taskboard@0.3.3 verify:build\n> node scripts/verify-build.mjs\n\nTaskboard build metadata is valid.\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:50284733b3514a247d27202e71ce52bd5205af90b4ff5b52dfc2d3a5305962f1",
+      "sourceTreeAfter": "sha256:50284733b3514a247d27202e71ce52bd5205af90b4ff5b52dfc2d3a5305962f1",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

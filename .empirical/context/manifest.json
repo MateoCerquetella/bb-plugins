@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "generator": "empirical-0.33.0",
-  "sourceDigest": "sha256:0e0bab4184846bbd9ff15d4ef390085a7198a6f14c8b80bedf70d87a5ce6f9ac",
+  "sourceDigest": "sha256:fbc73454522b7ac1e06f560a8d3b47ea94e70ee1173492a68f31311cde0f802b",
   "files": [
     {
       "path": ".agents/skills/empirical/SKILL.md",
@@ -1260,8 +1260,8 @@
     },
     {
       "path": "plugins/taskboard/preparation/app.tsx",
-      "size": 31680,
-      "digest": "sha256:8b92262d8c586ec4d8f9f3934ecab23838213d7ae1ba4e07daef19fff136a457"
+      "size": 33484,
+      "digest": "sha256:7f770683a33845ba947b5b6a12e7562cbac39e453315fe5c0a7cee4defa43f2b"
     },
     {
       "path": "plugins/taskboard/preparation/context.ts",
@@ -1272,6 +1272,11 @@
       "path": "plugins/taskboard/preparation/contract.ts",
       "size": 7818,
       "digest": "sha256:330811a87f4f583cff8ce2e30983972713346c352c40765bf47239bb84cb7c13"
+    },
+    {
+      "path": "plugins/taskboard/preparation/request-gate.ts",
+      "size": 554,
+      "digest": "sha256:7b152e60ceda7f3fb6b90c8dfa707570af4d44494edacb887ae4ff713cea264a"
     },
     {
       "path": "plugins/taskboard/preparation/server.ts",
@@ -1380,8 +1385,8 @@
     },
     {
       "path": "plugins/taskboard/test/preparation.test.ts",
-      "size": 15980,
-      "digest": "sha256:21c3a5bca910e5cab05b768e4fbbc30ba8b229001803941e19e142e567ac8e8c"
+      "size": 17509,
+      "digest": "sha256:0964c5856c723edd8bff38ae3157e1dc4d986066efe23544369c6cdaa1589561"
     },
     {
       "path": "plugins/taskboard/test/project-selection.test.ts",
@@ -2009,6 +2014,7 @@
         "plugins/taskboard/preparation/app.tsx",
         "plugins/taskboard/preparation/context.ts",
         "plugins/taskboard/preparation/contract.ts",
+        "plugins/taskboard/preparation/request-gate.ts",
         "plugins/taskboard/preparation/server.ts",
         "plugins/taskboard/preparation/store.ts",
         "plugins/taskboard/preparation/style.css",
@@ -2105,7 +2111,7 @@
         "plugins/usage-tracker/tsconfig.json",
         "plugins/usage-tracker/types/css-modules.d.ts"
       ],
-      "sourceDigest": "sha256:0e0bab4184846bbd9ff15d4ef390085a7198a6f14c8b80bedf70d87a5ce6f9ac",
+      "sourceDigest": "sha256:fbc73454522b7ac1e06f560a8d3b47ea94e70ee1173492a68f31311cde0f802b",
       "digest": "sha256:eed9cfd95fdecbf70535c9b9bfdb204011bdad5af0a5418d4d923f3a99f354f2",
       "freshness": "fresh"
     },
@@ -2267,11 +2273,11 @@
         "plugins/usage-tracker/app.css",
         "plugins/usage-tracker/app.tsx"
       ],
-      "sourceDigest": "sha256:a1afea16c37f6a14ab717626be40d7e49c29432849660e5dcdd440ab3e10ab9e",
+      "sourceDigest": "sha256:a052502f25f4970285658928a8b749251729d3d20dc7f300395b92c976cf6f89",
       "digest": "sha256:23f355d733d86c584f760d4a0c0136ee7bb2c3a3aa12edfc199b29b55a480ca2",
       "freshness": "fresh"
     }
   ],
   "truncated": false,
-  "digest": "sha256:32ed2df47dd948f421f4db73907021ed7601fdd1860c4690cef000bcb9ca37ff"
+  "digest": "sha256:df2f2bad3d20c42a743ec410fa01204e49a9b951c07647bca5f01a05695d414a"
 }

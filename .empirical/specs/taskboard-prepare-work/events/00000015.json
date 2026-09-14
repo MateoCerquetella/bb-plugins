@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sequence": 15,
+  "previousDigest": "sha256:9bf90bd3bed2228f3151104106f36e0747f3e4864e45d11eb9280af5024cb44f",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Fixed stale cross-preparation response/edit race with per-request identity/supersession gates, unmount cancellation, display-scope guards and keyed editors. Deferred A/B ordering and mutation invalidation regressions pass; actual BB flow still passes after reload.",
+  "createdAt": "2026-09-14T17:02:32.810Z",
+  "stateBeforeDigest": "sha256:c03c645028591a8854bde04b30dcbf9c7d30bd3f4de545503b49a33a6953de52",
+  "stateAfterDigest": "sha256:8ce42ce316f6866fbb0f462896371ca57b5971bfac940ff9b5e1c9bdaa798bdd",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 15,
+    "activeFeature": "taskboard-prepare-work",
+    "request": "Enhance Taskboard in the existing bb-plugins repository, separate from empirical-sdd, with a smallest complete Prepare work flow: project-scoped New thread action; explicitly resolved local or remote project environment; repository-informed editable versioned brief preserving request and edits and showing bounded safe sources; conversation refinement using configured BB agents; 1-4 (default 2) distinct interactive isolated versioned prototype alternatives with progress, partial failures, individual retry and refinement; selection feeds brief; persisted workspace linked to project/thread; readiness and readable preparation packet export without starting implementation or asserting Empirical gates. Inspect current SDK extension/composer capabilities and tryhamster.com discovery-to-brief reference, own design. Exclude tracker features. Exercise actual BB flow including two prototypes, refinement/selection/reopen/export and verify target production files unchanged; plugin checks and working UI. Do not modify empirical-sdd or implement changes in target repositories.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "context",
+    "status": "waiting",
+    "repairAttempts": 2,
+    "message": "Fixed stale cross-preparation response/edit race with per-request identity/supersession gates, unmount cancellation, display-scope guards and keyed editors. Deferred A/B ordering and mutation invalidation regressions pass; actual BB flow still passes after reload.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:4674b7f1dcd881b61476dfa00bdbbf6c8942b1e88f42afce8702e62ff8e330e9",
+    "approvedSpecRevision": 4,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:b03c1654a53c3e45d584b5f546f2421ed9d7194de4fb301ad9766ac1a8ba241c",
+    "impactDigest": "sha256:b9b01a20a994a4cc31fb48febb115dda70a0fc2faa61eb49cf13deca76d14940",
+    "capabilityClaimId": "taskboard-prepare-work-e201ae7d98d9",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-14T17:02:32.810Z"
+  },
+  "digest": "sha256:1adfec1353e324a28425e90af13709e38ecd1ebc880b69dca19be73b514f40f4"
+}
