@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-e456f284313c40d549b934b4",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Real BB native request→agent brief/direct edit→two prototypes→refinement→selection→plugin reload→native packet download. Browser asserts persisted state, working filter/drawer, sandbox parent isolation and invalid/stale input rejection; all 555 tracked target hashes match. Tracker with zero cached tasks; remote routing tested separately.",
+  "passed": true,
+  "startedAt": "2026-09-14T16:30:39.157Z",
+  "completedAt": "2026-09-14T16:30:46.420Z",
+  "provenance": {
+    "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+    "feature": "taskboard-prepare-work",
+    "specRevision": 4,
+    "specDigest": "sha256:4674b7f1dcd881b61476dfa00bdbbf6c8942b1e88f42afce8702e62ff8e330e9",
+    "treeDigest": "sha256:9561057b8fb9685adac028a36199a9e3dc6eeb47db165f2cd0790c727a000053",
+    "policyDigest": "sha256:6939b9647917fab393f834ea036e732502efe15237727328ab199cc38f1718dd",
+    "workflowRevision": 8,
+    "gitCommit": "4c5f90a58ea50e45431b94739ab4ffe41079b93e"
+  },
+  "digest": "sha256:1de51d9086402da426bb65261fa77fdfed65bc2156b47f56c05654b90e7fb28f",
+  "kind": "qa",
+  "matrixDigest": "sha256:6f3262e759948bf680f32f6ffacfc80cf295465b33aa8753725039966261e56e",
+  "check": {
+    "id": "qa-end-to-end",
+    "kind": "end-to-end"
+  },
+  "coveredChecks": [
+    "end-to-end"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Real BB native request→agent brief/direct edit→two prototypes→refinement→selection→plugin reload→native packet download. Browser asserts persisted state, working filter/drawer, sandbox parent isolation and invalid/stale input rejection; all 555 tracked target hashes match. Tracker with zero cached tasks; remote routing tested separately.",
+      "startedAt": "2026-09-14T16:30:39.157Z",
+      "completedAt": "2026-09-14T16:30:46.420Z",
+      "durationMs": 7263,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:bd784594930f1f70edd6bba4ba19679f6b473dca3ff0c3c38f002d07000bb12e",
+        "argv": [
+          "node",
+          ".empirical/specs/taskboard-prepare-work/qa/live-acceptance.mjs"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:ede74ddd25196d218b28ea705e6d1f0a07447bfcfea01bdd6011bd332b1f9c6a",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "{\"realBB\":true,\"threadId\":\"thr_v44c8fsz23\",\"preparationId\":\"9e00bf5a-2b93-4985-9f19-04c7e88a8392\",\"briefRevision\":3,\"versions\":3,\"alternatives\":2,\"selectedVersion\":\"f535773b-027a-41b9-8deb-41dee65ebbb2\",\"nativeSettings\":{\"providerId\":\"codex\",\"model\":\"gpt-6-astra\",\"permissionMode\":\"full\",\"reasoningLevel\":\"high\",\"serviceTier\":\"default\"},\"sourceCount\":21,\"prototypeInteraction\":\"search, details drawer, close and clear passed\",\"sandbox\":{\"parentBlocked\":true,\"csp\":\"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'\"},\"downloadBytes\":172844,\"reopened\":true,\"targetTrackedFiles\":555,\"targetChangedFiles\":0,\"invalidCountRejected\":true,\"staleEditRejected\":true,\"wrongProjectRejected\":true,\"externalTrackerConfiguredCase\":\"not exercised live; existing adapter reuse and disconnected operation covered\",\"remoteHost\":\"explicit routing covered by unit test; live run uses selected local host\"}\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:9561057b8fb9685adac028a36199a9e3dc6eeb47db165f2cd0790c727a000053",
+      "sourceTreeAfter": "sha256:9561057b8fb9685adac028a36199a9e3dc6eeb47db165f2cd0790c727a000053",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/taskboard-prepare-work/qa/final-brief.png",
+          "mediaType": "image/png",
+          "bytes": 200687,
+          "digest": "sha256:5eed32762d00fee7c41c56a6ab009f8ceadef7621c4f15f2f83af29ffc241d1a"
+        },
+        {
+          "path": ".empirical/specs/taskboard-prepare-work/qa/final-prototypes.png",
+          "mediaType": "image/png",
+          "bytes": 194362,
+          "digest": "sha256:a2f5f215c46bc7c9d881cd95887cb69fe86c8d95dc2b70a8f793557128623a66"
+        },
+        {
+          "path": ".empirical/specs/taskboard-prepare-work/qa/live-acceptance.json",
+          "mediaType": "application/json",
+          "bytes": 1164,
+          "digest": "sha256:3548c21608d7d7a92c41dc680a3cc5a0d5e25f1788752bcecf2919882f12cda1"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}

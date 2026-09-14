@@ -1,3 +1,4 @@
+import { registerPreparation } from './preparation/server.js';
 import {
   PLUGIN_CLI_OUTPUT_MAX_BYTES,
   type BbPluginApi,
@@ -1750,6 +1751,15 @@ export default async function plugin(bb: BbPluginApi) {
     }
   };
   bb.rpc.register(taskboardRpcContract, handlers);
+  const preparation = registerPreparation(bb, {
+    assertProject: assertProjectExists,
+    async task(projectId, source, locator) {
+      await assertProjectExists(projectId);
+      await assertSelectedSourceAfterMutations(projectId, source);
+      const item = await getLiveItem(projectId, source, locator);
+      return { projectId, source, locator, title: item.title, key: item.key, url: item.url };
+    }
+  });
 
   bb.ui.registerMentionProvider({
     id: 'external-work-item',
@@ -1781,8 +1791,9 @@ export default async function plugin(bb: BbPluginApi) {
 
   bb.cli.register({
     name: 'taskboard',
-    summary: 'Browse project-scoped Linear, GitHub, and Jira issues',
+    summary: 'Browse tasks and inspect durable preparation briefs',
     commands: [
+      {name: 'prepare', summary: 'List, inspect or export preparation packets without starting implementation', usage: 'bb taskboard prepare list [--project <id>] | show <id> | export <id>'},
       {
         name: 'status',
         summary: 'Show connector status for a BB project',
@@ -1846,6 +1857,20 @@ export default async function plugin(bb: BbPluginApi) {
     ],
     async run(argv, ctx) {
       try {
+        if (argv[0] === 'prepare') {
+          const verb = argv[1] ?? 'list';
+          const projectIndex = argv.indexOf('--project');
+          const projectId = projectIndex >= 0 ? argv[projectIndex + 1] : ctx.projectId;
+          if (!projectId) throw new Error('Choose a project with --project <id>.');
+          await assertProjectExists(projectId);
+          const input = {id: argv[2] ?? '', projectId};
+          let output: unknown;
+          if (verb === 'list') output = await preparation.handlers.prepareList({projectId});
+          else if (verb === 'show') output = await preparation.handlers.prepareGet(input);
+          else if (verb === 'export') output = await preparation.handlers.prepareExport(input);
+          else throw new Error('Use prepare list, show <id>, or export <id>.');
+          return {exitCode: 0, stdout: formatFilterPresetCliJson(output)};
+        }
         const firstArgument = argv[0];
         const hasExplicitCommand = Boolean(
           firstArgument && !firstArgument.startsWith('--')

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "generator": "empirical-0.31.0",
-  "sourceDigest": "sha256:239ea129c6f18179983a2daf5558f7220be4f92142552e9b3f11e5c8c66b21e2",
+  "generator": "empirical-0.33.0",
+  "sourceDigest": "sha256:41cc562dd4da42c529e073ff3eb7b0f024dd7027931e1f8150ee04fa6963eae1",
   "files": [
     {
       "path": ".agents/skills/empirical/SKILL.md",
@@ -10,8 +10,8 @@
     },
     {
       "path": ".bb/plugins.json",
-      "size": 811,
-      "digest": "sha256:a55130437086c4b81166ef09b42b3819fa9f5ff618116d8278b184b6ae6b68a6"
+      "size": 879,
+      "digest": "sha256:bb59dcd1154dc4b8cce416303487f3137c9458008e4bcee0c4c40208c743106b"
     },
     {
       "path": ".claude/skills/empirical/SKILL.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "size": 13404,
-      "digest": "sha256:e43fd01c63893c622be0c4647f8165c7b85bbffe4bfed70db120ef149c224bf4"
+      "size": 13755,
+      "digest": "sha256:5d29778704eaaa4b0edcec0020d897e36ec98990af7ad7881c23fcd1d17dc8e9"
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -100,8 +100,8 @@
     },
     {
       "path": "package-lock.json",
-      "size": 298190,
-      "digest": "sha256:ade780293289402116c161c2d6e2205ff22513d1579a1886991fabc9c6eeadf2"
+      "size": 359276,
+      "digest": "sha256:9dd7cd013021e5af4fdfb91b7ef4e645dcb9f4ec59f2af051e9003fc1ca79828"
     },
     {
       "path": "package.json",
@@ -195,6 +195,141 @@
     },
     {
       "path": "plugins/action-topbar/types/css-modules.d.ts",
+      "size": 24,
+      "digest": "sha256:35d26ea66c86da9701e4f4b467913481ffeae910761cea34c775c5dacb7f8eaa"
+    },
+    {
+      "path": "plugins/aura/.gitignore",
+      "size": 20,
+      "digest": "sha256:58aea3d6b4b0f8799c1e00c3b023898516997f6369ee8e13d8d4b4215f70a62b"
+    },
+    {
+      "path": "plugins/aura/CHANGELOG.md",
+      "size": 504,
+      "digest": "sha256:5f41cc5a3d82db4303de48f57943e08e74b232d498635e074c43a9bef9bebaea"
+    },
+    {
+      "path": "plugins/aura/LICENSE",
+      "size": 1074,
+      "digest": "sha256:d73e86b0d180da7359d03c23a6378eca5177f6a9ffc0e2c51c5b4a1dcf17391c"
+    },
+    {
+      "path": "plugins/aura/README.md",
+      "size": 4401,
+      "digest": "sha256:0457165f05e2196c516f5404eb2a61c01b4b9141ea6a3ed51d442ed85f84a5e8"
+    },
+    {
+      "path": "plugins/aura/THIRD_PARTY_NOTICES.md",
+      "size": 1326,
+      "digest": "sha256:ea331deb3081afa7d6e68f72b2903ad6f1cacc2f2e2e24529b3bcb9506afd213"
+    },
+    {
+      "path": "plugins/aura/app.css",
+      "size": 8498,
+      "digest": "sha256:ca706e4888a7b2291ee3622efeb5e8f24263b2a8a52daf0959ac5ef32ef6f3ec"
+    },
+    {
+      "path": "plugins/aura/app.tsx",
+      "size": 15062,
+      "digest": "sha256:cbcd7d8f920896f971ddec4ff6dfa44be6619082c1292c8bd3d223a6a6fa538b"
+    },
+    {
+      "path": "plugins/aura/assets/icon.svg",
+      "size": 289,
+      "digest": "sha256:5e1855866c03cdc0737805faed1ee56100510f274521c8e9a9f91cbc45ddba05"
+    },
+    {
+      "path": "plugins/aura/lib/background.ts",
+      "size": 6406,
+      "digest": "sha256:8c06157331ff4016406e4ccf0fb3a61092604058fd9f713c887e11ee2d8eb8db"
+    },
+    {
+      "path": "plugins/aura/lib/capy-effect.ts",
+      "size": 12158,
+      "digest": "sha256:ea239593d7d63e23c152e69ba9e2a6a4bdcb16fdb3c173c33e871f1890bf6623"
+    },
+    {
+      "path": "plugins/aura/lib/capy-shaders.ts",
+      "size": 18352,
+      "digest": "sha256:b5234201c71050590b29d6eb1c14a81f172dd4b0a661f0d7ace3fc91947c943e"
+    },
+    {
+      "path": "plugins/aura/lib/image.ts",
+      "size": 2559,
+      "digest": "sha256:9ecfbc22021688528f747e0956b4a3add520e156946797c68cc7ca48cdedddf8"
+    },
+    {
+      "path": "plugins/aura/lib/model.ts",
+      "size": 2352,
+      "digest": "sha256:64093c75ba6b5120967d331977f9bb61b2bd205a86d341248ff0105a41e12219"
+    },
+    {
+      "path": "plugins/aura/lib/photo-shader.ts",
+      "size": 699,
+      "digest": "sha256:ff53f22a64aa1279e57dc3f09ed48409a912e89e09c0746b72cb2783cd75a63b"
+    },
+    {
+      "path": "plugins/aura/lib/upload.ts",
+      "size": 2160,
+      "digest": "sha256:8099d1480620af12f73207668bb0894b43ee9d7a37984713a12ba6b4b5200853"
+    },
+    {
+      "path": "plugins/aura/licenses/PAPER-SHADERS-APACHE-2.0.txt",
+      "size": 11357,
+      "digest": "sha256:c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    {
+      "path": "plugins/aura/package.json",
+      "size": 1617,
+      "digest": "sha256:a9dfa4779a6e34e2fa741e9f8bb4b1652141e1ef97f7e0817b2b4f5bfd58516e"
+    },
+    {
+      "path": "plugins/aura/server.ts",
+      "size": 8359,
+      "digest": "sha256:6cbb2dca30f2de38e8024165407357a47d684f6f38d8fb6648c6d0390a6f1025"
+    },
+    {
+      "path": "plugins/aura/test/half-wallpaper.browser.mjs",
+      "size": 3910,
+      "digest": "sha256:d1d0b422e339606ded58e324fbd95b67709a8ca0ebd9103926dd7058ed462873"
+    },
+    {
+      "path": "plugins/aura/test/lifecycle.test.ts",
+      "size": 4116,
+      "digest": "sha256:5347d30deed0aa78c3e7865e7478e31b1790e61a5eaee28002694209ae614db2"
+    },
+    {
+      "path": "plugins/aura/test/live-browser.mjs",
+      "size": 5841,
+      "digest": "sha256:27b651a6127f630a2324b9b71d616a065398be979239c79bf89c478ba6632542"
+    },
+    {
+      "path": "plugins/aura/test/promo.browser.mjs",
+      "size": 4642,
+      "digest": "sha256:c184347cb374e9b458605fbfa261502db51995690824da267bd8b5c59382b8c0"
+    },
+    {
+      "path": "plugins/aura/test/readability.browser.mjs",
+      "size": 3441,
+      "digest": "sha256:525ecf5d32ceb0ea6e0bab67081d25f6eddf526cc54a459d1f8fb551ef83e7f8"
+    },
+    {
+      "path": "plugins/aura/test/server.test.ts",
+      "size": 6882,
+      "digest": "sha256:b0620b8c12463cad93ce494617e9439e26c3d394f5176c7cb6ff030aca85f992"
+    },
+    {
+      "path": "plugins/aura/test/table-readability.browser.mjs",
+      "size": 3653,
+      "digest": "sha256:87fd8991527b945c6ddba35f30c069585edc45d73dc7b9d3317c0ed7b7bb5f67"
+    },
+    {
+      "path": "plugins/aura/tsconfig.json",
+      "size": 426,
+      "digest": "sha256:91570f40da9694882622d4079a91bc01fe6607697c2a8cb1f95d9a16faf89fdb"
+    },
+    {
+      "path": "plugins/aura/types/css.d.ts",
       "size": 24,
       "digest": "sha256:35d26ea66c86da9701e4f4b467913481ffeae910761cea34c775c5dacb7f8eaa"
     },
@@ -940,8 +1075,8 @@
     },
     {
       "path": "plugins/taskboard/README.md",
-      "size": 12111,
-      "digest": "sha256:86c8f17782907f39460e780a75758fca58de3bb397f8785ef5f9966cf07b84a6"
+      "size": 16617,
+      "digest": "sha256:69760576596ae9f274d10be8d09e49699daeeaa9e9c8f8415c2b77889d573166"
     },
     {
       "path": "plugins/taskboard/THIRD_PARTY_NOTICES.md",
@@ -955,8 +1090,8 @@
     },
     {
       "path": "plugins/taskboard/app.tsx",
-      "size": 245828,
-      "digest": "sha256:a07f6aa10c4d0e3a3bb991bc00be9a165da75fece84f378943a3df2307219316"
+      "size": 245922,
+      "digest": "sha256:dd4056c9bd083b62bec9082cc669cbbded9218141c05a92b78a2ebdca717f9a3"
     },
     {
       "path": "plugins/taskboard/assets/icon.svg",
@@ -1104,6 +1239,11 @@
       "digest": "sha256:505daff1cfcc8aa86195dbb00db274feee4ed47cc75f50ed90f10b6de049ea9c"
     },
     {
+      "path": "plugins/taskboard/host.ts",
+      "size": 663,
+      "digest": "sha256:3bfb2ced5da06754ca661465c71bb91c6b73b0b76ab355eaa5275306f1836299"
+    },
+    {
       "path": "plugins/taskboard/lib/portal-scope.ts",
       "size": 439,
       "digest": "sha256:cbf23e81c4436585a5e55a4893591d0cc22c189f54d004d70cb7e1a8cc72f988"
@@ -1115,8 +1255,38 @@
     },
     {
       "path": "plugins/taskboard/package.json",
-      "size": 2292,
-      "digest": "sha256:9599b3c0bca8e61345445b59585e03a49a59c4f20aea75e93b0ad0d2d963d2fa"
+      "size": 2623,
+      "digest": "sha256:3fee7587aed3feb9456b15897a4a8c36f0c1d19e9ab27a72bdca545b506e014d"
+    },
+    {
+      "path": "plugins/taskboard/preparation/app.tsx",
+      "size": 31468,
+      "digest": "sha256:58bf4c8e876d03451a636c4b7af40b54f8128c58dda2a82669be0f11eec01269"
+    },
+    {
+      "path": "plugins/taskboard/preparation/context.ts",
+      "size": 5153,
+      "digest": "sha256:bf856b7e721d8c01154664105c3421813764d92d658faeb0ccc50ed7fb68351b"
+    },
+    {
+      "path": "plugins/taskboard/preparation/contract.ts",
+      "size": 6958,
+      "digest": "sha256:58de9cc373b602626b80fdf3ef8132ae8f94077d6504bdddab9174a3774e4794"
+    },
+    {
+      "path": "plugins/taskboard/preparation/server.ts",
+      "size": 24384,
+      "digest": "sha256:6d92cd50375272fd5b37ce2ebf13a21550673364ce5b80407d12cc92063bc3ce"
+    },
+    {
+      "path": "plugins/taskboard/preparation/store.ts",
+      "size": 2150,
+      "digest": "sha256:1b74e3736ee5ad3b1a378dde2d4eb2820e523cef9ab4d8590aa6ab72c567d471"
+    },
+    {
+      "path": "plugins/taskboard/preparation/style.css",
+      "size": 4831,
+      "digest": "sha256:6480d94c87b1e05002e98a44d8a754e1f9f0038dd82b9e9f61f7e12674cf0449"
     },
     {
       "path": "plugins/taskboard/project-selection.ts",
@@ -1130,8 +1300,8 @@
     },
     {
       "path": "plugins/taskboard/server.ts",
-      "size": 82370,
-      "digest": "sha256:e84f85bd81d4d89d53d4ecdc697bdaaa59bcbf1a8341abbea3d19ed73ff4630b"
+      "size": 83928,
+      "digest": "sha256:b2ed38f5427f474513c941ea61ce27151fd735f783ed1e57e941c6bd5979e71b"
     },
     {
       "path": "plugins/taskboard/sources/github.ts",
@@ -1196,7 +1366,7 @@
     {
       "path": "plugins/taskboard/test/distribution.test.ts",
       "size": 6759,
-      "digest": "sha256:f94572780a9e7b3c68c928b61a12170f9678551c9a9dbf9db305953d9b08da74"
+      "digest": "sha256:330ff90c1110f50af295e43d11dc1ec58bdaf1668268ce29e6b63397b021ceae"
     },
     {
       "path": "plugins/taskboard/test/filter-presets-backend.test.ts",
@@ -1207,6 +1377,11 @@
       "path": "plugins/taskboard/test/filter-presets.test.ts",
       "size": 6818,
       "digest": "sha256:acfd2867b81df3b3991f2395c01925cebde79d46800202303a1eb7e768442d38"
+    },
+    {
+      "path": "plugins/taskboard/test/preparation.test.ts",
+      "size": 12726,
+      "digest": "sha256:f620016d67073ec9170857a9c78180ba88bc306bf960ad2c30568dc20f492c76"
     },
     {
       "path": "plugins/taskboard/test/project-selection.test.ts",
@@ -1225,8 +1400,8 @@
     },
     {
       "path": "plugins/taskboard/tsconfig.json",
-      "size": 563,
-      "digest": "sha256:3817ff83f2f2b7e4a0d8690452ca6a827bb5102b6102cf949221454cb7c46947"
+      "size": 597,
+      "digest": "sha256:2b09492e8f30a9e59a37bc6d8c0f3ab8b0fc2aa55fc4e4604169fd0a01786c67"
     },
     {
       "path": "plugins/touchbar/.gitignore",
@@ -1241,7 +1416,7 @@
     {
       "path": "plugins/touchbar/README.md",
       "size": 8519,
-      "digest": "sha256:5b6594fb787db8d870088667404a968269f560ba5a56dbf6784e3f2122ee5b6e"
+      "digest": "sha256:3c037867896b4f5aeb18f262b2436e1088204ef924e4a12be9cd5f563803cbe7"
     },
     {
       "path": "plugins/touchbar/assets/icon.svg",
@@ -1391,7 +1566,7 @@
     {
       "path": "plugins/touchbar/package.json",
       "size": 1336,
-      "digest": "sha256:a127ab88239b0c29a8efec0c66fc2c578f42e7fefa374d933f3f8b90bc02dd9f"
+      "digest": "sha256:9d1b41140cda7563941410e7d48576ec54c5bf8acc5b17f3978304311a520e45"
     },
     {
       "path": "plugins/touchbar/server.ts",
@@ -1577,7 +1752,7 @@
   "pages": [
     {
       "path": ".empirical/context/index.md",
-      "generator": "empirical-0.31.0",
+      "generator": "empirical-0.33.0",
       "managed": false,
       "dependencies": [
         ".agents/skills/empirical/SKILL.md",
@@ -1619,6 +1794,33 @@
         "plugins/action-topbar/test/tab-model.test.ts",
         "plugins/action-topbar/tsconfig.json",
         "plugins/action-topbar/types/css-modules.d.ts",
+        "plugins/aura/.gitignore",
+        "plugins/aura/CHANGELOG.md",
+        "plugins/aura/LICENSE",
+        "plugins/aura/README.md",
+        "plugins/aura/THIRD_PARTY_NOTICES.md",
+        "plugins/aura/app.css",
+        "plugins/aura/app.tsx",
+        "plugins/aura/assets/icon.svg",
+        "plugins/aura/lib/background.ts",
+        "plugins/aura/lib/capy-effect.ts",
+        "plugins/aura/lib/capy-shaders.ts",
+        "plugins/aura/lib/image.ts",
+        "plugins/aura/lib/model.ts",
+        "plugins/aura/lib/photo-shader.ts",
+        "plugins/aura/lib/upload.ts",
+        "plugins/aura/licenses/PAPER-SHADERS-APACHE-2.0.txt",
+        "plugins/aura/package.json",
+        "plugins/aura/server.ts",
+        "plugins/aura/test/half-wallpaper.browser.mjs",
+        "plugins/aura/test/lifecycle.test.ts",
+        "plugins/aura/test/live-browser.mjs",
+        "plugins/aura/test/promo.browser.mjs",
+        "plugins/aura/test/readability.browser.mjs",
+        "plugins/aura/test/server.test.ts",
+        "plugins/aura/test/table-readability.browser.mjs",
+        "plugins/aura/tsconfig.json",
+        "plugins/aura/types/css.d.ts",
         "plugins/clean-my-context/.gitignore",
         "plugins/clean-my-context/README.md",
         "plugins/clean-my-context/app.test.tsx",
@@ -1800,9 +2002,16 @@
         "plugins/taskboard/create-issue.ts",
         "plugins/taskboard/filter-presets.ts",
         "plugins/taskboard/hooks/useBrowserDimmingModal.ts",
+        "plugins/taskboard/host.ts",
         "plugins/taskboard/lib/portal-scope.ts",
         "plugins/taskboard/lib/utils.ts",
         "plugins/taskboard/package.json",
+        "plugins/taskboard/preparation/app.tsx",
+        "plugins/taskboard/preparation/context.ts",
+        "plugins/taskboard/preparation/contract.ts",
+        "plugins/taskboard/preparation/server.ts",
+        "plugins/taskboard/preparation/store.ts",
+        "plugins/taskboard/preparation/style.css",
         "plugins/taskboard/project-selection.ts",
         "plugins/taskboard/scripts/verify-build.mjs",
         "plugins/taskboard/server.ts",
@@ -1821,6 +2030,7 @@
         "plugins/taskboard/test/distribution.test.ts",
         "plugins/taskboard/test/filter-presets-backend.test.ts",
         "plugins/taskboard/test/filter-presets.test.ts",
+        "plugins/taskboard/test/preparation.test.ts",
         "plugins/taskboard/test/project-selection.test.ts",
         "plugins/taskboard/test/source-types.test.ts",
         "plugins/taskboard/test/theme-css.test.ts",
@@ -1895,19 +2105,21 @@
         "plugins/usage-tracker/tsconfig.json",
         "plugins/usage-tracker/types/css-modules.d.ts"
       ],
-      "sourceDigest": "sha256:239ea129c6f18179983a2daf5558f7220be4f92142552e9b3f11e5c8c66b21e2",
+      "sourceDigest": "sha256:41cc562dd4da42c529e073ff3eb7b0f024dd7027931e1f8150ee04fa6963eae1",
       "digest": "sha256:eed9cfd95fdecbf70535c9b9bfdb204011bdad5af0a5418d4d923f3a99f354f2",
       "freshness": "fresh"
     },
     {
       "path": ".empirical/context/overview.md",
-      "generator": "empirical-0.31.0",
+      "generator": "empirical-0.33.0",
       "managed": false,
       "dependencies": [
         "README.md",
         "package.json",
         "plugins/action-topbar/README.md",
         "plugins/action-topbar/package.json",
+        "plugins/aura/README.md",
+        "plugins/aura/package.json",
         "plugins/clean-my-context/README.md",
         "plugins/clean-my-context/package.json",
         "plugins/dockside/README.md",
@@ -1932,17 +2144,18 @@
         "plugins/usage-tracker/README.md",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:c99a0c20f49cf68d97062ca317334d591a8d08407b13230a315d87a1d488aa5d",
+      "sourceDigest": "sha256:3f98f87523d7d88f9b2a43324f1d2445f7c276165f4bbaa9e041f889bfb0b7b7",
       "digest": "sha256:37f1b782a0e88dee101030bf6ac6aa2742c329ca37daf764d5022e793ce6bc15",
       "freshness": "fresh"
     },
     {
       "path": ".empirical/context/architecture.md",
-      "generator": "empirical-0.31.0",
+      "generator": "empirical-0.33.0",
       "managed": false,
       "dependencies": [
         "package.json",
         "plugins/action-topbar/package.json",
+        "plugins/aura/package.json",
         "plugins/clean-my-context/package.json",
         "plugins/dockside/package.json",
         "plugins/host-monitor/package.json",
@@ -1951,18 +2164,19 @@
         "plugins/touchbar/package.json",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:842609399b970981507f83cc34f893b8146fc676f478ebf525b58847571d0b63",
+      "sourceDigest": "sha256:07fd8d47427e37a3512db509c1f8b282e7025205bb3d82d7a7000fc6b0dc88a1",
       "digest": "sha256:6a3333fdbbcffff93c96400aab0596932dc23cce823061cdedacad5e44ef7bd7",
       "freshness": "fresh"
     },
     {
       "path": ".empirical/context/commands.md",
-      "generator": "empirical-0.31.0",
+      "generator": "empirical-0.33.0",
       "managed": false,
       "dependencies": [
         ".github/workflows/ci.yml",
         "package.json",
         "plugins/action-topbar/package.json",
+        "plugins/aura/package.json",
         "plugins/clean-my-context/package.json",
         "plugins/dockside/package.json",
         "plugins/host-monitor/package.json",
@@ -1971,36 +2185,40 @@
         "plugins/touchbar/package.json",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:b8a72a9e4c0606b2c5567d72c1c6fb7b6d6df8100b2e28785ebd5b0639bba88b",
+      "sourceDigest": "sha256:9a23bb5bd7b0109dcd3fbf662cb75a7a86c71cc8a5882b52583144ec9f4b2c2d",
       "digest": "sha256:06a7a6d07d2649e2d00a93cf62beef749d2f5dada25077c225726f81ec2eeed3",
       "freshness": "fresh"
     },
     {
       "path": ".empirical/context/conventions.md",
-      "generator": "empirical-0.31.0",
+      "generator": "empirical-0.33.0",
       "managed": false,
       "dependencies": [
         "AGENTS.md",
         "plugins/action-topbar/tsconfig.json",
+        "plugins/aura/tsconfig.json",
         "plugins/clean-my-context/tsconfig.json",
         "plugins/dockside/tsconfig.json",
         "plugins/host-monitor/tsconfig.json",
         "plugins/save-my-model/tsconfig.json",
+        "plugins/taskboard/preparation/style.css",
         "plugins/taskboard/tsconfig.json",
         "plugins/touchbar/tsconfig.json",
         "plugins/usage-tracker/tsconfig.json"
       ],
-      "sourceDigest": "sha256:243016fe1ee852528e50233d1e9a3c9b8b96c956e76ce500898020bc1171bbf1",
+      "sourceDigest": "sha256:e828272685bb848e07a4a1214b47074405520144f7e8cc6415ff65b66ea59ccc",
       "digest": "sha256:8ce7179f299316d315c6c9c8d246aaa18e9cdbf9441943ce24643c415c4db02c",
       "freshness": "fresh"
     },
     {
       "path": ".empirical/context/design-language.md",
-      "generator": "empirical-0.31.0",
+      "generator": "empirical-0.33.0",
       "managed": false,
       "dependencies": [
         "plugins/action-topbar/app.css",
         "plugins/action-topbar/app.tsx",
+        "plugins/aura/app.css",
+        "plugins/aura/app.tsx",
         "plugins/clean-my-context/app.test.tsx",
         "plugins/clean-my-context/app.tsx",
         "plugins/clean-my-context/components/ui/button.tsx",
@@ -2044,14 +2262,16 @@
         "plugins/taskboard/components/ui/skeleton.tsx",
         "plugins/taskboard/components/ui/textarea.tsx",
         "plugins/taskboard/components/ui/tooltip.tsx",
+        "plugins/taskboard/preparation/app.tsx",
+        "plugins/taskboard/preparation/style.css",
         "plugins/usage-tracker/app.css",
         "plugins/usage-tracker/app.tsx"
       ],
-      "sourceDigest": "sha256:007db7655fb06377fc181f23c1905af6b73e53fe1a581b887164aafa93922e44",
+      "sourceDigest": "sha256:e8e03d4f215eda1a999d62b5b54e9b077b4e3bde67fd5fb356bda73b2fdd5945",
       "digest": "sha256:23f355d733d86c584f760d4a0c0136ee7bb2c3a3aa12edfc199b29b55a480ca2",
       "freshness": "fresh"
     }
   ],
   "truncated": false,
-  "digest": "sha256:efb636128ca25ec11eba2ace420b6bb293ab7c0addbe1ab13ffefc865128bc8c"
+  "digest": "sha256:2ff30069306ab88a7365403fc9df089a2ec3953ec025da1d2bbe491ac0a1c8a3"
 }

@@ -1,0 +1,4 @@
+import {execFileSync} from 'node:child_process';import {createHash} from 'node:crypto';import {readFile,writeFile,lstat,readlink} from 'node:fs/promises';import {join} from 'node:path';
+const root='/home/dyaus/Developer/projects/MateoCerquetella/BB/bb-plugins';const paths=execFileSync('git',['-C',root,'ls-files','-z'],{encoding:'utf8'}).split('\0').filter(Boolean);const result={root,at:new Date().toISOString(),files:{}};
+for(const path of paths){try{const full=join(root,path);const stat=await lstat(full);if(stat.isDirectory())continue;const data=stat.isSymbolicLink()?await readlink(full):await readFile(full);result.files[path]=createHash('sha256').update(data).digest('hex');}catch{result.files[path]='missing';}}
+const dest=process.argv[2];await writeFile(dest,JSON.stringify(result,null,2));console.log(`Recorded ${Object.keys(result.files).length} tracked file hashes.`);

@@ -31,6 +31,8 @@
     "test",
     "components",
     "lib",
-    "hooks"
+    "hooks",
+    "host.ts",
+    "preparation"
   ]
 }

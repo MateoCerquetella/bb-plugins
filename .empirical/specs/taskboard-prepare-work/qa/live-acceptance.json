@@ -1,0 +1,31 @@
+{
+  "realBB": true,
+  "threadId": "thr_v44c8fsz23",
+  "preparationId": "9e00bf5a-2b93-4985-9f19-04c7e88a8392",
+  "briefRevision": 3,
+  "versions": 3,
+  "alternatives": 2,
+  "selectedVersion": "f535773b-027a-41b9-8deb-41dee65ebbb2",
+  "nativeSettings": {
+    "providerId": "codex",
+    "model": "gpt-6-astra",
+    "permissionMode": "full",
+    "reasoningLevel": "high",
+    "serviceTier": "default"
+  },
+  "sourceCount": 21,
+  "prototypeInteraction": "search, details drawer, close and clear passed",
+  "sandbox": {
+    "parentBlocked": true,
+    "csp": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
+  },
+  "downloadBytes": 172844,
+  "reopened": true,
+  "targetTrackedFiles": 555,
+  "targetChangedFiles": 0,
+  "invalidCountRejected": true,
+  "staleEditRejected": true,
+  "wrongProjectRejected": true,
+  "externalTrackerConfiguredCase": "not exercised live; existing adapter reuse and disconnected operation covered",
+  "remoteHost": "explicit routing covered by unit test; live run uses selected local host"
+}

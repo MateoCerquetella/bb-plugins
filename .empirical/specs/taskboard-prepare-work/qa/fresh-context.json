@@ -1,0 +1,11 @@
+{
+  "check": "qa-fresh-context",
+  "reviewer": "/root/preparation_acceptance",
+  "method": "Independent agent with no conversation history; only frozen criteria, real BB API/DOM/frames and bounded acceptance artifacts. No implementation source or prior review judgment inspected.",
+  "outcome": "passed",
+  "conclusion": "Fresh-context QA passes the demonstrated end-to-end preparation flow. No remaining failure was observed in that flow.",
+  "observed": ["Native selected settings and explicit thread/environment/host binding", "Bounded sources and references; 555 target tracked files unchanged", "Agent brief, direct edits, conversation and history", "Two alternatives and refinement preserving three versions", "Prototype interaction and sandbox parent-access restriction", "Reopening after reload with settings, versions and selection preserved", "Actual downloaded packet with selected complete HTML and no gates claimed", "Optional/no-task tracker state"],
+  "testEvidence": "120 passing Taskboard tests, successful build and build metadata verification; service tests cover partial failure/retry and explicit remote routing",
+  "limits": ["Original immutable source snapshot has limited Taskboard/token coverage; corrected reader was not rerun live", "Remote host execution not exercised live", "Live interrupted-job recovery not exercised", "No populated tracker task available to test live linkage", "Other native composer-setting combinations not exercised"],
+  "resolvedFinding": "Prototype provenance introduction now says Next generation uses saved brief r3, while versions correctly retain originating brief r2"
+}

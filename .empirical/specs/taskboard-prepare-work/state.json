@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 5,
+  "revision": 9,
+  "activeFeature": "taskboard-prepare-work",
+  "request": "Enhance Taskboard in the existing bb-plugins repository, separate from empirical-sdd, with a smallest complete Prepare work flow: project-scoped New thread action; explicitly resolved local or remote project environment; repository-informed editable versioned brief preserving request and edits and showing bounded safe sources; conversation refinement using configured BB agents; 1-4 (default 2) distinct interactive isolated versioned prototype alternatives with progress, partial failures, individual retry and refinement; selection feeds brief; persisted workspace linked to project/thread; readiness and readable preparation packet export without starting implementation or asserting Empirical gates. Inspect current SDK extension/composer capabilities and tryhamster.com discovery-to-brief reference, own design. Exclude tracker features. Exercise actual BB flow including two prototypes, refinement/selection/reopen/export and verify target production files unchanged; plugin checks and working UI. Do not modify empirical-sdd or implement changes in target repositories.",
+  "profile": "complex",
+  "workflow": "complex",
+  "mode": "normal",
+  "phase": "review",
+  "status": "waiting",
+  "repairAttempts": 0,
+  "message": "Full workspace checks, real BB flow, screenshot artifacts, immutable packet download and independent fresh-context QA passed. Target tracked-file digests unchanged.",
+  "implementationActor": "agent",
+  "workStartedAt": null,
+  "specDigest": "sha256:4674b7f1dcd881b61476dfa00bdbbf6c8942b1e88f42afce8702e62ff8e330e9",
+  "approvedSpecRevision": 4,
+  "capabilityArchiveRequired": true,
+  "capabilityDeltaDigest": "sha256:b03c1654a53c3e45d584b5f546f2421ed9d7194de4fb301ad9766ac1a8ba241c",
+  "impactDigest": "sha256:b9b01a20a994a4cc31fb48febb115dda70a0fc2faa61eb49cf13deca76d14940",
+  "capabilityClaimId": "taskboard-prepare-work-e201ae7d98d9",
+  "authorizationDigest": null,
+  "evidence": [],
+  "evidenceReceiptIds": [
+    "qa-a49a28e67418ecbe3daca7be",
+    "qa-e456f284313c40d549b934b4",
+    "qa-d351bf3583d9bb2edce5f6f5",
+    "collected-850f4cc20869516d7f056ca0"
+  ],
+  "legacyEvidenceCount": 0,
+  "completion": {
+    "implemented": true,
+    "verified": true,
+    "integrated": false,
+    "delivered": false,
+    "published": false,
+    "highest": "verified",
+    "reasons": {
+      "integrated": "integrated has not been proven by a durable receipt.",
+      "delivered": "delivered has not been proven by a durable receipt.",
+      "published": "published has not been proven by a durable receipt."
+    }
+  },
+  "updatedAt": "2026-09-14T16:32:15.892Z"
+}
