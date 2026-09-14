@@ -27,20 +27,50 @@ export function preparationStore(bb: Pick<BbPluginApi, 'storage'>) {
       return put(p);
     })();
   }
-  function all() {
-    return (
+  function parseRows(rows: unknown): Preparation[] {
+    return (rows as { document: string }[]).map((row) =>
+      preparationSchema.parse(JSON.parse(row.document))
+    );
+  }
+  function project(projectId: string) {
+    return parseRows(
       db
         .prepare(
-          'SELECT document FROM preparations ORDER BY updated_at DESC LIMIT 300'
+          'SELECT document FROM preparations WHERE project_id=? ORDER BY updated_at DESC LIMIT 300'
         )
-        .all() as { document: string }[]
-    ).map((r) => preparationSchema.parse(JSON.parse(r.document)));
+        .all(projectId)
+    );
+  }
+  function forThread(threadId: string, projectId: string) {
+    const row = db
+      .prepare(
+        "SELECT document FROM preparations WHERE project_id=? AND json_extract(document, '$.threadId')=? LIMIT 1"
+      )
+      .get(projectId, threadId) as { document: string } | undefined;
+    return row ? preparationSchema.parse(JSON.parse(row.document)) : null;
+  }
+  function* pending(): Generator<Preparation> {
+    let cursor = '';
+    while (true) {
+      const page = parseRows(
+        db
+          .prepare(
+            "SELECT document FROM preparations WHERE id>? AND EXISTS (SELECT 1 FROM json_each(preparations.document, '$.jobs') WHERE json_extract(value, '$.status') IN ('queued','starting','running')) ORDER BY id LIMIT 100"
+          )
+          .all(cursor)
+      );
+      if (!page.length) return;
+      yield* page;
+      cursor = page[page.length - 1]!.id;
+    }
   }
   return {
     get,
     put,
     update,
-    all,
+    project,
+    forThread,
+    pending,
     artifact(id: string, prep: string) {
       const row = db
         .prepare(

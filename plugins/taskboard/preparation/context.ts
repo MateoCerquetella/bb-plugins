@@ -26,7 +26,15 @@ export function safeContextPath(path: string): boolean {
   );
 }
 export function containsCredential(content: string): boolean {
-  return /-----BEGIN [A-Z ]*PRIVATE KEY-----|(?:gh[pousr]_|github_pat_|sk-(?:live-|proj-)?)[a-zA-Z0-9_-]{20,}|AKIA[A-Z0-9]{16}|Bearer\s+[A-Za-z0-9_.-]{20,}|https?:\/\/[^\s/:]+:[^\s/@]+@|(?:password|secret|token|api[_-]?key)["']?\s*[=:]\s*["'][^"'\n]{12,}["']/i.test(
+  if (
+    /-----BEGIN [A-Z ]*PRIVATE KEY-----|(?:gh[pousr]_|github_pat_|sk-(?:live-|proj-)?)[a-zA-Z0-9_-]{20,}|AKIA[A-Z0-9]{16}|Bearer\s+[A-Za-z0-9_.-]{20,}|https?:\/\/[^\s/:]+:[^\s/@]+@/i.test(
+      content
+    )
+  )
+    return true;
+  // Conservative: exclude the complete source file when credential-shaped keys
+  // have any nonempty value, including unquoted YAML/env values and block scalars.
+  return /(?:password|passwd|secret|token|api[_-]?key)["']?\s*[:=]\s*(?:["'][^"'\r\n]+["']|[^\s"',;#}\]][^\r\n]*)/i.test(
     content
   );
 }

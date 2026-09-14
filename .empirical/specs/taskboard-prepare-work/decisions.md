@@ -35,3 +35,24 @@ Bootstrap completion depends on the selected agent using its supplied tool; this
 
 ### Verification
 Inspect SDK declarations; exercise native Send, bound configuration, source retrieval, two agent-generated prototypes, refinement, selection, restart/export and target digest. Test context filters, CAS, parser limits, version preservation, remote host routing and preview restrictions.
+
+## D-002: Put navigation denial outside generated HTML
+
+Status: Accepted
+
+### Evidence
+Independent code review found that an inner document's resource CSP does not prevent self-navigation. Real Chromium testing confirmed a trusted outer frame's frame-src about: policy permits an interactive srcdoc child while rejecting script/link/meta-refresh navigation before any network request.
+
+### Options
+1. Keep one frame and rely on the generated document's policy.
+2. Add a trusted outer frame whose child-navigation policy cannot be changed by generated code.
+3. Remove generated JavaScript entirely.
+
+### Chosen approach
+Option 2. Escape the complete generated document into the inner srcdoc attribute. Both layers have opaque sandboxed origins. The outer policy allows only about: child documents; the inner policy disallows nested frames and resource loads. Preserve generated interactive code and immutable versions.
+
+### Trade-offs and risks
+One extra frame layer requires nested frame locators in acceptance tests. A blocked malicious navigation can replace only the inner preview with a browser error page. Browser sandbox and CSP support are required.
+
+### Verification
+Adversarial real-browser tests assert zero attempted network requests for script self-navigation, links, meta refresh, nested frames, fetch/image/style resources, form submission and top navigation. A normal inline button still works, and the actual BB prototypes retain their search/drawer interactions after reload.

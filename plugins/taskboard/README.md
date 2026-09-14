@@ -292,11 +292,16 @@ Briefs, sources, conversation, jobs, HTML versions and selection persist in
 Taskboard's SQLite database. Active jobs reconcile from their BB thread IDs after
 reload. If a restart interrupts a spawn before its ID is saved, the job reports an
 ambiguous start and requires checking recent Prepare threads before retrying; it is
-never automatically duplicated. Brief edits use revision checks. A preparation is
+never automatically duplicated. Idle jobs without output become retryable failures
+after a 15-second settling period. Worker enumeration is paginated independently
+of the recent-preparation list; old thread bindings remain directly addressable.
+Brief edits use revision checks. A preparation is
 bounded to 60 jobs and 100 brief revisions.
 
-HTML previews use an opaque-origin `sandbox="allow-scripts"` iframe and a restrictive
-CSP that blocks resource loads, fetch, nested frames and form submission. Scripts
+HTML previews use nested opaque-origin `sandbox="allow-scripts"` frames. A trusted
+outer document limits child navigation to `about:`; generated content cannot relax
+that policy or navigate its own frame onto the network. The inner CSP also blocks
+resource loads, fetch, nested frames and form submission. Scripts
 cannot read BB's page or storage or navigate the parent. Do not treat browser
 iframe isolation as an OS sandbox for arbitrary downloaded code.
 

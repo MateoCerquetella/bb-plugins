@@ -74,6 +74,13 @@ test('context and generation boundaries reject dangerous and malformed input', (
   ])
     assert.equal(safeContextPath(path), false, path);
   assert.equal(containsCredential('-----BEGIN RSA PRIVATE KEY-----'), true);
+  for (const value of [
+    'password: abcdefghijklmnop',
+    'API_KEY=abcdefghijk',
+    'client_secret: short',
+    'token: |\n  abcdefghijklmnop'
+  ])
+    assert.equal(containsCredential(value), true, value);
   assert.equal(
     preparationRpc.prepareGenerate.input.safeParse({
       id: 'a',
@@ -108,7 +115,9 @@ test('context and generation boundaries reject dangerous and malformed input', (
   const html = sandboxHtml(
     '<script>parent.location="https://example.com"</script>'
   );
-  assert.ok(html.indexOf('Content-Security-Policy') < html.indexOf('<script>'));
+  assert.ok(html.indexOf('Content-Security-Policy') < html.indexOf('<iframe'));
+  assert.ok(!html.includes('<script>parent.location'));
+  assert.match(html, /frame-src about:/);
   assert.match(html, /connect-src 'none'/);
   assert.match(html, /form-action 'none'/);
 });
@@ -311,6 +320,7 @@ test('job service routes context to the remote host and preserves partial succes
           return { id: 'job-thread-' + spawns.length };
         },
         output: async ({ threadId }: any) => {
+          if (threadId === 'empty-job') return { output: null };
           if (threadId === 'job-thread-1')
             return {
               output: JSON.stringify({
@@ -395,9 +405,104 @@ test('job service routes context to the remote host and preserves partial succes
       store.artifact(oldVersion.id, p.id).startsWith('<main>'),
       true
     );
+    store.update(p.id, (current) => {
+      const job = current.jobs.at(-1)!;
+      job.status = 'running';
+      job.threadId = 'empty-job';
+      job.emptyOutputAt = null;
+    });
+    await until(() => Boolean(store.get(p.id).jobs.at(-1)?.emptyOutputAt));
+    assert.equal(
+      store.get(p.id).jobs.at(-1)?.status,
+      'running',
+      'Give final output time to settle'
+    );
+    store.update(p.id, (current) => {
+      current.jobs.at(-1)!.emptyOutputAt = '2000-01-01T00:00:00.000Z';
+    });
+    await until(() => store.get(p.id).jobs.at(-1)?.status === 'failed');
+    assert.match(store.get(p.id).jobs.at(-1)!.error!, /without an artifact/);
   } finally {
     controller.abort();
     await running;
+    db.close();
+  }
+});
+
+test('old preparations remain discoverable and every pending record is reconciled beyond presentation limits', async () => {
+  const { preparationStore } = await import('../preparation/store.ts');
+  const db = new Database(':memory:');
+  const store = preparationStore({ storage: { database: () => db } } as any);
+  const at = new Date().toISOString();
+  const brief = {
+    revision: 0,
+    title: 'Brief',
+    description: '',
+    author: 'request',
+    at
+  };
+  const base: any = {
+    id: 'old',
+    projectId: 'project',
+    request: 'Request',
+    createdAt: at,
+    updatedAt: at,
+    threadId: 'old-thread',
+    environmentId: null,
+    hostId: null,
+    execution: null,
+    context: null,
+    artifactRoot: null,
+    brief,
+    history: [],
+    proposals: [],
+    messages: [],
+    jobs: [],
+    versions: [],
+    selection: null,
+    ready: false,
+    linkedTask: null,
+    error: null
+  };
+  try {
+    for (let i = 0; i < 330; i++)
+      store.put({
+        ...base,
+        id: 'pending-' + String(i).padStart(3, '0'),
+        threadId: i === 0 ? 'old-thread' : 'thread-' + i,
+        jobs: [
+          {
+            id: 'job-' + i,
+            kind: 'brief',
+            status: 'running',
+            threadId: 'agent-' + i,
+            brief,
+            direction: '',
+            alternativeId: null,
+            parentVersionId: null,
+            error: null,
+            at,
+            finishedAt: null
+          }
+        ]
+      });
+    db.prepare('UPDATE preparations SET updated_at=? WHERE id=?').run(
+      '2000-01-01T00:00:00Z',
+      'pending-000'
+    );
+    assert.equal(store.project('project').length, 300);
+    assert.equal(store.forThread('old-thread', 'project')?.id, 'pending-000');
+    assert.equal(store.forThread('old-thread', 'another-project'), null);
+    let count = 0;
+    for (const p of store.pending()) {
+      count++;
+      store.update(p.id, (current) => {
+        current.jobs[0]!.status = 'succeeded';
+      });
+    }
+    assert.equal(count, 330);
+    assert.equal([...store.pending()].length, 0);
+  } finally {
     db.close();
   }
 });

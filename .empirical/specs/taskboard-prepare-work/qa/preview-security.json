@@ -1,0 +1,40 @@
+{
+  "interactive": true,
+  "cases": [
+    {
+      "case": "script-self-navigation",
+      "networkRequests": 0,
+      "passed": true
+    },
+    {
+      "case": "self-link",
+      "networkRequests": 0,
+      "passed": true
+    },
+    {
+      "case": "meta-refresh",
+      "networkRequests": 0,
+      "passed": true
+    },
+    {
+      "case": "nested-frame",
+      "networkRequests": 0,
+      "passed": true
+    },
+    {
+      "case": "fetch-image-style",
+      "networkRequests": 0,
+      "passed": true
+    },
+    {
+      "case": "form-submit",
+      "networkRequests": 0,
+      "passed": true
+    },
+    {
+      "case": "top-navigation",
+      "networkRequests": 0,
+      "passed": true
+    }
+  ]
+}

@@ -148,26 +148,18 @@ export function registerPreparation(
     },
     async prepareList(input) {
       await dependencies.assertProject(input.projectId);
-      return store
-        .all()
-        .filter((p) => p.projectId === input.projectId)
-        .map((p) => ({
-          id: p.id,
-          title: p.brief.title,
-          threadId: p.threadId,
-          ready: p.ready,
-          updatedAt: p.updatedAt
-        }));
+      return store.project(input.projectId).map((p) => ({
+        id: p.id,
+        title: p.brief.title,
+        threadId: p.threadId,
+        ready: p.ready,
+        updatedAt: p.updatedAt
+      }));
     },
     prepareGet: (input) => scoped(input),
     async prepareForThread(input) {
       const t = await bb.sdk.threads.get({ threadId: input.threadId });
-      return (
-        store
-          .all()
-          .find((p) => p.threadId === t.id && p.projectId === t.projectId) ??
-        null
-      );
+      return store.forThread(t.id, t.projectId);
     },
     prepareEdit(input) {
       scoped(input);
@@ -569,9 +561,27 @@ export function registerPreparation(
         );
         return;
       }
-      if (thread.status !== 'idle') return;
+      if (thread.status !== 'idle') {
+        if (j.emptyOutputAt)
+          change(p.id, (current) => {
+            current.jobs.find((job) => job.id === j.id)!.emptyOutputAt = null;
+          });
+        return;
+      }
       const { output } = await bb.sdk.threads.output({ threadId: j.threadId });
-      if (!output) return;
+      if (!output?.trim()) {
+        if (!j.emptyOutputAt)
+          change(p.id, (current) => {
+            current.jobs.find((job) => job.id === j.id)!.emptyOutputAt = now();
+          });
+        else if (Date.now() - Date.parse(j.emptyOutputAt) >= 15000)
+          fail(
+            p.id,
+            j.id,
+            'The agent finished or was stopped without an artifact. Output remained empty after a 15-second settling period. Retry this job.'
+          );
+        return;
+      }
       const result = parseAgentResult(output, j.kind);
       const vId = uid();
       if ('html' in result) store.saveArtifact(vId, p.id, result.html);
@@ -624,7 +634,7 @@ export function registerPreparation(
   bb.background.service('preparation-jobs', {
     async start(signal) {
       // A persisted "starting" without a thread id is ambiguous; never automatically duplicate a spawn.
-      for (const p of store.all())
+      for (const p of store.pending())
         for (const j of p.jobs)
           if (j.status === 'starting')
             fail(
@@ -634,7 +644,7 @@ export function registerPreparation(
             );
       while (!signal.aborted) {
         try {
-          for (const p of store.all()) {
+          for (const p of store.pending()) {
             for (const j of p.jobs) {
               if (signal.aborted) return;
               if (j.status === 'queued')

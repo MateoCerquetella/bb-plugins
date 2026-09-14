@@ -68,7 +68,8 @@ export const jobSchema = z.object({
   parentVersionId: id.nullable(),
   error: z.string().nullable(),
   at: z.string(),
-  finishedAt: z.string().nullable()
+  finishedAt: z.string().nullable(),
+  emptyOutputAt: z.string().datetime().nullable().optional()
 });
 export const versionSchema = z.object({
   id,
@@ -241,10 +242,28 @@ export function parseAgentResult(output: string, kind: 'brief' | 'prototype') {
     })
     .parse(data);
 }
-// Prepends a policy before any generated element, even if the document tries to provide its own CSP.
+// The trusted outer document owns the child-frame navigation policy. A policy
+// inside generated HTML alone cannot block that document navigating itself.
 export function sandboxHtml(html: string): string {
+  const policy =
+    "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; ";
+  const child =
+    '<!doctype html><meta http-equiv="Content-Security-Policy" content="' +
+    policy +
+    "frame-src 'none'" +
+    '"><meta name="referrer" content="no-referrer">' +
+    html;
+  const escaped = child
+    .replaceAll('&', '&amp;')
+    .replaceAll('"', '&quot;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;');
   return (
-    "<!doctype html><meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'\"><meta name=\"referrer\" content=\"no-referrer\">" +
-    html
+    '<!doctype html><meta http-equiv="Content-Security-Policy" content="' +
+    policy +
+    'frame-src about:' +
+    '"><meta name="referrer" content="no-referrer"><style>html,body{height:100%;margin:0;overflow:hidden}iframe{display:block;border:0;width:100%;height:100%}</style><iframe title="Prototype document" sandbox="allow-scripts" referrerpolicy="no-referrer" srcdoc="' +
+    escaped +
+    '"></iframe>'
   );
 }
