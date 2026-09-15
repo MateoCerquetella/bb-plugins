@@ -71,7 +71,7 @@ const activeContext = await Promise.all([
 ]);
 
 const directGitInstall =
-  'bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.3 --subdirectory plugins/taskboard --tag-prefix taskboard/';
+  'bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.4 --subdirectory plugins/taskboard --tag-prefix taskboard/';
 const hostMonitorGitInstall =
   'bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.2 --subdirectory plugins/host-monitor --tag-prefix host-monitor/';
 const usageGitInstall =
@@ -87,7 +87,7 @@ test('keeps Taskboard private and Git-buildable without npm publication hooks', 
     assert.equal(typeof rootManifest.scripts[script], 'string');
   }
   assert.equal(taskboardManifest.name, 'bb-plugin-taskboard');
-  assert.equal(taskboardManifest.version, '0.3.3');
+  assert.equal(taskboardManifest.version, '0.3.4');
   assert.equal(taskboardManifest.private, true);
   assert.equal('publishConfig' in taskboardManifest, false);
   assert.equal('files' in taskboardManifest, false);
@@ -111,7 +111,7 @@ test('keeps Taskboard private and Git-buildable without npm publication hooks', 
 
   const lockedTaskboard = rootLock.packages['plugins/taskboard'];
   const lockedSdk = rootLock.packages['node_modules/@get-bb/plugin-sdk'];
-  assert.equal(lockedTaskboard.version, '0.3.3');
+  assert.equal(lockedTaskboard.version, '0.3.4');
   assert.equal(lockedTaskboard.dependencies['@get-bb/plugin-sdk'], '0.4.6');
   assert.equal('@get-bb/plugin-sdk' in lockedTaskboard.devDependencies, false);
   assert.equal(lockedSdk.dev, undefined);
