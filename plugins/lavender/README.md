@@ -29,6 +29,11 @@ To return to the default palette, run `bb theme reset`. Disabling or removing La
 
 ## Preview
 
+New thread with sample projects, threads, and an unsent draft. The optional wallpaper shown is provided by Aura; Lavender supplies the UI colors.
+
+![Lavender dark New thread](../../docs/media/lavender/dark-new-thread.jpg)
+![Lavender light New thread](../../docs/media/lavender/light-new-thread.jpg)
+
 ![Lavender in dark mode](../../docs/media/lavender/dark-settings.png)
 ![Lavender in light mode](../../docs/media/lavender/light-settings.png)
 
