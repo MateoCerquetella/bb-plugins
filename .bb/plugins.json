@@ -38,6 +38,10 @@
     {
       "name": "aura",
       "source": "./plugins/aura"
+    },
+    {
+      "name": "lavender",
+      "source": "./plugins/lavender"
     }
   ]
 }
