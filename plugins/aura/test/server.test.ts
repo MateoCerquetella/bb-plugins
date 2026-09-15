@@ -77,6 +77,16 @@ test("image type must match bytes; legacy settings get the new scope default", a
   } finally { await host.harness.dispose(); }
 });
 
+test("versioned images use an immutable private browser cache", async () => {
+  const host = createFakePluginHost({ pluginId: "aura" }); plugin(host.bb);
+  try {
+    const saved = await host.harness.callRpc("apply", { settings: defaults, image: replace }) as Snapshot;
+    const response = await host.harness.fetchHttp("GET", `/image?v=${saved.image?.version}`);
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("cache-control"), "private, max-age=31536000, immutable");
+  } finally { await host.harness.dispose(); }
+});
+
 test("New thread dimmer toggles without replacing images or saved slots", async () => {
   const host = createFakePluginHost(); plugin(host.bb);
   try {

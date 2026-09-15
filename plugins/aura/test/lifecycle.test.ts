@@ -18,6 +18,10 @@ test("applies scoped backgrounds, disables cleanly and ignores a late fetch afte
     notifyChange({ settings: defaults, image: null, slots: [], activeSlot: null });
     assert.match(document.head.textContent!, /thread-detail-timeline-panel/);
     assert.ok(document.head.textContent!.includes(TARGETS));
+    assert.match(document.head.textContent!, /data-root-compose-mobile-recents.*letter-spacing:\.02em; text-transform:none/s);
+    assert.match(document.head.textContent!, /data-root-compose-mobile-recents.*data-overflow-fade.*display:none/s);
+    assert.match(document.head.textContent!, /:root:not\(\.dark\).*data-root-compose-mobile-recents.*background:color-mix\(in oklab,var\(--background\) 94%,transparent\)/s);
+    assert.match(document.head.textContent!, /\.dark.*data-root-compose-mobile-recents.*background:color-mix\(in oklab,var\(--background\) 30%,transparent\)/s);
     assert.ok(!document.head.textContent!.includes("aside"));
     assert.equal(document.querySelectorAll('.aura-capy-layer').length, 2);
     notifyChange({ settings: { ...defaults, newThreadOnly: true }, image: null, slots: [], activeSlot: null });
