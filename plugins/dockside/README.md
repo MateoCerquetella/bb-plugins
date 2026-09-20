@@ -136,7 +136,7 @@ never hidden.
 
 ### Snoozing
 
-The hover button snoozes until **09:00 tomorrow**.
+The Snooze button snoozes until **09:00 tomorrow**.
 
 ### Inline agents
 

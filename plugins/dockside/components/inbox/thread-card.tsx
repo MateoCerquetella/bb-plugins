@@ -302,7 +302,9 @@ export function ThreadCard({
                   data-dockside-root-time=""
                   className={cn(
                     "flex h-4 items-center justify-end gap-1.5",
-                    canPark && !selectionMode && "group-hover/root:hidden",
+                    canPark &&
+                      !selectionMode &&
+                      "[@media(hover:hover)]:group-hover/root:hidden",
                   )}
                 >
                   {preferences.showRelativeTime ? (
@@ -310,7 +312,7 @@ export function ThreadCard({
                   ) : null}
                 </span>
                 {canPark && !selectionMode ? (
-                  <span className="hidden h-4 items-center gap-0.5 group-hover/root:flex">
+                  <span className="hidden h-4 items-center gap-0.5 group-hover/root:flex [@media(hover:none)]:flex">
                     <ParkButton
                       label="Snooze until tomorrow"
                       icon="Clock"
