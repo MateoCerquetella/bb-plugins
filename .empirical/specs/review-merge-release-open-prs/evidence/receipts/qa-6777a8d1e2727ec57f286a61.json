@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-6777a8d1e2727ec57f286a61",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Verify the Dockside 0.1.5 release from a clean archived checkout with a fresh dependency install and clean tracked output.",
+  "passed": true,
+  "startedAt": "2026-09-21T17:18:49.062Z",
+  "completedAt": "2026-09-21T17:22:11.363Z",
+  "provenance": {
+    "repositoryId": "sha256:b503769d621265b1260d48e307b706764511b6e0b4ef2d36cb52800751c273c7",
+    "feature": "review-merge-release-open-prs",
+    "specRevision": 2,
+    "specDigest": "sha256:70424b72bef5bfbb582b8dab86f13d1f879c24d458b579216f97934697cf6165",
+    "treeDigest": "sha256:8c43d777e49c70ae69473cb8ee4d0b7be266a06619602ca60fc71975ac7b7977",
+    "policyDigest": "sha256:593bbd252bb2fbe423ab33a35f9f4ea2869e5b89423f2d528b42e434681e8e5b",
+    "workflowRevision": 6,
+    "gitCommit": "5dd9d17b0fea25abfb4ff98405590b4ce44157d9"
+  },
+  "digest": "sha256:769ed029872dd96f19b35dcbbc47766fc3147345ef210f00378c086a796e5b53",
+  "kind": "qa",
+  "matrixDigest": "sha256:7c837d4d842e2aa153f3ff0085cd25798d91600e9127af103531f96a6650ff1c",
+  "check": {
+    "id": "qa-clean-clone",
+    "kind": "clean-clone"
+  },
+  "coveredChecks": [
+    "clean-clone",
+    "cross-platform",
+    "integration",
+    "package-consumer"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "x64",
+    "node": "24.21.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Verify the Dockside 0.1.5 release from a clean archived checkout with a fresh dependency install and clean tracked output.",
+      "startedAt": "2026-09-21T17:18:49.062Z",
+      "completedAt": "2026-09-21T17:22:11.363Z",
+      "durationMs": 202301,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:7bf093ac6d03d792cbf228b4ef1772abb405a106ae50ecd0146a4e26e22a81b6",
+        "argv": [
+          "node",
+          ".empirical/specs/dockside-main-reconciliation/qa/portability.mjs"
+        ],
+        "cwd": ".",
+        "timeoutMs": 900000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH",
+          "TMPDIR"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:99c3bd4ffb92eb63c9383a42daa2418d13abd1200842c34f4c5abec000ad224e",
+        "stderrDigest": "sha256:895a3d132573254dd3584d1f387ed156967bc3d03abbeb7afe66a4217cdcd3fe",
+        "stdoutTail": "s (0.52562ms)\n  ✔ uses optional metadata and layout preferences without changing defaults (0.309329ms)\n  ✔ uses a semantic full-row selection target and keeps navigation separate (0.371963ms)\n✔ Dockside settings contract (24.850636ms)\n▶ isUnread\n  ✔ is bb's own rule: last read has to catch up with last attention (1.63598ms)\n  ✔ treats a never-read thread as unread (0.285498ms)\n✔ isUnread (4.597776ms)\n▶ isWithinSettledWindow\n  ✔ keeps a settle from inside the window (0.532994ms)\n  ✔ drops a settle older than the window (0.293704ms)\n  ✔ keeps a settle stamped in the future (0.293374ms)\n  ✔ is a day by default (0.357624ms)\n✔ isWithinSettledWindow (2.238882ms)\n▶ settledIndicator\n  ✔ draws nothing for a quiet thread (2.587559ms)\n  ✔ puts a raised hand above everything else (0.389091ms)\n  ✔ reports live work from the status (0.255923ms)\n  ✔ reports live work from an activity count alone (0.540048ms)\n  ✔ separates an unread failure from an unread success (0.439023ms)\n✔ settledIndicator (5.40861ms)\n▶ toSidebarThread\n  ✔ marks the thread archived, which is why this path exists (0.617998ms)\n  ✔ keeps only the origin kinds this sidebar draws (0.422413ms)\n  ✔ carries the fields the list sorts, filters, and searches on (0.348205ms)\n✔ toSidebarThread (1.850274ms)\n▶ mergeSettledThreads\n  ✔ adds the settled threads the host cannot report (0.799322ms)\n  ✔ lets the host win a collision (0.165177ms)\n  ✔ returns the host list unchanged when nothing is settled (0.366888ms)\n✔ mergeSettledThreads (1.840547ms)\n▶ pendingSettledCount\n  ✔ counts a settled thread the host cannot report (0.636448ms)\n  ✔ ignores a row that is not settled (0.268386ms)\n  ✔ ignores a settled thread the host still reports (0.265982ms)\n  ✔ drops a settle that has aged out of the window (16.960454ms)\n  ✔ counts each pending row once and nothing else (0.336307ms)\n  ✔ counts nothing when no row was seeded (0.275366ms)\n  ✔ reads any iterable of rows (0.343967ms)\n✔ pendingSettledCount (19.986725ms)\n▶ parseArchivedThreadIds\n  ✔ reads back what settle stored (0.331652ms)\n  ✔ gives nothing back for a missing or unusable value (0.563154ms)\n✔ parseArchivedThreadIds (1.259718ms)\n▶ statusColorRole\n  ✔ separates error, waiting, unread, working, and idle roles (1.900224ms)\n✔ statusColorRole (4.784054ms)\n▶ groupFamiliesByStatus\n  ✔ orders semantic sections, omits empty sections, and includes each family once (46.761039ms)\n✔ groupFamiliesByStatus (49.494941ms)\n▶ compact root card contract\n  ✔ keeps zero-child and no-PR roots on the same two-row skeleton (2.2277ms)\n  ✔ co-locates root PR and multiple-child controls in row two (0.619061ms)\n  ✔ looks up PR data only for the parent and never on child rows (0.556677ms)\n  ✔ truncates long title and branch text without shrinking metadata (0.554704ms)\n  ✔ keeps semantic, disclosure, provider, and reorder help keyboard-readable (0.73652ms)\n  ✔ keeps child status and disclosure-provider help keyboard-readable (0.469772ms)\n✔ compact root card contract (8.904173ms)\n▶ family status\n  ✔ uses the newest member update and requires every member to be quiet (1.665753ms)\n✔ family status (3.343802ms)\n▶ filterProjectThreadGroups\n  ✔ supports attention and quiet presets (1.905414ms)\n  ✔ uses inclusive family age boundaries (0.367848ms)\n  ✔ preserves project and family order without mutating the input (0.431966ms)\n✔ filterProjectThreadGroups (3.324934ms)\n▶ thread filter presentation\n  ✔ describes every preset once in the intended menu hierarchy (0.444942ms)\n✔ thread filter presentation (0.764234ms)\n▶ bulkEligibility\n  ✔ protects the current, working, waiting, unread, and pinned family (1.095712ms)\n  ✔ allows a quiet read family (0.287778ms)\n✔ bulkEligibility (1.853004ms)\n▶ selection helpers\n  ✔ selects eligible visible roots and prunes roots that disappeared (0.571261ms)\n  ✔ keeps a selected family visible after it stops matching the filter (0.575426ms)\n✔ selection helpers (1.41031ms)\n▶ applyRootSelection\n  ✔ ordinary clicks toggle one root and replace the anchor (0.665648ms)\n  ✔ selects inclusive forward and reverse Shift ranges (0.264974ms)\n  ✔ uses the clicked checked state to deselect a range (0.179023ms)\n  ✔ skips protected gaps omitted from eligible order (0.20025ms)\n  ✔ falls back to one toggle when the anchor is no longer visible (0.147507ms)\n  ✔ fails closed when the target is no longer eligible (0.083445ms)\n✔ applyRootSelection (1.937784ms)\n▶ resolveFamilyExpanded\n  ✔ keeps a family with no children closed (0.287872ms)\n  ✔ opens a child family by default and while search forces it (0.176921ms)\n  ✔ respects explicit open and closed overrides (0.142056ms)\n  ✔ uses the configured default until search or a user override wins (0.158043ms)\n✔ resolveFamilyExpanded (1.038752ms)\n▶ decodeWarmStartRows\n  ✔ round-trips what encodeWarmStartRows wrote (3.400435ms)\n  ✔ reads nothing stored as a miss (0.341953ms)\n  ✔ reads unparseable text as a miss (0.338935ms)\n  ✔ reads a payload that is not an array as a miss (0.156212ms)\n  ✔ keeps a hit with no rows apart from a miss (0.321893ms)\n  ✔ rejects a row without a usable thread id (0.260978ms)\n  ✔ rejects an entry that is not an object (0.296653ms)\n  ✔ rejects a timestamp the wire could not have produced (0.352934ms)\n  ✔ rejects a non-finite timestamp (0.484414ms)\n  ✔ reads an absent timestamp as null (0.445421ms)\n  ✔ rejects the whole payload when one row is bad (0.436176ms)\n  ✔ rejects more rows than the encoder would ever write (1.551005ms)\n  ✔ rejects an entry too long to be worth parsing (0.445156ms)\n✔ decodeWarmStartRows (12.305517ms)\n▶ encodeWarmStartRows\n  ✔ writes an array, which is the only shape that survives the trip (0.512937ms)\n  ✔ carries only the four fields a row is made of (0.265593ms)\n  ✔ caps the entry and keeps the newest parks (1.034687ms)\n  ✔ ranks a park by when it was made, not by when a snooze ends (0.356151ms)\n  ✔ keeps a fresh settle over a full cap of long snoozes (1.138668ms)\n✔ encodeWarmStartRows (3.981193ms)\n▶ readWarmStartRows\n  ✔ serves what was stored (0.976576ms)\n  ✔ does not throw when the store does (0.266697ms)\n  ✔ still serves from memory after the store failed (0.400305ms)\n  ✔ prefers the memory tier over what the store holds (0.324121ms)\n  ✔ drops an entry that did not decode (0.207652ms)\n  ✔ ignores an entry written under another version's key (0.197434ms)\n✔ readWarmStartRows (2.898338ms)\n▶ writeWarmStartRows\n  ✔ does not throw when the store does (0.330249ms)\n  ✔ writes under the versioned key (0.249547ms)\n  ✔ offers a refused value to the store again (0.366024ms)\n✔ writeWarmStartRows (1.245078ms)\n▶ decodeWarmStartProviders\n  ✔ round-trips providers (0.786703ms)\n  ✔ reads a miss as null (0.256122ms)\n  ✔ rejects a provider with no name to fall back to (0.18028ms)\n  ✔ rejects a provider whose name is blank (0.179331ms)\n  ✔ drops a logo that is not a same-origin path (0.428942ms)\n  ✔ drops a path that resolves onto another host (0.241902ms)\n  ✔ drops a path carrying the characters that end a CSS token (0.187261ms)\n  ✔ rejects an entry too long to be worth parsing (0.10101ms)\n✔ decodeWarmStartProviders (19.755922ms)\n▶ encodeWarmStartProviders\n  ✔ carries only the three fields the glyph reads (0.209419ms)\n✔ encodeWarmStartProviders (0.381219ms)\n▶ readWarmStartProviders\n  ✔ serves what was stored (0.394928ms)\n  ✔ survives a store that throws on every call (0.306523ms)\n  ✔ drops an entry that did not decode (0.226086ms)\n  ✔ ignores an entry written under another version's key (0.214093ms)\n✔ readWarmStartProviders (1.586696ms)\n▶ writeWarmStartProviders\n  ✔ does not throw when the store does (0.228071ms)\n  ✔ keeps its own versioned key (0.126353ms)\n✔ writeWarmStartProviders (0.51187ms)\nℹ tests 206\nℹ suites 59\nℹ pass 206\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 1354.293056\n\n> bb-plugin-dockside@0.1.5 build\n> bb plugin build .\n\nThis plugin vendors types/ — `bb plugin migrate` switches it to the @get-bb/plugin-sdk npm package.\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\nDockside reconciliation portability check passed: archived clean checkout, npm ci, focused Dockside test/type/build, all-workspace check, and clean tracked output.\n",
+        "stderrTail": "npm warn deprecated whatwg-encoding@3.1.1: Use @exodus/bytes instead for a more spec-conformant and faster implementation\nnpm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.\nnpm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead\nnpm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead\nnpm warn install-scripts 13 packages have install scripts not yet covered by allowScripts:\nnpm warn install-scripts   @google/genai@1.52.0 (preinstall: echo 'preinstall: no-op')\nnpm warn install-scripts   @parcel/watcher@2.5.6 (install: node scripts/build-from-source.js)\nnpm warn install-scripts   better-sqlite3@12.10.0 (install: prebuild-install || node-gyp rebuild --release)\nnpm warn install-scripts   better-sqlite3@12.11.1 (install: prebuild-install || node-gyp rebuild --release)\nnpm warn install-scripts   esbuild@0.28.2 (postinstall: node install.js)\nnpm warn install-scripts   fsevents@2.3.3 (install: (install scripts present))\nnpm warn install-scripts   node-pty@1.1.0 (install: node scripts/prebuild.js || node-gyp rebuild; postinstall: node scripts/post-install.js)\nnpm warn install-scripts   protobufjs@7.6.6 (postinstall: node scripts/postinstall)\nnpm warn install-scripts   better-sqlite3@12.10.0 (install: prebuild-install || node-gyp rebuild --release)\nnpm warn install-scripts   better-sqlite3@12.10.0 (install: prebuild-install || node-gyp rebuild --release)\nnpm warn install-scripts   better-sqlite3@12.10.0 (install: prebuild-install || node-gyp rebuild --release)\nnpm warn install-scripts   @google/genai@1.52.0 (preinstall: echo 'preinstall: no-op')\nnpm warn install-scripts   protobufjs@7.6.5 (postinstall: node scripts/postinstall)\nnpm warn install-scripts\nnpm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.\nThis plugin pins @get-bb/plugin-sdk 0.4.40; this bb's SDK is 0.4.21 — `bb plugin types` updates the pin.\n",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:8c43d777e49c70ae69473cb8ee4d0b7be266a06619602ca60fc71975ac7b7977",
+      "sourceTreeAfter": "sha256:8c43d777e49c70ae69473cb8ee4d0b7be266a06619602ca60fc71975ac7b7977",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

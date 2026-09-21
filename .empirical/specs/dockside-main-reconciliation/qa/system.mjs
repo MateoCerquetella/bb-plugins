@@ -33,8 +33,11 @@ assert.ok(mergeParents.includes(MAIN), "merge contains current main parent");
 
 for (const plugin of [
   "action-topbar",
+  "aura",
+  "clean-my-context",
   "dockside",
   "host-monitor",
+  "lavender",
   "save-my-model",
   "taskboard",
   "touchbar",
@@ -53,8 +56,11 @@ const trackedPlugins = run("git", ["ls-files", "plugins/*/package.json"])
   .sort();
 assert.deepEqual(trackedPlugins, [
   "action-topbar",
+  "aura",
+  "clean-my-context",
   "dockside",
   "host-monitor",
+  "lavender",
   "save-my-model",
   "taskboard",
   "touchbar",
