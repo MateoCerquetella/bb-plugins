@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "generator": "empirical-0.34.0",
-  "sourceDigest": "sha256:b36f42d8a28866e605cfe030979be4bfdea8f1fca7786e40122576c59593e815",
+  "sourceDigest": "sha256:6e430befbe0f0c5ad3a26b1fd158781697d3be80044e65a20fb3dd5ed8fd9c30",
   "files": [
     {
       "path": ".agents/skills/empirical/SKILL.md",
@@ -216,7 +216,7 @@
     {
       "path": "plugins/aura/README.md",
       "size": 4401,
-      "digest": "sha256:0ec7ba80f51aaf15400310f308b50a1d26277a33993510f016ec2570b6085a8a"
+      "digest": "sha256:21aaec29c2337cf07156834012eba33fd4829beaddeddd7d4469097c76ec5bd9"
     },
     {
       "path": "plugins/aura/THIRD_PARTY_NOTICES.md",
@@ -2177,7 +2177,7 @@
         "plugins/usage-tracker/tsconfig.json",
         "plugins/usage-tracker/types/css-modules.d.ts"
       ],
-      "sourceDigest": "sha256:b36f42d8a28866e605cfe030979be4bfdea8f1fca7786e40122576c59593e815",
+      "sourceDigest": "sha256:6e430befbe0f0c5ad3a26b1fd158781697d3be80044e65a20fb3dd5ed8fd9c30",
       "digest": "sha256:eed9cfd95fdecbf70535c9b9bfdb204011bdad5af0a5418d4d923f3a99f354f2",
       "freshness": "fresh"
     },
@@ -2218,7 +2218,7 @@
         "plugins/usage-tracker/README.md",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:8f02a1f742515cd408ddf9b0d3a94712ffa3d0c3ad6245a96768aa5e5cb9f3ce",
+      "sourceDigest": "sha256:25130e27e815865cd4a03ddf8a51479ae6ebfedeb67669f5bf7599f4412e7291",
       "digest": "sha256:37f1b782a0e88dee101030bf6ac6aa2742c329ca37daf764d5022e793ce6bc15",
       "freshness": "fresh"
     },
@@ -2350,5 +2350,5 @@
     }
   ],
   "truncated": false,
-  "digest": "sha256:023fc425975210fa85907b21e2bc2d5396cdf62cdd65ff0126835e8c39cc0efd"
+  "digest": "sha256:efebe0c5b3a801548788fd75937ba9f4ec933b36c85cd5e5920a6c09243b02fb"
 }
