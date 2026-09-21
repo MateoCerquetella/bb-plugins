@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:9729e8e4d49d0cfe844640c4a83e01f25c216a375205245d25ecd7a51e7e379e",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "da38cfedd3dd4aad596c31bd653ec9ba00adee33",
+  "headCommit": "14098d82b893225eb2832a13a72333429d28690d",
+  "diffDigest": "sha256:d449829ecb3bab3677ba5d6d14e633f0bdafeff0aff8dc23881728e86100d09d",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "codex-fresh-isolated-reviewer",
+  "reviewerInvocationId": "release_journal_fresh_review:9729e8e4d49d0cfe844640c4a83e01f25c216a375205245d25ecd7a51e7e379e",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- FAIL AC-1: Dockside Cards docs misdescribe the unified working spinner and optional verbose badges; root README labels Aura local-only.\n- PASS AC-2: Command-backed focused and distribution checks pass.\n- PASS AC-3: Isolation and primary checkout preservation are proven.\n- PASS AC-4: Exactly one safe annotated patch tag per plugin is planned.\n- FAIL AC-5: Root release-facing docs omit Aura from immutable Git release surfaces.\n- PASS AC-6: Focused, clean-source, package, system, and cross-platform checks pass.\n\n## Security / correctness\n\nNo unresolved security or accessibility issue; prior Dockside code defects are fixed.\n\n## Design / maintainability\n\nUpdate Dockside Cards docs to icon-first/unified spinner/optional badges and root Aura distribution labels.",
+  "bodyDigest": "sha256:613e6285dbba8c689eda6da10e48d373d450daa2d9df01b0d2c3aaec494e1127",
+  "digest": "sha256:c90ceef5e7f9a57d684cced58bdc80adb872b41fe2d96cb9ef097e23a1a3eed7"
+}

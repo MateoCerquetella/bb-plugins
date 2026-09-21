@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "packetDigest": "sha256:b44dbff70cc31f43adf24653b11977e536b150d6400e5d75abfc86eea40de541",
-  "resultPath": ".empirical/specs/review-merge-release-open-prs/reviews/d85b949c1ac5d4e59393e8dd.json",
-  "resultDigest": "sha256:d85b949c1ac5d4e59393e8dd95cea4f59cf6a94b23a493feeb772a7884612c33",
-  "receiptId": "collected-fe2aebafffa3de612a3fb579"
+  "packetDigest": "sha256:9729e8e4d49d0cfe844640c4a83e01f25c216a375205245d25ecd7a51e7e379e",
+  "resultPath": ".empirical/specs/review-merge-release-open-prs/reviews/c90ceef5e7f9a57d684cced5.json",
+  "resultDigest": "sha256:c90ceef5e7f9a57d684cced58bdc80adb872b41fe2d96cb9ef097e23a1a3eed7",
+  "receiptId": "collected-d836992879b534173c62e532"
 }
