@@ -25,5 +25,7 @@
   "review": {
     "mode": "fresh-context",
     "reviewerTokenEnv": "EMPIRICAL_REVIEWER_TOKEN"
-  }
+  },
+  "activationMode": "explicit",
+  "mockupsBeforeCoding": true
 }

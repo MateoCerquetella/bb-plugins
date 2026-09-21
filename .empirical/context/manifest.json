@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "generator": "empirical-0.31.0",
-  "sourceDigest": "sha256:239ea129c6f18179983a2daf5558f7220be4f92142552e9b3f11e5c8c66b21e2",
+  "generator": "empirical-0.34.0",
+  "sourceDigest": "sha256:5ae0b3cba501091f34a017b92e074f463d8b28ec6e6b81b0cd2dfe76b9693053",
   "files": [
     {
       "path": ".agents/skills/empirical/SKILL.md",
@@ -10,8 +10,8 @@
     },
     {
       "path": ".bb/plugins.json",
-      "size": 811,
-      "digest": "sha256:a55130437086c4b81166ef09b42b3819fa9f5ff618116d8278b184b6ae6b68a6"
+      "size": 955,
+      "digest": "sha256:1c3f7cff6ed51256c213abe5ecb9047662bca2a73f5fe5b8b9d822f37837ecd6"
     },
     {
       "path": ".claude/skills/empirical/SKILL.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "size": 13404,
-      "digest": "sha256:e43fd01c63893c622be0c4647f8165c7b85bbffe4bfed70db120ef149c224bf4"
+      "size": 13947,
+      "digest": "sha256:305a9d3941f33098f70b3f554ce4fb3ef417e129d7d04bd6e142839dbda1bdb3"
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -100,8 +100,8 @@
     },
     {
       "path": "package-lock.json",
-      "size": 298190,
-      "digest": "sha256:ade780293289402116c161c2d6e2205ff22513d1579a1886991fabc9c6eeadf2"
+      "size": 364700,
+      "digest": "sha256:74435ef855954437f16568783bd77a2f66abfdb7c6d0591713980ec95c6f07b3"
     },
     {
       "path": "package.json",
@@ -199,6 +199,141 @@
       "digest": "sha256:35d26ea66c86da9701e4f4b467913481ffeae910761cea34c775c5dacb7f8eaa"
     },
     {
+      "path": "plugins/aura/.gitignore",
+      "size": 20,
+      "digest": "sha256:58aea3d6b4b0f8799c1e00c3b023898516997f6369ee8e13d8d4b4215f70a62b"
+    },
+    {
+      "path": "plugins/aura/CHANGELOG.md",
+      "size": 803,
+      "digest": "sha256:22953427ce4e6ddb6880cc9740ed5e007d9c898a2681a3e18a6dab22a3089491"
+    },
+    {
+      "path": "plugins/aura/LICENSE",
+      "size": 1074,
+      "digest": "sha256:d73e86b0d180da7359d03c23a6378eca5177f6a9ffc0e2c51c5b4a1dcf17391c"
+    },
+    {
+      "path": "plugins/aura/README.md",
+      "size": 4401,
+      "digest": "sha256:0ec7ba80f51aaf15400310f308b50a1d26277a33993510f016ec2570b6085a8a"
+    },
+    {
+      "path": "plugins/aura/THIRD_PARTY_NOTICES.md",
+      "size": 1326,
+      "digest": "sha256:ea331deb3081afa7d6e68f72b2903ad6f1cacc2f2e2e24529b3bcb9506afd213"
+    },
+    {
+      "path": "plugins/aura/app.css",
+      "size": 8498,
+      "digest": "sha256:ca706e4888a7b2291ee3622efeb5e8f24263b2a8a52daf0959ac5ef32ef6f3ec"
+    },
+    {
+      "path": "plugins/aura/app.tsx",
+      "size": 15062,
+      "digest": "sha256:cbcd7d8f920896f971ddec4ff6dfa44be6619082c1292c8bd3d223a6a6fa538b"
+    },
+    {
+      "path": "plugins/aura/assets/icon.svg",
+      "size": 289,
+      "digest": "sha256:5e1855866c03cdc0737805faed1ee56100510f274521c8e9a9f91cbc45ddba05"
+    },
+    {
+      "path": "plugins/aura/lib/background.ts",
+      "size": 10415,
+      "digest": "sha256:cb448bd82d0f340ce243b7c35be301945262f0faf77e3a128da45bdb7249a155"
+    },
+    {
+      "path": "plugins/aura/lib/capy-effect.ts",
+      "size": 12449,
+      "digest": "sha256:6e233fc3b6363ab1c9ef8aa1596512a6d23cab8aa708a2859032162dff2fe14e"
+    },
+    {
+      "path": "plugins/aura/lib/capy-shaders.ts",
+      "size": 18352,
+      "digest": "sha256:b5234201c71050590b29d6eb1c14a81f172dd4b0a661f0d7ace3fc91947c943e"
+    },
+    {
+      "path": "plugins/aura/lib/image.ts",
+      "size": 2559,
+      "digest": "sha256:9ecfbc22021688528f747e0956b4a3add520e156946797c68cc7ca48cdedddf8"
+    },
+    {
+      "path": "plugins/aura/lib/model.ts",
+      "size": 2352,
+      "digest": "sha256:64093c75ba6b5120967d331977f9bb61b2bd205a86d341248ff0105a41e12219"
+    },
+    {
+      "path": "plugins/aura/lib/photo-shader.ts",
+      "size": 699,
+      "digest": "sha256:ff53f22a64aa1279e57dc3f09ed48409a912e89e09c0746b72cb2783cd75a63b"
+    },
+    {
+      "path": "plugins/aura/lib/upload.ts",
+      "size": 2160,
+      "digest": "sha256:8099d1480620af12f73207668bb0894b43ee9d7a37984713a12ba6b4b5200853"
+    },
+    {
+      "path": "plugins/aura/licenses/PAPER-SHADERS-APACHE-2.0.txt",
+      "size": 11357,
+      "digest": "sha256:c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    {
+      "path": "plugins/aura/package.json",
+      "size": 1617,
+      "digest": "sha256:40d9abc0de42f147c7dcd1d01b8e637ba2154632ff11fc2c75739038048b6e09"
+    },
+    {
+      "path": "plugins/aura/server.ts",
+      "size": 8378,
+      "digest": "sha256:80c34fe9ccb9a2fbc66e80f29f8383373462ac37fe548fc8715ddcf4329fa67d"
+    },
+    {
+      "path": "plugins/aura/test/half-wallpaper.browser.mjs",
+      "size": 3910,
+      "digest": "sha256:d1d0b422e339606ded58e324fbd95b67709a8ca0ebd9103926dd7058ed462873"
+    },
+    {
+      "path": "plugins/aura/test/lifecycle.test.ts",
+      "size": 4695,
+      "digest": "sha256:c869cc6f450abbdd209bf4cf1627a00ae34d6b0312c07d8af52bc39928a77d54"
+    },
+    {
+      "path": "plugins/aura/test/live-browser.mjs",
+      "size": 5841,
+      "digest": "sha256:27b651a6127f630a2324b9b71d616a065398be979239c79bf89c478ba6632542"
+    },
+    {
+      "path": "plugins/aura/test/promo.browser.mjs",
+      "size": 4642,
+      "digest": "sha256:c184347cb374e9b458605fbfa261502db51995690824da267bd8b5c59382b8c0"
+    },
+    {
+      "path": "plugins/aura/test/readability.browser.mjs",
+      "size": 3441,
+      "digest": "sha256:525ecf5d32ceb0ea6e0bab67081d25f6eddf526cc54a459d1f8fb551ef83e7f8"
+    },
+    {
+      "path": "plugins/aura/test/server.test.ts",
+      "size": 7433,
+      "digest": "sha256:6b08c499681151abdb58cf5c5e52e2ea0cacb428c0645cdc6fa0f4b231c88739"
+    },
+    {
+      "path": "plugins/aura/test/table-readability.browser.mjs",
+      "size": 3653,
+      "digest": "sha256:87fd8991527b945c6ddba35f30c069585edc45d73dc7b9d3317c0ed7b7bb5f67"
+    },
+    {
+      "path": "plugins/aura/tsconfig.json",
+      "size": 426,
+      "digest": "sha256:91570f40da9694882622d4079a91bc01fe6607697c2a8cb1f95d9a16faf89fdb"
+    },
+    {
+      "path": "plugins/aura/types/css.d.ts",
+      "size": 24,
+      "digest": "sha256:35d26ea66c86da9701e4f4b467913481ffeae910761cea34c775c5dacb7f8eaa"
+    },
+    {
       "path": "plugins/clean-my-context/.gitignore",
       "size": 20,
       "digest": "sha256:58aea3d6b4b0f8799c1e00c3b023898516997f6369ee8e13d8d4b4215f70a62b"
@@ -290,8 +425,8 @@
     },
     {
       "path": "plugins/dockside/README.md",
-      "size": 10553,
-      "digest": "sha256:291ccfdd7cdb4e347afdab1c3b539a648bad8126f74cba5fbbcde48dd23c8df0"
+      "size": 11572,
+      "digest": "sha256:48a7367f40da305a6d959015563547093361d129e35570a5e65fb77f2b910a80"
     },
     {
       "path": "plugins/dockside/THIRD_PARTY_NOTICES.md",
@@ -330,13 +465,13 @@
     },
     {
       "path": "plugins/dockside/components/inbox/family-status.tsx",
-      "size": 3200,
-      "digest": "sha256:4610e79a4b845acd3d8b3c0eeac8f10cb852fd08b8c0ed826cc4e49ac41041a2"
+      "size": 3166,
+      "digest": "sha256:ff510d8d543ab9d24115fd69481aa3c2c2fb7a58ef0264add841407dd879a307"
     },
     {
       "path": "plugins/dockside/components/inbox/filter-menu.tsx",
-      "size": 1518,
-      "digest": "sha256:4ccb5345af36866c1cd96db982118e21518e28deaa40de03c6971fbce38a87b5"
+      "size": 3101,
+      "digest": "sha256:89f702daacdde3203e87c50e6d71bc659ec80953c44475912147f2942e6bb9fd"
     },
     {
       "path": "plugins/dockside/components/inbox/parent-chip.tsx",
@@ -365,13 +500,28 @@
     },
     {
       "path": "plugins/dockside/components/inbox/slim-row.tsx",
-      "size": 4448,
-      "digest": "sha256:9b56db8d4df13700b8e2b7699d962daebc9849129a78d13a4dec184590ff0a32"
+      "size": 4726,
+      "digest": "sha256:1797d64466f180ee3fad8cc08f8b59eec7557d049a28fb4c09888abf881ff662"
     },
     {
       "path": "plugins/dockside/components/inbox/status-glyph.tsx",
-      "size": 4701,
-      "digest": "sha256:4a8b5374091dfc1ef0d9508a62e2f034874f3bb6f8b7820f43cab7c9c9ebb6d7"
+      "size": 2286,
+      "digest": "sha256:4768174f3eb40001154bdb79b0dfeee071a1524aec4676ae68f53dd90623bc25"
+    },
+    {
+      "path": "plugins/dockside/components/inbox/status-group.tsx",
+      "size": 3770,
+      "digest": "sha256:98de1b4e14c0cb8fbb2a4c928c7ccc9ea7bd7ccea2a0d943d8c88c3fbac75d6b"
+    },
+    {
+      "path": "plugins/dockside/components/inbox/status-mark.css",
+      "size": 963,
+      "digest": "sha256:d5ac2b10db06d39df11b5ed5a040cb765e018770802eb65648bebbe5f9be2a2d"
+    },
+    {
+      "path": "plugins/dockside/components/inbox/status-mark.tsx",
+      "size": 1628,
+      "digest": "sha256:bea5b28b309504949c99127a7252d1bc066cd4dea7e4e665cc8dcaed3404af0c"
     },
     {
       "path": "plugins/dockside/components/inbox/status-slot.tsx",
@@ -385,18 +535,23 @@
     },
     {
       "path": "plugins/dockside/components/inbox/thread-card.tsx",
-      "size": 24998,
-      "digest": "sha256:36ffeb28cbcebe6d6563780ef39526eb971306444a5e01c81a357c0f42c11a41"
+      "size": 24932,
+      "digest": "sha256:720e344b5a48cb811a4d1acdc477831adab2ddbbe2cae70204b1343a970164d1"
     },
     {
       "path": "plugins/dockside/components/inbox/thread-inbox.tsx",
-      "size": 30003,
-      "digest": "sha256:cfa56b8f7c978477016ef11ba9a3f8e8157c5429cc2fadceee1c8e60908f71ce"
+      "size": 31069,
+      "digest": "sha256:a15867ab33d8b3cb4a4485e275b3c5f2f108717baf3c2a1badcce75a3bde42c2"
     },
     {
       "path": "plugins/dockside/components/settings/dockside-settings.tsx",
-      "size": 14171,
-      "digest": "sha256:bbdcd61df588f87d58bbddb9ad6d59fa08a3c20f15541686012d59146e543af5"
+      "size": 14511,
+      "digest": "sha256:a7af3d8fb46fd81fda6f19b65fb2b3309b6759ce66fd845d13b09fd64bf71fda"
+    },
+    {
+      "path": "plugins/dockside/components/styles.d.ts",
+      "size": 79,
+      "digest": "sha256:1b0d084d7c68229c19e340930d306533e1164c6e9e245d39d42bd29a02716f10"
     },
     {
       "path": "plugins/dockside/components/ui/icon.tsx",
@@ -405,8 +560,8 @@
     },
     {
       "path": "plugins/dockside/components/ui/select.tsx",
-      "size": 4948,
-      "digest": "sha256:87bbc998424530d3eded0ef5805dd8518810c273ccccc8de2d499d1d14070c5b"
+      "size": 5903,
+      "digest": "sha256:3e7bed41afdaab2ab18ff420c06ad8fefcbab9ff99f52e199945a0b1d9258ed4"
     },
     {
       "path": "plugins/dockside/hooks/use-lifecycle.ts",
@@ -465,8 +620,8 @@
     },
     {
       "path": "plugins/dockside/lib/preferences.ts",
-      "size": 7028,
-      "digest": "sha256:0f897bed7c0f9115cdb05c33de808522f431b0ba19eef6ea1ad6938ad012ea40"
+      "size": 7233,
+      "digest": "sha256:9794c0e6efd6eee63ca0f1f1ae46aaa937a7b249ed887b3608be4ffdb96bb212"
     },
     {
       "path": "plugins/dockside/lib/project-color-store.ts",
@@ -504,14 +659,19 @@
       "digest": "sha256:0dbc78505c453e773ffffa9cbd3b71df774f706d0586fc0cc639576fc8e7c99d"
     },
     {
+      "path": "plugins/dockside/lib/status-groups.ts",
+      "size": 1149,
+      "digest": "sha256:b421ca34a1bf8ce12f5d386af8fbb9b1d7ef68543b7356f7a5f23305a7e58321"
+    },
+    {
       "path": "plugins/dockside/lib/status-presentation.ts",
       "size": 747,
       "digest": "sha256:7aca3d6f2310a0ac89c09052ce3007e1c049195e77da5d0c28a2d6bee6e50cb5"
     },
     {
       "path": "plugins/dockside/lib/thread-management.ts",
-      "size": 7737,
-      "digest": "sha256:300e06811bb7771959908ed7569b2491b2d2f219302a3a4d92f87ccc828385dc"
+      "size": 8932,
+      "digest": "sha256:0a19f61dd1652a2364f77935779f762f8f9778eb5a77064dbe5e244de802a7ee"
     },
     {
       "path": "plugins/dockside/lib/utils.ts",
@@ -526,12 +686,12 @@
     {
       "path": "plugins/dockside/package.json",
       "size": 2142,
-      "digest": "sha256:e3f36dbbce0dc7fbca8d527d8e867659589b8da796ad5817bddbcfddc35dded9"
+      "digest": "sha256:cd68174c077945e6ec6a4af6adcdc8edaf0e87b0f71fc1602abfa8ef5901135f"
     },
     {
       "path": "plugins/dockside/server.ts",
-      "size": 27946,
-      "digest": "sha256:9db262e6a816e74fdde8e31b8f329fdc23431455659ed95a92ab7f30155ef4f6"
+      "size": 28239,
+      "digest": "sha256:29b9808dc0eaeb81f4851a9caf64f24f6d55fbb2b7130eb6fe43b8aaa550b833"
     },
     {
       "path": "plugins/dockside/test/attention-state.test.ts",
@@ -546,7 +706,7 @@
     {
       "path": "plugins/dockside/test/distribution-contract.test.ts",
       "size": 1684,
-      "digest": "sha256:f16c5ca398f464e358ab12d6dde3ea346739f6330add34fa3dab1c28dd7d7060"
+      "digest": "sha256:7ba3fccab751e7b82ca0692bd74de2b0fa7b2a90212b96dedb14751a79d64f5e"
     },
     {
       "path": "plugins/dockside/test/family-order.test.ts",
@@ -557,6 +717,11 @@
       "path": "plugins/dockside/test/family-status.test.ts",
       "size": 3394,
       "digest": "sha256:f91dedf975f44808699b49fb41f54e5e62c0828094fb98f4d2b0557d2e5e123a"
+    },
+    {
+      "path": "plugins/dockside/test/filter-ui-contract.test.ts",
+      "size": 1641,
+      "digest": "sha256:f42e36f7e01cf47aa682b16ffbad805f821aa92754e44c0b28e93e167c1b1102"
     },
     {
       "path": "plugins/dockside/test/inbox.test.ts",
@@ -570,8 +735,8 @@
     },
     {
       "path": "plugins/dockside/test/preferences.test.ts",
-      "size": 4249,
-      "digest": "sha256:7e309752756231e8856d27ebf8f20cbe5ba25bbb569db91c9e161f7d315e8802"
+      "size": 4924,
+      "digest": "sha256:1d94782362631336c1442dcc9db5999ae1b557681ab042c602fbf8bc3bfcd023"
     },
     {
       "path": "plugins/dockside/test/project-color-store.test.ts",
@@ -605,8 +770,8 @@
     },
     {
       "path": "plugins/dockside/test/settings-contract.test.ts",
-      "size": 5195,
-      "digest": "sha256:508f2540fe9ba4420dfe1a7fd37a4f68a6828c68ddfd214d329a96762f5d0c33"
+      "size": 5218,
+      "digest": "sha256:d53fdc69e9048d205317cd8dbc9b28db7902076a3a48020a5d641e4aa3185fd6"
     },
     {
       "path": "plugins/dockside/test/settled-threads.test.ts",
@@ -619,14 +784,19 @@
       "digest": "sha256:c399afbe2413de1e9ca7077b078aa33eba356c17f7fb1055c5ec8dbac114c9d8"
     },
     {
+      "path": "plugins/dockside/test/status-groups.test.ts",
+      "size": 2108,
+      "digest": "sha256:5ec3cbbe826bc61ac9611331909de1696da369f3e2334098986d7d8122747be2"
+    },
+    {
       "path": "plugins/dockside/test/thread-card-layout.test.ts",
-      "size": 4234,
-      "digest": "sha256:156fdde2d34f8f416054d61c329e50f3d6ad945e6aee80bf987f0befa00f7488"
+      "size": 4289,
+      "digest": "sha256:8189635ff3a13acd542c37a47cea57f58b06616e11704c1688cde17a2fb9ad02"
     },
     {
       "path": "plugins/dockside/test/thread-management.test.ts",
-      "size": 10591,
-      "digest": "sha256:aee622db66469f87d67d93c2f47d99b757f62cc215bc350a69f4e53bbe69e5f8"
+      "size": 11581,
+      "digest": "sha256:1ae8eb845245239fd95acbf0cf4478c942bf19caa890be6c269fd3821c577b2c"
     },
     {
       "path": "plugins/dockside/test/warm-start.test.ts",
@@ -892,6 +1062,71 @@
       "path": "plugins/host-monitor/types/css-modules.d.ts",
       "size": 24,
       "digest": "sha256:35d26ea66c86da9701e4f4b467913481ffeae910761cea34c775c5dacb7f8eaa"
+    },
+    {
+      "path": "plugins/lavender/.gitignore",
+      "size": 20,
+      "digest": "sha256:58aea3d6b4b0f8799c1e00c3b023898516997f6369ee8e13d8d4b4215f70a62b"
+    },
+    {
+      "path": "plugins/lavender/CHANGELOG.md",
+      "size": 207,
+      "digest": "sha256:1e416c7935fc45a525fc3c3322027b71a0a4174f988052d7737020cb99ccefd5"
+    },
+    {
+      "path": "plugins/lavender/LICENSE",
+      "size": 1074,
+      "digest": "sha256:d73e86b0d180da7359d03c23a6378eca5177f6a9ffc0e2c51c5b4a1dcf17391c"
+    },
+    {
+      "path": "plugins/lavender/PLUGIN_OVERVIEW.md",
+      "size": 544,
+      "digest": "sha256:5abaef8d4aa14de93755552aa45d175c55c9e6d004dc923006906b465014c318"
+    },
+    {
+      "path": "plugins/lavender/README.md",
+      "size": 1991,
+      "digest": "sha256:70b1df7d44a79b71dc931b1e476b4b700528ebb0e7b462adbc943b5d7e9cab0e"
+    },
+    {
+      "path": "plugins/lavender/assets/icon.svg",
+      "size": 290,
+      "digest": "sha256:f1617faeac51fb851efd9252ed35d00469713093ee3cc74dadbc4f2ca9a3fa07"
+    },
+    {
+      "path": "plugins/lavender/package.json",
+      "size": 1471,
+      "digest": "sha256:9b0c21ab9332f31d730df0b44e57f1d221738bbbdc4735568761f8ccc53d2477"
+    },
+    {
+      "path": "plugins/lavender/server.ts",
+      "size": 182,
+      "digest": "sha256:ea6b620788a9a16b6504ecee1a6fc33d96e3a2ae9acf56c2cea5c31371f2fbcd"
+    },
+    {
+      "path": "plugins/lavender/test/palette.test.mjs",
+      "size": 2667,
+      "digest": "sha256:943e16c8e61ab7075163795a7346b61dcb1fe8667b4320fdfb682cf9ef3ed83c"
+    },
+    {
+      "path": "plugins/lavender/themes/lavender-dark.json",
+      "size": 1837,
+      "digest": "sha256:749f0235bcd706cd39e718f3cbb47584fb0f4fafe4e98468486fcb5c07c1d9e6"
+    },
+    {
+      "path": "plugins/lavender/themes/lavender-light.json",
+      "size": 1839,
+      "digest": "sha256:32822b8c8a144a5c0767c71e4374063addc638b32277692043fb7ca0a9b56f5d"
+    },
+    {
+      "path": "plugins/lavender/themes/lavender.css",
+      "size": 2894,
+      "digest": "sha256:665e23ea6d9aa841abd50840053ebd278165b78453391507c34850e3b6c20758"
+    },
+    {
+      "path": "plugins/lavender/tsconfig.json",
+      "size": 215,
+      "digest": "sha256:55a4e8e67a306d5b176ad8fe414b21942b37c11f6fdc6b844f39e2bddda2c1a8"
     },
     {
       "path": "plugins/save-my-model/README.md",
@@ -1196,7 +1431,7 @@
     {
       "path": "plugins/taskboard/test/distribution.test.ts",
       "size": 6759,
-      "digest": "sha256:f94572780a9e7b3c68c928b61a12170f9678551c9a9dbf9db305953d9b08da74"
+      "digest": "sha256:330ff90c1110f50af295e43d11dc1ec58bdaf1668268ce29e6b63397b021ceae"
     },
     {
       "path": "plugins/taskboard/test/filter-presets-backend.test.ts",
@@ -1241,7 +1476,7 @@
     {
       "path": "plugins/touchbar/README.md",
       "size": 8519,
-      "digest": "sha256:5b6594fb787db8d870088667404a968269f560ba5a56dbf6784e3f2122ee5b6e"
+      "digest": "sha256:3c037867896b4f5aeb18f262b2436e1088204ef924e4a12be9cd5f563803cbe7"
     },
     {
       "path": "plugins/touchbar/assets/icon.svg",
@@ -1391,7 +1626,7 @@
     {
       "path": "plugins/touchbar/package.json",
       "size": 1336,
-      "digest": "sha256:a127ab88239b0c29a8efec0c66fc2c578f42e7fefa374d933f3f8b90bc02dd9f"
+      "digest": "sha256:9d1b41140cda7563941410e7d48576ec54c5bf8acc5b17f3978304311a520e45"
     },
     {
       "path": "plugins/touchbar/server.ts",
@@ -1577,7 +1812,7 @@
   "pages": [
     {
       "path": ".empirical/context/index.md",
-      "generator": "empirical-0.31.0",
+      "generator": "empirical-0.34.0",
       "managed": false,
       "dependencies": [
         ".agents/skills/empirical/SKILL.md",
@@ -1619,6 +1854,33 @@
         "plugins/action-topbar/test/tab-model.test.ts",
         "plugins/action-topbar/tsconfig.json",
         "plugins/action-topbar/types/css-modules.d.ts",
+        "plugins/aura/.gitignore",
+        "plugins/aura/CHANGELOG.md",
+        "plugins/aura/LICENSE",
+        "plugins/aura/README.md",
+        "plugins/aura/THIRD_PARTY_NOTICES.md",
+        "plugins/aura/app.css",
+        "plugins/aura/app.tsx",
+        "plugins/aura/assets/icon.svg",
+        "plugins/aura/lib/background.ts",
+        "plugins/aura/lib/capy-effect.ts",
+        "plugins/aura/lib/capy-shaders.ts",
+        "plugins/aura/lib/image.ts",
+        "plugins/aura/lib/model.ts",
+        "plugins/aura/lib/photo-shader.ts",
+        "plugins/aura/lib/upload.ts",
+        "plugins/aura/licenses/PAPER-SHADERS-APACHE-2.0.txt",
+        "plugins/aura/package.json",
+        "plugins/aura/server.ts",
+        "plugins/aura/test/half-wallpaper.browser.mjs",
+        "plugins/aura/test/lifecycle.test.ts",
+        "plugins/aura/test/live-browser.mjs",
+        "plugins/aura/test/promo.browser.mjs",
+        "plugins/aura/test/readability.browser.mjs",
+        "plugins/aura/test/server.test.ts",
+        "plugins/aura/test/table-readability.browser.mjs",
+        "plugins/aura/tsconfig.json",
+        "plugins/aura/types/css.d.ts",
         "plugins/clean-my-context/.gitignore",
         "plugins/clean-my-context/README.md",
         "plugins/clean-my-context/app.test.tsx",
@@ -1654,11 +1916,15 @@
         "plugins/dockside/components/inbox/row-metadata.tsx",
         "plugins/dockside/components/inbox/slim-row.tsx",
         "plugins/dockside/components/inbox/status-glyph.tsx",
+        "plugins/dockside/components/inbox/status-group.tsx",
+        "plugins/dockside/components/inbox/status-mark.css",
+        "plugins/dockside/components/inbox/status-mark.tsx",
         "plugins/dockside/components/inbox/status-slot.tsx",
         "plugins/dockside/components/inbox/subagents-chip.tsx",
         "plugins/dockside/components/inbox/thread-card.tsx",
         "plugins/dockside/components/inbox/thread-inbox.tsx",
         "plugins/dockside/components/settings/dockside-settings.tsx",
+        "plugins/dockside/components/styles.d.ts",
         "plugins/dockside/components/ui/icon.tsx",
         "plugins/dockside/components/ui/select.tsx",
         "plugins/dockside/hooks/use-lifecycle.ts",
@@ -1680,6 +1946,7 @@
         "plugins/dockside/lib/pull-request-presentation.ts",
         "plugins/dockside/lib/relative-time.ts",
         "plugins/dockside/lib/settled-threads.ts",
+        "plugins/dockside/lib/status-groups.ts",
         "plugins/dockside/lib/status-presentation.ts",
         "plugins/dockside/lib/thread-management.ts",
         "plugins/dockside/lib/utils.ts",
@@ -1691,6 +1958,7 @@
         "plugins/dockside/test/distribution-contract.test.ts",
         "plugins/dockside/test/family-order.test.ts",
         "plugins/dockside/test/family-status.test.ts",
+        "plugins/dockside/test/filter-ui-contract.test.ts",
         "plugins/dockside/test/inbox.test.ts",
         "plugins/dockside/test/lifecycle.test.ts",
         "plugins/dockside/test/preferences.test.ts",
@@ -1703,6 +1971,7 @@
         "plugins/dockside/test/settings-contract.test.ts",
         "plugins/dockside/test/settled-threads.test.ts",
         "plugins/dockside/test/status-glyph.test.ts",
+        "plugins/dockside/test/status-groups.test.ts",
         "plugins/dockside/test/thread-card-layout.test.ts",
         "plugins/dockside/test/thread-management.test.ts",
         "plugins/dockside/test/warm-start.test.ts",
@@ -1758,6 +2027,19 @@
         "plugins/host-monitor/test/thresholds.test.ts",
         "plugins/host-monitor/tsconfig.json",
         "plugins/host-monitor/types/css-modules.d.ts",
+        "plugins/lavender/.gitignore",
+        "plugins/lavender/CHANGELOG.md",
+        "plugins/lavender/LICENSE",
+        "plugins/lavender/PLUGIN_OVERVIEW.md",
+        "plugins/lavender/README.md",
+        "plugins/lavender/assets/icon.svg",
+        "plugins/lavender/package.json",
+        "plugins/lavender/server.ts",
+        "plugins/lavender/test/palette.test.mjs",
+        "plugins/lavender/themes/lavender-dark.json",
+        "plugins/lavender/themes/lavender-light.json",
+        "plugins/lavender/themes/lavender.css",
+        "plugins/lavender/tsconfig.json",
         "plugins/save-my-model/README.md",
         "plugins/save-my-model/app.tsx",
         "plugins/save-my-model/assets/icon.svg",
@@ -1895,19 +2177,21 @@
         "plugins/usage-tracker/tsconfig.json",
         "plugins/usage-tracker/types/css-modules.d.ts"
       ],
-      "sourceDigest": "sha256:239ea129c6f18179983a2daf5558f7220be4f92142552e9b3f11e5c8c66b21e2",
+      "sourceDigest": "sha256:5ae0b3cba501091f34a017b92e074f463d8b28ec6e6b81b0cd2dfe76b9693053",
       "digest": "sha256:eed9cfd95fdecbf70535c9b9bfdb204011bdad5af0a5418d4d923f3a99f354f2",
       "freshness": "fresh"
     },
     {
       "path": ".empirical/context/overview.md",
-      "generator": "empirical-0.31.0",
+      "generator": "empirical-0.34.0",
       "managed": false,
       "dependencies": [
         "README.md",
         "package.json",
         "plugins/action-topbar/README.md",
         "plugins/action-topbar/package.json",
+        "plugins/aura/README.md",
+        "plugins/aura/package.json",
         "plugins/clean-my-context/README.md",
         "plugins/clean-my-context/package.json",
         "plugins/dockside/README.md",
@@ -1921,6 +2205,8 @@
         "plugins/dockside/test/project-order.test.ts",
         "plugins/host-monitor/README.md",
         "plugins/host-monitor/package.json",
+        "plugins/lavender/README.md",
+        "plugins/lavender/package.json",
         "plugins/save-my-model/README.md",
         "plugins/save-my-model/package.json",
         "plugins/taskboard/README.md",
@@ -1932,75 +2218,84 @@
         "plugins/usage-tracker/README.md",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:c99a0c20f49cf68d97062ca317334d591a8d08407b13230a315d87a1d488aa5d",
+      "sourceDigest": "sha256:8f02a1f742515cd408ddf9b0d3a94712ffa3d0c3ad6245a96768aa5e5cb9f3ce",
       "digest": "sha256:37f1b782a0e88dee101030bf6ac6aa2742c329ca37daf764d5022e793ce6bc15",
       "freshness": "fresh"
     },
     {
       "path": ".empirical/context/architecture.md",
-      "generator": "empirical-0.31.0",
+      "generator": "empirical-0.34.0",
       "managed": false,
       "dependencies": [
         "package.json",
         "plugins/action-topbar/package.json",
+        "plugins/aura/package.json",
         "plugins/clean-my-context/package.json",
         "plugins/dockside/package.json",
         "plugins/host-monitor/package.json",
+        "plugins/lavender/package.json",
         "plugins/save-my-model/package.json",
         "plugins/taskboard/package.json",
         "plugins/touchbar/package.json",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:842609399b970981507f83cc34f893b8146fc676f478ebf525b58847571d0b63",
+      "sourceDigest": "sha256:88ca06d31576dd269ab9749d8dda0f8c3c3d063306e0b496a62d5f2f13ea419b",
       "digest": "sha256:6a3333fdbbcffff93c96400aab0596932dc23cce823061cdedacad5e44ef7bd7",
       "freshness": "fresh"
     },
     {
       "path": ".empirical/context/commands.md",
-      "generator": "empirical-0.31.0",
+      "generator": "empirical-0.34.0",
       "managed": false,
       "dependencies": [
         ".github/workflows/ci.yml",
         "package.json",
         "plugins/action-topbar/package.json",
+        "plugins/aura/package.json",
         "plugins/clean-my-context/package.json",
         "plugins/dockside/package.json",
         "plugins/host-monitor/package.json",
+        "plugins/lavender/package.json",
         "plugins/save-my-model/package.json",
         "plugins/taskboard/package.json",
         "plugins/touchbar/package.json",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:b8a72a9e4c0606b2c5567d72c1c6fb7b6d6df8100b2e28785ebd5b0639bba88b",
+      "sourceDigest": "sha256:15e3027a7fe7166ce45c940284be55739f4037eb1b7de324e4c09446eda09b82",
       "digest": "sha256:06a7a6d07d2649e2d00a93cf62beef749d2f5dada25077c225726f81ec2eeed3",
       "freshness": "fresh"
     },
     {
       "path": ".empirical/context/conventions.md",
-      "generator": "empirical-0.31.0",
+      "generator": "empirical-0.34.0",
       "managed": false,
       "dependencies": [
         "AGENTS.md",
         "plugins/action-topbar/tsconfig.json",
+        "plugins/aura/tsconfig.json",
         "plugins/clean-my-context/tsconfig.json",
+        "plugins/dockside/components/styles.d.ts",
         "plugins/dockside/tsconfig.json",
         "plugins/host-monitor/tsconfig.json",
+        "plugins/lavender/tsconfig.json",
         "plugins/save-my-model/tsconfig.json",
         "plugins/taskboard/tsconfig.json",
         "plugins/touchbar/tsconfig.json",
         "plugins/usage-tracker/tsconfig.json"
       ],
-      "sourceDigest": "sha256:243016fe1ee852528e50233d1e9a3c9b8b96c956e76ce500898020bc1171bbf1",
+      "sourceDigest": "sha256:251cb7786751f69dae02f70fade8e8cb369a59d5e1e7c99d94922e5bb9a517ad",
       "digest": "sha256:8ce7179f299316d315c6c9c8d246aaa18e9cdbf9441943ce24643c415c4db02c",
       "freshness": "fresh"
     },
     {
       "path": ".empirical/context/design-language.md",
-      "generator": "empirical-0.31.0",
+      "generator": "empirical-0.34.0",
       "managed": false,
       "dependencies": [
         "plugins/action-topbar/app.css",
         "plugins/action-topbar/app.tsx",
+        "plugins/aura/app.css",
+        "plugins/aura/app.tsx",
         "plugins/clean-my-context/app.test.tsx",
         "plugins/clean-my-context/app.tsx",
         "plugins/clean-my-context/components/ui/button.tsx",
@@ -2018,6 +2313,8 @@
         "plugins/dockside/components/inbox/row-metadata.tsx",
         "plugins/dockside/components/inbox/slim-row.tsx",
         "plugins/dockside/components/inbox/status-glyph.tsx",
+        "plugins/dockside/components/inbox/status-group.tsx",
+        "plugins/dockside/components/inbox/status-mark.tsx",
         "plugins/dockside/components/inbox/status-slot.tsx",
         "plugins/dockside/components/inbox/subagents-chip.tsx",
         "plugins/dockside/components/inbox/thread-card.tsx",
@@ -2047,11 +2344,11 @@
         "plugins/usage-tracker/app.css",
         "plugins/usage-tracker/app.tsx"
       ],
-      "sourceDigest": "sha256:007db7655fb06377fc181f23c1905af6b73e53fe1a581b887164aafa93922e44",
+      "sourceDigest": "sha256:adb4efbd67d1209afc087c18d406c29c9c1dea56340e7c3a8f0aa91572716bcb",
       "digest": "sha256:23f355d733d86c584f760d4a0c0136ee7bb2c3a3aa12edfc199b29b55a480ca2",
       "freshness": "fresh"
     }
   ],
   "truncated": false,
-  "digest": "sha256:efb636128ca25ec11eba2ace420b6bb293ab7c0addbe1ab13ffefc865128bc8c"
+  "digest": "sha256:eb326391c10affe336abffc4a8ad4ac38775c46358089789574ece66c0af0cbb"
 }
