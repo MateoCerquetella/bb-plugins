@@ -37,5 +37,9 @@ describe("workspace filter UI contract", () => {
       "utf8",
     );
     assert.match(statusGroup, /<ThreadCard/);
+    assert.match(statusGroup, /effectiveExpanded = forceExpanded \|\| expanded/);
+    assert.match(statusGroup, /aria-expanded=\{effectiveExpanded\}/);
+    assert.match(statusGroup, /interactive=\{false\}/);
+    assert.match(statusGroup, /\{effectiveExpanded \? \(/);
   });
 });

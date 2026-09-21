@@ -11,6 +11,7 @@ export function FamilyStatusIcon({
   status,
   className,
   tooltipAlign = "left",
+  interactive = true,
   draggable = false,
   reorderHelp,
   onDragStart,
@@ -19,6 +20,7 @@ export function FamilyStatusIcon({
   status: FamilyStatusPresentation;
   className?: string;
   tooltipAlign?: "left" | "right";
+  interactive?: boolean;
   draggable?: boolean;
   reorderHelp?: string;
   onDragStart?: DragEventHandler<HTMLSpanElement>;
@@ -31,11 +33,12 @@ export function FamilyStatusIcon({
     <span
       data-dockside-family-status-icon={status.kind}
       data-dockside-status-color-role={status.colorRole}
-      tabIndex={0}
+      tabIndex={interactive ? 0 : undefined}
       draggable={draggable}
-      aria-label={help}
-      aria-keyshortcuts={reorderHelp ? "Alt+ArrowUp Alt+ArrowDown" : undefined}
-      title={help}
+      aria-hidden={interactive ? undefined : true}
+      aria-label={interactive ? help : undefined}
+      aria-keyshortcuts={interactive && reorderHelp ? "Alt+ArrowUp Alt+ArrowDown" : undefined}
+      title={interactive ? help : undefined}
       onDragStart={onDragStart}
       onKeyDown={onKeyDown}
       className={cn(
@@ -46,23 +49,25 @@ export function FamilyStatusIcon({
       style={{ color: familyStatusColor(status) }}
     >
       <StatusMark kind={status.kind} />
-      <span
-        role="tooltip"
-        className={cn(
-          tooltipAlign === "right" ? "right-0" : "left-0",
-          "pointer-events-none absolute bottom-full z-40 mb-1 w-max max-w-56 translate-y-0.5 rounded-md border border-border bg-popover px-2 py-1.5 text-left text-2xs leading-tight text-popover-foreground opacity-0 shadow-md transition-all group-hover/family-status:translate-y-0 group-hover/family-status:opacity-100 group-focus/family-status:translate-y-0 group-focus/family-status:opacity-100",
-        )}
-      >
-        <span className="block font-semibold">{status.label}</span>
-        <span className="mt-0.5 block whitespace-normal text-muted-foreground">
-          {status.description}
-        </span>
-        {reorderHelp ? (
-          <span className="mt-1 block border-t border-border/70 pt-1 whitespace-normal text-muted-foreground">
-            {reorderHelp}
+      {interactive ? (
+        <span
+          role="tooltip"
+          className={cn(
+            tooltipAlign === "right" ? "right-0" : "left-0",
+            "pointer-events-none absolute bottom-full z-40 mb-1 w-max max-w-56 translate-y-0.5 rounded-md border border-border bg-popover px-2 py-1.5 text-left text-2xs leading-tight text-popover-foreground opacity-0 shadow-md transition-all group-hover/family-status:translate-y-0 group-hover/family-status:opacity-100 group-focus/family-status:translate-y-0 group-focus/family-status:opacity-100",
+          )}
+        >
+          <span className="block font-semibold">{status.label}</span>
+          <span className="mt-0.5 block whitespace-normal text-muted-foreground">
+            {status.description}
           </span>
-        ) : null}
-      </span>
+          {reorderHelp ? (
+            <span className="mt-1 block border-t border-border/70 pt-1 whitespace-normal text-muted-foreground">
+              {reorderHelp}
+            </span>
+          ) : null}
+        </span>
+      ) : null}
     </span>
   );
 }

@@ -40,17 +40,22 @@ export function StatusGroup({
 }) {
   const [expanded, setExpanded] = useState(true);
   const listId = useId();
+  const effectiveExpanded = forceExpanded || expanded;
 
   return (
     <section aria-label={group.presentation.label} className="mt-2 first:mt-0">
       <button
         type="button"
-        aria-expanded={expanded}
+        aria-expanded={effectiveExpanded}
         aria-controls={listId}
         onClick={() => setExpanded((open) => !open)}
         className="flex h-7 w-full items-center gap-2 rounded-md px-1.5 text-left hover:bg-sidebar-accent/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
       >
-        <FamilyStatusIcon status={group.presentation} className="pointer-events-none" />
+        <FamilyStatusIcon
+          status={group.presentation}
+          interactive={false}
+          className="pointer-events-none"
+        />
         <span className="min-w-0 flex-1 text-xs font-medium text-muted-foreground">
           {group.presentation.label}
         </span>
@@ -58,7 +63,7 @@ export function StatusGroup({
           {group.families.length}
         </span>
       </button>
-      {expanded ? (
+      {effectiveExpanded ? (
         <ul id={listId} className="mt-0.5 flex flex-col gap-0.5">
           {group.families.map((family) => {
             const eligibility = bulkEligibility(family, activeThreadId);

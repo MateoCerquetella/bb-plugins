@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:60fed14da89d05a9a3b882137252ed4b8fb97c9f4cae60e3816e64906994fde4",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "da38cfedd3dd4aad596c31bd653ec9ba00adee33",
+  "headCommit": "ab844c642562dc9af056ba49a99692616f343ff5",
+  "diffDigest": "sha256:4949d875b632ac179edb305fae6cb847422e0f36fcc761d2a8dca4d96ee5ebac",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "codex-fresh-isolated-reviewer",
+  "reviewerInvocationId": "release_fresh_review:60fed14da89d05a9a3b882137252ed4b8fb97c9f4cae60e3816e64906994fde4",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- FAIL AC-1: The reviewed diff retains correctness/accessibility findings in StatusGroup: forceExpanded does not expand a collapsed status section during search, and a tab-focusable FamilyStatusIcon is nested inside the section button.\n- FAIL AC-2: The packet does not provide complete passing plugin-focused evidence for both affected plugins; its repository check receipt records Aura tests failing.\n- PASS AC-3: Packet evidence identifies both PR merge commits, restoration of Empirical isolation, and use of an isolated checkout that preserved unrelated local work.\n- FAIL AC-4: The packet explicitly says the new tags were still absent before publication, so immutable annotated tags peeling to reviewed main-reachable content are not yet proven.\n- FAIL AC-5: GitHub release publication and final marketplace resolution are not yet proven. Aura's changelog also calls randomly versioned image URLs content-addressed, which does not match the implementation.\n- FAIL AC-6: Post-merge/release-source verification is not complete: state.json says verified=false, and the recorded workspace verification receipt failed, including Aura's test command.\n\n## Security / correctness\n\nNo new credential or command-injection surface was found, but Dockside's status grouping has two correctness/accessibility defects: collapsed groups remain hidden during forced search expansion, and the group header contains a nested tab-focusable status control. Verification evidence also contains an unresolved Aura test failure.\n\n## Design / maintainability\n\nApply forceExpanded to StatusGroup's effective expansion state, avoid placing a focusable FamilyStatusIcon inside a button, describe Aura caching as immutable versioned caching unless versions become content hashes, rerun focused Aura and Dockside typecheck/tests/build/whitespace checks, then publish and verify annotated tags and releases.",
+  "bodyDigest": "sha256:6031df25a6b1d8b55505394dc8620056e5b2117a89165ae7269fce4179e9a23a",
+  "digest": "sha256:4d994643f5b5e8ccbb65af5060610cbb7753933b4bdf21219fab53c9d3a67fef"
+}

@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 6,
+  "revision": 8,
   "activeFeature": "review-merge-release-open-prs",
   "request": "Review all open pull requests in MateoCerquetella/bb-plugins, merge those that are correct and verified, then create and publish new patch releases for affected BB plugins so the BB Community marketplace ranges resolve them.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "verify",
+  "phase": "implement",
   "status": "waiting",
-  "repairAttempts": 0,
-  "message": "Refreshed repository context from the isolated release branch; the context report has no stale, missing, invalid, or refinement-required paths, and repository workflow settings remain unchanged.",
+  "repairAttempts": 1,
+  "message": "Fresh isolated review requested corrections for Dockside forced search expansion and nested focusable controls, plus accurate Aura caching terminology and final publication proof.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:70424b72bef5bfbb582b8dab86f13d1f879c24d458b579216f97934697cf6165",
@@ -36,5 +36,5 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-21T16:56:07.231Z"
+  "updatedAt": "2026-09-21T17:34:49.334Z"
 }

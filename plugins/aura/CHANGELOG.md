@@ -3,7 +3,7 @@
 ## 0.2.2
 
 - Add theme-aware reading surfaces to New thread controls and recent threads.
-- Cache content-addressed background images privately for one year.
+- Cache immutable versioned background images privately for one year.
 - Reduce animated dither rendering to 15 FPS and one-third resolution.
 - Cache WebGL uniform locations instead of resolving them every frame.
 
