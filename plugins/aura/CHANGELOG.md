@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.2
+
+- Add theme-aware reading surfaces to New thread controls and recent threads.
+- Cache immutable versioned background images privately for one year.
+- Reduce animated dither rendering to 15 FPS and one-third resolution.
+- Cache WebGL uniform locations instead of resolving them every frame.
+
 ## 0.2.1
 
 - Extend chat wallpapers to the bottom of the pane, including beside the composer.

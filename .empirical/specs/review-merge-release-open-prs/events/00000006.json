@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sequence": 6,
+  "previousDigest": "sha256:34689c83bdcaceee51b041c25fdce4d4c9037392fabd3663c1bce65870ff8b81",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Refreshed repository context from the isolated release branch; the context report has no stale, missing, invalid, or refinement-required paths, and repository workflow settings remain unchanged.",
+  "createdAt": "2026-09-21T16:56:07.231Z",
+  "stateBeforeDigest": "sha256:b31bf493bc02570d1fbad835b85c8b94c8082f9f094fc10fe955c16291a2efb5",
+  "stateAfterDigest": "sha256:29dfc41b15eb1921894f6bd7796364d7d4bc76adb2adc5a48782398ac073684c",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 6,
+    "activeFeature": "review-merge-release-open-prs",
+    "request": "Review all open pull requests in MateoCerquetella/bb-plugins, merge those that are correct and verified, then create and publish new patch releases for affected BB plugins so the BB Community marketplace ranges resolve them.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "verify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Refreshed repository context from the isolated release branch; the context report has no stale, missing, invalid, or refinement-required paths, and repository workflow settings remain unchanged.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:70424b72bef5bfbb582b8dab86f13d1f879c24d458b579216f97934697cf6165",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:198eb35b899059ed9045f2ed90a9cca1c047e28f6d2cefd91cef4a1d7e0e45d9",
+    "impactDigest": "sha256:0ef2490ec0f0e93898cd2a2844c877df03835199d8011d5476417ab6fdbda821",
+    "capabilityClaimId": "review-merge-release-open-prs-7d601272d2cd",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-21T16:56:07.231Z"
+  },
+  "digest": "sha256:9587e522a0b32e6c615524d2b911657c6ec25f98598b367922ed858af921f25d"
+}

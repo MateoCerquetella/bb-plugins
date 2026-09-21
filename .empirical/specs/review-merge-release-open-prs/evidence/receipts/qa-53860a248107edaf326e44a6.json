@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-53860a248107edaf326e44a6",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "Fresh-context audit of the corrected release tree confirms the reviewer findings are fixed, focused Aura and Dockside checks pass, release metadata and marketplace compatibility remain coherent, publication tags are safely absent before merge, and the primary checkout remains untouched.",
+  "passed": true,
+  "startedAt": "2026-09-21T18:19:03.397Z",
+  "completedAt": "2026-09-21T18:19:03.397Z",
+  "provenance": {
+    "repositoryId": "sha256:b503769d621265b1260d48e307b706764511b6e0b4ef2d36cb52800751c273c7",
+    "feature": "review-merge-release-open-prs",
+    "specRevision": 2,
+    "specDigest": "sha256:70424b72bef5bfbb582b8dab86f13d1f879c24d458b579216f97934697cf6165",
+    "treeDigest": "sha256:6810a2866f4bb5db8c7e970068f55c690e49c0a068073983a1f4dbb0a1f36038",
+    "policyDigest": "sha256:593bbd252bb2fbe423ab33a35f9f4ea2869e5b89423f2d528b42e434681e8e5b",
+    "workflowRevision": 10,
+    "gitCommit": "ad366afb2eefcef29a1570c30d690a7bc4a70f12"
+  },
+  "digest": "sha256:e7196067366e90a1aa5d91b16a686689272e3a2c512779821636c90bca8e08a5",
+  "kind": "qa",
+  "matrixDigest": "sha256:7c837d4d842e2aa153f3ff0085cd25798d91600e9127af103531f96a6650ff1c",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "x64",
+    "node": "24.21.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Fresh-context audit of the corrected release tree confirms the reviewer findings are fixed, focused Aura and Dockside checks pass, release metadata and marketplace compatibility remain coherent, publication tags are safely absent before merge, and the primary checkout remains untouched.",
+      "startedAt": "2026-09-21T18:19:03.397Z",
+      "completedAt": "2026-09-21T18:19:03.397Z",
+      "durationMs": 0,
+      "collector": "codex-fresh-context-corrected-release-audit",
+      "command": null,
+      "result": null,
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:6810a2866f4bb5db8c7e970068f55c690e49c0a068073983a1f4dbb0a1f36038",
+      "sourceTreeAfter": "sha256:6810a2866f4bb5db8c7e970068f55c690e49c0a068073983a1f4dbb0a1f36038",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/review-merge-release-open-prs/qa/fresh-context.md",
+          "mediaType": "text/markdown",
+          "bytes": 877,
+          "digest": "sha256:cadc33c07659b9147ae2c4919735a177cb312a9dde5969e73f048dab2bbea512"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}

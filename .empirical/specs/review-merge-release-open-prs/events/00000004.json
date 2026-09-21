@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "sequence": 4,
+  "previousDigest": "sha256:319adcf5dec6097bbb2db3167cbcd694a318562585f4499b769879c06c330a1e",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Created the executable plan for PR correction, verification, merges, release preparation, publication, marketplace resolution checks, and capability archival.",
+  "createdAt": "2026-09-21T16:43:33.871Z",
+  "stateBeforeDigest": "sha256:161f177985ecdc00b02c2fa6297535bdfd8eaf241a1d72a91b928beb98393b59",
+  "stateAfterDigest": "sha256:9489c6eb1b67cc6ff39543d6ad7f7135b598a4e8c65207bb76f9270db5077c22",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 4,
+    "activeFeature": "review-merge-release-open-prs",
+    "request": "Review all open pull requests in MateoCerquetella/bb-plugins, merge those that are correct and verified, then create and publish new patch releases for affected BB plugins so the BB Community marketplace ranges resolve them.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Created the executable plan for PR correction, verification, merges, release preparation, publication, marketplace resolution checks, and capability archival.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:70424b72bef5bfbb582b8dab86f13d1f879c24d458b579216f97934697cf6165",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:198eb35b899059ed9045f2ed90a9cca1c047e28f6d2cefd91cef4a1d7e0e45d9",
+    "impactDigest": "sha256:0ef2490ec0f0e93898cd2a2844c877df03835199d8011d5476417ab6fdbda821",
+    "capabilityClaimId": "review-merge-release-open-prs-7d601272d2cd",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-21T16:43:33.871Z"
+  },
+  "digest": "sha256:c5dc4d96219e377ed9331d629e49dcb73b0a8160ccc73890d966fb948d94df71"
+}

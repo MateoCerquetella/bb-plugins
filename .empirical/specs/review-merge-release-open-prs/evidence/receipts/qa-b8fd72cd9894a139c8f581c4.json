@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-b8fd72cd9894a139c8f581c4",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Focused Aura 0.2.2 typecheck, seven tests, and build.",
+  "passed": true,
+  "startedAt": "2026-09-21T18:30:58.422Z",
+  "completedAt": "2026-09-21T18:31:42.275Z",
+  "provenance": {
+    "repositoryId": "sha256:b503769d621265b1260d48e307b706764511b6e0b4ef2d36cb52800751c273c7",
+    "feature": "review-merge-release-open-prs",
+    "specRevision": 2,
+    "specDigest": "sha256:70424b72bef5bfbb582b8dab86f13d1f879c24d458b579216f97934697cf6165",
+    "treeDigest": "sha256:007436504fd137226c523c99ca093f708765c0e6ae41685f2bea8f49c7efe916",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 14,
+    "gitCommit": "212becb88448d93c0b2931228aebef4aedb96f78"
+  },
+  "digest": "sha256:b37c9f72652c8ccebc7eddb011c556020b71ccac2367c20b76d42989a368fcdd",
+  "kind": "qa",
+  "matrixDigest": "sha256:6bcd670223ca5b38f442ae2a3163f78f1a00599026f75e00d7353ee2baa6cd22",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "adapter-contract",
+    "integration",
+    "unit"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "x64",
+    "node": "24.21.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Focused Aura 0.2.2 typecheck, seven tests, and build.",
+      "startedAt": "2026-09-21T18:30:58.422Z",
+      "completedAt": "2026-09-21T18:31:42.275Z",
+      "durationMs": 43853,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:f9b129d8080d6ae249324764ab9bf53ce8ebc569462bb37a19a9d1056d966f66",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-aura"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH",
+          "TMPDIR"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:9bad091a305906acb700d05d5ad3f39e5523e8f30c73e45373922dd0f80c3b35",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "\n> bb-plugin-aura@0.2.2 check\n> npm run typecheck && npm test && npm run build\n\n\n> bb-plugin-aura@0.2.2 typecheck\n> tsc --noEmit\n\n\n> bb-plugin-aura@0.2.2 test\n> node --experimental-strip-types --test test/*.test.ts\n\n✔ applies scoped backgrounds, disables cleanly and ignores a late fetch after disposal (1059.576242ms)\n✔ six independent slots retain images and appearance across switches and reload (393.936839ms)\n✔ invalid image or slot rejects the entire apply without partially changing settings (205.113721ms)\n✔ scope stays global across slots; clearing/resetting preserves saved work (129.19362ms)\n✔ image type must match bytes; legacy settings get the new scope default (45.35227ms)\n✔ versioned images use an immutable private browser cache (274.219721ms)\n✔ New thread dimmer toggles without replacing images or saved slots (100.238025ms)\nℹ tests 7\nℹ suites 0\nℹ pass 7\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 7796.603382\n\n> bb-plugin-aura@0.2.2 build\n> env -u BB_CLI bb plugin build .\n\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:007436504fd137226c523c99ca093f708765c0e6ae41685f2bea8f49c7efe916",
+      "sourceTreeAfter": "sha256:007436504fd137226c523c99ca093f708765c0e6ae41685f2bea8f49c7efe916",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}
