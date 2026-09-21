@@ -64,9 +64,15 @@ bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.0 
 
 The range currently resolves [`dockside/v0.1.4`](https://github.com/MateoCerquetella/bb-plugins/tree/dockside/v0.1.4),
 which restores the segmented progress spinner with heavier strokes and a stronger gold color for better visibility.
-The [BB Community marketplace submission](https://github.com/get-bb/marketplace/pull/162)
-is validated and awaiting maintainer merge. Until it lands, use the Git command
-above rather than a bare npm package or marketplace name.
+The [BB Community marketplace entry](https://github.com/get-bb/marketplace/pull/162)
+is live, so you can also install Dockside by name:
+
+```sh
+bb plugin install dockside
+```
+
+The Git command above remains the source-verifiable install path. Do not use the
+unrelated npm package with the same name.
 
 **For development from source** — clone the repo and install the plugin as a
 local path source:

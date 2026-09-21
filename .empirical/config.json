@@ -9,7 +9,7 @@
     "codeReview": true
   },
   "isolation": {
-    "mode": "off",
+    "mode": "ask",
     "baseBranch": "main",
     "worktreePath": "../{repo}-{feature}",
     "branchPattern": "{type}/{feature}"
