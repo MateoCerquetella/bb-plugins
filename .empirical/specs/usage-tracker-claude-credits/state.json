@@ -1,16 +1,16 @@
 {
   "schemaVersion": 5,
-  "revision": 4,
+  "revision": 5,
   "activeFeature": "usage-tracker-claude-credits",
   "request": "Implement GitHub issue #43: show Claude Code usage credits (the dollar amount reported by Claude Code /usage) in Usage Tracker, with accessible UI, focused tests, documentation, issue closure, and a new immutable Usage Tracker patch release that the marketplace range resolves.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "implement",
+  "phase": "context",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Planned the renderer, styling, focused contracts, documentation/version bump, verification, integration, issue closure, and immutable release.",
-  "implementationActor": null,
+  "message": "Implemented readable expanded-window credit amounts from existing normalized BB cost data, no-cost omission, presentation contracts, documentation, and Usage Tracker v0.1.9 metadata; focused typecheck, 46 tests, build, and whitespace checks pass.",
+  "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:c7e6ab2031a0dfe5452c22f06cb6c1ad15ce8429e4401cd204d3b739d3c08204",
   "approvedSpecRevision": 2,
@@ -23,19 +23,20 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": false,
+    "implemented": true,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "none",
+    "highest": "implemented",
     "reasons": {
-      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-21T19:07:15.235Z"
+  "updatedAt": "2026-09-21T19:45:00.246Z",
+  "route": "formal-sdd",
+  "publicState": "working"
 }
