@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.9 - 2026-09-21
+
+- Show reported USD credit usage and limits in expanded provider details,
+  including the dollar amounts supplied for Claude Code usage windows.
+- Keep windows without cost data unchanged and avoid running provider CLIs.
+
 ## 0.1.8 - 2026-09-04
 
 - Preserve the v0.1.6 provider set (Codex, Claude Code, Cursor, Grok, and OpenCode) and add Google Antigravity quota tracking as an opt-in provider.
