@@ -91,7 +91,7 @@ the Paper Shaders Apache-2.0 license are recorded in
 Aura decorates BB's `root-compose-main-panel` and `thread-detail-timeline-panel`
 DOM containers. Recheck these host names when upgrading BB. Canvas/GL resources,
 observers and listeners are disposed when disabling or reloading. Noise and photo animation
-run at up to 30 fps and pauses off-screen, when hidden, and for reduced motion.
+run at up to 15 fps and pauses off-screen, when hidden, and for reduced motion.
 The image/gradient remains if WebGL is unavailable.
 
 ```sh
