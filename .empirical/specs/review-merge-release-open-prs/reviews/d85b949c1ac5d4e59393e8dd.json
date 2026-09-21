@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:b44dbff70cc31f43adf24653b11977e536b150d6400e5d75abfc86eea40de541",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "da38cfedd3dd4aad596c31bd653ec9ba00adee33",
+  "headCommit": "1974c7a189e2eabf2eed73a65d00ba43578915be",
+  "diffDigest": "sha256:e73828c23c32ed1cf6c747d8aedd9fd8ef1d0ffa0880b4dc2738e57499b3479a",
+  "verdict": "APPROVED",
+  "reviewerActor": "codex-fresh-isolated-reviewer",
+  "reviewerInvocationId": "release_final_fresh_review:b44dbff70cc31f43adf24653b11977e536b150d6400e5d75abfc86eea40de541",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: Complete diff has no unresolved blocker; all prior findings are corrected.\n- PASS AC-2: Command-backed focused Aura/Dockside typecheck, tests, build, clean/package/system, and diff checks pass.\n- PASS AC-3: Isolated workflow preserved primary checkout and required isolation policy.\n- PASS AC-4: Exactly one safe annotated patch tag per plugin is planned on reviewed main-reachable content without moving tags.\n- PASS AC-5: Existing marketplace ranges and prefixes select planned patches without metadata churn; release metadata agrees.\n- PASS AC-6: Focused, system, clean-source, package-consumer, and cross-platform receipts pass; remote checks follow publication.\n\n## Security / correctness\n\nNo unresolved credential, injection, authorization, cache-safety, lifecycle, or selection correctness issue found; private immutable caching uses versioned URLs and Dockside accessibility/search defects are fixed.\n\n## Design / maintainability\n\nRelease workflow is coherent and fail-closed: exact versions/prefixes, immutable tags, reviewed-main prerequisite, and durable command-backed verification.",
+  "bodyDigest": "sha256:32584c60e92e755327df93847a01d9478dc5c5ec55e3790295ab007885c2c7a3",
+  "digest": "sha256:d85b949c1ac5d4e59393e8dd95cea4f59cf6a94b23a493feeb772a7884612c33"
+}
