@@ -45,3 +45,12 @@ test("preserves provider-specific details and focus restoration", () => {
   assert.match(source, /isOverviewOpen = false/u);
   assert.match(source, /requestedFocus = \{ kind: "summary" \}/u);
 });
+
+test("shows reported credits as readable expanded-detail metadata", () => {
+  assert.match(source, /formatCost,/u);
+  assert.match(source, /window\?\.cost !== null/u);
+  assert.match(source, /`Credits \$\{formatCost\(window\.cost\)\}`/u);
+  assert.match(source, /usage-tracker-sidebar__cost/u);
+  assert.match(styles, /\.usage-tracker-sidebar__cost/u);
+  assert.doesNotMatch(source, /claude\s+\/usage/iu);
+});

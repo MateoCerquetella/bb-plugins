@@ -44,6 +44,8 @@ plugin page.
   weekly or five-hour limit. Weekly is the default.
 - Expands any provider to show its five-hour, weekly, and additional
   provider-defined percentages.
+- Shows reported USD credit usage and limits in expanded details, including the
+  dollar amounts exposed by Claude Code usage data.
 - Shows the available Codex usage resets in the expanded details.
 - Includes reset timing and provider session status in the expanded view.
 - Refreshes automatically every five minutes and whenever a stale BB window
@@ -62,7 +64,7 @@ The configurable Compact limit was contributed by
 Usage Tracker requires BB 0.38 or newer. Install its tracking Git release:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.8 --subdirectory plugins/usage-tracker --tag-prefix usage-tracker/
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.9 --subdirectory plugins/usage-tracker --tag-prefix usage-tracker/
 ```
 
 After [the BB Community entry](https://github.com/get-bb/marketplace/pull/129)
@@ -100,8 +102,8 @@ The collapsed strip is designed for quick scanning:
   open the complete provider overview.
 - Select any provider reading to open its details in place.
 - Review the reported **5-hour limit**, **weekly limit**, every additional
-  provider-defined window, and their reset times. Codex Pro accounts that do
-  not report a five-hour limit omit that row.
+  provider-defined window, their reset times, and any reported USD credits.
+  Codex Pro accounts that do not report a five-hour limit omit that row.
 - For Codex, select **Use a reset…** to open a confirmation. Nothing is
   consumed until **Yes, use reset** is selected; canceling the confirmation
   does not contact the reset-consumption endpoint.

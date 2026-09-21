@@ -1,4 +1,5 @@
 import {
+  formatCost,
   formatResetCredits,
   formatResetTime,
   formatUsedPercent,
@@ -404,6 +405,15 @@ function detailWindowRow(
       window === null ? "No limit reported" : formatResetTime(window.resetsAt),
     ),
   );
+  if (window?.cost !== null && window?.cost !== undefined) {
+    row.append(
+      element(
+        "span",
+        "usage-tracker-sidebar__cost",
+        `Credits ${formatCost(window.cost)}`,
+      ),
+    );
+  }
   return row;
 }
 
