@@ -62,11 +62,17 @@ bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.0 
   --tag-prefix dockside/
 ```
 
-The range currently resolves [`dockside/v0.1.0`](https://github.com/MateoCerquetella/bb-plugins/tree/dockside/v0.1.0)
-at the code merged by [plugin PR #26](https://github.com/MateoCerquetella/bb-plugins/pull/26).
-The [BB Community marketplace submission](https://github.com/get-bb/marketplace/pull/162)
-is validated and awaiting maintainer merge. Until it lands, use the Git command
-above rather than a bare npm package or marketplace name.
+The range currently resolves [`dockside/v0.1.4`](https://github.com/MateoCerquetella/bb-plugins/tree/dockside/v0.1.4),
+which restores the segmented progress spinner with heavier strokes and a stronger gold color for better visibility.
+The [BB Community marketplace entry](https://github.com/get-bb/marketplace/pull/162)
+is live, so you can also install Dockside by name:
+
+```sh
+bb plugin install dockside
+```
+
+The Git command above remains the source-verifiable install path. Do not use the
+unrelated npm package with the same name.
 
 **For development from source** — clone the repo and install the plugin as a
 local path source:
@@ -136,7 +142,7 @@ never hidden.
 
 ### Snoozing
 
-The hover button snoozes until **09:00 tomorrow**.
+The Snooze button snoozes until **09:00 tomorrow**.
 
 ### Inline agents
 
@@ -231,3 +237,9 @@ bun run --filter 'bb-plugin-dockside' test
 ```
 
 The test script needs Node 22.6+.
+
+Choose **Status display → Icons** (default) in Dockside settings for compact status marks, or **Verbose** to also show status labels. Working uses a slightly larger segmented loading spinner, Needs you a filled exclamation mark, and unread results a filled check. Errors retain a distinct cross; inactive and stale threads keep their clock and hourglass. Hover or focus an icon for its full meaning. The default palette uses yellow for working, orange for attention, and green for unread results; custom and accessibility palettes remain available.
+
+The segmented working spinner rotates, attention and error marks pulse gently, and unread checks pop into view once. Inactive marks stay still. Animations are disabled when your system requests reduced motion.
+
+Agent logos sit beside thread titles. The trailing metadata groups PR details and thread status; child-agent provider names remain in the child-count tooltip and on expanded child rows.
