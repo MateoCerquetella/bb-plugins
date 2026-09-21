@@ -62,8 +62,8 @@ bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.0 
   --tag-prefix dockside/
 ```
 
-The range currently resolves [`dockside/v0.1.4`](https://github.com/MateoCerquetella/bb-plugins/tree/dockside/v0.1.4),
-which restores the segmented progress spinner with heavier strokes and a stronger gold color for better visibility.
+The range currently resolves [`dockside/v0.1.5`](https://github.com/MateoCerquetella/bb-plugins/tree/dockside/v0.1.5),
+which keeps Snooze, Settle, Restore, and thread age controls visible on touch-only devices.
 The [BB Community marketplace entry](https://github.com/get-bb/marketplace/pull/162)
 is live, so you can also install Dockside by name:
 

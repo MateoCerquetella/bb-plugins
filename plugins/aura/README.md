@@ -47,7 +47,7 @@ bb plugin reload aura
 Install the Git release after publication:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.2.1 \
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.2.2 \
   --subdirectory plugins/aura --tag-prefix aura/
 ```
 

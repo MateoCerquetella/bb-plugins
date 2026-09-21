@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "plugin-git-distribution"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:0ef2490ec0f0e93898cd2a2844c877df03835199d8011d5476417ab6fdbda821"
+}

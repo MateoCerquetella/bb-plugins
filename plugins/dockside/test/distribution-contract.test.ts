@@ -12,7 +12,7 @@ const REQUIRED_RUNTIME_DEPENDENCIES = {
   zod: "^4.3.6",
 } as const;
 
-const EXPECTED_RELEASE_VERSION = "0.1.4";
+const EXPECTED_RELEASE_VERSION = "0.1.5";
 
 interface PackageRecord {
   version?: string;
