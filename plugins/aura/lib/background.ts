@@ -16,6 +16,81 @@ ${NEW_THREAD_TARGET} [class~="@container/page"]:has(> .mx-auto) {
 ${NEW_THREAD_TARGET} [class~="@container/page"] > .mx-auto {
   margin-block:auto; padding-block:28px;
 }
+@media (min-width:768px) {
+  ${NEW_THREAD_TARGET} [data-app-composer-role="primary"] > :last-child {
+    position:relative; z-index:0; margin-top:8px; padding:5px 9px;
+    border-radius:11px;
+    -webkit-backdrop-filter:blur(14px) saturate(.86);
+    backdrop-filter:blur(14px) saturate(.86);
+  }
+  ${NEW_THREAD_TARGET} [data-root-compose-mobile-recents] > :first-child {
+    display:flex; align-items:center; gap:12px; margin-bottom:8px; padding:0 2px;
+    background-color:transparent;
+  }
+  ${NEW_THREAD_TARGET} [data-root-compose-mobile-recents] > :first-child::after {
+    content:""; height:1px; flex:1;
+    background:linear-gradient(to right,color-mix(in oklab,var(--foreground) 22%,transparent),transparent);
+  }
+  ${NEW_THREAD_TARGET} [data-root-compose-mobile-recents] h2 {
+    color:color-mix(in oklab,var(--foreground) 76%,transparent);
+    font-size:.75rem; line-height:1; font-weight:600;
+    letter-spacing:.02em; text-transform:none;
+  }
+  ${NEW_THREAD_TARGET} [data-root-compose-mobile-recents] [data-overflow-fade] {
+    display:none;
+  }
+  ${NEW_THREAD_TARGET} [data-root-compose-mobile-recents] > ul > li,
+  ${NEW_THREAD_TARGET} [data-root-compose-mobile-recents] > [role="status"] {
+    transition:background-color 140ms ease,border-color 140ms ease,box-shadow 140ms ease;
+  }
+  :root:not(.dark) ${NEW_THREAD_TARGET} [data-app-composer-role="primary"] > :last-child {
+    border:1px solid color-mix(in oklab,var(--border) 74%,transparent);
+    background:color-mix(in oklab,var(--background) 94%,transparent);
+    box-shadow:0 5px 18px color-mix(in oklab,var(--foreground) 7%,transparent);
+  }
+  :root:not(.dark) ${NEW_THREAD_TARGET} [data-root-compose-mobile-recents] {
+    padding:12px 10px 8px;
+    border:1px solid color-mix(in oklab,var(--border) 72%,transparent);
+    border-radius:16px;
+    background:color-mix(in oklab,var(--background) 94%,transparent);
+    box-shadow:0 10px 30px color-mix(in oklab,var(--foreground) 8%,transparent);
+    -webkit-backdrop-filter:blur(16px) saturate(.88);
+    backdrop-filter:blur(16px) saturate(.88);
+  }
+  :root:not(.dark) ${NEW_THREAD_TARGET} [data-root-compose-mobile-recents] > ul > li,
+  :root:not(.dark) ${NEW_THREAD_TARGET} [data-root-compose-mobile-recents] > [role="status"] {
+    border:0; background:transparent; box-shadow:none;
+  }
+  :root:not(.dark) ${NEW_THREAD_TARGET} [data-root-compose-mobile-recents] > ul > li + li {
+    margin-top:0;
+    border-top:1px solid color-mix(in oklab,var(--border) 58%,transparent);
+  }
+  :root:not(.dark) ${NEW_THREAD_TARGET} [data-root-compose-mobile-recents] > ul > li:hover,
+  :root:not(.dark) ${NEW_THREAD_TARGET} [data-root-compose-mobile-recents] > ul > li[class~="bg-surface-selected"] {
+    background:color-mix(in oklab,var(--foreground) 5%,transparent);
+  }
+  .dark ${NEW_THREAD_TARGET} [data-app-composer-role="primary"] > :last-child {
+    border:1px solid color-mix(in oklab,var(--border) 48%,transparent);
+    background:color-mix(in oklab,var(--background) 46%,transparent);
+    box-shadow:0 5px 18px color-mix(in oklab,var(--foreground) 5%,transparent);
+  }
+  .dark ${NEW_THREAD_TARGET} [data-root-compose-mobile-recents] > ul > li,
+  .dark ${NEW_THREAD_TARGET} [data-root-compose-mobile-recents] > [role="status"] {
+    border:1px solid color-mix(in oklab,var(--border) 40%,transparent);
+    background:color-mix(in oklab,var(--background) 30%,transparent);
+    box-shadow:0 3px 14px color-mix(in oklab,var(--foreground) 4%,transparent);
+    -webkit-backdrop-filter:blur(10px) saturate(.84);
+    backdrop-filter:blur(10px) saturate(.84);
+  }
+  .dark ${NEW_THREAD_TARGET} [data-root-compose-mobile-recents] > ul > li + li {
+    margin-top:4px;
+  }
+  .dark ${NEW_THREAD_TARGET} [data-root-compose-mobile-recents] > ul > li:hover,
+  .dark ${NEW_THREAD_TARGET} [data-root-compose-mobile-recents] > ul > li[class~="bg-surface-selected"] {
+    border-color:color-mix(in oklab,var(--border) 70%,transparent);
+    background:color-mix(in oklab,var(--background) 54%,transparent);
+  }
+}
 `;
 export const READING_SURFACE = `
 [id="thread-detail-timeline-panel"] .thread-scrollbar:has(> div > .mx-auto) {

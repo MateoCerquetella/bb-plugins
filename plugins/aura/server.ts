@@ -85,7 +85,7 @@ export default function aura(bb: BbPluginApi): void {
     const row = db.prepare("SELECT image_info, image_bytes FROM background WHERE json_extract(image_info, '$.version') = ? UNION ALL SELECT image_info, image_bytes FROM aura_slots WHERE json_extract(image_info, '$.version') = ? LIMIT 1").get(version, version) as Stored | undefined;
     if (!row?.image_info || !row.image_bytes) return c.notFound();
     return new Response(new Uint8Array(row.image_bytes), { headers: {
-      "Content-Type": JSON.parse(row.image_info).mime, "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff",
+      "Content-Type": JSON.parse(row.image_info).mime, "Cache-Control": "private, max-age=31536000, immutable", "X-Content-Type-Options": "nosniff",
       "Content-Security-Policy": "default-src 'none'",
     } });
   });

@@ -85,6 +85,9 @@ function mountShader(parent: HTMLElement, imageUrl: string | null, color: string
   let imageReady = imageUrl === null;
   let image: HTMLImageElement | null = null;
   let texture: WebGLTexture | null = null;
+  let timeUniform: WebGLUniformLocation | null = null;
+  let resolutionUniform: WebGLUniformLocation | null = null;
+  let pixelRatioUniform: WebGLUniformLocation | null = null;
   const shaders: WebGLShader[] = [];
   const program = gl.createProgram();
   const buffer = gl.createBuffer();
@@ -109,6 +112,9 @@ function mountShader(parent: HTMLElement, imageUrl: string | null, color: string
     gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program) ?? "Shader link failed");
     gl.useProgram(program);
+    timeUniform = gl.getUniformLocation(program, "u_time");
+    resolutionUniform = gl.getUniformLocation(program, "u_resolution");
+    pixelRatioUniform = gl.getUniformLocation(program, "u_pixelRatio");
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
     const position = gl.getAttribLocation(program, "a_position");
@@ -135,7 +141,7 @@ function mountShader(parent: HTMLElement, imageUrl: string | null, color: string
   function draw(): void {
     if (disposed || lost || !imageReady || !canvas.width || !canvas.height) return;
     gl!.useProgram(program);
-    gl!.uniform1f(gl!.getUniformLocation(program!,"u_time"),frame * .001);
+    gl!.uniform1f(timeUniform,frame * .001);
     gl!.clear(gl!.COLOR_BUFFER_BIT); gl!.drawArrays(gl!.TRIANGLES,0,6);
     if (canvas.dataset.rendered !== "true") canvas.dataset.rendered = "true";
   }
@@ -144,7 +150,7 @@ function mountShader(parent: HTMLElement, imageUrl: string | null, color: string
     if (disposed || lost || document.hidden || !visible || reduced.matches) return;
     if (previous !== null) frame += Math.min(now-previous, 1000/15) * .5;
     previous = now;
-    if (now-lastDraw >= 1000/30) { draw(); lastDraw = now; }
+    if (now-lastDraw >= 1000/15) { draw(); lastDraw = now; }
     raf = requestAnimationFrame(tick);
   }
   function schedule() {
@@ -158,12 +164,12 @@ function mountShader(parent: HTMLElement, imageUrl: string | null, color: string
     const {width,height} = parent.getBoundingClientRect();
     if (disposed || lost || width <= 0 || height <= 0) return;
     // Match Capy's bounded noise renderer: width*height / (3*3) framebuffer pixels.
-    const scale = imageUrl ? Math.min(1/2, Math.sqrt(2073600/(width*height))) : 1/3;
+    const scale = imageUrl ? Math.min(1/3, Math.sqrt(2073600/(width*height))) : 1/3;
     canvas.width = Math.max(1,Math.round(width*scale)); canvas.height = Math.max(1,Math.round(height*scale));
     gl!.viewport(0,0,canvas.width,canvas.height);
     gl!.useProgram(program);
-    gl!.uniform2f(gl!.getUniformLocation(program!,"u_resolution"),canvas.width,canvas.height);
-    gl!.uniform1f(gl!.getUniformLocation(program!,"u_pixelRatio"),canvas.width/width);
+    gl!.uniform2f(resolutionUniform,canvas.width,canvas.height);
+    gl!.uniform1f(pixelRatioUniform,canvas.width/width);
     draw();
   }
   if (imageUrl) {
