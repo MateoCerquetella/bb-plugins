@@ -4,6 +4,7 @@ import {
   consumeCodexRateLimitResetCredit,
   readCodexResetCredits,
 } from "./lib/codex-reset-credits.ts";
+import { readClaudeUsageFromKeychain } from "./lib/claude-keychain-usage.ts";
 import { loadUsageSnapshot } from "./lib/load-usage.ts";
 import { getCachedAntigravityUsage } from "./lib/antigravity-probe.ts";
 import {
@@ -144,6 +145,13 @@ export default function plugin(bb: BbPluginApi) {
       description: "Show Claude Code usage in the sidebar footer.",
       default: true,
     },
+    claudeKeychainService: {
+      type: "string",
+      label: "Claude Keychain service",
+      description:
+        "macOS only. Set when Claude Code runs with CLAUDE_CONFIG_DIR, which stores credentials under `Claude Code-credentials-<hash>` instead of BB's default `Claude Code-credentials`. Leave empty to use BB's usage data.",
+      default: "",
+    },
     enableCodex: {
       type: "boolean",
       label: "Enable Codex",
@@ -192,8 +200,18 @@ export default function plugin(bb: BbPluginApi) {
       };
     },
     async getUsage({ threadId }) {
-      const snapshot = await loadUsageSnapshot(bb.sdk, threadId);
       const preferences = await settings.get();
+      const claudeKeychainService = preferences.claudeKeychainService.trim();
+      const snapshot = await loadUsageSnapshot(
+        bb.sdk,
+        threadId,
+        new Date(),
+        claudeKeychainService === ""
+          ? Promise.resolve({})
+          : readClaudeUsageFromKeychain(claudeKeychainService).then(
+              (usage) => ({ "claude-code": usage }),
+            ),
+      );
       const providers = preferences.enableAntigravity
         ? [
             ...snapshot.providers.filter((provider) => provider.id !== "antigravity"),
