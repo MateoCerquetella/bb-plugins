@@ -95,7 +95,7 @@ const defaultDeps: ClaudeKeychainUsageDeps = {
 };
 
 export function isClaudeKeychainService(service: string): boolean {
-  return CLAUDE_KEYCHAIN_SERVICE_PATTERN.test(service);
+  return !/[\r\n]/u.test(service) && CLAUDE_KEYCHAIN_SERVICE_PATTERN.test(service);
 }
 
 export function parseClaudeCredentials(raw: string): ClaudeCredentials | null {
@@ -186,7 +186,13 @@ export function normalizeClaudeUsageResponse(
     usageWindow(parsed.data.seven_day, "Weekly limit"),
     ...scopedWindows(parsed.data.limits),
   ].filter((window): window is RawUsageWindow => window !== null);
-  if (windows.length === 0) {
+  if (
+    windows.length === 0 ||
+    parsed.data.five_hour == null ||
+    parsed.data.seven_day == null ||
+    parsed.data.five_hour.utilization == null ||
+    parsed.data.seven_day.utilization == null
+  ) {
     return {
       status: "error",
       message: "Claude usage response was malformed.",

@@ -66,6 +66,7 @@ test("accepts only Claude Code credential services", () => {
   assert.equal(isClaudeKeychainService(SERVICE), true);
   assert.equal(isClaudeKeychainService("github.com"), false);
   assert.equal(isClaudeKeychainService(` ${SERVICE} `), false);
+  assert.equal(isClaudeKeychainService(`${SERVICE}\n`), false);
   assert.equal(isClaudeKeychainService("Claude Code-credentials-x y"), false);
   assert.equal(isClaudeKeychainService("Claude Code-credentials-a1b2c3d"), false);
   assert.equal(
@@ -110,6 +111,20 @@ test("rejects an empty or partial usage response", async () => {
     deps({ fetch: async () => Response.json({}) }),
   );
   assert.deepEqual(usage, {
+    status: "error",
+    message: "Claude usage response was malformed.",
+    planLabel: "Max (20x)",
+  });
+  const partial = await readClaudeUsageFromKeychain(
+    SERVICE,
+    deps({
+      fetch: async () =>
+        Response.json({
+          five_hour: { utilization: 12.5, resets_at: null },
+        }),
+    }),
+  );
+  assert.deepEqual(partial, {
     status: "error",
     message: "Claude usage response was malformed.",
     planLabel: "Max (20x)",
