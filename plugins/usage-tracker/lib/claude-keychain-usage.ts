@@ -95,7 +95,10 @@ const defaultDeps: ClaudeKeychainUsageDeps = {
 };
 
 export function isClaudeKeychainService(service: string): boolean {
-  return !/[\r\n]/u.test(service) && CLAUDE_KEYCHAIN_SERVICE_PATTERN.test(service);
+  return (
+    !/[\r\n\u2028\u2029]/u.test(service) &&
+    CLAUDE_KEYCHAIN_SERVICE_PATTERN.test(service)
+  );
 }
 
 export function parseClaudeCredentials(raw: string): ClaudeCredentials | null {

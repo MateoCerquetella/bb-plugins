@@ -67,6 +67,8 @@ test("accepts only Claude Code credential services", () => {
   assert.equal(isClaudeKeychainService("github.com"), false);
   assert.equal(isClaudeKeychainService(` ${SERVICE} `), false);
   assert.equal(isClaudeKeychainService(`${SERVICE}\n`), false);
+  assert.equal(isClaudeKeychainService(`${SERVICE}\u2028`), false);
+  assert.equal(isClaudeKeychainService(`${SERVICE}\u2029`), false);
   assert.equal(isClaudeKeychainService("Claude Code-credentials-x y"), false);
   assert.equal(isClaudeKeychainService("Claude Code-credentials-a1b2c3d"), false);
   assert.equal(
