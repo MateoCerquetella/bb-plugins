@@ -20,6 +20,11 @@
 <td align="center"><a href="plugins/amp/"><b>Amp</b></a></td>
 <td>Runs <a href="https://ampcode.com">Amp</a> as a native bb provider, locally or in an Orb.</td>
 </tr>
+<tr>
+<td align="center" width="60"></td>
+<td align="center"><a href="plugins/jev-route/"><b>Jev Routing</b></a></td>
+<td>Shows per-thread model history and provides independent Jev routing setup for Codex.</td>
+</tr>
 </table>
 
 ### Dev Productivity
