@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "sequence": 1,
+  "previousDigest": "sha256:e454052c7f9d4e6b61efff77a8741b4efa1792dc885606212e1c9a616c34b6f2",
+  "actor": "empirical-start",
+  "type": "transition",
+  "summary": "Started review-github-pull-request-48-https-github-com-mateocerquetella-bb",
+  "createdAt": "2026-09-23T00:54:51.403Z",
+  "stateBeforeDigest": "sha256:74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+  "stateAfterDigest": "sha256:e3281e8c75142d4b9e1494768e86114c6e85837e49891bdd88f2e62935222455",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 1,
+    "activeFeature": "review-github-pull-request-48-https-github-com-mateocerquetella-bb",
+    "request": "Review GitHub pull request #48, fix blocking findings and failing CI, update usage-tracker version/changelog, verify, comment, and merge without publishing.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": null,
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:fe621464edd3b8e6c122915e58ef163256918ac64245b5daa72020078e4ce55c",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": null,
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-23T00:54:51.403Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:8bc36ebd79c974864c6411dcad6e6ebc06d10aaa4ffd2487c386096ab7890433"
+}

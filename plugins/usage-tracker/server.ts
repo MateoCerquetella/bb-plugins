@@ -149,7 +149,7 @@ export default function plugin(bb: BbPluginApi) {
       type: "string",
       label: "Claude Keychain service",
       description:
-        "macOS only. Set when Claude Code runs with CLAUDE_CONFIG_DIR, which stores credentials under `Claude Code-credentials-<hash>` instead of BB's default `Claude Code-credentials`. Leave empty to use BB's usage data.",
+        "macOS only. Set when Claude Code runs with CLAUDE_CONFIG_DIR, which stores credentials under `Claude Code-credentials-<8 lowercase hex characters>` instead of BB's default `Claude Code-credentials`. Leave empty to use BB's usage data.",
       default: "",
     },
     enableCodex: {
@@ -206,11 +206,13 @@ export default function plugin(bb: BbPluginApi) {
         bb.sdk,
         threadId,
         new Date(),
-        claudeKeychainService === ""
-          ? Promise.resolve({})
-          : readClaudeUsageFromKeychain(claudeKeychainService).then(
-              (usage) => ({ "claude-code": usage }),
-            ),
+        async () =>
+          claudeKeychainService === ""
+            ? {}
+            : {
+                "claude-code":
+                  await readClaudeUsageFromKeychain(claudeKeychainService),
+              },
       );
       const providers = preferences.enableAntigravity
         ? [

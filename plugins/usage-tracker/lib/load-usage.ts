@@ -52,7 +52,7 @@ export async function loadUsageSnapshot(
   sdk: UsageSdk,
   threadId: string | null,
   fetchedAt = new Date(),
-  overrides: Promise<RawUsageResponse> = Promise.resolve({}),
+  loadPrimaryOverrides: () => Promise<RawUsageResponse> = async () => ({}),
 ): Promise<UsageSnapshot> {
   const hostId =
     threadId === null ? null : await resolveThreadHostId(sdk, threadId);
@@ -61,7 +61,7 @@ export async function loadUsageSnapshot(
       ? sdk.system.usageLimits()
       : sdk.system.usageLimits({ hostId }),
     resolveHostName(sdk, hostId),
-    overrides,
+    hostId === null ? loadPrimaryOverrides() : Promise.resolve({}),
   ]);
 
   return normalizeUsage(

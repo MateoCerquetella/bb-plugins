@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.10 - 2026-09-22
+
+### Added
+
+- Add a **Claude Keychain service** setting so Claude Code usage loads on the
+  primary macOS machine when `CLAUDE_CONFIG_DIR` stores credentials under
+  `Claude Code-credentials-<hash>` instead of BB's default Keychain service.
+  Contributed by [Julien Erny (@AbelThorne)](https://github.com/AbelThorne).
+
+### Fixed
+
+- Restrict the override to exact Claude Code service names, keep local
+  credentials out of remote-host snapshots, bound the Anthropic response, and
+  return safe errors without exposing command or network details.
+
 ## 0.1.9 - 2026-09-21
 
 - Show reported USD credit usage and limits in expanded provider details,
@@ -12,14 +27,6 @@
 - Discover `agy` from PATH and supported macOS fallback locations, use the official Antigravity mark, and show all Antigravity quota groups.
 
 All notable changes to Usage Tracker are documented here.
-
-## Unreleased
-
-### Added
-
-- Add a **Claude Keychain service** setting so Claude Code usage loads when
-  `CLAUDE_CONFIG_DIR` stores credentials under `Claude Code-credentials-<hash>`
-  instead of BB's default Keychain service.
 
 ## 0.1.6 - 2026-09-02
 

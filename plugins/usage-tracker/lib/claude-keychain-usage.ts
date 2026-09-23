@@ -7,42 +7,46 @@ import type { RawProviderUsage, RawUsageWindow } from "./usage.ts";
 const execFileAsync = promisify(execFile);
 const KEYCHAIN_TIMEOUT_MS = 10_000;
 const USAGE_FETCH_TIMEOUT_MS = 15_000;
+const USAGE_RESPONSE_MAX_BYTES = 1024 * 1024;
 const CLAUDE_USAGE_URL = "https://api.anthropic.com/api/oauth/usage";
 
 // Claude Code stores its OAuth credentials under "Claude Code-credentials",
 // suffixed with a hash of CLAUDE_CONFIG_DIR when that variable is set. Only
 // services of that shape are read, so the setting cannot send an unrelated
 // Keychain secret to Anthropic.
-const CLAUDE_KEYCHAIN_SERVICE_PATTERN = /^Claude Code-credentials(?:-[0-9a-f]+)?$/u;
+const CLAUDE_KEYCHAIN_SERVICE_PATTERN =
+  /^Claude Code-credentials(?:-[0-9a-f]{8})?$/u;
 
 const credentialsSchema = z.object({
   claudeAiOauth: z.object({
-    accessToken: z.string().min(1),
-    expiresAt: z.number().nullish(),
-    subscriptionType: z.string().nullish(),
-    rateLimitTier: z.string().nullish(),
+    accessToken: z.string().min(1).max(16_384),
+    expiresAt: z.number().finite().nullish(),
+    subscriptionType: z.string().trim().max(64).nullish(),
+    rateLimitTier: z.string().trim().max(128).nullish(),
   }),
 });
 
 type ClaudeCredentials = z.infer<typeof credentialsSchema>["claudeAiOauth"];
 
 const usageWindowSchema = z.object({
-  utilization: z.number().nullish(),
-  resets_at: z.string().nullish(),
+  utilization: z.number().finite().nullish(),
+  resets_at: z.string().max(128).nullish(),
 });
 
 const scopedLimitSchema = z
   .object({
-    kind: z.string(),
+    kind: z.string().max(64),
     scope: z
       .object({
         model: z
-          .object({ display_name: z.string().trim().min(1).nullish() })
+          .object({
+            display_name: z.string().trim().min(1).max(100).nullish(),
+          })
           .nullish(),
       })
       .nullish(),
-    percent: z.number().nullish(),
-    resets_at: z.string().nullish(),
+    percent: z.number().finite().nullish(),
+    resets_at: z.string().max(128).nullish(),
   })
   .passthrough();
 
@@ -52,6 +56,7 @@ const usageResponseSchema = z
     seven_day: usageWindowSchema.nullish(),
     limits: z
       .array(scopedLimitSchema.nullable().catch(null))
+      .max(100)
       .nullish()
       .catch([]),
   })
@@ -208,10 +213,18 @@ export async function readClaudeUsageFromKeychain(
     return {
       status: "error",
       message:
-        "The Claude Keychain service must look like `Claude Code-credentials` or `Claude Code-credentials-<hash>`.",
+        "The Claude Keychain service must be `Claude Code-credentials` or `Claude Code-credentials-<8 lowercase hex characters>`.",
     };
   }
-  const secret = await deps.readKeychainSecret(service);
+  let secret: string | null;
+  try {
+    secret = await deps.readKeychainSecret(service);
+  } catch {
+    return {
+      status: "error",
+      message: "The Claude Keychain item could not be read.",
+    };
+  }
   const credentials = secret === null ? null : parseClaudeCredentials(secret);
   if (credentials === null) return { status: "unauthenticated" };
   if (credentials.expiresAt != null && deps.now() >= credentials.expiresAt) {
@@ -238,11 +251,19 @@ export async function readClaudeUsageFromKeychain(
         planLabel: planLabel(credentials),
       };
     }
-    return normalizeClaudeUsageResponse(await response.json(), credentials);
-  } catch (error) {
+    const body = await response.text();
+    if (Buffer.byteLength(body, "utf8") > USAGE_RESPONSE_MAX_BYTES) {
+      return {
+        status: "error",
+        message: "Claude usage response was too large.",
+        planLabel: planLabel(credentials),
+      };
+    }
+    return normalizeClaudeUsageResponse(JSON.parse(body), credentials);
+  } catch {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : String(error),
+      message: "Claude usage could not be loaded.",
       planLabel: planLabel(credentials),
     };
   }

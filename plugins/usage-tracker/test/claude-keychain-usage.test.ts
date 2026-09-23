@@ -23,18 +23,25 @@ function credentials(overrides: Record<string, unknown> = {}): string {
 
 function deps(
   overrides: Partial<ClaudeKeychainUsageDeps> = {},
-): ClaudeKeychainUsageDeps & { services: string[]; tokens: string[] } {
+): ClaudeKeychainUsageDeps & {
+  services: string[];
+  tokens: string[];
+  urls: string[];
+} {
   const services: string[] = [];
   const tokens: string[] = [];
+  const urls: string[] = [];
   return {
     services,
     tokens,
+    urls,
     platform: "darwin",
     async readKeychainSecret(service) {
       services.push(service);
       return credentials();
     },
-    async fetch(_url, init) {
+    async fetch(url, init) {
+      urls.push(String(url));
       tokens.push(new Headers(init?.headers).get("Authorization") ?? "");
       return Response.json({
         five_hour: { utilization: 12.5, resets_at: "2026-09-22T18:00:00Z" },
@@ -59,6 +66,12 @@ test("accepts only Claude Code credential services", () => {
   assert.equal(isClaudeKeychainService(SERVICE), true);
   assert.equal(isClaudeKeychainService("github.com"), false);
   assert.equal(isClaudeKeychainService("Claude Code-credentials-x y"), false);
+  assert.equal(isClaudeKeychainService("Claude Code-credentials-a1b2c3d"), false);
+  assert.equal(
+    isClaudeKeychainService("Claude Code-credentials-a1b2c3d4e"),
+    false,
+  );
+  assert.equal(isClaudeKeychainService("Claude Code-credentials-A1B2C3D4"), false);
 });
 
 test("reads usage with the configured Keychain service", async () => {
@@ -67,6 +80,9 @@ test("reads usage with the configured Keychain service", async () => {
 
   assert.deepEqual(fake.services, [SERVICE]);
   assert.deepEqual(fake.tokens, ["Bearer token"]);
+  assert.deepEqual(fake.urls, [
+    "https://api.anthropic.com/api/oauth/usage",
+  ]);
   assert.deepEqual(usage, {
     status: "ok",
     accountEmail: null,
@@ -109,6 +125,35 @@ test("reports a missing or unreadable item as unauthenticated", async () => {
       deps({ readKeychainSecret: async () => "not json" }),
     ),
     { status: "unauthenticated" },
+  );
+});
+
+test("contains Keychain and transport failures without exposing details", async () => {
+  const keychainFailure = await readClaudeUsageFromKeychain(
+    SERVICE,
+    deps({
+      readKeychainSecret: async () => {
+        throw new Error("token=keychain-sensitive");
+      },
+    }),
+  );
+  assert.deepEqual(keychainFailure, {
+    status: "error",
+    message: "The Claude Keychain item could not be read.",
+  });
+
+  const fetchFailure = await readClaudeUsageFromKeychain(
+    SERVICE,
+    deps({
+      fetch: async () => {
+        throw new Error("Bearer network-sensitive");
+      },
+    }),
+  );
+  assert.equal(fetchFailure.status, "error");
+  assert.equal(
+    fetchFailure.status === "error" ? fetchFailure.message : "",
+    "Claude usage could not be loaded.",
   );
 });
 
@@ -169,7 +214,7 @@ test("overrides BB's Claude Code usage in the snapshot", async () => {
     sdk,
     null,
     new Date("2026-09-22T12:00:00Z"),
-    Promise.resolve({
+    async () => ({
       "claude-code": {
         status: "ok",
         accountEmail: null,
@@ -183,4 +228,45 @@ test("overrides BB's Claude Code usage in the snapshot", async () => {
   );
   assert.equal(claude?.status, "ok");
   assert.equal(claude?.planLabel, "Pro");
+});
+
+test("does not apply primary-machine overrides to a remote thread", async () => {
+  let overrideCalls = 0;
+  const sdk: UsageSdk = {
+    threads: { get: async () => ({ environmentId: "env" }) },
+    environments: { get: async () => ({ hostId: "remote-host" }) },
+    hosts: { get: async () => ({ name: "Remote" }) },
+    system: {
+      usageLimits: async () => ({
+        "claude-code": {
+          status: "ok",
+          planLabel: "Remote plan",
+          windows: [],
+        },
+      }),
+    },
+  };
+  const snapshot = await loadUsageSnapshot(
+    sdk,
+    "thread",
+    new Date("2026-09-22T12:00:00Z"),
+    async () => {
+      overrideCalls += 1;
+      return {
+        "claude-code": {
+          status: "ok",
+          planLabel: "Local plan",
+          windows: [],
+        },
+      };
+    },
+  );
+
+  assert.equal(overrideCalls, 0);
+  assert.equal(snapshot.host.id, "remote-host");
+  assert.equal(
+    snapshot.providers.find((provider) => provider.id === "claudeCode")
+      ?.planLabel,
+    "Remote plan",
+  );
 });

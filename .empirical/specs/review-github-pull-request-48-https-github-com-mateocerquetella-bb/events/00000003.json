@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "sequence": 3,
+  "previousDigest": "sha256:28290345a9b11d90a8ef53d94beb1945704c39eca27e117d74f9c78206e3fe1b",
+  "actor": "codex",
+  "type": "transition",
+  "summary": "Specified the PR #48 delivery contract with eight observable criteria covering opt-in behavior, exact Keychain service validation, fixed-origin token handling, bounded errors, remote-host isolation, regression coverage, version 0.1.10 consistency, and green reviewed merge; added provider-usage and distribution capability deltas.",
+  "createdAt": "2026-09-23T01:00:26.888Z",
+  "stateBeforeDigest": "sha256:7b6469aeff75ffc12ac90d623200ef5d1131ab38bc82ad242cb062064ec36fd0",
+  "stateAfterDigest": "sha256:87ef5eedfd80d266385af8fd24e494c3f25331ff75d7079efe2898a3bcd798c5",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 3,
+    "activeFeature": "review-github-pull-request-48-https-github-com-mateocerquetella-bb",
+    "request": "Review GitHub pull request #48, fix blocking findings and failing CI, update usage-tracker version/changelog, verify, comment, and merge without publishing.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "design",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Specified the PR #48 delivery contract with eight observable criteria covering opt-in behavior, exact Keychain service validation, fixed-origin token handling, bounded errors, remote-host isolation, regression coverage, version 0.1.10 consistency, and green reviewed merge; added provider-usage and distribution capability deltas.",
+    "implementationActor": null,
+    "workStartedAt": "2026-09-23T00:54:51.928Z",
+    "specDigest": "sha256:81cc1ae0b3a3c63c0f2e0f565dab2c224f0a3b94acba5c7a36cc34b1835264ff",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:154aaddde8f2cd4b2982b33d62e00d9d8bbab38427c4129d7198f35ed156187a",
+    "impactDigest": "sha256:42a28a104162d17ee6bb1c5ed7547f8e0ede24af71b4c52c6cb6b67de4c1573d",
+    "capabilityClaimId": "review-github-pull-request-48-https-github-com-mateocerquetella-bb-6bdfe6e0a200",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-23T01:00:26.888Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "riskRequest": "Usage Tracker advances from `0.1.9` to `0.1.10`; its changelog, lockfile, and cross-plugin distribution assertions agree on that version, and no npm publication or Git release/tag is created."
+    },
+    "reviewFirst": true,
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "review-github-pull-request-48-https-github-com-mateocerquetella-bb-6bdfe6e0a200",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "review-github-pull-request-48-https-github-com-mateocerquetella-bb",
+      "worktree": "/home/dyaus/Developer/projects/MateoCerquetella/BB/bb-plugins-review-github-pull-request-48-https-github-com-mateocerquetella-bb",
+      "worktreeId": "sha256:2a32caf7ceae6f39747d75dd6a7df37a1fd84416f452a2b2d69d4285477e4f68",
+      "baseCommit": "821855b07d68d9be4f9fd767b977c4c419b8acb4",
+      "baseTree": "79d3f064f319464896f18b80ae77417cf250e76f",
+      "bases": {
+        "usage-tracker-distribution": {
+          "capability": "usage-tracker-distribution",
+          "digest": "sha256:1abf98e1d06367f02d1943f7975c08e7e095b0a1ef9afb1fd132ff151e44f131",
+          "requirements": {
+            "immutable usage tracker git release": "sha256:cdc8a80433bcd2bd625de49e09c6793faa784706605a6e9eb67584df9df9f244"
+          }
+        },
+        "usage-tracker-provider-usage": {
+          "capability": "usage-tracker-provider-usage",
+          "digest": "sha256:b7d93dc3f6c18265ec2f97a4754d672ad29c54a16f5c4d9d474f876825d35123",
+          "requirements": {
+            "explicit local claude keychain usage override": null
+          }
+        }
+      },
+      "capabilities": [
+        "usage-tracker-distribution",
+        "usage-tracker-provider-usage"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-09-23T01:00:26.884Z",
+      "heartbeatAt": "2026-09-23T01:00:26.884Z",
+      "digest": "sha256:e9e619e4eb09eaa8c26e980257002099a83ce99a4a8762599966d058cb87d814"
+    }
+  },
+  "digest": "sha256:51d87a17f5cb9183392b3a716ba30f184906379327433c370150122fbe969860"
+}
