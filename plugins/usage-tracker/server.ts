@@ -48,22 +48,38 @@ const usageWindowSchema = z
   })
   .strict();
 
+const providerStatusSchema = z.enum([
+  "ok",
+  "not_installed",
+  "unauthenticated",
+  "expired",
+  "error",
+]);
+
+const pooledAccountSchema = z
+  .object({
+    id: z.string(),
+    label: z.string(),
+    status: providerStatusSchema,
+    accountEmail: z.string().nullable(),
+    planLabel: z.string().nullable(),
+    message: z.string().nullable(),
+    observedAt: z.string().nullable(),
+    windows: z.array(usageWindowSchema),
+  })
+  .strict();
+
 const providerSchema = z
   .object({
     id: z.enum(PROVIDER_IDS),
     name: z.string(),
-    status: z.enum([
-      "ok",
-      "not_installed",
-      "unauthenticated",
-      "expired",
-      "error",
-    ]),
+    status: providerStatusSchema,
     accountEmail: z.string().nullable(),
     planLabel: z.string().nullable(),
     message: z.string().nullable(),
     windows: z.array(usageWindowSchema),
     resetCredits: resetCreditsSchema.nullable().optional(),
+    accounts: z.array(pooledAccountSchema).optional(),
   })
   .strict();
 

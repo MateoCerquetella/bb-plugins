@@ -1,4 +1,9 @@
 import {
+  applyPooledAccounts,
+  loadPooledAccounts,
+  type PoolRpcSdk,
+} from "./pooled-usage.ts";
+import {
   normalizeUsage,
   type RawUsageResponse,
   type UsageSnapshot,
@@ -17,6 +22,8 @@ export interface UsageSdk {
   system: {
     usageLimits(args?: { hostId?: string }): Promise<RawUsageResponse>;
   };
+  /** Present in the plugin runtime; lets pooled accounts replace local usage. */
+  plugins?: PoolRpcSdk["plugins"];
 }
 
 export async function resolveThreadHostId(
@@ -55,12 +62,17 @@ export async function loadUsageSnapshot(
 ): Promise<UsageSnapshot> {
   const hostId =
     threadId === null ? null : await resolveThreadHostId(sdk, threadId);
-  const [response, hostName] = await Promise.all([
+  const plugins = sdk.plugins;
+  const [response, hostName, pooled] = await Promise.all([
     hostId === null
       ? sdk.system.usageLimits()
       : sdk.system.usageLimits({ hostId }),
     resolveHostName(sdk, hostId),
+    plugins === undefined ? null : loadPooledAccounts({ plugins }, hostId),
   ]);
 
-  return normalizeUsage(response, { id: hostId, name: hostName }, fetchedAt);
+  return applyPooledAccounts(
+    normalizeUsage(response, { id: hostId, name: hostName }, fetchedAt),
+    pooled,
+  );
 }

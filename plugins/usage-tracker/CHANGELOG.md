@@ -15,6 +15,11 @@ All notable changes to Usage Tracker are documented here.
 
 ## Unreleased
 
+- Read every Account Pooler account through its `provider-usage.v1` RPC. Pooled
+  providers show a combined, plan-weighted reading in the strip, and their
+  expanded details list each account's plan, status, and limits. The strip
+  falls back to host-local usage when the pooler is disabled or unresponsive.
+
 ## 0.1.6 - 2026-09-02
 
 ### Added

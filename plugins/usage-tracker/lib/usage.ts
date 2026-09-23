@@ -71,6 +71,18 @@ export interface UsageWindow {
 
 export type UsageLevel = "normal" | "warning" | "critical";
 
+/** One account served by the Account Pooler plugin. */
+export interface PooledAccountUsage {
+  id: string;
+  label: string;
+  status: ProviderStatus;
+  accountEmail: string | null;
+  planLabel: string | null;
+  message: string | null;
+  observedAt: string | null;
+  windows: UsageWindow[];
+}
+
 export interface ProviderUsage {
   id: ProviderId;
   name: string;
@@ -80,6 +92,11 @@ export interface ProviderUsage {
   message: string | null;
   windows: UsageWindow[];
   resetCredits?: UsageResetCredits | null;
+  /**
+   * Present when the Account Pooler owns this provider's accounts. The
+   * provider-level windows then combine every healthy pooled account.
+   */
+  accounts?: PooledAccountUsage[];
 }
 
 export interface UsageSnapshot {
@@ -153,6 +170,14 @@ const PROVIDERS: readonly ProviderDefinition[] = [
     loginCommand: "opencode auth login",
   },
 ];
+
+export function providerIdForWireId(wireId: string): ProviderId | null {
+  return (
+    PROVIDERS.find((provider) =>
+      (provider.wireIds as readonly string[]).includes(wireId),
+    )?.id ?? null
+  );
+}
 
 export const REQUEST_ERROR_MESSAGE =
   "Usage could not be loaded. Check the agent session and try again.";
