@@ -1,0 +1,13 @@
+[Unit]
+Description=Jev model routing
+After=network-online.target codex-router.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 %h/.local/share/jev-codex-router/server/jev_server.py
+Restart=on-failure
+RestartSec=3
+UMask=0077
+
+[Install]
+WantedBy=default.target

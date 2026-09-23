@@ -1,0 +1,18 @@
+{
+  "slug": "jev/auto",
+  "gatewayModel": "jev-auto",
+  "compHash": "jev-auto-user-v1",
+  "upstreamModel": "auto",
+  "provider": "jev",
+  "listed": true,
+  "displayName": "Jev Routing",
+  "description": "Jev selects the model and reasoning effort for each request.",
+  "priority": 1,
+  "defaultEffort": "medium",
+  "reasoningLevels": [
+    { "effort": "medium", "description": "Automatically chosen by Jev" }
+  ],
+  "contextWindow": 258400,
+  "autoCompact": 219640,
+  "inputModalities": ["text", "image"]
+}
