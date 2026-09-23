@@ -65,6 +65,7 @@ test("accepts only Claude Code credential services", () => {
   assert.equal(isClaudeKeychainService("Claude Code-credentials"), true);
   assert.equal(isClaudeKeychainService(SERVICE), true);
   assert.equal(isClaudeKeychainService("github.com"), false);
+  assert.equal(isClaudeKeychainService(` ${SERVICE} `), false);
   assert.equal(isClaudeKeychainService("Claude Code-credentials-x y"), false);
   assert.equal(isClaudeKeychainService("Claude Code-credentials-a1b2c3d"), false);
   assert.equal(
@@ -100,6 +101,42 @@ test("reads usage with the configured Keychain service", async () => {
         resetsAt: "2026-09-25T00:00:00.000Z",
       },
     ],
+  });
+});
+
+test("rejects an empty or partial usage response", async () => {
+  const usage = await readClaudeUsageFromKeychain(
+    SERVICE,
+    deps({ fetch: async () => Response.json({}) }),
+  );
+  assert.deepEqual(usage, {
+    status: "error",
+    message: "Claude usage response was malformed.",
+    planLabel: "Max (20x)",
+  });
+});
+
+test("rejects an oversized response before buffering it", async () => {
+  const oversized = new ReadableStream<Uint8Array>({
+    start(controller) {
+      controller.enqueue(new Uint8Array(1024 * 1024));
+      controller.enqueue(new Uint8Array(1));
+      controller.close();
+    },
+  });
+  const usage = await readClaudeUsageFromKeychain(
+    SERVICE,
+    deps({
+      fetch: async () =>
+        new Response(oversized, {
+          headers: { "content-type": "application/json" },
+        }),
+    }),
+  );
+  assert.deepEqual(usage, {
+    status: "error",
+    message: "Claude usage response was too large.",
+    planLabel: "Max (20x)",
   });
 });
 

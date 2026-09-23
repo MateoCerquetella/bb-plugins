@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:ea4ccbd2b12c46ca03841aca54c752f50b31ae646bc570e5b1b3f87708ece816",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "235147a554a9f5f48287766ae461acace0877bd3",
+  "headCommit": "beb9e66a55877fa58b9642e3407d9b855efb663e",
+  "diffDigest": "sha256:418b3190d781cf0313523631b9cec1a5215941e6098f54f689de5cf7ba42fa64",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "fresh-context-reviewer",
+  "reviewerInvocationId": "/root/fresh_review",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- PASS AC-1: An empty setting leaves BB's Claude Code response intact and skips the Keychain and Anthropic request.\n- PASS AC-2: On macOS, a configured allowed service can supply OAuth usage for the primary-machine path.\n- FAIL AC-3: The reader validates service names and passes them as one argument, but the settings path trims malformed padded names into valid ones before validation.\n- FAIL AC-4: Errors are sanitized, but an empty or partial usage response is accepted as healthy, and the response-size check occurs after the entire body is read.\n- PASS AC-5: A thread resolved to a remote host skips the local override and uses that host's BB response.\n- FAIL AC-6: Provider normalization remains compatible, but regression tests do not cover malformed or oversized response handling or the settings-path validation gap.\n- PASS AC-7: The manifest, lockfile, changelog, and active cross-plugin assertion identify 0.1.10; the packet shows no publication or release mutation.\n- FAIL AC-8: The committed changes are not ready for downstream CI and merge gates because acceptance findings remain unresolved.\n\n## Security / correctness\n\nThe token is confined to the authorization header at the fixed Anthropic URL, and raw failures are not returned. Service validation must apply to the configured value, and the response body must be bounded while reading.\n\n## Design / maintainability\n\nThe override is localized and preserves remote-host behavior. Tightening response validation and adding focused tests should be straightforward.",
+  "bodyDigest": "sha256:529a1b511263cb76135b930ec0423daa78915f103f8c4a83632c1a45821c4b45",
+  "findings": [
+    {
+      "id": "F-1",
+      "severity": "high",
+      "category": "acceptance",
+      "summary": "All usage-response fields are optional, so `{}` and some partial or malformed responses normalize to `status: \"ok\"` with no windows.",
+      "path": "plugins/usage-tracker/lib/claude-keychain-usage.ts"
+    },
+    {
+      "id": "F-2",
+      "severity": "medium",
+      "category": "security",
+      "summary": "The code calls `response.text()` before enforcing the one-megabyte limit, allowing an oversized response to consume unbounded memory first.",
+      "path": "plugins/usage-tracker/lib/claude-keychain-usage.ts"
+    },
+    {
+      "id": "F-3",
+      "severity": "medium",
+      "category": "acceptance",
+      "summary": "Trimming the configured service before validation makes padded, malformed service values trigger a Keychain read.",
+      "path": "plugins/usage-tracker/server.ts"
+    }
+  ],
+  "digest": "sha256:140f09bb26fcdd5c492b071634c76d51c0a4205276dee7bbb004cc9ab24624a1"
+}

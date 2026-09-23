@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "generator": "empirical-0.34.0",
-  "sourceDigest": "sha256:6e430befbe0f0c5ad3a26b1fd158781697d3be80044e65a20fb3dd5ed8fd9c30",
+  "generator": "empirical-0.38.0",
+  "sourceDigest": "sha256:e32ab30602eb199bab9696471771126b6d71d69a8687eaa30527c9a9be4198ac",
   "files": [
     {
       "path": ".agents/skills/empirical/SKILL.md",
@@ -10,8 +10,8 @@
     },
     {
       "path": ".bb/plugins.json",
-      "size": 955,
-      "digest": "sha256:1c3f7cff6ed51256c213abe5ecb9047662bca2a73f5fe5b8b9d822f37837ecd6"
+      "size": 1033,
+      "digest": "sha256:76a6119257b2898fbb16cd1702fe09e2b34108b02aa9a6bcbf4fcb26e242dbcc"
     },
     {
       "path": ".claude/skills/empirical/SKILL.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "size": 13947,
-      "digest": "sha256:305a9d3941f33098f70b3f554ce4fb3ef417e129d7d04bd6e142839dbda1bdb3"
+      "size": 14140,
+      "digest": "sha256:ef32b57a2618855001c67e25a7d5cf9210b79f79f824ffd7774608c8ea15ec0b"
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -100,8 +100,8 @@
     },
     {
       "path": "package-lock.json",
-      "size": 364700,
-      "digest": "sha256:74435ef855954437f16568783bd77a2f66abfdb7c6d0591713980ec95c6f07b3"
+      "size": 365495,
+      "digest": "sha256:fc326f36b778e53aac186cbc990dc44d0ea7e3729c7fb7b83ed8106a24b0aa3b"
     },
     {
       "path": "package.json",
@@ -425,8 +425,8 @@
     },
     {
       "path": "plugins/dockside/README.md",
-      "size": 11572,
-      "digest": "sha256:48a7367f40da305a6d959015563547093361d129e35570a5e65fb77f2b910a80"
+      "size": 11639,
+      "digest": "sha256:cf6e71cef111cee5cca54ff18384ec6431866a6370e082c5815d198d54b64fbe"
     },
     {
       "path": "plugins/dockside/THIRD_PARTY_NOTICES.md",
@@ -1064,6 +1064,101 @@
       "digest": "sha256:35d26ea66c86da9701e4f4b467913481ffeae910761cea34c775c5dacb7f8eaa"
     },
     {
+      "path": "plugins/jev-route/.gitignore",
+      "size": 39,
+      "digest": "sha256:b541e6fb4c70aa694e6d75eeb9f0e9d0f6375179ec525bf54706772c3db1fa09"
+    },
+    {
+      "path": "plugins/jev-route/LICENSE",
+      "size": 1074,
+      "digest": "sha256:d73e86b0d180da7359d03c23a6378eca5177f6a9ffc0e2c51c5b4a1dcf17391c"
+    },
+    {
+      "path": "plugins/jev-route/README.md",
+      "size": 2900,
+      "digest": "sha256:e5a873224fa2a1019352eaa2a528a6724e350d4c6927efe92a6d3a75b77a13c1"
+    },
+    {
+      "path": "plugins/jev-route/app.css",
+      "size": 7412,
+      "digest": "sha256:711c005fdc61123a987ea651721ab5df2552272908feaafc727d62e1d0db30a5"
+    },
+    {
+      "path": "plugins/jev-route/app.tsx",
+      "size": 21083,
+      "digest": "sha256:b1bbeccc592ac7607f13d06f25dd40ade90db6c809f7b33b34cc07860704489a"
+    },
+    {
+      "path": "plugins/jev-route/ops/jev-model.json",
+      "size": 507,
+      "digest": "sha256:796643e046abc89ab0a565bf6ddcde179f4dccf2b112835891d4e5ea886d5cea"
+    },
+    {
+      "path": "plugins/jev-route/ops/jev-router.service",
+      "size": 268,
+      "digest": "sha256:68750e53de3529e7b0b4089bb00342edadfcb1095d070d15058de0ff31dafdd9"
+    },
+    {
+      "path": "plugins/jev-route/ops/register-bb-model.mjs",
+      "size": 758,
+      "digest": "sha256:75affa067a8429800c5135b8337e35594141414feee90b73c49aadc90485f4d4"
+    },
+    {
+      "path": "plugins/jev-route/ops/register-model.mjs",
+      "size": 928,
+      "digest": "sha256:6e3da6541eb27d85ea87ba149e6e43b5e7c80702424e49f1cb370c61a74f5e4f"
+    },
+    {
+      "path": "plugins/jev-route/package.json",
+      "size": 1032,
+      "digest": "sha256:36679a9e171c2bb43444fc6985fe6f6555835eaaa84e3991e3d24c86ba098285"
+    },
+    {
+      "path": "plugins/jev-route/runtime/LICENSE",
+      "size": 1076,
+      "digest": "sha256:8828246199f50e1e3044618affcd875a618d37bd7905ecd10594dd3b70caa60f"
+    },
+    {
+      "path": "plugins/jev-route/runtime/jev_server.py",
+      "size": 62840,
+      "digest": "sha256:19268d815c9b977cba3faac0ec233af89fbfa8c3585fa2878e7f2ffce96da14a"
+    },
+    {
+      "path": "plugins/jev-route/runtime/routing_policy.py",
+      "size": 5506,
+      "digest": "sha256:76bdb646fd8b28a6915f0a34800b63972ce93845b4cbdc6bd43f1535c8906f8a"
+    },
+    {
+      "path": "plugins/jev-route/runtime/test_per_call_routing.py",
+      "size": 10697,
+      "digest": "sha256:a7256ea252d9d69d08c78d3f06d702c9cd8b130de0322678c1af3dd3d09fab66"
+    },
+    {
+      "path": "plugins/jev-route/runtime/test_route_policy.py",
+      "size": 5080,
+      "digest": "sha256:5f6029cdaab92886c8cc1b5f2889538a5703504ff732bf97b1b41cb044d58174"
+    },
+    {
+      "path": "plugins/jev-route/server.ts",
+      "size": 9434,
+      "digest": "sha256:b41098d35d8bde09949752d03ff371b451f9a116aa6b200b55dfa7d666d7d2e5"
+    },
+    {
+      "path": "plugins/jev-route/test/live.mjs",
+      "size": 1795,
+      "digest": "sha256:773f6d8b66d8c5594dd11eb7c3a3618255404da0ffe2efb5790ba65cb3caf2f4"
+    },
+    {
+      "path": "plugins/jev-route/test/server.test.ts",
+      "size": 2504,
+      "digest": "sha256:29f82b1d363eb7144e57b91904cb33e68c46f6cd719b82d76e925bb849d00423"
+    },
+    {
+      "path": "plugins/jev-route/tsconfig.json",
+      "size": 294,
+      "digest": "sha256:0c1656a967686377e9b2e2d45447714dfc4ee8070320ed92172e72a9d8a3187c"
+    },
+    {
       "path": "plugins/lavender/.gitignore",
       "size": 20,
       "digest": "sha256:58aea3d6b4b0f8799c1e00c3b023898516997f6369ee8e13d8d4b4215f70a62b"
@@ -1430,8 +1525,8 @@
     },
     {
       "path": "plugins/taskboard/test/distribution.test.ts",
-      "size": 6759,
-      "digest": "sha256:330ff90c1110f50af295e43d11dc1ec58bdaf1668268ce29e6b63397b021ceae"
+      "size": 6761,
+      "digest": "sha256:9c1711d9532ff75ebf3b7a95478ed7d6a46f9d2d56a6de75cf3653465b37430a"
     },
     {
       "path": "plugins/taskboard/test/filter-presets-backend.test.ts",
@@ -1675,8 +1770,8 @@
     },
     {
       "path": "plugins/usage-tracker/CHANGELOG.md",
-      "size": 3103,
-      "digest": "sha256:05395bbce84b61ac517455d32d5d4111a46ba7823fbb3459ae1838d749034ae7"
+      "size": 3902,
+      "digest": "sha256:3dd1c1bc4cac1de9669a6b62b607414e90d392ea0eb609e72ea03422dde8f31a"
     },
     {
       "path": "plugins/usage-tracker/LICENSE",
@@ -1685,8 +1780,8 @@
     },
     {
       "path": "plugins/usage-tracker/README.md",
-      "size": 6483,
-      "digest": "sha256:a070f58ee26d5de01517623360543d1de0f0cdda599638052696a19932902cdd"
+      "size": 7496,
+      "digest": "sha256:abbfff18e72b788406d4f94c28c13ea10aac01325d6af9947ab6578e6e08a6a1"
     },
     {
       "path": "plugins/usage-tracker/THIRD_PARTY_NOTICES.md",
@@ -1695,8 +1790,8 @@
     },
     {
       "path": "plugins/usage-tracker/app.css",
-      "size": 19337,
-      "digest": "sha256:a094424477f8df7df4fe25d9dbb6b8512ae868959fdc09ebc270e17cd4759390"
+      "size": 19512,
+      "digest": "sha256:cf7e7db78fa058bb16cd3f24d79d9c1d3f52dac3948b048d89bf3c24182f6a68"
     },
     {
       "path": "plugins/usage-tracker/app.tsx",
@@ -1724,14 +1819,19 @@
       "digest": "sha256:b443ddeebe441638707357c1f0906616d2b60283263c1718f2e3935492a490af"
     },
     {
+      "path": "plugins/usage-tracker/lib/claude-keychain-usage.ts",
+      "size": 8266,
+      "digest": "sha256:6692f335188d9e309e0755ccf2db096527f8e39cc56f4011071ada2ebf6b0d90"
+    },
+    {
       "path": "plugins/usage-tracker/lib/codex-reset-credits.ts",
       "size": 5747,
       "digest": "sha256:f2e91301dbdd9320e1494b5fb6f4dc7ac539418e9343a51c41f8a618c7774dfb"
     },
     {
       "path": "plugins/usage-tracker/lib/load-usage.ts",
-      "size": 1658,
-      "digest": "sha256:4e686c5707b8d5621d9676c32466c1a782efff46a24150c73f7a34a1dc92c425"
+      "size": 1853,
+      "digest": "sha256:9a7c036de0a71aafb77c413daea4de0d2be30fd790072ce30240c980ee5aceaa"
     },
     {
       "path": "plugins/usage-tracker/lib/preferences.ts",
@@ -1750,8 +1850,8 @@
     },
     {
       "path": "plugins/usage-tracker/lib/sidebar-strip.ts",
-      "size": 41402,
-      "digest": "sha256:9d07ebe352707c03169b610278296376545f8ccec04bfdca8fc873c4f37df51c"
+      "size": 41629,
+      "digest": "sha256:2213caaa623e39b2dbf168f3b703504a90e6afa263dc1e006bda2f973e3d10c3"
     },
     {
       "path": "plugins/usage-tracker/lib/sidebar-usage.ts",
@@ -1765,13 +1865,13 @@
     },
     {
       "path": "plugins/usage-tracker/package.json",
-      "size": 1956,
-      "digest": "sha256:ffdc477328e2369df59f056476a1219d082fc72643b8069f9ae6c9ca897a4d1f"
+      "size": 1957,
+      "digest": "sha256:30a5a8021e29a6dfdcd66f1e7988c1741cda2c16113149088e55d9c56aa4f86d"
     },
     {
       "path": "plugins/usage-tracker/server.ts",
-      "size": 6079,
-      "digest": "sha256:b9f1827bf5aacde7844ce0619802a587702fdb887742116e1814759f2fc685f0"
+      "size": 6878,
+      "digest": "sha256:0f217aa1a2cfd5c0a50ec7c82bd6e125f2450fdc4f49fedade59beb7cb5ed377"
     },
     {
       "path": "plugins/usage-tracker/test/antigravity.test.ts",
@@ -1779,9 +1879,14 @@
       "digest": "sha256:882b3f98acd98a08779dddcbdad6830e8e11033b430b1b93b134a6d7cd982a01"
     },
     {
+      "path": "plugins/usage-tracker/test/claude-keychain-usage.test.ts",
+      "size": 7634,
+      "digest": "sha256:3d0a459ce7e53fdb61f9057744fb5ad17d3dc86949d2861ff28b2716f90788f5"
+    },
+    {
       "path": "plugins/usage-tracker/test/presentation-contract.test.ts",
-      "size": 2095,
-      "digest": "sha256:1eb7c5be4f118fe589e2ff962b3c85e5d8694615dab3c44d5be3777f0d28a980"
+      "size": 2506,
+      "digest": "sha256:c821db55d5fcff256a12b1c8bab0c8c1e6e8622b5027d4c496b84e55d9166573"
     },
     {
       "path": "plugins/usage-tracker/test/reset-action.test.ts",
@@ -1812,7 +1917,7 @@
   "pages": [
     {
       "path": ".empirical/context/index.md",
-      "generator": "empirical-0.34.0",
+      "generator": "empirical-0.38.0",
       "managed": false,
       "dependencies": [
         ".agents/skills/empirical/SKILL.md",
@@ -2027,6 +2132,25 @@
         "plugins/host-monitor/test/thresholds.test.ts",
         "plugins/host-monitor/tsconfig.json",
         "plugins/host-monitor/types/css-modules.d.ts",
+        "plugins/jev-route/.gitignore",
+        "plugins/jev-route/LICENSE",
+        "plugins/jev-route/README.md",
+        "plugins/jev-route/app.css",
+        "plugins/jev-route/app.tsx",
+        "plugins/jev-route/ops/jev-model.json",
+        "plugins/jev-route/ops/jev-router.service",
+        "plugins/jev-route/ops/register-bb-model.mjs",
+        "plugins/jev-route/ops/register-model.mjs",
+        "plugins/jev-route/package.json",
+        "plugins/jev-route/runtime/LICENSE",
+        "plugins/jev-route/runtime/jev_server.py",
+        "plugins/jev-route/runtime/routing_policy.py",
+        "plugins/jev-route/runtime/test_per_call_routing.py",
+        "plugins/jev-route/runtime/test_route_policy.py",
+        "plugins/jev-route/server.ts",
+        "plugins/jev-route/test/live.mjs",
+        "plugins/jev-route/test/server.test.ts",
+        "plugins/jev-route/tsconfig.json",
         "plugins/lavender/.gitignore",
         "plugins/lavender/CHANGELOG.md",
         "plugins/lavender/LICENSE",
@@ -2159,6 +2283,7 @@
         "plugins/usage-tracker/assets/logo-dark.svg",
         "plugins/usage-tracker/assets/logo.svg",
         "plugins/usage-tracker/lib/antigravity-probe.ts",
+        "plugins/usage-tracker/lib/claude-keychain-usage.ts",
         "plugins/usage-tracker/lib/codex-reset-credits.ts",
         "plugins/usage-tracker/lib/load-usage.ts",
         "plugins/usage-tracker/lib/preferences.ts",
@@ -2170,6 +2295,7 @@
         "plugins/usage-tracker/package.json",
         "plugins/usage-tracker/server.ts",
         "plugins/usage-tracker/test/antigravity.test.ts",
+        "plugins/usage-tracker/test/claude-keychain-usage.test.ts",
         "plugins/usage-tracker/test/presentation-contract.test.ts",
         "plugins/usage-tracker/test/reset-action.test.ts",
         "plugins/usage-tracker/test/reset-credits.test.ts",
@@ -2177,13 +2303,13 @@
         "plugins/usage-tracker/tsconfig.json",
         "plugins/usage-tracker/types/css-modules.d.ts"
       ],
-      "sourceDigest": "sha256:6e430befbe0f0c5ad3a26b1fd158781697d3be80044e65a20fb3dd5ed8fd9c30",
+      "sourceDigest": "sha256:e32ab30602eb199bab9696471771126b6d71d69a8687eaa30527c9a9be4198ac",
       "digest": "sha256:eed9cfd95fdecbf70535c9b9bfdb204011bdad5af0a5418d4d923f3a99f354f2",
       "freshness": "fresh"
     },
     {
       "path": ".empirical/context/overview.md",
-      "generator": "empirical-0.34.0",
+      "generator": "empirical-0.38.0",
       "managed": false,
       "dependencies": [
         "README.md",
@@ -2205,6 +2331,8 @@
         "plugins/dockside/test/project-order.test.ts",
         "plugins/host-monitor/README.md",
         "plugins/host-monitor/package.json",
+        "plugins/jev-route/README.md",
+        "plugins/jev-route/package.json",
         "plugins/lavender/README.md",
         "plugins/lavender/package.json",
         "plugins/save-my-model/README.md",
@@ -2218,13 +2346,13 @@
         "plugins/usage-tracker/README.md",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:25130e27e815865cd4a03ddf8a51479ae6ebfedeb67669f5bf7599f4412e7291",
+      "sourceDigest": "sha256:0e3f649475a27e75d473a14130e5d038825436428636b1078cb6541bb0234c1e",
       "digest": "sha256:37f1b782a0e88dee101030bf6ac6aa2742c329ca37daf764d5022e793ce6bc15",
       "freshness": "fresh"
     },
     {
       "path": ".empirical/context/architecture.md",
-      "generator": "empirical-0.34.0",
+      "generator": "empirical-0.38.0",
       "managed": false,
       "dependencies": [
         "package.json",
@@ -2233,19 +2361,20 @@
         "plugins/clean-my-context/package.json",
         "plugins/dockside/package.json",
         "plugins/host-monitor/package.json",
+        "plugins/jev-route/package.json",
         "plugins/lavender/package.json",
         "plugins/save-my-model/package.json",
         "plugins/taskboard/package.json",
         "plugins/touchbar/package.json",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:88ca06d31576dd269ab9749d8dda0f8c3c3d063306e0b496a62d5f2f13ea419b",
+      "sourceDigest": "sha256:cd5b9855b4206baa46059a0b76bd4cdedf0869eb301f1aa82903fcbabe5bc1f0",
       "digest": "sha256:6a3333fdbbcffff93c96400aab0596932dc23cce823061cdedacad5e44ef7bd7",
       "freshness": "fresh"
     },
     {
       "path": ".empirical/context/commands.md",
-      "generator": "empirical-0.34.0",
+      "generator": "empirical-0.38.0",
       "managed": false,
       "dependencies": [
         ".github/workflows/ci.yml",
@@ -2255,19 +2384,20 @@
         "plugins/clean-my-context/package.json",
         "plugins/dockside/package.json",
         "plugins/host-monitor/package.json",
+        "plugins/jev-route/package.json",
         "plugins/lavender/package.json",
         "plugins/save-my-model/package.json",
         "plugins/taskboard/package.json",
         "plugins/touchbar/package.json",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:15e3027a7fe7166ce45c940284be55739f4037eb1b7de324e4c09446eda09b82",
+      "sourceDigest": "sha256:01e833bc18a34a1cad17f0f7a667aa07e1d022cf78a01de326c0776f058fd92e",
       "digest": "sha256:06a7a6d07d2649e2d00a93cf62beef749d2f5dada25077c225726f81ec2eeed3",
       "freshness": "fresh"
     },
     {
       "path": ".empirical/context/conventions.md",
-      "generator": "empirical-0.34.0",
+      "generator": "empirical-0.38.0",
       "managed": false,
       "dependencies": [
         "AGENTS.md",
@@ -2277,19 +2407,20 @@
         "plugins/dockside/components/styles.d.ts",
         "plugins/dockside/tsconfig.json",
         "plugins/host-monitor/tsconfig.json",
+        "plugins/jev-route/tsconfig.json",
         "plugins/lavender/tsconfig.json",
         "plugins/save-my-model/tsconfig.json",
         "plugins/taskboard/tsconfig.json",
         "plugins/touchbar/tsconfig.json",
         "plugins/usage-tracker/tsconfig.json"
       ],
-      "sourceDigest": "sha256:251cb7786751f69dae02f70fade8e8cb369a59d5e1e7c99d94922e5bb9a517ad",
+      "sourceDigest": "sha256:c2d36c79a7f4fae1ec342feb93e255baba4b3d5f5c459c60da077e2585e72c3a",
       "digest": "sha256:8ce7179f299316d315c6c9c8d246aaa18e9cdbf9441943ce24643c415c4db02c",
       "freshness": "fresh"
     },
     {
       "path": ".empirical/context/design-language.md",
-      "generator": "empirical-0.34.0",
+      "generator": "empirical-0.38.0",
       "managed": false,
       "dependencies": [
         "plugins/action-topbar/app.css",
@@ -2324,6 +2455,8 @@
         "plugins/dockside/components/ui/select.tsx",
         "plugins/host-monitor/app.css",
         "plugins/host-monitor/app.tsx",
+        "plugins/jev-route/app.css",
+        "plugins/jev-route/app.tsx",
         "plugins/save-my-model/app.tsx",
         "plugins/taskboard/app.css",
         "plugins/taskboard/app.tsx",
@@ -2344,11 +2477,11 @@
         "plugins/usage-tracker/app.css",
         "plugins/usage-tracker/app.tsx"
       ],
-      "sourceDigest": "sha256:86307fcfb0dadce8e8a25a727a086c1b5198c81696ae1e810fae34990c1c5457",
+      "sourceDigest": "sha256:3175eade826b8c52231cba984db9b6ec7146b194a6efc5e4567036fd115bbe6d",
       "digest": "sha256:23f355d733d86c584f760d4a0c0136ee7bb2c3a3aa12edfc199b29b55a480ca2",
       "freshness": "fresh"
     }
   ],
   "truncated": false,
-  "digest": "sha256:efebe0c5b3a801548788fd75937ba9f4ec933b36c85cd5e5920a6c09243b02fb"
+  "digest": "sha256:9a240ccbdc3d2e158372a2c77d723b72e661985e95af9d3bdb9f89a85db7f06e"
 }

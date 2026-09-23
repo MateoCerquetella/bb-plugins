@@ -201,7 +201,7 @@ export default function plugin(bb: BbPluginApi) {
     },
     async getUsage({ threadId }) {
       const preferences = await settings.get();
-      const claudeKeychainService = preferences.claudeKeychainService.trim();
+      const claudeKeychainService = preferences.claudeKeychainService;
       const snapshot = await loadUsageSnapshot(
         bb.sdk,
         threadId,

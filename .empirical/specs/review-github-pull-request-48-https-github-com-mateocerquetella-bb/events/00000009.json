@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "sequence": 9,
+  "previousDigest": "sha256:159e42636652e013612fbfbdaf8856632c82653c206bfbec1bd4f2a4d8fd1d1d",
+  "actor": "codex",
+  "type": "transition",
+  "summary": "Refreshed repository knowledge after consolidation; all required context pages are present, current, and free of stale, missing, invalid, or refinement-required topics.",
+  "createdAt": "2026-09-23T01:10:35.752Z",
+  "stateBeforeDigest": "sha256:c590b18df4645c3e31e248c614ec3b18dbf5a105fb0514d8ca53f4a56622e6e1",
+  "stateAfterDigest": "sha256:3e4c6a8147396c7ea16da2fc46deea612ea651d8ecbf28239723394899418051",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 9,
+    "activeFeature": "review-github-pull-request-48-https-github-com-mateocerquetella-bb",
+    "request": "Review GitHub pull request #48, fix blocking findings and failing CI, update usage-tracker version/changelog, verify, comment, and merge without publishing.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "review",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Refreshed repository knowledge after consolidation; all required context pages are present, current, and free of stale, missing, invalid, or refinement-required topics.",
+    "implementationActor": "codex",
+    "workStartedAt": "2026-09-23T00:54:51.928Z",
+    "specDigest": "sha256:81cc1ae0b3a3c63c0f2e0f565dab2c224f0a3b94acba5c7a36cc34b1835264ff",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:154aaddde8f2cd4b2982b33d62e00d9d8bbab38427c4129d7198f35ed156187a",
+    "impactDigest": "sha256:42a28a104162d17ee6bb1c5ed7547f8e0ede24af71b4c52c6cb6b67de4c1573d",
+    "capabilityClaimId": "review-github-pull-request-48-https-github-com-mateocerquetella-bb-6bdfe6e0a200",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-23T01:10:35.752Z",
+    "lifecycle": {
+      "stage": "consolidation",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "riskRequest": "Usage Tracker advances from `0.1.9` to `0.1.10`; its changelog, lockfile, and cross-plugin distribution assertions agree on that version, and no npm publication or Git release/tag is created.",
+      "contractBaseline": 7
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "review-github-pull-request-48-https-github-com-mateocerquetella-bb-6bdfe6e0a200",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "review-github-pull-request-48-https-github-com-mateocerquetella-bb",
+      "worktree": "/home/dyaus/Developer/projects/MateoCerquetella/BB/bb-plugins-review-github-pull-request-48-https-github-com-mateocerquetella-bb",
+      "worktreeId": "sha256:2a32caf7ceae6f39747d75dd6a7df37a1fd84416f452a2b2d69d4285477e4f68",
+      "baseCommit": "821855b07d68d9be4f9fd767b977c4c419b8acb4",
+      "baseTree": "79d3f064f319464896f18b80ae77417cf250e76f",
+      "bases": {
+        "usage-tracker-distribution": {
+          "capability": "usage-tracker-distribution",
+          "digest": "sha256:1abf98e1d06367f02d1943f7975c08e7e095b0a1ef9afb1fd132ff151e44f131",
+          "requirements": {
+            "immutable usage tracker git release": "sha256:cdc8a80433bcd2bd625de49e09c6793faa784706605a6e9eb67584df9df9f244"
+          }
+        },
+        "usage-tracker-provider-usage": {
+          "capability": "usage-tracker-provider-usage",
+          "digest": "sha256:b7d93dc3f6c18265ec2f97a4754d672ad29c54a16f5c4d9d474f876825d35123",
+          "requirements": {
+            "explicit local claude keychain usage override": null
+          }
+        }
+      },
+      "capabilities": [
+        "usage-tracker-distribution",
+        "usage-tracker-provider-usage"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-09-23T01:00:26.884Z",
+      "heartbeatAt": "2026-09-23T01:00:26.884Z",
+      "digest": "sha256:e9e619e4eb09eaa8c26e980257002099a83ce99a4a8762599966d058cb87d814"
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 8,
+      "capabilities": 2,
+      "reason": "Keep one slice because the Keychain override and the 0.1.10 distribution correction are coupled in PR #48: the release metadata fix is required for the same branch to pass CI, and neither slice is independently shippable without the other.",
+      "actor": "codex",
+      "revision": 3
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:34bb5a828af49ce692ede84b43f6f3e15e690f7e70b1b12ef8c20f4ff5350cf9"
+}

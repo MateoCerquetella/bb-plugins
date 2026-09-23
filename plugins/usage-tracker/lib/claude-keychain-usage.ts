@@ -181,17 +181,52 @@ export function normalizeClaudeUsageResponse(
       planLabel: plan,
     };
   }
+  const windows = [
+    usageWindow(parsed.data.five_hour, "Current session"),
+    usageWindow(parsed.data.seven_day, "Weekly limit"),
+    ...scopedWindows(parsed.data.limits),
+  ].filter((window): window is RawUsageWindow => window !== null);
+  if (windows.length === 0) {
+    return {
+      status: "error",
+      message: "Claude usage response was malformed.",
+      planLabel: plan,
+    };
+  }
   return {
     status: "ok",
     // The account email lives in the matching config dir, not the Keychain.
     accountEmail: null,
     planLabel: plan,
-    windows: [
-      usageWindow(parsed.data.five_hour, "Current session"),
-      usageWindow(parsed.data.seven_day, "Weekly limit"),
-      ...scopedWindows(parsed.data.limits),
-    ].filter((window): window is RawUsageWindow => window !== null),
+    windows,
   };
+}
+
+async function readBoundedBody(response: Response): Promise<string | null> {
+  if (response.body === null) {
+    const body = await response.text();
+    return Buffer.byteLength(body, "utf8") <= USAGE_RESPONSE_MAX_BYTES
+      ? body
+      : null;
+  }
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > USAGE_RESPONSE_MAX_BYTES) {
+        await reader.cancel();
+        return null;
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  return Buffer.concat(chunks).toString("utf8");
 }
 
 /**
@@ -251,8 +286,8 @@ export async function readClaudeUsageFromKeychain(
         planLabel: planLabel(credentials),
       };
     }
-    const body = await response.text();
-    if (Buffer.byteLength(body, "utf8") > USAGE_RESPONSE_MAX_BYTES) {
+    const body = await readBoundedBody(response);
+    if (body === null) {
       return {
         status: "error",
         message: "Claude usage response was too large.",

@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-570846362623cd80b62d09b4",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review requested changes to the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-09-23T01:14:50.869Z",
+  "completedAt": "2026-09-23T01:14:50.869Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "review-github-pull-request-48-https-github-com-mateocerquetella-bb",
+    "specRevision": 3,
+    "specDigest": "sha256:81cc1ae0b3a3c63c0f2e0f565dab2c224f0a3b94acba5c7a36cc34b1835264ff",
+    "treeDigest": "sha256:7b958b3417b57c698ab6670fec3155c811293fcea67bb596372d3751ed50264d",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:0d18e5ac0686479ab199d4a027c3e0c123262e9eb8df3b0e4b9ee78bc83b57ed",
+  "kind": "collected",
+  "collector": "empirical-review:fresh-context-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/review-github-pull-request-48-https-github-com-mateocerquetella-bb/reviews/140f09bb26fcdd5c492b0716.json",
+      "mediaType": "application/json",
+      "bytes": 3223,
+      "digest": "sha256:16b6b2cf28325a0a574c91385a857db4aed37f88298500500ce869cc0843c49e"
+    },
+    {
+      "path": ".empirical/specs/review-github-pull-request-48-https-github-com-mateocerquetella-bb/reviews/140f09bb26fcdd5c492b0716.md",
+      "mediaType": "text/markdown",
+      "bytes": 1563,
+      "digest": "sha256:9d09a662520dcd8eaf1f60bf60d270205680edac0d0fff04d423df84ec2c4961"
+    }
+  ]
+}
