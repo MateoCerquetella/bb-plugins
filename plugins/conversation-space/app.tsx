@@ -4,8 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 import type { rpcContract } from './server';
 import type { JevSummary } from './jev';
 import { formatTokens, summarize, tokenShare } from './usage';
+import { SessionUsage } from './session-view';
 import './app.css';
-type Snapshot = ReturnType<typeof summarize> & {model:string;provider:string;jev:JevSummary};
+export type Snapshot = ReturnType<typeof summarize> & {model:string;provider:string;jev:JevSummary};
 function ConversationSpace() {
   const { scope } = useComposer();
   const threadId = scope.kind === 'thread' ? scope.threadId : null;
@@ -40,6 +41,7 @@ function ConversationSpace() {
   const rpc = useRpc<typeof rpcContract>();
   const [data,setData] = useState<Snapshot|null>(null);
   const [error,setError] = useState(false);
+  const [detailsOpen,setDetailsOpen] = useState(false);
   const panel = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -69,7 +71,7 @@ function ConversationSpace() {
   }, []);
   useEffect(() => {
     let disposed=false;
-    setData(null); setError(false); panel.current?.hidePopover();
+    setData(null); setError(false); setDetailsOpen(false); panel.current?.hidePopover();
     const refresh = async () => { try { const value=await rpc.call('usage',{threadId:threadId!}); if(!disposed){setData(value);setError(false);} } catch {if(!disposed){setError(true);setData(null);}} };
     if (!threadId) return;
     void refresh(); const timer=setInterval(()=>void refresh(),5000);
@@ -94,7 +96,9 @@ function ConversationSpace() {
         {([['Input',data?.input,'input'],['Cached',data?.cached,'cached'],['Output',data?.output,'output'],['Reasoning',data?.reasoning,'reasoning']] as const).map(([label,value,color])=><div className={`cs-token-row cs-${color}`} key={label} title={`${label}: share of latest call tokens${color === 'reasoning' ? ' (included in Output)' : ''}`}><span className="cs-token-label"><i aria-hidden="true"/>{label}</span><b>{formatTokens(value??null)}</b><span className="cs-share">{tokenShare(value,data?.input,data?.cached,data?.output)}</span></div>)}
       </div>
       <div className="cs-row cs-model"><span>{actualModel??'Unknown model'} {data?.provider ? `(${data.provider})`:''}</span><span>{formatTokens(data?.capacity??null)} window</span></div>
-      <details className="cs-details"><summary>View details <span aria-hidden="true">›</span></summary>
+      <button type="button" className="cs-view-details" onClick={()=>{cancelClose();panel.current?.hidePopover();setDetailsOpen(true);}}>View details <span aria-hidden="true">›</span></button>
+    </div>
+    {detailsOpen && threadId && <SessionUsage key={threadId} threadId={threadId} usage={data} onClose={()=>setDetailsOpen(false)}>
         <section className="cs-detail-section">
           <h4>Token usage</h4>
           <div className="cs-row"><span>Cache reuse</span><b>{cacheRate == null ? 'Unavailable' : `${cacheRate}% of input`}</b></div>
@@ -114,8 +118,7 @@ function ConversationSpace() {
           </> : <p>{jev?.state === 'unavailable' ? 'The local routing log could not be read. Routing activity cannot be verified here.' : 'No matching Jev calls recorded for this session yet.'}</p>}
           <p>Jev selects a model for each call; it does not reduce context size. Cache reuse is not a token reduction. Token or cost savings are unmeasured without a comparable baseline.</p>
         </section>
-      </details>
-    </div>
+    </SessionUsage>}
   </>;
 }
 export default definePluginApp(app=>{app.composer.customize({id:'conversation-space',scopes:['thread'],actions:[{id:'context-circle',component:ConversationSpace}]});});

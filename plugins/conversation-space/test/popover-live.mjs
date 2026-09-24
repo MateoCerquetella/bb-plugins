@@ -21,8 +21,11 @@ try {
  assert.equal(await panel.getByRole('button',{name:'Close',exact:true}).count(),0);
  await page.screenshot({path:'docs/media/conversation-space-popover.png'});
  await panel.getByText('View details').click();
- assert.match(await panel.innerText(),/Input excludes cached/);
+ const session=page.getByRole('dialog',{name:'Session usage',exact:true});
+ await session.waitFor();
+ assert.match(await session.innerText(),/Raw message data/);
  await page.keyboard.press('Escape');
+ await session.waitFor({state:'hidden'});
  await panel.waitFor({state:'hidden'});
  await circle.click(); await panel.waitFor();
  await page.mouse.click(400,100); await panel.waitFor({state:'hidden'});
