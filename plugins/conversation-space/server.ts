@@ -9,7 +9,7 @@ export const rpcContract = defineRpcContract({ session: {
   output:z.object({startedAt:z.number(),messages:z.array(messageSchema),nextCursor:z.string().nullable()})
 }, usage: {
   input: z.object({ threadId: z.string().min(1) }),
-  output: z.object({ used:number, capacity:number, remaining:number, percent:number, input:number, cached:number, output:number, reasoning:number, estimated:z.boolean(), measuredAt:number, model:z.string(), provider:z.string(), jev:z.object({state:z.enum(['off','waiting','recorded','unavailable']),calls:z.number(),failures:z.number(),models:z.array(z.object({model:z.string(),calls:z.number()})),lastModel:z.string().nullable(),effort:z.string().nullable(),at:z.string().nullable(),judgeTokens:number}) })
+  output: z.object({ used:number, capacity:number, remaining:number, percent:number, totalInput:number, input:number, cached:number, output:number, reasoning:number, estimated:z.boolean(), measuredAt:number, model:z.string(), provider:z.string(), jev:z.object({state:z.enum(['off','waiting','recorded','unavailable']),calls:z.number(),failures:z.number(),models:z.array(z.object({model:z.string(),calls:z.number()})),lastModel:z.string().nullable(),effort:z.string().nullable(),at:z.string().nullable(),judgeTokens:number}) })
 }});
 export default function plugin(bb: BbPluginApi) {
   bb.rpc.register(rpcContract, { session: async ({threadId,beforeSeq}) => {
