@@ -42,7 +42,7 @@ test("invalid colors and blank model IDs are rejected at the RPC boundary", () =
   assert.equal(rpcContract.colors.input.safeParse({ model: "opus", color: "url(example)" }).success, false);
 });
 
-test("non-Codex models without reasoning still appear; polling never writes chat events", async () => {
+test("manual model changes have no Jev switch history; polling never writes chat events", async () => {
   const { handlers, storage } = harness([
     { createdAt: 20, data: { providerId: "pi", execution: { model: "deepseek/v4" } } },
     { createdAt: 10, data: { providerId: "pi", execution: { model: "claude-opus" } } },
@@ -51,7 +51,7 @@ test("non-Codex models without reasoning still appear; polling never writes chat
   const second = await handlers.latest!({ threadId: "thr_test" });
   assert.equal(first.execution.model, "deepseek/v4");
   assert.equal(first.execution.reasoningLevel, "");
-  assert.equal(first.switches.length, 1);
+  assert.equal(first.switches.length, 0);
   assert.deepEqual(first.switches, second.switches);
   assert.equal(storage.size, 0);
 });

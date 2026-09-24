@@ -1,0 +1,36 @@
+import { chromium } from 'playwright';
+import assert from 'node:assert/strict';
+const threadUrl = process.env.BB_TEST_THREAD_URL;
+if (!threadUrl) throw new Error('Set BB_TEST_THREAD_URL to a manually selected model thread in your local BB.');
+const browser = await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH??'/usr/bin/chromium'});
+try {
+ const page=await browser.newPage({viewport:{width:1280,height:900}});
+ await page.goto(threadUrl);
+ const circle=page.getByRole('button',{name:'Conversation space',exact:true});
+ await circle.waitFor();
+ await page.waitForTimeout(1000);
+ assert.equal((await circle.textContent()).trim(), '');
+ assert.equal(await circle.evaluate(e=>!!e.closest('[data-follow-up-composer-footer]')),true);
+ assert.equal(await page.locator('button[aria-label^="Context window"]:visible').count(),0);
+ await page.screenshot({path:'docs/media/conversation-space-circle.png'});
+ const other=page.locator('a[data-sidebar-thread-id]').filter({hasNot:page.locator('[data-no-match]')});
+ const ids=await other.evaluateAll(es=>[...new Set(es.map(e=>e.getAttribute('data-sidebar-thread-id')))].filter(id=>id&&id!==new URL(threadUrl).pathname.split('/').at(-1)));
+ assert.ok(ids.length>0);
+ await page.locator(`a[data-sidebar-thread-id="${ids[0]}"]`).first().click();
+ await circle.waitFor();
+ assert.ok(await circle.isVisible());
+ console.log('PASS circle visible on two threads; native circle replaced in expanded composer');
+ await page.route('**/api/v1/plugins/conversation-space/rpc/usage',route=>route.fulfill({json:{ok:true,result:{used:null,capacity:null,remaining:null,percent:null,input:null,cached:null,output:null,reasoning:null,estimated:false,measuredAt:null,model:'Unknown model',provider:'codex'}}}));
+ await page.waitForTimeout(5500);
+ assert.ok(await circle.isVisible());
+ await page.setViewportSize({width:390,height:844});
+ await page.waitForTimeout(500);
+ assert.ok(await circle.isVisible());
+ await page.screenshot({path:'docs/media/conversation-space-circle-mobile-closed.png'});
+ await circle.click();
+ await page.getByRole('dialog',{name:'Conversation space',exact:true}).waitFor();
+ assert.match(await page.getByRole('dialog',{name:'Conversation space',exact:true}).innerText(), /Unavailable/);
+ await page.screenshot({path:'docs/media/conversation-space-circle-mobile.png'});
+ await page.keyboard.press('Escape');
+ console.log('PASS unavailable usage retains circle; mobile circle and details visible');
+} finally {await browser.close();}

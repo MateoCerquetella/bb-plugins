@@ -56,18 +56,9 @@ Balance: sufficient capability and effort for the next decision, including
 compaction. Capability profiles are priors; outcome quality requires evaluation.
 Log: ~/.codex/codex-router/jev-router-live.jsonl
 
-Codex-dry tandem: when native usage is exhausted — a manual flag file
-(~/.codex/codex-router/jev-router.codex-dry) or an observed quota failure
-(429 / usage-limit body) — the triptych is replaced until the window resets:
-frontier-tier (astra) calls go to GLM (opencode-go/glm-5.3-flash), every
-other tier to deepseek (opencode-go/deepseek-v4.1-flash). A quota failure
-flips the state and retries the same call on the tandem; a successful native
-call clears an auto state (never the manual flag). A tandem call that comes
-back retryable (429/5xx) is tried once on the sibling model, because the two Go
-models are metered separately and a spent allowance is reported the same way a
-transient outage is. The decided depth travels with the call, mapped onto the Go
-ladder (low/high/max): a low step stays low, medium and high become high, and
-xhigh or above become max.
+Codex-only execution: native Luna, Sol and Astra remain the only execution
+models. Quota failures are relayed unchanged, and legacy dry flags never
+substitute another provider.
 """
 import codecs
 import hashlib
@@ -1188,15 +1179,12 @@ class Handler(BaseHTTPRequestHandler):
             would = {"model": model, "effort": effort, "speed": speed, "gate": gate}
             model, effort, speed, gate = ASTRA, None, "default", "shadow(astra)"
 
-        # Codex-dry tandem: ONLY while native usage is exhausted (manual flag or
-        # observed quota failure) the triptych is replaced — GLM for frontier
-        # steps, deepseek for the rest. Otherwise luna/sol/astra run untouched.
-        dry_reason = native_dry()
+        # This Codex endpoint never substitutes another provider, even when
+        # legacy dry flags exist or native quota is exhausted.
+        dry_reason = None
         native_model = model
-        if dry_reason and model in TIERS:
-            model, effort = dry_target(native_model, effort)
-            speed = "default"
-            gate = f"codex_dry({dry_reason}):{native_model}"
+        if model not in TIERS:
+            model, effort, speed, gate = ASTRA, "medium", "default", "native_guard"
 
         # Display the model actually serving the request, including shadow and
         # operational fallbacks, rather than a hypothetical classification.
@@ -1225,42 +1213,6 @@ class Handler(BaseHTTPRequestHandler):
             payload, out_path, stream_requested, debug, marker, model, signature)
         retried = False
         fallback = None
-        if quota_hit and not dry_reason:
-            # Native usage is exhausted: flip to the Go tandem and retry this very
-            # call so the turn does not fail (nothing reached the client yet). The
-            # flip lasts until the edge says the window reopens, so the first call
-            # after the reset is served by the native triptych again.
-            mark_native_dry("quota", resets_at=resets_at)
-            model, effort = dry_target(native_model, effort)
-            apply_route(payload, model, effort)
-            retried = True
-            # The log records the state this call entered, not the one it started
-            # in: reading `dry: None` next to `codex_dry(retry)` is how a flip
-            # looks like it never happened when calibrating from the log.
-            dry_reason = "quota"
-            gate = f"codex_dry(retry):{native_model}"
-            marker = route_marker(model, effort)
-            signature = answer_signature({"model": model, "effort": effort})
-            status, out_kind, ctype, quota_hit, unwritten, _resets_at = self._forward(
-                payload, out_path, stream_requested, debug, marker, model, signature)
-        elif status == 200 and not dry_reason and model in TIERS and os.path.exists(DRY_STATE_PATH):
-            # Native answered again: drop the stale auto state (never the flag).
-            clear_native_dry()
-            dry_reason = "cleared"
-        if model in GO_TANDEM and status in RETRYABLE_TANDEM_STATUS:
-            # Half of the tandem refused this call, so try the sibling model
-            # before the turn is lost. The two Go models are metered against
-            # separate allowances, and a spent allowance arrives as the same
-            # 429/503 a transient outage does -- which is exactly what killed a
-            # live session on 18 September 2026 after the handoff.
-            fallback = other_tandem(model)
-            model, effort = fallback, tandem_effort(effort, native_model)
-            apply_route(payload, model, effort)
-            gate = f"codex_dry(fallback):{native_model}"
-            marker = route_marker(model, effort)
-            signature = answer_signature({"model": model, "effort": effort})
-            status, out_kind, ctype, quota_hit, unwritten, _resets_at = self._forward(
-                payload, out_path, stream_requested, debug, marker, model, signature)
         if unwritten is not None:
             # Every model that could have served this turn refused it, and the
             # refusal was held back only because another attempt might have

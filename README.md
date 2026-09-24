@@ -16,6 +16,11 @@
 
 <table>
 <tr>
+<td align="center" width="60"></td>
+<td align="center"><a href="plugins/conversation-space/"><b>Conversation Space (WIP)</b></a></td>
+<td>Shows compact context usage, token percentages, session details, and measured Jev routing diagnostics.</td>
+</tr>
+<tr>
 <td align="center" width="60"><picture><source media="(prefers-color-scheme: dark)" srcset="plugins/amp/assets/logo-dark.svg" /><img src="plugins/amp/assets/logo.svg" width="40" height="40" alt="" /></picture></td>
 <td align="center"><a href="plugins/amp/"><b>Amp</b></a></td>
 <td>Runs <a href="https://ampcode.com">Amp</a> as a native bb provider, locally or in an Orb.</td>

@@ -1,8 +1,8 @@
 # Jev Routing
 
-Shows the latest requested model and reasoning level beside BB's model picker, with per-thread, paginated model history. Click the badge to open history; Close or Escape dismisses it. No history messages are injected into the conversation.
+Shows the actual routed model and reasoning beside BB’s model picker only while Jev Routing is selected, with paginated Jev history. Click the badge to open history; Close or Escape dismisses it. No history messages are injected into the conversation.
 
-Plugin settings include 18 color presets, a custom color picker, and saved overrides for any model ID. Tracking reads BB thread events and is provider-independent. Actual per-call Jev selections are read from the local routing log when the selected model is `jev/auto`.
+Plugin settings include 18 color presets, a custom color picker, and saved overrides for any model ID. Tracking reads BB thread events and is scoped to Jev routing. Actual per-call Jev selections are read from the local routing log when the selected model is `jev/auto`.
 
 ## Install
 
@@ -10,7 +10,7 @@ Plugin settings include 18 color presets, a custom color picker, and saved overr
 bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git --plugin jev-route
 ```
 
-The plugin runs on BB 0.40 or later. Normal model tracking does not require Jev. Automatic routing currently uses the Codex Responses transport; installing this plugin alone does not configure another provider's routing.
+The plugin runs on BB 0.40 or later. Manual model selections do not display routing badges. Automatic routing currently uses the Codex Responses transport; installing this plugin alone does not configure another provider's routing.
 
 ## Independent Linux Routing
 
@@ -41,3 +41,5 @@ python3 -m unittest discover -s plugins/jev-route/runtime -p 'test_*.py'
 ```
 
 The Python runtime is adapted from [0xNatoshi/jev-codex-router](https://github.com/0xNatoshi/jev-codex-router), revision `6905869590038489ce0ad6d6e4b236e64d050ed3`, copyright Thibault Saint-Jean, under the MIT license in `runtime/LICENSE`. This copy adds an explicit HTTP user-agent for TypeSafe compatibility.
+
+Codex routing uses only native Luna, Sol and Astra models. Legacy dry flags do not select external providers. Quota failures are returned to Codex without DeepSeek/GLM retries.
