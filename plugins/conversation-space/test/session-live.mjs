@@ -12,12 +12,12 @@ try{
  const dialog=page.getByRole('dialog',{name:'Session usage',exact:true});await dialog.waitFor();
  await dialog.locator('.cs-message').first().waitFor();
  assert.equal(await page.locator('.cs-popover:popover-open').count(),0);
- assert.match(await dialog.innerText(),/Context used/);assert.match(await dialog.innerText(),/Raw message data/);
+ assert.match(await dialog.innerText(),/Context used/);assert.doesNotMatch(await dialog.innerText(),/Not reported|Billing plan not reported/);assert.match(await dialog.innerText(),/Estimated tokens/);assert.match(await dialog.innerText(),/Raw message data/);
  await page.screenshot({path:'docs/media/conversation-space-session.png'});
  const before=await dialog.locator('.cs-message').count();assert.ok(before>0);
  await dialog.getByRole('button',{name:'Assistant',exact:true}).click();assert.equal(await dialog.locator('.cs-role-user').count(),0);
  await dialog.getByRole('button',{name:'All',exact:true}).click();
- await dialog.getByRole('textbox',{name:'Search messages'}).fill('zzzz-no-record-match-999');await dialog.getByText('No matching records.').waitFor();
+ await dialog.getByRole('textbox',{name:'Search messages'}).fill(`no-record-${crypto.randomUUID()}`);await dialog.getByText('No matching records.',{exact:true}).waitFor();
  await dialog.getByRole('textbox',{name:'Search messages'}).fill('');
  await dialog.locator('.cs-message summary').first().click();assert.ok(await dialog.locator('.cs-message pre').first().isVisible());
  await dialog.getByRole('button',{name:'Copy JSON',exact:false}).click();await dialog.getByRole('status').filter({hasText:'Copied'}).waitFor();
