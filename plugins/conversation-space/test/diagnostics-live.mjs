@@ -1,0 +1,32 @@
+import { chromium } from 'playwright';
+import assert from 'node:assert/strict';
+const threadUrl = process.env.BB_TEST_THREAD_URL;
+if (!threadUrl) throw new Error('Set BB_TEST_THREAD_URL to a manually selected model thread in your local BB.');
+const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH??'/usr/bin/chromium'});
+try {
+ const page=await browser.newPage({viewport:{width:1280,height:900}});
+ await page.goto(threadUrl);
+ const circle=page.getByRole('button',{name:'Conversation space',exact:true});
+ await circle.waitFor(); await page.waitForTimeout(1200); await circle.click();
+ const panel=page.getByRole('dialog',{name:'Conversation space',exact:true});
+ await panel.waitFor();
+ assert.equal(Math.round((await panel.boundingBox()).width),288);
+ assert.ok((await panel.boundingBox()).height<320,'compact closed panel');
+ assert.equal(await panel.locator('.cs-token-row').count(),4);
+ assert.equal(await panel.locator('.cs-share').count(),4);
+ await page.screenshot({path:'docs/media/conversation-space-compact.png'});
+ await panel.getByText('View details').click();
+ await panel.getByText('Jev routing',{exact:false}).first().waitFor();
+ assert.match(await panel.innerText(),/Cache reuse/);
+ assert.match(await panel.innerText(),/latest turn used a manually selected model/);
+ await page.screenshot({path:'docs/media/conversation-space-details.png'});
+ const fixture={used:47264,capacity:1100000,remaining:1052736,percent:4,input:5500,cached:41100,output:664,reasoning:188,estimated:false,measuredAt:Date.now(),model:'jev/auto',provider:'codex',jev:{state:'recorded',calls:10,failures:1,models:[{model:'gpt-6-luna',calls:6},{model:'gpt-6-sol',calls:3},{model:'gpt-6-astra',calls:1}],lastModel:'gpt-6-sol',effort:'high',at:new Date().toISOString(),judgeTokens:800}};
+ await page.route('**/api/v1/plugins/conversation-space/rpc/usage',route=>route.fulfill({json:{ok:true,result:fixture}}));
+ await page.waitForFunction(()=>document.querySelector('.cs-status')?.textContent==='Recorded');
+ assert.match(await panel.innerText(),/10 · 1 failed/);
+ assert.match(await panel.innerText(),/800 tokens/);
+ assert.match(await panel.innerText(),/88% of input/);
+ assert.match(await panel.innerText(),/unmeasured without a comparable baseline/);
+ await page.screenshot({path:'docs/media/conversation-space-jev-fixture.png'});
+ console.log('PASS 288px compact card, four colored percentage rows, real manual-turn status; fixture Jev distribution, failures, overhead and cache rate');
+} finally {await browser.close();}

@@ -251,12 +251,12 @@ export default function plugin(bb: BbPluginApi) {
   const settings = bb.settings.define({
     showThreadRoute: {
       type: "boolean",
-      label: "Show the latest model used in every thread",
+      label: "Show the latest model used by Jev routing",
       default: true,
     },
     showSwitchHistory: {
       type: "boolean",
-      label: "Show the previous model when a thread switches",
+      label: "Show the previous model when Jev switches",
       default: true,
     },
     lunaColor: {
@@ -310,7 +310,7 @@ export default function plugin(bb: BbPluginApi) {
       const switches =
         execution.execution?.model === "jev/auto"
           ? route.routeSwitches
-          : execution.switches;
+          : [];
       return {
         ...route,
         ...execution,

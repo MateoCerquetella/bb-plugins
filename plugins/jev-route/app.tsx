@@ -146,8 +146,9 @@ function syncJevComposer(): void {
               provider: providerLabel(activeExecution.providerId),
             };
 
-    if (!showThreadRoute || tracked === null) {
+    if (!isJev || !jevExecution || !showThreadRoute || tracked === null) {
       existingBadge?.remove();
+      document.querySelector("[data-jev-switch-history]")?.remove();
       continue;
     }
 
@@ -268,7 +269,7 @@ function syncJevComposer(): void {
 
 function renderSwitchHistory(): void {
   const existing = document.querySelector(`[data-jev-switch-history]`);
-  if (!showSwitchHistory) {
+  if (!showSwitchHistory || activeExecution?.model !== "jev/auto") {
     existing?.remove();
     return;
   }
@@ -599,7 +600,7 @@ export default definePluginApp((app) => {
   app.slots.settingsSection({
     id: "thread-routing",
     title: "Thread routing",
-    description: "The actual model and reasoning level used by every BB thread.",
+    description: "The actual model and reasoning level used by Jev-routed threads.",
     component: JevSettingsSummary,
   });
 });
