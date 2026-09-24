@@ -153,6 +153,24 @@ class PerCallEndToEnd(unittest.TestCase):
         self.assertTrue(self.logged.wait(3), "wait for the call's log record")
         return result
 
+    def test_manual_dry_does_not_leave_codex(self):
+        jev.native_dry = lambda: "manual"
+        with mock.patch.object(jev, "call_jev_routed", return_value=answer(jev.LUNA, "low")):
+            self.call(payload_for([message("user", "inspect files")]))
+        self.assertEqual([p["model"] for p in Edge.payloads], [jev.LUNA])
+
+    def test_quota_failure_does_not_retry_on_another_provider(self):
+        refusal = b'{"error":{"message":"usage limit reached"}}'
+        def refuse(handler, payload, *args):
+            Edge.payloads.append(dict(payload))
+            return 429, "json", "application/json", True, refusal, None
+        with mock.patch.object(jev, "call_jev_routed", return_value=answer(jev.SOL, "high")), mock.patch.object(jev.Handler, "_forward", refuse):
+            with self.assertRaises(urllib.error.HTTPError) as failure:
+                self.call(payload_for([message("user", "fix tests")]))
+            self.assertEqual(failure.exception.code, 429)
+            self.assertEqual(failure.exception.read(), refusal)
+        self.assertEqual([p["model"] for p in Edge.payloads], [jev.SOL])
+
     def test_each_sub_action_is_decided_and_can_swap_model(self):
         opening = [message("user", "run the tests and fix what breaks")]
         choices = [

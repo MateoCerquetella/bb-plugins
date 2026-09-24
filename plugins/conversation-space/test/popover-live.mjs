@@ -1,0 +1,36 @@
+import { chromium } from 'playwright';
+import assert from 'node:assert/strict';
+const threadUrl = process.env.BB_TEST_THREAD_URL;
+if (!threadUrl) throw new Error('Set BB_TEST_THREAD_URL to a manually selected model thread in your local BB.');
+const browser = await chromium.launch({headless:true, executablePath:process.env.CHROMIUM_PATH??'/usr/bin/chromium'});
+try {
+ const page = await browser.newPage({viewport:{width:1280,height:900}});
+ await page.goto(threadUrl);
+ const circle=page.getByRole('button',{name:'Conversation space',exact:true});
+ await circle.waitFor();
+ await page.waitForTimeout(1000);
+ assert.equal((await circle.textContent()).trim(),'');
+ assert.equal(await circle.locator('svg').count(),1);
+ await circle.click();
+ const panel=page.getByRole('dialog',{name:'Conversation space',exact:true});
+ await panel.waitFor();
+ const a=await circle.boundingBox(), b=await panel.boundingBox();
+ assert.ok(Math.abs(b.y+b.height-(a.y-8))<3,'popover anchored above circle');
+ assert.ok(Math.abs(b.x+b.width-(a.x+a.width))<3,'popover right edge aligned');
+ assert.equal(await page.locator(':modal').count(),0);
+ assert.equal(await panel.getByRole('button',{name:'Close',exact:true}).count(),0);
+ await page.screenshot({path:'docs/media/conversation-space-popover.png'});
+ await panel.getByText('View details').click();
+ assert.match(await panel.innerText(),/Input excludes cached/);
+ await page.keyboard.press('Escape');
+ await panel.waitFor({state:'hidden'});
+ await circle.click(); await panel.waitFor();
+ await page.mouse.click(400,100); await panel.waitFor({state:'hidden'});
+ await page.setViewportSize({width:390,height:844});
+ await circle.click(); await panel.waitFor();
+ const mobile=await panel.boundingBox();
+ assert.ok(mobile.x>=0 && mobile.x+mobile.width<=390);
+ assert.equal(await page.locator(':modal').count(),0);
+ await page.screenshot({path:'docs/media/conversation-space-popover-mobile.png'});
+ console.log('PASS icon-only circle; anchored non-modal popover; details; Escape; outside dismissal; mobile fit');
+} finally {await browser.close();}
