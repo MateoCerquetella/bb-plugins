@@ -28,6 +28,8 @@ test('patch is idempotent and refuses an unknown or ambiguous upstream boundary'
  assert.equal(preserveJevNativeReplay(once.source).changed,false);
  assert.throws(()=>preserveJevNativeReplay('different source'));
  assert.throws(()=>preserveJevNativeReplay(marker+'\n'+marker));
+ assert.throws(()=>preserveJevNativeReplay(once.source+'\n'+marker));
+ assert.throws(()=>preserveJevNativeReplay(once.source+'\n'+once.source));
 });
 
 test('installed repair backs up source, is repeatable and validates target identity',async()=>{

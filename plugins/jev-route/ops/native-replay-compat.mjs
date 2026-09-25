@@ -16,8 +16,10 @@ const replacement = `  // Jev native-only histories keep their reasoning continu
       )))) {
     // Three replay channels, not two.`;
 export function preserveJevNativeReplay(source) {
-  if (source.includes(replacement)) return {source,changed:false};
-  if (source.split(original).length !== 2) throw new Error('Unsupported router source: expected one reasoning-carry boundary; no files changed.');
+  const originals=source.split(original).length-1;
+  const replacements=source.split(replacement).length-1;
+  if (originals===0 && replacements===1) return {source,changed:false};
+  if (originals!==1 || replacements!==0) throw new Error('Unsupported router source: expected one reasoning-carry boundary; no files changed.');
   return {source:source.replace(original,replacement),changed:true};
 }
 export async function patchInstalledRouter(root) {
