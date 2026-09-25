@@ -1,5 +1,6 @@
 import concurrent.futures
 import unittest
+import threading
 from unittest import mock
 from route_memory import RouteMemory, session_key
 from routing_policy import LUNA, SOL, ASTRA
@@ -46,6 +47,31 @@ class MemoryTests(unittest.TestCase):
             results=list(pool.map(lambda _:memory.resolve(payload(),TOOL,choose),range(20)))
         self.assertEqual(choose.call_count,1)
         self.assertEqual(sum(result[1]['reused'] for result in results),19)
+
+    def test_failure_after_concurrent_reuse_still_escalates(self):
+        memory=RouteMemory();choose=mock.Mock(return_value=PAIR)
+        _,_,first=memory.resolve(payload(),TOOL,choose)
+        _,_,second=memory.resolve(payload(),TOOL,choose)
+        self.assertEqual(first,second)
+        memory.observe(first,True)
+        pair,info,_=memory.resolve(payload(),TOOL,choose)
+        self.assertEqual(info['reason'],'provider_failure')
+        self.assertEqual(pair[0],ASTRA)
+        self.assertEqual(choose.call_count,2)
+
+    def test_failure_waiting_on_reuse_lock_is_not_lost(self):
+        memory=RouteMemory();choose=mock.Mock(return_value=PAIR)
+        _,_,ticket=memory.resolve(payload(),TOOL,choose)
+        started=threading.Event()
+        def observe():
+            started.set();memory.observe(ticket,True)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+            with memory._stripe(ticket[0]):
+                work=pool.submit(observe)
+                self.assertTrue(started.wait(2))
+                memory.resolve(payload(),TOOL,choose)
+            work.result(timeout=2)
+        self.assertEqual(memory.resolve(payload(),TOOL,choose)[1]['reason'],'provider_failure')
 
     def test_old_failure_ticket_does_not_poison_new_decision(self):
         memory=RouteMemory();choose=mock.Mock(return_value=PAIR)

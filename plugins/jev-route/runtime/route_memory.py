@@ -90,8 +90,9 @@ class RouteMemory:
                 effort = EFFORTS[max(EFFORTS.index(effort), EFFORTS.index(previous_effort))]
                 pair = (model, effort, speed, gate + ":escalation")
             with self._lock:
-                self._generation += 1
-                generation = self._generation
+                if not reuse:
+                    self._generation += 1
+                generation = old["generation"] if reuse else self._generation
                 self._entries[key] = {**snap, "pair": pair, "errors": errors if reuse else 0,
                                       "failed": False, "touched": self.clock(), "generation": generation}
                 self._entries.move_to_end(key)
@@ -109,7 +110,7 @@ class RouteMemory:
         if not ticket or not failed:
             return
         key, generation = ticket
-        with self._lock:
+        with self._stripe(key), self._lock:
             entry = self._entries.get(key)
             if entry and entry["generation"] == generation:
                 entry["failed"] = True
