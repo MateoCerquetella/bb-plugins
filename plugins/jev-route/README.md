@@ -49,3 +49,17 @@ Codex routing uses only native Luna, Sol and Astra models. Legacy dry flags do n
 Repeated tool continuations reuse the selected model and effort, avoiding classifier calls and unnecessary pair changes. New user requests, changed instructions/tools/settings, rewritten or compacted history, 30 minutes idle, two successive detected tool errors or provider failures trigger re-evaluation. Failure escalation within an unchanged task never reduces the prior model/effort; the model moves up at least one tier when possible. Decisions use a bounded, thread-safe, process-local cache of 512 session hashes. Restarting safely reclassifies; requests without a cache key never share state. Off and shadow controls bypass retained decisions.
 
 `cache_observation` in the routing log includes the selection reason, reuse flag, model/effort change flags, changed configuration fields, hashes and actual cache reuse percentage when available. These are local observations, not provider-confirmed cache-miss diagnoses. The router preserves the caller’s cache controls and full conversation; it does not cache answers, rewrite prompts, inject unverified API options or promise a cache-hit target. Tool failure detection remains heuristic.
+
+## Native reasoning replay compatibility
+
+Some Codex Router builds run generic reasoning-to-assistant-text conversion even for the Jev Responses route. That replaces a native reasoning item (including its encrypted continuation token) before the request returns to native Codex. Preserve the original native history instead:
+
+```sh
+node plugins/jev-route/ops/native-replay-compat.mjs ~/.local/share/codex-router
+```
+
+The repair preserves only native-only reasoning histories (opaque continuation tokens, native item IDs, no foreign plaintext thinking); legacy foreign/mixed histories keep the existing adapter behavior.
+
+The helper validates the installation identity, backs up `src/router.mjs`, and changes only the `jev` provider with the Responses adapter. Other providers, Chat Completions behavior, credentials and service configuration are untouched. It is idempotent and refuses an unrecognized source shape. Restart the shared Codex Router only after active requests finish. Recheck compatibility after upstream router upgrades; do not blindly patch changed source. This restores native continuation semantics but does not guarantee a cache-hit percentage.
+
+Read-only verification against the installed adapter: `node plugins/jev-route/ops/verify-native-replay.mjs ~/.local/share/codex-router`. It uses isolated synthetic fixtures, makes no provider calls, and checks that native continuations are preserved while foreign histories and other providers retain their prior behavior.
