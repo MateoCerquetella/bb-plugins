@@ -47,6 +47,8 @@ plugin page.
 - Shows reported USD credit usage and limits in expanded details, including the
   dollar amounts exposed by Claude Code usage data.
 - Shows the available Codex usage resets in the expanded details.
+- Shows Codex and Claude Code weekly pace and projected usage at their current
+  reset time.
 - Includes reset timing and provider session status in the expanded view.
 - Refreshes automatically every five minutes and whenever a stale BB window
   becomes active again.

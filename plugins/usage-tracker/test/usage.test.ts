@@ -28,6 +28,8 @@ import {
   sidebarUsagePrimaryWindow,
   sidebarUsageSummary,
   sidebarUsageWindows,
+  weeklyUsagePace,
+  weeklyUsagePaceLabel,
 } from "../lib/sidebar-usage.ts";
 import {
   enabledSidebarProviderIds,
@@ -486,6 +488,82 @@ test("formats reset, update, percentage, and cost copy safely", () => {
     "$1.25 of $5.00",
   );
 });
+
+test("calculates weekly pace and reset projection from each reset window", () => {
+  const nowMs = Date.parse("2026-09-25T12:00:00.000Z");
+  const halfWindowReset = new Date(nowMs + 3.5 * 24 * 60 * 60 * 1_000);
+  const codex = weeklyUsagePace(
+    { usedPercent: 60, resetsAt: halfWindowReset.toISOString() },
+    nowMs,
+  );
+  assert.equal(codex.status, "ahead");
+  assert.equal(codex.differencePercentPoints, 10);
+  assert.equal(codex.projectedPercent, 120);
+  assert.equal(
+    weeklyUsagePaceLabel(codex),
+    "10 percentage points ahead · 120% projected by reset",
+  );
+
+  const quarterWindowReset = new Date(nowMs + 5.25 * 24 * 60 * 60 * 1_000);
+  const claudeCode = weeklyUsagePace(
+    { usedPercent: 60, resetsAt: quarterWindowReset.toISOString() },
+    nowMs,
+  );
+  assert.equal(claudeCode.differencePercentPoints, 35);
+  assert.equal(claudeCode.projectedPercent, 240);
+});
+
+test("classifies on-pace and behind weekly usage", () => {
+  const nowMs = Date.parse("2026-09-25T12:00:00.000Z");
+  const resetAt = new Date(nowMs + 3.5 * 24 * 60 * 60 * 1_000).toISOString();
+
+  const onPace = weeklyUsagePace(
+    { usedPercent: 50, resetsAt: resetAt },
+    nowMs,
+  );
+  assert.equal(onPace.status, "on-pace");
+  assert.equal(
+    weeklyUsagePaceLabel(onPace),
+    "On pace · 100% projected by reset",
+  );
+
+  const behind = weeklyUsagePace({ usedPercent: 30, resetsAt: resetAt }, nowMs);
+  assert.equal(behind.status, "behind");
+  assert.equal(behind.differencePercentPoints, -20);
+  assert.equal(behind.projectedPercent, 60);
+  assert.equal(
+    weeklyUsagePaceLabel(behind),
+    "20 percentage points behind · 60% projected by reset",
+  );
+});
+
+test(
+  "keeps weekly pace unavailable for missing, invalid, expired, or just-started windows",
+  () => {
+    const nowMs = Date.parse("2026-09-25T12:00:00.000Z");
+    const unavailableLabel = "Pace unavailable · Projection unavailable";
+    const cases = [
+      weeklyUsagePace(null, nowMs),
+      weeklyUsagePace({ usedPercent: 60, resetsAt: null }, nowMs),
+      weeklyUsagePace({ usedPercent: 60, resetsAt: "not-a-date" }, nowMs),
+      weeklyUsagePace(
+        { usedPercent: 60, resetsAt: "2026-09-25T11:59:59.000Z" },
+        nowMs,
+      ),
+      weeklyUsagePace(
+        { usedPercent: 60, resetsAt: "2026-10-02T12:00:00.000Z" },
+        nowMs,
+      ),
+    ];
+
+    for (const pace of cases) {
+      assert.equal(pace.status, "unavailable");
+      assert.equal(pace.differencePercentPoints, null);
+      assert.equal(pace.projectedPercent, null);
+      assert.equal(weeklyUsagePaceLabel(pace), unavailableLabel);
+    }
+  },
+);
 
 test("selects the configured compact usage window", () => {
   const provider = normalizeUsage(

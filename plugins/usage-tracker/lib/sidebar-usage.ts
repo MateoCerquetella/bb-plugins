@@ -10,6 +10,91 @@ export interface SidebarUsageWindows {
   weekly: UsageWindow | null;
 }
 
+export type WeeklyUsagePaceStatus =
+  | "ahead"
+  | "on-pace"
+  | "behind"
+  | "unavailable";
+
+export interface WeeklyUsagePace {
+  status: WeeklyUsagePaceStatus;
+  differencePercentPoints: number | null;
+  projectedPercent: number | null;
+}
+
+const WEEKLY_WINDOW_MS = 7 * 24 * 60 * 60 * 1_000;
+const ON_PACE_TOLERANCE_PERCENT_POINTS = 1;
+
+function unavailableWeeklyUsagePace(): WeeklyUsagePace {
+  return {
+    status: "unavailable",
+    differencePercentPoints: null,
+    projectedPercent: null,
+  };
+}
+
+export function weeklyUsagePace(
+  window: Pick<UsageWindow, "usedPercent" | "resetsAt"> | null,
+  nowMs = Date.now(),
+): WeeklyUsagePace {
+  if (
+    window === null ||
+    window.resetsAt === null ||
+    !Number.isFinite(window.usedPercent) ||
+    window.usedPercent < 0 ||
+    !Number.isFinite(nowMs)
+  ) {
+    return unavailableWeeklyUsagePace();
+  }
+
+  const resetAtMs = Date.parse(window.resetsAt);
+  if (!Number.isFinite(resetAtMs) || resetAtMs <= nowMs) {
+    return unavailableWeeklyUsagePace();
+  }
+
+  const elapsedMs = nowMs - (resetAtMs - WEEKLY_WINDOW_MS);
+  if (elapsedMs <= 0 || elapsedMs >= WEEKLY_WINDOW_MS) {
+    return unavailableWeeklyUsagePace();
+  }
+
+  const elapsedShare = elapsedMs / WEEKLY_WINDOW_MS;
+  const differencePercentPoints = window.usedPercent - elapsedShare * 100;
+  const projectedPercent = window.usedPercent / elapsedShare;
+  if (
+    !Number.isFinite(differencePercentPoints) ||
+    !Number.isFinite(projectedPercent)
+  ) {
+    return unavailableWeeklyUsagePace();
+  }
+
+  return {
+    status:
+      Math.abs(differencePercentPoints) <= ON_PACE_TOLERANCE_PERCENT_POINTS
+        ? "on-pace"
+        : differencePercentPoints > 0
+          ? "ahead"
+          : "behind",
+    differencePercentPoints,
+    projectedPercent,
+  };
+}
+
+export function weeklyUsagePaceLabel(pace: WeeklyUsagePace): string {
+  if (
+    pace.status === "unavailable" ||
+    pace.differencePercentPoints === null ||
+    pace.projectedPercent === null
+  ) {
+    return "Pace unavailable · Projection unavailable";
+  }
+
+  const projection = `${formatUsedPercent(pace.projectedPercent)}% projected by reset`;
+  if (pace.status === "on-pace") return `On pace · ${projection}`;
+
+  const difference = `${formatUsedPercent(Math.abs(pace.differencePercentPoints))} percentage points`;
+  return `${difference} ${pace.status} · ${projection}`;
+}
+
 export interface SidebarUsageDetailRow {
   label: string;
   window: UsageWindow | null;

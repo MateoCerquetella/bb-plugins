@@ -591,11 +591,17 @@
 }
 
 .usage-tracker-sidebar__reset,
+.usage-tracker-sidebar__pace,
 .usage-tracker-sidebar__cost {
   color: var(--usage-sidebar-muted);
   font-size: 0.5625rem;
   line-height: 1.25;
   overflow-wrap: anywhere;
+}
+
+.usage-tracker-sidebar__pace {
+  color: color-mix(in srgb, var(--usage-sidebar-text) 82%, transparent);
+  font-variant-numeric: tabular-nums;
 }
 
 .usage-tracker-sidebar__cost {

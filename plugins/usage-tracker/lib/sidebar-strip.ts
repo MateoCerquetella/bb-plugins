@@ -24,6 +24,9 @@ import {
   sidebarUsageDetailRows,
   sidebarUsagePrimaryAccessibleText,
   sidebarUsagePrimarySelectionSummary,
+  weeklyUsagePace,
+  weeklyUsagePaceLabel,
+  type WeeklyUsagePace,
   type SidebarUsageOverviewItem,
 } from "./sidebar-usage.ts";
 
@@ -385,6 +388,7 @@ function progressRail(window: UsageWindow | null): HTMLSpanElement {
 function detailWindowRow(
   label: string,
   window: UsageWindow | null,
+  pace: WeeklyUsagePace | null = null,
 ): HTMLDivElement {
   const row = element("div", "usage-tracker-sidebar__window");
   row.dataset.level = usageLevel(window?.usedPercent ?? null);
@@ -405,6 +409,15 @@ function detailWindowRow(
       window === null ? "No limit reported" : formatResetTime(window.resetsAt),
     ),
   );
+  if (pace !== null) {
+    row.append(
+      element(
+        "span",
+        "usage-tracker-sidebar__pace",
+        weeklyUsagePaceLabel(pace),
+      ),
+    );
+  }
   if (window?.cost !== null && window?.cost !== undefined) {
     row.append(
       element(
@@ -579,7 +592,16 @@ function detailsCard(
     detailRows.some((row) => row.label === "5-hour limit"),
   );
   windows.append(
-    ...detailRows.map(({ label, window }) => detailWindowRow(label, window)),
+    ...detailRows.map(({ label, window }) => {
+      const showWeeklyPace =
+        label === "Weekly limit" &&
+        (provider.id === "codex" || provider.id === "claudeCode");
+      return detailWindowRow(
+        label,
+        window,
+        showWeeklyPace ? weeklyUsagePace(window) : null,
+      );
+    }),
   );
   card.append(header, windows);
 

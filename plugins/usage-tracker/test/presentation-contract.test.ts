@@ -54,3 +54,14 @@ test("shows reported credits as readable expanded-detail metadata", () => {
   assert.match(styles, /\.usage-tracker-sidebar__cost/u);
   assert.doesNotMatch(source, /claude\s+\/usage/iu);
 });
+
+test("shows weekly pace and projection for Codex and Claude Code detail rows", () => {
+  assert.match(source, /label === "Weekly limit"/u);
+  assert.match(
+    source,
+    /provider\.id === "codex" \|\| provider\.id === "claudeCode"/u,
+  );
+  assert.match(source, /weeklyUsagePace\(window\)/u);
+  assert.match(source, /weeklyUsagePaceLabel\(pace\)/u);
+  assert.match(styles, /\.usage-tracker-sidebar__pace/u);
+});

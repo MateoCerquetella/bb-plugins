@@ -15,6 +15,9 @@ All notable changes to Usage Tracker are documented here.
 
 ## Unreleased
 
+- Show Codex and Claude Code weekly pace and projected usage at each
+  provider's current reset time.
+
 ## 0.1.6 - 2026-09-02
 
 ### Added
