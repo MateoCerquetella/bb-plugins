@@ -1,14 +1,4 @@
-"""Per-call routing keeps Jev's view compact and the executor's replay complete.
-
-The contract pinned here is:
-
-1. every model call, including tool continuations and post-compaction calls,
-   gets a fresh Jev decision;
-2. different sub-actions may therefore use different models;
-3. the canonical Responses request and prompt_cache_key are preserved for the
-   selected model; the compact Jev dossier never becomes execution context;
-4. cache telemetry identifies a session only by a non-reversible local hash.
-"""
+"""Task routing retains healthy tool-loop pairs and preserves canonical replay."""
 import json
 import os
 import sys
@@ -112,6 +102,7 @@ class CacheScope(unittest.TestCase):
 class PerCallEndToEnd(unittest.TestCase):
     def setUp(self):
         Edge.payloads = []
+        self.enterContext(mock.patch.object(jev, "ROUTE_MEMORY", jev.RouteMemory()))
         tmp = self.enterContext(tempfile.TemporaryDirectory())
         for name in ("OFF_PATH", "SHADOW_PATH", "DEBUG_PATH", "SIGNATURE_PATH",
                      "LOG_PATH", "DRY_STATE_PATH", "DRY_MANUAL_PATH"):
@@ -171,26 +162,41 @@ class PerCallEndToEnd(unittest.TestCase):
             self.assertEqual(failure.exception.read(), refusal)
         self.assertEqual([p["model"] for p in Edge.payloads], [jev.SOL])
 
-    def test_each_sub_action_is_decided_and_can_swap_model(self):
-        opening = [message("user", "run the tests and fix what breaks")]
-        choices = [
-            answer(jev.LUNA, "low"),
-            answer(jev.SOL, "high"),
-            answer(jev.LUNA, "medium"),
-            answer(jev.ASTRA, "xhigh"),
-        ]
-        with mock.patch.object(jev, "call_jev_routed", side_effect=choices) as judge:
-            self.call(payload_for(opening))
+    def test_successful_tool_loop_reuses_model_effort_and_classifier(self):
+        history = [message("user", "run the tests and fix what breaks")]
+        with mock.patch.object(jev, "call_jev_routed", return_value=answer(jev.SOL, "medium")) as judge:
+            self.call(payload_for(history))
             for index in range(3):
-                history = opening + [tool_call(f"c{index}"), tool_step(f"c{index}", "exit 1")]
+                history += [tool_call(f"c{index}"), tool_step(f"c{index}", "exit 0")]
                 self.call(payload_for(history))
-        self.assertEqual(judge.call_count, 4)
-        self.assertEqual(
-            [p["model"] for p in Edge.payloads],
-            [jev.LUNA, jev.SOL, jev.LUNA, jev.ASTRA],
-        )
-        self.assertEqual([r["routing_scope"] for r in self.records], ["call"] * 4)
-        self.assertEqual(len({r["cache_scope"] for r in self.records}), 1)
+        self.assertEqual(judge.call_count, 1)
+        self.assertEqual([p["model"] for p in Edge.payloads], [jev.SOL]*4)
+        self.assertEqual([p["reasoning"]["effort"] for p in Edge.payloads], ["medium"]*4)
+        self.assertEqual([r["cache_observation"]["reused"] for r in self.records], [False, True, True, True])
+        self.assertTrue(all(r["jev_usage"] is None for r in self.records[1:]))
+        self.assertEqual(Edge.payloads[-1]["input"], history)
+        self.assertNotIn("run the tests and fix what breaks", json.dumps(self.records))
+
+    def test_two_tool_failures_reclassify_and_do_not_downgrade(self):
+        history = [message("user", "repair tests")]
+        with mock.patch.object(jev, "call_jev_routed", side_effect=[answer(jev.SOL,"high"),answer(jev.LUNA,"low")]) as judge:
+            self.call(payload_for(history))
+            for index in range(2):
+                history += [tool_call(f"c{index}"),tool_step(f"c{index}","exit code 1")]
+                self.call(payload_for(history))
+        self.assertEqual(judge.call_count,2)
+        self.assertEqual(Edge.payloads[-1]["model"],jev.ASTRA)
+        self.assertEqual(Edge.payloads[-1]["reasoning"]["effort"],"high")
+        self.assertEqual(self.records[-1]["cache_observation"]["reason"],"repeated_tool_failure")
+
+    def test_new_user_request_can_select_another_pair(self):
+        history = [message("user", "analyze the architecture")]
+        with mock.patch.object(jev,"call_jev_routed",side_effect=[answer(jev.ASTRA,"high"),answer(jev.LUNA,"low")]) as judge:
+            self.call(payload_for(history))
+            history += [message("assistant","done"),message("user","format this file")]
+            self.call(payload_for(history))
+        self.assertEqual(judge.call_count,2)
+        self.assertEqual(Edge.payloads[-1]["model"],jev.LUNA)
 
     def test_compaction_gets_a_new_decision_and_full_handoff(self):
         opening = [message("user", "refactor the router tests"),
@@ -239,7 +245,7 @@ class PerCallEndToEnd(unittest.TestCase):
     def test_cache_controls_and_canonical_replay_survive_model_swaps_unchanged(self):
         cache_key = "stable-private-session-key"
         first = [message("user", "first")]
-        second = [message("user", "first"), tool_call("c"), tool_step("c", "done")]
+        second = [message("user", "first"), message("user", "new task"), tool_call("c"), tool_step("c", "done")]
         with mock.patch.object(
             jev, "call_jev_routed",
             side_effect=[answer(jev.LUNA, "low"), answer(jev.SOL, "high")],

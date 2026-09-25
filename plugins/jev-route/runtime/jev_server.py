@@ -7,22 +7,18 @@ and a thinking depth, applies the routing policy, then relays to the Codex
 Router's local caller edge (native session sharing enabled) — with no format
 conversion: Responses in, Responses out, SSE relayed verbatim.
 
-Routing policy: Jev independently chooses one capability tier and one thinking
-depth for every call, in a single typed request. Code combines those two answers.
-Every pair uses standard speed. Confidence is logged without changing the chosen
-model. There are no keyword/scenario overrides or target model proportions.
-Technical Jev failures remain fail-open to astra @medium and are logged separately.
+Routing policy: Jev chooses a native model and reasoning depth for a task.
+Successful append-only tool continuations retain that pair and skip the judge.
+A new user request, changed configuration, rewritten/compacted history, 30-minute
+idle expiry, repeated tool errors or provider failure triggers re-evaluation.
+Failure re-evaluation within the same task cannot downgrade capability/effort.
+State is isolated by a hashed prompt_cache_key, bounded to 512 sessions, and
+resets safely on process restart. Missing keys bypass retention entirely.
 
-Per-call routing (v5): every model call is judged independently, so a tool loop
-may move between Luna, Sol and Astra as the next sub-action changes. Provider
-retries inside that call retain its decision. The compact Jev projection is
-judgment input only: the executing model always receives the caller's canonical
-request untouched, never that projection. The caller's prompt_cache_key also
-passes through untouched, allowing each selected model to reuse its own cache
-for this session; caches are not assumed to be shared across different models.
-Context continuity does not depend on those cache hits: every selected model
-receives the full canonical request. Cache reuse only changes how much of that
-identical prefix the provider must process and bill again.
+The executing model receives the caller's full canonical history, instructions,
+and cache controls; classification never replaces execution context. Telemetry
+records request hashes/change flags and real provider usage, not definitive
+cache-miss causes. No unsupported native diagnostics fields are injected.
 
 Input handling (v5): Jev sees the current ask, never the thread — the task is
 Codex's last user text, with Codex's own machine-generated envelopes stripped
@@ -71,6 +67,8 @@ import time
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
+from route_memory import RouteMemory, session_key
+
 from routing_policy import (ASTRA, EFFORTS, LUNA, POLICY_VERSION, QUESTIONS, SOL,
                             TIERS, decision_from_answers, route)
 
@@ -90,7 +88,8 @@ LISTEN = ("127.0.0.1", 4319)
 ROUTER = ("127.0.0.1", 4202)
 
 DISPLAY_NAME = "Jev Codex Router"
-VERSION = "1.3"
+VERSION = "1.4"
+ROUTE_MEMORY = RouteMemory()
 
 API = "https://api.typesafe.ai/v1/systemone"
 MODEL = "jev-latest"
@@ -1149,30 +1148,39 @@ class Handler(BaseHTTPRequestHandler):
         decision = None
         jev_usage = None
         scope = cache_scope(payload, task)
-        if os.path.exists(OFF_PATH):
-            model, effort, speed, gate = ASTRA, None, "default", "off"
-        else:
+        def choose():
+            nonlocal tier, depth, conf, jev_ms, decision, jev_usage
             key = load_key()
-            if key and (task or step.get("digest") or signals.get("has_image")):
-                jt0 = time.time()
-                state = jev_state(task, prev_assistant, signals, step)
-                try:
-                    result = call_jev_routed(key, state)
-                    decision = decision_from_answers(result.get("answers"))
-                    raw_usage = result.get("usage") or {}
-                    if not isinstance(raw_usage, dict):
-                        raw_usage = {}
-                    jev_usage = {k: v for k, v in raw_usage.items()
-                                 if k in ("input_tokens", "output_tokens", "inputTokens", "outputTokens")
-                                 and isinstance(v, int) and not isinstance(v, bool) and v >= 0}
-                    tier, depth, conf = (decision["model"], decision["effort"],
-                                         decision["confidence"])
-                    model, effort, speed, gate = route(tier, depth)
-                except Exception as exc:
-                    model, effort, speed, gate = ASTRA, "medium", "default", f"jev_error:{type(exc).__name__}"
+            if not key or not (task or step.get("digest") or signals.get("has_image")):
+                return ASTRA, "medium", "default", "no_key_or_task"
+            jt0 = time.time()
+            state = jev_state(task, prev_assistant, signals, step)
+            try:
+                result = call_jev_routed(key, state)
+                decision = decision_from_answers(result.get("answers"))
+                raw_usage = result.get("usage") or {}
+                if not isinstance(raw_usage, dict):
+                    raw_usage = {}
+                jev_usage = {k: v for k, v in raw_usage.items()
+                             if k in ("input_tokens", "output_tokens", "inputTokens", "outputTokens")
+                             and isinstance(v, int) and not isinstance(v, bool) and v >= 0}
+                tier, depth, conf = decision["model"], decision["effort"], decision["confidence"]
+                return route(tier, depth)
+            except Exception as exc:
+                return ASTRA, "medium", "default", f"jev_error:{type(exc).__name__}"
+            finally:
                 jev_ms = int((time.time() - jt0) * 1000)
-            else:
-                model, effort, speed, gate = ASTRA, "medium", "default", "no_key_or_task"
+
+        ticket = None
+        if os.path.exists(OFF_PATH):
+            ROUTE_MEMORY.invalidate(session_key(payload))
+            model, effort, speed, gate = ASTRA, None, "default", "off"
+            cache_observation = {"reason": "off", "reused": False}
+        else:
+            (model, effort, speed, gate), cache_observation, ticket = ROUTE_MEMORY.resolve(
+                payload, step, choose, enabled=not os.path.exists(SHADOW_PATH))
+            if cache_observation["reused"]:
+                gate = "retained"
 
         would = None
         if os.path.exists(SHADOW_PATH):
@@ -1209,8 +1217,15 @@ class Handler(BaseHTTPRequestHandler):
 
         out_path = path if path.startswith("/v1") else "/v1" + path
         self._attempts = []
-        status, out_kind, ctype, quota_hit, unwritten, resets_at = self._forward(
-            payload, out_path, stream_requested, debug, marker, model, signature)
+        try:
+            status, out_kind, ctype, quota_hit, unwritten, resets_at = self._forward(
+                payload, out_path, stream_requested, debug, marker, model, signature)
+        except Exception:
+            ROUTE_MEMORY.observe(ticket, failed=True)
+            raise
+        ROUTE_MEMORY.observe(ticket, failed=status >= 400 or any(
+            attempt.get("terminal_type") in ("response.failed", "error") for attempt in self._attempts))
+
         retried = False
         fallback = None
         if unwritten is not None:
@@ -1223,6 +1238,13 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("Content-Length", str(len(unwritten)))
             self.end_headers()
             self.wfile.write(unwritten)
+
+        usage = (self._attempts[-1].get("usage") or {}) if self._attempts else {}
+        input_count, cached_count = usage.get("input_tokens"), usage.get("cached_input_tokens")
+        cache_observation["cache_reuse_percent"] = (
+            round(100 * cached_count / input_count, 2)
+            if isinstance(input_count, int) and input_count > 0 and isinstance(cached_count, int) else None)
+        cache_observation["classifier_called"] = jev_ms is not None
 
         log_line({
             "at": time.strftime("%Y-%m-%dT%H:%M:%S"),
@@ -1240,7 +1262,8 @@ class Handler(BaseHTTPRequestHandler):
             "speed": speed,
             "native": native_model,
             "dry": dry_reason,
-            "routing_scope": "call",
+            "routing_scope": "task",
+            "cache_observation": cache_observation,
             "cache_scope": scope,
             "cache_key_present": isinstance(payload.get("prompt_cache_key"), str)
                                  and bool(payload["prompt_cache_key"].strip()),
@@ -1259,7 +1282,7 @@ class Handler(BaseHTTPRequestHandler):
             "digest_len": len(step["digest"]),
             "stripped": stripped,
             "would": would,
-            "task": task[:110],
+            "task_fingerprint": hashlib.sha256(task.encode("utf-8")).hexdigest(),
         })
 
     def _forward(self, payload, out_path, stream_requested, debug, marker, model, signature=None):

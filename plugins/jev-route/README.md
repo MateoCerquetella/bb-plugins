@@ -31,7 +31,7 @@ systemctl --user restart codex-router
 
 When BB runs on that same machine, `node ops/register-bb-model.mjs` and `bb settings reload` also register the picker entry in BB's managed configuration. Both registration scripts preserve existing entries. Other execution machines need their own routing installation before selecting Jev there.
 
-Jev independently selects Luna, Sol or Astra and a reasoning depth for each call. Requests retain their conversation payload. Caches are model-specific. A Jev API failure falls back to Astra/medium and is recorded in the routing log; a missing or unavailable router is an execution error. The runtime keeps the upstream routing policy and model IDs.
+Jev selects Luna, Sol or Astra and a reasoning depth for each task, retaining both during successful append-only tool continuations. Requests retain their conversation payload. Caches are model-specific. A Jev API failure falls back to Astra/medium and is recorded in the routing log; a missing or unavailable router is an execution error. The runtime keeps the upstream routing policy and model IDs.
 
 ## Verify
 
@@ -43,3 +43,9 @@ python3 -m unittest discover -s plugins/jev-route/runtime -p 'test_*.py'
 The Python runtime is adapted from [0xNatoshi/jev-codex-router](https://github.com/0xNatoshi/jev-codex-router), revision `6905869590038489ce0ad6d6e4b236e64d050ed3`, copyright Thibault Saint-Jean, under the MIT license in `runtime/LICENSE`. This copy adds an explicit HTTP user-agent for TypeSafe compatibility.
 
 Codex routing uses only native Luna, Sol and Astra models. Legacy dry flags do not select external providers. Quota failures are returned to Codex without DeepSeek/GLM retries.
+
+## Cache-aware task routing
+
+Repeated tool continuations reuse the selected model and effort, avoiding classifier calls and unnecessary pair changes. New user requests, changed instructions/tools/settings, rewritten or compacted history, 30 minutes idle, two successive detected tool errors or provider failures trigger re-evaluation. Failure escalation within an unchanged task never reduces the prior model/effort; the model moves up at least one tier when possible. Decisions use a bounded, thread-safe, process-local cache of 512 session hashes. Restarting safely reclassifies; requests without a cache key never share state. Off and shadow controls bypass retained decisions.
+
+`cache_observation` in the routing log includes the selection reason, reuse flag, model/effort change flags, changed configuration fields, hashes and actual cache reuse percentage when available. These are local observations, not provider-confirmed cache-miss diagnoses. The router preserves the caller’s cache controls and full conversation; it does not cache answers, rewrite prompts, inject unverified API options or promise a cache-hit target. Tool failure detection remains heuristic.
