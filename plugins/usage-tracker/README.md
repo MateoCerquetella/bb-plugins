@@ -113,6 +113,12 @@ directory path:
 printf '%s' "$CLAUDE_CONFIG_DIR" | shasum -a 256 | cut -c1-8
 ```
 
+Expired access tokens are refreshed through Anthropic's OAuth endpoint when
+the item contains a refresh token. Rotated credentials are written back to
+the same Keychain service and verified before usage is requested. If no
+refresh token exists or refresh fails, sign in again using the matching
+Claude Code configuration directory.
+
 ## Use
 
 The collapsed strip is designed for quick scanning:
@@ -157,8 +163,9 @@ session to read the available reset count and, only after the explicit
 confirmation above, request one reset. When **Claude Keychain service** is set,
 it reads that macOS Keychain item with `security` and sends its Claude Code
 access token only to Anthropic's usage endpoint; it only accepts
-`Claude Code-credentials` service names. It does not ask for or store provider
-credentials. Its only persistent browser data is the last successful usage
+`Claude Code-credentials` service names. It sends refresh tokens only to
+Anthropic's OAuth endpoint and stores refreshed credentials in that same
+Keychain item, never in plugin storage. Its only persistent browser data is the last successful usage
 snapshot in local storage, used to keep useful values visible during a
 temporary provider or network failure.
 

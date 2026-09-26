@@ -30,6 +30,7 @@ function deps(
     services,
     tokens,
     platform: "darwin",
+    async writeKeychainSecret() {},
     async readKeychainSecret(service) {
       services.push(service);
       return credentials();
@@ -61,6 +62,29 @@ test("accepts only Claude Code credential services", () => {
   assert.equal(isClaudeKeychainService("Claude Code-credentials-x y"), false);
 });
 
+test("refreshes expired tokens and persists rotated credentials before usage", async () => {
+  let saved = "";
+  const fake = deps({
+    now: () => 3000,
+    readKeychainSecret: async () => credentials({ refreshToken: "old-refresh", scopes: ["user:profile"] }),
+    writeKeychainSecret: async (service, value) => {
+      assert.equal(service, SERVICE);
+      saved = value;
+    },
+    fetch: async (url, init) => {
+      if (String(url).endsWith("/oauth/token")) {
+        assert.equal(JSON.parse(String(init?.body)).refresh_token, "old-refresh");
+        return Response.json({ access_token: "new-access", refresh_token: "new-refresh", expires_in: 3600 });
+      }
+      assert.equal(JSON.parse(saved).claudeAiOauth.refreshToken, "new-refresh");
+      assert.deepEqual(JSON.parse(saved).claudeAiOauth.scopes, ["user:profile"]);
+      assert.equal(new Headers(init?.headers).get("Authorization"), "Bearer new-access");
+      return Response.json({ five_hour: { utilization: 10 } });
+    },
+  });
+  assert.equal((await readClaudeUsageFromKeychain(SERVICE, fake)).status, "ok");
+});
+
 test("reads usage with the configured Keychain service", async () => {
   const fake = deps();
   const usage = await readClaudeUsageFromKeychain(SERVICE, fake);
@@ -85,6 +109,22 @@ test("reads usage with the configured Keychain service", async () => {
       },
     ],
   });
+});
+
+test("failed credential persistence stops usage and hides secret errors", async () => {
+  let calls = 0;
+  const usage = await readClaudeUsageFromKeychain(SERVICE, deps({
+    now: () => 3000,
+    readKeychainSecret: async () => credentials({ refreshToken: "private-token" }),
+    writeKeychainSecret: async () => { throw new Error("private-token"); },
+    fetch: async () => {
+      calls++;
+      return Response.json({ access_token: "new", refresh_token: "rotated", expires_in: 3600 });
+    },
+  }));
+  assert.equal(usage.status, "error");
+  assert.equal(calls, 1);
+  assert.doesNotMatch(JSON.stringify(usage), /private-token|rotated/);
 });
 
 test("never reads the Keychain for an unrelated service", async () => {
