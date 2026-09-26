@@ -7,6 +7,29 @@ from cache_telemetry import provider_diagnostics, fingerprint
 from jev_server import usage_counts
 
 MAX_CALLS=36;MAX_INPUT=250000;MAX_OUTPUT=15000
+MAX_RESPONSE_BYTES=2*1024*1024
+
+def cancel_connection(connection,active_socket):
+ # HTTPResponse owns this socket after a close-delimited getresponse().
+ try:
+  if active_socket:active_socket.shutdown(socket.SHUT_RDWR)
+ except OSError:pass
+ connection.close()
+
+def response_lines(response,start):
+ remaining=MAX_RESPONSE_BYTES
+ while remaining>0:
+  if time.monotonic()-start>=90:raise RuntimeError('Per-call benchmark limit exceeded')
+  line=response.readline(min(1024*1024,remaining));remaining-=len(line)
+  if time.monotonic()-start>=90:raise RuntimeError('Per-call benchmark limit exceeded')
+  if not line:return
+  yield line
+ # Do not read even one additional byte to test for EOF at the strict cap.
+ raise RuntimeError('Per-call benchmark limit exceeded')
+
+def require_accounting(result):
+ if result.get('accounting_error'):raise RuntimeError(result['accounting_error'])
+
 class Budget:
  def __init__(self,allow_thresholds=False):
   self.calls=0;self.input=0;self.output=0;self.allow_thresholds=allow_thresholds;self.checkpoint=lambda:None;self.events=[]
@@ -62,15 +85,11 @@ def call(payload,budget):
  secret=(Path.home()/'.codex/codex-router/caller-secret').read_text().strip()
  if not re.fullmatch(r'[A-Za-z0-9_-]{32,}',secret):raise RuntimeError('Invalid local caller credential format')
  connection=http.client.HTTPConnection('127.0.0.1',4202,timeout=60)
- start=time.monotonic();final=None;bytes_read=0;trace_id=uuid.uuid4().hex
- def cancel():
-  try:
-   sock=connection.sock
-   if sock:sock.shutdown(socket.SHUT_RDWR)
-  except OSError:pass
-  connection.close()
- timer=threading.Timer(90,cancel);timer.daemon=True;timer.start()
+ start=time.monotonic();final=None;trace_id=uuid.uuid4().hex;timer=None;response=None
  try:
+  connection.connect()
+  active_socket=connection.sock
+  timer=threading.Timer(max(0,90-(time.monotonic()-start)),cancel_connection,args=(connection,active_socket));timer.daemon=True;timer.start()
   connection.request('POST','/v1/responses',body=json.dumps(payload).encode(),headers={'Authorization':'Bearer '+secret,'Content-Type':'application/json','x-jev-request-id':trace_id})
   response=connection.getresponse()
   if response.status!=200:
@@ -84,10 +103,7 @@ def call(payload,budget):
    summary=safe_code+(':'+safe_param if safe_param else '')
    budget.events[-1].update(state='rejected',http_status=response.status,error_summary=summary);budget.checkpoint()
    raise RuntimeError('Native usage unavailable; benchmark stopped')
-  while True:
-   line=response.readline(1024*1024);bytes_read+=len(line)
-   if not line:break
-   if time.monotonic()-start>90 or bytes_read>2*1024*1024:raise RuntimeError('Per-call benchmark limit exceeded')
+  for line in response_lines(response,start):
    if not line.startswith(b'data:'):continue
    raw=line[5:].strip()
    if raw==b'[DONE]':continue
@@ -106,7 +122,10 @@ def call(payload,budget):
     budget.input+=usage['input_tokens'];budget.output+=usage['output_tokens']
    budget.events[-1].update(state='usage_unknown',usage_known=False,native_usage=usage);budget.checkpoint()
   return {'status':200,'response_status':(final or {}).get('status'),'id':(final or {}).get('id'),'elapsed_ms':network_ms,'request_id':route_info.get('request_id',trace_id),'request_fingerprint':route_info.get('egress') or fingerprint(payload),'actual_model':route_info.get('model',payload.get('model')),'actual_effort':route_info.get('effort',(payload.get('reasoning') or {}).get('effort')),'accounting_error':accounting_error,'usage':usage,'judge_usage':judge,'judge_called':judge_called,'diagnostics':provider_diagnostics((final or {}).get('prompt_cache_diagnostics')),'output':(final or {}).get('output',[])}
- finally:timer.cancel();connection.close()
+ finally:
+  if timer:timer.cancel()
+  if response:response.close()
+  connection.close()
 
 def base_payload(model,effort,key,context):
  return {'model':model,'reasoning':{'effort':effort},'service_tier':'default','store':False,'stream':True,'include':['reasoning.encrypted_content'],'prompt_cache_key':key,'instructions':context,'input':[]}
@@ -146,11 +165,14 @@ def run_probe(budget,common,run_id,results=None,supported=None):
   payload=base_payload(model,'low',f'{run_id}-probe-{model}',common+'\nReply with exactly OK. No explanation.')
   payload['input']=[{'role':'user','content':'Reply OK.'}]
   row={'model':model,'supported':False};results.append(row);budget.checkpoint()
-  first=call(payload,budget);row.update(baseline_status=first['status'],baseline_usage=first.get('usage',{}));budget.checkpoint()
+  first=call(payload,budget);row.update(baseline_status=first['status'],baseline_usage=first.get('usage',{}),accounting_error=first.get('accounting_error'));budget.checkpoint()
+  require_accounting(first)
   if first.get('response_status')!='completed' or not first.get('id'):
    row.update(error_summary=first.get('error_summary'));budget.checkpoint();continue
   payload['prompt_cache_options']={'comparison_response_id':first['id']}
   second=call(payload,budget);diagnostics=second.get('diagnostics')
+  row.update(comparison_status=second['status'],comparison_usage=second.get('usage',{}),diagnostics=diagnostics,accounting_error=second.get('accounting_error'));budget.checkpoint()
+  require_accounting(second)
   useful=bool(diagnostics and diagnostics.get('type') in ('cache_hit','cache_miss'))
   if useful:supported.append(model)
   row.update({'model':model,'baseline_status':first['status'],'comparison_status':second['status'],'diagnostics':diagnostics,'error_summary':second.get('error_summary'),'supported':useful,'baseline_usage':first['usage'],'comparison_usage':second['usage']});budget.checkpoint()
@@ -172,7 +194,7 @@ def benchmark(budget,common,run_id,rows=None,steps=2):
     answer,call_id=answer_of(result.get('output',[]));passed=result.get('response_status')=='completed' and call_id is not None and isinstance(answer,str) and answer.strip()==expected
     row={'task':task,'arm':label,'step':step,'session_scope':hashlib.sha256(('prompt:'+key).encode()).hexdigest()[:16],'context_hash':hashlib.sha256(common.encode()).hexdigest(),'status':result['status'],'response_status':result.get('response_status'),'usage':result.get('usage',{}),'elapsed_ms':result['elapsed_ms'],'request_id':result.get('request_id'),'request_fingerprint':result.get('request_fingerprint'),'actual_model':result.get('actual_model',model),'actual_effort':result.get('actual_effort',effort),'judge_usage':result.get('judge_usage',{}),'judge_called':result.get('judge_called',False),'accounting_error':result.get('accounting_error'),'passed':passed,'answer':answer,'expected':expected}
     rows.append(row);budget.checkpoint();print(json.dumps({'task':task,'arm':label,'step':step,'passed':passed,'usage':row['usage']}),flush=True)
-    if result.get('accounting_error'):raise RuntimeError(result['accounting_error'])
+    require_accounting(result)
     if result['status']!=200 or not call_id:break # Failure recorded, no retries.
     payload['input']+=result['output']
     if step+1<len(checks):payload['input'].append({'type':'function_call_output','call_id':call_id,'output':json.dumps({'received':True,'next_check':checks[step+1][0]})})
