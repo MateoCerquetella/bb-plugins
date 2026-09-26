@@ -15,10 +15,15 @@ All notable changes to Usage Tracker are documented here.
 
 ## Unreleased
 
+### Added
+
 - Read every Account Pooler account through its `provider-usage.v1` RPC. Pooled
   providers show a combined, plan-weighted reading in the strip, and their
   expanded details list each account's plan, status, and limits. The strip
   falls back to host-local usage when the pooler is disabled or unresponsive.
+- Add a **Claude Keychain service** setting so Claude Code usage loads when
+  `CLAUDE_CONFIG_DIR` stores credentials under `Claude Code-credentials-<hash>`
+  instead of BB's default Keychain service.
 
 ## 0.1.6 - 2026-09-02
 

@@ -97,6 +97,31 @@ does not add its 3–4 second CLI startup time to the sidebar RPC response.
 If a CLI is missing, signed out, or expired, expand that provider in the strip
 to see the recovery instruction reported by BB.
 
+### Claude Code with `CLAUDE_CONFIG_DIR`
+
+When Claude Code runs with `CLAUDE_CONFIG_DIR` set, it stores its macOS
+Keychain credentials under `Claude Code-credentials-<hash>` instead of
+`Claude Code-credentials`, so BB reports Claude Code as signed out. Set
+**Claude Keychain service** to that service name and Usage Tracker reads Claude
+Code usage from it directly. List the candidates with:
+
+```sh
+security dump-keychain | grep -o '"Claude Code-credentials[^"]*"'
+```
+
+The hash is the first eight hex characters of the SHA-256 of the config
+directory path:
+
+```sh
+printf '%s' "$CLAUDE_CONFIG_DIR" | shasum -a 256 | cut -c1-8
+```
+
+Expired access tokens are refreshed through Anthropic's OAuth endpoint when
+the item contains a refresh token. Rotated credentials are written back to
+the same Keychain service and verified before usage is requested. If no
+refresh token exists or refresh fails, sign in again using the matching
+Claude Code configuration directory.
+
 ## Use
 
 The collapsed strip is designed for quick scanning:
@@ -144,8 +169,12 @@ When the Account Pooler plugin is enabled, it also reads that plugin's cached
 per-account usage through its `provider-usage.v1` RPC; for providers the pool
 serves, that replaces the host-local reading. It also uses the installed `codex app-server` with the existing local Codex
 session to read the available reset count and, only after the explicit
-confirmation above, request one reset. It does not ask for or store provider
-credentials. Its only persistent browser data is the last successful usage
+confirmation above, request one reset. When **Claude Keychain service** is set,
+it reads that macOS Keychain item with `security` and sends its Claude Code
+access token only to Anthropic's usage endpoint; it only accepts
+`Claude Code-credentials` service names. It sends refresh tokens only to
+Anthropic's OAuth endpoint and stores refreshed credentials in that same
+Keychain item, never in plugin storage. Its only persistent browser data is the last successful usage
 snapshot in local storage, used to keep useful values visible during a
 temporary provider or network failure.
 

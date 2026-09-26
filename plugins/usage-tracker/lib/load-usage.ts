@@ -59,20 +59,22 @@ export async function loadUsageSnapshot(
   sdk: UsageSdk,
   threadId: string | null,
   fetchedAt = new Date(),
+  overrides: Promise<RawUsageResponse> = Promise.resolve({}),
 ): Promise<UsageSnapshot> {
   const hostId =
     threadId === null ? null : await resolveThreadHostId(sdk, threadId);
   const plugins = sdk.plugins;
-  const [response, hostName, pooled] = await Promise.all([
+  const [response, hostName, pooled, overridden] = await Promise.all([
     hostId === null
       ? sdk.system.usageLimits()
       : sdk.system.usageLimits({ hostId }),
     resolveHostName(sdk, hostId),
     plugins === undefined ? null : loadPooledAccounts({ plugins }, hostId),
+    overrides,
   ]);
 
   return applyPooledAccounts(
-    normalizeUsage(response, { id: hostId, name: hostName }, fetchedAt),
+    normalizeUsage({ ...response, ...overridden }, { id: hostId, name: hostName }, fetchedAt),
     pooled,
   );
 }
