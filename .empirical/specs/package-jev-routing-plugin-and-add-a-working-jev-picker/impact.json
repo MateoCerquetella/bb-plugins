@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "jev-routing"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:ddeb610a6c68611bc0d93c431dc172721edb874845003d9fc5408a13abeac4bb"
+}

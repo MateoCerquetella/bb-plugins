@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "sequence": 4,
+  "previousDigest": "sha256:afcca6fba3784d8ab63d010e738dcb5f18ad13bd5698afdf22628abf7d589693",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Accepted independent Dyaus runtime with observable picker, transport and test evidence",
+  "createdAt": "2026-09-23T00:21:43.037Z",
+  "stateBeforeDigest": "sha256:1d67ba1f7af69239ddf46b9f03adc8341730533bc338f01c8c00379ded9dfa10",
+  "stateAfterDigest": "sha256:6e50eed5dfe9447ba70a5166a40f9e3fecc7296a2174f9d0c00600215c79ead5",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 4,
+    "activeFeature": "package-jev-routing-plugin-and-add-a-working-jev-picker",
+    "request": "Package Jev routing plugin and add a working Jev picker option on Dyaus; user also authorizes a focused push to bb-plugins",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "yolo",
+    "phase": "plan",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Accepted independent Dyaus runtime with observable picker, transport and test evidence",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:71b76f788c937aba16cead76842c4153292205552df7712553f4ed64755f1458",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:e1e264babea872a5a8bb159d20a3093f3b8a339f0fff374e7304003a2d716179",
+    "impactDigest": "sha256:ddeb610a6c68611bc0d93c431dc172721edb874845003d9fc5408a13abeac4bb",
+    "capabilityClaimId": "package-jev-routing-plugin-and-add-a-working-jev-picker-571a5bf2438a",
+    "authorizationDigest": "sha256:aa5d8c5f4f0d06b0028eb6dccae4a1b12464dbce2c30e8b908f298e82a583a45",
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-23T00:21:43.037Z"
+  },
+  "digest": "sha256:e42c320eb6646b1a47e2f9321847d519e199238a7a3da9c4c27946b5bfeb70c0"
+}

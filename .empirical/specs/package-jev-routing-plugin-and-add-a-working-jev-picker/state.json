@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 5,
+  "revision": 6,
+  "activeFeature": "package-jev-routing-plugin-and-add-a-working-jev-picker",
+  "request": "Package Jev routing plugin and add a working Jev picker option on Dyaus; user also authorizes a focused push to bb-plugins",
+  "profile": "complex",
+  "workflow": "complex",
+  "mode": "yolo",
+  "phase": "context",
+  "status": "awaiting_human",
+  "repairAttempts": 0,
+  "message": "YOLO authorization ceiling implemented reached",
+  "implementationActor": "agent",
+  "workStartedAt": null,
+  "specDigest": "sha256:71b76f788c937aba16cead76842c4153292205552df7712553f4ed64755f1458",
+  "approvedSpecRevision": 3,
+  "capabilityArchiveRequired": true,
+  "capabilityDeltaDigest": "sha256:e1e264babea872a5a8bb159d20a3093f3b8a339f0fff374e7304003a2d716179",
+  "impactDigest": "sha256:ddeb610a6c68611bc0d93c431dc172721edb874845003d9fc5408a13abeac4bb",
+  "capabilityClaimId": "package-jev-routing-plugin-and-add-a-working-jev-picker-571a5bf2438a",
+  "authorizationDigest": "sha256:aa5d8c5f4f0d06b0028eb6dccae4a1b12464dbce2c30e8b908f298e82a583a45",
+  "evidence": [],
+  "evidenceReceiptIds": [],
+  "legacyEvidenceCount": 0,
+  "completion": {
+    "implemented": true,
+    "verified": false,
+    "integrated": false,
+    "delivered": false,
+    "published": false,
+    "highest": "implemented",
+    "reasons": {
+      "verified": "verified has not been proven by a durable receipt.",
+      "integrated": "integrated has not been proven by a durable receipt.",
+      "delivered": "delivered has not been proven by a durable receipt.",
+      "published": "published has not been proven by a durable receipt."
+    }
+  },
+  "updatedAt": "2026-09-23T00:23:20.324Z"
+}

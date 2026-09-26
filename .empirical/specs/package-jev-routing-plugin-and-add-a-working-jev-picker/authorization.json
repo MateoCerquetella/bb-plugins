@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "mode": "yolo",
+  "repositoryId": "sha256:d9fdb0e2b401fa04d4c6318c891afc229f37c3e2501914648b64ceba94dfdccf",
+  "feature": "package-jev-routing-plugin-and-add-a-working-jev-picker",
+  "requestDigest": "sha256:9cde0d8c056b789d648bdd47904dd643f1d45ffd745de903e0c05aa5e7f7323b",
+  "ceiling": "implemented",
+  "targetBranch": null,
+  "allowExternalAgent": false,
+  "createdAt": "2026-09-22T23:24:30.641Z",
+  "expiresAt": null,
+  "digest": "sha256:aa5d8c5f4f0d06b0028eb6dccae4a1b12464dbce2c30e8b908f298e82a583a45"
+}

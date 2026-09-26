@@ -1,0 +1,11 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { summarizeRoutes, readJev } from '../jev.ts';
+import { tokenShare } from '../usage.ts';
+const scope=createHash('sha256').update('prompt:session-a').digest('hex').slice(0,16);
+const row=(overrides={})=>JSON.stringify({at:'2026-09-24T17:00:00',cache_scope:scope,model:'gpt-6-sol',effort:'high',status:200,jev_usage:{input_tokens:20,output_tokens:5},...overrides});
+test('Jev diagnostics isolate sessions and ignore partial records',()=>{const s=summarizeRoutes([row(),row({cache_scope:'other',model:'deepseek'}),'{partial',row({status:429,model:'gpt-6-luna'})].join('\n'),'session-a');assert.equal(s.calls,2);assert.equal(s.failures,1);assert.equal(s.lastModel,'gpt-6-luna');assert.equal(s.judgeTokens,50);assert.equal(s.models.length,2);});
+test('recent diagnostics are bounded, unknown usage is not zero',()=>{const s=summarizeRoutes(Array.from({length:220},()=>row({jev_usage:null})).join('\n'),'session-a');assert.equal(s.calls,200);assert.equal(s.judgeTokens,null);assert.equal(summarizeRoutes(row(),'another-session').state,'waiting');});
+test('manual model selection does not claim Jev activity',async()=>{assert.equal((await readJev(false,'session-a')).state,'off');assert.equal((await readJev(true,null)).state,'waiting');});
+test('category percentages use disjoint input/cache/output denominator',()=>{assert.equal(tokenShare(80,10,80,10),'80%');assert.equal(tokenShare(5,10,80,10),'5%');assert.equal(tokenShare(1,null,80,10),'—');assert.equal(tokenShare(1,0,100000,0),'<0.1%');});

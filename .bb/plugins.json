@@ -4,6 +4,10 @@
   "name": "mateocerquetella-bb-plugins",
   "plugins": [
     {
+      "name": "jev-route",
+      "source": "./plugins/jev-route"
+    },
+    {
       "name": "action-topbar",
       "source": "./plugins/action-topbar"
     },
@@ -42,6 +46,10 @@
     {
       "name": "lavender",
       "source": "./plugins/lavender"
+    },
+    {
+      "name": "conversation-space",
+      "source": "./plugins/conversation-space"
     }
   ]
 }
