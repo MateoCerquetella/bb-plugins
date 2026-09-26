@@ -530,6 +530,39 @@ function resetSection(
   return section;
 }
 
+function appendDetailRows(container: HTMLElement, provider: ProviderUsage): void {
+  const detailRows = sidebarUsageDetailRows(provider);
+  container.dataset.hasFiveHour = String(
+    detailRows.some((row) => row.label === "5-hour limit"),
+  );
+  container.append(
+    ...detailRows.map(({ label, window }) => detailWindowRow(label, window)),
+  );
+}
+
+function accountSection(
+  title: string,
+  subtitle: string | null,
+  usage: ProviderUsage,
+): HTMLDivElement {
+  const section = element("div", "usage-tracker-sidebar__account");
+  section.dataset.status = usage.status;
+  const heading = element("div", "usage-tracker-sidebar__account-heading");
+  heading.append(element("strong", undefined, title));
+  if (subtitle !== null) heading.append(element("span", undefined, subtitle));
+  const rows = element("div", "usage-tracker-sidebar__account-windows");
+  if (usage.status === "ok" || usage.windows.length > 0) {
+    appendDetailRows(rows, usage);
+  }
+  section.append(heading, rows);
+  if (usage.status !== "ok" && usage.message !== null) {
+    section.append(
+      element("p", "usage-tracker-sidebar__account-message", usage.message),
+    );
+  }
+  return section;
+}
+
 function detailsCard(
   provider: ProviderUsage,
   onClose: () => void,
@@ -552,9 +585,11 @@ function detailsCard(
     element(
       "span",
       undefined,
-      provider.status === "ok"
-        ? "Subscription usage"
-        : providerStatusLabel(provider.status),
+      provider.accounts !== undefined && provider.accounts.length > 0
+        ? `Account Pooler · ${provider.accounts.length} account${provider.accounts.length === 1 ? "" : "s"}`
+        : provider.status === "ok"
+          ? "Subscription usage"
+          : providerStatusLabel(provider.status),
     ),
   );
   identity.append(mark, title);
@@ -574,13 +609,28 @@ function detailsCard(
   windows.tabIndex = 0;
   windows.setAttribute("role", "region");
   windows.setAttribute("aria-label", `${provider.name} usage windows`);
-  const detailRows = sidebarUsageDetailRows(provider);
-  windows.dataset.hasFiveHour = String(
-    detailRows.some((row) => row.label === "5-hour limit"),
-  );
-  windows.append(
-    ...detailRows.map(({ label, window }) => detailWindowRow(label, window)),
-  );
+  const accounts = provider.accounts ?? [];
+  if (accounts.length > 1) {
+    windows.dataset.pooled = "true";
+    windows.append(
+      accountSection(
+        `All ${accounts.length} accounts`,
+        "Combined",
+        provider,
+      ),
+      ...accounts.map((account) =>
+        accountSection(
+          account.accountEmail ?? account.label,
+          account.status === "ok"
+            ? account.planLabel
+            : providerStatusLabel(account.status),
+          { ...provider, ...account, id: provider.id, accounts: undefined },
+        ),
+      ),
+    );
+  } else {
+    appendDetailRows(windows, provider);
+  }
   card.append(header, windows);
 
   if (provider.id === "codex") {

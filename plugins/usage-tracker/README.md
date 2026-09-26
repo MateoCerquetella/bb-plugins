@@ -46,6 +46,9 @@ plugin page.
   provider-defined percentages.
 - Shows reported USD credit usage and limits in expanded details, including the
   dollar amounts exposed by Claude Code usage data.
+- Works with BB's Account Pooler: when pooled accounts serve Claude Code or
+  Codex, the strip shows their combined, plan-weighted usage and the expanded
+  details list every pooled account's own limits.
 - Shows the available Codex usage resets in the expanded details.
 - Includes reset timing and provider session status in the expanded view.
 - Refreshes automatically every five minutes and whenever a stale BB window
@@ -129,6 +132,10 @@ The collapsed strip is designed for quick scanning:
 - Review the reported **5-hour limit**, **weekly limit**, every additional
   provider-defined window, their reset times, and any reported USD credits.
   Codex Pro accounts that do not report a five-hour limit omit that row.
+- With the Account Pooler enabled, a pooled provider's details start with the
+  combined reading across all its accounts, then one section per account with
+  its plan, status, and limits. The combined reading resets with the earliest
+  account.
 - For Codex, select **Use a reset…** to open a confirmation. Nothing is
   consumed until **Yes, use reset** is selected; canceling the confirmation
   does not contact the reset-consumption endpoint.
@@ -157,8 +164,10 @@ bb plugin remove usage-tracker
 
 ## Data and privacy
 
-The plugin reads BB's local `system.usageLimits` data for provider windows. It
-also uses the installed `codex app-server` with the existing local Codex
+The plugin reads BB's local `system.usageLimits` data for provider windows.
+When the Account Pooler plugin is enabled, it also reads that plugin's cached
+per-account usage through its `provider-usage.v1` RPC; for providers the pool
+serves, that replaces the host-local reading. It also uses the installed `codex app-server` with the existing local Codex
 session to read the available reset count and, only after the explicit
 confirmation above, request one reset. When **Claude Keychain service** is set,
 it reads that macOS Keychain item with `security` and sends its Claude Code

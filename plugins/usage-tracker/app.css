@@ -536,9 +536,58 @@
   border-left: 1px solid var(--usage-sidebar-line);
 }
 
+/* Pooled providers stack one section per account, each with its own grid. */
+.usage-tracker-sidebar__windows[data-pooled="true"] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.usage-tracker-sidebar__account + .usage-tracker-sidebar__account {
+  border-top: 1px solid var(--usage-sidebar-line);
+}
+
+.usage-tracker-sidebar__account-heading {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.375rem;
+  padding: 0.5rem 0.625rem 0;
+  color: var(--usage-sidebar-muted);
+  font-size: 0.625rem;
+  line-height: 1.2;
+}
+
+.usage-tracker-sidebar__account-heading strong {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--usage-sidebar-text);
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.usage-tracker-sidebar__account-heading span {
+  flex: none;
+}
+
+.usage-tracker-sidebar__account-windows {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.usage-tracker-sidebar__account-message {
+  margin: 0;
+  padding: 0.375rem 0.625rem 0.5rem;
+  color: var(--usage-sidebar-muted);
+  font-size: 0.625rem;
+  line-height: 1.4;
+}
+
 /* Stack the side-by-side windows once the card follows a narrow sidebar down. */
 @container usage-details (max-width: 15rem) {
-  .usage-tracker-sidebar__windows {
+  .usage-tracker-sidebar__windows,
+  .usage-tracker-sidebar__account-windows {
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -548,11 +597,14 @@
   }
 }
 
-.usage-tracker-sidebar__windows[data-has-five-hour="false"] {
+.usage-tracker-sidebar__windows[data-has-five-hour="false"],
+.usage-tracker-sidebar__account-windows[data-has-five-hour="false"] {
   grid-template-columns: minmax(0, 1fr);
 }
 
 .usage-tracker-sidebar__windows[data-has-five-hour="false"]
+  .usage-tracker-sidebar__window:nth-child(2),
+.usage-tracker-sidebar__account-windows[data-has-five-hour="false"]
   .usage-tracker-sidebar__window:nth-child(2) {
   border-top: 1px solid var(--usage-sidebar-line);
   border-left: 0;
