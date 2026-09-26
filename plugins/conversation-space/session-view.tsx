@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useRpc } from '@get-bb/plugin-sdk/app';
 import type { rpcContract } from './server';
-import { mergeMessages, type SessionMessage } from './session';
+import { mergeMessages, messageContentShares, type SessionMessage } from './session';
 import type { Snapshot } from './app';
-const exact=(value:number|null|undefined)=>value==null?'Not reported':value.toLocaleString('en-US');
-const date=(value:number|null|undefined)=>value==null?'Not reported':new Date(value).toLocaleString();
+const exact=(value:number|null|undefined)=>value==null?'—':value.toLocaleString('en-US');
+const date=(value:number|null|undefined)=>value==null?'—':new Date(value).toLocaleString();
 export function SessionUsage({threadId,usage,onClose,children}:{threadId:string;usage:Snapshot|null;onClose:()=>void;children:ReactNode}) {
  const rpc=useRpc<typeof rpcContract>();
  const dialog=useRef<HTMLDialogElement>(null);
@@ -20,18 +20,21 @@ export function SessionUsage({threadId,usage,onClose,children}:{threadId:string;
   return ()=>{alive.current=false;};
  },[rpc,threadId]);
  async function loadMore(){if(!cursor||busy)return;setBusy(true);setError('');try{const result=await rpc.call('session',{threadId,beforeSeq:cursor});if(alive.current){setMessages(previous=>mergeMessages(previous,result.messages));setCursor(result.nextCursor);}}catch{if(alive.current)setError('Could not load older records. Try again.');}finally{if(alive.current)setBusy(false);}}
- async function copy(){try{await navigator.clipboard.writeText(JSON.stringify({threadId,source:'BB recorded events, not a complete provider wire transcript',usage,startedAt:started,hasOlderRecords:cursor!==null,messages},null,2));if(alive.current)setCopied('Copied');}catch{if(alive.current)setCopied('Copy failed');}}
+ async function copy(){try{await navigator.clipboard.writeText(JSON.stringify({threadId,source:'BB recorded events, not a complete provider wire transcript',estimateMethod:'Text characters / 4, loaded records only; not current context attribution',contentEstimates:content,usage,startedAt:started,hasOlderRecords:cursor!==null,messages},null,2));if(alive.current)setCopied('Copied');}catch{if(alive.current)setCopied('Copy failed');}}
+ const content=messageContentShares(messages);
  const users=messages.filter(m=>m.role==='user').length,replies=messages.filter(m=>m.role==='assistant').length;
  const lastReply=messages.find(m=>m.role==='assistant')?.at;
  const visible=messages.filter(m=>(role==='all'||m.role===role)&&`${m.id} ${m.type} ${m.raw}`.toLowerCase().includes(query.toLowerCase()));
  const model=usage?.jev?.state==='recorded'?usage.jev.lastModel:usage?.model;
  return <dialog ref={dialog} className="cs-session" aria-label="Session usage" onCancel={onClose} onClose={onClose}>
   <header><h2>Session usage</h2><div><button type="button" onClick={()=>void copy()} disabled={busy}>▢ Copy JSON</button><span role="status">{copied}</span><button type="button" className="cs-session-close" aria-label="Close session usage" onClick={onClose}>×</button></div></header>
-  <div className="cs-session-summary"><div><span>Model</span><strong>{model??'Not reported'} {usage?.provider?`(${usage.provider})`:''}</strong><small>Billing plan not reported</small></div><div><span>Total cost</span><strong>Not reported</strong></div><div><span>Messages</span><strong>{busy&&!messages.length?'Loading…':users+replies}{cursor?' loaded':''}</strong><small>{cursor?'Older records available':'Recorded user and assistant messages'}</small></div></div>
-  <div className="cs-session-columns"><section><div className="cs-row"><h3>Context used</h3><b>{usage?.percent==null?'Not reported':`${usage.percent}%`}</b></div><progress max={100} value={usage?.percent??0}/><p className="cs-session-capacity">{exact(usage?.used)} / {exact(usage?.capacity)}</p>
-   <div className="cs-context-categories">{[['Your messages','user'],['Replies','reply'],['Tool results','tool'],['Other','other']].map(([name,color])=><div className="cs-row" key={name}><span><i className={`cs-dot-${color}`}/>{name}</span><span>Not reported</span></div>)}</div><p className="cs-session-note">The provider reports total context usage, but does not attribute context tokens to these categories. No category sizes are estimated.</p>
+  <div className="cs-session-summary"><div><span>Model</span><strong>{model??'Loading…'} {usage?.provider?`(${usage.provider})`:''}</strong><small>Current execution model</small></div><div><span>{usage?.sessionTokens!=null?'Session tokens':'Loaded text estimate'}</span><strong>{usage?.sessionTokens!=null?exact(usage.sessionTokens):busy&&!messages.length?'Loading…':`~${exact(content.total)}`}</strong><small>{usage?.sessionTokens!=null?'Cumulative, including repeated input':'Approximate · loaded records only'}</small></div><div><span>Messages</span><strong>{busy&&!messages.length?'Loading…':users+replies}{cursor?' loaded':''}</strong><small>{cursor?'Older records available':'Recorded user and assistant messages'}</small></div></div>
+  <div className="cs-session-columns"><section><div className="cs-row"><h3>Context used</h3><b>{usage?.percent==null?'—':`${usage.percent}%`}</b></div><progress max={100} value={usage?.percent??0}/><p className="cs-session-capacity">{exact(usage?.used)} / {exact(usage?.capacity)}</p>
+   <div className="cs-content-heading">Loaded message content <span>Estimated tokens</span></div>
+   <div className="cs-content-bar" aria-label="Estimated token shares of loaded message content">{content.rows.map(row=><span key={row.role} className={`cs-dot-${row.role==='assistant'?'reply':row.role}`} style={{width:`${row.percent}%`}}/>)}</div>
+   <div className="cs-context-categories">{content.rows.map(row=><div className="cs-row" key={row.role}><span><i className={`cs-dot-${row.role==='assistant'?'reply':row.role}`}/>{({user:'Your messages',assistant:'Replies',tool:'Tool results',other:'Other'} as Record<string,string>)[row.role]}</span><span>{busy&&!messages.length?'Loading…':error&&!messages.length?'Unavailable':`~${exact(row.tokens)} · ${row.percent>0&&row.percent<0.1?'<0.1':row.percent.toFixed(1)}%`}</span></div>)}</div><p className="cs-session-note">Text estimates use roughly 4 characters per token, before display truncation. Shares describe loaded records, not the provider’s current context. Older records, images and hidden instructions are not included.</p>
   </section><section><h3>Details</h3><dl>{[
-   ['Input tokens (latest call)',exact(usage?.totalInput)],['Output tokens (latest call)',exact(usage?.output)],['Reasoning tokens',exact(usage?.reasoning)],['Cache read / write',`${exact(usage?.cached)} / Not reported`],['Your messages',`${users}${cursor?' loaded':''}`],['Assistant replies',`${replies}${cursor?' loaded':''}`],['Session started',date(started)],['Last recorded reply',date(lastReply)]
+   ['Input tokens (latest call)',exact(usage?.totalInput)],['Output tokens (latest call)',exact(usage?.output)],['Reasoning tokens',exact(usage?.reasoning)],['Cached input (latest call)',exact(usage?.cached)],['Your messages',`${users}${cursor?' loaded':''}`],['Assistant replies',`${replies}${cursor?' loaded':''}`],['Session started',date(started)],['Last recorded reply',date(lastReply)]
   ].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl></section></div>
   <details className="cs-session-routing"><summary>Usage and Jev diagnostics</summary>{children}</details>
   <details className="cs-raw" open><summary>Raw message data <span>{messages.length}{cursor?'+':''}</span></summary><div className="cs-raw-body"><p>BB’s recorded input, replies and tool events. This is not the complete provider wire transcript. Search and filters apply to loaded records; long records are visibly truncated.</p>

@@ -12,6 +12,7 @@ export function summarize(events: UsageEvent[]) {
     if (!usage && event.type === 'thread/tokenUsage/updated') { usage = record(data.tokenUsage); measuredAt ??= event.createdAt; }
   }
   const last = record(usage?.last);
+  const total = record(usage?.total);
   const input = count(last.inputTokens), cached = count(last.cachedInputTokens);
   const capacity = count(context?.modelContextWindow ?? usage?.modelContextWindow);
   // Last-call total is the provider's context proxy, never cumulative usage.
@@ -19,6 +20,7 @@ export function summarize(events: UsageEvent[]) {
   return { used, capacity: capacity && capacity > 0 ? capacity : null,
     remaining: used !== null && capacity !== null && capacity > 0 ? Math.max(0, capacity-used) : null,
     percent: used !== null && capacity !== null && capacity > 0 ? Math.min(100,Math.round(used/capacity*100)) : null,
+    sessionTokens: count(total.totalTokens),
     totalInput: input,
     input: input !== null && cached !== null ? Math.max(0,input-cached) : null,
     cached, output: count(last.outputTokens), reasoning: count(last.reasoningOutputTokens),
