@@ -80,10 +80,12 @@ Only internally correlated Jev calls emit native fingerprints. The correlation h
 
 ## Controlled read-only comparison
 
-`ops/native-benchmark.py` explicitly requires `--confirm-quota-use`. It compares three self-contained code/state-analysis tasks across fixed Astra Low, fixed Astra Medium and Jev, with three sequential answer checks per task/arm. Arms use identical starting code, instructions and tools, counterbalanced ordering and isolated session keys. The only tool records an answer; it executes no code or external action. Correct answers are checked objectively. No automatic retries are made. This is a small controlled check, not a benchmark of full project completion quality.
+`ops/native-benchmark.py` explicitly requires both `--confirm-quota-use` and acceptance of `--allow-token-stop-thresholds`. It compares three self-contained code/state-analysis tasks across fixed Astra Low, fixed Astra Medium and Jev, with two sequential answer checks per task/arm by default (18 executor calls; `--steps 3` selects 27). Arms use identical starting code, instructions and tools, counterbalanced ordering and isolated session keys. The only tool records an answer; it executes no code or external action. Correct answers are checked objectively. No automatic retries are made. This is a small controlled check, not a benchmark of full project completion quality.
+
+Only run this command after accepting that an in-flight request may exceed the token stop thresholds:
 
 ```sh
-python3 plugins/jev-route/ops/native-benchmark.py --benchmark --confirm-quota-use --output /tmp/jev-benchmark.json
+python3 plugins/jev-route/ops/native-benchmark.py --benchmark --confirm-quota-use --allow-token-stop-thresholds --steps 2 --output /tmp/jev-benchmark.json
 ```
 
 The harness limits requests to 36, gates subsequent calls at 250K input/15K output tokens, and bounds per-call elapsed time and response size. Usage is known after completion, so a single in-flight request may exceed a token stop threshold; the report preserves measured consumption and errors. `--seed-budget` accepts a JSON file with reserved `calls`, `input`, and `output` to share a budget with prior probes. `--probe` checks optional provider diagnostics using an actual baseline response; unsupported or unavailable comparisons are never represented as cache-hit proof. Keep reports local unless reviewed for publication.
