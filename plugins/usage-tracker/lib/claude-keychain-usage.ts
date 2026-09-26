@@ -96,7 +96,7 @@ const defaultDeps: ClaudeKeychainUsageDeps = {
 
 async function writeKeychainSecret(service: string, secret: string): Promise<void> {
   // Interactive stdin keeps credentials out of process arguments and error objects.
-  const encoded = Buffer.from(secret, "utf8").toString("hex");
+  const encoded = secret.replace(/\\/gu, "\\\\").replace(/"/gu, '\\"');
   let account = "";
   try {
     await execFileAsync("/usr/bin/security", [
