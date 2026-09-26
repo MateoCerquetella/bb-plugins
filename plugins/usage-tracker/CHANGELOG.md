@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.10 - 2026-09-26
+
+- Add the optional Claude Keychain service override, including expired-token
+  refresh, verified credential write-back, and credential-safe error messages.
+- Read Account Pooler accounts with plan-weighted combined usage and account
+  details; preserve USD amounts for single accounts and enforce host scoping.
+
 ## 0.1.9 - 2026-09-21
 
 - Show reported USD credit usage and limits in expanded provider details,
@@ -12,18 +19,6 @@
 - Discover `agy` from PATH and supported macOS fallback locations, use the official Antigravity mark, and show all Antigravity quota groups.
 
 All notable changes to Usage Tracker are documented here.
-
-## Unreleased
-
-### Added
-
-- Read every Account Pooler account through its `provider-usage.v1` RPC. Pooled
-  providers show a combined, plan-weighted reading in the strip, and their
-  expanded details list each account's plan, status, and limits. The strip
-  falls back to host-local usage when the pooler is disabled or unresponsive.
-- Add a **Claude Keychain service** setting so Claude Code usage loads when
-  `CLAUDE_CONFIG_DIR` stores credentials under `Claude Code-credentials-<hash>`
-  instead of BB's default Keychain service.
 
 ## 0.1.6 - 2026-09-02
 
