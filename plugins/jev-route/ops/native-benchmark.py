@@ -3,7 +3,7 @@
 import argparse, datetime, hashlib, http.client, json, os, sys, time, uuid, re, threading, socket, tempfile
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'runtime'))
-from cache_telemetry import provider_diagnostics
+from cache_telemetry import provider_diagnostics, fingerprint
 from jev_server import usage_counts
 
 MAX_CALLS=36;MAX_INPUT=250000;MAX_OUTPUT=15000
@@ -25,7 +25,7 @@ class Budget:
 
 
 def judge_accounting(payload,seen):
- if payload.get('model')!='jev/auto':return {},False
+ if payload.get('model')!='jev/auto':return {},False,{}
  scope=hashlib.sha256(('prompt:'+payload['prompt_cache_key']).encode()).hexdigest()[:16]
  log=Path.home()/'.codex/codex-router/jev-router-live.jsonl'
  deadline=time.monotonic()+10
@@ -40,9 +40,10 @@ def judge_accounting(payload,seen):
     if row.get('cache_scope')!=scope or not request_id or request_id in seen:continue
     seen.add(request_id);called=observation.get('classifier_called') is True
     usage=row.get('jev_usage') or {}
-    if not called:return {},False
+    route_info={'model':row.get('model'),'effort':row.get('effort'),'request_id':request_id,'egress':observation.get('egress')}
+    if not called:return {},False,route_info
     if not all(isinstance(usage.get(k),int) and not isinstance(usage[k],bool) and usage[k]>=0 for k in ('input_tokens','output_tokens')):raise RuntimeError('Classifier usage unavailable; benchmark stopped')
-    return usage,True
+    return usage,True,route_info
   except OSError:pass
   time.sleep(.05)
  raise RuntimeError('Classifier usage unavailable; benchmark stopped')
@@ -61,7 +62,7 @@ def call(payload,budget):
  secret=(Path.home()/'.codex/codex-router/caller-secret').read_text().strip()
  if not re.fullmatch(r'[A-Za-z0-9_-]{32,}',secret):raise RuntimeError('Invalid local caller credential format')
  connection=http.client.HTTPConnection('127.0.0.1',4202,timeout=60)
- start=time.monotonic();final=None;bytes_read=0
+ start=time.monotonic();final=None;bytes_read=0;trace_id=uuid.uuid4().hex
  def cancel():
   try:
    sock=connection.sock
@@ -70,7 +71,7 @@ def call(payload,budget):
   connection.close()
  timer=threading.Timer(90,cancel);timer.daemon=True;timer.start()
  try:
-  connection.request('POST','/v1/responses',body=json.dumps(payload).encode(),headers={'Authorization':'Bearer '+secret,'Content-Type':'application/json'})
+  connection.request('POST','/v1/responses',body=json.dumps(payload).encode(),headers={'Authorization':'Bearer '+secret,'Content-Type':'application/json','x-jev-request-id':trace_id})
   response=connection.getresponse()
   if response.status!=200:
    error_body=response.read(4096).decode('utf-8','replace')
@@ -96,15 +97,15 @@ def call(payload,budget):
     final=event.get('response') or {}
   usage=usage_counts((final or {}).get('usage')) or {}
   if not hasattr(budget,'seen_judge_requests'):budget.seen_judge_requests=set()
-  network_ms=round((time.monotonic()-start)*1000);judge={};judge_called=False;accounting_error=None
+  network_ms=round((time.monotonic()-start)*1000);judge={};judge_called=False;route_info={};accounting_error=None
   try:
-   judge,judge_called=judge_accounting(payload,budget.seen_judge_requests);budget.record(usage,judge if judge_called else None,judge_called)
+   judge,judge_called,route_info=judge_accounting(payload,budget.seen_judge_requests);budget.record(usage,judge if judge_called else None,judge_called)
   except RuntimeError as error:
    accounting_error=str(error)
    if all(isinstance(usage.get(k),int) and not isinstance(usage[k],bool) and usage[k]>=0 for k in ('input_tokens','output_tokens')):
     budget.input+=usage['input_tokens'];budget.output+=usage['output_tokens']
    budget.events[-1].update(state='usage_unknown',usage_known=False,native_usage=usage);budget.checkpoint()
-  return {'status':200,'response_status':(final or {}).get('status'),'id':(final or {}).get('id'),'elapsed_ms':network_ms,'accounting_error':accounting_error,'usage':usage,'judge_usage':judge,'judge_called':judge_called,'diagnostics':provider_diagnostics((final or {}).get('prompt_cache_diagnostics')),'output':(final or {}).get('output',[])}
+  return {'status':200,'response_status':(final or {}).get('status'),'id':(final or {}).get('id'),'elapsed_ms':network_ms,'request_id':route_info.get('request_id',trace_id),'request_fingerprint':route_info.get('egress') or fingerprint(payload),'actual_model':route_info.get('model',payload.get('model')),'actual_effort':route_info.get('effort',(payload.get('reasoning') or {}).get('effort')),'accounting_error':accounting_error,'usage':usage,'judge_usage':judge,'judge_called':judge_called,'diagnostics':provider_diagnostics((final or {}).get('prompt_cache_diagnostics')),'output':(final or {}).get('output',[])}
  finally:timer.cancel();connection.close()
 
 def base_payload(model,effort,key,context):
@@ -169,7 +170,7 @@ def benchmark(budget,common,run_id,rows=None,steps=2):
     except BaseException:
      rows.append({'task':task,'arm':label,'step':step,'passed':False,'state':'interrupted','usage_known':False});budget.checkpoint();raise
     answer,call_id=answer_of(result.get('output',[]));passed=result.get('response_status')=='completed' and call_id is not None and isinstance(answer,str) and answer.strip()==expected
-    row={'task':task,'arm':label,'step':step,'session_scope':hashlib.sha256(('prompt:'+key).encode()).hexdigest()[:16],'context_hash':hashlib.sha256(common.encode()).hexdigest(),'status':result['status'],'response_status':result.get('response_status'),'usage':result.get('usage',{}),'elapsed_ms':result['elapsed_ms'],'judge_usage':result.get('judge_usage',{}),'judge_called':result.get('judge_called',False),'accounting_error':result.get('accounting_error'),'passed':passed,'answer':answer,'expected':expected}
+    row={'task':task,'arm':label,'step':step,'session_scope':hashlib.sha256(('prompt:'+key).encode()).hexdigest()[:16],'context_hash':hashlib.sha256(common.encode()).hexdigest(),'status':result['status'],'response_status':result.get('response_status'),'usage':result.get('usage',{}),'elapsed_ms':result['elapsed_ms'],'request_id':result.get('request_id'),'request_fingerprint':result.get('request_fingerprint'),'actual_model':result.get('actual_model',model),'actual_effort':result.get('actual_effort',effort),'judge_usage':result.get('judge_usage',{}),'judge_called':result.get('judge_called',False),'accounting_error':result.get('accounting_error'),'passed':passed,'answer':answer,'expected':expected}
     rows.append(row);budget.checkpoint();print(json.dumps({'task':task,'arm':label,'step':step,'passed':passed,'usage':row['usage']}),flush=True)
     if result.get('accounting_error'):raise RuntimeError(result['accounting_error'])
     if result['status']!=200 or not call_id:break # Failure recorded, no retries.
