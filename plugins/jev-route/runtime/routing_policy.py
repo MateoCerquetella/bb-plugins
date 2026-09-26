@@ -1,7 +1,7 @@
 """Compact Jev contract: independent model and effort choices for the current task."""
 import math
 
-POLICY_VERSION = "task-cache-v1"
+POLICY_VERSION = "task-cache-v2"
 LUNA, SOL, ASTRA = "gpt-5.6-luna", "gpt-5.6-sol", "gpt-6-astra"
 TIERS = (LUNA, SOL, ASTRA)
 EFFORTS = ["low", "medium", "high", "xhigh", "max"]

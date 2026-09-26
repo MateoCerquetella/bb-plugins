@@ -65,9 +65,11 @@ import re
 import threading
 import time
 import urllib.request
+import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from route_memory import RouteMemory, session_key
+from cache_telemetry import fingerprint, provider_diagnostics, cache_result
 
 from routing_policy import (ASTRA, EFFORTS, LUNA, POLICY_VERSION, QUESTIONS, SOL,
                             TIERS, decision_from_answers, route)
@@ -88,8 +90,10 @@ LISTEN = ("127.0.0.1", 4319)
 ROUTER = ("127.0.0.1", 4202)
 
 DISPLAY_NAME = "Jev Codex Router"
-VERSION = "1.4"
+VERSION = "1.5"
 ROUTE_MEMORY = RouteMemory()
+DIAGNOSTICS_REJECTED = set()
+_DIAGNOSTICS_LOCK = threading.Lock()
 
 API = "https://api.typesafe.ai/v1/systemone"
 MODEL = "jev-latest"
@@ -705,11 +709,12 @@ def usage_counts(usage):
         if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
             out[name] = value
     for group, name in (("input_tokens_details", "cached_tokens"),
+                        ("input_tokens_details", "cache_write_tokens"),
                         ("output_tokens_details", "reasoning_tokens")):
         details = usage.get(group)
         value = details.get(name) if isinstance(details, dict) else None
         if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
-            out["cached_input_tokens" if name == "cached_tokens" else name] = value
+            out[{"cached_tokens":"cached_input_tokens", "cache_write_tokens":"cache_write_input_tokens"}.get(name,name)] = value
     return out or None
 
 
@@ -746,6 +751,8 @@ class SummaryMarker:
         self._response_id = None  # the id this stream's completion must repeat
         self.usage = None
         self.terminal_type = None
+        self.cache_diagnostics = None
+        self.provider_response_id = None
 
     @staticmethod
     def _emit(lines):
@@ -947,6 +954,9 @@ class SummaryMarker:
             response = data.get("response")
             self.terminal_type = dtype
             self.usage = usage_counts(response.get("usage")) if isinstance(response, dict) else None
+            if isinstance(response, dict):
+                self.cache_diagnostics = provider_diagnostics(response.get("prompt_cache_diagnostics"))
+                self.provider_response_id = response.get("id")
             if (
                 self._response_id
                 and isinstance(response, dict)
@@ -1125,6 +1135,7 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(400, {"error": {"message": "invalid json"}})
         if not isinstance(payload, dict):
             return self._json(400, {"error": {"message": "json object expected"}})
+        ingress_fingerprint = fingerprint(payload)
         # Our own answer signatures never travel back upstream (see
         # strip_signatures): the model must not read its own route tag.
         stripped = strip_signatures(payload)
@@ -1214,17 +1225,51 @@ class Handler(BaseHTTPRequestHandler):
             return payload
 
         apply_route(payload, model, effort)
+        diagnostic_models = []
+        try:
+            with open(os.path.join(STATE, "jev-cache-diagnostics.json"), encoding="utf-8") as config_file:
+                config = json.load(config_file)
+            configured = config.get("supportedModels", []) if config.get("version") == 1 else []
+            diagnostic_models = [m for m in configured if m in TIERS] if isinstance(configured, list) else []
+        except (OSError, ValueError, AttributeError): pass
+        comparison = ROUTE_MEMORY.comparison_id(ticket)
+        self._injected_comparison = False
+        self._diagnostics_rejected = False
+        with _DIAGNOSTICS_LOCK:
+            diagnostics_allowed = model not in DIAGNOSTICS_REJECTED
+        if diagnostics_allowed and model in diagnostic_models and comparison:
+            options = payload.get("prompt_cache_options")
+            if options is None or isinstance(options, dict):
+                options = dict(options or {})
+                self._injected_comparison = "comparison_response_id" not in options
+                options.setdefault("comparison_response_id", comparison)
+                payload["prompt_cache_options"] = options
+        self._jev_request_id = uuid.uuid4().hex
+        cache_observation["request_id"] = self._jev_request_id
+        cache_observation["ingress"] = ingress_fingerprint
+        cache_observation["egress"] = fingerprint(payload)
+        cache_observation["provider_comparison_requested"] = isinstance(payload.get("prompt_cache_options"), dict) and bool(payload["prompt_cache_options"].get("comparison_response_id"))
 
         out_path = path if path.startswith("/v1") else "/v1" + path
         self._attempts = []
+        self._last_response_id = None
         try:
             status, out_kind, ctype, quota_hit, unwritten, resets_at = self._forward(
                 payload, out_path, stream_requested, debug, marker, model, signature)
+            if self._diagnostics_rejected and self._injected_comparison:
+                with _DIAGNOSTICS_LOCK: DIAGNOSTICS_REJECTED.add(model)
+                payload["prompt_cache_options"] = {k:v for k,v in payload["prompt_cache_options"].items() if k != "comparison_response_id"}
+                if not payload["prompt_cache_options"]: payload.pop("prompt_cache_options")
+                cache_observation["provider_comparison_disabled"] = True
+                status, out_kind, ctype, quota_hit, unwritten, resets_at = self._forward(
+                    payload, out_path, stream_requested, debug, marker, model, signature)
         except Exception:
             ROUTE_MEMORY.observe(ticket, failed=True)
             raise
         ROUTE_MEMORY.observe(ticket, failed=status >= 400 or any(
-            attempt.get("terminal_type") in ("response.failed", "error") for attempt in self._attempts))
+            attempt.get("terminal_type") in ("response.failed", "error") for attempt in self._attempts),
+            usage=(self._attempts[-1].get("usage") if self._attempts else None),
+            response_id=getattr(self,"_last_response_id",None))
 
         retried = False
         fallback = None
@@ -1245,6 +1290,7 @@ class Handler(BaseHTTPRequestHandler):
             round(100 * cached_count / input_count, 2)
             if isinstance(input_count, int) and input_count > 0 and isinstance(cached_count, int) else None)
         cache_observation["classifier_called"] = jev_ms is not None
+        cache_observation["cache_result"] = cache_result(cache_observation, usage)
 
         log_line({
             "at": time.strftime("%Y-%m-%dT%H:%M:%S"),
@@ -1312,7 +1358,8 @@ class Handler(BaseHTTPRequestHandler):
                 "POST",
                 f"/_codex-router/{caller_secret()}{out_path}",
                 body=body,
-                headers={"Content-Type": "application/json", "Accept": "text/event-stream"},
+                headers={"Content-Type": "application/json", "Accept": "text/event-stream",
+                         "x-jev-request-id": self._jev_request_id},
             )
             resp = conn.getresponse()
             status = resp.status
@@ -1365,6 +1412,12 @@ class Handler(BaseHTTPRequestHandler):
                 data = resp.read()
                 out_ctype = ctype or "application/json"
                 head = data[:64].lstrip()
+                # Retry only our optional unsupported diagnostic field, before any bytes leave.
+                if status == 400 and self._injected_comparison and not self._diagnostics_rejected:
+                    error_text = data.decode("utf-8", "replace").lower()
+                    if ("comparison_response_id" in error_text or "prompt_cache_options" in error_text) and any(word in error_text for word in ("unsupported", "not supported", "unknown", "unrecognized")):
+                        self._diagnostics_rejected = True
+                        return status, out_kind, ctype, False, data, None
                 if status >= 400 and (status == 429 or QUOTA_RX.search(data.decode("utf-8", "replace"))):
                     # Held back, not written: the caller decides whether another
                     # model gets this call first. The refusal also carries the
@@ -1377,6 +1430,8 @@ class Handler(BaseHTTPRequestHandler):
                     assembled = assemble_sse(data)
                     if assembled is not None:
                         attempt["usage"] = usage_counts(assembled.get("usage"))
+                        attempt["cache_diagnostics"] = provider_diagnostics(assembled.get("prompt_cache_diagnostics"))
+                        self._last_response_id = assembled.get("id")
                         response_status = assembled.get("status")
                         if response_status in ("completed", "incomplete", "failed"):
                             attempt["terminal_type"] = f"response.{response_status}"
@@ -1396,6 +1451,8 @@ class Handler(BaseHTTPRequestHandler):
             if markerer is not None:
                 attempt["usage"] = markerer.usage
                 attempt["terminal_type"] = markerer.terminal_type
+                attempt["cache_diagnostics"] = markerer.cache_diagnostics
+                self._last_response_id = markerer.provider_response_id
             conn.close()
 
 

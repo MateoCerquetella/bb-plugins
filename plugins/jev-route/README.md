@@ -63,3 +63,27 @@ The repair preserves only native-only reasoning histories (opaque continuation t
 The helper validates the installation identity, backs up `src/router.mjs`, and changes only the `jev` provider with the Responses adapter. Other providers, Chat Completions behavior, credentials and service configuration are untouched. It is idempotent and refuses an unrecognized source shape. Restart the shared Codex Router only after active requests finish. Recheck compatibility after upstream router upgrades; do not blindly patch changed source. This restores native continuation semantics but does not guarantee a cache-hit percentage.
 
 Read-only verification against the installed adapter: `node plugins/jev-route/ops/verify-native-replay.mjs ~/.local/share/codex-router`. It uses isolated synthetic fixtures, makes no provider calls, and checks that native continuations are preserved while foreign histories and other providers retain their prior behavior.
+
+## Cache diagnosis and conservative switching
+
+`task-cache-v2` records cold starts, idle gaps, changed requests and warm-prefix opportunities separately; an observed zero hit is labeled accordingly rather than automatically blamed on routing. Real provider diagnoses, when present, are allowlisted separately. Probe compatibility before populating `~/.codex/codex-router/jev-cache-diagnostics.json`; the default enables no comparison fields. Current native probes returned `unavailable` for Astra, Sol and Luna, so comparison requests remain disabled. If a previously verified optional field is explicitly rejected, the runtime disables it and retries without that field only before any response bytes were relayed.
+
+A new-task recommendation can retain an equally-or-more-capable warm model/effort only when recent measured input caching predicts at least 20% lower input-credit proxy cost than the cold candidate. It declines after five minutes, material prompt growth, changed prefixes/configuration, or failures, and never blocks required model/effort upgrades. Published Standard rates are pinned to 2026-09-25; this is an input-only estimate, not a guarantee about output, task cost, or subscription quota.
+
+To correlate content-free fingerprints before/after the native adapter, install the trace helper and restart the shared router when idle:
+
+```sh
+node plugins/jev-route/ops/install-cache-trace.mjs ~/.local/share/codex-router
+```
+
+Only internally correlated Jev calls emit native fingerprints. The correlation header is not forwarded upstream. Trace files rotate at 10 MiB with one retained predecessor; write failures never fail inference. No request text, tool definitions, ciphertext or response IDs are recorded in the trace. Python and JavaScript fingerprints normalize property order and numeric representations.
+
+## Controlled read-only comparison
+
+`ops/native-benchmark.py` explicitly requires `--confirm-quota-use`. It compares three self-contained code/state-analysis tasks across fixed Astra Low, fixed Astra Medium and Jev, with three sequential answer checks per task/arm. Arms use identical starting code, instructions and tools, counterbalanced ordering and isolated session keys. The only tool records an answer; it executes no code or external action. Correct answers are checked objectively. No automatic retries are made. This is a small controlled check, not a benchmark of full project completion quality.
+
+```sh
+python3 plugins/jev-route/ops/native-benchmark.py --benchmark --confirm-quota-use --output /tmp/jev-benchmark.json
+```
+
+The harness limits requests to 36, gates subsequent calls at 250K input/15K output tokens, and bounds per-call elapsed time and response size. Usage is known after completion, so a single in-flight request may exceed a token stop threshold; the report preserves measured consumption and errors. `--seed-budget` accepts a JSON file with reserved `calls`, `input`, and `output` to share a budget with prior probes. `--probe` checks optional provider diagnostics using an actual baseline response; unsupported or unavailable comparisons are never represented as cache-hit proof. Keep reports local unless reviewed for publication.

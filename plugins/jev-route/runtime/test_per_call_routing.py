@@ -103,6 +103,7 @@ class PerCallEndToEnd(unittest.TestCase):
     def setUp(self):
         Edge.payloads = []
         self.enterContext(mock.patch.object(jev, "ROUTE_MEMORY", jev.RouteMemory()))
+        self.enterContext(mock.patch.object(jev, "DIAGNOSTICS_REJECTED", set()))
         tmp = self.enterContext(tempfile.TemporaryDirectory())
         for name in ("OFF_PATH", "SHADOW_PATH", "DEBUG_PATH", "SIGNATURE_PATH",
                      "LOG_PATH", "DRY_STATE_PATH", "DRY_MANUAL_PATH"):
@@ -259,6 +260,38 @@ class PerCallEndToEnd(unittest.TestCase):
         )
         self.assertEqual([p["input"] for p in Edge.payloads], [first, second])
         self.assertNotIn(cache_key, json.dumps(self.records))
+
+    def test_verified_diagnostics_use_previous_response_without_rejudging(self):
+        Path(jev.STATE, "jev-cache-diagnostics.json").write_text(json.dumps({"version":1,"supportedModels":[jev.SOL]}))
+        history=[message("user","check code")]
+        with mock.patch.object(jev,"call_jev_routed",return_value=answer(jev.SOL,"medium")) as judge:
+            self.call(payload_for(history))
+            history += [tool_call("c"),tool_step("c","done")]
+            self.call(payload_for(history))
+        self.assertEqual(judge.call_count,1)
+        self.assertEqual(Edge.payloads[-1]["prompt_cache_options"]["comparison_response_id"],"resp_call")
+        self.assertNotIn("comparison_response_id",Edge.payloads[0]["prompt_cache_options"])
+
+    def test_optional_unsupported_diagnostic_retries_before_output_and_disables_model(self):
+        Path(jev.STATE, "jev-cache-diagnostics.json").write_text(json.dumps({"version":1,"supportedModels":[jev.SOL]}))
+        def edge(handler):
+            body=json.loads(handler.rfile.read(int(handler.headers.get("Content-Length") or 0)))
+            Edge.payloads.append(body)
+            unsupported="comparison_response_id" in body.get("prompt_cache_options",{})
+            data=b'{"error":{"message":"comparison_response_id not supported"}}' if unsupported else COMPLETED
+            handler.send_response(400 if unsupported else 200)
+            handler.send_header("Content-Type","application/json" if unsupported else "text/event-stream")
+            handler.send_header("Content-Length",str(len(data)));handler.end_headers();handler.wfile.write(data)
+        history=[message("user","check code")]
+        with mock.patch.object(Edge,"do_POST",edge), mock.patch.object(jev,"call_jev_routed",return_value=answer(jev.SOL,"medium")) as judge:
+            self.call(payload_for(history))
+            history += [tool_call("c"),tool_step("c","done")]
+            status,_=self.call(payload_for(history))
+        self.assertEqual(status,200);self.assertEqual(judge.call_count,1)
+        self.assertEqual(len(Edge.payloads),3)
+        self.assertIn(jev.SOL,jev.DIAGNOSTICS_REJECTED)
+        self.assertNotIn("comparison_response_id",Edge.payloads[-1]["prompt_cache_options"])
+        self.assertTrue(self.records[-1]["cache_observation"]["provider_comparison_disabled"])
 
     def test_two_threads_route_independently(self):
         with mock.patch.object(jev, "call_jev_routed", return_value=answer(jev.LUNA, "low")):

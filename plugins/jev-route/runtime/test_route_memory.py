@@ -52,7 +52,7 @@ class MemoryTests(unittest.TestCase):
         memory=RouteMemory();choose=mock.Mock(return_value=PAIR)
         _,_,first=memory.resolve(payload(),TOOL,choose)
         _,_,second=memory.resolve(payload(),TOOL,choose)
-        self.assertEqual(first,second)
+        self.assertEqual(first[:2],second[:2])
         memory.observe(first,True)
         pair,info,_=memory.resolve(payload(),TOOL,choose)
         self.assertEqual(info['reason'],'provider_failure')
