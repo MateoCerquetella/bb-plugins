@@ -15,6 +15,12 @@ All notable changes to Usage Tracker are documented here.
 
 ## Unreleased
 
+### Added
+
+- Add a **Claude Keychain service** setting so Claude Code usage loads when
+  `CLAUDE_CONFIG_DIR` stores credentials under `Claude Code-credentials-<hash>`
+  instead of BB's default Keychain service.
+
 ## 0.1.6 - 2026-09-02
 
 ### Added

@@ -52,15 +52,21 @@ export async function loadUsageSnapshot(
   sdk: UsageSdk,
   threadId: string | null,
   fetchedAt = new Date(),
+  overrides: Promise<RawUsageResponse> = Promise.resolve({}),
 ): Promise<UsageSnapshot> {
   const hostId =
     threadId === null ? null : await resolveThreadHostId(sdk, threadId);
-  const [response, hostName] = await Promise.all([
+  const [response, hostName, overridden] = await Promise.all([
     hostId === null
       ? sdk.system.usageLimits()
       : sdk.system.usageLimits({ hostId }),
     resolveHostName(sdk, hostId),
+    overrides,
   ]);
 
-  return normalizeUsage(response, { id: hostId, name: hostName }, fetchedAt);
+  return normalizeUsage(
+    { ...response, ...overridden },
+    { id: hostId, name: hostName },
+    fetchedAt,
+  );
 }
