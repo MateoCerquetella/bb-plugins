@@ -46,6 +46,10 @@
     {
       "name": "lavender",
       "source": "./plugins/lavender"
+    },
+    {
+      "name": "conversation-space",
+      "source": "./plugins/conversation-space"
     }
   ]
 }
