@@ -242,3 +242,28 @@ test("falls back to host-local usage when the Account Pooler is unavailable", as
   assert.equal(claude.accounts, undefined);
   assert.equal(claude.windows[0]?.usedPercent, 12);
 });
+
+test("unresolved hosts include only shared accounts", async () => {
+  const sdk = fakePoolSdk(
+    { a: claudeUsage("a@example.com", 4, 37, "2026-09-24T18:00:00.000Z") },
+    [RESOURCES[0]!, {
+      id: "other", providerId: "claude-code", label: "Other",
+      scope: { kind: "host", hostId: "host_2", hostName: "Other" },
+    }],
+  );
+  const pooled = await loadPooledAccounts(sdk, null);
+  assert.deepEqual(pooled?.get("claudeCode")?.map(a => a.usage.id), ["a"]);
+  assert.equal(sdk.calls.some(call => call.endsWith(":other")), false);
+});
+
+test("single pooled accounts preserve reported credit amounts", async () => {
+  const result = claudeUsage("a@example.com", 4, 37, "2026-09-24T18:00:00.000Z");
+  if (result.usage.status !== "ok") throw new Error("expected ok");
+  const cost = { usedUsdCents: 1234, limitUsdCents: 5000 };
+  result.usage.windows[0]!.cost = cost;
+  const pooled = await loadPooledAccounts(fakePoolSdk({ a: result }, [RESOURCES[0]!]), null);
+  const snapshot = applyPooledAccounts(normalizeUsage(
+    {}, { id: null, name: null }, new Date(),
+  ), pooled);
+  assert.deepEqual(snapshot.providers.find(p => p.id === "claudeCode")?.windows[0]?.cost, cost);
+});

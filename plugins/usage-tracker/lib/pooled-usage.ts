@@ -208,7 +208,6 @@ export async function loadPooledAccounts(
     (resource) =>
       providerIdForWireId(resource.providerId) !== null &&
       (resource.scope.kind === "shared" ||
-        hostId === null ||
         resource.scope.hostId === hostId),
   );
   const results = await Promise.all(
@@ -328,7 +327,9 @@ export function pooledProviderUsage(
           ? null
           : `${unavailableCount} of ${accounts.length} pooled accounts unavailable.`
         : (accounts[0]!.usage.message ?? "Pooled usage is unavailable."),
-    windows: combinePooledWindows(accounts),
+    windows: accounts.length === 1
+      ? accounts[0]!.usage.windows
+      : combinePooledWindows(accounts),
     accounts: accounts.map((account) => account.usage),
   };
 }
