@@ -67,7 +67,7 @@ The configurable Compact limit was contributed by
 Usage Tracker requires BB 0.38 or newer. Install its tracking Git release:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.9 --subdirectory plugins/usage-tracker --tag-prefix usage-tracker/
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.10 --subdirectory plugins/usage-tracker --tag-prefix usage-tracker/
 ```
 
 After [the BB Community entry](https://github.com/get-bb/marketplace/pull/129)
