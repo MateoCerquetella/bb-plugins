@@ -1,6 +1,7 @@
 export const SIDEBAR_PROVIDER_IDS = [
   "claudeCode",
   "codex",
+  "cursor",
   "grok",
   "openCode",
   "antigravity",
@@ -19,6 +20,7 @@ export function normalizeCompactLimitOption(
 export interface UsageTrackerPreferences {
   enableClaudeCode: boolean;
   enableCodex: boolean;
+  enableCursor?: boolean;
   enableGrok: boolean;
   enableOpenCode: boolean;
   enableAntigravity?: boolean;
@@ -27,7 +29,12 @@ export interface UsageTrackerPreferences {
 
 type ProviderPreferenceKey = keyof Pick<
   UsageTrackerPreferences,
-  "enableClaudeCode" | "enableCodex" | "enableGrok" | "enableOpenCode" | "enableAntigravity"
+  | "enableClaudeCode"
+  | "enableCodex"
+  | "enableCursor"
+  | "enableGrok"
+  | "enableOpenCode"
+  | "enableAntigravity"
 >;
 
 const PROVIDER_PREFERENCE_KEYS: Readonly<
@@ -35,6 +42,7 @@ const PROVIDER_PREFERENCE_KEYS: Readonly<
 > = {
   claudeCode: "enableClaudeCode",
   codex: "enableCodex",
+  cursor: "enableCursor",
   grok: "enableGrok",
   openCode: "enableOpenCode",
   antigravity: "enableAntigravity",
@@ -43,7 +51,12 @@ const PROVIDER_PREFERENCE_KEYS: Readonly<
 export function enabledSidebarProviderIds(
   preferences: Pick<
     UsageTrackerPreferences,
-    "enableClaudeCode" | "enableCodex" | "enableGrok" | "enableOpenCode" | "enableAntigravity"
+    | "enableClaudeCode"
+    | "enableCodex"
+    | "enableCursor"
+    | "enableGrok"
+    | "enableOpenCode"
+    | "enableAntigravity"
   >,
 ): SidebarProviderId[] {
   return SIDEBAR_PROVIDER_IDS.filter(

@@ -15,6 +15,7 @@ import {
   PROVIDER_IDS,
   withCodexResetCredits,
 } from "./lib/usage.ts";
+import { switchPoolAccount } from "./lib/pool-routing.ts";
 import {
   COMPACT_LIMIT_OPTIONS,
   enabledSidebarProviderIds,
@@ -46,6 +47,7 @@ const usageWindowSchema = z
     barPercent: z.number().finite().min(0).max(100),
     resetsAt: z.string().nullable(),
     cost: costSchema.nullable(),
+    kind: z.enum(["five-hour", "daily", "weekly", "custom"]).optional(),
   })
   .strict();
 
@@ -81,6 +83,8 @@ const providerSchema = z
     windows: z.array(usageWindowSchema),
     resetCredits: resetCreditsSchema.nullable().optional(),
     accounts: z.array(pooledAccountSchema).optional(),
+    currentAccountId: z.string().optional(),
+    inUse: z.boolean().optional(),
   })
   .strict();
 
@@ -141,6 +145,15 @@ export const usageRpcContract = defineRpcContract({
     input: z.null(),
     output: resetPrepareResultSchema,
   },
+  selectAccount: {
+    input: z
+      .object({
+        providerId: z.enum(PROVIDER_IDS),
+        accountId: z.string().trim().min(1),
+      })
+      .strict(),
+    output: z.object({ ok: z.literal(true) }).strict(),
+  },
   consumeReset: {
     input: z
       .object({
@@ -172,6 +185,12 @@ export default function plugin(bb: BbPluginApi) {
       type: "boolean",
       label: "Enable Codex",
       description: "Show Codex usage in the sidebar footer.",
+      default: true,
+    },
+    enableCursor: {
+      type: "boolean",
+      label: "Enable Cursor",
+      description: "Show Cursor usage in the sidebar footer.",
       default: true,
     },
     enableGrok: {
@@ -256,6 +275,10 @@ export default function plugin(bb: BbPluginApi) {
       return {
         outcome: await resetGate.consume(confirmationToken),
       };
+    },
+    async selectAccount({ providerId, accountId }) {
+      await switchPoolAccount(providerId, accountId);
+      return { ok: true as const };
     },
   });
 }

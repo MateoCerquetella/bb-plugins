@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.1.13 - 2026-09-26
+
+- The compact summary percentage is the combined usage of accounts in use
+  right now (live threads and in-flight Account Pooler routes), not the
+  highest idle provider.
+
+## 0.1.12 - 2026-09-26
+
+- Show the current Account Pooler account on the overview row and switch it
+  from provider details.
+- Show Cursor in the sidebar overview again.
+- Read missing ACP usage (including Grok) per provider, and use the first
+  reported window when weekly and five-hour labels are absent.
+
+## 0.1.11 - 2026-09-26
+
+- Close the usage card when the overview summary is clicked while a provider
+  details card is open.
+- Show the current Account Pooler account in compact usage and details instead
+  of a combined total across every pooled account.
+
 ## 0.1.10 - 2026-09-26
 
 - Add the optional Claude Keychain service override, including expired-token

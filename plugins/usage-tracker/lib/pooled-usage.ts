@@ -118,6 +118,7 @@ function toUsageWindow(window: PoolWindow): UsageWindow {
     barPercent: clampPercent(window.usedPercent),
     resetsAt: window.resetsAt,
     cost: window.cost ?? null,
+    ...(window.kind === undefined ? {} : { kind: window.kind }),
   };
 }
 
@@ -303,33 +304,53 @@ export function combinePooledWindows(
     });
 }
 
-function sharedValue(values: readonly (string | null)[]): string | null {
-  const first = values[0] ?? null;
-  return values.every((value) => value === first) ? first : null;
+/** The Account Pooler current account, else host-local email, else first healthy. */
+export function currentPooledAccount(
+  provider: ProviderUsage,
+  accounts: readonly PooledAccount[],
+  preferredAccountId?: string,
+): PooledAccount | null {
+  if (accounts.length === 0) return null;
+  if (preferredAccountId !== undefined) {
+    const preferred = accounts.find(
+      (account) => account.usage.id === preferredAccountId,
+    );
+    if (preferred !== undefined) return preferred;
+  }
+  if (provider.accountEmail !== null) {
+    const matched = accounts.find(
+      (account) => account.usage.accountEmail === provider.accountEmail,
+    );
+    if (matched !== undefined) return matched;
+  }
+  return accounts.find((account) => account.usage.status === "ok") ?? accounts[0]!;
 }
 
 export function pooledProviderUsage(
   provider: ProviderUsage,
   accounts: readonly PooledAccount[],
+  preferredAccountId?: string,
 ): ProviderUsage {
   const healthy = accounts.filter((account) => account.usage.status === "ok");
   const unavailableCount = accounts.length - healthy.length;
   const status = healthy.length > 0 ? "ok" : accounts[0]!.usage.status;
+  const current = currentPooledAccount(provider, accounts, preferredAccountId);
+  const currentUsage = current?.usage;
   return {
     ...provider,
     status,
-    accountEmail:
-      accounts.length === 1 ? accounts[0]!.usage.accountEmail : null,
-    planLabel: sharedValue(accounts.map((account) => account.usage.planLabel)),
+    accountEmail: currentUsage?.accountEmail ?? provider.accountEmail,
+    planLabel: currentUsage?.planLabel ?? provider.planLabel,
+    ...(currentUsage?.id === undefined ? {} : { currentAccountId: currentUsage.id }),
     message:
       status === "ok"
         ? unavailableCount === 0
           ? null
           : `${unavailableCount} of ${accounts.length} pooled accounts unavailable.`
-        : (accounts[0]!.usage.message ?? "Pooled usage is unavailable."),
-    windows: accounts.length === 1
-      ? accounts[0]!.usage.windows
-      : combinePooledWindows(accounts),
+        : (currentUsage?.message ??
+          accounts[0]!.usage.message ??
+          "Pooled usage is unavailable."),
+    windows: currentUsage?.windows ?? provider.windows,
     accounts: accounts.map((account) => account.usage),
   };
 }
@@ -338,6 +359,7 @@ export function pooledProviderUsage(
 export function applyPooledAccounts(
   snapshot: UsageSnapshot,
   pooled: PooledAccountsByProvider | null,
+  preferredAccountIds: Partial<Record<ProviderId, string>> = {},
 ): UsageSnapshot {
   if (pooled === null) return snapshot;
   return {
@@ -346,7 +368,11 @@ export function applyPooledAccounts(
       const accounts = pooled.get(provider.id);
       return accounts === undefined || accounts.length === 0
         ? provider
-        : pooledProviderUsage(provider, accounts);
+        : pooledProviderUsage(
+            provider,
+            accounts,
+            preferredAccountIds[provider.id],
+          );
     }),
   };
 }

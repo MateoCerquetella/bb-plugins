@@ -19,6 +19,7 @@ import {
 } from "../lib/usage.ts";
 import { normalizeAntigravityOutput } from "../lib/antigravity-probe.ts";
 import {
+  cumulativeInUseUsage,
   highestSidebarUsagePrimary,
   mergeLastKnownWindows,
   selectSidebarUsagePrimary,
@@ -136,15 +137,17 @@ test("enables sidebar providers independently in display order", () => {
     enabledSidebarProviderIds({
       enableClaudeCode: true,
       enableCodex: true,
+      enableCursor: true,
       enableGrok: true,
       enableOpenCode: true,
     }),
-    ["claudeCode", "codex", "grok", "openCode"],
+    ["claudeCode", "codex", "cursor", "grok", "openCode"],
   );
   assert.deepEqual(
     enabledSidebarProviderIds({
       enableClaudeCode: true,
       enableCodex: false,
+      enableCursor: false,
       enableGrok: false,
       enableOpenCode: false,
     }),
@@ -154,6 +157,7 @@ test("enables sidebar providers independently in display order", () => {
     enabledSidebarProviderIds({
       enableClaudeCode: false,
       enableCodex: true,
+      enableCursor: false,
       enableGrok: false,
       enableOpenCode: false,
     }),
@@ -163,6 +167,7 @@ test("enables sidebar providers independently in display order", () => {
     enabledSidebarProviderIds({
       enableClaudeCode: true,
       enableCodex: true,
+      enableCursor: false,
       enableGrok: false,
       enableOpenCode: true,
     }),
@@ -172,6 +177,7 @@ test("enables sidebar providers independently in display order", () => {
     enabledSidebarProviderIds({
       enableClaudeCode: false,
       enableCodex: false,
+      enableCursor: false,
       enableGrok: false,
       enableOpenCode: false,
     }),
@@ -487,6 +493,21 @@ test("formats reset, update, percentage, and cost copy safely", () => {
   );
 });
 
+test("uses a reported window when weekly and five-hour labels are absent", () => {
+  const cursor = normalizeUsage(
+    {
+      "acp-cursor": {
+        status: "ok",
+        accountEmail: "cursor@example.com",
+        planLabel: "Ultra",
+        windows: [{ label: "Plan usage", usedPercent: 100, resetsAt: null }],
+      },
+    },
+    { id: null, name: null },
+  ).providers.find((provider) => provider.id === "cursor")!;
+  assert.equal(sidebarUsagePrimarySummary(cursor, "Weekly"), "100%");
+});
+
 test("selects the configured compact usage window", () => {
   const provider = normalizeUsage(
     healthyResponse(),
@@ -507,6 +528,33 @@ test("selects the configured compact usage window", () => {
     "Five-hour limit",
   );
   assert.equal(sidebarUsagePrimarySummary(provider, "Five-hour"), "120%");
+});
+
+test("sums compact usage across accounts in use and ignores idle providers", () => {
+  const snapshot = normalizeUsage(
+    {
+      codex: healthyProvider("Weekly limit", 17),
+      "claude-code": healthyProvider("Weekly limit", 2),
+      "acp-cursor": healthyProvider("Plan usage", 100),
+      "acp-opencode": healthyProvider("Weekly", 4),
+    },
+    { id: null, name: null },
+  );
+  const items = snapshot.providers.map((provider) => ({
+    provider: {
+      ...provider,
+      inUse: provider.id === "codex" || provider.id === "claudeCode",
+    },
+    selection: selectSidebarUsagePrimary(provider, provider, "Weekly"),
+  }));
+  const cumulative = cumulativeInUseUsage(items);
+  assert.equal(cumulative.percent, 19);
+  assert.deepEqual(cumulative.names, ["Codex", "Claude Code"]);
+  assert.equal(
+    items.find((item) => item.provider.id === "cursor")?.selection.window
+      ?.usedPercent,
+    100,
+  );
 });
 
 test("selects the highest available compact usage for an overview summary", () => {

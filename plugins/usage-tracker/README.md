@@ -19,7 +19,7 @@ and their current usage reading, without adding a navigation item or a separate
 plugin page.
 
 <p align="center">
-  <img src="./assets/usage-tracker-summary.png" width="248" alt="Compact Usage Tracker summary showing the highest provider usage and three additional providers" />
+  <img src="./assets/usage-tracker-summary.png" width="248" alt="Compact Usage Tracker summary showing usage across providers currently in use and three additional providers" />
 </p>
 
 <p align="center">
@@ -34,8 +34,9 @@ plugin page.
 
 - Shows Codex, Claude Code, Cursor, Grok, OpenCode, and Antigravity usage in BB's sidebar footer.
 - Lets you show or hide every provider independently; the strip compacts for
-  one or two providers and summarizes larger sets with the highest usage plus
-  an additional-provider count. It disappears when every provider is disabled.
+  one or two providers and summarizes larger sets with cumulative usage across
+  providers currently in use plus an additional-provider count. Idle providers
+  do not drive the summary. It disappears when every provider is disabled.
 - Opens the summary into a complete provider overview; select any overview row
   to drill into that provider's existing limit details.
 - Colors usage yellow from 80% and red from 95% in both compact and expanded
