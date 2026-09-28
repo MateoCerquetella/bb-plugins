@@ -72,3 +72,21 @@ test("reset preparation refuses zero or unknown availability", () => {
   assert.equal(gate.prepare().outcome, "no-credit");
   assert.equal(calls, 0);
 });
+
+test("revokes a pending confirmation when availability becomes unknown", async () => {
+  let consumed = false;
+  const gate = createResetActionGate(async () => {
+    consumed = true;
+    return "reset";
+  });
+  gate.setAvailableCount(1);
+  const prepared = gate.prepare();
+  assert.equal(prepared.outcome, "ready");
+  if (prepared.outcome !== "ready") throw new Error("Expected confirmation");
+  gate.setAvailableCount(null);
+  assert.equal(
+    await gate.consume(prepared.confirmationToken),
+    "confirmation-invalid",
+  );
+  assert.equal(consumed, false);
+});

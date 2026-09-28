@@ -54,6 +54,13 @@ export function createResetActionGate(
   return {
     setAvailableCount(nextAvailableCount) {
       availableCount = nextAvailableCount;
+      if (nextAvailableCount === null) {
+        for (const [token, attempt] of attempts) {
+          if (attempt.inFlight === undefined && attempt.result === undefined) {
+            attempts.delete(token);
+          }
+        }
+      }
     },
 
     prepare() {

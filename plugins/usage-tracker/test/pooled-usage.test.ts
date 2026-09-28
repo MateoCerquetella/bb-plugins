@@ -4,6 +4,7 @@ import { loadUsageSnapshot, type UsageSdk } from "../lib/load-usage.ts";
 import {
   applyPooledAccounts,
   combinePooledWindows,
+  currentPooledAccount,
   loadPooledAccounts,
   pooledAccountFromResource,
   type PoolRpcSdk,
@@ -175,7 +176,7 @@ test("loads every pooled account and replaces host-local usage per provider", as
 
   const claude = snapshot.providers.find((provider) => provider.id === "claudeCode")!;
   assert.equal(claude.status, "ok");
-  assert.equal(claude.accountEmail, null);
+  assert.equal(claude.accountEmail, "a@example.com");
   assert.equal(claude.planLabel, "Max (20x)");
   assert.deepEqual(
     claude.accounts?.map((account) => [account.accountEmail, account.windows[1]?.usedPercent]),
@@ -184,7 +185,11 @@ test("loads every pooled account and replaces host-local usage per provider", as
       ["b@example.com", 57],
     ],
   );
-  assert.equal(sidebarUsageWindows(claude).weekly?.usedPercent, 47);
+  assert.equal(sidebarUsageWindows(claude).weekly?.usedPercent, 37);
+  assert.equal(
+    currentPooledAccount(claude, pooled?.get("claudeCode") ?? [])?.usage.accountEmail,
+    "a@example.com",
+  );
 
   const codex = snapshot.providers.find((provider) => provider.id === "codex")!;
   assert.equal(codex.status, "error");
@@ -193,6 +198,35 @@ test("loads every pooled account and replaces host-local usage per provider", as
 
   const grok = snapshot.providers.find((provider) => provider.id === "grok")!;
   assert.equal(grok.accounts, undefined);
+});
+
+test("prefers the Account Pooler current account over host-local email", async () => {
+  const sdk = fakePoolSdk({
+    a: claudeUsage("a@example.com", 4, 37, "2026-09-24T18:00:00.000Z"),
+    b: claudeUsage("b@example.com", 0, 57, "2026-09-28T11:00:00.000Z"),
+    c: new Error("Codex quota refresh failed"),
+  });
+  const pooled = await loadPooledAccounts(sdk, "host_1");
+  const snapshot = applyPooledAccounts(
+    normalizeUsage(
+      {
+        "claude-code": {
+          status: "ok",
+          accountEmail: "a@example.com",
+          planLabel: "Max",
+          windows: [{ label: "Weekly limit", usedPercent: 37, resetsAt: null }],
+        },
+      },
+      { id: "host_1", name: "Mac" },
+      new Date("2026-09-23T12:00:00.000Z"),
+    ),
+    pooled,
+    { claudeCode: "b" },
+  );
+  const claude = snapshot.providers.find((provider) => provider.id === "claudeCode")!;
+  assert.equal(claude.accountEmail, "b@example.com");
+  assert.equal(claude.currentAccountId, "b");
+  assert.equal(sidebarUsageWindows(claude).weekly?.usedPercent, 57);
 });
 
 test("skips accounts scoped to another host", async () => {
@@ -236,7 +270,13 @@ test("falls back to host-local usage when the Account Pooler is unavailable", as
       },
     },
   };
-  const snapshot = await loadUsageSnapshot(sdk, null);
+  const snapshot = await loadUsageSnapshot(
+    sdk,
+    null,
+    new Date(),
+    Promise.resolve({}),
+    Promise.resolve([]),
+  );
   const claude = snapshot.providers.find((provider) => provider.id === "claudeCode")!;
   assert.equal(claude.accountEmail, "local@example.com");
   assert.equal(claude.accounts, undefined);
