@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 14,
+  "revision": 15,
   "activeFeature": "taskboard-local-install-compatibility",
   "request": "Install Taskboard with its optional Symphony execution backend into live BB on this Mac. Preserve installed v0.3.4 GitHub status compatibility and hardened gh resolution by restoring the already-released adapter fixes on the execution branch. Keep tracker configuration, credentials and cached work during the supported plugin source switch. Install from a stable local checkout. Verify the loaded plugin and, for full setup, the pinned native Symphony service using the existing Codex login. No new UI, task planning policy, external message, paid coding task, or publication.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "integrate",
-  "status": "waiting",
-  "repairAttempts": 1,
-  "message": "Exact-revision focused verification passed all 143 tests and build/type metadata checks; independent review approved all non-UI criteria and the existing security consult. No further source or consult changes.",
+  "phase": "done",
+  "status": "done",
+  "repairAttempts": 0,
+  "message": "Integrated capability changes: taskboard-install-compatibility",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:be87f0e68cffeb96fe020e48a378038441b6131b3932025f4e7a65aa7b81397c",
@@ -29,17 +29,16 @@
   "completion": {
     "implemented": true,
     "verified": true,
-    "integrated": false,
+    "integrated": true,
     "delivered": false,
     "published": false,
-    "highest": "verified",
+    "highest": "integrated",
     "reasons": {
-      "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-28T15:39:02.479Z",
+  "updatedAt": "2026-09-28T15:47:52.686Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "taskboard-local-install-compatibility-caf37045e0a4",
@@ -74,7 +73,6 @@
     "iteration": 1,
     "awaitingFeedback": false
   },
-  "reviewFirst": true,
   "verificationCoverage": {
     "kind": "review-derived",
     "checkId": "qa-fresh-context",
@@ -82,5 +80,20 @@
     "matrixDigest": "sha256:20594a31fccb0ef6c737e7b3415c94e82461807358a48ef52e46753c3e7d6b1a",
     "specDigest": "sha256:be87f0e68cffeb96fe020e48a378038441b6131b3932025f4e7a65aa7b81397c",
     "revision": 14
+  },
+  "reviewFirst": true,
+  "completionRecord": {
+    "schemaVersion": 1,
+    "implementedBy": "agent",
+    "completedBy": "agent",
+    "decisionBy": "user",
+    "method": "workflow",
+    "reason": "Integrated capability changes: taskboard-install-compatibility",
+    "at": "2026-09-28T15:47:52.686Z",
+    "revision": 15,
+    "completion": "integrated",
+    "sourceTreeDigest": "sha256:cac0a57b1e440a1441f2a91f188029585b9c411ae47bd8fba8f88a108d4f4dc0",
+    "artifactTreeDigest": "sha256:57b196576485ae168e357775b4db5dc7a7376f7080c5f6305d81d7e973ff55cd",
+    "digest": "sha256:db4795545e53711c905b406f2e5eab2db9504edadda911fccfb5216953045991"
   }
 }
