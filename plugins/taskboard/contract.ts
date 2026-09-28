@@ -1,5 +1,6 @@
 import { defineRpcContract } from '@get-bb/plugin-sdk';
 import { z } from 'zod';
+import { executionRpc } from './execution/contract.js';
 import {
   bbProjectIdSchema,
   jiraBaseUrlSchema,
@@ -296,6 +297,7 @@ const listInputSchema = z
   .strict();
 
 export const taskboardRpcContract = defineRpcContract({
+  ...executionRpc,
   listProjects: {
     input: z.null(),
     output: z.object({ projects: z.array(trackerProjectSchema) }).strict()

@@ -28,6 +28,7 @@ import {
   type PluginThreadPanelProps
 } from '@get-bb/plugin-sdk/app';
 import { toast } from 'sonner';
+import { TaskExecution } from './execution/panel.js';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -4966,20 +4967,14 @@ function TrackerDetail({
                   Add to chat
                 </Button>
               ) : null}
-              <Button
-                size="sm"
-                onClick={() =>
-                  navigate.toCompose({
-                    initialPrompt: prompt,
-                    focusPrompt: true
-                  })
-                }
-              >
+              <Button size="sm" onClick={() => navigate.toCompose({initialPrompt: prompt, focusPrompt: true})}>
                 <Icon name="AiContentGenerator01" className="size-3.5" />
                 Send to agent
               </Button>
             </div>
           </div>
+
+          <TaskExecution key={`${item.bbProjectId}:${item.source}:${item.locator}`} item={item} />
 
           <DetailMetadata
             item={item}

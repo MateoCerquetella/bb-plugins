@@ -1,0 +1,1136 @@
+
+> bb-plugins@0.0.0 check
+> npm run check --workspaces --if-present && npm run check:dockside
+
+
+> bb-plugin-aura@0.2.2 check
+> npm run typecheck && npm test && npm run build
+
+
+> bb-plugin-aura@0.2.2 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-aura@0.2.2 test
+> node --experimental-strip-types --test test/*.test.ts
+
+✔ applies scoped backgrounds, disables cleanly and ignores a late fetch after disposal (332.858441ms)
+✔ six independent slots retain images and appearance across switches and reload (120.232274ms)
+✔ invalid image or slot rejects the entire apply without partially changing settings (51.603778ms)
+✔ scope stays global across slots; clearing/resetting preserves saved work (40.717312ms)
+✔ image type must match bytes; legacy settings get the new scope default (28.696429ms)
+✔ versioned images use an immutable private browser cache (105.46077ms)
+✔ New thread dimmer toggles without replacing images or saved slots (47.002714ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3497.70761
+
+> bb-plugin-aura@0.2.2 build
+> env -u BB_CLI bb plugin build .
+
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+dist/app.js
+dist/app.css
+dist/app.meta.json
+
+> bb-plugin-clean-my-context@0.1.1 check
+> npm run typecheck && npm test && npm run build
+
+
+> bb-plugin-clean-my-context@0.1.1 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-clean-my-context@0.1.1 test
+> vitest run
+
+
+ RUN  v3.2.7 /Users/mateocerquetella/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_7bdrvui3s8-1/bb-plugins/plugins/clean-my-context
+
+ ✓ server.test.ts (4 tests) 31ms
+ ✓ app.test.tsx (4 tests) 917ms
+   ✓ Clean My Context composer action > confirms and clears the exact current thread without navigating  807ms
+
+ Test Files  2 passed (2)
+      Tests  8 passed (8)
+   Start at  00:01:22
+   Duration  4.94s (transform 307ms, setup 0ms, collect 1.22s, tests 947ms, environment 1.70s, prepare 863ms)
+
+
+> bb-plugin-clean-my-context@0.1.1 build
+> env -u BB_CLI bb plugin build .
+
+This plugin pins @get-bb/plugin-sdk 0.4.40; this bb's SDK is 0.4.21 — `bb plugin types` updates the pin.
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+dist/app.js
+dist/app.css
+dist/app.meta.json
+
+> bb-plugin-conversation-space@0.1.0 check
+> npm run typecheck && npm test && npm run build
+
+
+> bb-plugin-conversation-space@0.1.0 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-conversation-space@0.1.0 test
+> node --test --experimental-strip-types test/*.test.ts
+
+✔ Jev diagnostics isolate sessions and ignore partial records (2.116861ms)
+✔ recent diagnostics are bounded, unknown usage is not zero (1.395384ms)
+✔ manual model selection does not claim Jev activity (0.614309ms)
+✔ category percentages use disjoint input/cache/output denominator (0.438057ms)
+✔ records roles without duplicating user input and repeated completed items (3.505969ms)
+✔ truncation is explicit and tools/system input retain distinct roles (0.741045ms)
+✔ text estimates exclude metadata, include full content before display truncation, and separate roles (0.40767ms)
+✔ loaded content shares use only loaded estimates and handle empty history (0.896627ms)
+✔ latest call excludes cached input and does not use cumulative totals (1.79477ms)
+✔ explicit context measurement takes precedence (0.391187ms)
+✔ reset and unavailable measurements do not show old context (0.493398ms)
+✔ unknown cache does not imply zero cached tokens or known uncached input (0.453956ms)
+✔ cumulative provider usage remains separate from current context (0.383372ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 595.859636
+
+> bb-plugin-conversation-space@0.1.0 build
+> env -u BB_CLI bb plugin build .
+
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+dist/app.js
+dist/app.css
+dist/app.meta.json
+
+> bb-plugin-host-monitor@0.1.4 check
+> npm run types:check && npm run typecheck && npm test && npm run build
+
+
+> bb-plugin-host-monitor@0.1.4 types:check
+> env -u BB_CLI bb plugin types --check .
+
+This plugin uses the npm package @get-bb/plugin-sdk; pin is 0.4.21, host is 0.4.21.
+The declarations are in node_modules/@get-bb/plugin-sdk/bundled-types/ — read them for exact signatures.
+
+> bb-plugin-host-monitor@0.1.4 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-host-monitor@0.1.4 test
+> node --import tsx --import ./test/register-css.mjs --test test/*.test.ts
+
+✔ keeps the installed plugin identity while presenting Host Monitor (86.629603ms)
+✔ keeps the retired compound identity out of active plugin text (73.480071ms)
+✔ keeps threshold color hooks on percentages without rendering a legend or coloring counts (2.46785ms)
+✔ marks download red and upload blue across network readings (19.615122ms)
+✔ keeps the redesigned host cards flat, private, and keyboard-native (2.444007ms)
+✔ registers the Host Monitor sidebar surfaces and targeted inspector (950.795958ms)
+✔ keeps process inspection on demand, target-bound, and privacy-safe (4.087026ms)
+✔ keeps process sorting responsive and accessible (2.386982ms)
+✔ stamps portaled process confirmations with the plugin overlay scope (1.863713ms)
+✔ network snapshot accepts only a canonical primary IP or null (9.062385ms)
+✔ network snapshot rejects malformed addresses and extra interface data (23.477455ms)
+✔ process rows expose only the bounded privacy-safe projection (5.604301ms)
+✔ process row protection fields cannot contradict each other (1.746511ms)
+✔ process list result is strict and bounded (11.922406ms)
+▶ resource health
+  ✔ applies memory thresholds immediately at 85 and 95 percent (8.421043ms)
+  ✔ applies disk thresholds immediately and tolerates a missing disk (1.172454ms)
+  ✔ requires a sustained CPU streak and never alerts on swap alone (0.815757ms)
+  ✔ selects the most severe alert with a stable resource tie-break (1.045781ms)
+  ✔ uses a supplied ordered threshold pair for health classification (0.94221ms)
+✔ resource health (34.571021ms)
+▶ sample state
+  ✔ prioritizes connectivity, active sampling, and errors (0.693608ms)
+  ✔ marks a reading stale only after two complete refresh intervals (0.427412ms)
+✔ sample state (1.840552ms)
+▶ last-good record merging
+  ✔ keeps useful snapshots through sampling, errors, and disconnection (1.559898ms)
+  ✔ rejects duplicate enrolled host ids (5.491266ms)
+✔ last-good record merging (10.322549ms)
+▶ dashboard construction
+  ✔ sorts by health then case-insensitive name and keeps stale health (2.019214ms)
+  ✔ exposes custom thresholds and classifies every machine with them (0.964568ms)
+  ✔ represents a connected machine without a sample as sampling/unavailable (17.652794ms)
+✔ dashboard construction (21.298875ms)
+▶ Host Monitor fleet presentation
+  ✔ counts stale and failed samples as attention exactly once (14.303696ms)
+  ✔ includes stale and failed samples in the Attention filter (0.345754ms)
+  ✔ keeps a connected host waiting for its first sample neutral (0.468987ms)
+  ✔ uses freshness-aware badge copy and attention styling (0.479513ms)
+✔ Host Monitor fleet presentation (18.766082ms)
+▶ Host Monitor fleet view preference
+  ✔ uses cards by default for missing or unrecognized values (1.656594ms)
+  ✔ round-trips both supported layouts (0.50933ms)
+  ✔ falls back safely when browser storage is unavailable (0.429411ms)
+✔ Host Monitor fleet view preference (5.269919ms)
+▶ Host Monitor IP address presentation
+  ✔ does not expose a masked address in any presentation field (18.30313ms)
+  ✔ reveals the exact address only after an explicit request (0.780423ms)
+  ✔ reports unavailable without inventing or revealing an address (0.343987ms)
+✔ Host Monitor IP address presentation (22.715364ms)
+✔ calculates aggregate machine-wide CPU utilization (4.523614ms)
+✔ selects one useful non-loopback IPv4 address without interface metadata (32.809209ms)
+✔ canonicalizes IPv6 while dropping its interface zone identifier (1.151479ms)
+✔ returns null when interfaces expose no useful unicast address (1.003092ms)
+✔ selects only address-owning interfaces for throughput aggregation (4.029157ms)
+✔ rejects missing, changed, and regressing CPU counters (2.120869ms)
+✔ calculates capacities and validates byte relationships (1.128986ms)
+✔ parses Linux MemAvailable and swap in kibibytes (2.203753ms)
+✔ estimates Linux available memory when MemAvailable is absent (1.065092ms)
+✔ rejects incomplete or inconsistent Linux counters independently (1.397092ms)
+✔ parses os-release as data without evaluating it (1.877592ms)
+✔ parses macOS vm_stat using the reported 16 KiB page size (1.602871ms)
+✔ rejects malformed vm_stat output and clamps racing page totals (1.190162ms)
+✔ parses decimal macOS swap counters and optional encryption suffix (2.533686ms)
+✔ parses sw_vers labels without depending on field order (1.011621ms)
+✔ calculates df-style system-volume usage from statfs counters (18.397728ms)
+✔ clamps negative statfs bavail and rejects unsafe byte totals (1.438031ms)
+✔ collects a schema-valid strict-JSON snapshot on the current machine (324.813213ms)
+✔ propagates an already-aborted snapshot request (1.552255ms)
+✔ rejects out-of-contract CPU sample windows (0.590547ms)
+▶ Host Monitor network presentation
+  ✔ formats rates compactly using binary units (205.221165ms)
+  ✔ uses an unavailable marker for absent or invalid rates (0.492276ms)
+  ✔ builds a shared receive and send summary (2.927767ms)
+✔ Host Monitor network presentation (213.366566ms)
+✔ parses Linux counters, excludes loopback, and handles alias colons (22.122948ms)
+✔ parses macOS counters once per interface and excludes loopback (1.08906ms)
+✔ parses Windows UInt64 strings without leaking adapter details (0.739143ms)
+✔ selects only interfaces that own useful addresses (0.529279ms)
+✔ derives rounded bytes-per-second from one bounded sample window (0.582452ms)
+✔ reports a stable zero delta as zero bytes per second (0.312127ms)
+✔ uses stable interfaces only when topology or one counter changes (0.368935ms)
+✔ fails closed when no stable safe rate can be calculated (15.490048ms)
+✔ process confirmations are one-use and consumed before remote work (6.533803ms)
+✔ process confirmations expire at the deadline and stay one-use (0.493303ms)
+✔ a new challenge invalidates every prior mode for the same process identity (0.967119ms)
+✔ process confirmation storage is bounded and prunes expired entries (2.259415ms)
+✔ process confirmation options reject unbounded configurations (0.823943ms)
+✔ process operations serialize per host while different hosts stay independent (4.363248ms)
+✔ process operation waiting is strictly bounded (1.606467ms)
+✔ a synchronous operation throw cannot wedge the host queue (0.635115ms)
+✔ closing the gate rejects queued destructive work without starting it (0.836361ms)
+✔ sorts processes deterministically without mutating the RPC rows (130.466189ms)
+✔ filters processes by safe name or PID fields (0.854768ms)
+✔ summarizes top resource consumers and protected processes (0.73727ms)
+✔ prefers a graceful end and only labels force-only platforms honestly (0.550402ms)
+✔ keeps blocked processes non-actionable with an accessible reason (0.708434ms)
+✔ shows only safe ownership categories (0.281639ms)
+✔ termination timeout has clear headroom over bounded Windows commands (3.192445ms)
+✔ listProcesses routes only to the explicit enrolled connected host (57.221713ms)
+✔ identical overlapping process polls are coalesced (39.493401ms)
+✔ termination preparation waits behind one active poll on the same host (14.291453ms)
+✔ offline and unknown hosts never start a host worker (6.088416ms)
+✔ prepare issues a one-use challenge and execute consumes it before dispatch (24.995303ms)
+✔ execute reports known preflight failure before dispatch and unknown transport outcome after dispatch (6.565531ms)
+✔ process names are reduced to safe basenames without Unicode controls (6.360594ms)
+✔ opaque process identities bind platform, PID, and lifetime without leaking it (6.88321ms)
+✔ Linux proc parsers handle parenthesized names and bounded RSS (4.639938ms)
+✔ macOS parser never returns path or UID and normalizes machine CPU (22.911327ms)
+✔ Windows parser ignores injected credentials and executable details (1.792717ms)
+✔ Windows collection proves ownership without requiring elevated Get-Process (1.343708ms)
+✔ process protection blocks system, monitor, ancestor, owner, identity, and elevation (0.936681ms)
+✔ monitor ancestry is bounded and cycle safe (1.686566ms)
+✔ POSIX modes map only to SIGTERM and explicit SIGKILL (3.637725ms)
+✔ Windows force script rechecks StartTime and kills the validated object (1.772214ms)
+✔ live process collection is schema-valid and exposes only safe fields (505.725465ms)
+✔ host process RPC validates its bounded strict result (345.08905ms)
+✔ refresh fans out only to connected hosts and isolates one failure (68.510323ms)
+✔ CLI exposes the bounded cached dashboard used by Touch Bar (22.420093ms)
+✔ CLI open request is claimed exactly once by the desktop app (4.682983ms)
+✔ CLI opens one validated enrolled host and rejects unknown ids (5.821955ms)
+✔ a failed refresh preserves the last good reading (6.645607ms)
+✔ CPU health uses configurable thresholds after three high samples (27.593056ms)
+✔ threshold settings keep the toggle key and expose effective percentages (3.446886ms)
+✔ settings changes immediately recompute dashboard health (3.721942ms)
+▶ Host Monitor sidebar summary
+  ✔ distinguishes null loading, error, and idle-empty states (4.959126ms)
+  ✔ reports an all-healthy connected fleet (1.331687ms)
+  ✔ surfaces an offline host when no connected host needs attention (17.339046ms)
+  ✔ counts each attention host once and gives critical health precedence (0.899209ms)
+  ✔ uses the attention tone when freshness needs attention without a critical host (0.564308ms)
+  ✔ keeps a connected host waiting for its first sample neutral (0.427328ms)
+  ✔ degrades cached data when a later refresh is unavailable (0.421394ms)
+✔ Host Monitor sidebar summary (30.436746ms)
+▶ Host Monitor sidebar requests
+  ✔ claims native open requests only from BB desktop windows (1.698342ms)
+  ✔ loads the declarative sidebar color preference (0.350996ms)
+  ✔ uses the dashboard RPC for passive reads (0.436406ms)
+  ✔ uses refresh-all semantics for an explicit refresh (0.503147ms)
+✔ Host Monitor sidebar requests (3.937146ms)
+▶ Host Monitor sidebar threshold colors
+  ✔ accepts enabled and disabled preference values (0.778134ms)
+  ✔ preserves the last-known value for malformed responses (0.272804ms)
+  ✔ parses only explicit boolean cache values (0.302928ms)
+  ✔ accepts effective cutoffs and falls back field by field (0.279748ms)
+  ✔ round-trips only complete valid sidebar preference caches (0.30888ms)
+  ✔ computes shared threshold tones for CPU and RAM only (0.385171ms)
+  ✔ gates sidebar tones behind the default-on preference attribute (1.926793ms)
+  ✔ colors download red and upload blue independently of threshold colors (1.186744ms)
+  ✔ uses bb's traffic-light semantic tokens instead of the accent color (1.075896ms)
+✔ Host Monitor sidebar threshold colors (7.465735ms)
+▶ Host Monitor trigger visibility
+  ✔ accepts a trigger that intersects the viewport (0.437318ms)
+  ✔ rejects collapsed, zero-area, and fully offscreen triggers (0.255703ms)
+✔ Host Monitor trigger visibility (1.000851ms)
+▶ Host Monitor drag threshold
+  ✔ keeps sub-threshold movement as an ordinary click (0.296864ms)
+  ✔ engages at the inclusive eight-pixel boundary (0.133949ms)
+✔ Host Monitor drag threshold (0.636666ms)
+▶ Host Monitor sidebar refresh cadence
+  ✔ polls cheaply while closed and follows a bounded visible cadence (0.374554ms)
+✔ Host Monitor sidebar refresh cadence (0.568098ms)
+▶ Host Monitor floating metric privacy
+  ✔ colors only CPU/RAM percentages by threshold and marks network direction (1.739019ms)
+✔ Host Monitor floating metric privacy (1.892887ms)
+▶ Host Monitor floating position
+  ✔ preserves an in-bounds position (0.469397ms)
+  ✔ clamps every edge with an eight-pixel gutter (0.275204ms)
+  ✔ pins an oversized panel to the viewport gutter (0.311295ms)
+  ✔ places the dropped titlebar under the pointer and then clamps (0.415716ms)
+  ✔ parses only finite coordinate cache objects (0.523901ms)
+✔ Host Monitor floating position (2.720412ms)
+▶ Host Monitor threshold presentation
+  ✔ uses the dashboard's effective attention and critical boundaries (2.91575ms)
+  ✔ treats missing and non-finite readings as unavailable (0.359136ms)
+  ✔ keeps stale and in-flight readings neutral (0.542213ms)
+  ✔ provides non-color threshold wording for accessible meter copy (0.681244ms)
+  ✔ defaults colors on until an explicit false setting arrives (0.654042ms)
+✔ Host Monitor threshold presentation (9.37304ms)
+▶ health threshold settings
+  ✔ uses the established 85/95 defaults when values are absent (4.058357ms)
+  ✔ accepts ordered numeric strings, decimals, and inclusive outer bounds (0.542394ms)
+  ✔ falls back as one pair for empty, non-finite, out-of-range, or reversed values (0.550875ms)
+  ✔ compares effective pairs without relying on object identity (0.35647ms)
+✔ health threshold settings (26.824051ms)
+ℹ tests 149
+ℹ suites 18
+ℹ pass 149
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4400.016708
+
+> bb-plugin-host-monitor@0.1.4 build
+> env -u BB_CLI bb plugin build .
+
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+dist/app.js
+dist/app.css
+dist/app.meta.json
+dist/host.js
+dist/host.js.map
+dist/host.meta.json
+
+> bb-plugin-jev-route@0.1.1 check
+> npm run typecheck && npm test && npm run build
+
+
+> bb-plugin-jev-route@0.1.1 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-jev-route@0.1.1 test
+> node --test --experimental-strip-types test/*.test.ts
+
+✔ Python and native fingerprints agree without exposing content (280.602703ms)
+✔ trace patch refuses partial/ambiguous states and is idempotent (0.89053ms)
+✔ repair skips generic reasoning carry only for the native Jev Responses path (12.444743ms)
+✔ patch is idempotent and refuses an unknown or ambiguous upstream boundary (1.022176ms)
+✔ installed repair backs up source, is repeatable and validates target identity (39.211516ms)
+✔ custom colors persist independently for arbitrary model IDs (20.991118ms)
+✔ invalid colors and blank model IDs are rejected at the RPC boundary (3.580625ms)
+✔ manual model changes have no Jev switch history; polling never writes chat events (3.018725ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 681.501886
+
+> bb-plugin-jev-route@0.1.1 build
+> env -u BB_CLI bb plugin build .
+
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+dist/app.js
+dist/app.css
+dist/app.meta.json
+
+> bb-plugin-lavender@0.1.0 check
+> npm run typecheck && npm test && npm run build
+
+
+> bb-plugin-lavender@0.1.0 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-lavender@0.1.0 test
+> node --test test/*.test.mjs
+
+✔ light text remains readable across content, panels, composer and selection (3.040893ms)
+✔ dark text remains readable across content, panels, composer and selection (1.057584ms)
+✔ the distributable exposes one paired palette with local readable syntax assets (1.840134ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 291.009056
+
+> bb-plugin-lavender@0.1.0 build
+> env -u BB_CLI bb plugin build .
+
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+
+> bb-plugin-save-my-model@0.1.2 check
+> npm run types:check && npm run typecheck && npm test && npm run build
+
+
+> bb-plugin-save-my-model@0.1.2 types:check
+> env -u BB_CLI bb plugin types --check .
+
+This plugin uses the npm package @get-bb/plugin-sdk; pin is 0.4.21, host is 0.4.21.
+The declarations are in node_modules/@get-bb/plugin-sdk/bundled-types/ — read them for exact signatures.
+
+> bb-plugin-save-my-model@0.1.2 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-save-my-model@0.1.2 test
+> node --test --experimental-strip-types test/*.test.ts
+
+✔ round-trips the selected provider and its execution preference per host (3.387666ms)
+✔ isolates host and provider execution selections (16.106136ms)
+✔ normalizes empty and malformed hosts to one browser-wide scope (0.582159ms)
+✔ recovers the selected provider from the legacy unscoped key (0.290486ms)
+✔ reads provider-scoped legacy values before matching unscoped values (0.608133ms)
+✔ recovers a complete unscoped legacy selection without a provider argument (1.516903ms)
+✔ uses unscoped legacy values only for their owning provider (0.214608ms)
+✔ keeps a legacy model when no reasoning was stored (0.22464ms)
+✔ changing the selected provider does not leak another provider's execution (0.2472ms)
+✔ rejects an explicitly invalid provider instead of using selected fallback (0.3013ms)
+✔ contains malformed and oversized storage while listing (3.425801ms)
+✔ listing never turns an invalid explicit key into provider fallback (0.390648ms)
+✔ bounds examined plugin records independently of valid results (9.839546ms)
+✔ lists and clears a selected provider even before a model is saved (0.34265ms)
+✔ ignores malformed values and clears only plugin-owned keys (0.238974ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 444.154232
+
+> bb-plugin-save-my-model@0.1.2 build
+> env -u BB_CLI bb plugin build .
+
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+dist/app.js
+dist/app.css
+dist/app.meta.json
+
+> bb-plugin-taskboard@0.3.3 check
+> npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build
+
+
+> bb-plugin-taskboard@0.3.3 types:check
+> env -u BB_CLI bb plugin types --check .
+
+This plugin uses the npm package @get-bb/plugin-sdk; pin is 0.4.6, host is 0.4.6.
+The declarations are in node_modules/@get-bb/plugin-sdk/bundled-types/ — read them for exact signatures.
+
+> bb-plugin-taskboard@0.3.3 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-taskboard@0.3.3 test
+> node --test --experimental-strip-types test/*.test.ts
+
+✔ registers Taskboard for existing-thread and New Thread right panels (6.371464ms)
+✔ accepts bounded Taskboard drops only on the visible composer textbox (19.935955ms)
+✔ makes constrained List and Kanban tickets composer drag sources (2.089594ms)
+✔ offers an accessible non-drag Add to chat detail action (9.688619ms)
+✔ shares durable project preferences between full and constrained surfaces (4.114021ms)
+✔ canonicalizes provider facet casing before rendering and persistence (0.537779ms)
+✔ applies project presets through the released preference store (2.113631ms)
+✔ keeps preset refreshes, drafts, and focus non-disruptive (7.34366ms)
+✔ announces preset apply and keeps save errors with the draft (1.480359ms)
+✔ keeps List measured and Kanban unconstrained (19.435153ms)
+✔ renders assignees as deterministic accessible avatars (1.492321ms)
+✔ uses an explicit constrained filter composition (1.105458ms)
+✔ centralizes and reuses decorative filter icons across surfaces (4.993388ms)
+✔ supports direct and manual composer capture through one dialog (14.378333ms)
+✔ captures the original composer prompt locally exactly once per open (1.82095ms)
+✔ contains no frontend issue-drafting lifecycle or generation copy (4.282262ms)
+✔ routes detail handoff through the external-content trust boundary (1.183581ms)
+✔ renders comments as one conversation rail (18.770879ms)
+✔ reconciles provider identity from the cached-list response (0.879347ms)
+✔ parses only strict version-1 browse records and normalizes values (33.422876ms)
+✔ restores project and Across-project preferences without scope leakage (4.576146ms)
+✔ restores collapsed groups from storage with the rest of a project view (0.842166ms)
+✔ board-setting seeds initialize only untouched preference scopes (1.654076ms)
+✔ storage failures fall back safely while in-window updates remain usable (2.344313ms)
+✔ one observable store notifies every surface and reloads external writes (1.777288ms)
+✔ structurally equal writes keep a stable snapshot and do not notify (1.355973ms)
+✔ clearing filters changes only the active scope and preserves its view and collapse state (2.690498ms)
+✔ provider reconciliation preserves view but drops provider-derived state (1.361986ms)
+✔ terminal collapse defaults use sparse overrides and search opens matches temporarily (1.021065ms)
+✔ create assignee defaults are versioned, fully scoped, and restored only from fresh options (23.506196ms)
+✔ create assignee scope canonicalizes Jira project keys (0.680972ms)
+✔ remembers only provider-confirmed create assignees and clears confirmed unassigned scopes (3.646278ms)
+✔ keeps the prior assignee when a successful create omits the requested assignment (1.008391ms)
+✔ scope helpers reject empty identities (2.342872ms)
+✔ storage keys remain collision-free for delimiter and Unicode identities (1.159142ms)
+✔ derives stable Unicode-safe assignee avatar identities (30.354868ms)
+✔ uses the backlog-first default before provider-specific states (9.543856ms)
+✔ defines the complete backlog-first default status order (1.188084ms)
+✔ builds case-insensitive assignee choices including Unassigned (54.750003ms)
+✔ keeps selected assignees available when other filters return no items (0.862491ms)
+✔ canonicalizes facet selections and toggles every case variant (1.095018ms)
+✔ uses a configurable exact workflow order (0.845655ms)
+✔ keeps the complete provider workflow ordered before and after a move (2.963996ms)
+✔ assigns distinct stable tones to the active workflow statuses (1.315384ms)
+✔ builds Linear-style field options including empty values (21.101779ms)
+✔ combines different filter fields with AND and values within a field with OR (1.433142ms)
+✔ builds and round-trips the bounded live Taskboard mention (8.74723ms)
+✔ writes only the private mention payload with the requested drag effect (0.970229ms)
+✔ rejects malformed, oversized, unsafe, and expanded drag payloads (1.460605ms)
+✔ fails closed when an item cannot form a safe mention or DataTransfer rejects it (0.831259ms)
+✔ delimits useful issue facts as untrusted external tracker data (3.851895ms)
+✔ keeps instruction-like issue text inside the untrusted boundary (2.428391ms)
+✔ prefixes control-character line separators inside external data (0.520972ms)
+✔ visibly escapes every C1 and bidirectional control inside ordered boundaries (1.967933ms)
+✔ visibly escapes every C0 control in inline CLI fields (0.882755ms)
+✔ keeps JSON CLI output readable around external controls (0.925688ms)
+✔ keeps detail handoff intent trusted while issue text stays inside the boundary (0.824966ms)
+✔ defaults optional provider-native issue creation properties (21.270006ms)
+✔ validates expanded provider-native issue creation properties (2.94484ms)
+✔ validates creation metadata and warning-bearing RPC results (7.520156ms)
+✔ returns authoritative provider identity with cached list results (0.931744ms)
+✔ Linear maps native metadata and sends it in IssueCreateInput (109.130979ms)
+✔ Linear paginates create options independently and preserves the native default state (9.611799ms)
+✔ Linear rejects invalid creation metadata cursors (2.920302ms)
+✔ Linear keeps explicit create rejection retryable without the uncertain marker (29.982698ms)
+✔ Linear marks malformed or lost post-dispatch create responses uncertain (18.25301ms)
+✔ Jira derives native fields from createmeta and forwards selections (31.858112ms)
+✔ Jira marks ambiguous create acknowledgement and detail failures uncertain (11.257559ms)
+✔ Jira paginates create metadata and canonicalizes issue types to native IDs (3.22937ms)
+✔ Jira exposes only priorities allowed for the selected project and issue type (1.238434ms)
+✔ GitHub loads native metadata and reports partially applied fields (23.650394ms)
+✔ GitHub confirms the submitted assignee from native response membership (1.435661ms)
+✔ GitHub paginates and deduplicates every create metadata collection (0.822877ms)
+✔ GitHub queues a fresh reconciliation after an overlapping pre-create refresh (1.576932ms)
+✔ GitHub queues a post-write refresh when issue confirmation is ambiguous (0.901427ms)
+✔ GitHub forced reconciliation refreshes before listing only project-scoped repos (0.578103ms)
+✔ keeps Taskboard private and Git-buildable without npm publication hooks (3.674239ms)
+✔ documents only BB Community and direct Git installation for Taskboard (3.292999ms)
+✔ keeps Usage Tracker private and documents its Git release too (32.17737ms)
+✔ has no active registry publication automation or credential path (2.391764ms)
+✔ credits merged contributors without reviving superseded filter storage (10.267979ms)
+✔ local remains default and direct routes cannot silently select Symphony (5.178174ms)
+✔ normalization omits raw internal data and approval covers scope (24.27412ms)
+✔ concurrent duplicate dispatch and restart preserve one execution (69.6723ms)
+✔ unavailable Symphony persists intent and never assumes success from 404 (4.931646ms)
+✔ state mapping never maps an agent finish to done or verified (0.543716ms)
+✔ runtime retries, failure, resume generations and duplicate events are durable (25.661917ms)
+✔ cancellation wins over late handoff and needs runtime acknowledgement (4.90175ms)
+✔ implementation handoff requires a revision and independent verification (4.272623ms)
+✔ HTTP adapter uses actual Symphony observation and refresh routes (87.584976ms)
+✔ tracker cancellation uses Taskboard reads; completion is guarded and restart recovers verification (19.216758ms)
+✔ verification binds checks to Git content and refuses dirty, changed or deleted branches (5990.724965ms)
+✔ appends only the preset migration and round-trips complete state (80.430537ms)
+✔ isolates names and ids between projects (9.556986ms)
+✔ contains corrupt rows and makes reorder exact and atomic (39.268906ms)
+✔ enforces the per-project preset limit without blocking updates (64.040533ms)
+✔ bounds reads and fails closed when raw rows exceed the preset limit (58.198801ms)
+✔ rejects --from-state on wrong verbs and preserves explicit precedence (0.964917ms)
+✔ keeps maximum aggregate preset JSON compact and under the CLI cap (84.363896ms)
+✔ enforces a transactional aggregate state-byte limit per project (162.172234ms)
+✔ accepts a complete strict project browse preference snapshot (17.954415ms)
+✔ requires a project provider and matching source (21.432575ms)
+✔ bounds names, ids, positions, order size, and state fields (7.188533ms)
+✔ rejects control characters in preset identity and state (5.447023ms)
+✔ rejects oversized adversarial containers before inspecting elements (2.772079ms)
+✔ accepts the maximum valid browse state inside the UTF-8 envelope (56.618822ms)
+✔ normalizes unique names without depending on locale (0.744657ms)
+✔ resolves only exact preset order permutations (1.431383ms)
+✔ selects the active thread project only when it still exists (3.220071ms)
+✔ treats a different thread in the same project as new context (0.677961ms)
+✔ reads the project and thread from a BB project route (2.898167ms)
+✔ uses only the immediately previous navigation entry as source context (1.023696ms)
+✔ never replaces an explicit Taskboard project selection with route context (1.151363ms)
+✔ writes project credentials atomically with owner-only permissions (101.179585ms)
+✔ deleting a missing credential is harmless (4.381272ms)
+✔ cached summaries never retain provider comments (6.678371ms)
+✔ provider creation results carry strict native assignee confirmation (0.814148ms)
+✔ metadata failures expose only a fixed server-safe message (1.837427ms)
+✔ finds Jira project keys from common configured JQL scopes (2.899672ms)
+✔ binds issue creation to the tracker reviewed in the modal (18.799112ms)
+✔ refreshes authoritative provider data after successful issue creation (0.52337ms)
+✔ refreshes authoritative provider data after ambiguous issue creation failure (0.730083ms)
+✔ keeps structural headers on neutral host theme surfaces (5.336442ms)
+✔ uses restrained state glyph, focus, and conversation treatments (18.753733ms)
+✔ keeps constrained filter values inside the vertical menu measure (1.027996ms)
+✔ keeps assignee avatars compact with six theme-safe identity tones (1.767573ms)
+✔ shows restrained composer drop feedback and discoverable drag grips (1.41245ms)
+ℹ tests 127
+ℹ suites 0
+ℹ pass 127
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7799.554098
+
+> bb-plugin-taskboard@0.3.3 build
+> env -u BB_CLI bb plugin build .
+
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+dist/app.js
+dist/app.css
+dist/app.meta.json
+
+> bb-plugin-taskboard@0.3.3 verify:build
+> node scripts/verify-build.mjs
+
+Taskboard build metadata is valid.
+
+> bb-plugin-touchbar@0.1.1 check
+> npm run types:check && npm run typecheck && npm test && npm run build
+
+
+> bb-plugin-touchbar@0.1.1 types:check
+> env -u BB_CLI bb plugin types --check .
+
+This plugin uses the npm package @get-bb/plugin-sdk; pin is 0.4.21, host is 0.4.21.
+The declarations are in node_modules/@get-bb/plugin-sdk/bundled-types/ — read them for exact signatures.
+
+> bb-plugin-touchbar@0.1.1 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-touchbar@0.1.1 test
+> node --import tsx --test test/*.test.ts
+
+✔ BetterTouchTool preset is global, persistent, bounded, and action-safe (3.06816ms)
+✔ companion scripts are POSIX-shell parseable and avoid eval (44.965246ms)
+✔ Swift source plugin renders native status cards with safe BB actions (1.419711ms)
+✔ package includes every companion and excludes a frontend entry (0.723236ms)
+✔ native app owns the Control Strip and fullscreen panel without physical stop (129.594876ms)
+✔ snapshot returns bounded JSON and queries hidden rows explicitly (13.171848ms)
+✔ snapshot includes bounded weekly subscription percentages (20.438861ms)
+✔ settings expose hidden-worker privacy and card count (2.08796ms)
+✔ open resolves and opens exactly one eligible thread (2.000148ms)
+✔ stop rejects idle and unknown threads without mutation (2.368525ms)
+✔ stop mutates exactly one active thread and malformed commands fail (2.640479ms)
+✔ card and open-card share the same deterministic current slot (3.486551ms)
+✔ card limit clamps invalid, low, and high settings (2.060695ms)
+✔ compact text removes controls, whitespace, and bounds user text (0.599723ms)
+✔ runtime states map to stable compact states (17.645157ms)
+✔ snapshot prioritizes attention and active work deterministically (2.25709ms)
+✔ hidden, archived, and deleted threads are excluded by default (20.539191ms)
+✔ summary and cards stay compact and useful (0.69912ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1455.672632
+
+> bb-plugin-touchbar@0.1.1 build
+> env -u BB_CLI bb plugin build .
+
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+
+> bb-plugin-usage-tracker@0.1.10 check
+> npm run types:check && npm run typecheck && npm test && npm run build
+
+
+> bb-plugin-usage-tracker@0.1.10 types:check
+> env -u BB_CLI bb plugin types --check .
+
+This plugin uses the npm package @get-bb/plugin-sdk; pin is 0.4.6, host is 0.4.6.
+The declarations are in node_modules/@get-bb/plugin-sdk/bundled-types/ — read them for exact signatures.
+
+> bb-plugin-usage-tracker@0.1.10 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-usage-tracker@0.1.10 test
+> node --test --experimental-strip-types test/*.test.ts
+
+✔ adds Antigravity without removing the v0.1.6 providers (4.160753ms)
+✔ normalizes Antigravity quota groups (66.624324ms)
+✔ normalizes agy command-data buckets (0.591124ms)
+✔ accepts only Claude Code credential services (2.061359ms)
+✔ refreshes expired tokens and persists rotated credentials before usage (88.938355ms)
+✔ reads usage with the configured Keychain service (3.936877ms)
+✔ failed credential persistence stops usage and hides secret errors (3.96102ms)
+✔ never reads the Keychain for an unrelated service (0.301247ms)
+✔ reports a missing or unreadable item as unauthenticated (0.296979ms)
+✔ decodes hex-encoded credentials (1.050122ms)
+✔ reports expired sessions before and after the request (0.527179ms)
+✔ explains throttling without claiming the limit is exhausted (0.753535ms)
+✔ is unavailable outside macOS (0.326927ms)
+✔ overrides BB's Claude Code usage in the snapshot (0.804391ms)
+✔ combines pooled windows as a plan-weighted share with the earliest reset (6.508721ms)
+✔ orders the overall weekly window ahead of model-specific windows (0.727705ms)
+✔ loads every pooled account and replaces host-local usage per provider (9.921472ms)
+✔ skips accounts scoped to another host (1.424554ms)
+✔ falls back to host-local usage when the Account Pooler is unavailable (1.091518ms)
+✔ unresolved hosts include only shared accounts (1.228721ms)
+✔ single pooled accounts preserve reported credit amounts (18.844097ms)
+✔ keeps Grok and OpenCode independently configurable (3.472818ms)
+✔ emits semantic severity for compact, rail, and detail presentation (1.087375ms)
+✔ summarizes larger provider sets and exposes the complete overview (0.841697ms)
+✔ preserves provider-specific details and focus restoration (0.667144ms)
+✔ shows reported credits as readable expanded-detail metadata (20.537425ms)
+✔ preparing a reset never invokes the consuming callback (4.844463ms)
+✔ reset confirmation is one-shot and idempotent (0.761336ms)
+✔ reset confirmation expires without invoking the consuming callback (0.623753ms)
+✔ reset preparation refuses zero or unknown availability (0.395789ms)
+✔ reads the authoritative Codex reset count (5.163792ms)
+✔ attaches reset availability to Codex only (3.743474ms)
+✔ rejects invalid reset counts before they reach the UI (0.957256ms)
+✔ enables sidebar providers independently in display order (4.067902ms)
+✔ normalizes compact limit preferences to the weekly default (0.524144ms)
+✔ normalizes providers in stable order with every usage window (3.267061ms)
+✔ normalizes Antigravity fractional quotas across both groups (1.326576ms)
+✔ normalizes agy command-data buckets (0.662361ms)
+✔ uses the tightest Antigravity group in compact usage (45.933028ms)
+✔ keeps current provider wire-key windows intact (1.694925ms)
+✔ keeps healthy legacy provider windows intact (0.643946ms)
+✔ accepts legacy provider keys and normalizes explicit statuses (17.504901ms)
+✔ prefers current provider keys over legacy aliases (0.467098ms)
+✔ isolates an omitted provider response (0.324168ms)
+✔ normalizes Grok and OpenCode and isolates an omitted new provider (0.221808ms)
+✔ clamps progress geometry and rejects non-finite values (0.583075ms)
+✔ classifies exact usage warning and critical thresholds (0.181778ms)
+✔ provides Grok and layered OpenCode provider marks (0.176875ms)
+✔ formats reset, update, percentage, and cost copy safely (7.964484ms)
+✔ selects the configured compact usage window (0.802687ms)
+✔ selects the highest available compact usage for an overview summary (0.343581ms)
+✔ keeps additional provider windows in expanded details only (0.696976ms)
+✔ falls back when the configured compact window is unavailable (0.594716ms)
+✔ hides the Codex Pro five-hour row when it is not reported (0.717313ms)
+✔ prefers a fresh alternative before merged last-known compact windows (0.52717ms)
+✔ describes configured, actual, and fallback compact windows accessibly (1.22219ms)
+✔ keeps last-known sidebar windows through partial and failed refreshes (0.694231ms)
+✔ keeps additional last-known windows without stale duplicates (0.749842ms)
+✔ resolves the thread environment host (0.25401ms)
+✔ falls back when a thread has no environment or lookup fails (0.269952ms)
+✔ loads usage for the resolved host and tolerates missing host metadata (0.462899ms)
+✔ omits host override for primary-machine fallback (0.348183ms)
+✔ loads the primary machine directly for the sidebar strip (0.232759ms)
+✔ propagates thread and request-level usage failures (0.706937ms)
+ℹ tests 64
+ℹ suites 0
+ℹ pass 64
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 953.08503
+
+> bb-plugin-usage-tracker@0.1.10 build
+> env -u BB_CLI bb plugin build .
+
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+dist/app.js
+dist/app.css
+dist/app.meta.json
+
+> bb-plugins@0.0.0 check:dockside
+> node .github/check-dockside.mjs
+
+
+> bb-plugin-dockside@0.1.5 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-dockside@0.1.5 test
+> node --test --experimental-strip-types test/*.test.ts
+
+▶ semanticStateToneClass
+  ✔ maps every named semantic role to theme-token utilities (2.250022ms)
+✔ semanticStateToneClass (6.267036ms)
+▶ familyProtection
+  ✔ fails closed for current, live, waiting, unread, and pinned descendants (3.124276ms)
+  ✔ treats unknown statuses as live instead of guessing they are safe (0.718051ms)
+  ✔ rejects a child promoted into the visible root position (0.647408ms)
+✔ familyProtection (28.402196ms)
+▶ bulk delete preview
+  ✔ counts roots and recursive children and binds current-thread protection (9.638615ms)
+  ✔ rejects empty, duplicate, and oversized root sets (2.38695ms)
+  ✔ rejects overlapping root and descendant selections (0.791957ms)
+✔ bulk delete preview (14.468515ms)
+▶ bulk delete confirmation
+  ✔ confirms child trees, consumes the token, and preserves stable order (2.734509ms)
+  ✔ expires a preview without mutating anything (0.938311ms)
+  ✔ revalidates, skips changed state, and continues after one failure (2.112892ms)
+  ✔ refuses a deletion when the descendant identity set grew after preview (1.084816ms)
+  ✔ refuses a deletion when a reviewed descendant disappeared (0.733482ms)
+✔ bulk delete confirmation (8.862396ms)
+✔ declares unshimmed runtime imports as production dependencies (60.983584ms)
+▶ family order persistence
+  ✔ round-trips bounded project-local root order (6.85182ms)
+  ✔ fails closed for malformed, duplicate, controlled, and oversized data (1.440157ms)
+  ✔ keeps pinned roots leading and merges new roots canonically (1.240716ms)
+✔ family order persistence (13.371654ms)
+▶ family reorder validation
+  ✔ moves a complete root family order and supports keyboard moves (2.783613ms)
+  ✔ rejects cross-project, missing, duplicate, and pinned-boundary moves (0.737965ms)
+✔ family reorder validation (4.736565ms)
+▶ familyStatus
+  ✔ projects every explicit state and the exact stale boundary (4.169657ms)
+  ✔ uses stable attention precedence across root and children (0.875879ms)
+  ✔ uses the newest family member for inactivity and never exposes Done (4.199106ms)
+  ✔ keeps all six labels, shapes, and color roles distinct (0.93769ms)
+  ✔ keeps the actual live activity type visible by shape and color (0.95496ms)
+✔ familyStatus (18.793884ms)
+▶ workspace filter UI contract
+  ✔ presents grouped descriptive filters and an explicit active state (41.382318ms)
+✔ workspace filter UI contract (46.619746ms)
+▶ sortByCreatedAtDescending
+  ✔ puts the newest thread first (11.158924ms)
+  ✔ ignores activity and update time (1.011023ms)
+  ✔ breaks ties on id so the order is stable (86.043458ms)
+  ✔ does not mutate its input (0.867675ms)
+✔ sortByCreatedAtDescending (103.49294ms)
+▶ threadDisplayTitle
+  ✔ prefers the title, then the fallback, then a placeholder (1.356116ms)
+  ✔ treats a whitespace-only title as absent (0.473118ms)
+✔ threadDisplayTitle (2.881185ms)
+▶ searchThreadsByTitle
+  ✔ matches case-insensitively on the visible title (0.953401ms)
+  ✔ returns everything for a blank query (0.591659ms)
+✔ searchThreadsByTitle (2.39451ms)
+▶ filtering
+  ✔ scopes to one project, or to all (0.90465ms)
+  ✔ drops archived threads (1.001695ms)
+  ✔ keeps an archived thread the plugin parked (1.018413ms)
+  ✔ splits pinned from the rest, keeping order (0.924972ms)
+✔ filtering (5.386445ms)
+▶ project thread groups
+  ✔ keeps bb's project order, pins roots within a project, and flattens descendants (1.641798ms)
+  ✔ promotes a child when its parent is not visible (0.3236ms)
+  ✔ keeps a parent as context when only its child matches search (0.905039ms)
+  ✔ matches a project name and keeps the whole project (0.467896ms)
+✔ project thread groups (3.930822ms)
+▶ threadIsWorking
+  ✔ includes activity counts and resolved runtime states (0.327142ms)
+✔ threadIsWorking (0.528861ms)
+▶ child threads
+  ✔ hides a child whose parent is on screen (0.398384ms)
+  ✔ keeps a child whose parent is not on screen (0.216268ms)
+  ✔ lists a thread's children oldest first (1.173393ms)
+✔ child threads (2.147815ms)
+▶ parentOf
+  ✔ finds a parent the inbox filters out (0.538684ms)
+  ✔ returns null for a root thread (0.417911ms)
+  ✔ returns null when the parent row is gone (0.261116ms)
+✔ parentOf (1.730979ms)
+▶ canPark
+  ✔ refuses while the agent is blocked on the user (2.798064ms)
+  ✔ refuses while any work is running (0.470261ms)
+  ✔ allows a quiet thread (0.621983ms)
+✔ canPark (8.10197ms)
+▶ resolveShelf
+  ✔ keeps an unparked thread active (0.740396ms)
+  ✔ settles a parked, quiet thread (0.419329ms)
+  ✔ brings a settled thread back when it starts working (0.386722ms)
+  ✔ brings a settled thread back when it asks a question (0.412515ms)
+  ✔ un-settles on new attention after the settle (0.571183ms)
+  ✔ keeps a snoozed thread hidden until its wake time (0.58144ms)
+  ✔ wakes a snoozed thread when the timer elapses (0.62091ms)
+  ✔ wakes a snoozed thread early when it raises its hand (0.904532ms)
+  ✔ does not wake on activity that predates the snooze (0.407053ms)
+✔ resolveShelf (7.17359ms)
+▶ wokenSettledThreadIds
+  ✔ leaves a thread that is still settled alone (22.704395ms)
+  ✔ reports a settled thread that has come back (0.785273ms)
+  ✔ ignores snoozed rows (0.30438ms)
+  ✔ skips a thread bb no longer reports (0.301224ms)
+✔ wokenSettledThreadIds (24.747012ms)
+▶ rowsMatch
+  ✔ matches a list that says what the rows already say (0.637559ms)
+  ✔ notices a timestamp that moved (0.578541ms)
+  ✔ notices a row that arrived or left (0.25814ms)
+✔ rowsMatch (2.686919ms)
+▶ snoozeWakeLabel
+  ✔ rounds minutes up so a hidden thread never reads 0m (0.541504ms)
+  ✔ switches to hours and days (0.22877ms)
+  ✔ reads 'now' once the wake time has passed (0.248471ms)
+✔ snoozeWakeLabel (1.910649ms)
+▶ resolveSnoozePresets
+  ✔ offers this evening while it is still well before evening (6.988453ms)
+  ✔ drops this evening once evening is near (0.395017ms)
+  ✔ puts tomorrow at 9am on the next calendar day (0.45535ms)
+  ✔ puts next week on the coming Monday (0.406871ms)
+✔ resolveSnoozePresets (8.802581ms)
+▶ nextWakeDelayMs
+  ✔ arms for the soonest upcoming wake (0.550626ms)
+  ✔ ignores wakes that have already passed (0.322406ms)
+  ✔ clamps a far-future wake to the maximum timeout (0.293521ms)
+✔ nextWakeDelayMs (1.675059ms)
+▶ refreshRetryDelayMs
+  ✔ grows the wait with each attempt (1.172656ms)
+  ✔ stops once the attempts are spent (0.385691ms)
+✔ refreshRetryDelayMs (2.196648ms)
+▶ resolveDocksidePreferences
+  ✔ preserves current behavior while settings load or are unknown (4.823496ms)
+  ✔ accepts either status display mode and safely defaults invalid saved values (0.915203ms)
+  ✔ resolves distinct high-contrast and colorblind-friendly presets (3.061614ms)
+  ✔ accepts only six-digit custom hex colors and falls back per role (3.296974ms)
+  ✔ resolves behavior preferences independently of palette (2.007599ms)
+✔ resolveDocksidePreferences (19.207974ms)
+▶ docksidePreferenceStyle
+  ✔ projects only owner-scoped semantic variables (1.162793ms)
+✔ docksidePreferenceStyle (2.94738ms)
+▶ project color store
+  ✔ canonicalizes, persists, updates, and resets one project (99.191798ms)
+  ✔ contains invalid persisted rows and rejects invalid writes (3.881497ms)
+  ✔ bounds new rows while allowing updates at the limit (24.66958ms)
+✔ project color store (131.522592ms)
+▶ project badge colors
+  ✔ selects a stable palette color from project id, not display name (4.228373ms)
+  ✔ accepts only canonicalizable opaque six-digit hex overrides (0.713075ms)
+  ✔ uses a valid override and otherwise restores the automatic color (0.688329ms)
+  ✔ chooses the stronger black or white contrast at and around crossover (4.359322ms)
+  ✔ bounds project ids and rejects control characters (0.723058ms)
+✔ project badge colors (15.378754ms)
+▶ project order
+  ✔ round-trips, applies stored ranks, and preserves new projects (23.284686ms)
+  ✔ fails closed for malformed, duplicate, and controlled values (0.572319ms)
+  ✔ moves complete project orders by drag and keyboard (0.958444ms)
+✔ project order (29.959129ms)
+▶ pullRequestPresentation
+  ✔ gives terminal states precedence over stale attention (21.469243ms)
+  ✔ maps open pull request attention into compact semantic states (0.728044ms)
+✔ pullRequestPresentation (25.819419ms)
+▶ PR semantic icon surface
+  ✔ uses the configured PR color for a visible tinted background (5.807258ms)
+✔ PR semantic icon surface (6.905991ms)
+▶ relativeTimeLabel
+  ✔ reads 'now' under a minute (21.498618ms)
+  ✔ steps through minutes, hours, days, and weeks (0.513011ms)
+  ✔ floors rather than rounds, so a label never overstates age (0.436724ms)
+  ✔ treats a future timestamp as 'now' (0.472485ms)
+✔ relativeTimeLabel (26.982588ms)
+▶ family reorder UI contract
+  ✔ applies persisted complete-family order before filter and search (2.481885ms)
+  ✔ disables reorder for selection, filters, and host search (1.110405ms)
+  ✔ wires explicit drag and keyboard controls with announcements (1.149173ms)
+  ✔ keeps navigation split props and bulk selection overlays independent (0.553592ms)
+✔ family reorder UI contract (9.550405ms)
+▶ Dockside settings contract
+  ✔ declares every palette and behavior setting with safe defaults (2.197613ms)
+  ✔ registers one settings preview and reads live settings (0.480711ms)
+  ✔ edits durable project-id colors and paints only project letter badges (2.508333ms)
+  ✔ uses optional metadata and layout preferences without changing defaults (0.503847ms)
+  ✔ uses a semantic full-row selection target and keeps navigation separate (0.396661ms)
+✔ Dockside settings contract (9.122014ms)
+▶ isUnread
+  ✔ is bb's own rule: last read has to catch up with last attention (1.713817ms)
+  ✔ treats a never-read thread as unread (0.358966ms)
+✔ isUnread (5.230841ms)
+▶ isWithinSettledWindow
+  ✔ keeps a settle from inside the window (1.065227ms)
+  ✔ drops a settle older than the window (0.405553ms)
+  ✔ keeps a settle stamped in the future (0.444275ms)
+  ✔ is a day by default (0.380124ms)
+✔ isWithinSettledWindow (3.272806ms)
+▶ settledIndicator
+  ✔ draws nothing for a quiet thread (19.400629ms)
+  ✔ puts a raised hand above everything else (0.641264ms)
+  ✔ reports live work from the status (0.466699ms)
+  ✔ reports live work from an activity count alone (0.601712ms)
+  ✔ separates an unread failure from an unread success (0.375239ms)
+✔ settledIndicator (22.779866ms)
+▶ toSidebarThread
+  ✔ marks the thread archived, which is why this path exists (0.776767ms)
+  ✔ keeps only the origin kinds this sidebar draws (0.339653ms)
+  ✔ carries the fields the list sorts, filters, and searches on (0.404515ms)
+✔ toSidebarThread (2.032577ms)
+▶ mergeSettledThreads
+  ✔ adds the settled threads the host cannot report (1.10226ms)
+  ✔ lets the host win a collision (0.347532ms)
+  ✔ returns the host list unchanged when nothing is settled (0.25128ms)
+✔ mergeSettledThreads (2.101635ms)
+▶ pendingSettledCount
+  ✔ counts a settled thread the host cannot report (0.582877ms)
+  ✔ ignores a row that is not settled (0.294174ms)
+  ✔ ignores a settled thread the host still reports (0.200659ms)
+  ✔ drops a settle that has aged out of the window (0.145224ms)
+  ✔ counts each pending row once and nothing else (0.234624ms)
+  ✔ counts nothing when no row was seeded (0.172128ms)
+  ✔ reads any iterable of rows (0.373735ms)
+✔ pendingSettledCount (2.659288ms)
+▶ parseArchivedThreadIds
+  ✔ reads back what settle stored (0.54724ms)
+  ✔ gives nothing back for a missing or unusable value (0.746029ms)
+✔ parseArchivedThreadIds (1.849103ms)
+▶ statusColorRole
+  ✔ separates error, waiting, unread, working, and idle roles (1.413048ms)
+✔ statusColorRole (3.671999ms)
+▶ groupFamiliesByStatus
+  ✔ orders semantic sections, omits empty sections, and includes each family once (39.325071ms)
+✔ groupFamiliesByStatus (42.961363ms)
+▶ compact root card contract
+  ✔ keeps zero-child and no-PR roots on the same two-row skeleton (3.240911ms)
+  ✔ co-locates root PR and multiple-child controls in row two (0.475371ms)
+  ✔ looks up PR data only for the parent and never on child rows (0.830438ms)
+  ✔ truncates long title and branch text without shrinking metadata (0.470647ms)
+  ✔ keeps semantic, disclosure, provider, and reorder help keyboard-readable (0.726431ms)
+  ✔ keeps child status and disclosure-provider help keyboard-readable (0.449933ms)
+✔ compact root card contract (10.149475ms)
+▶ family status
+  ✔ uses the newest member update and requires every member to be quiet (1.503339ms)
+✔ family status (3.13074ms)
+▶ filterProjectThreadGroups
+  ✔ supports attention and quiet presets (1.991001ms)
+  ✔ uses inclusive family age boundaries (0.266511ms)
+  ✔ preserves project and family order without mutating the input (0.294694ms)
+✔ filterProjectThreadGroups (2.998343ms)
+▶ thread filter presentation
+  ✔ describes every preset once in the intended menu hierarchy (0.316175ms)
+✔ thread filter presentation (0.570135ms)
+▶ bulkEligibility
+  ✔ protects the current, working, waiting, unread, and pinned family (0.988496ms)
+  ✔ allows a quiet read family (0.411956ms)
+✔ bulkEligibility (2.002424ms)
+▶ selection helpers
+  ✔ selects eligible visible roots and prunes roots that disappeared (0.943274ms)
+  ✔ keeps a selected family visible after it stops matching the filter (0.552074ms)
+✔ selection helpers (1.795294ms)
+▶ applyRootSelection
+  ✔ ordinary clicks toggle one root and replace the anchor (0.496026ms)
+  ✔ selects inclusive forward and reverse Shift ranges (0.230423ms)
+  ✔ uses the clicked checked state to deselect a range (0.175514ms)
+  ✔ skips protected gaps omitted from eligible order (0.154918ms)
+  ✔ falls back to one toggle when the anchor is no longer visible (0.135307ms)
+  ✔ fails closed when the target is no longer eligible (0.179506ms)
+✔ applyRootSelection (1.776755ms)
+▶ resolveFamilyExpanded
+  ✔ keeps a family with no children closed (0.330684ms)
+  ✔ opens a child family by default and while search forces it (0.260108ms)
+  ✔ respects explicit open and closed overrides (0.125576ms)
+  ✔ uses the configured default until search or a user override wins (0.14008ms)
+✔ resolveFamilyExpanded (1.108563ms)
+▶ decodeWarmStartRows
+  ✔ round-trips what encodeWarmStartRows wrote (3.119285ms)
+  ✔ reads nothing stored as a miss (0.618155ms)
+  ✔ reads unparseable text as a miss (0.609059ms)
+  ✔ reads a payload that is not an array as a miss (0.322226ms)
+  ✔ keeps a hit with no rows apart from a miss (0.31366ms)
+  ✔ rejects a row without a usable thread id (0.207688ms)
+  ✔ rejects an entry that is not an object (0.205425ms)
+  ✔ rejects a timestamp the wire could not have produced (0.305558ms)
+  ✔ rejects a non-finite timestamp (0.31479ms)
+  ✔ reads an absent timestamp as null (0.406377ms)
+  ✔ rejects the whole payload when one row is bad (0.261839ms)
+  ✔ rejects more rows than the encoder would ever write (0.794564ms)
+  ✔ rejects an entry too long to be worth parsing (0.193496ms)
+✔ decodeWarmStartRows (11.391452ms)
+▶ encodeWarmStartRows
+  ✔ writes an array, which is the only shape that survives the trip (0.28067ms)
+  ✔ carries only the four fields a row is made of (0.170328ms)
+  ✔ caps the entry and keeps the newest parks (0.666419ms)
+  ✔ ranks a park by when it was made, not by when a snooze ends (0.257349ms)
+  ✔ keeps a fresh settle over a full cap of long snoozes (0.886423ms)
+✔ encodeWarmStartRows (2.674796ms)
+▶ readWarmStartRows
+  ✔ serves what was stored (0.529782ms)
+  ✔ does not throw when the store does (0.15512ms)
+  ✔ still serves from memory after the store failed (0.250978ms)
+  ✔ prefers the memory tier over what the store holds (0.35461ms)
+  ✔ drops an entry that did not decode (0.350815ms)
+  ✔ ignores an entry written under another version's key (0.228317ms)
+✔ readWarmStartRows (2.357624ms)
+▶ writeWarmStartRows
+  ✔ does not throw when the store does (0.293165ms)
+  ✔ writes under the versioned key (0.250347ms)
+  ✔ offers a refused value to the store again (0.398729ms)
+✔ writeWarmStartRows (1.258677ms)
+▶ decodeWarmStartProviders
+  ✔ round-trips providers (0.682133ms)
+  ✔ reads a miss as null (0.18084ms)
+  ✔ rejects a provider with no name to fall back to (0.127152ms)
+  ✔ rejects a provider whose name is blank (0.123359ms)
+  ✔ drops a logo that is not a same-origin path (0.348276ms)
+  ✔ drops a path that resolves onto another host (0.207943ms)
+  ✔ drops a path carrying the characters that end a CSS token (0.194102ms)
+  ✔ rejects an entry too long to be worth parsing (0.118906ms)
+✔ decodeWarmStartProviders (2.433762ms)
+▶ encodeWarmStartProviders
+  ✔ carries only the three fields the glyph reads (0.146507ms)
+✔ encodeWarmStartProviders (0.261132ms)
+▶ readWarmStartProviders
+  ✔ serves what was stored (0.321271ms)
+  ✔ survives a store that throws on every call (0.387682ms)
+  ✔ drops an entry that did not decode (0.33712ms)
+  ✔ ignores an entry written under another version's key (0.226659ms)
+✔ readWarmStartProviders (1.650404ms)
+▶ writeWarmStartProviders
+  ✔ does not throw when the store does (0.239677ms)
+  ✔ keeps its own versioned key (0.174249ms)
+✔ writeWarmStartProviders (0.614656ms)
+ℹ tests 206
+ℹ suites 59
+ℹ pass 206
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1536.386283
+
+> bb-plugin-dockside@0.1.5 build
+> bb plugin build .
+
+This plugin vendors types/ — `bb plugin migrate` switches it to the @get-bb/plugin-sdk npm package.
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+dist/app.js
+dist/app.css
+dist/app.meta.json

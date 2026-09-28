@@ -1,0 +1,7 @@
+Compiling 2 files (.ex)
+Generated symphony_elixir app
+Running ExUnit with seed: 108957, max_cases: 32
+
+....................................................................................................
+Finished in 10.1 seconds (0.00s async, 10.1s sync)
+100 tests, 0 failures

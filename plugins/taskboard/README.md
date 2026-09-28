@@ -22,6 +22,10 @@ exactly one tracker for each BB project, browse a quiet List or Kanban view,
 open live task details, move work through real provider statuses, and hand a
 task to an agent without rebuilding context by hand.
 
+Optional [Symphony execution](execution/README.md) runs approved implementation
+work in isolated workspaces while Taskboard retains verification and tracker
+control. It is disabled by default; **Send to agent** keeps its existing behavior.
+
 ## What it does
 
 - **Project-first tasks** — each BB project selects GitHub, Linear, or Jira;

@@ -64,6 +64,7 @@ import {
   type WorkSourceAdapter
 } from './sources/types.js';
 import { createWorkItemStore } from './store.js';
+import { registerExecution } from './execution/server.js';
 
 const SOURCES: readonly WorkSource[] = ['linear', 'github', 'jira'];
 const CREDENTIAL_SOURCES: readonly CredentialSource[] = ['linear', 'jira'];
@@ -410,6 +411,10 @@ function parseGithubRepoFromRemote(
 export default async function plugin(bb: BbPluginApi) {
   const store = createWorkItemStore(bb);
   const credentials = createProjectCredentialVault(bb);
+  const execution = registerExecution(bb, {
+    assertProject: assertProjectExists,
+    getItem: task => getLiveItem(task.projectId, task.source, task.locator)
+  });
 
   async function liveProjects() {
     return bb.sdk.projects.list({ includePersonal: true });
@@ -1479,6 +1484,11 @@ export default async function plugin(bb: BbPluginApi) {
           `${sourceName(source)} item is no longer cached for this BB project`
         );
       }
+      if (execution.hasManagedExecution({projectId, source, locator})) {
+        const target = (await adapter.statusOptions(locator)).find(option => option.id === statusId);
+        if (!target) throw new Error('Tracker status is no longer available');
+        await execution.guardTrackerTransition({projectId, source, locator}, target);
+      }
       advanceSourceRevision(projectId, source);
       let externalItem: ExternalWorkItemDetail;
       try {
@@ -1605,6 +1615,7 @@ export default async function plugin(bb: BbPluginApi) {
   }
 
   const handlers: PluginRpcHandlers<typeof taskboardRpcContract> = {
+    ...execution.handlers,
     async listProjects() {
       return { projects: await listProjects() };
     },
