@@ -1,7 +1,7 @@
+/* oxlint-disable jsx-a11y/control-has-associated-label -- color swatches expose accessible labels dynamically. */
 import { definePluginApp, useSettings, useRpc } from "@get-bb/plugin-sdk/app";
 import { useEffect, useState } from "react";
-import type { rpcContract } from "./server";
-import type { Route } from "./server";
+import type { rpcContract, Route } from "./server";
 import "./app.css";
 
 const HIDDEN_REASONING_ATTRIBUTE = "data-jev-reasoning-hidden";
@@ -45,21 +45,31 @@ const COLOR_VALUES: Record<string, string> = {
   Blue: "#3b82f6",
   Violet: "#a855f7",
   Pink: "#ec4899",
-  Coral: "#fb7185", Amber: "#f59e0b", Lime: "#84cc16",
-  Emerald: "#10b981", Teal: "#14b8a6", Cyan: "#06b6d4",
-  Sky: "#0ea5e9", Indigo: "#6366f1", Lavender: "#c084fc",
-  Fuchsia: "#d946ef", Rose: "#f43f5e", Silver: "#94a3b8",
+  Coral: "#fb7185",
+  Amber: "#f59e0b",
+  Lime: "#84cc16",
+  Emerald: "#10b981",
+  Teal: "#14b8a6",
+  Cyan: "#06b6d4",
+  Sky: "#0ea5e9",
+  Indigo: "#6366f1",
+  Lavender: "#c084fc",
+  Fuchsia: "#d946ef",
+  Rose: "#f43f5e",
+  Silver: "#94a3b8",
 };
 
 function modelColor(model: string): string | null {
   const normalized = model.toLowerCase();
-  const colorName = modelColors[normalized] ?? (normalized.includes("astra")
-    ? modelColors.astra
-    : normalized.includes("sol")
-      ? modelColors.sol
-      : normalized.includes("luna")
-        ? modelColors.luna
-        : null);
+  const colorName =
+    modelColors[normalized] ??
+    (normalized.includes("astra")
+      ? modelColors.astra
+      : normalized.includes("sol")
+        ? modelColors.sol
+        : normalized.includes("luna")
+          ? modelColors.luna
+          : null);
   if (colorName) return COLOR_VALUES[colorName] ?? colorName;
   let hash = 0;
   for (const char of normalized) hash = (Math.imul(hash, 31) + char.charCodeAt(0)) >>> 0;
@@ -95,23 +105,16 @@ function providerLabel(providerId: string): string {
 
 function isSelectedModelOption(option: Element): boolean {
   if (option.getAttribute("aria-selected") === "true") return true;
-  return (
-    option.querySelector('[data-icon="Check"]')?.classList.contains("opacity-100") ??
-    false
-  );
+  return option.querySelector('[data-icon="Check"]')?.classList.contains("opacity-100") ?? false;
 }
 
 function syncJevComposer(): void {
   document.querySelector(`[data-jev-latest-switch]`)?.remove();
   for (const button of Array.from(
-    document.querySelectorAll(
-      'button[aria-label^="Provider, model and reasoning"]',
-    ),
+    document.querySelectorAll('button[aria-label^="Provider, model and reasoning"]'),
   )) {
     const isJev = /Jev (Codex Router|Routing)/i.test(button.textContent ?? "");
-    const staticEffort = button.querySelector(
-      "[data-promptbox-hide-compact]",
-    );
+    const staticEffort = button.querySelector("[data-promptbox-hide-compact]");
     if (staticEffort instanceof HTMLElement) {
       staticEffort.hidden = isJev;
       if (isJev) {
@@ -120,9 +123,7 @@ function syncJevComposer(): void {
         staticEffort.removeAttribute(HIDDEN_STATIC_EFFORT_ATTRIBUTE);
       }
     }
-    const existingBadge = button.parentElement?.querySelector(
-      `[${ROUTE_BADGE_ATTRIBUTE}]`,
-    );
+    const existingBadge = button.parentElement?.querySelector(`[${ROUTE_BADGE_ATTRIBUTE}]`);
 
     const jevExecution = activeExecution?.model === "jev/auto";
     const tracked =
@@ -153,15 +154,11 @@ function syncJevComposer(): void {
     }
 
     const badge =
-      existingBadge instanceof HTMLSpanElement
-        ? existingBadge
-        : document.createElement("span");
+      existingBadge instanceof HTMLSpanElement ? existingBadge : document.createElement("span");
     const modelLabel = shortModel(tracked.model);
     const effortLabel = tracked.effort;
     const switchLabel =
-      showSwitchHistory &&
-      tracked.previous !== null &&
-      tracked.previous !== tracked.model
+      showSwitchHistory && tracked.previous !== null && tracked.previous !== tracked.model
         ? `Switched from ${shortModel(tracked.previous)}`
         : null;
     const routeKey = [
@@ -241,18 +238,11 @@ function syncJevComposer(): void {
     if (existingBadge === null) button.after(badge);
   }
 
-  for (const dialog of Array.from(
-    document.querySelectorAll('[role="dialog"]'),
-  )) {
-    const jevOption = Array.from(
-      dialog.querySelectorAll('[role="option"]'),
-    ).find(
-      (option) =>
-        /Jev (Codex Router|Routing)/i.test(option.textContent ?? ""),
+  for (const dialog of Array.from(document.querySelectorAll('[role="dialog"]'))) {
+    const jevOption = Array.from(dialog.querySelectorAll('[role="option"]')).find((option) =>
+      /Jev (Codex Router|Routing)/i.test(option.textContent ?? ""),
     );
-    const reasoningGroup = dialog.querySelector(
-      '[role="radiogroup"][aria-label="Reasoning"]',
-    );
+    const reasoningGroup = dialog.querySelector('[role="radiogroup"][aria-label="Reasoning"]');
     const reasoningSection = reasoningGroup?.parentElement;
     if (!(reasoningSection instanceof HTMLElement)) continue;
 
@@ -273,20 +263,15 @@ function renderSwitchHistory(): void {
     existing?.remove();
     return;
   }
-  const panel =
-    existing instanceof HTMLDialogElement ? existing : document.createElement("dialog");
-  const pageCount = Math.max(
-    1,
-    Math.ceil(executionSwitches.length / HISTORY_PAGE_SIZE),
-  );
+  const panel = existing instanceof HTMLDialogElement ? existing : document.createElement("dialog");
+  const pageCount = Math.max(1, Math.ceil(executionSwitches.length / HISTORY_PAGE_SIZE));
   historyPage = Math.min(historyPage, pageCount - 1);
-  const historyKey = executionSwitches
-    .map((change) =>
-      [change.at, change.provider, change.from, change.to, change.reasoningLevel].join(
-        ":",
-      ),
-    )
-    .join("|") + `:page:${historyPage}:${JSON.stringify(modelColors)}`;
+  const historyKey =
+    executionSwitches
+      .map((change) =>
+        [change.at, change.provider, change.from, change.to, change.reasoningLevel].join(":"),
+      )
+      .join("|") + `:page:${historyPage}:${JSON.stringify(modelColors)}`;
   if (panel.getAttribute("data-jev-switch-key") === historyKey) return;
   panel.setAttribute("data-jev-switch-history", "");
   panel.setAttribute("data-jev-switch-key", historyKey);
@@ -315,10 +300,7 @@ function renderSwitchHistory(): void {
   }
   const newestFirst = [...executionSwitches].reverse();
   const pageStart = historyPage * HISTORY_PAGE_SIZE;
-  for (const change of newestFirst.slice(
-    pageStart,
-    pageStart + HISTORY_PAGE_SIZE,
-  )) {
+  for (const change of newestFirst.slice(pageStart, pageStart + HISTORY_PAGE_SIZE)) {
     const row = document.createElement("div");
     row.className = "jev-switch-row";
     const dot = document.createElement("span");
@@ -369,10 +351,7 @@ function renderSwitchHistory(): void {
   }
 }
 
-function positionSwitchHistoryDialog(
-  dialog: HTMLDialogElement,
-  anchor: HTMLElement,
-): void {
+function positionSwitchHistoryDialog(dialog: HTMLDialogElement, anchor: HTMLElement): void {
   const anchorRect = anchor.getBoundingClientRect();
   const dialogRect = dialog.getBoundingClientRect();
   const gutter = 12;
@@ -380,10 +359,7 @@ function positionSwitchHistoryDialog(
     window.innerWidth - dialogRect.width - gutter,
     Math.max(gutter, anchorRect.right - dialogRect.width),
   );
-  const top = Math.max(
-    gutter,
-    anchorRect.top - dialogRect.height - 8,
-  );
+  const top = Math.max(gutter, anchorRect.top - dialogRect.height - 8);
   dialog.style.left = `${left}px`;
   dialog.style.top = `${top}px`;
 }
@@ -457,26 +433,16 @@ async function refreshActiveRoute(signal: AbortSignal): Promise<void> {
       };
     };
     if (currentThreadId() !== threadId) return;
-    activeRoute =
-      response.ok && payload.ok === true ? (payload.result?.route ?? null) : null;
+    activeRoute = response.ok && payload.ok === true ? (payload.result?.route ?? null) : null;
     previousModel =
-      response.ok && payload.ok === true
-        ? (payload.result?.previousModel ?? null)
-        : null;
+      response.ok && payload.ok === true ? (payload.result?.previousModel ?? null) : null;
     activeExecution =
-      response.ok && payload.ok === true
-        ? (payload.result?.execution ?? null)
-        : null;
+      response.ok && payload.ok === true ? (payload.result?.execution ?? null) : null;
     previousExecutionModel =
-      response.ok && payload.ok === true
-        ? (payload.result?.previousExecutionModel ?? null)
-        : null;
-    executionSwitches =
-      response.ok && payload.ok === true ? (payload.result?.switches ?? []) : [];
-    showThreadRoute =
-      payload.result?.display?.showThreadRoute ?? true;
-    showSwitchHistory =
-      payload.result?.display?.showSwitchHistory ?? true;
+      response.ok && payload.ok === true ? (payload.result?.previousExecutionModel ?? null) : null;
+    executionSwitches = response.ok && payload.ok === true ? (payload.result?.switches ?? []) : [];
+    showThreadRoute = payload.result?.display?.showThreadRoute ?? true;
+    showSwitchHistory = payload.result?.display?.showSwitchHistory ?? true;
     modelColors = payload.result?.display?.modelColors ?? modelColors;
   } catch (cause) {
     if (cause instanceof DOMException && cause.name === "AbortError") return;
@@ -514,9 +480,7 @@ function mountJevReasoningVisibility(signal: AbortSignal): () => void {
     previousExecutionModel = null;
     executionSwitches = [];
     loadedThreadId = null;
-    for (const badge of Array.from(
-      document.querySelectorAll(`[${ROUTE_BADGE_ATTRIBUTE}]`),
-    )) {
+    for (const badge of Array.from(document.querySelectorAll(`[${ROUTE_BADGE_ATTRIBUTE}]`))) {
       badge.remove();
     }
     document.querySelector(`[data-jev-switch-history]`)?.remove();
@@ -548,9 +512,12 @@ function JevSettingsSummary() {
   const [color, setColor] = useState("#3b82f6");
   const [status, setStatus] = useState("");
   useEffect(() => {
-    void rpc.call("colors", {}).then(result => {
-      setColors(result);
-    }).catch(() => setStatus("Could not load colors"));
+    void rpc
+      .call("colors", {})
+      .then((result) => {
+        setColors(result);
+      })
+      .catch(() => setStatus("Could not load colors"));
   }, [rpc]);
   async function saveColor() {
     setStatus("Saving...");
@@ -560,34 +527,88 @@ function JevSettingsSummary() {
       modelColors = { ...modelColors, ...result };
       syncJevComposer();
       setStatus("Saved");
-    } catch { setStatus("Could not save color. Try again."); }
+    } catch {
+      setStatus("Could not save color. Try again.");
+    }
   }
   const routeVisible = settings.values?.showThreadRoute !== false;
   const switchesVisible = settings.values?.showSwitchHistory !== false;
 
   return (
     <div>
-    <div className="jev-settings-summary">
-      <div className="jev-settings-status">
-        <span className="jev-settings-status-dot" aria-hidden="true" />
-        <div>
-          <strong>Thread model tracking</strong>
-          <span>
-            {routeVisible ? "Visible in thread composers" : "Hidden in threads"}
-          </span>
+      <div className="jev-settings-summary">
+        <div className="jev-settings-status">
+          <span className="jev-settings-status-dot" aria-hidden="true" />
+          <div>
+            <strong>Thread model tracking</strong>
+            <span>{routeVisible ? "Visible in thread composers" : "Hidden in threads"}</span>
+          </div>
         </div>
+        <span className="jev-settings-history">
+          Switch history {switchesVisible ? "on" : "off"}
+        </span>
       </div>
-      <span className="jev-settings-history">
-        Switch history {switchesVisible ? "on" : "off"}
-      </span>
-    </div>
-    <div className="jev-color-editor">
-      <label>Model ID<input value={model} onChange={event => setModel(event.target.value)} placeholder="e.g. claude-opus-4-6" list="jev-colored-models" /></label>
-      <datalist id="jev-colored-models">{[...new Set(["luna", "sol", "astra", ...Object.keys(colors)])].map(id => <option key={id} value={id} />)}</datalist>
-      <div className="jev-color-swatches">{Object.entries(COLOR_VALUES).map(([name, value]) => <button key={name} type="button" aria-label={name} title={name} aria-pressed={color === value} style={{ backgroundColor: value }} onClick={() => setColor(value)} />)}</div>
-      <div className="jev-color-actions"><input type="color" aria-label="Custom model color" value={color} onChange={event => setColor(event.target.value)} /><button type="button" disabled={!model.trim() || status === "Saving..."} onClick={() => void saveColor()}>Save color</button><span role="status">{status}</span></div>
-      {Object.entries(colors).map(([id, value]) => <button className="jev-saved-color" key={id} type="button" onClick={() => { setModel(id); setColor(value); }}><span style={{ backgroundColor: value }} />{id}</button>)}
-    </div>
+      <div className="jev-color-editor">
+        <label>
+          Model ID
+          <input
+            value={model}
+            onChange={(event) => setModel(event.target.value)}
+            placeholder="e.g. claude-opus-4-6"
+            list="jev-colored-models"
+          />
+        </label>
+        <datalist id="jev-colored-models">
+          {[...new Set(["luna", "sol", "astra", ...Object.keys(colors)])].map((id) => (
+            <option key={id} value={id} />
+          ))}
+        </datalist>
+        {/* oxlint-disable-next-line jsx-a11y/control-has-associated-label -- each swatch has an accessible model-color name. */}
+        <div className="jev-color-swatches">
+          {Object.entries(COLOR_VALUES).map(([name, value]) => (
+            <button
+              key={name}
+              type="button"
+              aria-label={name}
+              title={name}
+              aria-pressed={color === value}
+              style={{ backgroundColor: value }}
+              onClick={() => setColor(value)}
+            />
+          ))}
+        </div>
+        <div className="jev-color-actions">
+          <input
+            type="color"
+            aria-label="Custom model color"
+            value={color}
+            onChange={(event) => setColor(event.target.value)}
+          />
+          <button
+            type="button"
+            aria-label="Save custom model color"
+            disabled={!model.trim() || status === "Saving..."}
+            onClick={() => void saveColor()}
+          >
+            Save color
+          </button>
+          <output>{status}</output>
+        </div>
+        {Object.entries(colors).map(([id, value]) => (
+          <button
+            className="jev-saved-color"
+            key={id}
+            type="button"
+            onClick={() => {
+              setModel(id);
+              setColor(value);
+            }}
+          >
+            <span style={{ backgroundColor: value }} />
+            {id}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
