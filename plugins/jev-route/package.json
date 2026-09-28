@@ -8,7 +8,21 @@
     "url": "git+https://github.com/MateoCerquetella/bb-plugins.git",
     "directory": "plugins/jev-route"
   },
+  "files": [
+    "dist/*.js",
+    "dist/*.css",
+    "dist/*.json",
+    "dist/*.map",
+    "ops/",
+    "runtime/",
+    "README.md",
+    "LICENSE",
+    "server.ts",
+    "app.tsx",
+    "app.css"
+  ],
   "scripts": {
+    "dev": "\"${BB_CLI:?Run bun run dev from the repository root}\" plugin dev .",
     "build": "env -u BB_CLI bb plugin build .",
     "typecheck": "tsc --noEmit",
     "test": "node --test --experimental-strip-types test/*.test.ts",

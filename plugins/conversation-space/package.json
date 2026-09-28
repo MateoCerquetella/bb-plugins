@@ -8,7 +8,23 @@
     "url": "git+https://github.com/MateoCerquetella/bb-plugins.git",
     "directory": "plugins/conversation-space"
   },
+  "files": [
+    "dist/*.js",
+    "dist/*.css",
+    "dist/*.json",
+    "dist/*.map",
+    "README.md",
+    "LICENSE",
+    "server.ts",
+    "app.tsx",
+    "app.css",
+    "jev.ts",
+    "session-view.tsx",
+    "session.ts",
+    "usage.ts"
+  ],
   "scripts": {
+    "dev": "\"${BB_CLI:?Run bun run dev from the repository root}\" plugin dev .",
     "build": "env -u BB_CLI bb plugin build .",
     "typecheck": "tsc --noEmit",
     "test": "node --test --experimental-strip-types test/*.test.ts",
