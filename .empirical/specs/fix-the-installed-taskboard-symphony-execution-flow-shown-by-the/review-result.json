@@ -1,7 +1,44 @@
 {
   "schemaVersion": 1,
-  "packetDigest": "sha256:386466f9fd1c966bf3b8dbaee4c794c461567edcdeab2fd031b9708c6fe38bbd",
-  "resultPath": ".empirical/specs/fix-the-installed-taskboard-symphony-execution-flow-shown-by-the/reviews/e9edcb8e36e223b93ee99662.json",
-  "resultDigest": "sha256:e9edcb8e36e223b93ee996621509647f513aacb246d4de2dd9452255105b824e",
-  "receiptId": "collected-6ece4cc7095e4cd329ba26bb"
+  "packetDigest": "sha256:8624f32989a91582883e9d354d70bbc8822333bf863463bd11ef30feb56dc350",
+  "resultPath": ".empirical/specs/fix-the-installed-taskboard-symphony-execution-flow-shown-by-the/reviews/5e2380b15812e772b1f1ac8f.json",
+  "resultDigest": "sha256:5e2380b15812e772b1f1ac8f25b542f2551b4eaec8ab6dcf2a2ca788c7e2e561",
+  "receiptId": "collected-3ee585737bd6ac063f2b421d",
+  "reReview": {
+    "previousResultDigest": "sha256:e9edcb8e36e223b93ee996621509647f513aacb246d4de2dd9452255105b824e",
+    "previousBaseCommit": "ea037e6cd1df7f1aecd9f1704f0349322a9d70d5",
+    "previousHeadCommit": "9b087b565648a84dd26b61f989da241f247eda16",
+    "previousVerdict": "CHANGES_REQUESTED",
+    "previousReview": "# Verdict: CHANGES_REQUESTED\n\n- PASS AC-1: Attached checkouts return the current symbolic branch and exact HEAD revision.\n- FAIL AC-2: Exact local refs and remote-default metadata are handled, but the configured initial-branch fallback requires an existing ref.\n- FAIL AC-3: Process spawn errors can escape the resolver boundary instead of producing repository guidance.\n- FAIL AC-4: The field is named, but generic branch validation does not state the correction.\n- PASS AC-5: Taskboard remains authoritative for workflow, verification, completion, and tracker state.\n- FAIL AC-6: Live reinstall/reload and successful defaults response remain to be performed.\n\n## Security / correctness\n\nNo security defect found. Correctness gaps remain in process-error normalization, configured-default fallback, and corrective validation guidance.\n\n## Design / maintainability\n\nThe resolver and error formatter are well separated. Complete the documented configured-default fallback, normalize spawn failures, and provide corrective branch guidance.",
+    "openFindings": [
+      {
+        "id": "F-1",
+        "severity": "medium",
+        "category": "acceptance",
+        "summary": "tryGit does not catch command rejection, leaking process errors instead of actionable repository guidance.",
+        "path": "plugins/taskboard/execution/defaults.ts"
+      },
+      {
+        "id": "F-2",
+        "severity": "medium",
+        "category": "acceptance",
+        "summary": "Configured init.defaultBranch is rejected unless a matching ref already exists.",
+        "path": "plugins/taskboard/execution/defaults.ts"
+      },
+      {
+        "id": "F-3",
+        "severity": "medium",
+        "category": "acceptance",
+        "summary": "Generic schema messages do not consistently tell the user how to correct the field.",
+        "path": "plugins/taskboard/execution/errors.ts"
+      },
+      {
+        "id": "F-4",
+        "severity": "medium",
+        "category": "acceptance",
+        "summary": "Live reinstall/reload and corrected executionDefaults evidence are pending."
+      }
+    ],
+    "deferredFindings": []
+  }
 }
