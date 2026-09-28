@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "taskboard-install-compatibility"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:2549717e98a6350ceba385338f9c61b1479220969c606378c7321dd935aa991d"
+}

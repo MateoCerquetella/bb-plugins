@@ -68,7 +68,7 @@ test('keeps Taskboard private and Git-buildable without npm publication hooks', 
     assert.equal(typeof rootManifest.scripts[script], 'string');
   }
   assert.equal(taskboardManifest.name, 'bb-plugin-taskboard');
-  assert.equal(taskboardManifest.version, '0.3.3');
+  assert.equal(taskboardManifest.version, '0.3.5-symphony.0');
   assert.equal(taskboardManifest.private, true);
   assert.equal('publishConfig' in taskboardManifest, false);
   assert.equal('files' in taskboardManifest, false);

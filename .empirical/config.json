@@ -10,7 +10,7 @@
   },
   "isolation": {
     "mode": "ask",
-    "baseBranch": "mine/main",
+    "baseBranch": "feat/taskboard-symphony",
     "worktreePath": "../{repo}-{feature}",
     "branchPattern": "{type}/{feature}"
   },
