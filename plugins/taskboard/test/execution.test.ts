@@ -34,6 +34,8 @@ const { createExecutionStore, EXECUTION_MIGRATION } =
 const { createExecutionManager } = await import('../execution/manager.ts');
 const { verifyExecution, command, git, inspectWorkspace } =
   await import('../execution/verification.ts');
+const { resolveExecutionDefaults } = await import('../execution/defaults.ts');
+const { formatExecutionError } = await import('../execution/errors.ts');
 const { formatWorkItemHandoffPrompt } = await import('../contract.ts');
 const { registerExecution } = await import('../execution/server.ts');
 const { Hono } = await import('hono');
@@ -130,6 +132,68 @@ test('local remains default and direct routes cannot silently select Symphony', 
     selectEngine('structured', 'symphony', { ...defaults, enabled: true }),
     'symphony'
   );
+});
+test('execution defaults support attached and detached project checkouts', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'taskboard-defaults-'));
+  const repository = join(root, 'repository');
+  await mkdir(repository);
+  try {
+    for (const args of [
+      ['init', '-b', 'main'],
+      ['config', 'user.email', 'test@example.invalid'],
+      ['config', 'user.name', 'Test']
+    ])
+      assert.equal((await command(['git', ...args], repository)).passed, true);
+    await writeFile(join(repository, 'file.txt'), 'base\n');
+    await command(['git', 'add', '.'], repository);
+    await command(['git', 'commit', '-m', 'base'], repository);
+    const head = await git(repository, 'rev-parse', 'HEAD');
+
+    assert.deepEqual(await resolveExecutionDefaults(repository), {
+      repository,
+      baseBranch: 'main',
+      baseRevision: head
+    });
+
+    await git(repository, 'checkout', '--detach');
+    assert.equal(
+      (await resolveExecutionDefaults(repository)).baseBranch,
+      'main'
+    );
+
+    await git(repository, 'update-ref', 'refs/remotes/origin/trunk', head);
+    await git(
+      repository,
+      'symbolic-ref',
+      'refs/remotes/origin/HEAD',
+      'refs/remotes/origin/trunk'
+    );
+    await git(repository, 'branch', '-D', 'main');
+    assert.equal(
+      (await resolveExecutionDefaults(repository)).baseBranch,
+      'trunk'
+    );
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+test('execution defaults and form validation report actionable fields', async () => {
+  await assert.rejects(
+    resolveExecutionDefaults('/definitely/not/a/taskboard/repository'),
+    error =>
+      error instanceof Error &&
+      /Repository: configure an accessible Git repository/.test(
+        error.message
+      ) &&
+      !error.message.includes('symbolic-ref')
+  );
+  const parsed = executionScopeSchema.safeParse({
+    ...scope(),
+    repository: ''
+  });
+  assert.equal(parsed.success, false);
+  if (!parsed.success)
+    assert.match(formatExecutionError(parsed.error), /^Repository: .+/);
 });
 test('normalization omits raw internal data and approval covers scope', () => {
   const request = normalizeExecutionRequest(

@@ -20,6 +20,7 @@ import {
   type ExecutionRun
 } from './contract.js';
 import { parseVerificationCommands } from './commands.js';
+import { formatExecutionError } from './errors.js';
 
 const labels: Record<ExecutionRun['state'], string> = {
   queued: 'Queued',
@@ -104,9 +105,7 @@ export function TaskExecution({ item }: { item: WorkItem }) {
     try {
       await work();
     } catch (failure) {
-      setError(
-        failure instanceof Error ? failure.message : 'Execution action failed'
-      );
+      setError(formatExecutionError(failure));
     } finally {
       pending.current = false;
       setBusy(false);

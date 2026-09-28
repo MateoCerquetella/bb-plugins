@@ -22,6 +22,7 @@ import {
 import { localEngine } from './engines/local/index.js';
 import { createSymphonyEngine } from './engines/symphony/index.js';
 import { git, inspectWorkspace, verifyExecution } from './verification.js';
+import { resolveExecutionDefaults } from './defaults.js';
 
 type Contract = typeof taskboardRpcContract;
 type ExecutionHandlers = Pick<
@@ -131,14 +132,7 @@ export function registerExecution(
         project.sources.find(source => source.isDefault) ?? project.sources[0];
       if (!source) throw new Error('Configure a project repository first');
       // Shared-workspace execution is intentionally limited to repository paths accessible to this server.
-      const baseBranch = await git(
-        source.path,
-        'symbolic-ref',
-        '--short',
-        'HEAD'
-      );
-      const baseRevision = await git(source.path, 'rev-parse', 'HEAD');
-      return { repository: source.path, baseBranch, baseRevision };
+      return resolveExecutionDefaults(source.path);
     },
     async prepareExecution(input) {
       const item = await currentItem(input.task);
