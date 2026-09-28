@@ -174,7 +174,12 @@ test('execution defaults support attached and detached project checkouts', async
       'trunk'
     );
 
-    await git(repository, 'update-ref', '-d', 'refs/remotes/origin/HEAD');
+    await git(
+      repository,
+      'symbolic-ref',
+      '--delete',
+      'refs/remotes/origin/HEAD'
+    );
     await git(repository, 'update-ref', '-d', 'refs/remotes/origin/trunk');
     await git(repository, 'config', 'init.defaultBranch', 'develop');
     assert.equal(
