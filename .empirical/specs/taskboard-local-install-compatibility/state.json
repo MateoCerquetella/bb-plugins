@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 11,
+  "revision": 14,
   "activeFeature": "taskboard-local-install-compatibility",
   "request": "Install Taskboard with its optional Symphony execution backend into live BB on this Mac. Preserve installed v0.3.4 GitHub status compatibility and hardened gh resolution by restoring the already-released adapter fixes on the execution branch. Keep tracker configuration, credentials and cached work during the supported plugin source switch. Install from a stable local checkout. Verify the loaded plugin and, for full setup, the pinned native Symphony service using the existing Codex login. No new UI, task planning policy, external message, paid coding task, or publication.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "implement",
+  "phase": "integrate",
   "status": "waiting",
   "repairAttempts": 1,
-  "message": "The already-committed required security consult records an advisory and observed checks addressing it. No implementation changes or acceptance changes needed. Re-review only the new artifact.",
+  "message": "Exact-revision focused verification passed all 143 tests and build/type metadata checks; independent review approved all non-UI criteria and the existing security consult. No further source or consult changes.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:be87f0e68cffeb96fe020e48a378038441b6131b3932025f4e7a65aa7b81397c",
@@ -20,23 +20,26 @@
   "capabilityClaimId": "taskboard-local-install-compatibility-caf37045e0a4",
   "authorizationDigest": null,
   "evidence": [],
-  "evidenceReceiptIds": [],
+  "evidenceReceiptIds": [
+    "collected-cda4918afcae1b3d38455dba",
+    "qa-13de7a50a12a9f7350371ae8",
+    "collected-a6e5cdb3475942184d08fa3e"
+  ],
   "legacyEvidenceCount": 0,
   "completion": {
     "implemented": true,
-    "verified": false,
+    "verified": true,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "implemented",
+    "highest": "verified",
     "reasons": {
-      "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-28T15:34:12.459Z",
+  "updatedAt": "2026-09-28T15:39:02.479Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "taskboard-local-install-compatibility-caf37045e0a4",
@@ -67,9 +70,17 @@
   },
   "trackerGeneration": 1,
   "lifecycle": {
-    "stage": "iteration",
+    "stage": "consolidation",
     "iteration": 1,
-    "awaitingFeedback": true
+    "awaitingFeedback": false
   },
-  "reviewFirst": true
+  "reviewFirst": true,
+  "verificationCoverage": {
+    "kind": "review-derived",
+    "checkId": "qa-fresh-context",
+    "receiptId": "collected-cda4918afcae1b3d38455dba",
+    "matrixDigest": "sha256:20594a31fccb0ef6c737e7b3415c94e82461807358a48ef52e46753c3e7d6b1a",
+    "specDigest": "sha256:be87f0e68cffeb96fe020e48a378038441b6131b3932025f4e7a65aa7b81397c",
+    "revision": 14
+  }
 }

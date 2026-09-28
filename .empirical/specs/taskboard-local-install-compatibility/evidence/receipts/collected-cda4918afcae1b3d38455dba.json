@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-cda4918afcae1b3d38455dba",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-09-28T15:36:20.693Z",
+  "completedAt": "2026-09-28T15:36:20.693Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "taskboard-local-install-compatibility",
+    "specRevision": 2,
+    "specDigest": "sha256:be87f0e68cffeb96fe020e48a378038441b6131b3932025f4e7a65aa7b81397c",
+    "treeDigest": "sha256:38a220e6cb770a88abdead8e970f1ade8e1424956f95b9b6b0d92c0baec04b6d",
+    "policyDigest": "sha256:168cfa9fe1a343bc5a02663b51d27fc4808f530064f01faa64abed49e9580803"
+  },
+  "digest": "sha256:146161b151b19e0b1dc4b383fa8b2923ccfd0637bbd9b0030e143e4a079459de",
+  "kind": "collected",
+  "collector": "empirical-review:install_consult_review",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/taskboard-local-install-compatibility/reviews/1de3ed331e52ddc0a709adbe.json",
+      "mediaType": "application/json",
+      "bytes": 2240,
+      "digest": "sha256:beb8d1d43494b3189b462e7caa42c1db24069ce2c1da5fc7d4c641b8c080f709"
+    },
+    {
+      "path": ".empirical/specs/taskboard-local-install-compatibility/reviews/1de3ed331e52ddc0a709adbe.md",
+      "mediaType": "text/markdown",
+      "bytes": 1455,
+      "digest": "sha256:9d118aed7ac64a89cffc785b2b7ac92c7e50b43b282d6bd7897d07f1112b0ecb"
+    }
+  ]
+}
