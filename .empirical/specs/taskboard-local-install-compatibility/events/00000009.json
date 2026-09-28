@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "sequence": 9,
+  "previousDigest": "sha256:ebdcb11acb183c21a6f167bb25b050ed5652763b0d83572678f5bd92806015c9",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Taskboard-focused verification passed 143 tests plus types/build/metadata. Independent review covers all non-UI criteria. Live installation, preserved data, service authentication and empty queue verified. Security consult is advisory; observed listener is loopback-only and missing/invalid Taskboard tokens each return 401.",
+  "createdAt": "2026-09-28T15:31:01.912Z",
+  "stateBeforeDigest": "sha256:4aef53f8ea593f00d35b6b39f5b6b9790ca842fbb053d719020946349facb577",
+  "stateAfterDigest": "sha256:586fb6204073d409ed30b66f11d0af1291200763f0415c1a07541df1f668aca9",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 9,
+    "activeFeature": "taskboard-local-install-compatibility",
+    "request": "Install Taskboard with its optional Symphony execution backend into live BB on this Mac. Preserve installed v0.3.4 GitHub status compatibility and hardened gh resolution by restoring the already-released adapter fixes on the execution branch. Keep tracker configuration, credentials and cached work during the supported plugin source switch. Install from a stable local checkout. Verify the loaded plugin and, for full setup, the pinned native Symphony service using the existing Codex login. No new UI, task planning policy, external message, paid coding task, or publication.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "integrate",
+    "status": "waiting",
+    "repairAttempts": 1,
+    "message": "Taskboard-focused verification passed 143 tests plus types/build/metadata. Independent review covers all non-UI criteria. Live installation, preserved data, service authentication and empty queue verified. Security consult is advisory; observed listener is loopback-only and missing/invalid Taskboard tokens each return 401.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:be87f0e68cffeb96fe020e48a378038441b6131b3932025f4e7a65aa7b81397c",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:bbb7dc756b0d4f90e8c4b093920b8419cf3a1897ac1558cba9b014812b015956",
+    "impactDigest": "sha256:2549717e98a6350ceba385338f9c61b1479220969c606378c7321dd935aa991d",
+    "capabilityClaimId": "taskboard-local-install-compatibility-caf37045e0a4",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "collected-4559bd422512ec8bebaebd95",
+      "qa-f8ad4edf3019e6b0056c253f",
+      "collected-a6e5cdb3475942184d08fa3e"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": true,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "verified",
+      "reasons": {
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-28T15:31:01.912Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "taskboard-local-install-compatibility-caf37045e0a4",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "taskboard-local-install-compatibility",
+      "worktree": "/Users/mateocerquetella/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_7bdrvui3s8-1/bb-plugins",
+      "worktreeId": "sha256:073ce177d297c60d57a1b5df11ed13a96daf60f831afb54937a2965d654e3eec",
+      "baseCommit": "ea037e6cd1df7f1aecd9f1704f0349322a9d70d5",
+      "baseTree": "57f47ec7ffea5d6babe677a9e25229b23214735a",
+      "bases": {
+        "taskboard-install-compatibility": {
+          "capability": "taskboard-install-compatibility",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "retain released github compatibility": null,
+            "preserve installation state": null
+          }
+        }
+      },
+      "capabilities": [
+        "taskboard-install-compatibility"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-09-28T14:42:02.157Z",
+      "heartbeatAt": "2026-09-28T14:42:02.157Z",
+      "digest": "sha256:72a29d4c06276a886d223d49e03a5023e02583ef67e771b667651d0c56253301"
+    },
+    "reviewFirst": true,
+    "verificationCoverage": {
+      "kind": "review-derived",
+      "checkId": "qa-fresh-context",
+      "receiptId": "collected-4559bd422512ec8bebaebd95",
+      "matrixDigest": "sha256:20594a31fccb0ef6c737e7b3415c94e82461807358a48ef52e46753c3e7d6b1a",
+      "specDigest": "sha256:be87f0e68cffeb96fe020e48a378038441b6131b3932025f4e7a65aa7b81397c",
+      "revision": 9
+    }
+  },
+  "digest": "sha256:b4280f6d8a6e3aaa717b492a33cc06a707fd3ee6457bac5e3e9648658f32e858"
+}

@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-a6e5cdb3475942184d08fa3e",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Observed live plugin running from stable source, all five project configurations and four credential files retained, all 361 old cached items retained, private backup, healthy pinned native runtime, service Codex login and initialize-only handshake; zero dispatched tasks.",
+  "passed": true,
+  "startedAt": "2026-09-28T15:29:23.500Z",
+  "completedAt": "2026-09-28T15:29:23.500Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "taskboard-local-install-compatibility",
+    "specRevision": 2,
+    "specDigest": "sha256:be87f0e68cffeb96fe020e48a378038441b6131b3932025f4e7a65aa7b81397c",
+    "treeDigest": "sha256:38a220e6cb770a88abdead8e970f1ade8e1424956f95b9b6b0d92c0baec04b6d",
+    "policyDigest": "sha256:168cfa9fe1a343bc5a02663b51d27fc4808f530064f01faa64abed49e9580803"
+  },
+  "digest": "sha256:d03a351f826413c3825469349ef6113e175db685cbed55fc6fad2e970fe1729d",
+  "kind": "collected",
+  "collector": "taskboard-local-install-observations",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/taskboard-local-install-compatibility/qa/installation.json",
+      "mediaType": "application/json",
+      "bytes": 1172,
+      "digest": "sha256:89af5e7d73090fce4b69399602d12f59f70afeb863d775a015c0330244f5d02d"
+    }
+  ]
+}

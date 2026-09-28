@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 6,
+  "revision": 9,
   "activeFeature": "taskboard-local-install-compatibility",
   "request": "Install Taskboard with its optional Symphony execution backend into live BB on this Mac. Preserve installed v0.3.4 GitHub status compatibility and hardened gh resolution by restoring the already-released adapter fixes on the execution branch. Keep tracker configuration, credentials and cached work during the supported plugin source switch. Install from a stable local checkout. Verify the loaded plugin and, for full setup, the pinned native Symphony service using the existing Codex login. No new UI, task planning policy, external message, paid coding task, or publication.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "implement",
+  "phase": "integrate",
   "status": "waiting",
   "repairAttempts": 1,
-  "message": "Review requests evidence for cached-work preservation (F-1/AC-2) and the service's Codex authentication (F-2/AC-3). Both observations are now available without dispatching work; record them and retry the focused QA with a realistic timeout after the 120-second environment timeout.",
+  "message": "Taskboard-focused verification passed 143 tests plus types/build/metadata. Independent review covers all non-UI criteria. Live installation, preserved data, service authentication and empty queue verified. Security consult is advisory; observed listener is loopback-only and missing/invalid Taskboard tokens each return 401.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:be87f0e68cffeb96fe020e48a378038441b6131b3932025f4e7a65aa7b81397c",
@@ -20,23 +20,26 @@
   "capabilityClaimId": "taskboard-local-install-compatibility-caf37045e0a4",
   "authorizationDigest": null,
   "evidence": [],
-  "evidenceReceiptIds": [],
+  "evidenceReceiptIds": [
+    "collected-4559bd422512ec8bebaebd95",
+    "qa-f8ad4edf3019e6b0056c253f",
+    "collected-a6e5cdb3475942184d08fa3e"
+  ],
   "legacyEvidenceCount": 0,
   "completion": {
     "implemented": true,
-    "verified": false,
+    "verified": true,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "implemented",
+    "highest": "verified",
     "reasons": {
-      "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-28T15:19:54.974Z",
+  "updatedAt": "2026-09-28T15:31:01.912Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "taskboard-local-install-compatibility-caf37045e0a4",
@@ -65,5 +68,13 @@
     "heartbeatAt": "2026-09-28T14:42:02.157Z",
     "digest": "sha256:72a29d4c06276a886d223d49e03a5023e02583ef67e771b667651d0c56253301"
   },
-  "reviewFirst": true
+  "reviewFirst": true,
+  "verificationCoverage": {
+    "kind": "review-derived",
+    "checkId": "qa-fresh-context",
+    "receiptId": "collected-4559bd422512ec8bebaebd95",
+    "matrixDigest": "sha256:20594a31fccb0ef6c737e7b3415c94e82461807358a48ef52e46753c3e7d6b1a",
+    "specDigest": "sha256:be87f0e68cffeb96fe020e48a378038441b6131b3932025f4e7a65aa7b81397c",
+    "revision": 9
+  }
 }
