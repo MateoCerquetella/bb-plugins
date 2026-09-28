@@ -19,7 +19,7 @@ and their current usage reading, without adding a navigation item or a separate
 plugin page.
 
 <p align="center">
-  <img src="./assets/usage-tracker-summary.png" width="248" alt="Compact Usage Tracker summary showing the highest provider usage and three additional providers" />
+  <img src="./assets/usage-tracker-summary.png" width="248" alt="Compact Usage Tracker summary showing usage across providers currently in use and three additional providers" />
 </p>
 
 <p align="center">
@@ -34,8 +34,9 @@ plugin page.
 
 - Shows Codex, Claude Code, Cursor, Grok, OpenCode, and Antigravity usage in BB's sidebar footer.
 - Lets you show or hide every provider independently; the strip compacts for
-  one or two providers and summarizes larger sets with the highest usage plus
-  an additional-provider count. It disappears when every provider is disabled.
+  one or two providers and summarizes larger sets with cumulative usage across
+  providers currently in use plus an additional-provider count. Idle providers
+  do not drive the summary. It disappears when every provider is disabled.
 - Opens the summary into a complete provider overview; select any overview row
   to drill into that provider's existing limit details.
 - Colors usage yellow from 80% and red from 95% in both compact and expanded
@@ -47,7 +48,7 @@ plugin page.
 - Shows reported USD credit usage and limits in expanded details, including the
   dollar amounts exposed by Claude Code usage data.
 - Works with BB's Account Pooler: when pooled accounts serve Claude Code or
-  Codex, the strip shows their combined, plan-weighted usage and the expanded
+  Codex, the strip shows the currently selected account and the expanded
   details list every pooled account's own limits.
 - Shows the available Codex usage resets in the expanded details.
 - Includes reset timing and provider session status in the expanded view.
@@ -126,19 +127,18 @@ Claude Code configuration directory.
 
 The collapsed strip is designed for quick scanning:
 
-- With more than two enabled providers, select the highest-usage summary to
+- With more than two enabled providers, select the active-usage summary to
   open the complete provider overview.
 - Select any provider reading to open its details in place.
 - Review the reported **5-hour limit**, **weekly limit**, every additional
   provider-defined window, their reset times, and any reported USD credits.
   Codex Pro accounts that do not report a five-hour limit omit that row.
-- With the Account Pooler enabled, a pooled provider's details start with the
-  combined reading across all its accounts, then one section per account with
-  its plan, status, and limits. The combined reading resets with the earliest
-  account.
-- For Codex, select **Use a reset…** to open a confirmation. Nothing is
+- With the Account Pooler enabled, a pooled provider's details show the current
+  account and one section per account with its plan, status, and limits.
+- For local Codex sessions, select **Use a reset…** to open a confirmation. Nothing is
   consumed until **Yes, use reset** is selected; canceling the confirmation
-  does not contact the reset-consumption endpoint.
+  does not contact the reset-consumption endpoint. Resets are unavailable for
+  pooled accounts because the reset API cannot target a specific pool account.
 - Select the same provider again, use the close button, press <kbd>Esc</kbd>,
   or click outside the details to collapse it.
 - Select the refresh icon to fetch every provider immediately.

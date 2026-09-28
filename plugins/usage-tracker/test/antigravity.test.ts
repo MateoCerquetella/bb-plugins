@@ -12,11 +12,12 @@ test("adds Antigravity without removing the v0.1.6 providers", () => {
     enabledSidebarProviderIds({
       enableClaudeCode: true,
       enableCodex: true,
+      enableCursor: true,
       enableGrok: true,
       enableOpenCode: true,
       enableAntigravity: true,
     }),
-    ["claudeCode", "codex", "grok", "openCode", "antigravity"],
+    ["claudeCode", "codex", "cursor", "grok", "openCode", "antigravity"],
   );
 });
 

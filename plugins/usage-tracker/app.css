@@ -449,6 +449,13 @@
   opacity: 0.78;
 }
 
+.usage-tracker-sidebar__overview-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+
 .usage-tracker-sidebar__overview-name {
   min-width: 0;
   overflow: hidden;
@@ -457,6 +464,32 @@
   line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.usage-tracker-sidebar__overview-account {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 0.625rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--muted-foreground);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.usage-tracker-sidebar__account-switch {
+  margin: 0.35rem 0.5rem 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--usage-sidebar-line);
+  border-radius: 0.375rem;
+  background: transparent;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.usage-tracker-sidebar__account-switch:hover {
+  background: var(--usage-sidebar-hover);
 }
 
 .usage-tracker-sidebar__overview-provider > .usage-tracker-sidebar__rail {
