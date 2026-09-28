@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 8,
+  "revision": 9,
   "activeFeature": "taskboard-symphony-execution",
   "request": "Integrate OpenAI Symphony as an optional execution backend in the existing Taskboard BB plugin (user corrected Taskmaster to Taskboard). Keep Taskboard authoritative for routing, plans, approvals, task context, acceptance criteria, verification, and external tracker status. Preserve existing local composer handoff by default; opt-in Symphony only for delegated or explicitly structured execution. Introduce an engine-neutral normalized execution DTO and persistent execution IDs, adapter-specific state mapping, cancellation/retry/restart recovery and duplicate protection, workspace context, existing UI execution status, configuration, authoritative verification/fix cycles, and regression/failure tests. Taskboard currently has tracker adapters, SQLite cache, RPC, background sync, composer handoff, and detail UI but no execution/workflow engine; do not claim these already exist. Symphony upstream is tracker-driven and has no HTTP run mutation API; use a real tested integration without inventing APIs or changing BB core. Implement and validate in this existing isolated feature checkout; do not publish.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "review",
+  "phase": "implement",
   "status": "waiting",
-  "repairAttempts": 0,
-  "message": "Updated architecture and commands with execution ownership, preserved local handoff, pinned runtime extension, independent verification and shared-workspace limitation. Context refresh reports no stale, missing, invalid, or refinement-required pages.",
+  "repairAttempts": 1,
+  "message": "Independent review failed AC-6 and AC-UI-1. Blocking findings F-1 and F-2 require a strict start-request projection and complete Git-output fingerprinting, with schema-validating browser and large-input regressions.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:95a8cdc3f2754ae0a5c3fbb95bb46544e7dc1f07ca7bae776a0b1ae65427a3b7",
@@ -36,7 +36,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-28T03:19:22.465Z",
+  "updatedAt": "2026-09-28T03:26:06.881Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "taskboard-symphony-execution-caf37045e0a4",

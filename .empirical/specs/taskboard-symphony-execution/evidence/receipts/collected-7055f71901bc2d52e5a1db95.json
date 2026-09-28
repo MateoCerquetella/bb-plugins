@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-7055f71901bc2d52e5a1db95",
+  "criteria": [
+    "AC-1",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Actual Taskboard plugin rendered in isolated BB 0.40.0 at 127.0.0.1:50577 with synthetic RPC fixtures. Browser test passed disabled local action compatibility, review, single dispatch, running state, explicit acceptance review, and mobile verified state. All four screenshots were inspected. This is UI evidence, not a live Symphony coding run.",
+  "passed": true,
+  "startedAt": "2026-09-28T03:21:55.325Z",
+  "completedAt": "2026-09-28T03:21:55.325Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "taskboard-symphony-execution",
+    "specRevision": 4,
+    "specDigest": "sha256:95a8cdc3f2754ae0a5c3fbb95bb46544e7dc1f07ca7bae776a0b1ae65427a3b7",
+    "treeDigest": "sha256:fabaa381d599870e909fc696ebd8abb82365f2aa70a3993c32c027650f5b6cb6",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:8cbac7be37dfe68d70708cca3725ffd31867c45a00dceb6339d74f1660dedeea",
+  "kind": "collected",
+  "collector": "isolated-bb-taskboard-browser-fixture",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/taskboard-symphony-execution/qa/local.png",
+      "mediaType": "image/png",
+      "bytes": 60000,
+      "digest": "sha256:d315ea5a9f5512bd66276604aee484326761c4eb807d6df6095631c1fc03eb3c"
+    },
+    {
+      "path": ".empirical/specs/taskboard-symphony-execution/qa/mobile-verified.png",
+      "mediaType": "image/png",
+      "bytes": 45618,
+      "digest": "sha256:4a1e66b51f38b012a023cb559a59434274aa2da9105b4adcc3f5753418dbed5f"
+    },
+    {
+      "path": ".empirical/specs/taskboard-symphony-execution/qa/result.json",
+      "mediaType": "application/json",
+      "bytes": 432,
+      "digest": "sha256:86c523824346a0862cd869369cbe56a33452be00c3f1ac0c6cb75e381a0e10c6"
+    },
+    {
+      "path": ".empirical/specs/taskboard-symphony-execution/qa/review.png",
+      "mediaType": "image/png",
+      "bytes": 96107,
+      "digest": "sha256:b35cae97bf789ace6e16873477795fdd7464b95f70da1ff3ea8b515882aeadc3"
+    },
+    {
+      "path": ".empirical/specs/taskboard-symphony-execution/qa/running.png",
+      "mediaType": "image/png",
+      "bytes": 94983,
+      "digest": "sha256:5ac6e46a4fbf9de66f463fa0da308ac27f5105edb4e8ed193f570f80267a732c"
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
+import { executionRpc } from '../../../../plugins/taskboard/execution/contract.ts';
 const { chromium } = await import(
   pathToFileURL(
     process.env.PLAYWRIGHT_MODULE ||
@@ -34,7 +35,10 @@ let enabled = false;
 let run = null;
 let dispatched = 0;
 const pageErrors = [];
-const browser = await chromium.launch({ headless: true, executablePath:process.env.TASKBOARD_CHROMIUM });
+const browser = await chromium.launch({
+  headless: true,
+  executablePath: process.env.TASKBOARD_CHROMIUM
+});
 const page = await browser.newPage({
   viewport: { width: 1440, height: 1080 },
   deviceScaleFactor: 1
@@ -43,7 +47,21 @@ page.on('pageerror', error => pageErrors.push(error.message));
 await page.route('**/api/v1/plugins/taskboard/rpc/*', async route => {
   const method = new URL(route.request().url()).pathname.split('/').at(-1);
   let result;
-  const input = route.request().postDataJSON();
+  const rawInput = route.request().postDataJSON();
+  const schema = executionRpc[method];
+  const parsed = schema?.input.safeParse(rawInput);
+  if (parsed && !parsed.success) {
+    await route.fulfill({
+      status: 400,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        ok: false,
+        error: { code: 'invalid_input', message: parsed.error.message }
+      })
+    });
+    return;
+  }
+  const input = parsed ? parsed.data : rawInput;
   switch (method) {
     case 'getItem':
       result = { item };

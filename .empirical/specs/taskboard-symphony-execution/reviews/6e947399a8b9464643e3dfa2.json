@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:aefe65968d2db16ec7c3ab76e210666158651d7e578dd99268b3cff722c4a4b1",
+  "mode": "fresh-context",
+  "baseRef": "mine/main",
+  "baseCommit": "9614dd51fc203d740614aba4de44f31cda50ec04",
+  "headCommit": "8418eeb34aa96bbac54dddbe18598ff4ad0ffb5b",
+  "diffDigest": "sha256:59b0891bb7ed337eae3f2ab784d4c610131442821507f6a6c3349ba22b7f780c",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "/root/taskboard_review",
+  "reviewerInvocationId": "/root/taskboard_review",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- PASS AC-1: The existing composer handoff remains unchanged. Direct routes select local execution; delegated and structured routes explicitly select their backend.\n- PASS AC-2: The backend persists versioned requests, binds dispatch to the normalized request digest, and uses durable dispatch uniqueness plus generation checks. The separate UI dispatch defect is reported under AC-UI-1.\n- PASS AC-3: The adapter pins a real Symphony revision, implements its tracker boundary, uses observation/refresh endpoints, and supplies isolated workspaces and implementation-only context.\n- PASS AC-4: Execution states and runtime/Git metadata are persisted separately from external tracker completion.\n- PASS AC-5: The implementation provides durable unavailable-runtime handling, cancellation acknowledgement, retry/time budgets, generation-based resume, and preserved workspaces. Reviewed evidence includes synthetic runtime tests rather than a live coding-agent lifecycle.\n- FAIL AC-6: F-2: declared-input fingerprints hash silently truncated git ls-tree output, allowing stale passing evidence to survive changes beyond the output limit.\n- PASS AC-7: Managed execution is opt-in, authenticated HTTP carries the runtime token, context generation omits that token, and existing provider adapters remain responsible for external status writes.\n- FAIL AC-UI-1: F-1: the real approval request violates its strict RPC schema, preventing managed execution from starting through the UI. The committed browser fixture bypasses this validation.\n\n## Security / correctness\n\nChanges required. The approval path cannot dispatch through the real RPC contract, and verification can reuse stale evidence. A read-only execution of the packet's command helper confirmed that distinct successful outputs sharing the first 32,000 characters produce identical retained output and fingerprints. No additional blocking security finding was established.\n\n## Design / maintainability\n\nThe engine, persistence, verification, and UI responsibilities are separated clearly. The blockers expose missing boundary coverage: browser fixtures do not validate the production RPC schema, and cache tests cover only small Git listings. Add focused regression coverage alongside both fixes.",
+  "bodyDigest": "sha256:6095208d837e36ed7178c45541f2d6e730aa68c609733e75e9f921d3f8501b5b",
+  "findings": [
+    {
+      "id": "F-1",
+      "severity": "high",
+      "category": "acceptance",
+      "summary": "setPrepared(result) retains engine and prompt from prepareExecution; approve() then spreads those fields into startExecution at lines 160–163, whose strict schema permits only request, digest, and dispatchKey. Every real managed approval is rejected for unknown fields. Store or send only the permitted fields and exercise approval through actual RPC validation.",
+      "path": "plugins/taskboard/execution/panel.tsx:153"
+    },
+    {
+      "id": "F-2",
+      "severity": "high",
+      "category": "correctness",
+      "summary": "Declared-input fingerprints use git ls-tree through command(), which silently truncates successful output to 32,000 characters at lines 28–30. For a large declared directory, a fix iteration changing files after that prefix retains the same fingerprint and reuses stale passing checks. Hash the complete Git listing or fail on truncation, and test a change beyond the current limit.",
+      "path": "plugins/taskboard/execution/verification.ts:127"
+    }
+  ],
+  "digest": "sha256:6e947399a8b9464643e3dfa24a1ae6cc606eb321ba293086e23498dc51971a37"
+}

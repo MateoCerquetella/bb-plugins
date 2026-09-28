@@ -8,7 +8,8 @@ export async function command(
   argv: string[],
   cwd: string,
   timeoutMs = 30_000,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  capture: 'text' | 'sha256' = 'text'
 ): Promise<{ passed: boolean; output: string }> {
   return new Promise((resolve, reject) => {
     const env = Object.fromEntries(
@@ -23,12 +24,16 @@ export async function command(
       detached: process.platform !== 'win32'
     });
     let output = '';
+    const stdoutHash = createHash('sha256');
     let timedOut = false;
     const collect = (data: Buffer) => {
       if (output.length < 32_000)
         output += data.toString('utf8').slice(0, 32_000 - output.length);
     };
-    child.stdout.on('data', collect);
+    child.stdout.on('data', (data: Buffer) => {
+      stdoutHash.update(data);
+      collect(data);
+    });
     child.stderr.on('data', collect);
     const stop = () => {
       timedOut = true;
@@ -55,7 +60,11 @@ export async function command(
       cleanup();
       resolve({
         passed: code === 0 && !timedOut,
-        output: timedOut ? 'Required check stopped or timed out' : output.trim()
+        output: timedOut
+          ? 'Required check stopped or timed out'
+          : capture === 'sha256' && code === 0
+            ? stdoutHash.digest('hex')
+            : output.trim()
       });
     });
   });
@@ -73,6 +82,34 @@ export async function git(cwd: string, ...args: string[]): Promise<string> {
     cwd
   );
   if (!result.passed) throw new Error(`Git validation failed: ${args[0]}`);
+  return result.output;
+}
+/** Hash the complete byte stream; the display-output cap must never affect evidence identity. */
+async function gitInputDigest(
+  cwd: string,
+  head: string,
+  inputs: string[]
+): Promise<string> {
+  const result = await command(
+    [
+      'git',
+      '-c',
+      'core.hooksPath=/dev/null',
+      '-c',
+      'core.fsmonitor=false',
+      'ls-tree',
+      '-rz',
+      head,
+      '--',
+      ...inputs
+    ],
+    cwd,
+    30_000,
+    undefined,
+    'sha256'
+  );
+  if (!result.passed)
+    throw new Error('Could not fingerprint all verification inputs');
   return result.output;
 }
 export async function inspectWorkspace(run: ExecutionRun): Promise<string> {
@@ -125,7 +162,7 @@ export async function verifyExecution(
   const checks: CheckResult[] = [];
   for (const check of run.request.scope.verificationRequirements) {
     const content = check.inputs.length
-      ? await git(run.workspace, 'ls-tree', '-r', head, '--', ...check.inputs)
+      ? await gitInputDigest(run.workspace, head, check.inputs)
       : await git(run.workspace, 'rev-parse', `${head}^{tree}`);
     const fingerprint = createHash('sha256')
       .update(JSON.stringify([run.digest, check, content]))

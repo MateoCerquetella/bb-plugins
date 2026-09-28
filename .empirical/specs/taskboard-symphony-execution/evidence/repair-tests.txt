@@ -1,0 +1,20 @@
+✔ local remains default and direct routes cannot silently select Symphony (5.952513ms)
+✔ normalization omits raw internal data and approval covers scope (8.301155ms)
+✔ concurrent duplicate dispatch and restart preserve one execution (75.749095ms)
+✔ unavailable Symphony persists intent and never assumes success from 404 (4.830515ms)
+✔ state mapping never maps an agent finish to done or verified (0.61319ms)
+✔ runtime retries, failure, resume generations and duplicate events are durable (7.52861ms)
+✔ cancellation wins over late handoff and needs runtime acknowledgement (7.696524ms)
+✔ implementation handoff requires a revision and independent verification (3.813664ms)
+✔ fix creation atomically preserves approved scope, feedback, and duplicate protection (24.392087ms)
+✔ HTTP adapter uses actual Symphony observation and refresh routes (64.077108ms)
+✔ tracker cancellation uses Taskboard reads; completion is guarded and restart recovers verification (16.117602ms)
+✔ verification binds checks to Git content and refuses dirty, changed or deleted branches (10717.494929ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11776.329018

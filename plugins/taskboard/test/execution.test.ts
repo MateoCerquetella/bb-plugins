@@ -551,6 +551,78 @@ test('verification binds checks to Git content and refuses dirty, changed or del
     });
     assert.equal(changed.checks[0]!.passed, false);
     assert.equal(changed.checks[0]!.reused, false);
+    const largeDirectory = join(workspace, 'large');
+    await mkdir(largeDirectory);
+    for (let index = 0; index < 700; index++) {
+      await writeFile(
+        join(
+          largeDirectory,
+          `input-${String(index).padStart(4, '0')}-with-long-name.txt`
+        ),
+        'approved\n'
+      );
+    }
+    await git(workspace, 'add', '.');
+    await git(
+      workspace,
+      '-c',
+      'user.email=test@example.invalid',
+      '-c',
+      'user.name=Test',
+      'commit',
+      '-m',
+      'large declared input'
+    );
+    const largeRequest = normalizeExecutionRequest(item, {
+      ...request.scope,
+      verificationRequirements: [
+        {
+          id: 'large-directory',
+          argv: [
+            process.execPath,
+            '-e',
+            'if(require("fs").readFileSync("large/input-0699-with-long-name.txt","utf8")!=="approved\\n")process.exit(1)'
+          ],
+          inputs: ['large'],
+          timeoutMs: 1000
+        }
+      ]
+    });
+    const largeRun = {
+      ...run,
+      request: largeRequest,
+      digest: requestDigest(largeRequest),
+      head: await git(workspace, 'rev-parse', 'HEAD'),
+      checks: []
+    };
+    assert.ok(
+      (await git(workspace, 'ls-tree', '-r', 'HEAD', '--', 'large')).length >
+        31_000
+    );
+    const largePassed = await verifyExecution(largeRun);
+    assert.equal(largePassed.checks[0]!.passed, true);
+    await writeFile(
+      join(largeDirectory, 'input-0699-with-long-name.txt'),
+      'regression\n'
+    );
+    await git(workspace, 'add', '.');
+    await git(
+      workspace,
+      '-c',
+      'user.email=test@example.invalid',
+      '-c',
+      'user.name=Test',
+      'commit',
+      '-m',
+      'change beyond display output limit'
+    );
+    const largeFailed = await verifyExecution({
+      ...largeRun,
+      head: await git(workspace, 'rev-parse', 'HEAD'),
+      checks: largePassed.checks
+    });
+    assert.equal(largeFailed.checks[0]!.reused, false);
+    assert.equal(largeFailed.checks[0]!.passed, false);
     await git(workspace, 'checkout', '--detach');
     await assert.rejects(inspectWorkspace(run), /Git validation failed/);
     assert.equal(

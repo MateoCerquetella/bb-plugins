@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-8b6e4c7fb87a018462b6e0b6",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Taskboard check passed 130 tests plus SDK types, typecheck, build and metadata. Pinned OpenAI Symphony extension compiled and 100 adapter/workspace/orchestrator tests passed. Full workspace check passed before the independent mine/main update; the affected Taskboard distribution test passed after the merge. No paid coding run or real tracker writes.",
+  "passed": true,
+  "startedAt": "2026-09-28T03:21:52.789Z",
+  "completedAt": "2026-09-28T03:21:52.789Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "taskboard-symphony-execution",
+    "specRevision": 4,
+    "specDigest": "sha256:95a8cdc3f2754ae0a5c3fbb95bb46544e7dc1f07ca7bae776a0b1ae65427a3b7",
+    "treeDigest": "sha256:fabaa381d599870e909fc696ebd8abb82365f2aa70a3993c32c027650f5b6cb6",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:8abf627f6e17fcdafe4ba8dbcebf205f1d4a70ad2a577cb5e6de2ba2ec15c469",
+  "kind": "collected",
+  "collector": "taskboard-integration-validation",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/taskboard-symphony-execution/evidence/symphony-tests.txt",
+      "mediaType": "text/plain",
+      "bytes": 277,
+      "digest": "sha256:e0789b028a54a15983fc09178c196ab25dfb9389baa6185d485e28999d26592b"
+    },
+    {
+      "path": ".empirical/specs/taskboard-symphony-execution/evidence/taskboard-check.txt",
+      "mediaType": "text/plain",
+      "bytes": 11756,
+      "digest": "sha256:f2b01bac8d9d957daae7a7c252c51a62f908d8f64d9aaea8ebbb6031be7a64cc"
+    },
+    {
+      "path": ".empirical/specs/taskboard-symphony-execution/evidence/workspace-check.txt",
+      "mediaType": "text/plain",
+      "bytes": 58952,
+      "digest": "sha256:da5934882e55f2a81fdb2d66d575163cf87ec216c1b2e91f0665cdf3af3fe891"
+    }
+  ]
+}

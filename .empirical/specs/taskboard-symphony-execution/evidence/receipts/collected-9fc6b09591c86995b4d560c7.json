@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-9fc6b09591c86995b4d560c7",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review requested changes to the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-09-28T03:25:38.528Z",
+  "completedAt": "2026-09-28T03:25:38.528Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "taskboard-symphony-execution",
+    "specRevision": 4,
+    "specDigest": "sha256:95a8cdc3f2754ae0a5c3fbb95bb46544e7dc1f07ca7bae776a0b1ae65427a3b7",
+    "treeDigest": "sha256:fabaa381d599870e909fc696ebd8abb82365f2aa70a3993c32c027650f5b6cb6",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:571a746156326e76dbad4faa3f4a18834ba750883128e1e38c0aa7584090452f",
+  "kind": "collected",
+  "collector": "empirical-review:/root/taskboard_review",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/taskboard-symphony-execution/reviews/6e947399a8b9464643e3dfa2.json",
+      "mediaType": "application/json",
+      "bytes": 4138,
+      "digest": "sha256:ba5166fd9201e0bcf837676d7454b0da9f7dbed1c068f72e4c9a21b4063c2384"
+    },
+    {
+      "path": ".empirical/specs/taskboard-symphony-execution/reviews/6e947399a8b9464643e3dfa2.md",
+      "mediaType": "text/markdown",
+      "bytes": 2279,
+      "digest": "sha256:9c5a876a5329931ec99bf0442a9b39aa4e033ceaf7da01247db682517a1b7cdd"
+    }
+  ]
+}

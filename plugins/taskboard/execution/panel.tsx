@@ -150,7 +150,7 @@ export function TaskExecution({ item }: { item: WorkItem }) {
         navigate.toCompose({ initialPrompt: result.prompt, focusPrompt: true });
         return;
       }
-      setPrepared(result);
+      setPrepared({ request: result.request, digest: result.digest });
       dispatchKey.current = crypto.randomUUID();
     });
   }
@@ -158,7 +158,8 @@ export function TaskExecution({ item }: { item: WorkItem }) {
     await perform(async () => {
       if (!prepared) return;
       const next = await rpc.call('startExecution', {
-        ...prepared,
+        request: prepared.request,
+        digest: prepared.digest,
         dispatchKey: dispatchKey.current
       });
       setRun(next);
