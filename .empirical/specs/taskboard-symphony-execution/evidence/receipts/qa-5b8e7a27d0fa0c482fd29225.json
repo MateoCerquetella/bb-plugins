@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-5b8e7a27d0fa0c482fd29225",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "The user explicitly approved the implemented result with 'approve and go' after being shown the final implementation summary, actual-plugin desktop/mobile screenshot report, test results, limitations, and the request for final human QA acceptance. This records that human acceptance; it does not represent a paid live agent run or external tracker mutation.",
+  "passed": true,
+  "startedAt": "2026-09-28T04:29:51.168Z",
+  "completedAt": "2026-09-28T04:29:51.168Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "taskboard-symphony-execution",
+    "specRevision": 4,
+    "specDigest": "sha256:95a8cdc3f2754ae0a5c3fbb95bb46544e7dc1f07ca7bae776a0b1ae65427a3b7",
+    "treeDigest": "sha256:843d7854758d4c94231cb7b4d659a7aeade6013ed234999445fde399c71950ce",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 13,
+    "gitCommit": "c75809baec1a9c470df3ae53a4b4dde385c5bc16",
+    "textTreeDigest": "sha256:843d7854758d4c94231cb7b4d659a7aeade6013ed234999445fde399c71950ce"
+  },
+  "digest": "sha256:eb75b995576d54879c9ea7fe9cec4a48b5c02ca5a402b54fc8b6edda21c1b7a6",
+  "kind": "qa",
+  "matrixDigest": "sha256:0235a3519b8fb142dc8d12d1716da214592f941c69f8d2ce5fbc499d19063208",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "x64",
+    "node": "24.21.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "The user explicitly approved the implemented result with 'approve and go' after being shown the final implementation summary, actual-plugin desktop/mobile screenshot report, test results, limitations, and the request for final human QA acceptance. This records that human acceptance; it does not represent a paid live agent run or external tracker mutation.",
+      "startedAt": "2026-09-28T04:29:51.168Z",
+      "completedAt": "2026-09-28T04:29:51.168Z",
+      "durationMs": 0,
+      "collector": "user-acceptance:thr_7bdrvui3s8",
+      "command": null,
+      "result": null,
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:843d7854758d4c94231cb7b4d659a7aeade6013ed234999445fde399c71950ce",
+      "sourceTreeAfter": "sha256:843d7854758d4c94231cb7b4d659a7aeade6013ed234999445fde399c71950ce",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/taskboard-symphony-execution/qa/mobile-verified.png",
+          "mediaType": "image/png",
+          "bytes": 45618,
+          "digest": "sha256:4a1e66b51f38b012a023cb559a59434274aa2da9105b4adcc3f5753418dbed5f"
+        },
+        {
+          "path": ".empirical/specs/taskboard-symphony-execution/qa/result.json",
+          "mediaType": "application/json",
+          "bytes": 432,
+          "digest": "sha256:86c523824346a0862cd869369cbe56a33452be00c3f1ac0c6cb75e381a0e10c6"
+        },
+        {
+          "path": ".empirical/specs/taskboard-symphony-execution/qa/review.png",
+          "mediaType": "image/png",
+          "bytes": 101740,
+          "digest": "sha256:4697154fdd73e3d47e44ac1700a7c01d712fbaf324c4c3c672d2bdce95a1dab5"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}
