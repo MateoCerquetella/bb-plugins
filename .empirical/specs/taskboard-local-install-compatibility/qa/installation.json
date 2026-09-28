@@ -1,0 +1,23 @@
+{
+  "at": "2026-09-28T15:11:43.697483+00:00",
+  "pluginVersion": "0.3.5-symphony.0",
+  "pluginRunning": true,
+  "stableSource": true,
+  "projectConfigurationsPreserved": true,
+  "credentialFilesPreserved": 4,
+  "cachedWorkItemsBeforeMigration": 361,
+  "privateBackupCreated": true,
+  "runtime": "OpenAI Symphony be10a1b79df723d6d7612b5651c8522704dafb2e with Taskboard adapter",
+  "toolchain": "Erlang/OTP 28, Elixir 1.19.5",
+  "nativeRuntimeHealthy": true,
+  "runtimeCounts": {
+    "blocked": 0,
+    "running": 0,
+    "retrying": 0
+  },
+  "credentialFileMode": "0o600",
+  "startsAtLogin": true,
+  "managedExecutionEnabled": true,
+  "defaultEngine": "symphony",
+  "taskDispatchedByInstaller": false
+}
