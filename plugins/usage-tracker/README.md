@@ -48,7 +48,7 @@ plugin page.
 - Shows reported USD credit usage and limits in expanded details, including the
   dollar amounts exposed by Claude Code usage data.
 - Works with BB's Account Pooler: when pooled accounts serve Claude Code or
-  Codex, the strip shows their combined, plan-weighted usage and the expanded
+  Codex, the strip shows the currently selected account and the expanded
   details list every pooled account's own limits.
 - Shows the available Codex usage resets in the expanded details.
 - Includes reset timing and provider session status in the expanded view.

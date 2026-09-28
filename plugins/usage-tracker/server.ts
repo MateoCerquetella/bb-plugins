@@ -254,7 +254,10 @@ export default function plugin(bb: BbPluginApi) {
           ]
         : snapshot.providers.filter((provider) => provider.id !== "antigravity");
       const codexIsAvailable = snapshot.providers.some(
-        (provider) => provider.id === "codex" && provider.status === "ok",
+        (provider) =>
+          provider.id === "codex" &&
+          provider.status === "ok" &&
+          (provider.accounts?.length ?? 0) === 0,
       );
       if (codexIsAvailable) {
         try {

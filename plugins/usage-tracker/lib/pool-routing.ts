@@ -14,6 +14,7 @@ export interface PoolAccountRecord {
   label: string;
   enabled: boolean;
   status: string;
+  priority: number;
   lastUsedAt: number | null;
   inFlight: number;
 }
@@ -76,6 +77,7 @@ export function parsePoolAccountList(payload: unknown): PoolAccountRecord[] {
       label: typeof record.label === "string" ? record.label : id,
       enabled: record.enabled === true,
       status: typeof record.status === "string" ? record.status : "unknown",
+      priority: typeof record.priority === "number" ? record.priority : 100,
       lastUsedAt:
         typeof record.lastUsedAt === "number" ? record.lastUsedAt : null,
       inFlight: typeof record.inFlight === "number" ? record.inFlight : 0,
@@ -98,37 +100,92 @@ async function runPool(args: string[]): Promise<string> {
   return stdout;
 }
 
-export async function loadPoolAccountRecords(): Promise<PoolAccountRecord[]> {
+export async function loadPoolAccountRecords(
+  run: (args: string[]) => Promise<string> = runPool,
+): Promise<PoolAccountRecord[]> {
   try {
-    const stdout = await runPool(["account", "list", "--json"]);
+    const stdout = await run(["account", "list", "--json"]);
     return parsePoolAccountList(JSON.parse(stdout) as unknown);
   } catch {
     return [];
   }
 }
 
-export async function switchPoolAccount(
+export interface PoolSwitchDependencies {
+  loadAccounts?: () => Promise<PoolAccountRecord[]>;
+  run?: (args: string[]) => Promise<string>;
+}
+
+let switchQueue: Promise<void> = Promise.resolve();
+
+async function restorePoolAccounts(
+  provider: PoolProvider,
+  accounts: readonly PoolAccountRecord[],
+  run: (args: string[]) => Promise<string>,
+): Promise<void> {
+  const order = accounts.map((account) => account.id);
+  if (order.length > 0) {
+    await run(["account", "reorder", provider, ...order]);
+  }
+  for (const account of accounts) {
+    await run(["account", "priority", account.id, String(account.priority)]);
+    await run([
+      "account",
+      account.enabled ? "enable" : "disable",
+      account.id,
+    ]);
+  }
+}
+
+async function performPoolAccountSwitch(
   providerId: ProviderId,
   accountId: string,
+  dependencies: PoolSwitchDependencies,
 ): Promise<void> {
   const provider = poolProviderFor(providerId);
   if (provider === null) {
     throw new Error("This provider is not routed through Account Pooler.");
   }
-  const accounts = await loadPoolAccountRecords();
+  const run = dependencies.run ?? runPool;
+  const accounts = await (dependencies.loadAccounts?.() ??
+    loadPoolAccountRecords(run));
   const mine = accounts.filter((account) => account.provider === provider);
   if (!mine.some((account) => account.id === accountId)) {
     throw new Error("That account is not in Account Pooler.");
   }
-  await runPool(["account", "enable", accountId]);
-  const order = [
-    accountId,
-    ...mine.map((account) => account.id).filter((id) => id !== accountId),
-  ];
-  await runPool(["account", "reorder", provider, ...order]);
-  await runPool(["account", "priority", accountId, "0"]);
-  for (const account of mine) {
-    if (account.id === accountId || !account.enabled) continue;
-    await runPool(["account", "disable", account.id]);
+  try {
+    await run(["account", "enable", accountId]);
+    const order = [
+      accountId,
+      ...mine.map((account) => account.id).filter((id) => id !== accountId),
+    ];
+    await run(["account", "reorder", provider, ...order]);
+    await run(["account", "priority", accountId, "0"]);
+    for (const account of mine) {
+      if (account.id === accountId || !account.enabled) continue;
+      await run(["account", "disable", account.id]);
+    }
+  } catch (error) {
+    try {
+      await restorePoolAccounts(provider, mine, run);
+    } catch {
+      throw new AggregateError(
+        [error],
+        "Account switch failed and Account Pooler state could not be restored.",
+      );
+    }
+    throw error;
   }
+}
+
+export function switchPoolAccount(
+  providerId: ProviderId,
+  accountId: string,
+  dependencies: PoolSwitchDependencies = {},
+): Promise<void> {
+  const operation = switchQueue.then(() =>
+    performPoolAccountSwitch(providerId, accountId, dependencies),
+  );
+  switchQueue = operation.catch(() => undefined);
+  return operation;
 }

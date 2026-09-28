@@ -1005,6 +1005,62 @@ test("loads the primary machine directly for the sidebar strip", async () => {
   assert.deepEqual(snapshot.host, { id: null, name: null });
 });
 
+test("leaves provider activity unknown when thread counts are unavailable", async () => {
+  const sdk = makeSdk({
+    threads: {
+      async get() {
+        return { environmentId: null };
+      },
+      async count() {
+        throw new Error("thread counts unavailable");
+      },
+    },
+  });
+
+  const snapshot = await loadUsageSnapshot(
+    sdk,
+    null,
+    new Date(),
+    Promise.resolve({}),
+    Promise.resolve([]),
+  );
+
+  assert.ok(snapshot.providers.every((provider) => provider.inUse === undefined));
+});
+
+test("marks inactive providers only when every thread count succeeds", async () => {
+  const sdk = makeSdk({
+    threads: {
+      async get() {
+        return { environmentId: null };
+      },
+      async count({ status }) {
+        return {
+          total: status === "active" ? 1 : 0,
+          groups: status === "active" ? [{ key: "codex", count: 1 }] : [],
+        };
+      },
+    },
+  });
+
+  const snapshot = await loadUsageSnapshot(
+    sdk,
+    null,
+    new Date(),
+    Promise.resolve({}),
+    Promise.resolve([]),
+  );
+
+  assert.equal(
+    snapshot.providers.find((provider) => provider.id === "codex")?.inUse,
+    true,
+  );
+  assert.equal(
+    snapshot.providers.find((provider) => provider.id === "claudeCode")?.inUse,
+    false,
+  );
+});
+
 test("propagates thread and request-level usage failures", async () => {
   const threadFailure = makeSdk({
     threads: {

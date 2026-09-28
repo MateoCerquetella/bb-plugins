@@ -107,8 +107,8 @@ export async function loadUsageSnapshot(
     pooled,
     preferredPoolAccountIds(routedAccounts),
   );
-  const inUseIds = await loadInUseProviderIds(sdk, routedAccounts);
-  return markProvidersInUse(snapshot, inUseIds);
+  const activity = await loadInUseProviderIds(sdk, routedAccounts);
+  return markProvidersInUse(snapshot, activity.ids, activity.complete);
 }
 
 export function inUseProviderIdsFromPool(
@@ -126,23 +126,27 @@ export function inUseProviderIdsFromPool(
 export function markProvidersInUse(
   snapshot: UsageSnapshot,
   inUseIds: ReadonlySet<ProviderId>,
+  complete = true,
 ): UsageSnapshot {
   return {
     ...snapshot,
-    providers: snapshot.providers.map((provider) => ({
-      ...provider,
-      inUse: inUseIds.has(provider.id),
-    })),
+    providers: snapshot.providers.map((provider) => {
+      const inUse = inUseIds.has(provider.id);
+      return inUse || complete
+        ? { ...provider, inUse }
+        : { ...provider, inUse: undefined };
+    }),
   };
 }
 
 async function loadInUseProviderIds(
   sdk: UsageSdk,
   poolAccounts: readonly PoolAccountRecord[],
-): Promise<Set<ProviderId>> {
+): Promise<{ ids: Set<ProviderId>; complete: boolean }> {
   const ids = inUseProviderIdsFromPool(poolAccounts);
   const count = sdk.threads.count;
-  if (count === undefined) return ids;
+  if (count === undefined) return { ids, complete: false };
+  let complete = true;
   for (const status of ["active", "starting"] as const) {
     try {
       const counted = await count({ groupBy: "provider", status });
@@ -152,10 +156,10 @@ async function loadInUseProviderIds(
         if (providerId !== null) ids.add(providerId);
       }
     } catch {
-      // Live-thread occupancy is extra signal; pool in-flight still counts.
+      complete = false;
     }
   }
-  return ids;
+  return { ids, complete };
 }
 
 async function loadRawUsage(

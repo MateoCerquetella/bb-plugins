@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.14 - 2026-09-28
+
+- Keep pooled Codex reset actions bound to the local session instead of the
+  process-default account.
+- Preserve unknown activity when BB cannot read thread counts.
+- Serialize pooled account switches, restore prior state after failures, and
+  queue refreshes requested during an active load.
+
 ## 0.1.13 - 2026-09-26
 
 - The compact summary percentage is the combined usage of accounts in use

@@ -793,6 +793,7 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
   let selectedProviderId: SidebarProviderId | null = null;
   let isOverviewOpen = false;
   let isLoading = false;
+  let refreshQueued = false;
   let isLoadingPreferences = false;
   let lastError: string | null = null;
   let lastLoadedAt = 0;
@@ -1261,7 +1262,11 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
   };
 
   const load = async (): Promise<void> => {
-    if (isLoading || disposed) return;
+    if (disposed) return;
+    if (isLoading) {
+      refreshQueued = true;
+      return;
+    }
     isLoading = true;
     lastError = null;
     render();
@@ -1296,7 +1301,10 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
       signal.removeEventListener("abort", abortRequest);
       requestController = null;
       isLoading = false;
+      const shouldRefresh = refreshQueued;
+      refreshQueued = false;
       render();
+      if (shouldRefresh && !disposed) void load();
     }
   };
 
