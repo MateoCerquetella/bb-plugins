@@ -10,7 +10,7 @@
   },
   "isolation": {
     "mode": "ask",
-    "baseBranch": "main",
+    "baseBranch": "mine/main",
     "worktreePath": "../{repo}-{feature}",
     "branchPattern": "{type}/{feature}"
   },
@@ -25,5 +25,7 @@
   "review": {
     "mode": "fresh-context",
     "reviewerTokenEnv": "EMPIRICAL_REVIEWER_TOKEN"
-  }
+  },
+  "activationMode": "explicit",
+  "mockupsBeforeCoding": true
 }
