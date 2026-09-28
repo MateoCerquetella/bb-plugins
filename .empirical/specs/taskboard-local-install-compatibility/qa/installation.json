@@ -19,5 +19,16 @@
   "startsAtLogin": true,
   "managedExecutionEnabled": true,
   "defaultEngine": "symphony",
-  "taskDispatchedByInstaller": false
+  "taskDispatchedByInstaller": false,
+  "cachedWorkItemsAfterMigration": 378,
+  "originalCachedWorkItemsMissing": 0,
+  "originalCachedWorkItemsPreserved": 361,
+  "cachedWorkPreserved": true,
+  "serviceCodexCommand": "/usr/local/bin/codex",
+  "serviceCodexAuthenticated": true,
+  "serviceCodexAuthenticationStatus": "Logged in using ChatGPT",
+  "serviceAuthenticationCheckDispatchedTask": false,
+  "codexAppServerHandshakePassed": true,
+  "codexThreadStartedByCheck": false,
+  "codexTurnStartedByCheck": false
 }

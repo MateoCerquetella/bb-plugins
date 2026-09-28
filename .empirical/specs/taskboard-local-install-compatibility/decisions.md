@@ -25,3 +25,28 @@ Source replacement causes a brief Taskboard interruption. The native runtime nee
 ### Verification
 
 Run Taskboard checks, compare retained state without exposing values, confirm the live source and services, and verify the optional runtime's healthy empty queue.
+
+## D-002: Allow the focused check to finish on the installation host
+
+Status: Accepted
+
+### Evidence
+
+The complete Taskboard check passed 143 tests, but its instrumented replay hit the existing 120-second command timeout during host load. The timeout receipt is retained; it was not a test assertion failure.
+
+### Options
+
+- Skip checks or run an unrelated faster plugin suite: rejected.
+- Keep the same checks with a bounded 300-second command timeout: selected.
+
+### Chosen approach
+
+Increase only the development workflow's taskboard-focused command timeout to 300 seconds. Run the same type, test, build, and metadata checks. Product execution and verification timeout settings remain unchanged.
+
+### Trade-offs and risks
+
+The check may occupy the host longer, but no assertion or evidence requirement is removed. Record the earlier timed-out attempt and the subsequent outcome separately.
+
+### Verification
+
+Repeat the focused Taskboard QA command and require a passing result.

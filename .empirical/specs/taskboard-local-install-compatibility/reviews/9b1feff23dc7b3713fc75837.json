@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:756ce3f7331d1cd1995b1a471a378ae1fa69c5e122a78b5cba600559f8dad343",
+  "mode": "fresh-context",
+  "baseRef": "feat/taskboard-symphony",
+  "baseCommit": "ea037e6cd1df7f1aecd9f1704f0349322a9d70d5",
+  "headCommit": "45954583015c55ff68b112295f52dc7f14c55b51",
+  "diffDigest": "sha256:d397ba91a59abb2b2ef70489fd1cb4700f2f8e4c6b310edd87470b25c13e2c8b",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "/root/install_review",
+  "reviewerInvocationId": "/root/install_review",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- PASS AC-1: The committed changes add optional ghState support, deliberate CLI environment forwarding, credential-free discovery, absolute candidate resolution, and canonical workspace exclusion. Regression tests cover these behaviors alongside execution tests. The committed taskboard-check.txt records 143 passing tests and successful type, build, and build-metadata checks. I did not independently execute those checks.\n- FAIL AC-2: installation.json records a running stable-source plugin, preserved project configurations and four credential files, and a private backup. It records 361 cached work items before migration but no post-migration comparison or explicit cached-work preservation result. Cached-work retention therefore remains unproven by the supplied committed evidence; this is not a finding that data was lost.\n- FAIL AC-3: The runtime installer enforces the stated Symphony revision. installation.json records native runtime health, empty running/retrying/blocked counts, consistent enabled Symphony selection, private runtime credentials, and no installer-dispatched task. Committed defaults keep managed execution disabled. However, no installation evidence confirms that the native service resolves the existing Codex login. The design's intention to reuse that login is insufficient to verify the installed authentication configuration.\n\n## Security / correctness\n\nNo new security or correctness defect was identified in the scoped compatibility restoration. CLI discovery avoids forwarding credentials and rejects workspace executables after canonicalization. Installation evidence contains no credential values. Live state and authentication were not independently inspected; the two findings concern missing evidence, not observed runtime failures.\n\n## Design / maintainability\n\nThe implementation is narrowly scoped, separates environment/path policy into a helper, retains execution coverage, and consistently updates the prerelease version. The installation record needs two additional non-secret observations to substantiate the remaining acceptance claims.",
+  "bodyDigest": "sha256:a5f4910c399edc0bb24d2fa883be3f7d0926d76a7d216a71a50a9d7ac4e01e09",
+  "findings": [
+    {
+      "id": "F-1",
+      "severity": "medium",
+      "category": "acceptance",
+      "summary": "AC-2 lacks a post-migration cached-work comparison or preservation result; record the actual verification against the pre-migration backup.",
+      "path": ".empirical/specs/taskboard-local-install-compatibility/qa/installation.json"
+    },
+    {
+      "id": "F-2",
+      "severity": "medium",
+      "category": "acceptance",
+      "summary": "AC-3 lacks confirmation that the installed native service resolves the existing Codex login; record a non-secret authentication/configuration check without dispatching a task.",
+      "path": ".empirical/specs/taskboard-local-install-compatibility/qa/installation.json"
+    }
+  ],
+  "digest": "sha256:9b1feff23dc7b3713fc7583791dcaeaa2109a1c0d05e609bc3ec7451599d1997"
+}
