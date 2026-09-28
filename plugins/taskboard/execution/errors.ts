@@ -10,6 +10,13 @@ const labels: Record<string, string> = {
   verificationRequirements: 'Required checks'
 };
 
+const corrections: Record<string, string> = {
+  branch:
+    'use a Git branch name without consecutive slashes, dot segments, trailing dots, or .lock',
+  baseBranch:
+    'use a Git branch name without consecutive slashes, dot segments, trailing dots, or .lock'
+};
+
 export function formatExecutionError(
   failure: unknown,
   fallback = 'Execution action failed'
@@ -18,7 +25,12 @@ export function formatExecutionError(
     const issue = failure.issues[0];
     if (!issue) return fallback;
     const field = issue.path.find(value => typeof value === 'string');
-    return `${typeof field === 'string' ? labels[field] || field : 'Request'}: ${issue.message}`;
+    const name = typeof field === 'string' ? field : '';
+    const message =
+      corrections[name] && issue.message === 'Invalid Git branch'
+        ? corrections[name]
+        : issue.message;
+    return `${labels[name] || name || 'Request'}: ${message}`;
   }
   return failure instanceof Error ? failure.message : fallback;
 }

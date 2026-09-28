@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 5,
+  "revision": 9,
   "activeFeature": "fix-the-installed-taskboard-symphony-execution-flow-shown-by-the",
   "request": "Fix the installed Taskboard Symphony execution flow shown by the user: the Review execution dialog fails Git validation with `symbolic-ref` when the repository field is empty or the source checkout is detached. Make repository and branch inference robust, show actionable validation errors, preserve Taskboard as workflow authority, add regression tests, verify the affected plugin, and reinstall/reload the corrected local Taskboard plugin in this BB installation.",
   "profile": "complex",
@@ -8,9 +8,9 @@
   "mode": "yolo",
   "phase": "implement",
   "status": "waiting",
-  "repairAttempts": 0,
-  "message": "Planned the resolver, existing-RPC integration, validation formatting, regression tests, focused verification, stable-source update, and live reload.",
-  "implementationActor": null,
+  "repairAttempts": 1,
+  "message": "Fresh-context review requested fixes for configured-default fallback, process-error normalization, corrective field messages, and pending live installation evidence.",
+  "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:366a8fb6979a0d66e71d9c21c2e2157d303d15dfdffa660ba9faf5854b9aa764",
   "approvedSpecRevision": 3,
@@ -23,21 +23,20 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": false,
+    "implemented": true,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "none",
+    "highest": "implemented",
     "reasons": {
-      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-28T15:58:23.480Z",
+  "updatedAt": "2026-09-28T16:07:31.507Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "fix-the-installed-taskboard-symphony-execution-flow-shown-by-the-caf37045e0a4",
@@ -65,5 +64,6 @@
     "heartbeatAt": "2026-09-28T15:57:07.641Z",
     "digest": "sha256:6acb42d7ec52334920e2093c97d089cd084d5a50be50057d3e9feddafd710bdf"
   },
-  "reviewFirst": true
+  "reviewFirst": true,
+  "budgetExtensionMinutes": 30
 }

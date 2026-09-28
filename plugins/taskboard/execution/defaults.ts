@@ -1,18 +1,22 @@
 import { command } from './verification.js';
 
 async function tryGit(cwd: string, ...args: string[]): Promise<string | null> {
-  const result = await command(
-    [
-      'git',
-      '-c',
-      'core.hooksPath=/dev/null',
-      '-c',
-      'core.fsmonitor=false',
-      ...args
-    ],
-    cwd
-  );
-  return result.passed ? result.output : null;
+  try {
+    const result = await command(
+      [
+        'git',
+        '-c',
+        'core.hooksPath=/dev/null',
+        '-c',
+        'core.fsmonitor=false',
+        ...args
+      ],
+      cwd
+    );
+    return result.passed ? result.output : null;
+  } catch {
+    return null;
+  }
 }
 
 function preferredBranch(branches: string[]): string | null {
@@ -88,28 +92,12 @@ export async function resolveExecutionDefaults(repository: string): Promise<{
     );
   }
   if (!baseBranch) {
-    const configured = await tryGit(
+    baseBranch = await tryGit(
       repository,
       'config',
       '--get',
       'init.defaultBranch'
     );
-    if (
-      configured &&
-      ((await tryGit(
-        repository,
-        'show-ref',
-        '--verify',
-        `refs/heads/${configured}`
-      )) ||
-        (await tryGit(
-          repository,
-          'show-ref',
-          '--verify',
-          `refs/remotes/origin/${configured}`
-        )))
-    )
-      baseBranch = configured;
   }
   if (!baseBranch)
     throw new Error(

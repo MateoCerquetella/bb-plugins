@@ -14,18 +14,18 @@ of exposing the failed Git subcommand.
 ## Acceptance Criteria
 
 - [ ] [AC-1] A normal checkout uses its current branch and HEAD for execution
-      defaults.
+  defaults.
 - [ ] [AC-2] A detached checkout retains the project repository and HEAD and
-      infers a valid base branch from exact local refs, remote default metadata, or
-      Git's configured initial branch.
+  infers a valid base branch from exact local refs, remote default metadata, or
+  Git's configured initial branch.
 - [ ] [AC-3] When no valid repository or base branch can be determined,
-      Taskboard reports an actionable error without exposing `symbolic-ref`.
+  Taskboard reports an actionable error without exposing `symbolic-ref`.
 - [ ] [AC-4] Review-request validation names the invalid field and its
-      correction.
+  correction.
 - [ ] [AC-5] Taskboard remains the authority for scope, approval, verification,
-      completion, and tracker synchronization.
+  completion, and tracker synchronization.
 - [ ] [AC-6] The corrected local plugin is reinstalled/reloaded and its live
-      execution-defaults RPC no longer reports the observed failure.
+  execution-defaults RPC no longer reports the observed failure.
 
 ## Scope
 

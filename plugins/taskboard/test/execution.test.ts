@@ -173,6 +173,14 @@ test('execution defaults support attached and detached project checkouts', async
       (await resolveExecutionDefaults(repository)).baseBranch,
       'trunk'
     );
+
+    await git(repository, 'update-ref', '-d', 'refs/remotes/origin/HEAD');
+    await git(repository, 'update-ref', '-d', 'refs/remotes/origin/trunk');
+    await git(repository, 'config', 'init.defaultBranch', 'develop');
+    assert.equal(
+      (await resolveExecutionDefaults(repository)).baseBranch,
+      'develop'
+    );
   } finally {
     await rm(root, { recursive: true, force: true });
   }
@@ -194,6 +202,16 @@ test('execution defaults and form validation report actionable fields', async ()
   assert.equal(parsed.success, false);
   if (!parsed.success)
     assert.match(formatExecutionError(parsed.error), /^Repository: .+/);
+  const invalidBranch = executionScopeSchema.safeParse({
+    ...scope(),
+    branch: 'feature/../unsafe'
+  });
+  assert.equal(invalidBranch.success, false);
+  if (!invalidBranch.success)
+    assert.equal(
+      formatExecutionError(invalidBranch.error),
+      'Implementation branch: use a Git branch name without consecutive slashes, dot segments, trailing dots, or .lock'
+    );
 });
 test('normalization omits raw internal data and approval covers scope', () => {
   const request = normalizeExecutionRequest(
