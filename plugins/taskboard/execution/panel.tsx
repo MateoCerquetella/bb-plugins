@@ -35,13 +35,22 @@ const labels: Record<ExecutionRun['state'], string> = {
   verified: 'Verification passed'
 };
 
-export function TaskExecution({ item }: { item: WorkItem }) {
+export function TaskExecution({
+  item,
+  autoStart = false,
+  presentation = 'embedded'
+}: {
+  item: WorkItem;
+  autoStart?: boolean;
+  presentation?: 'embedded' | 'worker';
+}) {
   const rpc = useRpc<TaskboardRpcContract>();
   const navigate = useBbNavigate();
   const formId = useId();
   const [config, setConfig] = useState<ExecutionConfig | null>(null);
   const [run, setRun] = useState<ExecutionRun | null>(null);
   const [open, setOpen] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [prepared, setPrepared] = useState<{
@@ -61,6 +70,7 @@ export function TaskExecution({ item }: { item: WorkItem }) {
     checks: 'npm test\nnpm run typecheck'
   });
   const dispatchKey = useRef(crypto.randomUUID());
+  const autoStartAttempted = useRef(false);
   const pending = useRef(false);
   const revision = useRef(0);
   const { bbProjectId: projectId, source, locator } = item;
@@ -81,6 +91,8 @@ export function TaskExecution({ item }: { item: WorkItem }) {
             ? failure.message
             : 'Could not load execution'
         );
+    } finally {
+      if (revision.current === token) setLoaded(true);
     }
   }, [rpc, projectId, source, locator]);
   useEffect(() => {
@@ -166,6 +178,66 @@ export function TaskExecution({ item }: { item: WorkItem }) {
       setPrepared(null);
     });
   }
+  async function startImmediately() {
+    await perform(async () => {
+      if (!config?.enabled) {
+        navigate.toCompose({
+          initialPrompt: formatWorkItemHandoffPrompt(item),
+          focusPrompt: true
+        });
+        return;
+      }
+      const defaults = await rpc.call('executionDefaults', {
+        projectId,
+        source,
+        locator,
+        initializeRepository: true
+      });
+      const scope = executionScopeSchema.parse({
+        ...defaults,
+        branch: `bb/${item.key.replace(/[^a-zA-Z0-9_-]/g, '-')}`,
+        route: 'delegated',
+        plan:
+          item.description.trim() || `Implement ${item.key}: ${item.title}.`,
+        context: `Tracker item: ${item.key}\nSource: ${item.source}\nURL: ${item.url}`,
+        acceptanceCriteria: [
+          `Complete ${item.key}: ${item.title}`,
+          'Keep the implementation scoped to this ticket',
+          'Pass the required verification'
+        ],
+        verificationRequirements: parseVerificationCommands('git diff --check')
+      });
+      const result = await rpc.call('prepareExecution', {
+        task: { projectId, source, locator },
+        scope,
+        engine: config.defaultEngine
+      });
+      if (result.engine === 'local') {
+        navigate.toCompose({ initialPrompt: result.prompt, focusPrompt: true });
+        return;
+      }
+      setRun(
+        await rpc.call('startExecution', {
+          request: result.request,
+          digest: result.digest,
+          dispatchKey: dispatchKey.current
+        })
+      );
+    });
+  }
+  useEffect(() => {
+    if (
+      !autoStart ||
+      !loaded ||
+      config === null ||
+      run !== null ||
+      autoStartAttempted.current
+    ) {
+      return;
+    }
+    autoStartAttempted.current = true;
+    void startImmediately();
+  }, [autoStart, config, loaded, run]);
   async function action(
     action: 'stop' | 'resume' | 'verify' | 'accept' | 'fix'
   ) {
@@ -184,7 +256,6 @@ export function TaskExecution({ item }: { item: WorkItem }) {
     run?.verifiedHead === run?.head &&
     Boolean(run?.head) &&
     run?.checks.every(check => check.passed);
-  const active = run && !['verified', 'failed', 'canceled'].includes(run.state);
   const verification =
     run?.state === 'verified'
       ? 'Passed · acceptance reviewed'
@@ -197,42 +268,34 @@ export function TaskExecution({ item }: { item: WorkItem }) {
             : 'Pending';
   return (
     <>
-      {config?.enabled ? (
-        <div className="mt-5 flex flex-wrap gap-2">
-          {config?.enabled ? (
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={Boolean(active) || busy}
-              onClick={() => {
-                setFields(previous => ({
-                  ...previous,
-                  engine: config.defaultEngine
-                }));
-                setOpen(true);
-                void perform(async () => {
-                  const defaults = await rpc.call('executionDefaults', {
-                    projectId,
-                    source,
-                    locator
-                  });
-                  setFields(previous => ({ ...previous, ...defaults }));
-                });
-              }}
-            >
-              Execute
-            </Button>
-          ) : null}
-        </div>
-      ) : null}
-      {error && !open && (config?.enabled || run) ? (
+      {error &&
+      !open &&
+      (config?.enabled || run || presentation === 'worker') ? (
         <p role="alert" className="mt-3 text-sm text-destructive">
           {error}
         </p>
       ) : null}
+      {presentation === 'worker' && loaded && !run && !error ? (
+        <div
+          role="status"
+          className="flex min-h-64 flex-col items-center justify-center gap-3 border-y py-12 text-center"
+        >
+          <span className="flex size-10 items-center justify-center rounded-full border bg-card">
+            <span className="size-2 animate-pulse rounded-full bg-success" />
+          </span>
+          <p className="text-sm font-semibold">Starting agent</p>
+          <p className="max-w-sm text-sm text-muted-foreground">
+            Preparing the repository and dispatching {item.key} to Symphony.
+          </p>
+        </div>
+      ) : null}
       {run ? (
         <section
-          className="execution my-7 border-y py-5"
+          className={
+            presentation === 'worker'
+              ? 'execution border-y py-5'
+              : 'execution my-7 border-y py-5'
+          }
           aria-label="Task execution"
         >
           <div className="row mb-3 flex flex-wrap items-center justify-between gap-3">
@@ -409,11 +472,11 @@ export function TaskExecution({ item }: { item: WorkItem }) {
               <details>
                 <summary>Repository and route</summary>
                 <p className="break-all">
-                  {prepared.request.scope.repository} ·{' '}
+                  {prepared.request.scope.repository} ·
                   {prepared.request.scope.branch}
                 </p>
                 <p>
-                  {prepared.request.scope.route} ·{' '}
+                  {prepared.request.scope.route} ·
                   {prepared.request.scope.baseRevision}
                 </p>
               </details>

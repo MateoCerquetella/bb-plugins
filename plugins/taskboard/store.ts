@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { EXECUTION_MIGRATION } from './execution/store.js';
+import { AGENT_THREAD_MIGRATION } from './execution/agent-thread-store.js';
 import type { BbPluginApi } from '@get-bb/plugin-sdk';
 import {
   FILTER_PRESET_LIMIT,
@@ -412,7 +413,8 @@ export function createWorkItemStore(bb: BbPluginApi) {
           bb_project_id, position, created_at, id
         );
     `,
-    EXECUTION_MIGRATION
+    EXECUTION_MIGRATION,
+    AGENT_THREAD_MIGRATION
   ]);
 
   const upsertItem = db.prepare<

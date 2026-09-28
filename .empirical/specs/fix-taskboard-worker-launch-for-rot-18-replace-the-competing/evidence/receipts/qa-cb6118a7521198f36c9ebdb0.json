@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-cb6118a7521198f36c9ebdb0",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Run focused Taskboard tests, typecheck, build, and artifact verification for the single Start agent flow and repository bootstrap.",
+  "passed": false,
+  "startedAt": "2026-09-28T20:30:26.559Z",
+  "completedAt": "2026-09-28T20:34:06.942Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-taskboard-worker-launch-for-rot-18-replace-the-competing",
+    "specRevision": 2,
+    "specDigest": "sha256:3b12a3e15d51ca1c93859814c289b6b317cef34e6f5ca50f4b1272077239e8dc",
+    "treeDigest": "sha256:a244f05b949a75dd160e4a5b6da7882f5b11b786883db33c6cb0bccdcfb113fb",
+    "policyDigest": "sha256:168cfa9fe1a343bc5a02663b51d27fc4808f530064f01faa64abed49e9580803",
+    "workflowRevision": 5,
+    "gitCommit": "81d0072d3bafecc0202a701388b8c2f3c70d2f5c",
+    "textTreeDigest": "sha256:a244f05b949a75dd160e4a5b6da7882f5b11b786883db33c6cb0bccdcfb113fb"
+  },
+  "digest": "sha256:fd65bc7c5b5ed6246c24664b56062b51f7bbf7692e4bec522de92a899ab21919",
+  "kind": "qa",
+  "matrixDigest": "sha256:ab98de0a1b97cf0906e14883f262be56d8260e7ebb343b540e3fc125d55a02e0",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "x64",
+    "node": "24.21.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "failed",
+      "summary": "Run focused Taskboard tests, typecheck, build, and artifact verification for the single Start agent flow and repository bootstrap.",
+      "startedAt": "2026-09-28T20:30:26.559Z",
+      "completedAt": "2026-09-28T20:34:06.942Z",
+      "durationMs": 220383,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:f9b129d8080d6ae249324764ab9bf53ce8ebc569462bb37a19a9d1056d966f66",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-taskboard"
+        ],
+        "cwd": ".",
+        "timeoutMs": 300000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH",
+          "TMPDIR"
+        ]
+      },
+      "result": {
+        "exitCode": 1,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:dfc7a6dedd25ed3be695e6091a9df156ae7c661de8f6db51597d3e182735c217",
+        "stderrDigest": "sha256:3cbc05792742a7e45bb196e5a1d351e2d7011d2566be82eef215d6377ea02af7",
+        "stdoutTail": "n: \"\",\\n    context: \"\",\\n    criteria: \"\",\\n    checks: \"npm test\\\\nnpm run typecheck\",\\n  });\\n  const dispatchKey = useRef(crypto.randomUUID());\\n  const autoStartAttempted = useRef(false);\\n  const pending = useRef(false);\\n  const revision = useRef(0);\\n  const { bbProjectId: projectId, source, locator } = item;\\n  const load = useCallback(async () => {\\n    const token = ++revision.current;\\n    try {\\n      const [cfg, status] = await Promise.all([\\n        rpc.call(\"executionConfig\", null),\\n        rpc.call(\"executionStatus\", { projectId, source, locator }),\\n      ]);\\n      if (revision.current !== token) return;\\n      setConfig(cfg);\\n      setRun(status.runs[0] ?? null);\\n    } catch (failure) {\\n      if (revision.current === token)\\n        setError(\\n          failure instanceof Error\\n            ? failure.message\\n            : \"Could not load execution\",\\n        );\\n    } finally {\\n      if (revision.current === token) setLoaded(true);\\n    }\\n  }, [rpc, projectId, source, locator]);\\n  useEffect(() => {\\n    void load();\\n    return () => {\\n      revision.current++;\\n    };\\n  }, [load]);\\n  useRealtime(\"taskboard:execution-changed\", () => {\\n    void load();\\n  });\\n  useEffect(() => {\\n    if (!run || [\"verified\", \"canceled\", \"failed\"].includes(run.state)) return;\\n    const timer = setInterval(() => void load(), 5000);\\n    return () => clearInterval(timer);\\n  }, [run?.state, load]);\\n  async function perform(work: () => Promise<void>) {\\n    if (pending.current) return;\\n    pending.current = true;\\n    setBusy(true);\\n    setError(null);\\n    try {\\n      await work();\\n    } catch (failure) {\\n      setError(formatExecutionError(failure));\\n    } finally {\\n      pending.current = false;\\n      setBusy(false);\\n    }\\n  }\\n  function field(key: keyof typeof fields, value: string) {\\n    setFields((previous) => ({ ...previous, [key]: value }));\\n    setPrepared(null);\\n  }\\n  async function prepare() {\\n    await perform(async () => {\\n      if (fields.engine === \"local\" || fields.route === \"direct\") {\\n        setOpen(false);\\n        navigate.toCompose({\\n          initialPrompt: formatWorkItemHandoffPrompt(item),\\n          focusPrompt: true,\\n        });\\n        return;\\n      }\\n      const scope = executionScopeSchema.parse({\\n        repository: fields.repository,\\n        branch: fields.branch,\\n        baseBranch: fields.baseBranch,\\n        baseRevision: fields.baseRevision,\\n        route: fields.route,\\n        plan: fields.plan,\\n        context: fields.context,\\n        acceptanceCriteria: fields.criteria\\n          .split(\"\\\\n\")\\n          .map((v) => v.trim())\\n          .filter(Boolean),\\n        verificationRequirements: parseVerificationCommands(fields.checks),\\n      });\\n      const result = await rpc.call(\"prepareExecution\", {\\n        task: { projectId, source, locator },\\n        scope,\\n        engine: fields.engine as \"local\" | \"symphony\",\\n      });\\n      if (result.engine === \"local\") {\\n        setOpen(false);\\n        navigate.toCompose({ initialPrompt: result.prompt, focusPrompt: true });\\n        return;\\n      }\\n      setPrepared({ request: result.request, digest: result.digest });\\n      dispatchKey.current = crypto.randomUUID();\\n    });\\n  }\\n  async function approve() {\\n    await perform(async () => {\\n      if (!prepared) return;\\n      const next = await rpc.call(\"startExecution\", {\\n        request: prepared.request,\\n        digest: prepared.digest,\\n        dispatchKey: dispatchKey.current,\\n      });\\n      setRun(next);\\n      setOpen(false);\\n      setPrepared(null);\\n    });\\n  }\\n  async function startImmediately() {\\n    await perform(async () => {\\n      if (!config?.enabled) {\\n        navigate.toCompose({\\n          initialPrompt: formatWorkItemHandoffPrompt(item),\\n          focusPrompt: true,\\n        });\\n        return;\\n      }\\n      const defaults = await rpc.call(\"executionDefaults\", {\\n        projectId,\\n        source,\\n        locator,\\n        initializeRepository: true,\\n      });\\n      const scope = executionScopeSchema.parse({\\n        ...defaults,\\n        branch: `bb/${item.key.replace(/[^a-zA-Z0-9_-]/g, \"-\")}`,\\n        route: \"delegated\",\\n        plan:\\n          item.description.trim() || `Implement ${item.key}: ${item.title}.`,\\n        context: `Tracker item: ${item.key}\\\\nSource: ${item.source}\\\\nURL: ${item.url}`,\\n        acceptanceCriteria: [\\n          `Complete ${item.key}: ${item.title}`,\\n          \"Keep the implementation scoped to this ticket\",\\n          \"Pass the required verification\",\\n        ],\\n        verificationRequirements: parseVerificationCommands(\"git diff --check\"),\\n      });\\n      const result = await rpc.call(\"prepareExecution\", {\\n        task: { projectId, source, locator },\\n        scope,\\n        engine: config.defaultEngine,\\n      });\\n      if (result.engine === \"local\") {\\n        navigate.toCompose({ initialPrompt: result.prompt, focusPrompt: true });\\n        return;\\n      }\\n      setRun(\\n        await rpc.call(\"startExecution\", {\\n          request: result.request,\\n          digest: result.digest,\\n          dispatchKey: dispatchKey.current,\\n        }),\\n      );\\n    });\\n  }\\n  useEffect(() => {\\n    if (\\n      !autoStart ||\\n      !loaded ||\\n      config === null ||\\n      run !== null ||\\n      autoStartAttempted.current\\n    ) {\\n      return;\\n    }\\n    autoStartAttempted.current = true;\\n    void startImmediately();\\n  }, [autoStart, config, loaded, run]);\\n  async function action(\\n    action: \"stop\" | \"resume\" | \"verify\" | \"accept\" | \"fix\",\\n  ) {\\n    await perform(async () => {\\n      if (!run) return;\\n      setRun(\\n        await rpc.call(\"executionAction\", {\\n          id: run.id,\\n          action,\\n          expectedVersion: run.version,\\n        }),\\n      );\\n    });\\n  }\\n  const verifiedChecks =\\n    run?.verifiedHead === run?.head &&\\n    Boolean(run?.head) &&\\n    run?.checks.every((check) => check.passed);\\n  const verification =\\n    run?.state === \"verified\"\\n      ? \"Passed · acceptance reviewed\"\\n      : run?.state === \"verifying\"\\n        ? \"Running required checks\"\\n        : verifiedChecks\\n          ? \"Checks passed · acceptance review required\"\\n          : run?.checks.some((check) => !check.passed)\\n            ? \"Failed · changes required\"\\n            : \"Pending\";\\n  return (\\n    <>\\n      {error &&\\n      !open &&\\n      (config?.enabled || run || presentation === \"worker\") ? (\\n        <p role=\"alert\" className=\"mt-3 text-sm text-destructive\">\\n          {error}\\n        </p>\\n      ) : null}\\n      {presentation === \"worker\" && loaded && !run && !error ? (\\n        <div\\n          role=\"status\"\\n          className=\"flex min-h-64 flex-col items-center justify-center gap-3 border-y py-12 text-center\"\\n        >\\n          <span className=\"flex size-10 items-center justify-center rounded-full border bg-card\">\\n            <span className=\"size-2 animate-pulse rounded-full bg-success\" />\\n          </span>\\n          <p className=\"text-sm font-semibold\">Starting agent</p>\\n          <p className=\"max-w-sm text-sm text-muted-foreground\">\\n            Preparing the repository and dispatching {item.key} to Symphony.\\n          </p>\\n        </div>\\n      ) : null}\\n      {run ? (\\n        <section\\n          className={\\n            presentation === \"worker\"\\n              ? \"execution border-y py-5\"\\n              : \"execution my-7 border-y py-5\"\\n          }\\n          aria-label=\"Task execution\"\\n        >\\n          <div className=\"row mb-3 flex flex-wrap items-center justify-between gap-3\">\\n            <h2 className=\"text-sm font-semibold\">Execution</h2>\\n            <span className=\"rounded border px-2 py-0.5 text-xs\">\\n              {run.request.scope.route}\\n            </span>\\n          </div>\\n          <p role=\"status\" className=\"text-sm font-medium\">\\n            {labels[run.state]}\\n          </p>\\n          {run.lastError ? (\\n            <p role=\"alert\" className=\"mt-2 text-sm text-destructive\">\\n              '... 11678 more characters,\n    expected: /rpc\\.call\\('executionDefaults'/u,\n    operator: 'match',\n    diff: 'simple'\n  }\n",
+        "stderrTail": "npm error Lifecycle script `test` failed with error:\nnpm error code 1\nnpm error path /Users/mateocerquetella/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_pshdwft79h-1/bb-plugins/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.5-symphony.0\nnpm error location /Users/mateocerquetella/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_pshdwft79h-1/bb-plugins/plugins/taskboard\nnpm error command failed\nnpm error command sh -c node --test --experimental-strip-types test/*.test.ts\nnpm error Lifecycle script `check` failed with error:\nnpm error code 1\nnpm error path /Users/mateocerquetella/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_pshdwft79h-1/bb-plugins/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.5-symphony.0\nnpm error location /Users/mateocerquetella/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_pshdwft79h-1/bb-plugins/plugins/taskboard\nnpm error command failed\nnpm error command sh -c npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build\n",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:a244f05b949a75dd160e4a5b6da7882f5b11b786883db33c6cb0bccdcfb113fb",
+      "sourceTreeAfter": "sha256:a244f05b949a75dd160e4a5b6da7882f5b11b786883db33c6cb0bccdcfb113fb",
+      "artifacts": []
+    }
+  ],
+  "anomalies": [
+    "outcome-failed"
+  ]
+}

@@ -12,6 +12,7 @@ import {
   filterPresetStateSchema,
   filterPresetSummary,
   formatWorkItemContext,
+  formatWorkItemHandoffPrompt,
   normalizePresetName,
   projectConfigMutationSchema,
   projectCredentialsInteractionResponseSchema,
@@ -65,6 +66,11 @@ import {
 } from './sources/types.js';
 import { createWorkItemStore } from './store.js';
 import { registerExecution } from './execution/server.js';
+import { resolveExecutionDefaults } from './execution/defaults.js';
+import {
+  agentThreadOutcome,
+  createAgentThreadStore
+} from './execution/agent-thread-store.js';
 
 const SOURCES: readonly WorkSource[] = ['linear', 'github', 'jira'];
 const CREDENTIAL_SOURCES: readonly CredentialSource[] = ['linear', 'jira'];
@@ -145,6 +151,27 @@ function sleep(ms: number, signal: AbortSignal): Promise<void> {
         resolve();
       },
       { once: true }
+    );
+  });
+}
+
+function waitUntilAborted<T>(
+  work: Promise<T>,
+  signal: AbortSignal
+): Promise<T | null> {
+  if (signal.aborted) return Promise.resolve(null);
+  return new Promise((resolve, reject) => {
+    const aborted = () => resolve(null);
+    signal.addEventListener('abort', aborted, { once: true });
+    work.then(
+      value => {
+        signal.removeEventListener('abort', aborted);
+        resolve(value);
+      },
+      error => {
+        signal.removeEventListener('abort', aborted);
+        reject(error);
+      }
     );
   });
 }
@@ -410,6 +437,7 @@ function parseGithubRepoFromRemote(
 
 export default async function plugin(bb: BbPluginApi) {
   const store = createWorkItemStore(bb);
+  const agentThreads = createAgentThreadStore(bb.storage.database());
   const credentials = createProjectCredentialVault(bb);
   const execution = registerExecution(bb, {
     assertProject: assertProjectExists,
@@ -1614,6 +1642,10 @@ export default async function plugin(bb: BbPluginApi) {
     return mutation;
   }
 
+  const agentThreadStarts = new Map<
+    string,
+    Promise<{ threadId: string }>
+  >();
   const handlers: PluginRpcHandlers<typeof taskboardRpcContract> = {
     ...execution.handlers,
     async listProjects() {
@@ -1623,6 +1655,105 @@ export default async function plugin(bb: BbPluginApi) {
       const thread = await bb.sdk.threads.get({ threadId: input.threadId });
       await assertProjectExists(thread.projectId);
       return { projectId: thread.projectId };
+    },
+    async startAgentThread(input) {
+      const task = {
+        projectId: input.projectId,
+        source: input.source,
+        locator: input.locator
+      };
+      const taskKey = JSON.stringify([
+        input.projectId,
+        input.source,
+        input.locator
+      ]);
+      const existing = agentThreadStarts.get(taskKey);
+      if (existing) return existing;
+      const start = (async () => {
+        await assertProjectExists(input.projectId);
+        const item = await getLiveItem(
+          input.projectId,
+          input.source,
+          input.locator
+        );
+        const durable =
+          agentThreads.byDispatch(input.dispatchKey) ??
+          (() => {
+            const latest = agentThreads.latest(task);
+            return latest?.state === 'running' ? latest : null;
+          })();
+        if (durable) return { threadId: durable.threadId };
+        const project = await bb.sdk.projects.get({
+          projectId: input.projectId
+        });
+        const source =
+          project.sources.find(candidate => candidate.isDefault) ??
+          project.sources[0];
+        if (!source) throw new Error('Configure a project repository first');
+
+        await resolveExecutionDefaults(source.path, {
+          initializeRepository: true
+        });
+        const thread = await bb.sdk.threads.spawn({
+          projectId: input.projectId,
+          title: `${item.key}: ${item.title}`.slice(0, 200),
+          prompt: formatWorkItemHandoffPrompt(item),
+          environment: { type: 'project-default' },
+          origin: 'plugin',
+          originPluginId: 'taskboard'
+        });
+        const now = new Date().toISOString();
+        agentThreads.insert({
+          dispatchKey: input.dispatchKey,
+          task,
+          threadId: thread.id,
+          state: 'running',
+          terminalEventSeq: null,
+          error: null,
+          createdAt: now,
+          updatedAt: now
+        });
+        bb.realtime.publish('taskboard:changed', {
+          projectId: input.projectId,
+          source: input.source
+        });
+        const currentTabs = await bb.sdk.threads.tabs.get({
+          threadId: thread.id
+        });
+        await bb.sdk.threads.tabs.update({
+          threadId: thread.id,
+          expectedRevision: currentTabs.revision,
+          tabs: [
+            ...currentTabs.tabs,
+            {
+              id: `taskboard-${input.dispatchKey}`,
+              kind: 'plugin-panel',
+              pluginId: 'taskboard',
+              actionId: 'taskboard-panel',
+              title: item.key,
+              paramsJson: JSON.stringify({
+                kind: 'item',
+                projectId: input.projectId,
+                source: input.source,
+                locator: input.locator
+              })
+            }
+          ]
+        });
+        return { threadId: thread.id };
+      })();
+      agentThreadStarts.set(taskKey, start);
+      try {
+        return await start;
+      } finally {
+        if (agentThreadStarts.get(taskKey) === start) {
+          agentThreadStarts.delete(taskKey);
+        }
+      }
+    },
+    async agentThreadStatus(input) {
+      await assertProjectExists(input.projectId);
+      return { link: agentThreads.latest(input) };
     },
     async status(input) {
       await assertProjectExists(input.projectId);
@@ -2426,6 +2557,55 @@ export default async function plugin(bb: BbPluginApi) {
     });
   }
 
+  bb.background.service('agent-thread-reconciliation', {
+    async start(signal) {
+      while (!signal.aborted) {
+        for (const link of agentThreads.unresolved()) {
+          if (signal.aborted) return;
+          try {
+            const events = await waitUntilAborted(
+              bb.sdk.threads.events.list({
+                threadId: link.threadId,
+                types: ['turn/completed'],
+                order: 'desc',
+                limit: '1',
+                signal
+              }),
+              signal
+            );
+            if (!events || signal.aborted) return;
+            const event = events[0];
+            if (!event || event.type !== 'turn/completed') continue;
+            const result = agentThreads.transition(
+              link,
+              agentThreadOutcome(event)
+            );
+            if (result.changed) {
+              bb.realtime.publish('taskboard:changed', {
+                projectId: link.task.projectId,
+                source: link.task.source
+              });
+            }
+          } catch (error) {
+            if (signal.aborted) return;
+            const result = agentThreads.transition(link, {
+              state: 'running',
+              terminalEventSeq: null,
+              error: `Could not refresh worker state: ${errorMessage(error)}`
+            });
+            if (result.changed) {
+              bb.realtime.publish('taskboard:changed', {
+                projectId: link.task.projectId,
+                source: link.task.source
+              });
+            }
+          }
+        }
+        await sleep(2000, signal);
+      }
+    }
+  });
+
   bb.background.service('sync', {
     async start(signal) {
       let legacyMigrationFinished = false;
@@ -2442,9 +2622,13 @@ export default async function plugin(bb: BbPluginApi) {
         }
         try {
           const projectIds = await configuredLiveProjectIds();
-          await Promise.all(
-            projectIds.map(projectId => syncAll(projectId, undefined, false))
+          await waitUntilAborted(
+            Promise.all(
+              projectIds.map(projectId => syncAll(projectId, undefined, false))
+            ),
+            signal
           );
+          if (signal.aborted) return;
         } catch (error) {
           bb.log.warn(`Background sync failed: ${errorMessage(error)}`);
         }

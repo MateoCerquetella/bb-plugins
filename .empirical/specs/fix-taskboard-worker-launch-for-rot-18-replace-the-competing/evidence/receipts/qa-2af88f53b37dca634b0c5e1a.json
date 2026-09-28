@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-2af88f53b37dca634b0c5e1a",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Run focused Taskboard verification after repairing TypeScript syntax errors.",
+  "passed": false,
+  "startedAt": "2026-09-28T21:05:53.932Z",
+  "completedAt": "2026-09-28T21:10:12.703Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-taskboard-worker-launch-for-rot-18-replace-the-competing",
+    "specRevision": 2,
+    "specDigest": "sha256:3b12a3e15d51ca1c93859814c289b6b317cef34e6f5ca50f4b1272077239e8dc",
+    "treeDigest": "sha256:87c8389d618dcf64a0c9f74a6317b1a9522944b274e9560d802cf238ba54ddfe",
+    "policyDigest": "sha256:168cfa9fe1a343bc5a02663b51d27fc4808f530064f01faa64abed49e9580803",
+    "workflowRevision": 10,
+    "gitCommit": "81d0072d3bafecc0202a701388b8c2f3c70d2f5c",
+    "textTreeDigest": "sha256:87c8389d618dcf64a0c9f74a6317b1a9522944b274e9560d802cf238ba54ddfe"
+  },
+  "digest": "sha256:25505c6a5f1f42c5cc53feb1e97c661f1441f1cb22f36b7d2a5d7d99273310d8",
+  "kind": "qa",
+  "matrixDigest": "sha256:ab98de0a1b97cf0906e14883f262be56d8260e7ebb343b540e3fc125d55a02e0",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "x64",
+    "node": "24.21.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "failed",
+      "summary": "Run focused Taskboard verification after repairing TypeScript syntax errors.",
+      "startedAt": "2026-09-28T21:05:53.932Z",
+      "completedAt": "2026-09-28T21:10:12.703Z",
+      "durationMs": 258771,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:f9b129d8080d6ae249324764ab9bf53ce8ebc569462bb37a19a9d1056d966f66",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-taskboard"
+        ],
+        "cwd": ".",
+        "timeoutMs": 300000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH",
+          "TMPDIR"
+        ]
+      },
+      "result": {
+        "exitCode": 1,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:83c35f6f562d635957fe01c08bcd691bd3c3d97f90acb98f71f9f781d22b8649",
+        "stderrDigest": "sha256:3cbc05792742a7e45bb196e5a1d351e2d7011d2566be82eef215d6377ea02af7",
+        "stdoutTail": " IssueCreateInput (1032.544187ms)\n✔ Linear paginates create options independently and preserves the native default state (159.338869ms)\n✔ Linear rejects invalid creation metadata cursors (34.287425ms)\n✔ Linear keeps explicit create rejection retryable without the uncertain marker (158.729247ms)\n✔ Linear marks malformed or lost post-dispatch create responses uncertain (240.803017ms)\n✔ Jira derives native fields from createmeta and forwards selections (104.933119ms)\n✔ Jira marks ambiguous create acknowledgement and detail failures uncertain (141.267856ms)\n✔ Jira paginates create metadata and canonicalizes issue types to native IDs (17.113208ms)\n✔ Jira exposes only priorities allowed for the selected project and issue type (38.039757ms)\n✔ GitHub loads native metadata and reports partially applied fields (90.754547ms)\n✔ GitHub confirms the submitted assignee from native response membership (3.732689ms)\n✔ GitHub paginates and deduplicates every create metadata collection (3.055889ms)\n✔ GitHub queues a fresh reconciliation after an overlapping pre-create refresh (8.328743ms)\n✔ GitHub queues a post-write refresh when issue confirmation is ambiguous (4.223287ms)\n✔ GitHub forced reconciliation refreshes before listing only project-scoped repos (129.326864ms)\n✔ keeps Taskboard private and Git-buildable without npm publication hooks (29.18887ms)\n✔ documents only BB Community and direct Git installation for Taskboard (6.224807ms)\n✔ keeps Usage Tracker private and documents its Git release too (292.376111ms)\n✔ has no active registry publication automation or credential path (48.879981ms)\n✔ credits merged contributors without reviving superseded filter storage (147.522975ms)\n✔ one-click execution waits for status before dispatching once (95.327053ms)\n✔ one-click execution uses project Git defaults and a bounded generated scope (5.94151ms)\n✔ one-click execution falls back to the existing composer when disabled (85.429059ms)\n✔ the embedded execution status does not expose a second Execute action (2.663462ms)\n✔ verification commands preserve quoted argv and never interpret shell operators (94.418618ms)\n✔ real workspace hook initializes context, preserves retries, seeds fixes, and rejects missing branches (40072.028522ms)\n✔ local remains default and direct routes cannot silently select Symphony (103.900082ms)\n✔ execution defaults support attached and detached project checkouts (21142.301639ms)\n✔ execution defaults can create an empty base commit without committing project files (8113.337879ms)\n✔ execution defaults and form validation report actionable fields (190.773186ms)\n✔ normalization omits raw internal data and approval covers scope (36.256195ms)\n✔ concurrent duplicate dispatch and restart preserve one execution (215.5396ms)\n✔ unavailable Symphony persists intent and never assumes success from 404 (248.144299ms)\n✔ state mapping never maps an agent finish to done or verified (4.100631ms)\n✔ runtime retries, failure, resume generations and duplicate events are durable (110.334867ms)\n✔ cancellation wins over late handoff and needs runtime acknowledgement (73.676655ms)\n✔ implementation handoff requires a revision and independent verification (68.760263ms)\n✔ fix creation atomically preserves approved scope, feedback, and duplicate protection (90.193163ms)\n✔ HTTP adapter uses actual Symphony observation and refresh routes (663.951322ms)\n✔ tracker cancellation uses Taskboard reads; completion is guarded and restart recovers verification (182.236636ms)\n✖ verification binds checks to Git content and refuses dirty, changed or deleted branches (18354.378523ms)\n✔ appends only the preset migration and round-trips complete state (696.265077ms)\n✔ isolates names and ids between projects (89.132344ms)\n✔ contains corrupt rows and makes reorder exact and atomic (255.421426ms)\n✔ enforces the per-project preset limit without blocking updates (863.614328ms)\n✔ bounds reads and fails closed when raw rows exceed the preset limit (801.594474ms)\n✔ rejects --from-state on wrong verbs and preserves explicit precedence (23.542723ms)\n✔ keeps maximum aggregate preset JSON compact and under the CLI cap (520.392502ms)\n✔ enforces a transactional aggregate state-byte limit per project (1547.858058ms)\n✔ accepts a complete strict project browse preference snapshot (247.96197ms)\n✔ requires a project provider and matching source (25.51488ms)\n✔ bounds names, ids, positions, order size, and state fields (106.818277ms)\n✔ rejects control characters in preset identity and state (39.396504ms)\n✔ rejects oversized adversarial containers before inspecting elements (18.091695ms)\n✔ accepts the maximum valid browse state inside the UTF-8 envelope (404.720781ms)\n✔ normalizes unique names without depending on locale (4.108695ms)\n✔ resolves only exact preset order permutations (25.866722ms)\n✔ passes only deliberate GitHub CLI environment categories on POSIX (33.602185ms)\n✔ normalizes deliberate Windows keys case-insensitively (1.934472ms)\n✔ keeps POSIX environment matching case-sensitive (1.755256ms)\n✔ probes GitHub CLI without credentials or executable search state (1.865688ms)\n✔ rejects relative and current-workspace POSIX search entries (191.0894ms)\n✔ rejects current-directory Windows gh.exe shadowing (38.166824ms)\n✔ resolves and probes only absolute GitHub CLI candidates (7.356541ms)\n✔ rejects an external symlink that canonicalizes into the workspace (264.827051ms)\n✔ GitHub loads mapped project issues with current status responses (114.985053ms)\n✔ GitHub loads mapped project issues with legacy status responses (23.23269ms)\n✔ GitHub preserves the provider error when needs_configuration (5.341841ms)\n✔ GitHub preserves the provider error when unavailable (6.866401ms)\n✔ GitHub still rejects malformed required status fields (7.976855ms)\n✔ selects the active thread project only when it still exists (55.981374ms)\n✔ treats a different thread in the same project as new context (3.263021ms)\n✔ reads the project and thread from a BB project route (70.007821ms)\n✔ uses only the immediately previous navigation entry as source context (1.599578ms)\n✔ never replaces an explicit Taskboard project selection with route context (1.350504ms)\n✔ writes project credentials atomically with owner-only permissions (253.898659ms)\n✔ deleting a missing credential is harmless (29.293532ms)\n✔ background sync can release promptly when BB reloads the plugin (78.671021ms)\n✔ cached summaries never retain provider comments (44.037347ms)\n✔ provider creation results carry strict native assignee confirmation (1.798751ms)\n✔ metadata failures expose only a fixed server-safe message (38.187839ms)\n✔ finds Jira project keys from common configured JQL scopes (13.482229ms)\n✔ binds issue creation to the tracker reviewed in the modal (35.560403ms)\n✔ refreshes authoritative provider data after successful issue creation (10.664276ms)\n✔ refreshes authoritative provider data after ambiguous issue creation failure (2.479666ms)\n✔ keeps structural headers on neutral host theme surfaces (16.092453ms)\n✔ uses restrained state glyph, focus, and conversation treatments (3.769682ms)\n✔ keeps constrained filter values inside the vertical menu measure (1.662055ms)\n✔ keeps assignee avatars compact with six theme-safe identity tones (12.380723ms)\n✔ shows restrained composer drop feedback and discoverable drag grips (3.270782ms)\nℹ tests 153\nℹ suites 0\nℹ pass 152\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 60605.538926\n\n✖ failing tests:\n\ntest at test/execution.test.ts:610:1\n✖ verification binds checks to Git content and refuses dirty, changed or deleted branches (18354.378523ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  false !== true\n  \n      at TestContext.<anonymous> (file:///Users/mateocerquetella/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_pshdwft79h-1/bb-plugins/plugins/taskboard/test/execution.test.ts:655:12)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: false,\n    expected: true,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n",
+        "stderrTail": "npm error Lifecycle script `test` failed with error:\nnpm error code 1\nnpm error path /Users/mateocerquetella/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_pshdwft79h-1/bb-plugins/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.5-symphony.0\nnpm error location /Users/mateocerquetella/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_pshdwft79h-1/bb-plugins/plugins/taskboard\nnpm error command failed\nnpm error command sh -c node --test --experimental-strip-types test/*.test.ts\nnpm error Lifecycle script `check` failed with error:\nnpm error code 1\nnpm error path /Users/mateocerquetella/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_pshdwft79h-1/bb-plugins/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.5-symphony.0\nnpm error location /Users/mateocerquetella/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_pshdwft79h-1/bb-plugins/plugins/taskboard\nnpm error command failed\nnpm error command sh -c npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build\n",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:87c8389d618dcf64a0c9f74a6317b1a9522944b274e9560d802cf238ba54ddfe",
+      "sourceTreeAfter": "sha256:87c8389d618dcf64a0c9f74a6317b1a9522944b274e9560d802cf238ba54ddfe",
+      "artifacts": []
+    }
+  ],
+  "anomalies": [
+    "outcome-failed"
+  ]
+}

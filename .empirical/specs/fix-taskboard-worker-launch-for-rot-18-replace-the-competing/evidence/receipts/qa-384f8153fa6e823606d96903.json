@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-384f8153fa6e823606d96903",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Run final focused Taskboard verification after formatter-resilient test repairs.",
+  "passed": false,
+  "startedAt": "2026-09-28T20:55:12.149Z",
+  "completedAt": "2026-09-28T20:57:03.549Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-taskboard-worker-launch-for-rot-18-replace-the-competing",
+    "specRevision": 2,
+    "specDigest": "sha256:3b12a3e15d51ca1c93859814c289b6b317cef34e6f5ca50f4b1272077239e8dc",
+    "treeDigest": "sha256:1782a388729558ee15fdeca43af46e9907046a35ac9b37bf970cc4afe8fa1f6f",
+    "policyDigest": "sha256:168cfa9fe1a343bc5a02663b51d27fc4808f530064f01faa64abed49e9580803",
+    "workflowRevision": 9,
+    "gitCommit": "81d0072d3bafecc0202a701388b8c2f3c70d2f5c",
+    "textTreeDigest": "sha256:1782a388729558ee15fdeca43af46e9907046a35ac9b37bf970cc4afe8fa1f6f"
+  },
+  "digest": "sha256:4197eb0ea55b6287b4fe6c410c8a91c35e55041871bb1414fd0bd3bc75451f17",
+  "kind": "qa",
+  "matrixDigest": "sha256:ab98de0a1b97cf0906e14883f262be56d8260e7ebb343b540e3fc125d55a02e0",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "x64",
+    "node": "24.21.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "failed",
+      "summary": "Run final focused Taskboard verification after formatter-resilient test repairs.",
+      "startedAt": "2026-09-28T20:55:12.149Z",
+      "completedAt": "2026-09-28T20:57:03.549Z",
+      "durationMs": 111400,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:f9b129d8080d6ae249324764ab9bf53ce8ebc569462bb37a19a9d1056d966f66",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-taskboard"
+        ],
+        "cwd": ".",
+        "timeoutMs": 300000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH",
+          "TMPDIR"
+        ]
+      },
+      "result": {
+        "exitCode": 2,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:03ec09c8ae16536cb78530309daf638b3322038dc41012133ec99a3ac908b3be",
+        "stderrDigest": "sha256:db4fd3eea3b73d68d8da3e7bacd0fb1c91ae212d98085f9963d0993868e87e9a",
+        "stdoutTail": "\n> bb-plugin-taskboard@0.3.5-symphony.0 check\n> npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build\n\n\n> bb-plugin-taskboard@0.3.5-symphony.0 types:check\n> env -u BB_CLI bb plugin types --check .\n\nThis plugin uses the npm package @get-bb/plugin-sdk; pin is 0.4.6, host is 0.4.6.\nThe declarations are in node_modules/@get-bb/plugin-sdk/bundled-types/ — read them for exact signatures.\n\n> bb-plugin-taskboard@0.3.5-symphony.0 typecheck\n> tsc --noEmit\n\napp.tsx(1619,5): error TS2322: Type 'undefined' is not assignable to type 'boolean'.\napp.tsx(1637,5): error TS2322: Type 'undefined' is not assignable to type 'boolean'.\napp.tsx(2148,3): error TS2322: Type 'undefined' is not assignable to type 'boolean'.\napp.tsx(7655,5): error TS2322: Type '(props: PluginPendingInteractionProps) => void' is not assignable to type 'ComponentType<PluginPendingInteractionProps>'.\n  Type '(props: PluginPendingInteractionProps) => void' is not assignable to type 'FunctionComponent<PluginPendingInteractionProps>'.\n    Type 'void' is not assignable to type 'ReactNode | Promise<ReactNode>'.\nexecution/defaults.ts(22,1): error TS2304: Cannot find name 'async'.\nexecution/defaults.ts(26,5): error TS2322: Type 'boolean' is not assignable to type 'Promise<boolean>'.\nexecution/defaults.ts(27,7): error TS1308: 'await' expressions are only allowed within async functions and at the top levels of modules.\nexecution/defaults.ts(40,5): error TS2322: Type 'boolean' is not assignable to type 'Promise<boolean>'.\n",
+        "stderrTail": "npm error Lifecycle script `typecheck` failed with error:\nnpm error code 2\nnpm error path /Users/mateocerquetella/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_pshdwft79h-1/bb-plugins/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.5-symphony.0\nnpm error location /Users/mateocerquetella/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_pshdwft79h-1/bb-plugins/plugins/taskboard\nnpm error command failed\nnpm error command sh -c tsc --noEmit\nnpm error Lifecycle script `check` failed with error:\nnpm error code 2\nnpm error path /Users/mateocerquetella/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_pshdwft79h-1/bb-plugins/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.5-symphony.0\nnpm error location /Users/mateocerquetella/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_pshdwft79h-1/bb-plugins/plugins/taskboard\nnpm error command failed\nnpm error command sh -c npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build\n",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:1782a388729558ee15fdeca43af46e9907046a35ac9b37bf970cc4afe8fa1f6f",
+      "sourceTreeAfter": "sha256:1782a388729558ee15fdeca43af46e9907046a35ac9b37bf970cc4afe8fa1f6f",
+      "artifacts": []
+    }
+  ],
+  "anomalies": [
+    "outcome-failed"
+  ]
+}

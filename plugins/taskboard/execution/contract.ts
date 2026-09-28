@@ -210,7 +210,11 @@ export type TaskReference = z.infer<typeof taskReferenceSchema>;
 
 export const executionRpc = {
   executionDefaults: {
-    input: taskReferenceSchema,
+    input: taskReferenceSchema
+      .extend({
+        initializeRepository: z.boolean().default(false)
+      })
+      .strict(),
     output: z
       .object({
         repository: z.string(),

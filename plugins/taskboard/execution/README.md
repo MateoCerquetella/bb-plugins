@@ -1,6 +1,9 @@
 # Execute approved Taskboard work with Symphony
 
-Taskboard keeps the task, approved scope, verification, and tracker status. Symphony runs the coding agent in an isolated workspace. The existing **Send to agent** action stays unchanged. Managed execution is disabled by default.
+Taskboard keeps the task, approved scope, verification, and tracker status.
+Symphony runs the coding agent in an isolated workspace. **Start agent** opens
+the dedicated Worker page when managed execution is enabled and falls back to
+the existing composer handoff when it is disabled.
 
 ## Setup
 
@@ -19,13 +22,13 @@ mix compile
 
 Copy `engines/symphony/runtime/WORKFLOW.example.md` to a runtime-owned `WORKFLOW.md`. Configure these environment variables for **the Symphony process**, using a private environment file or your service manager:
 
-| Variable | Value |
-| --- | --- |
-| `TASKBOARD_URL` | BB server URL followed by `/api/v1/plugins/taskboard/http/execution/v1` |
-| `TASKBOARD_TOKEN` | Taskboard's plugin HTTP token, obtained locally with `bb plugin token taskboard` |
-| `TASKBOARD_RUNTIME_ID` | `taskboard`, or the configured runtime identity |
-| `TASKBOARD_WORKSPACE_ROOT` | Absolute directory shared with the BB server, e.g. `/path/to/taskboard-workspaces` |
-| `TASKBOARD_WORKSPACE_HELPER` | Absolute path to `engines/symphony/runtime/workspace.mjs` in this plugin |
+| Variable                     | Value                                                                              |
+| ---------------------------- | ---------------------------------------------------------------------------------- |
+| `TASKBOARD_URL`              | BB server URL followed by `/api/v1/plugins/taskboard/http/execution/v1`            |
+| `TASKBOARD_TOKEN`            | Taskboard's plugin HTTP token, obtained locally with `bb plugin token taskboard`   |
+| `TASKBOARD_RUNTIME_ID`       | `taskboard`, or the configured runtime identity                                    |
+| `TASKBOARD_WORKSPACE_ROOT`   | Absolute directory shared with the BB server, e.g. `/path/to/taskboard-workspaces` |
+| `TASKBOARD_WORKSPACE_HELPER` | Absolute path to `engines/symphony/runtime/workspace.mjs` in this plugin           |
 
 Create the workspace root before starting. Keep the token out of source control and prompts. The adapter strips it from the coding agent's environment. Do not configure Linear, GitHub, or Jira credentials in this runtime. Run one Symphony daemon per Taskboard runtime identity. Use a private connection with TLS if BB is not on loopback; do not expose the plugin token in a URL.
 
@@ -49,10 +52,15 @@ bb plugin config taskboard set executionEnabled true
 
 ## Use
 
-1. Open a task and select **Execute**. Taskboard proposes the project's current repository, branch, and base commit.
-2. Choose delegated implementation or explicitly structured work. Supply the approved plan, acceptance criteria, project context, and required commands. A large task does not automatically become a structured workflow.
-3. Review and approve the execution request. A stable dispatch key prevents duplicate starts, including a repeated click after a lost response.
-4. Inspect execution status in the same task detail. Advanced details include engine, execution/run IDs, workspace, agent, retries/errors, and Git metadata.
+1. Open a task and select **Start agent**, use the play action on a Kanban card,
+   or move a card into an in-progress column.
+2. Taskboard opens the Worker page and derives a bounded delegated scope from
+   the task. A valid repository without commits receives an empty initial
+   commit; existing staged and untracked files are not included.
+3. A stable dispatch key prevents duplicate starts, including a repeated click
+   after a lost response.
+4. Inspect execution status on the Worker page. Advanced details include
+   engine, execution/run IDs, workspace, agent, retries/errors, and Git metadata.
 5. Once the agent calls `taskboard_handoff` and Symphony releases the workspace, Taskboard automatically checks the actual repository/branch/commit and runs the approved commands. **Verify implementation** also allows an explicit rerun.
 6. Review acceptance criteria against the changes and confirm them after checks pass. Then use Taskboard's existing status menu to advance the provider's workflow. Symphony never makes that transition.
 

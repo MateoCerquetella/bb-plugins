@@ -170,6 +170,34 @@ export const workItemDetailSchema = workItemSchema
   .strict();
 export type WorkItemDetail = z.infer<typeof workItemDetailSchema>;
 
+export const agentThreadStateSchema = z.enum([
+  'running',
+  'completed',
+  'failed',
+  'canceled'
+]);
+export type AgentThreadState = z.infer<typeof agentThreadStateSchema>;
+
+export const agentThreadLinkSchema = z
+  .object({
+    dispatchKey: z.string().uuid(),
+    task: z
+      .object({
+        projectId: bbProjectIdSchema,
+        source: workSourceSchema,
+        locator: z.string().min(1)
+      })
+      .strict(),
+    threadId: z.string().min(1),
+    state: agentThreadStateSchema,
+    terminalEventSeq: z.number().int().nonnegative().nullable(),
+    error: z.string().max(2000).nullable(),
+    createdAt: z.string(),
+    updatedAt: z.string()
+  })
+  .strict();
+export type AgentThreadLink = z.infer<typeof agentThreadLinkSchema>;
+
 export const workSourceStatusSchema = z
   .object({
     source: workSourceSchema,
@@ -305,6 +333,27 @@ export const taskboardRpcContract = defineRpcContract({
   threadProject: {
     input: z.object({ threadId: z.string().min(1) }).strict(),
     output: z.object({ projectId: bbProjectIdSchema }).strict()
+  },
+  startAgentThread: {
+    input: z
+      .object({
+        projectId: bbProjectIdSchema,
+        source: workSourceSchema,
+        locator: z.string().min(1),
+        dispatchKey: z.string().uuid()
+      })
+      .strict(),
+    output: z.object({ threadId: z.string().min(1) }).strict()
+  },
+  agentThreadStatus: {
+    input: z
+      .object({
+        projectId: bbProjectIdSchema,
+        source: workSourceSchema,
+        locator: z.string().min(1)
+      })
+      .strict(),
+    output: z.object({ link: agentThreadLinkSchema.nullable() }).strict()
   },
   status: {
     input: z.object({ projectId: bbProjectIdSchema }).strict(),

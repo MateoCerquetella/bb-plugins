@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "sequence": 1,
+  "previousDigest": "sha256:5838f719b45cbe5c36e74764e9e76634a2353b06f3af25bd7f73d0eccd7f7a62",
+  "actor": "empirical-start",
+  "type": "transition",
+  "summary": "Started fix-taskboard-worker-launch-for-rot-18-replace-the-competing",
+  "createdAt": "2026-09-28T20:09:46.377Z",
+  "stateBeforeDigest": "sha256:74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+  "stateAfterDigest": "sha256:50d142cdf991e934f165352b9ea5bb23afb0b9862be52089bc22c8d0503df240",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 1,
+    "activeFeature": "fix-taskboard-worker-launch-for-rot-18-replace-the-competing",
+    "request": "Fix Taskboard worker launch for ROT-18: replace the competing Execute and Start agent actions with one preferred Start agent flow, keep the dedicated Worker page and kanban drag-to-in-progress launch behavior, and handle repositories with no initial commit so users are not blocked by the current raw validation error. Preserve existing uncommitted Taskboard work and verify the resulting UI and execution behavior.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": null,
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:f2dc2e1452956dbf8126f2b3c99401bf46fb7593dd46cc374ca3acc14e60d442",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": null,
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-28T20:09:46.377Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:684cccc838836a71fb248a53d6661a6277bb6a75d143ad55f16d2d58d4cb52a2"
+}

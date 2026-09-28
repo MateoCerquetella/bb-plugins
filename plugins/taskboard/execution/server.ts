@@ -132,7 +132,9 @@ export function registerExecution(
         project.sources.find(source => source.isDefault) ?? project.sources[0];
       if (!source) throw new Error('Configure a project repository first');
       // Shared-workspace execution is intentionally limited to repository paths accessible to this server.
-      return resolveExecutionDefaults(source.path);
+      return resolveExecutionDefaults(source.path, {
+        initializeRepository: task.initializeRepository
+      });
     },
     async prepareExecution(input) {
       const item = await currentItem(input.task);

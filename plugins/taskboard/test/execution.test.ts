@@ -190,6 +190,44 @@ test('execution defaults support attached and detached project checkouts', async
     await rm(root, { recursive: true, force: true });
   }
 });
+test('execution defaults can create an empty base commit without committing project files', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'taskboard-unborn-defaults-'));
+  const repository = join(root, 'repository');
+  await mkdir(repository);
+  try {
+    assert.equal(
+      (await command(['git', 'init', '-b', 'main'], repository)).passed,
+      true
+    );
+    await writeFile(join(repository, 'untracked.txt'), 'keep me untracked\n');
+    await writeFile(join(repository, 'staged.txt'), 'keep me staged\n');
+    assert.equal(
+      (await command(['git', 'add', 'staged.txt'], repository)).passed,
+      true
+    );
+
+    const defaults = await resolveExecutionDefaults(repository, {
+      initializeRepository: true
+    });
+
+    assert.equal(defaults.baseBranch, 'main');
+    assert.equal(
+      defaults.baseRevision,
+      await git(repository, 'rev-parse', 'HEAD')
+    );
+    assert.equal(
+      await git(repository, 'show', '--format=', '--name-only', 'HEAD'),
+      ''
+    );
+    assert.match(await git(repository, 'status', '--short'), /A  staged\.txt/u);
+    assert.match(
+      await git(repository, 'status', '--short'),
+      /\?\? untracked\.txt/u
+    );
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
 test('execution defaults and form validation report actionable fields', async () => {
   await assert.rejects(
     resolveExecutionDefaults('/definitely/not/a/taskboard/repository'),

@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "sequence": 12,
+  "previousDigest": "sha256:9b6705546e47eec2e3e94142560d7dd7f2c7ee02a73c40129bdf16e10d9f5cfb",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Replaced the internal Worker route with a native BB project-thread launch. Start agent and Kanban launch now create one issue-seeded thread, initialize an unborn repository first, persist an issue-specific Taskboard right-panel tab, pin the panel, and navigate to the thread. Managed execution disabled still falls back to the composer. TypeScript and the affected UI/source regression suite pass.",
+  "createdAt": "2026-09-28T22:10:18.695Z",
+  "stateBeforeDigest": "sha256:9c23a3978a76134570fb6c8b557f91a327b2bed33cdde1ac0cee346757908e22",
+  "stateAfterDigest": "sha256:ed6e5094853a34e4b6dbd6ed4f579bd83369f998946c4fdfdac394763d8631f2",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 12,
+    "activeFeature": "fix-taskboard-worker-launch-for-rot-18-replace-the-competing",
+    "request": "Fix Taskboard worker launch for ROT-18: replace the competing Execute and Start agent actions with one preferred Start agent flow, keep the dedicated Worker page and kanban drag-to-in-progress launch behavior, and handle repositories with no initial commit so users are not blocked by the current raw validation error. Preserve existing uncommitted Taskboard work and verify the resulting UI and execution behavior.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Replaced the internal Worker route with a native BB project-thread launch. Start agent and Kanban launch now create one issue-seeded thread, initialize an unborn repository first, persist an issue-specific Taskboard right-panel tab, pin the panel, and navigate to the thread. Managed execution disabled still falls back to the composer. TypeScript and the affected UI/source regression suite pass.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:ff0b3103fee176b187084b13d933af8be667c8cf82197a192ff534bb033e3837",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:d06f5edb7a862bcb93c930b2b48375afb8691d91686898cffdb2c2bf15f48036",
+    "impactDigest": "sha256:6e91b8d6579374a3580349469c769cf5e5435c14ec960dcb667074bdc5f82639",
+    "capabilityClaimId": "fix-taskboard-worker-launch-for-rot-18-replace-the-competing-61a96e508a43",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-28T22:10:18.695Z",
+    "lifecycle": {
+      "stage": "iteration",
+      "iteration": 4,
+      "awaitingFeedback": true,
+      "iterative": true,
+      "contractBaseline": 12,
+      "amendments": [
+        11
+      ]
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "fix-taskboard-worker-launch-for-rot-18-replace-the-competing-61a96e508a43",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "fix-taskboard-worker-launch-for-rot-18-replace-the-competing",
+      "worktree": "/Users/mateocerquetella/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_pshdwft79h-1/bb-plugins",
+      "worktreeId": "sha256:395846d2bd8b93cec3b36a115f6212cd55327cfb13ee99f3d5dae7563ac32740",
+      "baseCommit": "81d0072d3bafecc0202a701388b8c2f3c70d2f5c",
+      "baseTree": "0a7c3cfb8f35d6999f206bd20290abba066b2889",
+      "bases": {
+        "taskboard-execution": {
+          "capability": "taskboard-execution",
+          "digest": "sha256:a753c7c2ee2fe4796628ddf317a510326dbaa4f33c7852c33bcd124664f2c8ee",
+          "requirements": {
+            "optional execution infrastructure": "sha256:10884bdd22260197551fea0247efb046c5a6f0bb24e4618dc08440618c606b3a"
+          }
+        }
+      },
+      "capabilities": [
+        "taskboard-execution"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-09-28T20:15:45.820Z",
+      "heartbeatAt": "2026-09-28T20:15:45.820Z",
+      "digest": "sha256:22f2bd7b73c9e7c50f265f7b93cc9ed1f690c62f7e827f0f7aadb04a8efc239d"
+    },
+    "trackerGeneration": 4,
+    "reviewFirst": true
+  },
+  "digest": "sha256:8d33240eade4ba78f2b2cc1bba03c52ed80745e50da2cf4a3900bf0667ea3a9d"
+}
