@@ -1,31 +1,16 @@
 {
   "schemaVersion": 1,
-  "packetDigest": "sha256:d1dd527aef4a61e2e6ba45c326ef49f6e17f76d2299d412ecbad0a18015d6a95",
-  "resultPath": ".empirical/specs/taskboard-symphony-execution/reviews/80d922aee861fdf2b0194d53.json",
-  "resultDigest": "sha256:80d922aee861fdf2b0194d536568ed8d465b9999864547a12a6ed9ca574cc730",
-  "receiptId": "collected-28f6b0fbc4852795c7b5cd18",
+  "packetDigest": "sha256:8359cb6617398848a7520f224e153f9d13e9b1d8e820ca715b631a21f593eb40",
+  "resultPath": ".empirical/specs/taskboard-symphony-execution/reviews/3e89fe05531c0f262c7de792.json",
+  "resultDigest": "sha256:3e89fe05531c0f262c7de792aebf40d43c0396b3d5adf51ef6d75169025b788a",
+  "receiptId": "collected-a857fc030f144e2a303b1ce5",
   "reReview": {
-    "previousResultDigest": "sha256:6e947399a8b9464643e3dfa24a1ae6cc606eb321ba293086e23498dc51971a37",
+    "previousResultDigest": "sha256:80d922aee861fdf2b0194d536568ed8d465b9999864547a12a6ed9ca574cc730",
     "previousBaseCommit": "9614dd51fc203d740614aba4de44f31cda50ec04",
-    "previousHeadCommit": "8418eeb34aa96bbac54dddbe18598ff4ad0ffb5b",
-    "previousVerdict": "CHANGES_REQUESTED",
-    "previousReview": "# Verdict: CHANGES_REQUESTED\n\n- PASS AC-1: The existing composer handoff remains unchanged. Direct routes select local execution; delegated and structured routes explicitly select their backend.\n- PASS AC-2: The backend persists versioned requests, binds dispatch to the normalized request digest, and uses durable dispatch uniqueness plus generation checks. The separate UI dispatch defect is reported under AC-UI-1.\n- PASS AC-3: The adapter pins a real Symphony revision, implements its tracker boundary, uses observation/refresh endpoints, and supplies isolated workspaces and implementation-only context.\n- PASS AC-4: Execution states and runtime/Git metadata are persisted separately from external tracker completion.\n- PASS AC-5: The implementation provides durable unavailable-runtime handling, cancellation acknowledgement, retry/time budgets, generation-based resume, and preserved workspaces. Reviewed evidence includes synthetic runtime tests rather than a live coding-agent lifecycle.\n- FAIL AC-6: F-2: declared-input fingerprints hash silently truncated git ls-tree output, allowing stale passing evidence to survive changes beyond the output limit.\n- PASS AC-7: Managed execution is opt-in, authenticated HTTP carries the runtime token, context generation omits that token, and existing provider adapters remain responsible for external status writes.\n- FAIL AC-UI-1: F-1: the real approval request violates its strict RPC schema, preventing managed execution from starting through the UI. The committed browser fixture bypasses this validation.\n\n## Security / correctness\n\nChanges required. The approval path cannot dispatch through the real RPC contract, and verification can reuse stale evidence. A read-only execution of the packet's command helper confirmed that distinct successful outputs sharing the first 32,000 characters produce identical retained output and fingerprints. No additional blocking security finding was established.\n\n## Design / maintainability\n\nThe engine, persistence, verification, and UI responsibilities are separated clearly. The blockers expose missing boundary coverage: browser fixtures do not validate the production RPC schema, and cache tests cover only small Git listings. Add focused regression coverage alongside both fixes.",
-    "openFindings": [
-      {
-        "id": "F-1",
-        "severity": "high",
-        "category": "acceptance",
-        "summary": "setPrepared(result) retains engine and prompt from prepareExecution; approve() then spreads those fields into startExecution at lines 160–163, whose strict schema permits only request, digest, and dispatchKey. Every real managed approval is rejected for unknown fields. Store or send only the permitted fields and exercise approval through actual RPC validation.",
-        "path": "plugins/taskboard/execution/panel.tsx:153"
-      },
-      {
-        "id": "F-2",
-        "severity": "high",
-        "category": "correctness",
-        "summary": "Declared-input fingerprints use git ls-tree through command(), which silently truncates successful output to 32,000 characters at lines 28–30. For a large declared directory, a fix iteration changing files after that prefix retains the same fingerprint and reuses stale passing checks. Hash the complete Git listing or fail on truncation, and test a change beyond the current limit.",
-        "path": "plugins/taskboard/execution/verification.ts:127"
-      }
-    ],
+    "previousHeadCommit": "c75809baec1a9c470df3ae53a4b4dde385c5bc16",
+    "previousVerdict": "APPROVED",
+    "previousReview": "# Verdict: APPROVED\n\n- PASS AC-1: Carried forward. The delta preserves local composer handoff and explicit route/backend selection.\n- PASS AC-2: Carried forward. Request persistence, digest binding, dispatch uniqueness, and generation checks are unchanged. Approval preserves the request, digest, and dispatch key.\n- PASS AC-3: Carried forward. The pinned Symphony tracker integration and workspace/context responsibilities are unchanged.\n- PASS AC-4: Carried forward. Durable execution states and runtime/Git metadata remain separate from tracker completion.\n- PASS AC-5: Carried forward. Recovery, cancellation, retry limits, and workspace preservation are unchanged. The prior limitation concerning synthetic runtime evidence remains.\n- PASS AC-6: F-2 is fixed. Declared-input fingerprints now incorporate a SHA-256 digest of every stdout byte from a NUL-delimited Git listing, independently of the display-output cap. Failed or timed-out fingerprint commands reject verification. The regression adds 700 files, changes the final file beyond the former cap, and requires a fresh failing check instead of cached success.\n- PASS AC-7: Carried forward. Opt-in configuration, credential handling, and exclusive external-status ownership remain unchanged.\n- PASS AC-UI-1: F-1 is fixed. Prepared state projects request and digest, and approval explicitly sends only request, digest, and dispatchKey. The browser fixture now validates execution inputs against the production RPC schemas before dispatch and asserts that approval reaches running status with exactly one dispatch.\n\n## Security / correctness\n\nBoth blocking findings are closed. No material security or correctness regression was found in the committed delta. Review used the packet and exact committed context; no working-tree files were inspected or changed, and tests were not independently executed.\n\n## Design / maintainability\n\nThe fixes are focused and preserve existing interfaces. Approval makes the strict RPC boundary explicit, while streaming input hashing separates evidence identity from bounded display output. Added regression coverage targets both previously missed boundaries.",
+    "openFindings": [],
     "deferredFindings": []
   }
 }
