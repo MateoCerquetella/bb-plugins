@@ -1,25 +1,25 @@
 {
   "schemaVersion": 1,
-  "sequence": 15,
-  "previousDigest": "sha256:21ae48fec87c7281762ed6a0c92885a21e96219b51f2e79a0d351c44355e63df",
-  "actor": "agent",
-  "type": "transition",
-  "summary": "The user explicitly approved the implemented result and instructed continuation. Recorded the required human acceptance QA receipt. Automated Taskboard checks, browser evidence, pinned Symphony tests, and approved independent re-review remain valid; all Verify requirements are now satisfied.",
-  "createdAt": "2026-09-28T04:30:49.056Z",
-  "stateBeforeDigest": "sha256:6271dee69afc012015a58b7f2ffe42081143c81a15e2acebe4a5b4dc619ce2a7",
-  "stateAfterDigest": "sha256:3f399b713a4206df09dd4a80e11ad05228fd3c01fea1b6e0a188cc850ab7319e",
+  "sequence": 22,
+  "previousDigest": "sha256:29cdcfbf3f6600a72ae77724dfa773e3f4565e0d5404f622188478887a355122",
+  "actor": "empirical-integrate",
+  "type": "compaction-boundary",
+  "summary": "Compacted through journal event 21",
+  "createdAt": "2026-09-28T04:49:23.980Z",
+  "stateBeforeDigest": "sha256:f836bd84c1d8ce3729abaabf2bc2769769914fd2cb143b5ef858af8ccf2b66dc",
+  "stateAfterDigest": "sha256:f836bd84c1d8ce3729abaabf2bc2769769914fd2cb143b5ef858af8ccf2b66dc",
   "state": {
     "schemaVersion": 5,
-    "revision": 15,
+    "revision": 21,
     "activeFeature": "taskboard-symphony-execution",
     "request": "Integrate OpenAI Symphony as an optional execution backend in the existing Taskboard BB plugin (user corrected Taskmaster to Taskboard). Keep Taskboard authoritative for routing, plans, approvals, task context, acceptance criteria, verification, and external tracker status. Preserve existing local composer handoff by default; opt-in Symphony only for delegated or explicitly structured execution. Introduce an engine-neutral normalized execution DTO and persistent execution IDs, adapter-specific state mapping, cancellation/retry/restart recovery and duplicate protection, workspace context, existing UI execution status, configuration, authoritative verification/fix cycles, and regression/failure tests. Taskboard currently has tracker adapters, SQLite cache, RPC, background sync, composer handoff, and detail UI but no execution/workflow engine; do not claim these already exist. Symphony upstream is tracker-driven and has no HTTP run mutation API; use a real tested integration without inventing APIs or changing BB core. Implement and validate in this existing isolated feature checkout; do not publish.",
     "profile": "complex",
     "workflow": "complex",
     "mode": "normal",
-    "phase": "integrate",
-    "status": "waiting",
-    "repairAttempts": 1,
-    "message": "The user explicitly approved the implemented result and instructed continuation. Recorded the required human acceptance QA receipt. Automated Taskboard checks, browser evidence, pinned Symphony tests, and approved independent re-review remain valid; all Verify requirements are now satisfied.",
+    "phase": "done",
+    "status": "done",
+    "repairAttempts": 0,
+    "message": "Integrated capability changes: taskboard-execution",
     "implementationActor": "agent",
     "workStartedAt": null,
     "specDigest": "sha256:95a8cdc3f2754ae0a5c3fbb95bb46544e7dc1f07ca7bae776a0b1ae65427a3b7",
@@ -31,7 +31,7 @@
     "authorizationDigest": null,
     "evidence": [],
     "evidenceReceiptIds": [
-      "collected-28f6b0fbc4852795c7b5cd18",
+      "collected-a857fc030f144e2a303b1ce5",
       "qa-5b8e7a27d0fa0c482fd29225",
       "qa-fb1fbd9810e0019391f55eab",
       "collected-2fcc7418dcb9e9cbe6314f7f",
@@ -41,17 +41,16 @@
     "completion": {
       "implemented": true,
       "verified": true,
-      "integrated": false,
+      "integrated": true,
       "delivered": false,
       "published": false,
-      "highest": "verified",
+      "highest": "integrated",
       "reasons": {
-        "integrated": "integrated has not been proven by a durable receipt.",
         "delivered": "delivered has not been proven by a durable receipt.",
         "published": "published has not been proven by a durable receipt."
       }
     },
-    "updatedAt": "2026-09-28T04:30:49.056Z",
+    "updatedAt": "2026-09-28T04:49:19.272Z",
     "capabilityBase": {
       "schemaVersion": 1,
       "id": "taskboard-symphony-execution-caf37045e0a4",
@@ -82,7 +81,27 @@
       "heartbeatAt": "2026-09-28T02:32:17.461Z",
       "digest": "sha256:6f1abb931df753887a9f777248ba005085eee217b77081c67645d1b2276ee392"
     },
-    "reviewFirst": true
+    "trackerGeneration": 1,
+    "lifecycle": {
+      "stage": "consolidation",
+      "iteration": 1,
+      "awaitingFeedback": false
+    },
+    "reviewFirst": true,
+    "completionRecord": {
+      "schemaVersion": 1,
+      "implementedBy": "agent",
+      "completedBy": "agent",
+      "decisionBy": "user",
+      "method": "workflow",
+      "reason": "Integrated capability changes: taskboard-execution",
+      "at": "2026-09-28T04:49:19.272Z",
+      "revision": 21,
+      "completion": "integrated",
+      "sourceTreeDigest": "sha256:0ad12c51415d2abf3a4f10afdf60392d06193df65f29123f4cd662014b47f84e",
+      "artifactTreeDigest": "sha256:1b6baa0f9f497e9a75825330939221232a1f8d0450445947429380bcd82c98dd",
+      "digest": "sha256:b74290616886f122bfe92c34af73931202a6912dcc396535d8ff9ac95190c567"
+    }
   },
-  "digest": "sha256:cf271547bc2eeb043db6d995e3fcbda101c3c7f9591e84e16b1b777d773feed5"
+  "digest": "sha256:c419f121f32e899efb1a2a42a2b35b2fe5a234decae5eb6174c9d31d6d311642"
 }

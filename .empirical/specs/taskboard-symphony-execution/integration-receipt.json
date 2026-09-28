@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "feature": "taskboard-symphony-execution",
+  "claimId": "taskboard-symphony-execution-caf37045e0a4",
+  "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+  "baseCommit": "bc7064eedf7dc1f4f340e3781f1494a8acd91802",
+  "baseTree": "a68591cb9decead62b40507697851e6c77866841",
+  "featureTree": "sha256:843d7854758d4c94231cb7b4d659a7aeade6013ed234999445fde399c71950ce",
+  "targetCommit": "9614dd51fc203d740614aba4de44f31cda50ec04",
+  "targetTree": "41b659cfcdc3046ebe70fbe0fc4e4b9502d04e38",
+  "capabilityBaseDigests": {
+    "taskboard-execution": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "deltaDigest": "sha256:560e70d7b35b78715e959d4c59c96df7a175a36717e96f3dbaca48f14a11ff64",
+  "resultDigests": {
+    "taskboard-execution": "sha256:ae73b0d656ad51f1c528aff9d63a816ce21e778e0bb17ee4452243c96743c5cf"
+  },
+  "verificationReceiptDigests": [
+    "sha256:440a4a5baf619b980896f77ebe801bc4e509fc1e4ebb729f982c229dbd6291fd"
+  ],
+  "promotionRoute": {
+    "mode": "auto",
+    "route": "local",
+    "reasons": [
+      {
+        "code": "REMOTE_CHECKS_NOT_CONFIGURED"
+      },
+      {
+        "code": "REMOTE_TARGET_BASE_UNRESOLVED",
+        "paths": [
+          "delivery.targetBranch"
+        ]
+      }
+    ]
+  },
+  "integratedAt": "2026-09-28T04:49:16.213Z",
+  "digest": "sha256:ade050422b84191cb5644997c0084ecc22083791326693d7bd49f94472bc64a7"
+}
