@@ -7,15 +7,13 @@ import {
 import { readClaudeUsageFromKeychain } from "./lib/claude-keychain-usage.ts";
 import { loadUsageSnapshot } from "./lib/load-usage.ts";
 import { getCachedAntigravityUsage } from "./lib/antigravity-probe.ts";
+import { createResetActionGate, type ResetPrepareResult } from "./lib/reset-action-gate.ts";
+import { PROVIDER_IDS, withCodexResetCredits } from "./lib/usage.ts";
 import {
-  createResetActionGate,
-  type ResetPrepareResult,
-} from "./lib/reset-action-gate.ts";
-import {
-  PROVIDER_IDS,
-  withCodexResetCredits,
-} from "./lib/usage.ts";
-import { switchPoolAccount } from "./lib/pool-routing.ts";
+  loadPoolAccountRecords,
+  poolOwnsProvider,
+  switchPoolAccount,
+} from "./lib/pool-routing.ts";
 import {
   COMPACT_LIMIT_OPTIONS,
   enabledSidebarProviderIds,
@@ -32,11 +30,7 @@ const costSchema = z
 
 const resetCreditsSchema = z
   .object({
-    availableCount: z
-      .number()
-      .int()
-      .min(0)
-      .max(Number.MAX_SAFE_INTEGER),
+    availableCount: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER),
   })
   .strict();
 
@@ -51,13 +45,7 @@ const usageWindowSchema = z
   })
   .strict();
 
-const providerStatusSchema = z.enum([
-  "ok",
-  "not_installed",
-  "unauthenticated",
-  "expired",
-  "error",
-]);
+const providerStatusSchema = z.enum(["ok", "not_installed", "unauthenticated", "expired", "error"]);
 
 const pooledAccountSchema = z
   .object({
@@ -125,9 +113,7 @@ export const usageRpcContract = defineRpcContract({
       .strict(),
   },
   getUsage: {
-    input: z
-      .object({ threadId: z.string().trim().min(1).nullable() })
-      .strict(),
+    input: z.object({ threadId: z.string().trim().min(1).nullable() }).strict(),
     output: z
       .object({
         fetchedAt: z.string(),
@@ -160,9 +146,7 @@ export const usageRpcContract = defineRpcContract({
         confirmationToken: z.string().trim().min(1).max(128),
       })
       .strict(),
-    output: z
-      .object({ outcome: resetConsumptionOutcomeSchema })
-      .strict(),
+    output: z.object({ outcome: resetConsumptionOutcomeSchema }).strict(),
   },
 });
 
@@ -220,9 +204,7 @@ export default function plugin(bb: BbPluginApi) {
     },
   });
 
-  const resetGate = createResetActionGate(
-    consumeCodexRateLimitResetCredit,
-  );
+  const resetGate = createResetActionGate(consumeCodexRateLimitResetCredit);
 
   let lastKnownCodexResetCount: number | null = null;
 
@@ -237,15 +219,17 @@ export default function plugin(bb: BbPluginApi) {
     async getUsage({ threadId }) {
       const preferences = await settings.get();
       const claudeKeychainService = preferences.claudeKeychainService.trim();
+      const routedAccounts = loadPoolAccountRecords();
       const snapshot = await loadUsageSnapshot(
         bb.sdk,
         threadId,
         new Date(),
         claudeKeychainService === ""
           ? Promise.resolve({})
-          : readClaudeUsageFromKeychain(claudeKeychainService).then(
-              (usage) => ({ "claude-code": usage }),
-            ),
+          : readClaudeUsageFromKeychain(claudeKeychainService).then((usage) => ({
+              "claude-code": usage,
+            })),
+        routedAccounts,
       );
       const providers = preferences.enableAntigravity
         ? [
@@ -253,12 +237,13 @@ export default function plugin(bb: BbPluginApi) {
             getCachedAntigravityUsage(),
           ]
         : snapshot.providers.filter((provider) => provider.id !== "antigravity");
-      const codexIsAvailable = snapshot.providers.some(
-        (provider) =>
-          provider.id === "codex" &&
-          provider.status === "ok" &&
-          (provider.accounts?.length ?? 0) === 0,
-      );
+      const codexIsAvailable =
+        snapshot.providers.some(
+          (provider) =>
+            provider.id === "codex" &&
+            provider.status === "ok" &&
+            (provider.accounts?.length ?? 0) === 0,
+        ) && !poolOwnsProvider(await routedAccounts, "codex");
       if (codexIsAvailable) {
         try {
           lastKnownCodexResetCount = await readCodexResetCredits();
@@ -280,6 +265,10 @@ export default function plugin(bb: BbPluginApi) {
       };
     },
     async selectAccount({ providerId, accountId }) {
+      if (providerId === "codex") {
+        lastKnownCodexResetCount = null;
+        resetGate.setAvailableCount(null);
+      }
       await switchPoolAccount(providerId, accountId);
       return { ok: true as const };
     },

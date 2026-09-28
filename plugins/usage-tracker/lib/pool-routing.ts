@@ -57,6 +57,13 @@ export function preferredPoolAccountIds(
   return preferred;
 }
 
+export function poolOwnsProvider(
+  accounts: readonly PoolAccountRecord[],
+  provider: PoolProvider,
+): boolean {
+  return accounts.some((account) => account.provider === provider);
+}
+
 export function parsePoolAccountList(payload: unknown): PoolAccountRecord[] {
   const root =
     payload !== null && typeof payload === "object"

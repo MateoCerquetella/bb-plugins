@@ -2,8 +2,7 @@
 
 ## 0.1.14 - 2026-09-28
 
-- Keep pooled Codex reset actions bound to the local session instead of the
-  process-default account.
+- Disable process-default Codex reset actions when displaying pooled accounts.
 - Preserve unknown activity when BB cannot read thread counts.
 - Serialize pooled account switches, restore prior state after failures, and
   queue refreshes requested during an active load.

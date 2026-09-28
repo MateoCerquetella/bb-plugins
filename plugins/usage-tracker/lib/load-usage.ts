@@ -150,11 +150,16 @@ async function loadInUseProviderIds(
   for (const status of ["active", "starting"] as const) {
     try {
       const counted = await count({ groupBy: "provider", status });
+      let attributedCount = 0;
       for (const group of counted.groups ?? []) {
         if (group.count <= 0 || group.key === null) continue;
         const providerId = providerIdForWireId(group.key);
-        if (providerId !== null) ids.add(providerId);
+        if (providerId !== null) {
+          ids.add(providerId);
+          attributedCount += group.count;
+        }
       }
+      if (attributedCount < counted.total) complete = false;
     } catch {
       complete = false;
     }

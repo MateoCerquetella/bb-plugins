@@ -4,6 +4,7 @@ import { inUseProviderIdsFromPool } from "../lib/load-usage.ts";
 import {
   currentPoolAccountId,
   parsePoolAccountList,
+  poolOwnsProvider,
   preferredPoolAccountIds,
   switchPoolAccount,
 } from "../lib/pool-routing.ts";
@@ -54,6 +55,9 @@ test("selects the in-flight enabled Account Pooler account as current", () => {
     codex: "codex-a",
   });
   assert.deepEqual([...inUseProviderIdsFromPool(accounts)], ["claudeCode"]);
+  assert.equal(poolOwnsProvider(accounts, "codex"), true);
+  assert.equal(poolOwnsProvider(accounts, "claude"), true);
+  assert.equal(poolOwnsProvider([], "codex"), false);
 });
 
 test("serializes overlapping account switches", async () => {

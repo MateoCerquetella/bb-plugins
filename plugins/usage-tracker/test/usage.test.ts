@@ -1061,6 +1061,31 @@ test("marks inactive providers only when every thread count succeeds", async () 
   );
 });
 
+test("keeps activity unknown when thread counts omit provider groups", async () => {
+  const sdk = makeSdk({
+    threads: {
+      async get() {
+        return { environmentId: null };
+      },
+      async count({ status }) {
+        return {
+          total: status === "active" ? 1 : 0,
+        };
+      },
+    },
+  });
+
+  const snapshot = await loadUsageSnapshot(
+    sdk,
+    null,
+    new Date(),
+    Promise.resolve({}),
+    Promise.resolve([]),
+  );
+
+  assert.ok(snapshot.providers.every((provider) => provider.inUse === undefined));
+});
+
 test("propagates thread and request-level usage failures", async () => {
   const threadFailure = makeSdk({
     threads: {

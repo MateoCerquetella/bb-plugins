@@ -127,19 +127,18 @@ Claude Code configuration directory.
 
 The collapsed strip is designed for quick scanning:
 
-- With more than two enabled providers, select the highest-usage summary to
+- With more than two enabled providers, select the active-usage summary to
   open the complete provider overview.
 - Select any provider reading to open its details in place.
 - Review the reported **5-hour limit**, **weekly limit**, every additional
   provider-defined window, their reset times, and any reported USD credits.
   Codex Pro accounts that do not report a five-hour limit omit that row.
-- With the Account Pooler enabled, a pooled provider's details start with the
-  combined reading across all its accounts, then one section per account with
-  its plan, status, and limits. The combined reading resets with the earliest
-  account.
-- For Codex, select **Use a reset…** to open a confirmation. Nothing is
+- With the Account Pooler enabled, a pooled provider's details show the current
+  account and one section per account with its plan, status, and limits.
+- For local Codex sessions, select **Use a reset…** to open a confirmation. Nothing is
   consumed until **Yes, use reset** is selected; canceling the confirmation
-  does not contact the reset-consumption endpoint.
+  does not contact the reset-consumption endpoint. Resets are unavailable for
+  pooled accounts because the reset API cannot target a specific pool account.
 - Select the same provider again, use the close button, press <kbd>Esc</kbd>,
   or click outside the details to collapse it.
 - Select the refresh icon to fetch every provider immediately.
