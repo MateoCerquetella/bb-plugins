@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "sequence": 11,
+  "previousDigest": "sha256:7d78d38d4ed5cb330022ba5e2a6b03f142c075f9f48fc02ec19b9e38ab8f673e",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "The already-committed required security consult records an advisory and observed checks addressing it. No implementation changes or acceptance changes needed. Re-review only the new artifact.",
+  "createdAt": "2026-09-28T15:34:12.459Z",
+  "stateBeforeDigest": "sha256:6741f65e19c65c364744e15444daee93748c25314f6ea914a2f6ff7bcca9dc23",
+  "stateAfterDigest": "sha256:8f2256fe8bb4434a7845d3215fa04f5e3835eb3cd2db8e17f4ef638d4e5191a0",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 11,
+    "activeFeature": "taskboard-local-install-compatibility",
+    "request": "Install Taskboard with its optional Symphony execution backend into live BB on this Mac. Preserve installed v0.3.4 GitHub status compatibility and hardened gh resolution by restoring the already-released adapter fixes on the execution branch. Keep tracker configuration, credentials and cached work during the supported plugin source switch. Install from a stable local checkout. Verify the loaded plugin and, for full setup, the pinned native Symphony service using the existing Codex login. No new UI, task planning policy, external message, paid coding task, or publication.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 1,
+    "message": "The already-committed required security consult records an advisory and observed checks addressing it. No implementation changes or acceptance changes needed. Re-review only the new artifact.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:be87f0e68cffeb96fe020e48a378038441b6131b3932025f4e7a65aa7b81397c",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:bbb7dc756b0d4f90e8c4b093920b8419cf3a1897ac1558cba9b014812b015956",
+    "impactDigest": "sha256:2549717e98a6350ceba385338f9c61b1479220969c606378c7321dd935aa991d",
+    "capabilityClaimId": "taskboard-local-install-compatibility-caf37045e0a4",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-28T15:34:12.459Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "taskboard-local-install-compatibility-caf37045e0a4",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "taskboard-local-install-compatibility",
+      "worktree": "/Users/mateocerquetella/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_7bdrvui3s8-1/bb-plugins",
+      "worktreeId": "sha256:073ce177d297c60d57a1b5df11ed13a96daf60f831afb54937a2965d654e3eec",
+      "baseCommit": "ea037e6cd1df7f1aecd9f1704f0349322a9d70d5",
+      "baseTree": "57f47ec7ffea5d6babe677a9e25229b23214735a",
+      "bases": {
+        "taskboard-install-compatibility": {
+          "capability": "taskboard-install-compatibility",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "retain released github compatibility": null,
+            "preserve installation state": null
+          }
+        }
+      },
+      "capabilities": [
+        "taskboard-install-compatibility"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-09-28T14:42:02.157Z",
+      "heartbeatAt": "2026-09-28T14:42:02.157Z",
+      "digest": "sha256:72a29d4c06276a886d223d49e03a5023e02583ef67e771b667651d0c56253301"
+    },
+    "trackerGeneration": 1,
+    "lifecycle": {
+      "stage": "iteration",
+      "iteration": 1,
+      "awaitingFeedback": true
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:a9c5a16e24ca72c4aa8424622a93c3591e71fc888279344cf90c67ef316d2ff9"
+}
