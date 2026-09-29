@@ -130,7 +130,9 @@ Status: Accepted
 
 ROT-18's worker reported successful implementation while Linear remained
 unchanged, and its handoff prompt did not require the target repository's
-Empirical harness.
+Empirical harness. The later ROT-8 live run entered Empirical, but its required
+ticket gate treated the work as a create intent and produced duplicate ROT-19
+because the originating ticket was never explicitly attached.
 
 ### Options
 
@@ -144,17 +146,24 @@ Resolve live provider status options by normalized state category, transition
 to in-progress after durable launch, transition to done only after structured
 successful completion, and persist exact-once receipts/errors in the linked
 worker record. Require the target repository's initialized Empirical workflow
-in the trusted handoff instructions.
+in the trusted handoff instructions. After the first Empirical action returns
+the exact feature id, require `empirical_tracker_bind` in attach mode for the
+source-validated originating ticket before any tracker prepare/sync operation
+or repository mutation; forbid replacement ticket creation.
 
 ### Trade-offs and risks
 
 Providers with no available in-progress or done mapping cannot be updated
 automatically; that is an actionable visible error, not silent success.
 Structured worker completion proves the BB turn ended, while Empirical evidence
-proves the requested workflow gates ran; both facts remain inspectable.
+proves the requested workflow gates ran; both facts remain inspectable. Ticket
+identifiers are validated by provider format before entering trusted prompt
+text, so arbitrary tracker content stays inside the untrusted boundary.
 
 ### Verification
 
 Adapter fixtures prove mapping and exact-once behavior across reloads, failed
 workers never close a ticket, transition failures retry visibly, and prompt
-tests prove the Empirical instruction is trusted text outside tracker data.
+tests prove the Empirical attachment instruction is trusted text outside
+tracker data for Linear, Jira, and GitHub while malformed identifiers fail
+closed.

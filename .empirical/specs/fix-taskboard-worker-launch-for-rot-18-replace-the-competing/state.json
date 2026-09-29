@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 30,
+  "revision": 32,
   "activeFeature": "fix-taskboard-worker-launch-for-rot-18-replace-the-competing",
   "request": "Fix Taskboard worker launch for ROT-18: replace the competing Execute and Start agent actions with one preferred Start agent flow, keep the dedicated Worker page and kanban drag-to-in-progress launch behavior, and handle repositories with no initial commit so users are not blocked by the current raw validation error. Preserve existing uncommitted Taskboard work and verify the resulting UI and execution behavior.",
   "profile": "complex",
@@ -9,7 +9,7 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Rebuilt Taskboard before installation so the live bundle includes provider lifecycle and repository-local Empirical handoff instructions. Added legacy thread recovery from persisted Taskboard panel metadata, durable terminal reconciliation, and exact-once Linear Done transition. Reinstalled and reloaded successfully; ROT-18 was imported from thr_g88227inzv with terminal event 854 and is now Done in Linear. Direct supported-Node verification passed typecheck, build, and 45 focused tests. The configured Empirical full Taskboard check timed out at 300 seconds and remains explicitly recorded as such.",
+  "message": "The live ROT-8 worker now launches and uses the target repository Empirical harness, but Empirical fails before implementation with TRACKER_CREATE_MARKER_MISMATCH / TRACKER_CREATE_AMBIGUOUS because the existing Linear ticket ROT-8 is not durably attached and a duplicate ROT-19 gets created. Fix Taskboard's worker handoff so an existing originating tracker ticket is explicitly and unambiguously attached to the Empirical feature before material work begins, without creating a duplicate issue. Preserve the external-data trust boundary, support Linear/Jira/GitHub identifiers, keep provider lifecycle synchronization, and verify against the live ROT-8/ROT-19 incident.",
   "implementationActor": "user",
   "workStartedAt": null,
   "specDigest": "sha256:0fc21b29f88acb4b4345eafb1fe1bf7eb8d0443153026832c0f788e1de307a2b",
@@ -20,32 +20,31 @@
   "capabilityClaimId": "fix-taskboard-worker-launch-for-rot-18-replace-the-competing-61a96e508a43",
   "authorizationDigest": null,
   "evidence": [],
-  "evidenceReceiptIds": [
-    "qa-45cf10a45f10578a18c2205b"
-  ],
+  "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": true,
+    "implemented": false,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "implemented",
+    "highest": "none",
     "reasons": {
+      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-29T01:23:09.406Z",
+  "updatedAt": "2026-09-29T03:42:26.699Z",
   "lifecycle": {
+    "riskRequest": "Fix the missing native-thread lifecycle integration: when a Taskboard-provisioned issue thread completes or reports its final result, Taskboard must reconcile that thread back into its internal execution/tracker state and expose the completion rather than leaving the issue unchanged. Preserve tracker authority: do not automatically mark an external issue done unless the configured workflow explicitly allows it, but always record/link the provisioned thread and its completion outcome so ROT-18 no longer appears untouched after successful work.",
     "stage": "iteration",
-    "iteration": 7,
-    "awaitingFeedback": true,
+    "iteration": 8,
+    "awaitingFeedback": false,
     "iterative": true,
     "contractRevision": 20,
-    "riskRequest": "Fix the missing native-thread lifecycle integration: when a Taskboard-provisioned issue thread completes or reports its final result, Taskboard must reconcile that thread back into its internal execution/tracker state and expose the completion rather than leaving the issue unchanged. Preserve tracker authority: do not automatically mark an external issue done unless the configured workflow explicitly allows it, but always record/link the provisioned thread and its completion outcome so ROT-18 no longer appears untouched after successful work.",
     "contractBaseline": 26
   },
   "capabilityBase": {
@@ -75,8 +74,8 @@
     "heartbeatAt": "2026-09-28T20:15:45.820Z",
     "digest": "sha256:22f2bd7b73c9e7c50f265f7b93cc9ed1f690c62f7e827f0f7aadb04a8efc239d"
   },
-  "trackerGeneration": 7,
-  "budgetExtensionMinutes": 137,
+  "trackerGeneration": 8,
+  "budgetExtensionMinutes": 174,
   "sizeDecision": {
     "choice": "keep",
     "criteria": 14,

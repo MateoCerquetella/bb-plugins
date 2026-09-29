@@ -55,9 +55,12 @@ The native thread prompt treats tracker content as untrusted and adds a
 first-class workflow instruction: inspect the target repository's `AGENTS.md`
 and initialized `.empirical/config.json`; when Empirical is initialized, use
 the repository-local Empirical workflow through implementation, verification,
-and completion. The prompt must not claim verified completion without durable
-Empirical evidence. This instruction is outside the untrusted tracker-data
-delimiter.
+and completion. Once Empirical returns the exact feature id, attach the
+source-validated originating ticket with `empirical_tracker_bind` before
+tracker preparation, synchronization, or material work, and never create a
+replacement ticket. The prompt must not claim verified completion without
+durable Empirical evidence. These instructions are outside the untrusted
+tracker-data delimiter.
 
 ## UI Projection
 

@@ -46,8 +46,10 @@ reconciles terminal thread outcomes into its internal work state.
   originating external issue to its configured done/completed status; failed
   or interrupted workers never transition to done.
 - [ ] [AC-12] The worker handoff requires the target repository's initialized
-  Empirical harness when present, and provider-transition failures are recorded
-  and shown as actionable errors rather than silently ignored.
+  Empirical harness when present, explicitly attaches the originating
+  Linear/Jira/GitHub ticket to the exact returned feature before tracker sync
+  or material work, forbids replacement ticket creation, and shows attachment
+  or provider-transition failures as actionable errors.
 - [ ] [AC-UI-2] [UI] The issue-specific right panel shows the linked thread's
   running or terminal state and provides a direct way to return to that thread.
 
