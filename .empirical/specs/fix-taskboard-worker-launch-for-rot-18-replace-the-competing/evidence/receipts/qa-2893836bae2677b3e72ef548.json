@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-2893836bae2677b3e72ef548",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Run the configured Taskboard check after rebuilding the live bundle and repairing lifecycle recovery.",
+  "passed": false,
+  "startedAt": "2026-09-29T01:05:08.083Z",
+  "completedAt": "2026-09-29T01:10:13.148Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-taskboard-worker-launch-for-rot-18-replace-the-competing",
+    "specRevision": 22,
+    "specDigest": "sha256:0fc21b29f88acb4b4345eafb1fe1bf7eb8d0443153026832c0f788e1de307a2b",
+    "treeDigest": "sha256:92a1abb0b990e1ecafd2a6973d0a24e223f808a1e9a84abacac7dbb40eb5f65b",
+    "policyDigest": "sha256:168cfa9fe1a343bc5a02663b51d27fc4808f530064f01faa64abed49e9580803",
+    "workflowRevision": 28,
+    "gitCommit": "0457024c5cb7b6b93bfd11736c045db81e52aac0",
+    "textTreeDigest": "sha256:92a1abb0b990e1ecafd2a6973d0a24e223f808a1e9a84abacac7dbb40eb5f65b"
+  },
+  "digest": "sha256:9cfba6118e161a42db86393f429accc80d0710d4766be182efbc0a229f926ed3",
+  "kind": "qa",
+  "matrixDigest": "sha256:aff5a3ebcdb0893294c53b55945d0f7c61274e1550d3e633c851fa516a26f377",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "x64",
+    "node": "24.21.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "timed-out",
+      "summary": "Run the configured Taskboard check after rebuilding the live bundle and repairing lifecycle recovery.",
+      "startedAt": "2026-09-29T01:05:08.083Z",
+      "completedAt": "2026-09-29T01:10:13.148Z",
+      "durationMs": 305065,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:f9b129d8080d6ae249324764ab9bf53ce8ebc569462bb37a19a9d1056d966f66",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-taskboard"
+        ],
+        "cwd": ".",
+        "timeoutMs": 300000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH",
+          "TMPDIR"
+        ]
+      },
+      "result": {
+        "exitCode": null,
+        "signal": null,
+        "timedOut": true,
+        "stdoutDigest": "sha256:19f20da1320b7cde459c93d0da9897ae77326e4d269b22c5727b0b302c9d723b",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "\n> bb-plugin-taskboard@0.3.5-symphony.0 check\n> npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build\n\n\n> bb-plugin-taskboard@0.3.5-symphony.0 types:check\n> env -u BB_CLI bb plugin types --check .\n\nThis plugin uses the npm package @get-bb/plugin-sdk; pin is 0.4.6, host is 0.4.6.\nThe declarations are in node_modules/@get-bb/plugin-sdk/bundled-types/ — read them for exact signatures.\n\n> bb-plugin-taskboard@0.3.5-symphony.0 typecheck\n> tsc --noEmit\n\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:92a1abb0b990e1ecafd2a6973d0a24e223f808a1e9a84abacac7dbb40eb5f65b",
+      "sourceTreeAfter": "sha256:92a1abb0b990e1ecafd2a6973d0a24e223f808a1e9a84abacac7dbb40eb5f65b",
+      "artifacts": []
+    }
+  ],
+  "anomalies": [
+    "outcome-timed-out"
+  ]
+}
