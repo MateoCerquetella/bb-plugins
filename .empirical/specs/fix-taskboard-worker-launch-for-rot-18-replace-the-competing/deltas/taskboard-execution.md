@@ -15,8 +15,13 @@ SHALL durably associate every provisioned native BB thread with its originating
 issue, reconcile the linked thread's lifecycle into Taskboard's internal
 execution state, and show that lifecycle state in the issue-specific right
 panel. Reconciliation SHALL be restart-safe and idempotent and SHALL not infer
-success from free-form assistant output. External provider status SHALL change
-only when an explicit completion policy authorizes that transition.
+success from free-form assistant output. Managed start SHALL transition the
+originating provider issue to its configured in-progress state. A structured
+successful terminal outcome SHALL transition it to its configured
+done/completed state. Failed or interrupted outcomes SHALL never transition to
+done. The worker handoff SHALL require the target repository's initialized
+Empirical harness when present, and provider mutation failures SHALL remain
+visible and retryable.
 
 #### Scenario: One-click managed start
 
@@ -80,12 +85,35 @@ only when an explicit completion policy authorizes that transition.
 - THEN its reconciliation service discovers and persists the missed outcome
   without creating another thread or duplicating completion effects.
 
-#### Scenario: External tracker authority is preserved
+#### Scenario: Managed start updates the provider
 
-- WHEN a linked thread reaches a terminal outcome and no explicit external
-  completion policy authorizes a provider transition
-- THEN Taskboard updates only its internal execution record and leaves the
-  provider-native issue status unchanged.
+- WHEN Taskboard successfully provisions a managed worker
+- THEN it uses the configured adapter to transition the originating issue to
+  the provider's configured in-progress status before reporting launch success.
+
+#### Scenario: Successful completion updates the provider
+
+- WHEN a linked worker emits a structured successful terminal outcome
+- THEN Taskboard transitions the originating issue to the configured
+  done/completed status exactly once.
+
+#### Scenario: Unsuccessful completion stays open
+
+- WHEN a linked worker fails or is interrupted
+- THEN Taskboard records the outcome but does not transition the provider issue
+  to done.
+
+#### Scenario: Provider mutation fails
+
+- WHEN a provider rejects an in-progress or done transition
+- THEN Taskboard preserves the worker link and records an actionable,
+  retryable transition error instead of claiming success.
+
+#### Scenario: Empirical harness is required
+
+- WHEN the target repository contains an initialized Empirical harness
+- THEN the handoff instructs the worker to use that harness and its verification
+  gates before reporting verified completion.
 
 #### Scenario: User returns to linked work
 

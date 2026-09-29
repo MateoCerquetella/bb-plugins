@@ -35,18 +35,36 @@ from durable unresolved records after every plugin reload, isolates errors per
 thread, and races polling sleeps against the plugin abort signal so reload can
 stop promptly.
 
-Taskboard publishes `taskboard:changed` after a lifecycle transition. It does
-not call provider adapters from reconciliation. Provider-native issue status
-therefore remains unchanged unless a future explicit completion policy owns
-that transition.
+Taskboard resolves provider transitions from live `statusOptions()` by
+`stateCategory`, never by a hard-coded Linear/Jira/GitHub state name. After the
+thread link is durable, launch moves the issue to the first available
+`in_progress` option through the existing serialized `updateItemStatus` path.
+Successful structured completion moves it to the first available `done`
+option. Failed or interrupted outcomes do not close the issue.
+
+The native-thread record stores separate in-progress and done transition
+receipts plus the latest bounded transition error. Each reconciliation sweep
+checks the receipt before calling the provider, making retries and reloads
+idempotent. Missing mappings and provider failures remain retryable and are
+shown in the lifecycle row. Taskboard publishes `taskboard:changed` after every
+lifecycle or provider-transition change.
+
+## Empirical Worker Contract
+
+The native thread prompt treats tracker content as untrusted and adds a
+first-class workflow instruction: inspect the target repository's `AGENTS.md`
+and initialized `.empirical/config.json`; when Empirical is initialized, use
+the repository-local Empirical workflow through implementation, verification,
+and completion. The prompt must not claim verified completion without durable
+Empirical evidence. This instruction is outside the untrusted tracker-data
+delimiter.
 
 ## UI Projection
 
 Add a bounded RPC that returns the latest linked native thread for an issue.
 Issue detail and the issue-specific right panel render a compact lifecycle row:
-`Running`, `Completed`, `Failed`, or `Canceled`, with a direct `Open thread`
-action. The lifecycle row is separate from the provider status field so an
-agent outcome cannot be mistaken for a Linear, GitHub, or Jira transition.
+`Running`, `Completed`, `Failed`, or `Canceled`, provider transition progress
+or error, and a direct `Open thread` action.
 
 ## Repository Bootstrap
 
@@ -66,5 +84,8 @@ Invalid repository errors retain field-oriented messages.
 Extend focused tests for unborn repositories, preserved working-tree state,
 single-action source structure, configuration fallback, durable dispatch
 guarding, terminal-event mapping, idempotent replay, restart recovery, and
-abort-aware service shutdown. Build and reload the local plugin, then inspect
-the live native-thread/right-panel flow and linked terminal state.
+abort-aware service shutdown. Add provider fixtures for in-progress/done
+selection, exact-once receipts, failure retry, and failed-worker non-closure;
+assert the handoff requires Empirical outside the untrusted tracker block.
+Build and reload the local plugin, then inspect the live
+native-thread/right-panel flow and provider status.

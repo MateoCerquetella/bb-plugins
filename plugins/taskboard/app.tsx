@@ -5012,6 +5012,15 @@ function AgentThreadLifecycle({ item }: { item: WorkItem }) {
 
   if (!link) return null;
   const isRunning = link.state === 'running';
+  const lifecycleError = link.providerError ?? link.error;
+  const providerStatus =
+    link.doneTransitionAt !== null
+      ? 'External issue marked complete.'
+      : link.state === 'completed'
+        ? 'Updating the external issue to Done.'
+        : link.inProgressTransitionAt !== null
+          ? 'External issue moved to In Progress.'
+          : 'Updating the external issue to In Progress.';
   return (
     <section
       className="mt-5 flex min-h-12 items-center gap-3 border-y py-2.5"
@@ -5031,16 +5040,15 @@ function AgentThreadLifecycle({ item }: { item: WorkItem }) {
         <p className="text-sm font-medium">
           {agentThreadLabels[link.state]}
         </p>
-        {link.error ? (
-          <p className="truncate text-xs text-muted-foreground" title={link.error}>
-            {link.error}
+        {lifecycleError ? (
+          <p
+            className="truncate text-xs text-destructive"
+            title={lifecycleError}
+          >
+            {lifecycleError}
           </p>
         ) : (
-          <p className="text-xs text-muted-foreground">
-            {isRunning
-              ? 'Taskboard will update this issue when the agent turn ends.'
-              : 'The external tracker status is unchanged.'}
-          </p>
+          <p className="text-xs text-muted-foreground">{providerStatus}</p>
         )}
       </div>
       <Button

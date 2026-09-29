@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 18,
+  "revision": 25,
   "activeFeature": "fix-taskboard-worker-launch-for-rot-18-replace-the-competing",
   "request": "Fix Taskboard worker launch for ROT-18: replace the competing Execute and Start agent actions with one preferred Start agent flow, keep the dedicated Worker page and kanban drag-to-in-progress launch behavior, and handle repositories with no initial commit so users are not blocked by the current raw validation error. Preserve existing uncommitted Taskboard work and verify the resulting UI and execution behavior.",
   "profile": "complex",
@@ -9,13 +9,13 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Planned the lifecycle change in five reviewable steps: contracts and durable storage, idempotent native-thread launch, structured event reconciliation, right-panel projection, and focused/live verification.",
+  "message": "Extended the execution plan with provider-native state resolution, exact-once transition receipts, successful-only Done semantics, trusted Empirical worker instructions, and focused provider/prompt/UI regression coverage.",
   "implementationActor": "agent",
   "workStartedAt": null,
-  "specDigest": "sha256:edb81876d1b0ee5f8e5cc115938d3fdacf570a56d80083b41cc0d3ebcbabc09d",
-  "approvedSpecRevision": 16,
+  "specDigest": "sha256:0fc21b29f88acb4b4345eafb1fe1bf7eb8d0443153026832c0f788e1de307a2b",
+  "approvedSpecRevision": 22,
   "capabilityArchiveRequired": true,
-  "capabilityDeltaDigest": "sha256:abdd7a82d3d4e8470cd203dd2e211a5e055b3a2e9afa50bc39921f88e3e09eba",
+  "capabilityDeltaDigest": "sha256:b7b84699123e991cda0b68185cf7cac25fb89008b50578253ed6da36673646e7",
   "impactDigest": "sha256:6e91b8d6579374a3580349469c769cf5e5435c14ec960dcb667074bdc5f82639",
   "capabilityClaimId": "fix-taskboard-worker-launch-for-rot-18-replace-the-competing-61a96e508a43",
   "authorizationDigest": null,
@@ -37,13 +37,13 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-28T23:25:39.651Z",
+  "updatedAt": "2026-09-28T23:55:54.401Z",
   "lifecycle": {
     "stage": "development",
-    "iteration": 5,
+    "iteration": 6,
     "awaitingFeedback": false,
     "iterative": true,
-    "contractRevision": 13,
+    "contractRevision": 20,
     "riskRequest": "Fix the missing native-thread lifecycle integration: when a Taskboard-provisioned issue thread completes or reports its final result, Taskboard must reconcile that thread back into its internal execution/tracker state and expose the completion rather than leaving the issue unchanged. Preserve tracker authority: do not automatically mark an external issue done unless the configured workflow explicitly allows it, but always record/link the provisioned thread and its completion outcome so ROT-18 no longer appears untouched after successful work."
   },
   "capabilityBase": {
@@ -73,15 +73,15 @@
     "heartbeatAt": "2026-09-28T20:15:45.820Z",
     "digest": "sha256:22f2bd7b73c9e7c50f265f7b93cc9ed1f690c62f7e827f0f7aadb04a8efc239d"
   },
-  "trackerGeneration": 5,
-  "budgetExtensionMinutes": 30,
+  "trackerGeneration": 6,
+  "budgetExtensionMinutes": 67,
   "sizeDecision": {
     "choice": "keep",
-    "criteria": 12,
+    "criteria": 14,
     "capabilities": 1,
-    "reason": "Keep as one because the native-thread launch, durable linkage, reconciliation service, and right-panel state are one inseparable execution lifecycle; splitting would leave each slice unable to prove the user-visible completion contract.",
+    "reason": "Provider transitions, Empirical handoff requirements, and native-thread reconciliation are one lifecycle; splitting would again allow a launch to report success without proving the ticket update and harness gate.",
     "actor": "agent",
-    "revision": 14
+    "revision": 22
   },
   "reviewFirst": true
 }

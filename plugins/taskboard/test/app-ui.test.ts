@@ -245,9 +245,17 @@ test('shows linked native thread lifecycle separately from provider status', () 
   assert.match(lifecycle, /Agent completed/u);
   assert.match(lifecycle, /Agent failed/u);
   assert.match(lifecycle, /Agent canceled/u);
-  assert.match(lifecycle, /The external tracker status is unchanged\./u);
+  assert.match(lifecycle, /External issue moved to In Progress\./u);
+  assert.match(lifecycle, /External issue marked complete\./u);
+  assert.match(lifecycle, /link\.providerError \?\? link\.error/u);
   assert.match(lifecycle, /navigate\.toThread\(link\.threadId\)/u);
   assert.match(lifecycle, /Open thread/u);
+  assert.match(server, /transitionAgentThreadProvider\(link, 'in_progress'\)/u);
+  assert.match(
+    server,
+    /transitionAgentThreadProvider\(result\.link, 'done'\)/u
+  );
+  assert.match(server, /selectAgentStatus\(options, category\)/u);
 });
 
 test('renders assignees as deterministic accessible avatars', () => {

@@ -48,6 +48,20 @@
 - Install and reload the local plugin, confirm both reconciliation and existing
   execution services are running, then inspect the live right-panel flow.
 
+## 6. Reconcile provider state and require Empirical
+
+- Extend the durable native-thread record with in-progress/done transition
+  receipts and a retryable provider error.
+- Resolve provider-native status IDs from live options by normalized
+  `in_progress` and `done` categories.
+- Apply the in-progress transition after durable thread provisioning and the
+  done transition only after structured successful completion; never close
+  failed or interrupted work.
+- Put the repository-local Empirical requirement in trusted worker prompt text
+  outside the untrusted tracker-data delimiter.
+- Add exact-once, reload, provider failure, missing mapping, unsuccessful worker,
+  prompt-boundary, and lifecycle UI regressions.
+
 1. Extend execution defaults and RPC input with explicit initial-repository
    bootstrap, using an empty commit and preserving all working-tree content.
 2. Replace issue-detail `Send to agent` plus embedded `Execute` with one

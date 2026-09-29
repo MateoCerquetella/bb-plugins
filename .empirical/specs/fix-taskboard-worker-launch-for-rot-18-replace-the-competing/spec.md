@@ -40,9 +40,14 @@ reconciles terminal thread outcomes into its internal work state.
   leaving the issue looking untouched.
 - [ ] [AC-9] Failed or canceled linked threads remain linked and expose their
   terminal outcome without being reported as successfully completed.
-- [ ] [AC-10] External tracker status is changed only when an explicit
-  completion policy authorizes it; otherwise Taskboard records the internal
-  outcome while preserving provider authority.
+- [ ] [AC-10] Starting a managed worker transitions the originating external
+  issue to its configured in-progress status through the provider adapter.
+- [ ] [AC-11] A structured successful worker outcome transitions the
+  originating external issue to its configured done/completed status; failed
+  or interrupted workers never transition to done.
+- [ ] [AC-12] The worker handoff requires the target repository's initialized
+  Empirical harness when present, and provider-transition failures are recorded
+  and shown as actionable errors rather than silently ignored.
 - [ ] [AC-UI-2] [UI] The issue-specific right panel shows the linked thread's
   running or terminal state and provides a direct way to return to that thread.
 
@@ -58,10 +63,12 @@ reconciles terminal thread outcomes into its internal work state.
 ## Non-goals
 
 - Automatically staging or committing user files.
-- Automatically changing external tracker status without an explicit policy.
+- Changing external tracker status without the configured provider adapter and
+  provider-native in-progress/done state mapping.
 - Redesigning Symphony runtime internals or tracker synchronization.
 - Changing external tracker status merely because an agent starts.
 - Inferring successful work from assistant prose or commit messages.
+- Treating a missing initialized Empirical harness as a verified managed run.
 
 ## Verification
 

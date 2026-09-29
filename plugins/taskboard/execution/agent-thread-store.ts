@@ -127,6 +127,35 @@ export function createAgentThreadStore(db: Database.Database) {
         .all()
         .map(row => decode(row)!);
     },
+    pending(): AgentThreadLink[] {
+      return db
+        .prepare('SELECT data FROM taskboard_agent_threads ORDER BY rowid')
+        .all()
+        .map(row => decode(row)!)
+        .filter(
+          link =>
+            link.state === 'running' ||
+            (link.state === 'completed' && link.doneTransitionAt === null)
+        );
+    },
+    providerTransition(
+      link: AgentThreadLink,
+      kind: 'in_progress' | 'done',
+      error: string | null
+    ): AgentThreadLink {
+      const now = new Date().toISOString();
+      return persist({
+        ...link,
+        inProgressTransitionAt:
+          kind === 'in_progress' && error === null
+            ? now
+            : link.inProgressTransitionAt,
+        doneTransitionAt:
+          kind === 'done' && error === null ? now : link.doneTransitionAt,
+        providerError: error?.slice(0, 2000) ?? null,
+        updatedAt: now
+      });
+    },
     transition(
       link: AgentThreadLink,
       input: {

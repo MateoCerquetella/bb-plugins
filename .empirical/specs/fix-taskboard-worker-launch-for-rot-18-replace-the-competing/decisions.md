@@ -113,8 +113,7 @@ Native BB threads are conversational and do not have a separate immutable
 thread-completed status, so the initial dispatched turn is the completion
 boundary for this one-click work request. Follow-up turns do not create another
 Taskboard execution. A transient SDK failure remains retryable and visible as a
-bounded reconciliation error. External provider status is deliberately
-unchanged without an explicit policy.
+bounded reconciliation error.
 
 ### Verification
 
@@ -122,3 +121,40 @@ Store and service tests cover durable dispatch deduplication, completed,
 failed, interrupted, missing, replayed, and still-running observations.
 Contract/UI tests cover the lifecycle row and thread navigation. Live reload
 proves the service starts and stops cleanly.
+
+## D-005: Provider lifecycle and Empirical are part of managed execution
+
+Status: Accepted
+
+### Evidence
+
+ROT-18's worker reported successful implementation while Linear remained
+unchanged, and its handoff prompt did not require the target repository's
+Empirical harness.
+
+### Options
+
+Keep provider updates manual, hard-code Linear state names, or resolve
+provider-native in-progress/done states through the existing adapter and make
+Empirical an explicit managed-worker instruction.
+
+### Chosen approach
+
+Resolve live provider status options by normalized state category, transition
+to in-progress after durable launch, transition to done only after structured
+successful completion, and persist exact-once receipts/errors in the linked
+worker record. Require the target repository's initialized Empirical workflow
+in the trusted handoff instructions.
+
+### Trade-offs and risks
+
+Providers with no available in-progress or done mapping cannot be updated
+automatically; that is an actionable visible error, not silent success.
+Structured worker completion proves the BB turn ended, while Empirical evidence
+proves the requested workflow gates ran; both facts remain inspectable.
+
+### Verification
+
+Adapter fixtures prove mapping and exact-once behavior across reloads, failed
+workers never close a ticket, transition failures retry visibly, and prompt
+tests prove the Empirical instruction is trusted text outside tracker data.

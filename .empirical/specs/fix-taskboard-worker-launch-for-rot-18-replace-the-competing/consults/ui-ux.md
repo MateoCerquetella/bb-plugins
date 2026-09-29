@@ -48,6 +48,16 @@ Verdict: advisory
 - Recommendation: Label the linked worker outcome independently and change the
   external status only under an explicit configured completion policy.
 
+### UX-5
+
+- Severity: high
+- Category: trust
+- Location: provider lifecycle row
+- Finding: Showing `Agent completed` while the Linear issue remains untouched
+  makes the board look stale and forces users to reconcile two systems by hand.
+- Recommendation: Show provider transition progress or failure separately, and
+  expose whether the worker used Empirical verification before claiming Done.
+
 ## Conclusion
 
 The approved native-thread and right-panel direction is clear, but the

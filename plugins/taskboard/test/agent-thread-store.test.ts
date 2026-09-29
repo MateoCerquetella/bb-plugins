@@ -134,3 +134,38 @@ test('transient reconciliation errors stay retryable', () => {
     f.db.close();
   }
 });
+
+test('provider transitions persist exact-once receipts and retryable errors', () => {
+  const f = fixture();
+  try {
+    const failed = f.store.providerTransition(
+      f.link,
+      'in_progress',
+      'Start status update failed: offline'
+    );
+    assert.equal(failed.inProgressTransitionAt, null);
+    assert.match(failed.providerError!, /offline/u);
+    assert.equal(f.store.pending().length, 1);
+
+    const started = f.store.providerTransition(
+      failed,
+      'in_progress',
+      null
+    );
+    assert.ok(started.inProgressTransitionAt);
+    assert.equal(started.providerError, null);
+    assert.equal(f.store.pending().length, 1);
+
+    const completed = f.store.transition(started, {
+      state: 'completed',
+      terminalEventSeq: 30,
+      error: null
+    }).link;
+    assert.equal(f.store.pending().length, 1);
+    const done = f.store.providerTransition(completed, 'done', null);
+    assert.ok(done.doneTransitionAt);
+    assert.equal(f.store.pending().length, 0);
+  } finally {
+    f.db.close();
+  }
+});
