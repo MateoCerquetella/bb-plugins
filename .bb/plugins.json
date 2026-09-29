@@ -8,6 +8,10 @@
       "source": "./plugins/agentation"
     },
     {
+      "name": "jev-route",
+      "source": "./plugins/jev-route"
+    },
+    {
       "name": "amp",
       "source": "./plugins/amp"
     },
