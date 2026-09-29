@@ -1,11 +1,11 @@
 import { execFile } from "node:child_process";
-import { readFile, statfs } from "node:fs/promises";
+import { readFile, realpath, stat, statfs } from "node:fs/promises";
 import { isIP } from "node:net";
 import * as os from "node:os";
-import { win32 as windowsPath } from "node:path";
+import { posix as posixPath, win32 as windowsPath } from "node:path";
 import { performance } from "node:perf_hooks";
 import { setTimeout as delay } from "node:timers/promises";
-import type { MachineSnapshot } from "../contract.ts";
+import type { ExtraDisk, MachineSnapshot } from "../contract.ts";
 import {
   calculateNetworkThroughput,
   parseLinuxNetworkCounters,
@@ -981,6 +981,71 @@ async function collectDisk(
   return { path, ...calculateDiskCapacity(values) };
 }
 
+/**
+ * A configured volume counts only when it is its own mount. An unmounted mount
+ * point is a plain directory on the parent filesystem, and statfs would
+ * silently report the parent's usage under the volume's path.
+ */
+async function isMountPoint(
+  path: string,
+  platform: NodeJS.Platform,
+): Promise<boolean> {
+  if (platform === "win32") return true;
+  const resolved = await realpath(path);
+  if (resolved === "/") return true;
+  const [self, parent] = await Promise.all([
+    stat(resolved, { bigint: true }),
+    stat(posixPath.dirname(resolved), { bigint: true }),
+  ]);
+  return self.dev !== parent.dev;
+}
+
+async function collectExtraDisk(
+  path: string,
+  platform: NodeJS.Platform,
+  signal: AbortSignal,
+): Promise<ExtraDisk["capacity"]> {
+  const absolute =
+    platform === "win32"
+      ? windowsPath.isAbsolute(path)
+      : posixPath.isAbsolute(path);
+  if (!absolute) throw new Error("Extra disk paths must be absolute.");
+  throwIfAborted(signal);
+  if (!(await isMountPoint(path, platform))) {
+    throw new Error("The path is not a mounted volume.");
+  }
+  const values = await statfs(path, { bigint: true });
+  throwIfAborted(signal);
+  return calculateDiskCapacity(values);
+}
+
+/**
+ * Measure each configured volume independently. A missing, unmounted, or
+ * unreadable path becomes an unavailable entry and never fails the snapshot.
+ */
+export async function collectExtraDisks(
+  paths: readonly string[],
+  platform: NodeJS.Platform,
+  signal: AbortSignal,
+  issues: MetricIssue[],
+): Promise<ExtraDisk[]> {
+  const results = await Promise.allSettled(
+    paths.map((path) => collectExtraDisk(path, platform, signal)),
+  );
+  throwIfAborted(signal);
+  return paths.map((path, index) => {
+    const capacity = settledValue(results[index]!);
+    if (capacity === null) {
+      pushIssue(
+        issues,
+        "disk",
+        `The volume at ${sanitizeText(path, "an extra path", 120)} could not be measured.`,
+      );
+    }
+    return { path, capacity };
+  });
+}
+
 function settledValue<T>(result: PromiseSettledResult<T>): T | null {
   return result.status === "fulfilled" ? result.value : null;
 }
@@ -1009,9 +1074,11 @@ function assertStrictJson(value: unknown, path = "snapshot"): void {
 
 export async function collectMachineSnapshot({
   cpuSampleMs,
+  extraDiskPaths = [],
   signal,
 }: {
   cpuSampleMs: number;
+  extraDiskPaths?: readonly string[];
   signal: AbortSignal;
 }): Promise<MachineSnapshot> {
   if (!Number.isInteger(cpuSampleMs) || cpuSampleMs < 100 || cpuSampleMs > 1_000) {
@@ -1173,6 +1240,10 @@ export async function collectMachineSnapshot({
   if (disk === null) {
     pushIssue(issues, "disk", "The system volume could not be measured.");
   }
+  const extraDisks =
+    extraDiskPaths.length === 0
+      ? null
+      : await collectExtraDisks(extraDiskPaths, platform, signal, issues);
   throwIfAborted(signal);
 
   const sampledAtMs = Math.max(0, Math.round(Date.now()));
@@ -1188,6 +1259,7 @@ export async function collectMachineSnapshot({
     memory,
     swap,
     disk,
+    ...(extraDisks === null ? {} : { extraDisks }),
     issues,
   };
   assertStrictJson(snapshot);

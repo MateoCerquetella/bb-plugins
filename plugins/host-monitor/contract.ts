@@ -32,6 +32,20 @@ export const capacitySchema = z
   })
   .strict();
 
+export const MAX_EXTRA_DISK_PATHS = 8;
+export const MAX_DISK_PATH_LENGTH = 1_024;
+
+const diskPathSchema = z.string().min(1).max(MAX_DISK_PATH_LENGTH);
+
+// An extra volume stays in the snapshot when it cannot be measured, so the UI
+// can show the configured path as unavailable instead of dropping it.
+export const extraDiskSchema = z
+  .object({
+    path: diskPathSchema,
+    capacity: capacitySchema.nullable(),
+  })
+  .strict();
+
 export const ipAddressSchema = z.union([z.ipv4(), z.ipv6()]);
 
 export const networkSnapshotSchema = z
@@ -92,6 +106,8 @@ export const machineSnapshotSchema = z
       })
       .strict()
       .nullable(),
+    // Optional so snapshots from hosts without configured volumes stay valid.
+    extraDisks: z.array(extraDiskSchema).max(MAX_EXTRA_DISK_PATHS).optional(),
     issues: z.array(
       z
         .object({
@@ -111,6 +127,7 @@ export const machineSnapshotSchema = z
   .strict();
 
 export type MachineSnapshot = z.infer<typeof machineSnapshotSchema>;
+export type ExtraDisk = z.infer<typeof extraDiskSchema>;
 
 export const processSortBySchema = z.enum(["cpu", "memory", "name"]);
 export const processTerminationModeSchema = z.enum(["graceful", "force"]);
@@ -286,6 +303,10 @@ export const hostContract = defineRpcContract({
     input: z
       .object({
         cpuSampleMs: z.number().int().min(100).max(1_000),
+        extraDiskPaths: z
+          .array(diskPathSchema)
+          .max(MAX_EXTRA_DISK_PATHS)
+          .optional(),
       })
       .strict(),
     output: machineSnapshotSchema,

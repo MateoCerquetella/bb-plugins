@@ -102,6 +102,16 @@ Swap appears only when the platform exposes a reliable system value. One
 machine failing or disconnecting never blocks the rest of the fleet; the last
 good sample stays visible and is marked stale or offline.
 
+## Extra volumes
+
+Host Monitor always measures the system volume (`/`, or the Windows system
+drive). To watch more mounted volumes, list their absolute mount points in the
+**Extra volumes** setting, one per line (up to 8), for example
+`/mnt/HC_Volume_106978058`. Each host measures every listed path, shows it by
+path in the machine details, and raises the same yellow/red disk alert as the
+system volume. A path that is missing, not a mount point, or not readable on a
+host shows as unavailable; the rest of the sample is unaffected.
+
 ## Thresholds and network colors
 
 Threshold colors apply only to percentage values. Defaults are:

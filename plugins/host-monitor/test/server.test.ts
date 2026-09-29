@@ -309,6 +309,14 @@ test("threshold settings keep the toggle key and expose effective percentages", 
           "CPU, memory, and disk turn red at this usage percentage. Enter 2–100, above the yellow threshold; invalid values use 95%.",
         default: "95",
       },
+      extraDiskPaths: {
+        type: "string",
+        label: "Extra volumes",
+        description:
+          "Absolute mount points to measure beside the system volume, one per line (for example /mnt/data). They use the disk thresholds. A path that is missing or not mounted on a host shows as unavailable.",
+        experimental_multiline: true,
+        default: "",
+      },
     },
   );
 
@@ -386,4 +394,50 @@ test("settings changes immediately recompute dashboard health", async (t) => {
     criticalPercent: 90,
   });
   assert.equal(updated.machines[0]?.health, "healthy");
+});
+
+test("sends no extra volume paths by default", async (t) => {
+  const fake = createFakePluginHost({
+    pluginId: "host-monitor",
+    sdk: { hosts: { list: async () => [hostRecord("host-alpha", "Alpha")] } },
+    experimental_callHostRpc: () => snapshot(),
+  });
+  t.after(() => fake.harness.lifecycle.dispose());
+  await plugin(fake.bb);
+
+  await fake.harness.behavior.callRpc("refresh", { hostId: null });
+  assert.deepEqual(
+    fake.harness.inspection.experimental_hostRpcCalls.map((call) => call.input),
+    [{ cpuSampleMs: 300 }],
+  );
+});
+
+test("samples configured extra volumes and alerts on their threshold", async (t) => {
+  const volume = "/mnt/HC_Volume_106978058";
+  const fake = createFakePluginHost({
+    pluginId: "host-monitor",
+    sdk: { hosts: { list: async () => [hostRecord("host-alpha", "Alpha")] } },
+    experimental_callHostRpc: ({ input }) => ({
+      ...snapshot(),
+      extraDisks: ((input as { extraDiskPaths?: string[] }).extraDiskPaths ?? [])
+        .map((path) => ({ path, capacity: capacity(96, 100 * 1024 ** 3) })),
+    }),
+  });
+  t.after(() => fake.harness.lifecycle.dispose());
+  await plugin(fake.bb);
+
+  await fake.harness.behavior.setSettings({
+    extraDiskPaths: `${volume}\nnot-absolute\n`,
+  });
+  const result = dashboardSchema.parse(
+    await fake.harness.behavior.callRpc("refresh", { hostId: null }),
+  );
+
+  assert.deepEqual(
+    fake.harness.inspection.experimental_hostRpcCalls.at(-1)?.input,
+    { cpuSampleMs: 300, extraDiskPaths: [volume] },
+  );
+  assert.equal(result.machines[0]?.health, "critical");
+  assert.equal(result.machines[0]?.alert?.metric, "disk");
+  assert.match(result.machines[0]?.alert?.message ?? "", /HC_Volume_106978058/u);
 });

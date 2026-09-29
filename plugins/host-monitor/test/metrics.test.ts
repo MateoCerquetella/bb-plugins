@@ -1,4 +1,7 @@
 import assert from "node:assert/strict";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import test from "node:test";
 import { machineSnapshotSchema } from "../contract.ts";
 import {
@@ -8,6 +11,7 @@ import {
   calculateLinuxMemory,
   calculateLinuxSwap,
   calculateMacMemory,
+  collectExtraDisks,
   collectMachineSnapshot,
   parseMacSwapUsage,
   parseOsRelease,
@@ -379,4 +383,66 @@ test("rejects out-of-contract CPU sample windows", async () => {
     }),
     /cpuSampleMs/,
   );
+});
+
+test("omits extra volumes when none are configured", async () => {
+  const snapshot = await collectMachineSnapshot({
+    cpuSampleMs: 100,
+    signal: new AbortController().signal,
+  });
+
+  assert.equal("extraDisks" in snapshot, false);
+});
+
+test("measures a configured extra volume like the system volume", async () => {
+  const snapshot = await collectMachineSnapshot({
+    cpuSampleMs: 100,
+    extraDiskPaths: ["/"],
+    signal: new AbortController().signal,
+  });
+
+  assert.doesNotThrow(() => machineSnapshotSchema.parse(snapshot));
+  assertStrictJson(snapshot);
+  assert.equal(snapshot.extraDisks?.length, 1);
+  assert.equal(snapshot.extraDisks?.[0]?.path, "/");
+  assert.ok(snapshot.extraDisks?.[0]?.capacity);
+  assert.ok(snapshot.extraDisks[0].capacity.totalBytes > 0);
+});
+
+test("marks missing, unmounted, and relative extra paths unavailable", async (t) => {
+  const directory = await mkdtemp(join(tmpdir(), "host-monitor-"));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  const missing = join(directory, "missing-volume");
+  const issues: Parameters<typeof collectExtraDisks>[3] = [];
+
+  const disks = await collectExtraDisks(
+    [missing, directory, "relative/volume"],
+    "linux",
+    new AbortController().signal,
+    issues,
+  );
+
+  assert.deepEqual(disks, [
+    { path: missing, capacity: null },
+    { path: directory, capacity: null },
+    { path: "relative/volume", capacity: null },
+  ]);
+  assert.equal(issues.length, 3);
+  assert.ok(issues.every((issue) => issue.metric === "disk"));
+  assert.match(issues[0]?.message ?? "", /missing-volume could not be measured/u);
+});
+
+test("keeps sampling when one extra volume is missing", async () => {
+  const snapshot = await collectMachineSnapshot({
+    cpuSampleMs: 100,
+    extraDiskPaths: ["/", "/definitely/not/mounted/host-monitor"],
+    signal: new AbortController().signal,
+  });
+
+  assert.doesNotThrow(() => machineSnapshotSchema.parse(snapshot));
+  assert.ok(snapshot.extraDisks?.[0]?.capacity);
+  assert.deepEqual(snapshot.extraDisks?.[1], {
+    path: "/definitely/not/mounted/host-monitor",
+    capacity: null,
+  });
 });
