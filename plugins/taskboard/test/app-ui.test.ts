@@ -241,10 +241,10 @@ test('shows linked native thread lifecycle separately from provider status', () 
   assert.ok(lifecycle, 'Missing AgentThreadLifecycle');
   assert.match(lifecycle, /rpc\.call\('agentThreadStatus'/u);
   assert.match(lifecycle, /Linked agent thread/u);
-  assert.match(lifecycle, /Agent working/u);
-  assert.match(lifecycle, /Agent completed/u);
-  assert.match(lifecycle, /Agent failed/u);
-  assert.match(lifecycle, /Agent canceled/u);
+  assert.match(app, /running: 'Agent working'/u);
+  assert.match(app, /completed: 'Agent completed'/u);
+  assert.match(app, /failed: 'Agent failed'/u);
+  assert.match(app, /canceled: 'Agent canceled'/u);
   assert.match(lifecycle, /External issue moved to In Progress\./u);
   assert.match(lifecycle, /External issue marked complete\./u);
   assert.match(lifecycle, /link\.providerError \?\? link\.error/u);

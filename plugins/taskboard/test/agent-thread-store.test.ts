@@ -41,6 +41,9 @@ function fixture() {
     state: 'running',
     terminalEventSeq: null,
     error: null,
+    inProgressTransitionAt: null,
+    doneTransitionAt: null,
+    providerError: null,
     createdAt: now,
     updatedAt: now
   });

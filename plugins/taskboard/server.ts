@@ -1648,6 +1648,13 @@ export default async function plugin(bb: BbPluginApi) {
     string,
     Promise<{ threadId: string }>
   >();
+  const listThreadEvents = bb.sdk.threads.events.list as unknown as (input: {
+    threadId: string;
+    types: readonly ['turn/completed'];
+    order: 'desc';
+    limit: string;
+    signal?: AbortSignal;
+  }) => ReturnType<typeof bb.sdk.threads.events.list>;
 
   async function ensureAgentThreadPanel(
     link: AgentThreadLink,
@@ -1678,6 +1685,81 @@ export default async function plugin(bb: BbPluginApi) {
         }
       ]
     });
+  }
+
+  async function recoverLegacyAgentThread(
+    task: AgentThreadLink['task'],
+    dispatchKey: string
+  ): Promise<AgentThreadLink | null> {
+    const candidates = (
+      await Promise.all(
+        [false, true].map(archived =>
+          bb.sdk.threads.list({
+            archived,
+            projectId: task.projectId,
+            originPluginId: 'taskboard',
+            includeHidden: true,
+            limit: 200
+          })
+        )
+      )
+    )
+      .flat()
+      .sort((left, right) => right.updatedAt - left.updatedAt);
+
+    for (const thread of candidates) {
+      const tabs = await bb.sdk.threads.tabs.get({ threadId: thread.id });
+      const matchesTask = tabs.tabs.some(tab => {
+        if (
+          tab.kind !== 'plugin-panel' ||
+          tab.pluginId !== 'taskboard' ||
+          tab.actionId !== 'taskboard-panel' ||
+          !tab.paramsJson
+        ) {
+          return false;
+        }
+        try {
+          const params = JSON.parse(tab.paramsJson) as Record<string, unknown>;
+          return (
+            params.kind === 'item' &&
+            params.projectId === task.projectId &&
+            params.source === task.source &&
+            params.locator === task.locator
+          );
+        } catch {
+          return false;
+        }
+      });
+      if (!matchesTask) continue;
+
+      const events = await listThreadEvents({
+        threadId: thread.id,
+        types: ['turn/completed'],
+        order: 'desc',
+        limit: '1'
+      });
+      const terminal =
+        events[0]?.type === 'turn/completed'
+          ? agentThreadOutcome(events[0])
+          : {
+              state: 'running' as const,
+              terminalEventSeq: null,
+              error: null
+            };
+      const now = new Date().toISOString();
+      return agentThreads.insert({
+        dispatchKey,
+        task,
+        threadId: thread.id,
+        ...terminal,
+        inProgressTransitionAt: null,
+        doneTransitionAt: null,
+        providerError: null,
+        createdAt: now,
+        updatedAt: now
+      });
+    }
+    return null;
   }
 
   async function transitionAgentThreadProvider(
@@ -1767,10 +1849,14 @@ export default async function plugin(bb: BbPluginApi) {
           (() => {
             const latest = agentThreads.latest(task);
             return latest?.state === 'running' ? latest : null;
-          })();
+          })() ??
+          (await recoverLegacyAgentThread(task, input.dispatchKey));
         if (durable) {
           await ensureAgentThreadPanel(durable, item);
-          await transitionAgentThreadProvider(durable, 'in_progress');
+          await transitionAgentThreadProvider(
+            durable,
+            durable.state === 'completed' ? 'done' : 'in_progress'
+          );
           return { threadId: durable.threadId };
         }
         const project = await bb.sdk.projects.get({
@@ -2660,7 +2746,7 @@ export default async function plugin(bb: BbPluginApi) {
           }
           try {
             const events = await waitUntilAborted(
-              bb.sdk.threads.events.list({
+              listThreadEvents({
                 threadId: currentLink.threadId,
                 types: ['turn/completed'],
                 order: 'desc',

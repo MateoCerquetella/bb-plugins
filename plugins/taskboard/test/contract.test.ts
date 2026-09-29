@@ -217,7 +217,7 @@ test('keeps detail handoff intent trusted while issue text stays inside the boun
   assert.match(prompt, /repository-local Empirical workflow/u);
   assert.ok(
     prompt.indexOf('repository-local Empirical workflow') <
-      prompt.indexOf('--- BEGIN UNTRUSTED EXTERNAL TRACKER DATA ---')
+      prompt.indexOf('--- BEGIN UNTRUSTED EXTERNAL TRACKER DATA ')
   );
   assert.match(
     prompt,

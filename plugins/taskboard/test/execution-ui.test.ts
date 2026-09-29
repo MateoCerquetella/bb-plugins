@@ -15,7 +15,7 @@ test('one-click start dispatches one new BB thread', () => {
     /if \(pending\.current\.has\(itemId\)\) return[\s\S]*?pending\.current\.add\(itemId\)/u
   );
   assert.match(app, /rpc\.call\('startAgentThread'/u);
-  assert.match(server, /agentThreadStarts\.get\(input\.dispatchKey\)/u);
+  assert.match(server, /agentThreadStarts\.get\(taskKey\)/u);
   assert.match(server, /bb\.sdk\.threads\.spawn\(/u);
 });
 
