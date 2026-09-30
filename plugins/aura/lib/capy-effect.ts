@@ -29,6 +29,23 @@ export const QUALITY_SCALE: Record<BackgroundSettings["quality"], number> = {
   balanced: 1 / 3,
   sharp: 1 / 2,
 };
+export const MAX_IMAGE_FRAMEBUFFER_PIXELS = 2_073_600;
+
+export function frameIsDue(lastDraw: number | null, now: number, fps: BackgroundSettings["fps"]): boolean {
+  return lastDraw === null || now - lastDraw >= 1000 / fps;
+}
+
+export function canvasSize(width: number, height: number, quality: BackgroundSettings["quality"], imageBacked: boolean): { width: number; height: number } {
+  const requestedScale = QUALITY_SCALE[quality];
+  const scale = imageBacked
+    ? Math.min(requestedScale, Math.sqrt(MAX_IMAGE_FRAMEBUFFER_PIXELS / (width * height)))
+    : requestedScale;
+  const round = imageBacked ? Math.floor : Math.round;
+  return {
+    width: Math.max(1, round(width * scale)),
+    height: Math.max(1, round(height * scale)),
+  };
+}
 
 export function mountCapyEffect(parent: HTMLElement, initial: BackgroundSettings, imageUrl: string | null): CapyEffect {
   const layer = document.createElement("div"); layer.className = "aura-capy-layer"; layer.ariaHidden = "true";
@@ -87,7 +104,7 @@ function mountShader(parent: HTMLElement, imageUrl: string | null, color: string
   let frame = 40000;
   let raf = 0;
   let previous: number | null = null;
-  let lastDraw = 0;
+  let lastDraw: number | null = null;
   let visible = true;
   let lost = false;
   let imageReady = imageUrl === null;
@@ -147,11 +164,12 @@ function mountShader(parent: HTMLElement, imageUrl: string | null, color: string
   parent.append(canvas);
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
   const frameInterval = 1000 / settings.fps;
-  function draw(): void {
+  function draw(now = performance.now()): void {
     if (disposed || lost || !imageReady || !canvas.width || !canvas.height) return;
     gl!.useProgram(program);
     gl!.uniform1f(timeUniform,frame * .001);
     gl!.clear(gl!.COLOR_BUFFER_BIT); gl!.drawArrays(gl!.TRIANGLES,0,6);
+    lastDraw = now;
     if (canvas.dataset.rendered !== "true") canvas.dataset.rendered = "true";
   }
   function tick(now: number) {
@@ -159,22 +177,22 @@ function mountShader(parent: HTMLElement, imageUrl: string | null, color: string
     if (disposed || lost || document.hidden || !visible || reduced.matches) return;
     if (previous !== null) frame += Math.min(now-previous, frameInterval) * .5;
     previous = now;
-    if (now-lastDraw >= frameInterval) { draw(); lastDraw = now; }
+    if (frameIsDue(lastDraw, now, settings.fps)) draw(now);
     raf = requestAnimationFrame(tick);
   }
   function schedule() {
     cancelAnimationFrame(raf); raf = 0; previous = null;
     if (!disposed && !lost && !document.hidden && visible) {
-      draw();
+      const now = performance.now();
+      if (frameIsDue(lastDraw, now, settings.fps)) draw(now);
       if (!reduced.matches) raf = requestAnimationFrame(tick);
     }
   }
   function resize() {
     const {width,height} = parent.getBoundingClientRect();
     if (disposed || lost || width <= 0 || height <= 0) return;
-    const requestedScale = QUALITY_SCALE[settings.quality];
-    const scale = imageUrl ? Math.min(requestedScale, Math.sqrt(2073600/(width*height))) : requestedScale;
-    canvas.width = Math.max(1,Math.round(width*scale)); canvas.height = Math.max(1,Math.round(height*scale));
+    const size = canvasSize(width, height, settings.quality, Boolean(imageUrl));
+    canvas.width = size.width; canvas.height = size.height;
     gl!.viewport(0,0,canvas.width,canvas.height);
     gl!.useProgram(program);
     gl!.uniform2f(resolutionUniform,canvas.width,canvas.height);

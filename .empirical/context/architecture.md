@@ -4,6 +4,10 @@
 
 - The root workspace fans build, typecheck, test, and check scripts into all
   leaf plugins while keeping one lockfile and dependency installation.
+- `plugins/aura/server.ts` owns validated background and slot persistence,
+  versioned image delivery, RPC, and CLI. `app.tsx` owns settings/preview
+  controls, while `lib/background.ts` and `lib/capy-effect.ts` mount scoped
+  backgrounds and bounded WebGL animation into BB thread panels.
 - `plugins/action-topbar/lib/action-topbar.ts` owns the injected topbar strip,
   searchable Action combobox, tab reorder/close/focus behavior, and drag bridge
   into BB's experimental main-workspace split API. `server.ts` projects the
@@ -46,34 +50,38 @@
 
 1. BB loads each plugin backend from its manifest's source entry and builds the
    optional frontend into its shared React/plugin runtime.
-2. Action Topbar mirrors host-owned tabs in the main thread header and starts
+2. Aura validates active and saved-slot settings through one Zod model, serves
+   stored images through a private immutable route, and mounts one disposable
+   Capy shader per eligible panel. FPS and quality settings bound frame draws
+   and drawing-buffer density; reduced-motion and visibility guards pause work.
+3. Action Topbar mirrors host-owned tabs in the main thread header and starts
    the experimental split-drag bridge for Action rows. BB core owns the drop
    zones, per-thread layout persistence, and Browser/Terminal/plugin pane
    rendering.
-3. Dockside reads BB project/thread state through the Plugin SDK, derives each
+4. Dockside reads BB project/thread state through the Plugin SDK, derives each
    root/child family and semantic status, and renders the replacement thread
    list while server RPC handles guarded mutations.
-4. Save My Model reads and writes plugin-versioned localStorage in the browser.
+5. Save My Model reads and writes plugin-versioned localStorage in the browser.
    Invalid or empty host identities collapse into one browser-wide scope;
    changing selected provider never reuses another provider's execution values.
-5. Taskboard resolves the current BB project and its selected provider, then
+6. Taskboard resolves the current BB project and its selected provider, then
    syncs external summaries into its plugin SQLite database. List browsing and
    mentions read the cache; item detail and comments are fetched live.
-6. Frontend components call schema-validated RPC methods. Mutations update
+7. Frontend components call schema-validated RPC methods. Mutations update
    provider state, refresh the cache, publish an ephemeral project-scoped
    realtime invalidation, and let mounted clients refetch durable data.
-7. Linear/Jira secrets are stored outside RPC-visible configuration in
+8. Linear/Jira secrets are stored outside RPC-visible configuration in
    owner-only project credential files. The authenticated pending-interaction
    form is the human credential entry surface.
-8. Issue creation loads provider-native metadata, sends one validated create
+9. Issue creation loads provider-native metadata, sends one validated create
    request, caches the returned item, and inserts a Taskboard mention into the
    BB composer. The external provider is never written before confirmation.
-9. A background service refreshes configured projects; the external tracker
+10. A background service refreshes configured projects; the external tracker
    remains authoritative when cache and live state differ.
-10. Named presets never auto-apply. UI application provider-checks a preset,
+11. Named presets never auto-apply. UI application provider-checks a preset,
    atomically replaces the current project `BrowsePreferences`, and lets the
    existing observable store synchronize full/right-panel surfaces.
-11. Host Monitor asks BB for enrolled hosts, samples only connected targets via
+12. Host Monitor asks BB for enrolled hosts, samples only connected targets via
    the authenticated host-worker boundary, validates every response, and keeps
    the last good reading when a target becomes stale, fails, or disconnects.
    Process lists are fetched only for the explicitly opened host and stop
@@ -83,6 +91,8 @@
 
 - BB and the exact `@get-bb/plugin-sdk` version provide the host, RPC, UI,
   storage, agent, CLI, and testing contracts.
+- Aura uses browser WebGL2 for dithering and Zod for backward-compatible
+  settings validation; it makes no external runtime requests.
 - Action Topbar additionally requires the experimental Action split-drag API
   introduced in Plugin SDK 0.4.33 and its matching BB core implementation.
 - Taskboard uses Zod for runtime validation, better-sqlite3 through BB storage,

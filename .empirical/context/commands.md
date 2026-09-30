@@ -22,6 +22,8 @@ Commands below are verified from workspace and plugin manifests.
 - `bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.3 --subdirectory plugins/usage-tracker --tag-prefix usage-tracker/`
   — install the released Usage Tracker Git range directly.
 - `bb plugin install ./plugins/host-monitor` — register Host Monitor locally.
+- `bb plugin install ./plugins/aura --yes && bb plugin reload aura` — install
+  and reload Aura from the current checkout for live UI verification.
 - `bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.0 --subdirectory plugins/host-monitor --tag-prefix host-monitor/`
   — install the released Host Monitor Git range directly.
 
@@ -30,6 +32,10 @@ Commands below are verified from workspace and plugin manifests.
 - `npm run test --workspace=bb-plugin-action-topbar` and
   `npm run typecheck --workspace=bb-plugin-action-topbar` — focused Action
   Topbar verification.
+- `npm run check --workspace bb-plugin-aura` — Aura typecheck, focused tests,
+  and production plugin build.
+- `bb aura status --json` — inspect active Aura settings and saved slots
+  without returning stored image bytes.
 - `npm run build` — build every plugin workspace that declares a build script.
 - `npm run typecheck` — typecheck every plugin workspace.
 - `npm run test` — run every plugin test suite.

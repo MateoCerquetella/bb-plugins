@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:5ab959b473b5b3958258131338cdf6d65b4dafc2f65f369652690a9c35b7ad67",
+  "mode": "fresh-context",
+  "baseRef": "origin/main",
+  "baseCommit": "9614dd51fc203d740614aba4de44f31cda50ec04",
+  "headCommit": "0f1d4cd1888914cea985983694ab16e8678a0c48",
+  "diffDigest": "sha256:0ebb45f9aa8168ceeb0204c05f353fe49204089211223d2ad87ea1621a1719cd",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "codex-fresh-context-reviewer",
+  "reviewerInvocationId": "aura-review-0f1d4cd-20260930-01",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- PASS AC-1: fps and quality are validated, persisted with active settings, saved in slots, and restored on slot activation.\n- PASS AC-2: Zod defaults load missing fields as 15 and balanced; legacy active and slot settings remain compatible without migration or image loss.\n- FAIL AC-3: Quality scaling and image cap are correct, but schedule() performs a direct draw without updating lastDraw, allowing the following RAF to draw before the selected interval.\n- PASS AC-4: Draft changes remount CapyPreview immediately and Apply publishes the persisted snapshot to conversation and New thread surfaces.\n- PASS AC-UI-1: Controls are compact labeled three-column button groups with help text, keyboard-focusable buttons, aria-pressed, and narrow-width wrapping.\n- PASS AC-5: Reduced motion, hidden document, and non-intersection guards prevent or cancel continuous RAF work.\n- FAIL AC-6: Focused tests/typecheck/build were observed passing by reviewer, but scheduler/canvas behavior lacks deterministic coverage and local installation evidence is not yet recorded.\n\n## Security / correctness\n\nNo security vulnerabilities found. Strict validation and disposal are sound. One frame-cap correctness defect remains: direct scheduling draws do not update lastDraw.\n\n## Design / maintainability\n\nThe settings, persistence, preview/apply, and controls fit Aura patterns. Extracting deterministic scheduler and scale helpers would improve regression coverage.",
+  "bodyDigest": "sha256:d5e2ff343b432a079cb9351b5e3606d3bde60ae079fdb00df4452004f1a2cfb6",
+  "findings": [
+    {
+      "id": "F-1",
+      "severity": "medium",
+      "category": "correctness",
+      "summary": "schedule() calls draw() without updating lastDraw, so the next RAF may draw within one selected frame interval.",
+      "path": "plugins/aura/lib/capy-effect.ts"
+    },
+    {
+      "id": "F-2",
+      "severity": "medium",
+      "category": "tests",
+      "summary": "Tests assert only the quality lookup and do not cover FPS cadence, actual canvas sizing/cap, motion/visibility guards, or preview remount behavior.",
+      "path": "plugins/aura/test/lifecycle.test.ts"
+    },
+    {
+      "id": "F-3",
+      "severity": "medium",
+      "category": "acceptance",
+      "summary": "Local BB installation and status verification evidence have not yet been recorded.",
+      "path": ".empirical/specs/aura-animation-quality/state.json"
+    }
+  ],
+  "digest": "sha256:3fe5eea4b7226ad8fb6396c09b3d126f0fdbbf34eeb284e6b18e41cb01f4e7a0"
+}

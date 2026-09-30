@@ -13,6 +13,7 @@ collection index; each leaf manifest remains authoritative for that plugin.
 - [Architecture](architecture.md)
 - [Commands](commands.md)
 - [Conventions](conventions.md)
+- [Design language](design-language.md)
 
 Source dependencies, page digests, and freshness are recorded in
 [manifest.json](manifest.json). This is a compact file-backed context set, not

@@ -3,6 +3,8 @@
 ## Purpose
 
 - This workspace contains focused plugins for BB, the agent IDE.
+- Aura provides personal image backgrounds, animated Capy dithering, six saved
+  slots, and bounded animation speed/render-quality controls for BB threads.
 - Action Topbar puts a searchable Action launcher and persistent, per-thread
   content tabs in BB's main thread topbar. It delegates pane rendering and
   split-drop behavior to the matching experimental BB core/SDK surface.
@@ -34,7 +36,7 @@
 - Taskboard's current browse state stays versioned and device-local; named
   project presets store validated snapshots in the plugin database and apply
   explicitly through that same browse store.
-- All six indexed plugins are private/non-publishable workspaces. Releases use
+- All indexed plugins are private/non-publishable workspaces. Releases use
   immutable plugin-specific Git tags plus the BB Community marketplace.
 - Action Topbar is not marketplace-ready. It requires the matching BB core and
   experimental Plugin SDK 0.4.33 Action split-drag API; stock BB releases that
@@ -68,3 +70,5 @@
   `plugins/host-monitor/README.md`, its manifest, `contract.ts`, `server.ts`,
   `host.ts`, and `app.tsx`.
 - Hosted verification: `.github/workflows/ci.yml`.
+- Aura behavior and resource bounds: `plugins/aura/README.md`, `lib/model.ts`,
+  `lib/capy-effect.ts`, `app.tsx`, and focused tests.
