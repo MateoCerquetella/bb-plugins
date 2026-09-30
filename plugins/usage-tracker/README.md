@@ -19,7 +19,7 @@ and their current usage reading, without adding a navigation item or a separate
 plugin page.
 
 <p align="center">
-  <img src="./assets/usage-tracker-summary.png" width="248" alt="Compact Usage Tracker summary showing the highest provider usage and three additional providers" />
+  <img src="./assets/usage-tracker-summary.png" width="248" alt="Compact Usage Tracker summary showing usage across providers currently in use and three additional providers" />
 </p>
 
 <p align="center">
@@ -34,8 +34,9 @@ plugin page.
 
 - Shows Codex, Claude Code, Cursor, Grok, OpenCode, and Antigravity usage in BB's sidebar footer.
 - Lets you show or hide every provider independently; the strip compacts for
-  one or two providers and summarizes larger sets with the highest usage plus
-  an additional-provider count. It disappears when every provider is disabled.
+  one or two providers and summarizes larger sets with cumulative usage across
+  providers currently in use plus an additional-provider count. Idle providers
+  do not drive the summary. It disappears when every provider is disabled.
 - Opens the summary into a complete provider overview; select any overview row
   to drill into that provider's existing limit details.
 - Colors usage yellow from 80% and red from 95% in both compact and expanded
@@ -46,6 +47,9 @@ plugin page.
   provider-defined percentages.
 - Shows reported USD credit usage and limits in expanded details, including the
   dollar amounts exposed by Claude Code usage data.
+- Works with BB's Account Pooler: when pooled accounts serve Claude Code or
+  Codex, the strip shows the currently selected account and the expanded
+  details list every pooled account's own limits.
 - Shows the available Codex usage resets in the expanded details.
 - Includes reset timing and provider session status in the expanded view.
 - Refreshes automatically every five minutes and whenever a stale BB window
@@ -64,7 +68,7 @@ The configurable Compact limit was contributed by
 Usage Tracker requires BB 0.38 or newer. Install its tracking Git release:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.9 --subdirectory plugins/usage-tracker --tag-prefix usage-tracker/
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.10 --subdirectory plugins/usage-tracker --tag-prefix usage-tracker/
 ```
 
 After [the BB Community entry](https://github.com/get-bb/marketplace/pull/129)
@@ -94,19 +98,47 @@ does not add its 3–4 second CLI startup time to the sidebar RPC response.
 If a CLI is missing, signed out, or expired, expand that provider in the strip
 to see the recovery instruction reported by BB.
 
+### Claude Code with `CLAUDE_CONFIG_DIR`
+
+When Claude Code runs with `CLAUDE_CONFIG_DIR` set, it stores its macOS
+Keychain credentials under `Claude Code-credentials-<hash>` instead of
+`Claude Code-credentials`, so BB reports Claude Code as signed out. Set
+**Claude Keychain service** to that service name and Usage Tracker reads Claude
+Code usage from it directly. List the candidates with:
+
+```sh
+security dump-keychain | grep -o '"Claude Code-credentials[^"]*"'
+```
+
+The hash is the first eight hex characters of the SHA-256 of the config
+directory path:
+
+```sh
+printf '%s' "$CLAUDE_CONFIG_DIR" | shasum -a 256 | cut -c1-8
+```
+
+Expired access tokens are refreshed through Anthropic's OAuth endpoint when
+the item contains a refresh token. Rotated credentials are written back to
+the same Keychain service and verified before usage is requested. If no
+refresh token exists or refresh fails, sign in again using the matching
+Claude Code configuration directory.
+
 ## Use
 
 The collapsed strip is designed for quick scanning:
 
-- With more than two enabled providers, select the highest-usage summary to
+- With more than two enabled providers, select the active-usage summary to
   open the complete provider overview.
 - Select any provider reading to open its details in place.
 - Review the reported **5-hour limit**, **weekly limit**, every additional
   provider-defined window, their reset times, and any reported USD credits.
   Codex Pro accounts that do not report a five-hour limit omit that row.
-- For Codex, select **Use a reset…** to open a confirmation. Nothing is
+- With the Account Pooler enabled, a pooled provider's details show the current
+  account and one section per account with its plan, status, and limits.
+- For local Codex sessions, select **Use a reset…** to open a confirmation. Nothing is
   consumed until **Yes, use reset** is selected; canceling the confirmation
-  does not contact the reset-consumption endpoint.
+  does not contact the reset-consumption endpoint. Resets are unavailable for
+  pooled accounts because the reset API cannot target a specific pool account.
 - Select the same provider again, use the close button, press <kbd>Esc</kbd>,
   or click outside the details to collapse it.
 - Select the refresh icon to fetch every provider immediately.
@@ -132,11 +164,17 @@ bb plugin remove usage-tracker
 
 ## Data and privacy
 
-The plugin reads BB's local `system.usageLimits` data for provider windows. It
-also uses the installed `codex app-server` with the existing local Codex
+The plugin reads BB's local `system.usageLimits` data for provider windows.
+When the Account Pooler plugin is enabled, it also reads that plugin's cached
+per-account usage through its `provider-usage.v1` RPC; for providers the pool
+serves, that replaces the host-local reading. It also uses the installed `codex app-server` with the existing local Codex
 session to read the available reset count and, only after the explicit
-confirmation above, request one reset. It does not ask for or store provider
-credentials. Its only persistent browser data is the last successful usage
+confirmation above, request one reset. When **Claude Keychain service** is set,
+it reads that macOS Keychain item with `security` and sends its Claude Code
+access token only to Anthropic's usage endpoint; it only accepts
+`Claude Code-credentials` service names. It sends refresh tokens only to
+Anthropic's OAuth endpoint and stores refreshed credentials in that same
+Keychain item, never in plugin storage. Its only persistent browser data is the last successful usage
 snapshot in local storage, used to keep useful values visible during a
 temporary provider or network failure.
 

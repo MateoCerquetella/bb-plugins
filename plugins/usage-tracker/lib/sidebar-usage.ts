@@ -32,6 +32,40 @@ export interface SidebarUsageOverviewItem {
   selection: SidebarUsagePrimarySelection;
 }
 
+export interface CumulativeInUseUsage {
+  percent: number | null;
+  count: number;
+  names: string[];
+}
+
+export function inUseOverviewItems(
+  items: readonly SidebarUsageOverviewItem[],
+): SidebarUsageOverviewItem[] {
+  const marked = items.filter((item) => typeof item.provider.inUse === "boolean");
+  if (marked.length !== items.length) return [...items];
+  return items.filter((item) => item.provider.inUse === true);
+}
+
+export function cumulativeInUseUsage(
+  items: readonly SidebarUsageOverviewItem[],
+): CumulativeInUseUsage {
+  const active = inUseOverviewItems(items).filter(
+    (item) => item.selection.window !== null,
+  );
+  if (active.length === 0) {
+    return { percent: null, count: 0, names: [] };
+  }
+  const percent = active.reduce(
+    (sum, item) => sum + (item.selection.window?.usedPercent ?? 0),
+    0,
+  );
+  return {
+    percent,
+    count: active.length,
+    names: active.map((item) => item.provider.name),
+  };
+}
+
 export function highestSidebarUsagePrimary(
   items: readonly SidebarUsageOverviewItem[],
 ): SidebarUsageOverviewItem | null {
@@ -85,15 +119,21 @@ function isCodexProWithoutFiveHourLimit(
 export function sidebarUsageWindows(
   provider: ProviderUsage,
 ): SidebarUsageWindows {
-  const matching = (predicate: (label: string) => boolean) => {
-    const candidates = provider.windows.filter((window) => predicate(window.label));
+  const matching = (
+    predicate: (window: { label: string; kind?: string }) => boolean,
+  ) => {
+    const candidates = provider.windows.filter((window) => predicate(window));
     return (provider.id === "antigravity"
       ? [...candidates].sort((a, b) => b.usedPercent - a.usedPercent)
       : candidates)[0] ?? null;
   };
   return {
-    fiveHour: matching((label) => isFiveHourLabel(label)),
-    weekly: matching((label) => isWeeklyLabel(label)),
+    fiveHour: matching(
+      (window) => window.kind === "five-hour" || isFiveHourLabel(window.label),
+    ),
+    weekly: matching(
+      (window) => window.kind === "weekly" || isWeeklyLabel(window.label),
+    ),
   };
 }
 
@@ -162,6 +202,15 @@ export function selectSidebarUsagePrimary(
       return {
         window: alternativeWindow,
         actualKind: alternative,
+        fallback: "current-alternative",
+      };
+    }
+
+    const reportedWindow = currentProvider.windows[0] ?? null;
+    if (reportedWindow !== null) {
+      return {
+        window: reportedWindow,
+        actualKind: compactLimit,
         fallback: "current-alternative",
       };
     }

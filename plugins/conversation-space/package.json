@@ -1,0 +1,41 @@
+{
+  "name": "bb-plugin-conversation-space",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MateoCerquetella/bb-plugins.git",
+    "directory": "plugins/conversation-space"
+  },
+  "scripts": {
+    "build": "env -u BB_CLI bb plugin build .",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test --experimental-strip-types test/*.test.ts",
+    "check": "npm run typecheck && npm test && npm run build"
+  },
+  "type": "module",
+  "engines": {
+    "bb": ">=0.40.0",
+    "bbPluginSdk": ">=0.4.21"
+  },
+  "bb": {
+    "name": "Conversation Space (WIP)",
+    "description": "Work in progress: compact context usage and measured Jev routing diagnostics.",
+    "branding": {
+      "icon": "ChartPie"
+    },
+    "server": "./server.ts",
+    "app": "./app.tsx"
+  },
+  "dependencies": {
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@get-bb/plugin-sdk": "0.4.21",
+    "bb-app": "0.40.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "typescript": "^5.7.0"
+  }
+}

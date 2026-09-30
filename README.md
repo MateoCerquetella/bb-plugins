@@ -22,7 +22,8 @@ All plugins in this repository are independently installable.
 
 | | Plugin | Install | What it does |
 | --- | --- | --- | --- |
-| | [Jev Routing](./plugins/jev-route) | [Git install](./plugins/jev-route#install) | Per-thread model history, custom colors for any model, and independent Jev routing setup for Codex. |
+| | [Conversation Space (WIP)](./plugins/conversation-space) | [Local development install](./plugins/conversation-space#conversation-space-wip) | **Work in progress:** compact context usage, colored token percentages, and measured Jev routing diagnostics. |
+| | [Jev Routing](./plugins/jev-route) | [Git install](./plugins/jev-route#install) | Jev-only model history, custom model colors, and Codex-only automatic routing without cross-provider quota fallback. |
 | <img src="./plugins/action-topbar/assets/icon.svg" width="128" height="128" alt="" /> | [Action Topbar](./plugins/action-topbar) | [Experimental Git install](#action-topbar-experimental-install) | Adds a compact main-thread topbar with draggable BB Actions and persistent, per-thread workspace panes. Requires the matching experimental BB core/SDK build. |
 | <img src="./plugins/clean-my-context/assets/icon.svg" width="128" height="128" alt="" /> | [Clean My Context](./plugins/clean-my-context) | [Git release](#clean-my-context-quick-start) | Resets visible chat and provider context in place while preserving the exact thread, branch, folder, workspace, and settings. Requires BB PR #2500. |
 | <img src="./plugins/dockside/assets/icon.svg" width="128" height="128" alt="" /> | [Dockside](./plugins/dockside) | [Git release](#dockside-quick-start) | Replaces BB's thread list with a compact project-first sidebar, semantic status colors, filters, safe multi-select deletion, and child-agent families. |
@@ -213,7 +214,7 @@ bb plugin remove taskboard
 Install the tracking Git release directly from this monorepo:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.9 --subdirectory plugins/usage-tracker --tag-prefix usage-tracker/
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.10 --subdirectory plugins/usage-tracker --tag-prefix usage-tracker/
 ```
 
 After [the BB Community entry](https://github.com/get-bb/marketplace/pull/129)

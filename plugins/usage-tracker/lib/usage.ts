@@ -36,6 +36,7 @@ export interface RawUsageWindow {
   usedPercent: number;
   resetsAt: string | null;
   cost?: UsageCost;
+  kind?: "five-hour" | "daily" | "weekly" | "custom";
 }
 
 export interface RawHealthyProviderUsage {
@@ -67,9 +68,22 @@ export interface UsageWindow {
   barPercent: number;
   resetsAt: string | null;
   cost: UsageCost | null;
+  kind?: "five-hour" | "daily" | "weekly" | "custom";
 }
 
 export type UsageLevel = "normal" | "warning" | "critical";
+
+/** One account served by the Account Pooler plugin. */
+export interface PooledAccountUsage {
+  id: string;
+  label: string;
+  status: ProviderStatus;
+  accountEmail: string | null;
+  planLabel: string | null;
+  message: string | null;
+  observedAt: string | null;
+  windows: UsageWindow[];
+}
 
 export interface ProviderUsage {
   id: ProviderId;
@@ -80,6 +94,14 @@ export interface ProviderUsage {
   message: string | null;
   windows: UsageWindow[];
   resetCredits?: UsageResetCredits | null;
+  /**
+   * Present when the Account Pooler owns this provider's accounts. Provider-level
+   * windows and `accountEmail` are the current routed account.
+   */
+  accounts?: PooledAccountUsage[];
+  currentAccountId?: string;
+  /** True when a live thread or in-flight Account Pooler route is using this provider. */
+  inUse?: boolean;
 }
 
 export interface UsageSnapshot {
@@ -154,6 +176,14 @@ const PROVIDERS: readonly ProviderDefinition[] = [
   },
 ];
 
+export function providerIdForWireId(wireId: string): ProviderId | null {
+  return (
+    PROVIDERS.find((provider) =>
+      (provider.wireIds as readonly string[]).includes(wireId),
+    )?.id ?? null
+  );
+}
+
 export const REQUEST_ERROR_MESSAGE =
   "Usage could not be loaded. Check the agent session and try again.";
 
@@ -208,7 +238,10 @@ function normalizeProvider(
       status: "error",
       accountEmail: null,
       planLabel: null,
-      message: `${definition.name} usage was not reported by bb.`,
+      message:
+        definition.id === "grok"
+          ? "Grok Build does not report subscription limits through bb yet."
+          : `${definition.name} usage was not reported by bb.`,
       windows: [],
     };
   }
@@ -250,6 +283,7 @@ function normalizeProvider(
                 "limitUsdCents",
               ),
             },
+      ...(window.kind === undefined ? {} : { kind: window.kind }),
     })),
   };
 }
