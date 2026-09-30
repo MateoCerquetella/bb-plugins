@@ -5,24 +5,31 @@ private chain-of-thought, prompts, credentials, secrets, or scratchpad text.
 
 ## D-001: Select the implementation approach
 
-Status: Proposed
+Status: Accepted
 
 ### Evidence
 
-<!-- Repository facts, user constraints, or measured behavior. -->
+The supplied screenshot shows a dark spatial canvas, large live chat panes, a
+right Coordinator dock, and explicit canvas controls. BB's public SDK already
+provides native ThreadChat and NewThreadComposer.
 
 ### Options
 
-<!-- Two or more viable approaches. -->
+1. Rebuild chat and routing logic inside the plugin.
+2. Use native BB chat surfaces inside a plugin-owned spatial shell.
 
 ### Chosen approach
 
-<!-- Change Status to Accepted and state the chosen approach. -->
+Choose option 2: own layout, metadata, and gestures while delegating chat,
+permissions, streaming, and thread creation to BB.
 
 ### Trade-offs and risks
 
-<!-- Costs, limitations, failure modes, and mitigations. -->
+Native surfaces constrain styling but preserve authorization and behavior.
+Absolute positioning needs a narrow-screen fallback and bounded persisted
+geometry.
 
 ### Verification
 
-<!-- Checks that will prove the decision was implemented correctly. -->
+Typecheck/build, live install/reload, screenshot inspection, pane count check,
+and page-error check.
