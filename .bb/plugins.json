@@ -4,6 +4,10 @@
   "name": "mateocerquetella-bb-plugins",
   "plugins": [
     {
+      "name": "agent-canvas",
+      "source": "./plugins/agent-canvas"
+    },
+    {
       "name": "jev-route",
       "source": "./plugins/jev-route"
     },
