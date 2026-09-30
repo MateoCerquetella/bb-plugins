@@ -3,6 +3,13 @@ import test from "node:test";
 import { JSDOM } from "jsdom";
 import { mountBackground, notifyChange, TARGETS } from "../lib/background.ts";
 import { defaults } from "../lib/model.ts";
+import { QUALITY_SCALE } from "../lib/capy-effect.ts";
+
+test("render-quality tiers increase drawing-buffer density", () => {
+  assert.equal(QUALITY_SCALE.performance, 1 / 4);
+  assert.equal(QUALITY_SCALE.balanced, 1 / 3);
+  assert.equal(QUALITY_SCALE.sharp, 1 / 2);
+});
 
 test("applies scoped backgrounds, disables cleanly and ignores a late fetch after disposal", async () => {
   const dom = new JSDOM('<html><head></head><body><div id="thread-detail-timeline-panel"></div><div id="root-compose-main-panel"></div><aside>Sidebar</aside></body></html>', { pretendToBeVisual: true });

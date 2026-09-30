@@ -8,6 +8,8 @@ export const settingsSchema = z.object({
   newThreadOnly: z.boolean().default(false),
   dimmerEnabled: z.boolean().default(true),
   effect: z.enum(["pixels", "none"]),
+  fps: z.union([z.literal(15), z.literal(30), z.literal(60)]).default(15),
+  quality: z.enum(["performance", "balanced", "sharp"]).default("balanced"),
   tint: z.enum(["lavender", "theme"]),
   intensity: z.number().min(0).max(1),
   imageOpacity: z.number().min(0).max(1),
@@ -16,7 +18,7 @@ export const settingsSchema = z.object({
 }).strict();
 export type BackgroundSettings = z.infer<typeof settingsSchema>;
 export const defaults: BackgroundSettings = {
-  enabled: true, newThreadOnly: false, dimmerEnabled: true, effect: "pixels", tint: "lavender", intensity: 0.5,
+  enabled: true, newThreadOnly: false, dimmerEnabled: true, effect: "pixels", fps: 15, quality: "balanced", tint: "lavender", intensity: 0.5,
   imageOpacity: 0.7, fit: "cover", fade: 0.35,
 };
 export const imageInfoSchema = z.object({

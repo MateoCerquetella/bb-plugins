@@ -18,6 +18,9 @@ Select **Apply background** to save the setting.
   to fit the 2 MB stored-image limit. The preview shows the result before saving.
 - Adjust image visibility (0–100%), half-wallpaper mode, fit, and Capy dithering.
   The half-wallpaper setting affects New thread only. Photo dithering now animates with a gentle threshold wave.
+- Choose **15**, **30**, or **60 FPS** for animation speed and select
+  **Performance**, **Balanced**, or **Sharp** render quality. Higher settings use
+  more GPU; existing backgrounds default to 15 FPS and Balanced quality.
 - Select **Apply background** to apply the current draft.
 - Choose a slot, enter a name, and select **Save slot** to save and apply the draft.
   Occupied slots have an explicit **Replace slot** button. Each slot keeps its
@@ -90,9 +93,11 @@ the Paper Shaders Apache-2.0 license are recorded in
 
 Aura decorates BB's `root-compose-main-panel` and `thread-detail-timeline-panel`
 DOM containers. Recheck these host names when upgrading BB. Canvas/GL resources,
-observers and listeners are disposed when disabling or reloading. Noise and photo animation
-run at up to 15 fps and pauses off-screen, when hidden, and for reduced motion.
-The image/gradient remains if WebGL is unavailable.
+observers and listeners are disposed when disabling or reloading. Noise and photo
+animation run at the selected 15, 30, or 60 FPS and pause off-screen, when
+hidden, and for reduced motion. Quality tiers use one-quarter, one-third, or
+one-half drawing-buffer resolution; image-backed buffers retain the existing
+2,073,600-pixel cap. The image/gradient remains if WebGL is unavailable.
 
 ```sh
 npm run check --workspace bb-plugin-aura

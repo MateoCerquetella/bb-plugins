@@ -42,7 +42,7 @@ test("invalid image or slot rejects the entire apply without partially changing 
       await assert.rejects(host.harness.callRpc("apply", { settings: { ...defaults, enabled: false }, image: { ...replace, dataUrl }, saveSlot: { slot: 1, name: "Wrong" } }));
     }
     for (const slot of [0, 7, 1.5]) await assert.rejects(host.harness.callRpc("apply", { settings: defaults, image: keep, saveSlot: { slot, name: "Invalid" } }));
-    for (const patch of [{ intensity: 2 }, { imageOpacity: 1.1 }, { fit: "cover; color:red" }, { enabled: "true" }]) await assert.rejects(host.harness.callRpc("apply", { settings: { ...defaults, ...patch }, image: keep }));
+    for (const patch of [{ intensity: 2 }, { imageOpacity: 1.1 }, { fit: "cover; color:red" }, { fps: 45 }, { quality: "ultra" }, { enabled: "true" }]) await assert.rejects(host.harness.callRpc("apply", { settings: { ...defaults, ...patch }, image: keep }));
     assert.deepEqual(await host.harness.callRpc("get", null), before);
     await assert.rejects(host.harness.callRpc("activateSlot", { slot: 2 }), /empty/);
   } finally { await host.harness.dispose(); }
@@ -67,13 +67,30 @@ test("scope stays global across slots; clearing/resetting preserves saved work",
     assert.equal((await host.harness.runCli(["reset", "extra"])).exitCode, 1);
   } finally { await host.harness.dispose(); }
 });
-test("image type must match bytes; legacy settings get the new scope default", async () => {
+test("image type must match bytes; legacy settings get new defaults", async () => {
   assert.equal(decodeImage(png).mime, "image/png"); assert.throws(() => decodeImage(png.replace("image/png", "image/jpeg")));
   const host = createFakePluginHost(); plugin(host.bb);
   try {
-    const { newThreadOnly, ...legacy } = defaults;
+    const { newThreadOnly, fps, quality, ...legacy } = defaults;
     host.bb.storage.database().prepare("UPDATE background SET settings = ? WHERE id = 1").run(JSON.stringify(legacy));
-    assert.equal((await host.harness.callRpc("get", null) as Snapshot).settings.newThreadOnly, false);
+    const settings = (await host.harness.callRpc("get", null) as Snapshot).settings;
+    assert.equal(settings.newThreadOnly, false);
+    assert.equal(settings.fps, 15);
+    assert.equal(settings.quality, "balanced");
+  } finally { await host.harness.dispose(); }
+});
+
+test("animation speed and quality persist in saved slots", async () => {
+  const host = createFakePluginHost(); plugin(host.bb);
+  try {
+    const settings = { ...defaults, fps: 60 as const, quality: "sharp" as const };
+    const saved = await host.harness.callRpc("apply", { settings, image: keep, saveSlot: { slot: 1, name: "Smooth" } }) as Snapshot;
+    assert.equal(saved.slots[0]?.settings.fps, 60);
+    assert.equal(saved.slots[0]?.settings.quality, "sharp");
+    await host.harness.callRpc("apply", { settings: { ...defaults, fps: 30 }, image: keep });
+    const active = await host.harness.callRpc("activateSlot", { slot: 1 }) as Snapshot;
+    assert.equal(active.settings.fps, 60);
+    assert.equal(active.settings.quality, "sharp");
   } finally { await host.harness.dispose(); }
 });
 

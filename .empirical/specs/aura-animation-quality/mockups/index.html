@@ -1,0 +1,34 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Aura animation quality mockup</title>
+<style>
+  :root { color-scheme: dark; font: 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  body { margin: 0; padding: 32px; background: #15151b; color: #f2f1f7; }
+  main { width: min(420px, 100%); }
+  h1 { font-size: 18px; margin: 0 0 8px; }
+  p { color: #a7a5b4; line-height: 1.45; }
+  fieldset { border: 1px solid #383743; border-radius: 8px; padding: 16px; margin-top: 24px; }
+  legend { color: #a7a5b4; padding: 0 6px; }
+  label { display: block; color: #a7a5b4; margin: 14px 0 6px; }
+  .segmented { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  button { border: 1px solid #4b4958; background: #20202a; color: #dddbe8; padding: 9px 6px; border-radius: 6px; }
+  button[aria-pressed=true] { background: #7668d8; border-color: #9a8df0; color: white; }
+  small { display: block; color: #8e8b9d; margin-top: 5px; }
+</style>
+<main>
+  <h1>Animation quality</h1>
+  <p>Choose how smooth and sharp Capy dithering feels. Balanced keeps GPU use gentle.</p>
+  <fieldset>
+    <legend>Capy dithering</legend>
+    <label>Animation speed</label>
+    <div class="segmented">
+      <button aria-pressed="true">15 FPS</button><button aria-pressed="false">30 FPS</button><button aria-pressed="false">60 FPS</button>
+    </div>
+    <small>Higher FPS uses more GPU.</small>
+    <label>Render quality</label>
+    <div class="segmented">
+      <button aria-pressed="false">Performance</button><button aria-pressed="true">Balanced</button><button aria-pressed="false">Sharp</button>
+    </div>
+    <small>Sharp uses a denser drawing buffer.</small>
+  </fieldset>
+</main>

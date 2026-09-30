@@ -24,6 +24,12 @@ export const CAPY_CSS = `
 
 export interface CapyEffect { update(settings: BackgroundSettings, image: string | null): void; dispose(): void; }
 
+export const QUALITY_SCALE: Record<BackgroundSettings["quality"], number> = {
+  performance: 1 / 4,
+  balanced: 1 / 3,
+  sharp: 1 / 2,
+};
+
 export function mountCapyEffect(parent: HTMLElement, initial: BackgroundSettings, imageUrl: string | null): CapyEffect {
   const layer = document.createElement("div"); layer.className = "aura-capy-layer"; layer.ariaHidden = "true";
   const air = document.createElement("div"); air.className = "aura-capy-air";
@@ -43,6 +49,8 @@ export function mountCapyEffect(parent: HTMLElement, initial: BackgroundSettings
     const wasEnabled = settings.enabled;
     const wasTint = settings.tint;
     const wasFit = settings.fit;
+    const wasFps = settings.fps;
+    const wasQuality = settings.quality;
     settings = next;
     const dark = document.documentElement.classList.contains("dark");
     layer.style.display = settings.enabled ? "" : "none";
@@ -58,12 +66,12 @@ export function mountCapyEffect(parent: HTMLElement, initial: BackgroundSettings
     else delete ink.dataset.halfWallpaper;
     if (image) { ink.dataset.image = ""; ink.style.backgroundImage = `url("${image}")`; }
     else { delete ink.dataset.image; ink.style.backgroundImage = "none"; }
-    if (image !== currentImage || refresh || wasEffect !== settings.effect || wasEnabled !== settings.enabled || wasTint !== settings.tint || wasFit !== settings.fit) {
+    if (image !== currentImage || refresh || wasEffect !== settings.effect || wasEnabled !== settings.enabled || wasTint !== settings.tint || wasFit !== settings.fit || wasFps !== settings.fps || wasQuality !== settings.quality) {
       currentImage = image;
       disposeShader(); disposeShader = () => {};
       if (settings.enabled && settings.effect === "pixels") {
         const color = settings.tint === "theme" ? getComputedStyle(parent).getPropertyValue("--primary").trim() || "#5e6ad2" : dark ? "#606acc" : "#5e6ad2";
-        disposeShader = mountShader(ink, image, color, settings.fit);
+        disposeShader = mountShader(ink, image, color, settings);
       }
     }
   }
@@ -71,7 +79,7 @@ export function mountCapyEffect(parent: HTMLElement, initial: BackgroundSettings
   return { update, dispose() { if (stopped) return; stopped = true; theme.disconnect(); disposeShader(); layer.remove(); } };
 }
 
-function mountShader(parent: HTMLElement, imageUrl: string | null, color: string, fit: BackgroundSettings["fit"]): () => void {
+function mountShader(parent: HTMLElement, imageUrl: string | null, color: string, settings: BackgroundSettings): () => void {
   const canvas = document.createElement("canvas");
   const gl = canvas.getContext("webgl2", { alpha:true, antialias:false, depth:false, stencil:false, premultipliedAlpha:true, preserveDrawingBuffer:false });
   if (!gl) return () => {}; // Keep the source image/gradient when WebGL is unavailable.
@@ -119,7 +127,7 @@ function mountShader(parent: HTMLElement, imageUrl: string | null, color: string
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
     const position = gl.getAttribLocation(program, "a_position");
     gl.enableVertexAttribArray(position); gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
-    const values: Record<string, number> = { u_originX:.5,u_originY:.5,u_worldWidth:0,u_worldHeight:0,u_fit:imageUrl ? (fit === "cover" ? 2 : 1) : 0,u_scale:imageUrl ? 1 : 2,u_rotation:0,u_offsetX:0,u_offsetY:0,u_shape:1,u_type:4,u_pxSize:imageUrl ? 2 : 3,u_colorSteps:4 };
+    const values: Record<string, number> = { u_originX:.5,u_originY:.5,u_worldWidth:0,u_worldHeight:0,u_fit:imageUrl ? (settings.fit === "cover" ? 2 : 1) : 0,u_scale:imageUrl ? 1 : 2,u_rotation:0,u_offsetX:0,u_offsetY:0,u_shape:1,u_type:4,u_pxSize:imageUrl ? 2 : 3,u_colorSteps:4 };
     for (const [key, value] of Object.entries(values)) gl.uniform1f(gl.getUniformLocation(program, key), value);
     const probe = document.createElement("canvas"); probe.width = probe.height = 1;
     const ctx = probe.getContext("2d");
@@ -138,6 +146,7 @@ function mountShader(parent: HTMLElement, imageUrl: string | null, color: string
   }
   parent.append(canvas);
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const frameInterval = 1000 / settings.fps;
   function draw(): void {
     if (disposed || lost || !imageReady || !canvas.width || !canvas.height) return;
     gl!.useProgram(program);
@@ -148,9 +157,9 @@ function mountShader(parent: HTMLElement, imageUrl: string | null, color: string
   function tick(now: number) {
     raf = 0;
     if (disposed || lost || document.hidden || !visible || reduced.matches) return;
-    if (previous !== null) frame += Math.min(now-previous, 1000/15) * .5;
+    if (previous !== null) frame += Math.min(now-previous, frameInterval) * .5;
     previous = now;
-    if (now-lastDraw >= 1000/15) { draw(); lastDraw = now; }
+    if (now-lastDraw >= frameInterval) { draw(); lastDraw = now; }
     raf = requestAnimationFrame(tick);
   }
   function schedule() {
@@ -163,8 +172,8 @@ function mountShader(parent: HTMLElement, imageUrl: string | null, color: string
   function resize() {
     const {width,height} = parent.getBoundingClientRect();
     if (disposed || lost || width <= 0 || height <= 0) return;
-    // Match Capy's bounded noise renderer: width*height / (3*3) framebuffer pixels.
-    const scale = imageUrl ? Math.min(1/3, Math.sqrt(2073600/(width*height))) : 1/3;
+    const requestedScale = QUALITY_SCALE[settings.quality];
+    const scale = imageUrl ? Math.min(requestedScale, Math.sqrt(2073600/(width*height))) : requestedScale;
     canvas.width = Math.max(1,Math.round(width*scale)); canvas.height = Math.max(1,Math.round(height*scale));
     gl!.viewport(0,0,canvas.width,canvas.height);
     gl!.useProgram(program);

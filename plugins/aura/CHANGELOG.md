@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Add 15, 30, and 60 FPS animation-speed controls.
+- Add Performance, Balanced, and Sharp WebGL render-quality controls.
+- Preserve conservative defaults for existing backgrounds and saved slots.
+
 ## 0.2.2
 
 - Add theme-aware reading surfaces to New thread controls and recent threads.

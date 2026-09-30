@@ -23,6 +23,11 @@
 .aura-field { display: flex; flex-direction: column; gap: 10px; }
 .aura-field-title { font-size: 12px; font-weight: 550; display: flex; justify-content: space-between; align-items: center; }
 .aura-field-title span, .aura-field-title output { color: var(--aura-muted); font-size: 11px; font-weight: 400; }
+.aura-field-help { display: block; color: var(--aura-muted); font-size: 10px; line-height: 1.45; margin-top: -4px; }
+.aura-segmented { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+.aura-segmented button { min-width: 0; min-height: 35px; border: 1px solid var(--aura-border); background: var(--background); color: var(--aura-muted); border-radius: 6px; padding: 7px 5px; font-size: 11px !important; overflow-wrap: anywhere; }
+.aura-segmented button:hover { background: var(--muted); color: var(--foreground); }
+.aura-segmented button[aria-pressed="true"] { background: var(--primary, #8581dd); border-color: var(--primary, #8581dd); color: var(--primary-foreground, white); }
 .aura-controls select { width: 100%; min-height: 37px; font: inherit; font-size: 12px; background: var(--background); color: var(--foreground); border: 1px solid var(--aura-border); border-radius: 8px; padding: 7px 10px; }
 .aura-editor button { cursor: pointer; font: inherit; }
 .aura-editor button:disabled, .aura-editor fieldset:disabled { opacity: .5; cursor: default; }
