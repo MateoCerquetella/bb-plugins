@@ -28,7 +28,7 @@ test("emits semantic severity for compact, rail, and detail presentation", () =>
 
 test("summarizes larger provider sets and exposes the complete overview", () => {
   assert.match(source, /items\.length > 2/u);
-  assert.match(source, /highestSidebarUsagePrimary\(items\)/u);
+  assert.match(source, /cumulativeInUseUsage\(items\)/u);
   assert.match(source, /`\+\$\{additionalCount\}`/u);
   assert.match(source, /Agent usage overview/u);
   assert.match(source, /usage-tracker-sidebar__overview-provider/u);
@@ -44,4 +44,25 @@ test("preserves provider-specific details and focus restoration", () => {
   assert.match(source, /provider\.id === "codex"/u);
   assert.match(source, /isOverviewOpen = false/u);
   assert.match(source, /requestedFocus = \{ kind: "summary" \}/u);
+});
+
+test("closes an expanded provider card from the overview summary button", () => {
+  assert.match(source, /const cardOpen = selectedProviderId !== null \|\| isOverviewOpen/u);
+  assert.match(source, /selectedProviderId = null/u);
+});
+
+test("shows the current pooled account instead of a combined total", () => {
+  assert.doesNotMatch(source, /"Combined"/u);
+  assert.match(source, /\? "Current"/u);
+  assert.match(source, /Use this account/u);
+  assert.match(source, /usage-tracker-sidebar__overview-account/u);
+});
+
+test("shows reported credits as readable expanded-detail metadata", () => {
+  assert.match(source, /formatCost,/u);
+  assert.match(source, /window\?\.cost !== null/u);
+  assert.match(source, /`Credits \$\{formatCost\(window\.cost\)\}`/u);
+  assert.match(source, /usage-tracker-sidebar__cost/u);
+  assert.match(styles, /\.usage-tracker-sidebar__cost/u);
+  assert.doesNotMatch(source, /claude\s+\/usage/iu);
 });

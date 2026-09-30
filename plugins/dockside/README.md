@@ -62,11 +62,17 @@ bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.0 
   --tag-prefix dockside/
 ```
 
-The range currently resolves [`dockside/v0.1.0`](https://github.com/MateoCerquetella/bb-plugins/tree/dockside/v0.1.0)
-at the code merged by [plugin PR #26](https://github.com/MateoCerquetella/bb-plugins/pull/26).
-The [BB Community marketplace submission](https://github.com/get-bb/marketplace/pull/162)
-is validated and awaiting maintainer merge. Until it lands, use the Git command
-above rather than a bare npm package or marketplace name.
+The range currently resolves [`dockside/v0.1.5`](https://github.com/MateoCerquetella/bb-plugins/tree/dockside/v0.1.5),
+which keeps Snooze, Settle, Restore, and thread age controls visible on touch-only devices.
+The [BB Community marketplace entry](https://github.com/get-bb/marketplace/pull/162)
+is live, so you can also install Dockside by name:
+
+```sh
+bb plugin install dockside
+```
+
+The Git command above remains the source-verifiable install path. Do not use the
+unrelated npm package with the same name.
 
 **For development from source** — clone the repo and install the plugin as a
 local path source:
@@ -115,18 +121,19 @@ An empty shelf disappears.
 
 ### Cards
 
-Root rows always use exactly two compact lines. The first has a distinct semantic
-icon, truncated title, and elapsed time. The second has a truncated branch and a
-non-wrapping cluster with a readable status badge, parent-only PR metadata, and
-child/provider controls. **Failed**, **Needs you**, **Working**, **Unread**,
-**Inactive**, and seven-day **Stale** states have separate shapes, labels,
-tooltips, and customizable colors. Inactive and stale work recede; Dockside never
-calls ordinary idle work Done. A Working family keeps the actual activity type
-visible: runtime, workflow, background agent, command, plan, and goal each use a
-different animated shape and customizable color. PR ticks and other PR icons use
-their semantic color as a tinted background, so a ready tick is visibly green.
-Hovering a quiet root swaps its elapsed time for the two park buttons without
-adding a row.
+Root rows always use exactly two compact lines. The first has the provider mark,
+truncated title, and elapsed time. The second has a truncated branch and a
+non-wrapping cluster with parent-only PR metadata, child controls, and the
+semantic status icon. The default **Icons** display stays compact; **Verbose**
+adds a readable status badge beside the icon. **Failed**, **Needs you**,
+**Working**, **Unread**, **Inactive**, and seven-day **Stale** states have
+separate shapes, labels, tooltips, and customizable colors. Inactive and stale
+work recede; Dockside never calls ordinary idle work Done. Working families use
+one segmented spinner, while its accessible description preserves the actual
+runtime, workflow, agent, command, plan, or goal activity. PR ticks and other PR
+icons use their semantic color as a tinted background, so a ready tick is
+visibly green. Hovering a quiet root swaps its elapsed time for the two park
+buttons without adding a row.
 
 ### A working thread can never be parked
 
@@ -136,7 +143,7 @@ never hidden.
 
 ### Snoozing
 
-The hover button snoozes until **09:00 tomorrow**.
+The Snooze button snoozes until **09:00 tomorrow**.
 
 ### Inline agents
 
@@ -231,3 +238,9 @@ bun run --filter 'bb-plugin-dockside' test
 ```
 
 The test script needs Node 22.6+.
+
+Choose **Status display → Icons** (default) in Dockside settings for compact status marks, or **Verbose** to also show status labels. Working uses a slightly larger segmented loading spinner, Needs you a filled exclamation mark, and unread results a filled check. Errors retain a distinct cross; inactive and stale threads keep their clock and hourglass. Hover or focus an icon for its full meaning. The default palette uses yellow for working, orange for attention, and green for unread results; custom and accessibility palettes remain available.
+
+The segmented working spinner rotates, attention and error marks pulse gently, and unread checks pop into view once. Inactive marks stay still. Animations are disabled when your system requests reduced motion.
+
+Agent logos sit beside thread titles. The trailing metadata groups PR details and thread status; child-agent provider names remain in the child-count tooltip and on expanded child rows.

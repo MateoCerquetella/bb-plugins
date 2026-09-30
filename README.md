@@ -8,6 +8,8 @@
   Focused extensions for <a href="https://github.com/get-bb/bb">BB</a>, kept together in one extensible workspace.
 </p>
 
+All plugins in this repository are independently installable.
+
 <p align="center">
   <a href="https://github.com/MateoCerquetella/bb-plugins/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/MateoCerquetella/bb-plugins/ci.yml?branch=main&style=flat-square&label=CI" alt="CI status" /></a>
   <img src="https://img.shields.io/badge/BB-%E2%89%A5%200.38-7c3aed?style=flat-square" alt="BB 0.38 or newer" />
@@ -20,14 +22,18 @@
 
 | | Plugin | Install | What it does |
 | --- | --- | --- | --- |
+| | [Conversation Space (WIP)](./plugins/conversation-space) | [Local development install](./plugins/conversation-space#conversation-space-wip) | **Work in progress:** compact context usage, colored token percentages, and measured Jev routing diagnostics. |
+| | [Jev Routing](./plugins/jev-route) | [Git install](./plugins/jev-route#install) | Jev-only model history, custom model colors, and Codex-only automatic routing without cross-provider quota fallback. |
 | <img src="./plugins/action-topbar/assets/icon.svg" width="128" height="128" alt="" /> | [Action Topbar](./plugins/action-topbar) | [Experimental Git install](#action-topbar-experimental-install) | Adds a compact main-thread topbar with draggable BB Actions and persistent, per-thread workspace panes. Requires the matching experimental BB core/SDK build. |
 | <img src="./plugins/clean-my-context/assets/icon.svg" width="128" height="128" alt="" /> | [Clean My Context](./plugins/clean-my-context) | [Git release](#clean-my-context-quick-start) | Resets visible chat and provider context in place while preserving the exact thread, branch, folder, workspace, and settings. Requires BB PR #2500. |
-| <img src="./plugins/dockside/assets/icon.svg" width="128" height="128" alt="" /> | [Dockside](./plugins/dockside) | [Git branch](#dockside-quick-start) | Replaces BB's thread list with a compact project-first sidebar, semantic status colors, filters, safe multi-select deletion, and child-agent families. |
+| <img src="./plugins/dockside/assets/icon.svg" width="128" height="128" alt="" /> | [Dockside](./plugins/dockside) | [Git release](#dockside-quick-start) | Replaces BB's thread list with a compact project-first sidebar, semantic status colors, filters, safe multi-select deletion, and child-agent families. |
 | <img src="./plugins/host-monitor/assets/icon.svg" width="128" height="128" alt="" /> | [Host Monitor](./plugins/host-monitor) | [Git release](#host-monitor-quick-start) | Monitors CPU, RAM, disk, network, host details, and guarded process actions across every machine enrolled in BB. Requires BB 0.40+. |
 | <img src="./plugins/save-my-model/assets/icon.svg" width="128" height="128" alt="" /> | [Save My Model](./plugins/save-my-model) | [Git release](#save-my-model-quick-start) | Stores provider by BB host and model/reasoning separately for each host and provider. |
 | <img src="./plugins/taskboard/assets/icon.svg" width="128" height="128" alt="" /> | [Taskboard](./plugins/taskboard) | [Git release](#taskboard-quick-start) | Brings each BB project's GitHub, Linear, or Jira tasks into one focused List or Kanban board. |
+| <img src="./plugins/aura/assets/icon.svg" width="128" height="128" alt="" /> | [Aura](./plugins/aura) | [Git release](./plugins/aura#install) | Adds custom PNG/JPG backgrounds and softly faded pixel textures to conversations and New thread, with six saved slots and a live preview. |
 | <img src="./plugins/touchbar/assets/icon.svg" width="128" height="128" alt="" /> | [Touch Bar Agent Monitor](./plugins/touchbar) | [Git release](#touch-bar-agent-monitor-quick-start) | Adds a native persistent Control Strip badge and fullscreen BB agent panel to Touch Bar Macs. Requires BB 0.40+. |
 | <img src="./plugins/usage-tracker/assets/icon.svg" width="128" height="128" alt="" /> | [Usage Tracker](./plugins/usage-tracker) | [Git release](#usage-tracker-quick-start) | Keeps Codex and Claude Code 5-hour and weekly limits beside BB's sidebar utility icons. |
+| <img src="./plugins/lavender/assets/icon.svg" width="128" height="128" alt="" /> | [Lavender](./plugins/lavender) | [Git release](./plugins/lavender#install) | Adds coordinated pale-lilac light and charcoal-violet dark palettes for conversations and code. |
 
 ## Action Topbar experimental install
 
@@ -67,24 +73,23 @@ and development commands.
 
 ## Dockside quick start
 
-Install Dockside directly from this repository branch while PR #26 is under
-review:
+Install the latest compatible Dockside Git release:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@feature/dockside-thread-filters-bulk-delete --subdirectory plugins/dockside
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.5 --subdirectory plugins/dockside --tag-prefix dockside/
 ```
 
 Dockside groups threads by project, keeps root/child families together, adds
 working/needs-you/unread/quiet filters, and protects current, active, waiting,
 unread, and pinned families from permanent bulk deletion. Open
-**Settings → Dockside** to choose semantic status and PR colors, density,
+**Settings → Dockside** to choose Icons or Verbose status display, semantic status and PR colors, density,
 default child expansion, and optional metadata. See the
 [Dockside README](./plugins/dockside) for behavior and development details.
 
-Update or remove a local installation with BB:
+Update or remove an installation with BB:
 
 ```sh
-bb plugin reload dockside
+bb plugin update dockside
 bb plugin remove dockside
 ```
 
@@ -209,7 +214,7 @@ bb plugin remove taskboard
 Install the tracking Git release directly from this monorepo:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.3 --subdirectory plugins/usage-tracker --tag-prefix usage-tracker/
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.10 --subdirectory plugins/usage-tracker --tag-prefix usage-tracker/
 ```
 
 After [the BB Community entry](https://github.com/get-bb/marketplace/pull/129)
@@ -286,9 +291,8 @@ bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@main --
 bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@main --plugin usage-tracker
 ```
 
-Host Monitor, Taskboard, Touch Bar Agent Monitor, and Usage Tracker release through immutable
-plugin-specific Git tags and the BB Community marketplace. Dockside remains a
-branch installation until PR #26 lands and a release is prepared.
+Aura, Dockside, Host Monitor, Taskboard, Touch Bar Agent Monitor, and Usage Tracker release through immutable
+plugin-specific Git tags. See each plugin’s README for marketplace availability.
 
 ## Develop
 

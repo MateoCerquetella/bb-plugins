@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:a35c2695bf5fe7d1b11aa06d372bed4d0e976fcc8178113aa12808e1fd54d587",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "da38cfedd3dd4aad596c31bd653ec9ba00adee33",
+  "headCommit": "29c1ee334754d74dc5eaa70d06c6a820455ab2ac",
+  "diffDigest": "sha256:af0f7e7d8a2b7d900f0ff01f566982f4d5f23fb89285aebb8d9018b067b5a9c2",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "codex-fresh-isolated-rereviewer",
+  "reviewerInvocationId": "release_fresh_rereview:a35c2695bf5fe7d1b11aa06d372bed4d0e976fcc8178113aa12808e1fd54d587",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- FAIL AC-1: Dockside findings are corrected, but Aura README still says 30 FPS while release changes it to 15 FPS.\n- FAIL AC-2: No command-backed focused Aura receipt is included; the recorded workspace receipt failed before later manual focused success.\n- PASS AC-3: Merge commits, isolation policy, and isolated-checkout preservation are proven.\n- FAIL AC-4: Release tags are intentionally absent before publication, so final immutable-tag proof remains pending.\n- FAIL AC-5: GitHub releases and final marketplace resolution remain pending, and Aura has stale FPS documentation.\n- FAIL AC-6: Post-release verification remains pending before publication.\n\n## Security / correctness\n\nNo credential, injection, authorization, or cache-safety regression found. Prior Dockside defects are fixed; blockers are Aura evidence/docs and pending publication proof.\n\n## Design / maintainability\n\nUpdate Aura README to 15 FPS, capture command-backed Aura checks, then publish and verify tags, releases, and marketplace resolution.",
+  "bodyDigest": "sha256:c6fd99591e941ac67f36b9685be07fe6a45dad73afd83c736c8fecbff85cab9d",
+  "digest": "sha256:f39abfdff00bae98c678bc631eefd99459adf28feda6de736eb1590399c1a11e"
+}

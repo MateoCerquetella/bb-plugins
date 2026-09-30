@@ -1,13 +1,52 @@
 # Changelog
 
+## 0.1.14 - 2026-09-28
+
+- Disable process-default Codex reset actions when displaying pooled accounts.
+- Preserve unknown activity when BB cannot read thread counts.
+- Serialize pooled account switches, restore prior state after failures, and
+  queue refreshes requested during an active load.
+
+## 0.1.13 - 2026-09-26
+
+- The compact summary percentage is the combined usage of accounts in use
+  right now (live threads and in-flight Account Pooler routes), not the
+  highest idle provider.
+
+## 0.1.12 - 2026-09-26
+
+- Show the current Account Pooler account on the overview row and switch it
+  from provider details.
+- Show Cursor in the sidebar overview again.
+- Read missing ACP usage (including Grok) per provider, and use the first
+  reported window when weekly and five-hour labels are absent.
+
+## 0.1.11 - 2026-09-26
+
+- Close the usage card when the overview summary is clicked while a provider
+  details card is open.
+- Show the current Account Pooler account in compact usage and details instead
+  of a combined total across every pooled account.
+
+## 0.1.10 - 2026-09-26
+
+- Add the optional Claude Keychain service override, including expired-token
+  refresh, verified credential write-back, and credential-safe error messages.
+- Read Account Pooler accounts with plan-weighted combined usage and account
+  details; preserve USD amounts for single accounts and enforce host scoping.
+
+## 0.1.9 - 2026-09-21
+
+- Show reported USD credit usage and limits in expanded provider details,
+  including the dollar amounts supplied for Claude Code usage windows.
+- Keep windows without cost data unchanged and avoid running provider CLIs.
+
 ## 0.1.8 - 2026-09-04
 
 - Preserve the v0.1.6 provider set (Codex, Claude Code, Cursor, Grok, and OpenCode) and add Google Antigravity quota tracking as an opt-in provider.
 - Discover `agy` from PATH and supported macOS fallback locations, use the official Antigravity mark, and show all Antigravity quota groups.
 
 All notable changes to Usage Tracker are documented here.
-
-## Unreleased
 
 ## 0.1.6 - 2026-09-02
 

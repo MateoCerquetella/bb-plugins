@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sequence": 8,
+  "previousDigest": "sha256:9c3542974a29c2438f85d6c68db3c85721e8f681b7433a29c6e230be15a46ec7",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Fresh isolated review requested corrections for Dockside forced search expansion and nested focusable controls, plus accurate Aura caching terminology and final publication proof.",
+  "createdAt": "2026-09-21T17:34:49.334Z",
+  "stateBeforeDigest": "sha256:554734174c612427c18652fddcd5f8b033091646fc0fc1120d32050c0f28d461",
+  "stateAfterDigest": "sha256:88f0d7e664cf74407c6f141f1b3b4af03ae9b36b67c1c01514e38425e03abe96",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 8,
+    "activeFeature": "review-merge-release-open-prs",
+    "request": "Review all open pull requests in MateoCerquetella/bb-plugins, merge those that are correct and verified, then create and publish new patch releases for affected BB plugins so the BB Community marketplace ranges resolve them.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 1,
+    "message": "Fresh isolated review requested corrections for Dockside forced search expansion and nested focusable controls, plus accurate Aura caching terminology and final publication proof.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:70424b72bef5bfbb582b8dab86f13d1f879c24d458b579216f97934697cf6165",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:198eb35b899059ed9045f2ed90a9cca1c047e28f6d2cefd91cef4a1d7e0e45d9",
+    "impactDigest": "sha256:0ef2490ec0f0e93898cd2a2844c877df03835199d8011d5476417ab6fdbda821",
+    "capabilityClaimId": "review-merge-release-open-prs-7d601272d2cd",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-21T17:34:49.334Z"
+  },
+  "digest": "sha256:c37564019e57c4c9135453a25a4a503546bb7b8108bc1305a4a6aaf2f55b3b21"
+}

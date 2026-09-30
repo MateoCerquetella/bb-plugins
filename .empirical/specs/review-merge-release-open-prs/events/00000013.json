@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sequence": 13,
+  "previousDigest": "sha256:f4697cb327c7a2cdc962992eccb8a216665bd3be629ad888bd36416df98aa33b",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Updated Aura's performance documentation to the shipped 15 FPS behavior and added a bounded focused Aura verification command for immutable command-backed evidence.",
+  "createdAt": "2026-09-21T18:28:43.528Z",
+  "stateBeforeDigest": "sha256:22829f379810487639c6b8503b43a1df8f668ce4cd307d4ca637dc796ce39724",
+  "stateAfterDigest": "sha256:d1d13778f788cb2ac702474096fe65363fc53d541ee57a0a79530e8c0cd6facd",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 13,
+    "activeFeature": "review-merge-release-open-prs",
+    "request": "Review all open pull requests in MateoCerquetella/bb-plugins, merge those that are correct and verified, then create and publish new patch releases for affected BB plugins so the BB Community marketplace ranges resolve them.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "context",
+    "status": "waiting",
+    "repairAttempts": 2,
+    "message": "Updated Aura's performance documentation to the shipped 15 FPS behavior and added a bounded focused Aura verification command for immutable command-backed evidence.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:70424b72bef5bfbb582b8dab86f13d1f879c24d458b579216f97934697cf6165",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:198eb35b899059ed9045f2ed90a9cca1c047e28f6d2cefd91cef4a1d7e0e45d9",
+    "impactDigest": "sha256:0ef2490ec0f0e93898cd2a2844c877df03835199d8011d5476417ab6fdbda821",
+    "capabilityClaimId": "review-merge-release-open-prs-7d601272d2cd",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-21T18:28:43.528Z"
+  },
+  "digest": "sha256:fb2de37e6e0ff4429c26a02bc650746cf1ada9df3ada15e9cdee0ad7522a33fa"
+}

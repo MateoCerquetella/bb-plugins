@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-a0b129b6abd2fed424e0b7ac",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Corrected Dockside 0.1.5 SDK/type contract.",
+  "passed": true,
+  "startedAt": "2026-09-21T17:38:45.680Z",
+  "completedAt": "2026-09-21T17:39:01.285Z",
+  "provenance": {
+    "repositoryId": "sha256:b503769d621265b1260d48e307b706764511b6e0b4ef2d36cb52800751c273c7",
+    "feature": "review-merge-release-open-prs",
+    "specRevision": 2,
+    "specDigest": "sha256:70424b72bef5bfbb582b8dab86f13d1f879c24d458b579216f97934697cf6165",
+    "treeDigest": "sha256:6810a2866f4bb5db8c7e970068f55c690e49c0a068073983a1f4dbb0a1f36038",
+    "policyDigest": "sha256:593bbd252bb2fbe423ab33a35f9f4ea2869e5b89423f2d528b42e434681e8e5b",
+    "workflowRevision": 10,
+    "gitCommit": "ad366afb2eefcef29a1570c30d690a7bc4a70f12"
+  },
+  "digest": "sha256:872e8b6a5f1d45f33635e11faffccfe0438fb79c3fa617359c06f88236222805",
+  "kind": "qa",
+  "matrixDigest": "sha256:7c837d4d842e2aa153f3ff0085cd25798d91600e9127af103531f96a6650ff1c",
+  "check": {
+    "id": "qa-adapter-contract",
+    "kind": "adapter-contract"
+  },
+  "coveredChecks": [
+    "adapter-contract"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "x64",
+    "node": "24.21.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Corrected Dockside 0.1.5 SDK/type contract.",
+      "startedAt": "2026-09-21T17:38:45.680Z",
+      "completedAt": "2026-09-21T17:39:01.285Z",
+      "durationMs": 15605,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:f9b129d8080d6ae249324764ab9bf53ce8ebc569462bb37a19a9d1056d966f66",
+        "argv": [
+          "npm",
+          "run",
+          "typecheck",
+          "--workspace",
+          "bb-plugin-dockside"
+        ],
+        "cwd": ".",
+        "timeoutMs": 60000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "PATH",
+          "TMPDIR"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:7a261d704fd583127b7047b579a2d6e4002c3f8a67f485305911ee7da905e510",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "\n> bb-plugin-dockside@0.1.5 typecheck\n> tsc --noEmit\n\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:6810a2866f4bb5db8c7e970068f55c690e49c0a068073983a1f4dbb0a1f36038",
+      "sourceTreeAfter": "sha256:6810a2866f4bb5db8c7e970068f55c690e49c0a068073983a1f4dbb0a1f36038",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

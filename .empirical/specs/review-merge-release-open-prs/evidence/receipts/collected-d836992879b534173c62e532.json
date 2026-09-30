@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-d836992879b534173c62e532",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review requested changes to the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-09-21T18:52:43.554Z",
+  "completedAt": "2026-09-21T18:52:43.554Z",
+  "provenance": {
+    "repositoryId": "sha256:b503769d621265b1260d48e307b706764511b6e0b4ef2d36cb52800751c273c7",
+    "feature": "review-merge-release-open-prs",
+    "specRevision": 2,
+    "specDigest": "sha256:70424b72bef5bfbb582b8dab86f13d1f879c24d458b579216f97934697cf6165",
+    "treeDigest": "sha256:007436504fd137226c523c99ca093f708765c0e6ae41685f2bea8f49c7efe916",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:ce6650c8d7c4654054074b79cb5d7fa0c1c7f30affd8812a288515817ea3d08b",
+  "kind": "collected",
+  "collector": "empirical-review:codex-fresh-isolated-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/review-merge-release-open-prs/reviews/c90ceef5e7f9a57d684cced5.json",
+      "mediaType": "application/json",
+      "bytes": 1615,
+      "digest": "sha256:a4f62adfce8073efe54828da9b1fc0e376edb27d17b89e50be1e0a8433750609"
+    },
+    {
+      "path": ".empirical/specs/review-merge-release-open-prs/reviews/c90ceef5e7f9a57d684cced5.md",
+      "mediaType": "text/markdown",
+      "bytes": 798,
+      "digest": "sha256:e38b0c3509b6b4b3714ce416151fd4220b3f18e3d07ccd09121fe677774fd661"
+    }
+  ]
+}

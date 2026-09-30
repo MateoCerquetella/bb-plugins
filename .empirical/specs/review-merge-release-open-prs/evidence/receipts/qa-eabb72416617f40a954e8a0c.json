@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-eabb72416617f40a954e8a0c",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Verify shared plugin Git-distribution recovery and POSIX/Windows contract behavior without rerunning the already-passing clean-clone package suite.",
+  "passed": false,
+  "startedAt": "2026-09-21T18:16:08.921Z",
+  "completedAt": "2026-09-21T18:16:17.792Z",
+  "provenance": {
+    "repositoryId": "sha256:b503769d621265b1260d48e307b706764511b6e0b4ef2d36cb52800751c273c7",
+    "feature": "review-merge-release-open-prs",
+    "specRevision": 2,
+    "specDigest": "sha256:70424b72bef5bfbb582b8dab86f13d1f879c24d458b579216f97934697cf6165",
+    "treeDigest": "sha256:6810a2866f4bb5db8c7e970068f55c690e49c0a068073983a1f4dbb0a1f36038",
+    "policyDigest": "sha256:593bbd252bb2fbe423ab33a35f9f4ea2869e5b89423f2d528b42e434681e8e5b",
+    "workflowRevision": 10,
+    "gitCommit": "ad366afb2eefcef29a1570c30d690a7bc4a70f12"
+  },
+  "digest": "sha256:c5b5bd3a429a446d6d5c7c5bb60265e9adfc98cfe2b4c8bb56b101f5e62a4354",
+  "kind": "qa",
+  "matrixDigest": "sha256:7c837d4d842e2aa153f3ff0085cd25798d91600e9127af103531f96a6650ff1c",
+  "check": {
+    "id": "qa-cross-platform",
+    "kind": "cross-platform"
+  },
+  "coveredChecks": [
+    "clean-clone",
+    "cross-platform",
+    "end-to-end",
+    "integration",
+    "package-consumer"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "x64",
+    "node": "24.21.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "failed",
+      "summary": "Verify shared plugin Git-distribution recovery and POSIX/Windows contract behavior without rerunning the already-passing clean-clone package suite.",
+      "startedAt": "2026-09-21T18:16:08.921Z",
+      "completedAt": "2026-09-21T18:16:17.792Z",
+      "durationMs": 8871,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:7bf093ac6d03d792cbf228b4ef1772abb405a106ae50ecd0146a4e26e22a81b6",
+        "argv": [
+          "node",
+          ".empirical/specs/integrate-the-already-implemented-and-verified-action-topbar-plugin-into/qa/distribution.mjs"
+        ],
+        "cwd": ".",
+        "timeoutMs": 60000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "PATH",
+          "TMPDIR"
+        ]
+      },
+      "result": {
+        "exitCode": 1,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrDigest": "sha256:6e8ec8172397c60321597e9c118ff54ee73f9a8d358fa0d5f40afe837ebf5d93",
+        "stdoutTail": "",
+        "stderrTail": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: missing packed file: dist/app.js\n    at file:///private/tmp/bb-plugins-pr-review.AsZHVY/repo/.empirical/specs/integrate-the-already-implemented-and-verified-action-topbar-plugin-into/qa/distribution.mjs:54:10\n    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)\n    at async node:internal/modules/esm/loader:647:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v24.21.0\n",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:6810a2866f4bb5db8c7e970068f55c690e49c0a068073983a1f4dbb0a1f36038",
+      "sourceTreeAfter": "sha256:6810a2866f4bb5db8c7e970068f55c690e49c0a068073983a1f4dbb0a1f36038",
+      "artifacts": []
+    }
+  ],
+  "anomalies": [
+    "outcome-failed"
+  ]
+}

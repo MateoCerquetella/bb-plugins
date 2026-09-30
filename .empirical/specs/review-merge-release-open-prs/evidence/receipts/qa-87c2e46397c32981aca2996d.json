@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-87c2e46397c32981aca2996d",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Run Dockside system-level release verification for the 0.1.5 tree.",
+  "passed": false,
+  "startedAt": "2026-09-21T17:26:02.058Z",
+  "completedAt": "2026-09-21T17:26:03.763Z",
+  "provenance": {
+    "repositoryId": "sha256:b503769d621265b1260d48e307b706764511b6e0b4ef2d36cb52800751c273c7",
+    "feature": "review-merge-release-open-prs",
+    "specRevision": 2,
+    "specDigest": "sha256:70424b72bef5bfbb582b8dab86f13d1f879c24d458b579216f97934697cf6165",
+    "treeDigest": "sha256:8c43d777e49c70ae69473cb8ee4d0b7be266a06619602ca60fc71975ac7b7977",
+    "policyDigest": "sha256:593bbd252bb2fbe423ab33a35f9f4ea2869e5b89423f2d528b42e434681e8e5b",
+    "workflowRevision": 6,
+    "gitCommit": "5dd9d17b0fea25abfb4ff98405590b4ce44157d9"
+  },
+  "digest": "sha256:b5c3821a9654f4d2ed8862b4faeebf71846c2add82bdf18e5f41aabc0a78823a",
+  "kind": "qa",
+  "matrixDigest": "sha256:7c837d4d842e2aa153f3ff0085cd25798d91600e9127af103531f96a6650ff1c",
+  "check": {
+    "id": "qa-end-to-end",
+    "kind": "end-to-end"
+  },
+  "coveredChecks": [
+    "end-to-end"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "x64",
+    "node": "24.21.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "failed",
+      "summary": "Run Dockside system-level release verification for the 0.1.5 tree.",
+      "startedAt": "2026-09-21T17:26:02.058Z",
+      "completedAt": "2026-09-21T17:26:03.763Z",
+      "durationMs": 1705,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:7bf093ac6d03d792cbf228b4ef1772abb405a106ae50ecd0146a4e26e22a81b6",
+        "argv": [
+          "node",
+          ".empirical/specs/dockside-main-reconciliation/qa/system.mjs"
+        ],
+        "cwd": ".",
+        "timeoutMs": 60000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "PATH",
+          "TMPDIR"
+        ]
+      },
+      "result": {
+        "exitCode": 1,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrDigest": "sha256:08761347309ede0b5485310a8ff62bddf4bdbbf1ff68d7eddffa712e7fd8c8d4",
+        "stdoutTail": "",
+        "stderrTail": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'action-topbar',\n+   'aura',\n+   'clean-my-context',\n    'dockside',\n    'host-monitor',\n+   'lavender',\n    'save-my-model',\n    'taskboard',\n    'touchbar',\n    'usage-tracker'\n  ]\n\n    at file:///private/tmp/bb-plugins-pr-review.AsZHVY/repo/.empirical/specs/dockside-main-reconciliation/qa/system.mjs:54:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)\n    at async node:internal/modules/esm/loader:647:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: [\n    'action-topbar',\n    'aura',\n    'clean-my-context',\n    'dockside',\n    'host-monitor',\n    'lavender',\n    'save-my-model',\n    'taskboard',\n    'touchbar',\n    'usage-tracker'\n  ],\n  expected: [\n    'action-topbar',\n    'dockside',\n    'host-monitor',\n    'save-my-model',\n    'taskboard',\n    'touchbar',\n    'usage-tracker'\n  ],\n  operator: 'deepStrictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.21.0\n",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:8c43d777e49c70ae69473cb8ee4d0b7be266a06619602ca60fc71975ac7b7977",
+      "sourceTreeAfter": "sha256:8c43d777e49c70ae69473cb8ee4d0b7be266a06619602ca60fc71975ac7b7977",
+      "artifacts": []
+    }
+  ],
+  "anomalies": [
+    "outcome-failed"
+  ]
+}

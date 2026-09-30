@@ -16,6 +16,8 @@ import {
   pruneSelectedRootIds,
   resolveFamilyExpanded,
   selectableRootIds,
+  THREAD_FILTER_OPTIONS,
+  THREAD_FILTER_PRESETS,
 } from "../lib/thread-management.ts";
 
 function thread(
@@ -109,6 +111,14 @@ describe("filterProjectThreadGroups", () => {
   }
 
   it("supports attention and quiet presets", () => {
+    assert.deepEqual(ids("status"), [
+      "quiet-day",
+      "quiet-new",
+      "unread",
+      "waiting",
+      "working",
+      "quiet-week",
+    ]);
     assert.deepEqual(ids("working"), ["working"]);
     assert.deepEqual(ids("needs-you"), ["waiting"]);
     assert.deepEqual(ids("unread"), ["unread"]);
@@ -131,6 +141,32 @@ describe("filterProjectThreadGroups", () => {
     assert.deepEqual(
       groups.map((group) => group.families.length),
       before,
+    );
+  });
+});
+
+describe("thread filter presentation", () => {
+  it("describes every preset once in the intended menu hierarchy", () => {
+    assert.deepEqual(
+      THREAD_FILTER_OPTIONS.map((option) => option.preset),
+      THREAD_FILTER_PRESETS,
+    );
+    assert.deepEqual(
+      THREAD_FILTER_OPTIONS.filter((option) => option.group === "status").map(
+        (option) => option.preset,
+      ),
+      ["working", "needs-you", "unread"],
+    );
+    assert.deepEqual(
+      THREAD_FILTER_OPTIONS.filter(
+        (option) => option.group === "inactivity",
+      ).map((option) => option.preset),
+      ["quiet", "quiet-1d", "quiet-7d"],
+    );
+    assert.ok(
+      THREAD_FILTER_OPTIONS.every(
+        (option) => option.label.length > 0 && option.description.length > 0,
+      ),
     );
   });
 });

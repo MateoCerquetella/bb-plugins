@@ -1,0 +1,58 @@
+{
+  "name": "bb-plugin-lavender",
+  "version": "0.1.0",
+  "description": "Soft lavender light and charcoal-violet dark themes for BB.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "bb": ">=0.40",
+    "bbPluginSdk": ">=0.4.21"
+  },
+  "bb": {
+    "name": "Lavender",
+    "description": "A coordinated lavender palette for conversations and code, in light and dark.",
+    "branding": {
+      "icon": "./assets/icon.svg"
+    },
+    "server": "./server.ts",
+    "skills": [],
+    "themes": [
+      {
+        "id": "lavender",
+        "name": "Lavender",
+        "description": "Charcoal violet after dark, pale lilac by day.",
+        "css": "./themes/lavender.css",
+        "codeTheme": {
+          "dark": "./themes/lavender-dark.json",
+          "light": "./themes/lavender-light.json"
+        }
+      }
+    ]
+  },
+  "files": [
+    "dist/",
+    "server.ts",
+    "themes/",
+    "assets/",
+    "README.md",
+    "PLUGIN_OVERVIEW.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "env -u BB_CLI bb plugin build .",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test test/*.test.mjs",
+    "check": "npm run typecheck && npm test && npm run build"
+  },
+  "devDependencies": {
+    "@get-bb/plugin-sdk": "0.4.21",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  },
+  "author": "Mateo Cerquetella",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MateoCerquetella/bb-plugins.git",
+    "directory": "plugins/lavender"
+  }
+}

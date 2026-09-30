@@ -11,6 +11,35 @@
     },
     "commands": [
       {
+        "id": "aura-focused",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-aura"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "evidenceKinds": [
+          "test"
+        ],
+        "checks": [
+          "unit",
+          "adapter-contract",
+          "integration"
+        ],
+        "criteria": [
+          "AC-1",
+          "AC-2",
+          "AC-3",
+          "AC-4",
+          "AC-5",
+          "AC-6"
+        ]
+      },
+      {
         "id": "taskboard-focused",
         "argv": [
           "npm",

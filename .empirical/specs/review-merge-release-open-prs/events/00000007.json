@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "sequence": 7,
+  "previousDigest": "sha256:9587e522a0b32e6c615524d2b911657c6ec25f98598b367922ed858af921f25d",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Verified the exact Aura 0.2.2 and Dockside 0.1.5 release tree with focused tests, typecheck/build, clean-clone/package portability, cross-platform contracts, system verification, fresh-context audit, and a non-blocking security advisory.",
+  "createdAt": "2026-09-21T17:28:21.936Z",
+  "stateBeforeDigest": "sha256:29dfc41b15eb1921894f6bd7796364d7d4bc76adb2adc5a48782398ac073684c",
+  "stateAfterDigest": "sha256:554734174c612427c18652fddcd5f8b033091646fc0fc1120d32050c0f28d461",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 7,
+    "activeFeature": "review-merge-release-open-prs",
+    "request": "Review all open pull requests in MateoCerquetella/bb-plugins, merge those that are correct and verified, then create and publish new patch releases for affected BB plugins so the BB Community marketplace ranges resolve them.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "review",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Verified the exact Aura 0.2.2 and Dockside 0.1.5 release tree with focused tests, typecheck/build, clean-clone/package portability, cross-platform contracts, system verification, fresh-context audit, and a non-blocking security advisory.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:70424b72bef5bfbb582b8dab86f13d1f879c24d458b579216f97934697cf6165",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:198eb35b899059ed9045f2ed90a9cca1c047e28f6d2cefd91cef4a1d7e0e45d9",
+    "impactDigest": "sha256:0ef2490ec0f0e93898cd2a2844c877df03835199d8011d5476417ab6fdbda821",
+    "capabilityClaimId": "review-merge-release-open-prs-7d601272d2cd",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "qa-e1fb4c69593152c385860ca3",
+      "qa-e212ca4be21bd49f6d680ff5",
+      "qa-91eaff551edb80a308ba78dc",
+      "qa-99a5f89de1c143dc5f22b291",
+      "qa-5e72e609ad92f746a680ae5f",
+      "qa-6777a8d1e2727ec57f286a61",
+      "qa-65c48f3f3cf6d0f5f4e73ead",
+      "qa-2aeb77eb6258675bacf401e3",
+      "qa-0532e15d0addac4a850f2dcd"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": true,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "verified",
+      "reasons": {
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-21T17:28:21.936Z"
+  },
+  "digest": "sha256:9c3542974a29c2438f85d6c68db3c85721e8f681b7433a29c6e230be15a46ec7"
+}

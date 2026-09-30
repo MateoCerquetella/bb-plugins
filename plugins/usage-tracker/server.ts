@@ -4,16 +4,16 @@ import {
   consumeCodexRateLimitResetCredit,
   readCodexResetCredits,
 } from "./lib/codex-reset-credits.ts";
+import { readClaudeUsageFromKeychain } from "./lib/claude-keychain-usage.ts";
 import { loadUsageSnapshot } from "./lib/load-usage.ts";
 import { getCachedAntigravityUsage } from "./lib/antigravity-probe.ts";
+import { createResetActionGate, type ResetPrepareResult } from "./lib/reset-action-gate.ts";
+import { PROVIDER_IDS, withCodexResetCredits } from "./lib/usage.ts";
 import {
-  createResetActionGate,
-  type ResetPrepareResult,
-} from "./lib/reset-action-gate.ts";
-import {
-  PROVIDER_IDS,
-  withCodexResetCredits,
-} from "./lib/usage.ts";
+  loadPoolAccountRecords,
+  poolOwnsProvider,
+  switchPoolAccount,
+} from "./lib/pool-routing.ts";
 import {
   COMPACT_LIMIT_OPTIONS,
   enabledSidebarProviderIds,
@@ -30,11 +30,7 @@ const costSchema = z
 
 const resetCreditsSchema = z
   .object({
-    availableCount: z
-      .number()
-      .int()
-      .min(0)
-      .max(Number.MAX_SAFE_INTEGER),
+    availableCount: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER),
   })
   .strict();
 
@@ -45,6 +41,22 @@ const usageWindowSchema = z
     barPercent: z.number().finite().min(0).max(100),
     resetsAt: z.string().nullable(),
     cost: costSchema.nullable(),
+    kind: z.enum(["five-hour", "daily", "weekly", "custom"]).optional(),
+  })
+  .strict();
+
+const providerStatusSchema = z.enum(["ok", "not_installed", "unauthenticated", "expired", "error"]);
+
+const pooledAccountSchema = z
+  .object({
+    id: z.string(),
+    label: z.string(),
+    status: providerStatusSchema,
+    accountEmail: z.string().nullable(),
+    planLabel: z.string().nullable(),
+    message: z.string().nullable(),
+    observedAt: z.string().nullable(),
+    windows: z.array(usageWindowSchema),
   })
   .strict();
 
@@ -52,18 +64,15 @@ const providerSchema = z
   .object({
     id: z.enum(PROVIDER_IDS),
     name: z.string(),
-    status: z.enum([
-      "ok",
-      "not_installed",
-      "unauthenticated",
-      "expired",
-      "error",
-    ]),
+    status: providerStatusSchema,
     accountEmail: z.string().nullable(),
     planLabel: z.string().nullable(),
     message: z.string().nullable(),
     windows: z.array(usageWindowSchema),
     resetCredits: resetCreditsSchema.nullable().optional(),
+    accounts: z.array(pooledAccountSchema).optional(),
+    currentAccountId: z.string().optional(),
+    inUse: z.boolean().optional(),
   })
   .strict();
 
@@ -104,9 +113,7 @@ export const usageRpcContract = defineRpcContract({
       .strict(),
   },
   getUsage: {
-    input: z
-      .object({ threadId: z.string().trim().min(1).nullable() })
-      .strict(),
+    input: z.object({ threadId: z.string().trim().min(1).nullable() }).strict(),
     output: z
       .object({
         fetchedAt: z.string(),
@@ -124,15 +131,22 @@ export const usageRpcContract = defineRpcContract({
     input: z.null(),
     output: resetPrepareResultSchema,
   },
+  selectAccount: {
+    input: z
+      .object({
+        providerId: z.enum(PROVIDER_IDS),
+        accountId: z.string().trim().min(1),
+      })
+      .strict(),
+    output: z.object({ ok: z.literal(true) }).strict(),
+  },
   consumeReset: {
     input: z
       .object({
         confirmationToken: z.string().trim().min(1).max(128),
       })
       .strict(),
-    output: z
-      .object({ outcome: resetConsumptionOutcomeSchema })
-      .strict(),
+    output: z.object({ outcome: resetConsumptionOutcomeSchema }).strict(),
   },
 });
 
@@ -144,10 +158,23 @@ export default function plugin(bb: BbPluginApi) {
       description: "Show Claude Code usage in the sidebar footer.",
       default: true,
     },
+    claudeKeychainService: {
+      type: "string",
+      label: "Claude Keychain service",
+      description:
+        "macOS only. Set when Claude Code runs with CLAUDE_CONFIG_DIR, which stores credentials under `Claude Code-credentials-<hash>` instead of BB's default `Claude Code-credentials`. Leave empty to use BB's usage data.",
+      default: "",
+    },
     enableCodex: {
       type: "boolean",
       label: "Enable Codex",
       description: "Show Codex usage in the sidebar footer.",
+      default: true,
+    },
+    enableCursor: {
+      type: "boolean",
+      label: "Enable Cursor",
+      description: "Show Cursor usage in the sidebar footer.",
       default: true,
     },
     enableGrok: {
@@ -177,9 +204,7 @@ export default function plugin(bb: BbPluginApi) {
     },
   });
 
-  const resetGate = createResetActionGate(
-    consumeCodexRateLimitResetCredit,
-  );
+  const resetGate = createResetActionGate(consumeCodexRateLimitResetCredit);
 
   let lastKnownCodexResetCount: number | null = null;
 
@@ -192,17 +217,33 @@ export default function plugin(bb: BbPluginApi) {
       };
     },
     async getUsage({ threadId }) {
-      const snapshot = await loadUsageSnapshot(bb.sdk, threadId);
       const preferences = await settings.get();
+      const claudeKeychainService = preferences.claudeKeychainService.trim();
+      const routedAccounts = loadPoolAccountRecords();
+      const snapshot = await loadUsageSnapshot(
+        bb.sdk,
+        threadId,
+        new Date(),
+        claudeKeychainService === ""
+          ? Promise.resolve({})
+          : readClaudeUsageFromKeychain(claudeKeychainService).then((usage) => ({
+              "claude-code": usage,
+            })),
+        routedAccounts,
+      );
       const providers = preferences.enableAntigravity
         ? [
             ...snapshot.providers.filter((provider) => provider.id !== "antigravity"),
             getCachedAntigravityUsage(),
           ]
         : snapshot.providers.filter((provider) => provider.id !== "antigravity");
-      const codexIsAvailable = snapshot.providers.some(
-        (provider) => provider.id === "codex" && provider.status === "ok",
-      );
+      const codexIsAvailable =
+        snapshot.providers.some(
+          (provider) =>
+            provider.id === "codex" &&
+            provider.status === "ok" &&
+            (provider.accounts?.length ?? 0) === 0,
+        ) && !poolOwnsProvider(await routedAccounts, "codex");
       if (codexIsAvailable) {
         try {
           lastKnownCodexResetCount = await readCodexResetCredits();
@@ -222,6 +263,14 @@ export default function plugin(bb: BbPluginApi) {
       return {
         outcome: await resetGate.consume(confirmationToken),
       };
+    },
+    async selectAccount({ providerId, accountId }) {
+      if (providerId === "codex") {
+        lastKnownCodexResetCount = null;
+        resetGate.setAvailableCount(null);
+      }
+      await switchPoolAccount(providerId, accountId);
+      return { ok: true as const };
     },
   });
 }

@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "sequence": 1,
+  "previousDigest": "sha256:c339d62141e54ca09a4fb0203850519f9d7d003b42196c57c3a35948b67cad82",
+  "actor": "empirical-start",
+  "type": "transition",
+  "summary": "Started package-jev-routing-plugin-and-add-a-working-jev-picker",
+  "createdAt": "2026-09-22T23:24:29.339Z",
+  "stateBeforeDigest": "sha256:74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+  "stateAfterDigest": "sha256:90ff14c1928e1b9118aea6ab04c02988e91748e4abfabe758e5d71e440f3c91e",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 1,
+    "activeFeature": "package-jev-routing-plugin-and-add-a-working-jev-picker",
+    "request": "Package Jev routing plugin and add a working Jev picker option on Dyaus; user also authorizes a focused push to bb-plugins",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": null,
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:2dad39ed477c80817aa10ed403e7d2add8ac3b0f47919f5101b033dc931c5a89",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": null,
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-22T23:24:29.339Z"
+  },
+  "digest": "sha256:d5be5d56d8301f6fcbbb35ead278b91a49266e1bda981aeff0ce125506eb023a"
+}
