@@ -1,5 +1,10 @@
 # Capability Delta: Agent Canvas
 
+## Purpose
+
+Give BB operators one spatial place to inspect and coordinate visible agent
+threads without opening each worktree separately.
+
 ## ADDED Requirements
 
 ### Requirement: Spatial canvas workbench
@@ -19,15 +24,3 @@ before selecting or creating the Coordinator thread.
 - **WHEN** the plugin loads with no saved Coordinator
 - **THEN** it shows an empty Coordinator state and an explicit choose/create
   control, without spawning or messaging any thread.
-
-## MODIFIED Requirements
-
-### Requirement: Persisted spatial layout
-The existing worktree visibility capability is MODIFIED so pane position,
-size, focus, and Coordinator identity are validated and persisted per browser
-tab with bounded values.
-
-#### Scenario: Recover layout
-- **WHEN** the user reloads after moving a pane
-- **THEN** the pane returns to its saved bounded position and size, or a safe
-  default is used when persisted data is invalid.
