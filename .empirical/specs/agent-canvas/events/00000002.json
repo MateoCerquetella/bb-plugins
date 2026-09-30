@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "sequence": 2,
+  "previousDigest": "sha256:1ad08cf6d615fc48f8327eaf462d4eeed4679eb744aa0f6f2ae7c8b3d98ac6ae",
+  "actor": "empirical-worktree-approval",
+  "type": "transition",
+  "summary": "Approved isolated work started",
+  "createdAt": "2026-09-30T20:38:20.302Z",
+  "stateBeforeDigest": "sha256:63a0ae93363b200511c2863fca1a2aa0f432122f801b0364649db74dc5598ad7",
+  "stateAfterDigest": "sha256:301f474d5843b41ea3c0bc97eb5fd898eca92f08a7e7834b11eefcac2c70fd65",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 2,
+    "activeFeature": "agent-canvas",
+    "request": "Create a new BB plugin named Agent Canvas based closely on the supplied reference screenshot. Build a full-screen dark spatial canvas with draggable/resizable live thread panes using native ThreadChat, a persistent Coordinator native chat docked on the right, a compact workspace tab strip and add control, dotted background, minimap, zoom/fit/reorganize controls, and pane title/status metadata. Coordinator selection or creation must be an explicit user action through native BB controls; never autonomously spawn or message agents. Use current public Plugin SDK surfaces, preserve authorization and permission modes, persist bounded canvas layout safely, provide keyboard and narrow-screen fallbacks, add the package to the workspace catalog, install/reload it locally, and verify the visual experience against the screenshot without copying AgentGrid branding or proprietary assets.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Approved isolated work started",
+    "implementationActor": null,
+    "workStartedAt": "2026-09-30T20:38:20.302Z",
+    "specDigest": "sha256:5fa7fc5cd8435e773ed9e6362d8a1b5a406ac5e501db30e4ccbd4a5376e62fce",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": null,
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-30T20:38:20.302Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:153bd51ce6adcd0c902400bf84a19c13fd1d10a986d48ebaa0787af745b86817"
+}
