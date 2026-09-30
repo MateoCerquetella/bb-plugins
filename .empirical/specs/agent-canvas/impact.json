@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "status": "draft",
   "classification": "behavioral",
-  "capabilities": [],
+  "capabilities": ["agent-canvas"],
   "surfaces": [
     "workflow"
   ],
