@@ -24,7 +24,7 @@ All plugins in this repository are independently installable.
 | --- | --- | --- | --- |
 | <img src="./plugins/conversation-space/assets/icon.svg" width="128" height="128" alt="" /> | [Conversation Space (WIP)](./plugins/conversation-space) | [Local development install](./plugins/conversation-space#conversation-space-wip) | **Work in progress:** compact context usage, colored token percentages, and measured Jev routing diagnostics. |
 | <img src="./plugins/jev-route/assets/icon.svg" width="128" height="128" alt="" /> | [Jev Routing](./plugins/jev-route) | [Git install](./plugins/jev-route#install) | Jev-only model history, custom model colors, and Codex-only automatic routing without cross-provider quota fallback. |
-| <img src="./plugins/action-topbar/assets/icon.svg" width="128" height="128" alt="" /> | [Action Topbar](./plugins/action-topbar) | [Experimental Git install](#action-topbar-experimental-install) | Adds a compact main-thread topbar with draggable BB Actions and persistent, per-thread workspace panes. Requires the matching experimental BB core/SDK build. |
+| <img src="./plugins/action-topbar/assets/icon.svg" width="128" height="128" alt="" /> | [Action Topbar](./plugins/action-topbar) | [Git install](#action-topbar-install) | Adds a compact main-thread topbar with draggable BB Actions and persistent, per-thread workspace panes. |
 | <img src="./plugins/dockside/assets/icon.svg" width="128" height="128" alt="" /> | [Dockside](./plugins/dockside) | [Git release](#dockside-quick-start) | Replaces BB's thread list with a compact project-first sidebar, semantic status colors, filters, safe multi-select deletion, and child-agent families. |
 | <img src="./plugins/host-monitor/assets/icon.svg" width="128" height="128" alt="" /> | [Host Monitor](./plugins/host-monitor) | [Git release](#host-monitor-quick-start) | Monitors CPU, RAM, disk, network, host details, and guarded process actions across every machine enrolled in BB. Requires BB 0.40+. |
 | <img src="./plugins/save-my-model/assets/icon.svg" width="128" height="128" alt="" /> | [Save My Model](./plugins/save-my-model) | [Git release](#save-my-model-quick-start) | Stores provider by BB host and model/reasoning separately for each host and provider. |
@@ -34,15 +34,9 @@ All plugins in this repository are independently installable.
 | <img src="./plugins/usage-tracker/assets/icon.svg" width="128" height="128" alt="" /> | [Usage Tracker](./plugins/usage-tracker) | [Git release](#usage-tracker-quick-start) | Keeps Codex and Claude Code 5-hour and weekly limits beside BB's sidebar utility icons. |
 | <img src="./plugins/lavender/assets/icon.svg" width="128" height="128" alt="" /> | [Lavender](./plugins/lavender) | [Git release](./plugins/lavender#install) | Adds coordinated pale-lilac light and charcoal-violet dark palettes for conversations and code. |
 
-## Action Topbar experimental install
+## Action Topbar install
 
-> [!WARNING]
-> Action Topbar is not being submitted to the BB Marketplace yet. It requires
-> the matching BB core changes and experimental Plugin SDK 0.4.33 Action
-> split-drag API. Stock BB releases without that API cannot provide its native
-> main-workspace panes.
-
-Install it from this repository on a compatible BB build:
+Install it from this repository:
 
 ```sh
 bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@main \
