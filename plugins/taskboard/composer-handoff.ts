@@ -38,7 +38,12 @@ function validMentionId(value: unknown): value is string {
     return false;
   }
   const source = value.slice(firstSeparator + 1, secondSeparator);
-  return source === 'github' || source === 'linear' || source === 'jira';
+  return (
+    source === 'github' ||
+    source === 'gitlab' ||
+    source === 'linear' ||
+    source === 'jira'
+  );
 }
 
 export function taskboardComposerMention(

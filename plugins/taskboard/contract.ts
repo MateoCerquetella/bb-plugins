@@ -68,7 +68,7 @@ export type {
   SecretMutation
 } from './credential-contract.js';
 
-export const workSourceSchema = z.enum(['linear', 'github', 'jira']);
+export const workSourceSchema = z.enum(['linear', 'github', 'jira', 'gitlab']);
 export type WorkSource = z.infer<typeof workSourceSchema>;
 
 export const trackerProjectSchema = z
@@ -79,6 +79,34 @@ export const trackerProjectSchema = z
   .strict();
 export type TrackerProject = z.infer<typeof trackerProjectSchema>;
 
+export const gitlabProjectRefSchema = z
+  .string()
+  .trim()
+  .superRefine((value, context) => {
+    if (value === '') return; // empty = not configured yet
+    if (/\s/u.test(value) || value.includes('#')) {
+      context.addIssue({
+        code: 'custom',
+        path: ['gitlabProjectRef'],
+        message: 'GitLab project ref must not contain whitespace or #'
+      });
+      return;
+    }
+    const firstSlash = value.indexOf('/');
+    if (
+      firstSlash <= 0 ||
+      value.indexOf('/', firstSlash + 1) === -1 ||
+      value.includes('://')
+    ) {
+      context.addIssue({
+        code: 'custom',
+        path: ['gitlabProjectRef'],
+        message: 'GitLab project must be host/path/namespace format, e.g. gitlab.com/group/app'
+      });
+    }
+  });
+export type GitLabProjectRef = z.infer<typeof gitlabProjectRefSchema>;
+
 export const projectSourceConfigSchema = z
   .object({
     projectId: bbProjectIdSchema,
@@ -86,7 +114,8 @@ export const projectSourceConfigSchema = z
     linearTeamKey: z.string().trim(),
     jiraBaseUrl: jiraBaseUrlSchema,
     jiraEmail: z.string().trim(),
-    jiraJql: z.string().trim().min(1)
+    jiraJql: z.string().trim().min(1),
+    gitlabProjectRef: gitlabProjectRefSchema
   })
   .strict();
 export type ProjectSourceConfig = z.infer<typeof projectSourceConfigSchema>;
@@ -95,7 +124,8 @@ export const projectConfigViewSchema = projectSourceConfigSchema
   .extend({
     githubRepos: z.array(z.string()),
     linearCredentialConfigured: z.boolean(),
-    jiraCredentialConfigured: z.boolean()
+    jiraCredentialConfigured: z.boolean(),
+    gitlabConfigured: z.boolean()
   })
   .strict();
 export type ProjectConfigView = z.infer<typeof projectConfigViewSchema>;
@@ -112,6 +142,13 @@ export const projectConfigMutationSchema = projectSourceConfigSchema
         code: 'custom',
         path: ['linearTeamKey'],
         message: 'Linear team key is required when Linear is selected'
+      });
+    }
+    if (config.source === 'gitlab' && !config.gitlabProjectRef) {
+      context.addIssue({
+        code: 'custom',
+        path: ['gitlabProjectRef'],
+        message: 'GitLab project ref is required when GitLab is selected'
       });
     }
   });
@@ -253,7 +290,7 @@ export const createIssueContextSchema = z
     source: workSourceSchema,
     available: z.boolean(),
     message: z.string().nullable(),
-    destinationLabel: z.enum(['Repository', 'Team', 'Project key']),
+    destinationLabel: z.enum(['Repository', 'Team', 'Project key', 'GitLab project']),
     destinations: z.array(createIssueDestinationSchema),
     defaultDestinationId: z.string().nullable(),
     allowsCustomDestination: z.boolean(),

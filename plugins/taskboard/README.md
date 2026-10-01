@@ -5,13 +5,13 @@
 <h1 align="center">Taskboard</h1>
 
 <p align="center">
-  GitHub, Linear, or Jira tasks inside BB—one focused tracker for every project.
+  GitHub, GitLab, Linear, or Jira tasks inside BB—one focused tracker for every project.
 </p>
 
 <p align="center">
   <a href="https://github.com/MateoCerquetella/bb-plugins/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/MateoCerquetella/bb-plugins/ci.yml?branch=main&style=flat-square&label=CI" alt="CI status" /></a>
   <img src="https://img.shields.io/badge/BB-%E2%89%A5%200.38-7c3aed?style=flat-square" alt="BB 0.38 or newer" />
-  <img src="https://img.shields.io/badge/GitHub%20%C2%B7%20Linear%20%C2%B7%20Jira-supported-2563eb?style=flat-square" alt="GitHub, Linear, and Jira supported" />
+  <img src="https://img.shields.io/badge/GitHub%20%C2%B7%20GitLab%20%C2%B7%20Linear%20%C2%B7%20Jira-supported-2563eb?style=flat-square" alt="GitHub, GitLab, Linear, and Jira supported" />
   <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-16a34a?style=flat-square" alt="MIT license" /></a>
 </p>
 
@@ -24,8 +24,8 @@ task to an agent without rebuilding context by hand.
 
 ## What it does
 
-- **Project-first tasks** — each BB project selects GitHub, Linear, or Jira;
-  different projects can use different providers.
+- **Project-first tasks** — each BB project selects GitHub, GitLab, Linear, or
+  Jira; different projects can use different providers.
 - **List and Kanban** — compact rows plus Linear-style Status, State group,
   Assignee, Priority, Project, and Labels filters. Filter values within one
   field match either value; different fields combine to narrow the view.
@@ -57,6 +57,11 @@ task to an agent without rebuilding context by hand.
   Taskboard mention so the thread continues with live issue context.
 - **Agent handoff** — prefill a BB prompt from any task or attach one with the
   Taskboard mention result.
+- **GitLab** — uses the `glab` CLI already authenticated for the host
+  (`glab auth status` shows the hosts). Taskboard stores no GitLab token.
+  Workflow columns come from `status/<name>` labels on issues; moving a column
+  replaces the previous `status/*` label and closes/reopens the issue when the
+  column is terminal. Missing `status/*` labels are created on first move.
 - **CLI automation** — browse cached/live work, inspect transitions, move
   statuses, refresh providers, and manage project connections through
   `bb taskboard`. Issue creation remains an intentional review-and-confirm UI
@@ -183,13 +188,13 @@ The CLI uses the current BB project unless `--project <proj_id>` is supplied:
 
 ```text
 bb taskboard status [--project <proj_id>] [--json]
-bb taskboard config [--project <proj_id>] [--source linear|github|jira] [provider fields] [--json]
+bb taskboard config [--project <proj_id>] [--source linear|github|jira|gitlab] [provider fields] [--json]
 bb taskboard credentials [--project <proj_id>] [--json]
-bb taskboard refresh [linear|github|jira] [--project <proj_id>] [--json]
+bb taskboard refresh [linear|github|jira|gitlab] [--project <proj_id>] [--json]
 bb taskboard list [--project <proj_id>] [--source linear|github|jira] [--query <text>] [--preset <name>] [--cached] [--json]
-bb taskboard show <linear|github|jira> <locator> [--project <proj_id>] [--json]
-bb taskboard transitions <linear|github|jira> <locator> [--project <proj_id>] [--json]
-bb taskboard move <linear|github|jira> <locator> --status <id> [--project <proj_id>] [--json]
+bb taskboard show <linear|github|jira|gitlab> <locator> [--project <proj_id>] [--json]
+bb taskboard transitions <linear|github|jira|gitlab> <locator> [--project <proj_id>] [--json]
+bb taskboard move <linear|github|jira|gitlab> <locator> --status <id> [--project <proj_id>] [--json]
 bb taskboard presets list [--project <proj_id>] [--json]
 bb taskboard presets save <name> --from-state <json> [--project <proj_id>] [--json]
 bb taskboard presets rename <name> <new-name> [--project <proj_id>] [--json]
