@@ -63,6 +63,7 @@
   border-bottom: 1px solid var(--border, #36373d);
 }
 .steel-inline-browser > header > div { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.steel-inline-browser > header > .steel-inline-browser__actions { gap: 6px; flex: none; }
 .steel-inline-browser > header svg { width: 16px; height: 16px; flex: none; color: var(--steel-accent, #eddb63); }
 .steel-inline-browser > header span,
 .steel-inline-browser > header strong,
@@ -83,6 +84,16 @@
 }
 .steel-inline-browser__viewport { position: relative; width: 100%; aspect-ratio: 1 / 1; background: #171717; }
 .steel-inline-browser__viewport iframe { display: block; width: 100%; height: 100%; border: 0; }
+.steel-inline-browser--minimized { width: min(100%, 360px); }
+.steel-inline-browser--minimized > header { border-bottom: 0; }
+.steel-inline-browser--minimized .steel-inline-browser__viewport {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  aspect-ratio: auto;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
 .steel-header, .steel-identity, .steel-actions, .steel-status, .steel-toolbar, .steel-links {
   display: flex;
   align-items: center;

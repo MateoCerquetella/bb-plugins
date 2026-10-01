@@ -11,6 +11,8 @@ import {
   LayoutGrid,
   List,
   LogIn,
+  Maximize2,
+  Minimize2,
   X,
 } from "lucide-react";
 import {
@@ -97,13 +99,17 @@ function SteelThreadPanel({ threadId }: PluginThreadPanelProps) {
 function SteelBrowserDirective({ message }: PluginMessageDirectiveProps) {
   const { dashboard, error, refresh } = useSteelDashboard();
   const [playerKey, setPlayerKey] = useState(0);
+  const [minimized, setMinimized] = useState(false);
   const playerUrl = dashboard
     ? new URL("v1/sessions/debug", dashboard.uiUrl.replace(/ui\/?$/, "")).toString()
     : null;
   const active = dashboard?.sessions.some(session => ["idle", "live"].includes(session.status));
 
   return (
-    <section className="steel-inline-browser" aria-label="Steel browser in this thread">
+    <section
+      className={`steel-inline-browser${minimized ? " steel-inline-browser--minimized" : ""}`}
+      aria-label="Steel browser in this thread"
+    >
       <header>
         <div>
           <Monitor aria-hidden="true" />
@@ -112,14 +118,25 @@ function SteelBrowserDirective({ message }: PluginMessageDirectiveProps) {
             <small>{active ? "Live" : dashboard?.connected ? "No active session" : "Connecting"}</small>
           </span>
         </div>
-        <button aria-label="Reload inline browser" onClick={() => {
-          void refresh();
-          setPlayerKey(key => key + 1);
-        }} title="Reload browser" type="button">
-          <RefreshCw aria-hidden="true" />
-        </button>
+        <div className="steel-inline-browser__actions">
+          <button
+            aria-expanded={!minimized}
+            aria-label={minimized ? "Restore inline browser" : "Minimize inline browser"}
+            onClick={() => setMinimized(value => !value)}
+            title={minimized ? "Restore browser" : "Minimize browser"}
+            type="button"
+          >
+            {minimized ? <Maximize2 aria-hidden="true" /> : <Minimize2 aria-hidden="true" />}
+          </button>
+          <button aria-label="Reload inline browser" onClick={() => {
+            void refresh();
+            setPlayerKey(key => key + 1);
+          }} title="Reload browser" type="button">
+            <RefreshCw aria-hidden="true" />
+          </button>
+        </div>
       </header>
-      <div className="steel-inline-browser__viewport">
+      <div className="steel-inline-browser__viewport" aria-hidden={minimized}>
         {error || dashboard?.error ? (
           <div className="steel-panel-state" role="alert">{error ?? dashboard?.error}</div>
         ) : playerUrl && active ? (

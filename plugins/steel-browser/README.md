@@ -15,7 +15,9 @@ explicit confirmation.
 In a BB thread, agents render the live browser as a square inside chat by
 emitting `::steel-browser{}`. The inline viewer and local CDP automation target
 the same Steel session, so agent actions remain visible without opening the
-right panel or navigating away from the thread. A manual **Steel Browser**
+right panel or navigating away from the thread. The inline viewer can be
+minimized to its compact header and restored without stopping the session or
+reloading the browser. A manual **Steel Browser**
 thread-panel action remains available from the panel launcher.
 
 ## Install
