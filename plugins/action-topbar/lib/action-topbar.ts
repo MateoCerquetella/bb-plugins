@@ -88,6 +88,7 @@ interface CrossPaneDragState {
 }
 
 interface TopbarDragState extends CrossPaneDragState {
+  pointerId: number;
   reorderTargetId: string | null;
   sourceButton: HTMLButtonElement;
 }
@@ -1403,6 +1404,7 @@ export function mountActionTopbar(
     window.removeEventListener("pointermove", handleTopbarDragMove);
     window.removeEventListener("pointerup", handleTopbarDragUp);
     window.removeEventListener("pointercancel", handleTopbarDragCancel);
+    tryReleasePointer(current.sourceButton, current.pointerId);
     current.ghost?.remove();
     current.overlay?.remove();
     current.sourceButton.style.removeProperty("opacity");
@@ -1430,7 +1432,7 @@ export function mountActionTopbar(
   };
 
   const handleTopbarDragMove = (event: PointerEvent): void => {
-    if (topbarDrag === null) return;
+    if (topbarDrag === null || event.pointerId !== topbarDrag.pointerId) return;
     const hoveredTabId = topbarTabAt(event.clientX, event.clientY);
     const reorderTargetId =
       hoveredTabId !== topbarDrag.source.summary.id ? hoveredTabId : null;
@@ -1480,8 +1482,14 @@ export function mountActionTopbar(
     }
   };
 
-  const handleTopbarDragUp = (): void => endTopbarDrag(true);
-  const handleTopbarDragCancel = (): void => endTopbarDrag(false);
+  const handleTopbarDragUp = (event: PointerEvent): void => {
+    if (topbarDrag === null || event.pointerId !== topbarDrag.pointerId) return;
+    endTopbarDrag(true);
+  };
+  const handleTopbarDragCancel = (event: PointerEvent): void => {
+    if (topbarDrag === null || event.pointerId !== topbarDrag.pointerId) return;
+    endTopbarDrag(false);
+  };
 
   const beginTopbarDrag = (
     event: PointerEvent,
@@ -1494,6 +1502,7 @@ export function mountActionTopbar(
       engaged: false,
       ghost: null,
       overlay: null,
+      pointerId: event.pointerId,
       reorderTargetId: null,
       source: mirror,
       sourceButton,
@@ -1501,13 +1510,12 @@ export function mountActionTopbar(
       startY: event.clientY,
       targetPane: null,
     };
+    tryCapturePointer(sourceButton, event.pointerId);
     window.addEventListener("pointermove", handleTopbarDragMove, {
       passive: false,
     });
-    window.addEventListener("pointerup", handleTopbarDragUp, { once: true });
-    window.addEventListener("pointercancel", handleTopbarDragCancel, {
-      once: true,
-    });
+    window.addEventListener("pointerup", handleTopbarDragUp);
+    window.addEventListener("pointercancel", handleTopbarDragCancel);
   };
 
   const handleTopbarTabKeydown = (

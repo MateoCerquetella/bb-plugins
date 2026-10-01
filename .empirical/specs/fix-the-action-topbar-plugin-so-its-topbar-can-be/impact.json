@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "action-topbar-interaction"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:246e487a7e836d673e1e745c58c9e87a9d48a4a88f0738a443951074846b5155"
+}

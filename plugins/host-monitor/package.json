@@ -1,6 +1,6 @@
 {
   "name": "bb-plugin-host-monitor",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": true,
   "description": "Live CPU, memory, disk, network throughput, load, and uptime across every host enrolled in bb.",
   "license": "MIT",

@@ -23,7 +23,7 @@
     "name": "Conversation Space (WIP)",
     "description": "Work in progress: compact context usage and measured Jev routing diagnostics.",
     "branding": {
-      "icon": "ChartPie"
+      "icon": "./assets/icon.svg"
     },
     "server": "./server.ts",
     "app": "./app.tsx"

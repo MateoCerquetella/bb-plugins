@@ -1389,12 +1389,14 @@ function TelemetryGauge({
 
 function DetailItem({
   label,
+  labelClassName = "uppercase tracking-wider",
   value,
   title,
   valueClassName = "",
   valueNetworkDirection,
 }: {
   label: string;
+  labelClassName?: string;
   value: string;
   title?: string;
   valueClassName?: string;
@@ -1402,7 +1404,7 @@ function DetailItem({
 }) {
   return (
     <div className="min-w-0 border-b border-border py-2.5 last:border-b-0">
-      <dt className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</dt>
+      <dt className={`break-words text-[10px] text-muted-foreground ${labelClassName}`}>{label}</dt>
       <dd
         className={`mt-0.5 break-words text-xs text-foreground ${valueClassName}`}
         data-network-direction={valueNetworkDirection}
@@ -2600,6 +2602,9 @@ function MachineInspector() {
           <dl className="rounded-lg border border-border bg-card px-3">
             <DetailItem label="Memory" value={`${formatBytes(snapshot.memory.usedBytes)} used · ${formatBytes(snapshot.memory.availableBytes)} available`} />
             <DetailItem label="System volume" value={snapshot.disk ? `${formatBytes(snapshot.disk.usedBytes)} used · ${formatBytes(snapshot.disk.availableBytes)} free` : "Unavailable"} />
+            {(snapshot.extraDisks ?? []).map((extraDisk) => (
+              <DetailItem key={extraDisk.path} label={extraDisk.path} labelClassName="font-mono" value={extraDisk.capacity ? `${formatPercent(extraDisk.capacity.usagePercent)} · ${formatBytes(extraDisk.capacity.usedBytes)} used · ${formatBytes(extraDisk.capacity.availableBytes)} free` : "Unavailable"} />
+            ))}
             <DetailItem label="Load · 1 / 5 / 15 min" value={snapshot.cpu.loadAverage ? snapshot.cpu.loadAverage.map((value) => value.toFixed(2)).join(" / ") : "Unavailable"} />
             <DetailItem label="Swap" value={snapshot.swap ? `${formatPercent(snapshot.swap.usagePercent)} · ${formatBytes(snapshot.swap.usedBytes)} used` : "Not configured"} />
             <DetailItem label="Uptime" value={`${formatDuration(snapshot.system.uptimeSeconds)} · rebooted ${formatRelativeTime(snapshot.system.bootedAtMs)}`} title={`Rebooted ${formatDate(snapshot.system.bootedAtMs)}`} />

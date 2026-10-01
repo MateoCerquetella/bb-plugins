@@ -10,9 +10,10 @@ import {
 export default experimental_defineHostEntry({
   contract: hostContract,
   handlers: {
-    snapshot: ({ cpuSampleMs }, context) =>
+    snapshot: ({ cpuSampleMs, extraDiskPaths }, context) =>
       collectMachineSnapshot({
         cpuSampleMs,
+        extraDiskPaths,
         signal: context.signal,
       }),
     listProcesses: ({ sortBy, limit }, context) =>

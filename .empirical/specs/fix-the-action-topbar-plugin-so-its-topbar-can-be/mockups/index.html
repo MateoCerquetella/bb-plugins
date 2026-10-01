@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Action Topbar stacking repair</title>
+    <link rel="stylesheet" href="../../../../plugins/action-topbar/app.css" />
+    <style>
+      :root {
+        color-scheme: dark;
+        --background: #17181a;
+        --foreground: #f4f4f5;
+        --muted-foreground: #a1a1aa;
+        --border: #3f3f46;
+        --popover: #242528;
+        --popover-foreground: #fafafa;
+        --primary: #8b5cf6;
+        --ring: #a78bfa;
+        --destructive: #ef4444;
+        --radius: 0.5rem;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-width: 320px;
+        min-height: 100vh;
+        margin: 0;
+        overflow: hidden;
+        background: var(--background);
+        color: var(--foreground);
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      }
+
+      .shell {
+        display: grid;
+        min-height: 100vh;
+        grid-template-rows: 3rem 1fr;
+      }
+
+      .header {
+        position: relative;
+        display: flex;
+        min-width: 0;
+        align-items: stretch;
+        border-bottom: 1px solid var(--border);
+        background: #1d1e21;
+      }
+
+      .thread-title {
+        display: flex;
+        width: 11rem;
+        flex: none;
+        align-items: center;
+        padding: 0 1rem;
+        color: var(--foreground);
+        font-size: 0.8125rem;
+        font-weight: 600;
+      }
+
+      .workspace {
+        position: relative;
+        display: grid;
+        min-width: 0;
+        grid-template-columns: minmax(0, 1fr) 22rem;
+      }
+
+      .conversation {
+        padding: 2rem;
+      }
+
+      .conversation p {
+        max-width: 42rem;
+        margin: 0 0 1rem;
+        color: var(--muted-foreground);
+        font-size: 0.875rem;
+        line-height: 1.6;
+      }
+
+      .right-sidebar {
+        position: relative;
+        z-index: 500;
+        border-left: 1px solid var(--border);
+        background: #202124;
+      }
+
+      .right-sidebar__header {
+        height: 3rem;
+        padding: 0.9rem 1rem;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      .right-sidebar__body {
+        padding: 1rem;
+        color: var(--muted-foreground);
+        font-size: 0.75rem;
+      }
+
+      .action-topbar {
+        position: relative;
+        z-index: 2147483000;
+      }
+
+      .action-topbar__launcher {
+        z-index: 2147483001;
+        top: 3.25rem;
+        right: 1rem;
+        width: 20rem;
+      }
+
+      .action-topbar__drop-overlay {
+        z-index: 2147483002;
+        inset: 4.5rem 0.75rem 1.5rem max(1.5rem, calc(100vw - 25rem));
+      }
+
+      .action-topbar__drag-ghost {
+        z-index: 2147483003;
+        top: 7rem;
+        left: calc(100vw - 15rem);
+      }
+
+      .action-topbar__tab-button {
+        touch-action: none;
+      }
+
+      .mock-controls {
+        position: fixed;
+        z-index: 10;
+        bottom: 1rem;
+        left: 1rem;
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .mock-status {
+        position: fixed;
+        z-index: 2147483004;
+        right: 1rem;
+        bottom: 1rem;
+        max-width: min(24rem, calc(100vw - 2rem));
+        padding: 0.5rem 0.75rem;
+        border: 1px solid var(--border);
+        border-radius: 0.375rem;
+        background: var(--popover);
+        color: var(--popover-foreground);
+        font-size: 0.75rem;
+      }
+
+      .mock-controls button {
+        height: 2rem;
+        padding: 0 0.75rem;
+        border: 1px solid var(--border);
+        border-radius: 0.375rem;
+        background: var(--popover);
+        color: var(--foreground);
+        cursor: pointer;
+        font: inherit;
+        font-size: 0.75rem;
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      @media (max-width: 720px) {
+        .thread-title {
+          width: 7rem;
+        }
+
+        .workspace {
+          grid-template-columns: 1fr;
+        }
+
+        .right-sidebar {
+          position: absolute;
+          inset: 0 0 0 auto;
+          width: min(22rem, 88vw);
+        }
+
+        .action-topbar__launcher {
+          right: 0.5rem;
+          width: min(20rem, calc(100vw - 1rem));
+        }
+
+        .action-topbar__drop-overlay {
+          inset: 4rem 0.35rem 3.75rem 0.35rem;
+        }
+
+        .mock-status {
+          right: 0.5rem;
+          bottom: 3.75rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="header">
+        <div class="thread-title">Action Topbar</div>
+        <nav class="action-topbar" aria-label="Open panel tabs">
+          <div class="action-topbar__tabs" role="tablist">
+            <div class="action-topbar__tab" data-active="true">
+              <button class="action-topbar__tab-button" type="button">
+                <span class="action-topbar__tab-icon">T</span>
+                <span class="action-topbar__tab-label">Terminal</span>
+              </button>
+              <button class="action-topbar__tab-close" type="button">x</button>
+            </div>
+            <div class="action-topbar__tab" data-active="false">
+              <button class="action-topbar__tab-button" type="button">
+                <span class="action-topbar__tab-icon">B</span>
+                <span class="action-topbar__tab-label">Browser</span>
+              </button>
+            </div>
+          </div>
+          <button class="action-topbar__trigger" type="button" aria-expanded="true">
+            +
+          </button>
+        </nav>
+      </header>
+      <section class="workspace">
+        <article class="conversation">
+          <p>
+            The launcher intentionally overlaps the right sidebar. Its complete
+            surface remains visible and interactive above the sidebar.
+          </p>
+          <p>
+            Drag a topbar tab or an Action row toward the right sidebar. The
+            source retains the pointer, and release or cancel removes the drag
+            feedback.
+          </p>
+        </article>
+        <aside class="right-sidebar">
+          <div class="right-sidebar__header">Right sidebar</div>
+          <div class="right-sidebar__body">
+            This host surface uses an intentionally high stacking level to make
+            the regression visible.
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <section class="action-topbar__launcher" aria-label="Open a panel tab">
+      <div class="action-topbar__launcher-input-wrap">
+        <span class="action-topbar__search-glyph">?</span>
+        <input
+          class="action-topbar__launcher-input"
+          value=""
+          placeholder="Search tabs and actions"
+          aria-label="Search tabs and actions"
+        />
+      </div>
+      <div class="action-topbar__launcher-list">
+        <div class="action-topbar__launcher-heading">Actions</div>
+        <button
+          class="action-topbar__launcher-option"
+          data-action-topbar-action
+          type="button"
+        >
+          <span class="action-topbar__launcher-icon">T</span>
+          <span class="action-topbar__launcher-label">Start terminal</span>
+          <span class="action-topbar__launcher-detail">Drag</span>
+        </button>
+        <button
+          class="action-topbar__launcher-option"
+          data-action-topbar-action
+          type="button"
+        >
+          <span class="action-topbar__launcher-icon">B</span>
+          <span class="action-topbar__launcher-label">Open browser</span>
+          <span class="action-topbar__launcher-detail">Drag</span>
+        </button>
+      </div>
+    </section>
+
+    <div class="action-topbar__drop-overlay" hidden>
+      <span class="action-topbar__drop-label">Open Terminal here</span>
+    </div>
+    <div class="action-topbar__drag-ghost" hidden>Terminal</div>
+
+    <div class="mock-controls">
+      <button id="launcher-toggle" type="button">Toggle launcher</button>
+      <button id="cancel-drag" type="button">Cancel gesture</button>
+    </div>
+    <output class="mock-status" aria-live="polite">
+      Ready. Tab touch-action: none.
+    </output>
+
+    <script>
+      const launcher = document.querySelector(".action-topbar__launcher");
+      const overlay = document.querySelector(".action-topbar__drop-overlay");
+      const ghost = document.querySelector(".action-topbar__drag-ghost");
+      const trigger = document.querySelector(".action-topbar__trigger");
+      const status = document.querySelector(".mock-status");
+      let drag = null;
+
+      document.querySelector("#launcher-toggle").addEventListener("click", () => {
+        launcher.hidden = !launcher.hidden;
+        trigger.setAttribute("aria-expanded", String(!launcher.hidden));
+      });
+
+      function finishDrag(kind) {
+        if (drag === null) return;
+        if (drag.source.hasPointerCapture?.(drag.pointerId)) {
+          drag.source.releasePointerCapture(drag.pointerId);
+        }
+        overlay.hidden = true;
+        ghost.hidden = true;
+        document.body.classList.remove("action-topbar-is-dragging");
+        status.textContent = drag.engaged
+          ? `${kind}: drag feedback removed and pointer capture released.`
+          : `${kind}: pending gesture cleared.`;
+        drag = null;
+      }
+
+      function beginDrag(event, label, owner) {
+        if (event.button !== 0) return;
+        finishDrag("Restarted");
+        owner.setPointerCapture?.(event.pointerId);
+        drag = {
+          engaged: false,
+          label,
+          pointerId: event.pointerId,
+          source: owner,
+          startX: event.clientX,
+          startY: event.clientY,
+        };
+        status.textContent =
+          `${label}: pointer captured; move 7px to begin the drag.`;
+      }
+
+      function moveDrag(event) {
+        if (drag === null || drag.pointerId !== event.pointerId) return;
+        if (
+          !drag.engaged &&
+          Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) < 7
+        ) {
+          return;
+        }
+        drag.engaged = true;
+        overlay.hidden = false;
+        ghost.hidden = false;
+        ghost.textContent = drag.label;
+        ghost.style.left = `${Math.min(event.clientX + 12, innerWidth - 150)}px`;
+        ghost.style.top = `${Math.min(event.clientY + 8, innerHeight - 50)}px`;
+        document.body.classList.add("action-topbar-is-dragging");
+        status.textContent =
+          `${drag.label}: drag active above launcher and right sidebar.`;
+        event.preventDefault();
+      }
+
+      document
+        .querySelectorAll(".action-topbar__tab-button")
+        .forEach((button) => {
+          button.addEventListener("pointerdown", (event) =>
+            beginDrag(
+              event,
+              button.querySelector(".action-topbar__tab-label").textContent,
+              button,
+            ),
+          );
+        });
+
+      document
+        .querySelectorAll("[data-action-topbar-action]")
+        .forEach((button) => {
+          button.addEventListener("pointerdown", (event) => {
+            beginDrag(
+              event,
+              button.querySelector(".action-topbar__launcher-label").textContent,
+              button,
+            );
+            status.textContent =
+              "Host-owned Action split drag started; pointer captured.";
+          });
+        });
+
+      window.addEventListener("pointermove", moveDrag, { passive: false });
+      window.addEventListener("pointerup", () => finishDrag("Released"), true);
+      window.addEventListener(
+        "pointercancel",
+        () => finishDrag("Browser cancelled"),
+        true,
+      );
+      document
+        .querySelector("#cancel-drag")
+        .addEventListener("click", () => finishDrag("Cancelled"));
+    </script>
+  </body>
+</html>

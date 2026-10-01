@@ -59,6 +59,7 @@ interface ProjectConfigRow {
   jira_base_url: string;
   jira_email: string;
   jira_jql: string;
+  gitlab_project_ref: string;
 }
 
 interface ProjectBoardSettingsRow {
@@ -125,7 +126,8 @@ function configFromRow(row: ProjectConfigRow): ProjectSourceConfig {
     linearTeamKey: row.linear_team_key,
     jiraBaseUrl: row.jira_base_url,
     jiraEmail: row.jira_email,
-    jiraJql: row.jira_jql
+    jiraJql: row.jira_jql,
+    gitlabProjectRef: row.gitlab_project_ref
   });
 }
 
@@ -185,7 +187,7 @@ export function createWorkItemStore(bb: BbPluginApi) {
   bb.storage.migrate(db, [
     `
       CREATE TABLE work_items (
-        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira')),
+        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira', 'gitlab')),
         locator TEXT NOT NULL,
         item_key TEXT NOT NULL,
         title TEXT NOT NULL,
@@ -204,7 +206,7 @@ export function createWorkItemStore(bb: BbPluginApi) {
       );
 
       CREATE TABLE source_sync (
-        source TEXT PRIMARY KEY CHECK (source IN ('linear', 'github', 'jira')),
+        source TEXT PRIMARY KEY CHECK (source IN ('linear', 'github', 'jira', 'gitlab')),
         last_synced_at TEXT,
         error TEXT,
         item_count INTEGER NOT NULL DEFAULT 0 CHECK (item_count >= 0)
@@ -220,7 +222,7 @@ export function createWorkItemStore(bb: BbPluginApi) {
     `
       CREATE TABLE work_items_by_project (
         bb_project_id TEXT NOT NULL,
-        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira')),
+        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira', 'gitlab')),
         locator TEXT NOT NULL,
         item_key TEXT NOT NULL,
         title TEXT NOT NULL,
@@ -240,7 +242,7 @@ export function createWorkItemStore(bb: BbPluginApi) {
 
       CREATE TABLE source_sync_by_project (
         bb_project_id TEXT NOT NULL,
-        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira')),
+        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira', 'gitlab')),
         last_synced_at TEXT,
         error TEXT,
         item_count INTEGER NOT NULL DEFAULT 0 CHECK (item_count >= 0),
@@ -272,8 +274,6 @@ export function createWorkItemStore(bb: BbPluginApi) {
         ADD COLUMN jira_enabled INTEGER NOT NULL DEFAULT 0
         CHECK (jira_enabled IN (0, 1));
 
-      CREATE INDEX idx_all_project_work_items_updated
-        ON work_items_by_project(updated_at DESC, bb_project_id, source, locator);
 
       DROP TABLE work_items;
       DROP TABLE source_sync;
@@ -292,7 +292,7 @@ export function createWorkItemStore(bb: BbPluginApi) {
     `
       CREATE TABLE project_source_config_next (
         bb_project_id TEXT PRIMARY KEY,
-        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira')),
+        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira', 'gitlab')),
         linear_team_key TEXT NOT NULL,
         jira_base_url TEXT NOT NULL,
         jira_email TEXT NOT NULL,
@@ -410,6 +410,96 @@ export function createWorkItemStore(bb: BbPluginApi) {
         ON project_filter_presets(
           bb_project_id, position, created_at, id
         );
+    `,
+    `
+      CREATE TABLE work_items_by_project_next (
+        bb_project_id TEXT NOT NULL,
+        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira', 'gitlab')),
+        locator TEXT NOT NULL,
+        item_key TEXT NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL,
+        url TEXT NOT NULL,
+        status TEXT NOT NULL,
+        state_category TEXT NOT NULL CHECK (
+          state_category IN ('backlog', 'todo', 'in_progress', 'done', 'canceled')
+        ),
+        priority TEXT,
+        assignee TEXT,
+        project TEXT,
+        labels_json TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        PRIMARY KEY (bb_project_id, source, locator)
+      );
+      INSERT INTO work_items_by_project_next (
+        bb_project_id, source, locator, item_key, title, description, url,
+        status, state_category, priority, assignee, project, labels_json,
+        updated_at
+      )
+      SELECT bb_project_id, source, locator, item_key, title, description, url,
+        status, state_category, priority, assignee, project, labels_json,
+        updated_at
+      FROM work_items_by_project;
+      DROP TABLE work_items_by_project;
+      ALTER TABLE work_items_by_project_next RENAME TO work_items_by_project;
+      CREATE INDEX idx_project_work_items_updated
+        ON work_items_by_project(bb_project_id, updated_at DESC, source, locator);
+      CREATE INDEX idx_project_work_items_source_state_updated
+        ON work_items_by_project(
+          bb_project_id, source, state_category, updated_at DESC, locator
+        );
+      CREATE INDEX idx_project_work_items_key
+        ON work_items_by_project(bb_project_id, item_key COLLATE NOCASE);
+
+      CREATE TABLE source_sync_by_project_next (
+        bb_project_id TEXT NOT NULL,
+        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira', 'gitlab')),
+        last_synced_at TEXT,
+        error TEXT,
+        item_count INTEGER NOT NULL DEFAULT 0 CHECK (item_count >= 0),
+        PRIMARY KEY (bb_project_id, source)
+      );
+      INSERT INTO source_sync_by_project_next (
+        bb_project_id, source, last_synced_at, error, item_count
+      )
+      SELECT bb_project_id, source, last_synced_at, error, item_count
+      FROM source_sync_by_project;
+      DROP TABLE source_sync_by_project;
+      ALTER TABLE source_sync_by_project_next RENAME TO source_sync_by_project;
+    `,
+    `
+      CREATE TABLE project_source_config_next2 (
+        bb_project_id TEXT PRIMARY KEY,
+        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira', 'gitlab')),
+        linear_team_key TEXT NOT NULL,
+        jira_base_url TEXT NOT NULL,
+        jira_email TEXT NOT NULL,
+        jira_jql TEXT NOT NULL,
+        gitlab_project_ref TEXT NOT NULL DEFAULT '',
+        updated_at TEXT NOT NULL
+      );
+      INSERT INTO project_source_config_next2 (
+        bb_project_id, source, linear_team_key, jira_base_url, jira_email,
+        jira_jql, gitlab_project_ref, updated_at
+      )
+      SELECT
+        cfg.bb_project_id,
+        cfg.source,
+        cfg.linear_team_key,
+        cfg.jira_base_url,
+        cfg.jira_email,
+        cfg.jira_jql,
+        '',
+        cfg.updated_at
+      FROM project_source_config AS cfg;
+      DROP TABLE project_source_config;
+      ALTER TABLE project_source_config_next2 RENAME TO project_source_config;
+      CREATE INDEX idx_project_source_selected
+        ON project_source_config(source, bb_project_id);
+    `,
+    `
+      CREATE INDEX idx_all_project_work_items_updated
+        ON work_items_by_project(updated_at DESC, bb_project_id, source, locator);
     `
   ]);
 
@@ -502,7 +592,8 @@ export function createWorkItemStore(bb: BbPluginApi) {
       linear_team_key,
       jira_base_url,
       jira_email,
-      jira_jql
+      jira_jql,
+      gitlab_project_ref
     FROM project_source_config
     WHERE bb_project_id = ?
   `);
@@ -715,12 +806,14 @@ export function createWorkItemStore(bb: BbPluginApi) {
       defaults: ProjectSourceConfigDefaults
     ): ProjectSourceConfig {
       const config = defaultConfig(projectId, defaults);
-      db.prepare<[string, WorkSource, string, string, string, string, string]>(
+      db.prepare<
+        [string, WorkSource, string, string, string, string, string, string]
+      >(
         `
         INSERT INTO project_source_config (
           bb_project_id, source, linear_team_key, jira_base_url, jira_email,
-          jira_jql, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+          jira_jql, gitlab_project_ref, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(bb_project_id) DO NOTHING
       `
       ).run(
@@ -730,6 +823,7 @@ export function createWorkItemStore(bb: BbPluginApi) {
         config.jiraBaseUrl,
         config.jiraEmail,
         config.jiraJql,
+        config.gitlabProjectRef,
         new Date().toISOString()
       );
       return configFromRow(readProjectConfig.get(projectId)!);
@@ -739,19 +833,20 @@ export function createWorkItemStore(bb: BbPluginApi) {
       return db.transaction(() => {
         const previous = readProjectConfig.get(config.projectId);
         db.prepare<
-          [string, WorkSource, string, string, string, string, string]
+          [string, WorkSource, string, string, string, string, string, string]
         >(
           `
           INSERT INTO project_source_config (
             bb_project_id, source, linear_team_key, jira_base_url, jira_email,
-            jira_jql, updated_at
-          ) VALUES (?, ?, ?, ?, ?, ?, ?)
+            jira_jql, gitlab_project_ref, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
           ON CONFLICT(bb_project_id) DO UPDATE SET
             source = excluded.source,
             linear_team_key = excluded.linear_team_key,
             jira_base_url = excluded.jira_base_url,
             jira_email = excluded.jira_email,
             jira_jql = excluded.jira_jql,
+            gitlab_project_ref = excluded.gitlab_project_ref,
             updated_at = excluded.updated_at
         `
         ).run(
@@ -761,6 +856,7 @@ export function createWorkItemStore(bb: BbPluginApi) {
           config.jiraBaseUrl,
           config.jiraEmail,
           config.jiraJql,
+          config.gitlabProjectRef,
           new Date().toISOString()
         );
         if (previous && previous.source !== config.source) {

@@ -21,6 +21,10 @@ import {
   sameHealthThresholds,
   type HealthThresholds,
 } from "./lib/thresholds.js";
+import {
+  parseExtraDiskPaths,
+  sameExtraDiskPaths,
+} from "./lib/extra-disk-paths.js";
 import { ProcessConfirmationStore } from "./lib/process-confirmations.js";
 import {
   HostProcessOperationGate,
@@ -127,10 +131,19 @@ export default async function hostMonitorPlugin(
         "CPU, memory, and disk turn red at this usage percentage. Enter 2–100, above the yellow threshold; invalid values use 95%.",
       default: "95",
     },
+    extraDiskPaths: {
+      type: "string",
+      label: "Extra volumes",
+      description:
+        "Absolute mount points to measure beside the system volume, one per line (for example /mnt/data). They use the disk thresholds. A path that is missing or not mounted on a host shows as unavailable.",
+      experimental_multiline: true,
+      default: "",
+    },
   });
   const initialSettings = await settings.get();
   let sidebarThresholdColors = initialSettings.sidebarThresholdColors;
   let thresholds = resolveHealthThresholds(initialSettings);
+  let extraDiskPaths = parseExtraDiskPaths(initialSettings.extraDiskPaths);
   const hostClient = bb.hosts.experimental_client({ contract: hostContract });
   const processConfirmations = new ProcessConfirmationStore();
   const processOperations = new HostProcessOperationGate();
@@ -179,8 +192,14 @@ export default async function hostMonitorPlugin(
       thresholds,
       nextThresholds,
     );
+    const nextExtraDiskPaths = parseExtraDiskPaths(next.extraDiskPaths);
+    const extraDiskPathsChanged = !sameExtraDiskPaths(
+      extraDiskPaths,
+      nextExtraDiskPaths,
+    );
     sidebarThresholdColors = next.sidebarThresholdColors;
     thresholds = nextThresholds;
+    extraDiskPaths = nextExtraDiskPaths;
     if (thresholdsChanged) {
       records = new Map(
         [...records].map(([hostId, record]) => [
@@ -188,8 +207,8 @@ export default async function hostMonitorPlugin(
           { ...record, cpuHighStreak: 0 },
         ]),
       );
-      requestRefresh();
     }
+    if (thresholdsChanged || extraDiskPathsChanged) requestRefresh();
     publish(hosts.map((host) => host.id));
   });
 
@@ -225,7 +244,9 @@ export default async function hostMonitorPlugin(
       try {
         const snapshot = await hostClient.call(
           "snapshot",
-          { cpuSampleMs: CPU_SAMPLE_MS },
+          extraDiskPaths.length === 0
+            ? { cpuSampleMs: CPU_SAMPLE_MS }
+            : { cpuSampleMs: CPU_SAMPLE_MS, extraDiskPaths },
           { hostId: machine.id, signal: callSignal },
         );
         const update: MachineSampleUpdate = {
