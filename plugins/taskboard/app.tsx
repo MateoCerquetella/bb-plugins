@@ -153,6 +153,13 @@ import './app.css';
 const PANEL_PATH = 'tasks';
 const THREAD_PANEL_ACTION_ID = 'taskboard-panel';
 const ALL_SOURCES = 'all';
+const SOURCE_FILTER_OPTIONS = [
+  ALL_SOURCES,
+  'linear',
+  'github',
+  'jira',
+  'gitlab'
+] as const;
 const RIGHT_PANEL_PINNED_STORAGE_KEY = 'bb-taskboard:right-panel-pinned';
 const RIGHT_PANEL_PIN_EVENT = 'bb-taskboard:right-panel-pin-changed';
 const SIDEBAR_COLLAPSED_STORAGE_KEY = 'bb-taskboard:sidebar-collapsed';
@@ -372,12 +379,18 @@ function decodeSegment(segment: string): string {
 }
 
 function isWorkSource(value: string): value is WorkSource {
-  return value === 'linear' || value === 'github' || value === 'jira';
+  return (
+    value === 'linear' ||
+    value === 'github' ||
+    value === 'jira' ||
+    value === 'gitlab'
+  );
 }
 
 function sourceName(source: WorkSource): string {
   if (source === 'github') return 'GitHub';
   if (source === 'jira') return 'Jira';
+  if (source === 'gitlab') return 'GitLab';
   return 'Linear';
 }
 
@@ -387,12 +400,24 @@ const TRACKER_OPTIONS: ReadonlyArray<{
 }> = [
   { source: 'github', description: 'Repository issues' },
   { source: 'linear', description: 'Team issues' },
-  { source: 'jira', description: 'JQL-filtered issues' }
+  { source: 'jira', description: 'JQL-filtered issues' },
+  { source: 'gitlab', description: 'GitLab project issues' }
 ];
 
 function SourceGlyph({ source }: { source: WorkSource }) {
   if (source === 'github') {
     return <Icon name="Github" className="size-3.5" aria-hidden="true" />;
+  }
+
+  if (source === 'gitlab') {
+    return (
+      <svg aria-hidden="true" className="size-3.5" viewBox="0 0 24 24">
+        <path
+          d="M22.65 14.39 12 22.13 1.35 14.39a.7.7 0 0 1-.25-.78l1.6-4.93L4.46 3.4a.35.35 0 0 1 .67 0l1.93 5.28h9.9l1.93-5.28a.35.35 0 0 1 .67 0l1.76 5.28 1.6 4.93a.7.7 0 0 1-.27.78Z"
+          fill="currentColor"
+        />
+      </svg>
+    );
   }
 
   if (source === 'linear') {
@@ -2481,7 +2506,7 @@ function TrackerFilterBar({
     options.filter(option => matchesFacet(option.label));
   const matchingFacetValueCount =
     (showSourceFilter
-      ? ([ALL_SOURCES, 'linear', 'github', 'jira'] as const).filter(option =>
+      ? SOURCE_FILTER_OPTIONS.filter(option =>
           matchesFacet(
             option === ALL_SOURCES ? 'All sources' : sourceName(option)
           )
@@ -2616,7 +2641,7 @@ function TrackerFilterBar({
                 {showSourceFilter ? (
                   <>
                     <FilterSectionLabel filter="source" />
-                    {([ALL_SOURCES, 'linear', 'github', 'jira'] as const)
+                    {SOURCE_FILTER_OPTIONS
                       .filter(option =>
                         matchesFacet(
                           option === ALL_SOURCES
@@ -2826,7 +2851,7 @@ function TrackerFilterBar({
             label={FILTER_PRESENTATION.source.label}
             selectedNames={source === ALL_SOURCES ? [] : [sourceName(source)]}
           >
-            {([ALL_SOURCES, 'linear', 'github', 'jira'] as const).map(
+            {SOURCE_FILTER_OPTIONS.map(
               option => (
                 <DropdownMenuCheckboxItem
                   key={option}
@@ -5046,7 +5071,8 @@ function configFingerprint(config: ProjectConfigView): string {
     linearTeamKey: config.linearTeamKey,
     jiraBaseUrl: config.jiraBaseUrl,
     jiraEmail: config.jiraEmail,
-    jiraJql: config.jiraJql
+    jiraJql: config.jiraJql,
+    gitlabProjectRef: config.gitlabProjectRef
   });
 }
 
@@ -5196,6 +5222,24 @@ function ProjectConfigForm({
       );
       return;
     }
+    if (config.source === 'gitlab') {
+      const ref = config.gitlabProjectRef.trim();
+      const hasHostAndPath = /^(?<host>[^/\s]+)\/(?<path>[^/\s]+\/.+)$/u.exec(
+        ref
+      );
+      if (!hasHostAndPath?.groups) {
+        setError(
+          'Add a host-qualified GitLab project ref, e.g. gitlab.com/group/app.'
+        );
+        return;
+      }
+      if (!baseline.gitlabConfigured) {
+        setError(
+          'Sign in to GitLab with the glab CLI (glab auth login), then press Save.'
+        );
+        return;
+      }
+    }
 
     setSaving(true);
     onSavingChange(true);
@@ -5207,6 +5251,7 @@ function ProjectConfigForm({
         jiraBaseUrl,
         jiraEmail: config.jiraEmail.trim(),
         jiraJql: config.jiraJql.trim(),
+        gitlabProjectRef: config.gitlabProjectRef.trim(),
         linearCredential,
         jiraCredential
       });
@@ -5548,6 +5593,52 @@ function ProjectConfigForm({
               {removeJira ? 'Keep Jira credential' : 'Remove Jira credential'}
             </Button>
           ) : null}
+        </section>
+      ) : null}
+
+      {config.source === 'gitlab' ? (
+        <section
+          className={cardClass}
+          aria-labelledby="gitlab-connector-title"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h3
+                id="gitlab-connector-title"
+                className="text-sm font-semibold"
+              >
+                <span className="mr-2 inline-flex items-center">
+                  <SourceGlyph source="gitlab" />
+                </span>
+                GitLab
+              </h3>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                Uses the glab CLI configuration on this machine — no token is
+                stored by Taskboard. Workflow columns come from{' '}
+                <code>status/&lt;name&gt;</code> labels; closing a column{' '}
+                closes the issue.
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 grid gap-3 @lg:grid-cols-2">
+            <label className="space-y-1.5 text-xs font-medium @lg:col-span-2">
+              GitLab project (host/path)
+              <Input
+                aria-label="GitLab project"
+                value={config.gitlabProjectRef}
+                placeholder="gitlab.com/group/app"
+                className="tb-field tb-field-mono"
+                disabled={saving}
+                onChange={event => {
+                  setConfig({
+                    ...config,
+                    gitlabProjectRef: event.target.value
+                  });
+                  setSaved(false);
+                }}
+              />
+            </label>
+          </div>
         </section>
       ) : null}
 

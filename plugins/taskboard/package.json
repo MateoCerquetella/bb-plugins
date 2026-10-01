@@ -2,7 +2,7 @@
   "name": "bb-plugin-taskboard",
   "version": "0.3.3",
   "private": true,
-  "description": "Bring each BB project's GitHub, Linear, or Jira tasks into one focused taskboard.",
+  "description": "Bring each BB project's GitHub, GitLab, Linear, or Jira tasks into one focused taskboard.",
   "type": "module",
   "license": "MIT",
   "author": "Mateo Cerquetella",
@@ -23,7 +23,8 @@
     "github",
     "linear",
     "jira",
-    "kanban"
+    "kanban",
+    "gitlab"
   ],
   "engines": {
     "bb": ">=0.38",
@@ -31,7 +32,7 @@
   },
   "bb": {
     "name": "Taskboard",
-    "description": "Bring each BB project's GitHub, Linear, or Jira tasks into one focused taskboard.",
+    "description": "Bring each BB project's GitHub, GitLab, Linear, or Jira tasks into one focused taskboard.",
     "branding": {
       "icon": "./assets/icon.svg"
     },
