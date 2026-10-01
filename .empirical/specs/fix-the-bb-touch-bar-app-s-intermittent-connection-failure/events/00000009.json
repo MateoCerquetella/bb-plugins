@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "sequence": 9,
+  "previousDigest": "sha256:c23a63927d83e52984d5603e4075779f7a40a02490d039f8f725c150fbec1db1",
+  "actor": "empirical-merge-observed",
+  "type": "compaction-boundary",
+  "summary": "Compacted through journal event 8",
+  "createdAt": "2026-10-01T16:07:15.420Z",
+  "stateBeforeDigest": "sha256:7785b7c62344ce9fd8809d035c19a5b48f5b29b3b31584df93dce095d4beb96b",
+  "stateAfterDigest": "sha256:7785b7c62344ce9fd8809d035c19a5b48f5b29b3b31584df93dce095d4beb96b",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 8,
+    "activeFeature": "fix-the-bb-touch-bar-app-s-intermittent-connection-failure",
+    "request": "Fix the BB Touch Bar app's intermittent connection failure where it shows reconnecting indefinitely; diagnose the lifecycle, implement a robust recovery, and verify the UI and connection behavior.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "done",
+    "status": "done",
+    "repairAttempts": 0,
+    "message": "Closed as merged-externally: Merged in pull request #38 as 235147a554a9f5f48287766ae461acace0877bd3 into main; closed when the merge was observed.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:1f805f32b9de8256dd8255cff3272d5b063f5a33912a3512914fd1241b1a330c",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:e78f716bb4dfa6db4d4ec6472c2d152f5064b1329d887ce15059691518d270e4",
+    "impactDigest": "sha256:67072cd8f29c5d52d1d71f84adc498a58a1db1330a8a60a5580749d6884f77c4",
+    "capabilityClaimId": "fix-the-bb-touch-bar-app-s-intermittent-connection-failure-3dc13adec0db",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "qa-c29f87345041605fcb8d5f1c",
+      "qa-9efa5b0abbaadd5adab23945"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": true,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "verified",
+      "reasons": {
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-01T16:07:14.709Z",
+    "closure": {
+      "schemaVersion": 1,
+      "outcome": "merged-externally",
+      "reason": "Merged in pull request #38 as 235147a554a9f5f48287766ae461acace0877bd3 into main; closed when the merge was observed.",
+      "actor": "empirical",
+      "confirmation": "merge-observed",
+      "closedAtPhase": "review",
+      "completionAtClosure": "verified",
+      "externalMerge": {
+        "pullRequest": 38,
+        "url": "https://github.com/MateoCerquetella/bb-plugins/pull/38",
+        "state": "MERGED",
+        "mergeCommit": "235147a554a9f5f48287766ae461acace0877bd3",
+        "targetBranch": "main",
+        "ancestorOfTarget": true,
+        "observedAt": "2026-10-01T16:07:08.164Z"
+      },
+      "closedAt": "2026-10-01T16:07:14.551Z",
+      "digest": "sha256:c1be461d83690c921425bbdc036d6e2354cf7c16f934f100dedcec7ac795f5b1"
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "fix-the-bb-touch-bar-app-s-intermittent-connection-failure-3dc13adec0db",
+      "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+      "feature": "fix-the-bb-touch-bar-app-s-intermittent-connection-failure",
+      "worktree": "/home/dyaus/.bb/worktrees/env_3zxdgx5rfx/bb-plugins",
+      "worktreeId": "sha256:c42ffebbff33d51a297a4cb1ddb919cf113c73165b4d0c3ee134a3269996d32e",
+      "baseCommit": "29861c4d1990ad0df51e20b8b0f0df718191a00b",
+      "baseTree": "ddb13969f19d146f6d5465e58ed9da1cb97addcb",
+      "bases": {
+        "native-connection-recovery": {
+          "capability": "native-connection-recovery",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "native snapshot polling recovers from transient command failure": null
+          }
+        }
+      },
+      "capabilities": [
+        "native-connection-recovery"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-09-07T17:53:43.430Z",
+      "heartbeatAt": "2026-09-07T17:53:43.430Z",
+      "digest": "sha256:61df31b59e8b7faa5c89a1f52ca974b243fc82557a1f57eb7da4a9f4a5300969"
+    },
+    "completionRecord": {
+      "schemaVersion": 1,
+      "implementedBy": "agent",
+      "completedBy": "empirical",
+      "decisionBy": null,
+      "method": "merged-externally",
+      "reason": "Merged in pull request #38 as 235147a554a9f5f48287766ae461acace0877bd3 into main; closed when the merge was observed.",
+      "at": "2026-10-01T16:07:14.709Z",
+      "revision": 8,
+      "completion": "verified",
+      "sourceTreeDigest": "sha256:a87feeeb37cfa853759e0162a0f8a76caad8d6e8e1026084a971e5be7f97c827",
+      "artifactTreeDigest": "sha256:2427307ad7d7801cf83cacc394c17d2ca781ace410bd4311d96be9da3d318535",
+      "digest": "sha256:db36d6dc4ed493f8a4912b5b7892033ca751cbd29c2b643144caa2b4e4873a5e"
+    }
+  },
+  "digest": "sha256:bdcb716106875c9b4b3b7990a9aae18d3a9f0b853cab2ae0c7b26ecacbf5435a"
+}

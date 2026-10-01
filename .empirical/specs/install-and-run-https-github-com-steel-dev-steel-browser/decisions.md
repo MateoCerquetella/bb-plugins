@@ -1,5 +1,33 @@
 # Decisions: Install And Run Https Github Com Steel Dev Steel Browser
 
+## D-002: Show The Browser
+
+Status: Accepted
+
+### Evidence
+
+The user's screenshot and explicit request supersede the original decision
+to omit a viewport. Inspection confirms `/v1/sessions/debug` returns Steel's
+canvas-based Session Player, whereas `/ui` is a dashboard.
+
+### Options
+
+Embed the upstream player or build a separate screencast transport.
+
+### Chosen approach
+
+Embed the existing player behind an explicit play control with an external
+authenticated fallback. Do not label scripted automation as jev.
+
+### Trade-offs and risks
+
+Remote iframe authentication can fail; provide the same player in a new tab.
+
+### Verification
+
+Verify player pixels locally and BB layout on desktop/mobile; remote
+authenticated embedding must not be claimed verified without evidence.
+
 Record concise, externally reviewable evidence and choices here. Do not store
 private chain-of-thought, prompts, credentials, secrets, or scratchpad text.
 

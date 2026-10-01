@@ -23,6 +23,11 @@
 
 ## Boundaries
 
+- Steel Browser operates a single self-hosted Steel instance through bounded
+  health and session lifecycle requests, with BB app and CLI surfaces.
+  It does not yet manage concurrent containers or persistent account profiles.
+  Source: `plugins/steel-browser/README.md`, `server.ts`, and `steel-client.ts`.
+
 - The repository root is orchestration only. Each installable plugin is an
   independent package under `plugins/<id>` with its own source, tests, assets,
   manifest, license, third-party notices, and README.

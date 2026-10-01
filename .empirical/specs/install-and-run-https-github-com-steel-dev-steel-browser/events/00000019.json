@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "sequence": 19,
+  "previousDigest": "sha256:1387ce65a9ac7ba7a05b3b02f3e00d59ad8c42c97677cde8a143225ac8879524",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Reworked Steel Browser for the native BB thread-panel workflow requested by the user. Registered a flush threadPanelAction rendering the live Steel session player, plus a steel-browser messageDirective that calls useBbNavigate.openThreadPanel for the current thread and provides a Show browser fallback button. Updated the bundled skill and README so agents open the in-thread panel instead of sending users to an external BB Connect URL. Typecheck and plugin build passed; the plugin was reloaded. Connected to Steel's actual Chrome over local CDP on dyaus and navigated the visible session to a 'Steel is live' page identifying this BB thread, proving the agent and panel target the same page. Also validated BB's native browser CLI behavior on the connected Mac, then released and closed the temporary native test tab. Waiting for user confirmation that the emitted directive opens and displays the Steel panel in their current BB thread. Broader formal verification/review and jev-ultrafast adapter remain pending.",
+  "createdAt": "2026-10-01T18:41:42.958Z",
+  "stateBeforeDigest": "sha256:ad75966c88c70211f89300de5f836d9673c6fd9d793f4355fa4997d21e25b700",
+  "stateAfterDigest": "sha256:7f3b2a5efa8c820acd9145b9da4d0b2efe52f8c5207bdb084d85f87c54f5a5dc",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 19,
+    "activeFeature": "install-and-run-https-github-com-steel-dev-steel-browser",
+    "request": "Install and run https://github.com/steel-dev/steel-browser on the dyaus host for use from this BB environment, then create a new independently installable BB plugin in this repository that integrates Steel as the replacement browser infrastructure for the prior KERNEL.SH-based workflow. Keep the root orchestration-only conventions, align manifest/package/CLI/UI/docs/tests, avoid committing generated artifacts, and verify the Steel service plus the plugin's human UI and CLI surface.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "awaiting_human",
+    "repairAttempts": 0,
+    "message": "Reworked Steel Browser for the native BB thread-panel workflow requested by the user. Registered a flush threadPanelAction rendering the live Steel session player, plus a steel-browser messageDirective that calls useBbNavigate.openThreadPanel for the current thread and provides a Show browser fallback button. Updated the bundled skill and README so agents open the in-thread panel instead of sending users to an external BB Connect URL. Typecheck and plugin build passed; the plugin was reloaded. Connected to Steel's actual Chrome over local CDP on dyaus and navigated the visible session to a 'Steel is live' page identifying this BB thread, proving the agent and panel target the same page. Also validated BB's native browser CLI behavior on the connected Mac, then released and closed the temporary native test tab. Waiting for user confirmation that the emitted directive opens and displays the Steel panel in their current BB thread. Broader formal verification/review and jev-ultrafast adapter remain pending.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:1470a114871c2de56687be5f20fd2c1664295d2ba7abb50f038f6bbdaa04edc0",
+    "approvedSpecRevision": 13,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:2e5e1ae01f38a490fd2b9b94e2a2c874d2dd8b9020c2cfd934ce3aa0ae789b36",
+    "impactDigest": "sha256:12589f53cfe5df3acd8d844396ff6eac97966c4679bd63007e9b6c8b888d7a7b",
+    "capabilityClaimId": "install-and-run-https-github-com-steel-dev-steel-browser-a8ef2053ff39",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-01T18:41:42.958Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 1,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "contractRevision": 10,
+      "riskRequest": "Keep Steel hosted on the connected dyaus machine as the primary host; do not move or duplicate it to another machine. Extend the existing Steel browser plugin scope to evaluate and, where supported, integrate browser-use/jev-ultrafast as an optional browser-agent layer over the existing Steel CDP endpoint. Preserve the existing Steel service and plugin behavior, keep credentials out of repository state, and document any unsupported direct integration as an explicit limitation."
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 11,
+      "capabilities": 1,
+      "reason": "Keep Steel hosting and the optional jev-ultrafast adapter together because the adapter's only supported browser target is the existing Steel CDP session, and splitting them would make the integration contract unverifiable as separate slices.",
+      "actor": "codex",
+      "revision": 11
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "install-and-run-https-github-com-steel-dev-steel-browser-a8ef2053ff39",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "install-and-run-https-github-com-steel-dev-steel-browser",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_cj9zf3k5m4-1/bb-plugins",
+      "worktreeId": "sha256:fe30a202fa07d32cabf7c31f25dde37e3d9687d7450ba2d5cd220a37a360bd56",
+      "baseCommit": "9614dd51fc203d740614aba4de44f31cda50ec04",
+      "baseTree": "41b659cfcdc3046ebe70fbe0fc4e4b9502d04e38",
+      "bases": {
+        "steel-browser-infrastructure": {
+          "capability": "steel-browser-infrastructure",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "durable local service": null,
+            "browser session lifecycle": null,
+            "operational app": null,
+            "agent and plugin distribution": null,
+            "optional jev-ultrafast agent adapter": null
+          }
+        }
+      },
+      "capabilities": [
+        "steel-browser-infrastructure"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-01T16:17:45.656Z",
+      "heartbeatAt": "2026-10-01T17:43:19.254Z",
+      "digest": "sha256:efa8ca283ae3136b5a925a85da7322d186e02fd4a256f0f7a983c7091f2d12f6"
+    },
+    "trackerGeneration": 1,
+    "budgetExtensionMinutes": 30,
+    "reviewFirst": true
+  },
+  "digest": "sha256:1ee9a2ae6410c5aecfad28006d793759c02caa2deddbd0836fe91b1edfe2c2e9"
+}

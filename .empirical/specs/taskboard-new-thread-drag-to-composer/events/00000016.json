@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "sequence": 16,
+  "previousDigest": "sha256:b0e03847ec5bddb99210bb1058e4b95c7fc1a7325c3613470cfec45a81a12c2a",
+  "actor": "empirical-merge-observed",
+  "type": "compaction-boundary",
+  "summary": "Compacted through journal event 15",
+  "createdAt": "2026-10-01T16:07:16.734Z",
+  "stateBeforeDigest": "sha256:d97a2fca969ccdf65925996b7cc89746bb401cb17ac13e5f781d362bc85d27cd",
+  "stateAfterDigest": "sha256:d97a2fca969ccdf65925996b7cc89746bb401cb17ac13e5f781d362bc85d27cd",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 15,
+    "activeFeature": "taskboard-new-thread-drag-to-composer",
+    "request": "Fix Taskboard on BB's root New Thread surface so users can reliably open Taskboard in the right panel instead of landing on an unavailable panel view. Add an explicit Taskboard affordance on New Thread if the current SDK supports it without fragile DOM coupling. Allow dragging a Taskboard ticket from the right panel into the currently visible composer—existing thread or New Thread—to insert the ticket as Taskboard's live external-work-item mention, focus the composer, preserve any existing draft and attachments, and never submit automatically. Preserve Kanban status drag behavior and provide an accessible non-drag equivalent. Add focused tests, build the plugin, install or move the local path installation to this checkout, reload it, and verify both existing-thread and New Thread flows live without publishing.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "done",
+    "status": "done",
+    "repairAttempts": 0,
+    "message": "Closed as merged-externally: Merged in pull request #32 as a6391be14058735b3aebe1769edb313f20100014 into main; closed when the merge was observed.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:1160f7f4d7ad0ec46be9753497ef99fa76a7f5b5b59379f1bce0a6b795ea49a4",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:66a541c14b2aebdcb37309ab123cba965ba91ea3b97e170164b76e92afc5cc06",
+    "impactDigest": "sha256:8b5e653b2ef533df4fb4f48b4614947114c6ae7b1f7172f1d584eb99dd2c91a5",
+    "capabilityClaimId": "taskboard-new-thread-drag-to-composer-cf82bcfe1438",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "qa-83e5b85aa79dd396c1a55370",
+      "qa-58f5b56c983e6669704a1a4a",
+      "qa-78b5940a71cdeb26f859e679",
+      "collected-94ed8c067b1169e8a9380561",
+      "collected-93fd69dd51e2719757521eed",
+      "collected-1308e7f6e0029c0ad3bb391c"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": true,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "verified",
+      "reasons": {
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-01T16:07:16.273Z",
+    "closure": {
+      "schemaVersion": 1,
+      "outcome": "merged-externally",
+      "reason": "Merged in pull request #32 as a6391be14058735b3aebe1769edb313f20100014 into main; closed when the merge was observed.",
+      "actor": "empirical",
+      "confirmation": "merge-observed",
+      "closedAtPhase": "integrate",
+      "completionAtClosure": "verified",
+      "externalMerge": {
+        "pullRequest": 32,
+        "url": "https://github.com/MateoCerquetella/bb-plugins/pull/32",
+        "state": "MERGED",
+        "mergeCommit": "a6391be14058735b3aebe1769edb313f20100014",
+        "targetBranch": "main",
+        "ancestorOfTarget": true,
+        "observedAt": "2026-10-01T16:07:08.164Z"
+      },
+      "closedAt": "2026-10-01T16:07:16.155Z",
+      "digest": "sha256:5b410d1c4f3df761d44dd5e3dcb452030d2c8846d4777c6d1876b2bf99116390"
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "taskboard-new-thread-drag-to-composer-cf82bcfe1438",
+      "repositoryId": "sha256:8b7ffb17d47d3b29f9ec020c10aab5fe8b605e476b7797f7cbcca069de63857d",
+      "feature": "taskboard-new-thread-drag-to-composer",
+      "worktree": "/home/dyaus/.bb/worktrees/env_phvvjxay6w/bb-plugins",
+      "worktreeId": "sha256:f6ae569f5335d34e15941afc2f9fc7af747d2cb0f746026683f6e051facaa6b6",
+      "baseCommit": "b627bb0d43d8fac89e9777b0669700fa6f7e68ef",
+      "baseTree": "d5911f0aec136183caa27c0cfb01324a4061a8c8",
+      "bases": {
+        "external-task-context": {
+          "capability": "external-task-context",
+          "digest": "sha256:906acfd59ce7ec00da01c0bc2361727e99c789cea85b8ca1172bddd7eb4cce94",
+          "requirements": {
+            "external tracker data is untrusted context": "sha256:ec93f6d981360e923de755c0b5023c5888b0898c7fb29670cb384a237a6eff57"
+          }
+        },
+        "taskboard-browser": {
+          "capability": "taskboard-browser",
+          "digest": "sha256:04bf0664ae90d67adcdb184c5744a353dbe6ba012091d3b7232867a3de1ee0c1",
+          "requirements": {
+            "restrained responsive list presentation": "sha256:ff8d15300ea8407150608b7e8c7bb7f340a961076f4ce9fd5d22d97d5c0b074a",
+            "new thread taskboard panel": null
+          }
+        }
+      },
+      "capabilities": [
+        "external-task-context",
+        "taskboard-browser"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-09-02T22:46:04.327Z",
+      "heartbeatAt": "2026-09-02T22:46:04.327Z",
+      "digest": "sha256:76dec8322b48751aa2cfd99cbe4c5386ddfe0d22155cd8db9f2cfbb747872746"
+    },
+    "completionRecord": {
+      "schemaVersion": 1,
+      "implementedBy": "agent",
+      "completedBy": "empirical",
+      "decisionBy": null,
+      "method": "merged-externally",
+      "reason": "Merged in pull request #32 as a6391be14058735b3aebe1769edb313f20100014 into main; closed when the merge was observed.",
+      "at": "2026-10-01T16:07:16.273Z",
+      "revision": 15,
+      "completion": "verified",
+      "sourceTreeDigest": "sha256:a87feeeb37cfa853759e0162a0f8a76caad8d6e8e1026084a971e5be7f97c827",
+      "artifactTreeDigest": "sha256:b1f0ce700c4ec1a4062452476c7285a03344270bec7e664aeb5857391e6e38e2",
+      "digest": "sha256:41a56922d282e7dbc724a71b94c8a6827b70eb90b1a90be0f068751606427f11"
+    }
+  },
+  "digest": "sha256:9ddffeaf8163b6de982d413ea8f572fea351513b029185e9cdb24db6868265f2"
+}

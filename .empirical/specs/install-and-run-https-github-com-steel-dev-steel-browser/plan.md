@@ -1,5 +1,13 @@
 # Implementation Plan
 
+## Immediate Viewer Repair
+
+1. Derive the player URL from the validated configured viewer origin.
+2. Add a primary Play/Watch control, player viewport and external fallback.
+3. Treat idle sessions as usable in both client and UI lifecycle controls.
+4. Verify player pixels, focused plugin checks, install/reload and responsive UI.
+5. Leave the unfinished jev integration explicitly pending.
+
 1. Resolve and record the upstream Steel image digest; create the durable
    compose/systemd configuration under the host data directory, start it, and
    verify loopback bindings and health.

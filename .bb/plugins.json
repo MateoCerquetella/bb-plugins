@@ -28,6 +28,10 @@
       "source": "./plugins/host-monitor"
     },
     {
+      "name": "steel-browser",
+      "source": "./plugins/steel-browser"
+    },
+    {
       "name": "taskboard",
       "source": "./plugins/taskboard"
     },

@@ -1,5 +1,16 @@
 # Design
 
+## Live Viewer Correction
+
+The user explicitly requested a visible browser and play control. Put Steel's
+existing `/v1/sessions/debug` player above session metadata, using the configured
+authenticated viewer origin. Provide Play/Watch, disconnect, reload and external
+player controls. Never embed `/ui`, which is only another dashboard. Mount the
+player only while requested, and show an external authentication fallback.
+Idle and live sessions both count as usable; released rows belong to history.
+This incremental UI correction does not claim a jev agent or demo runner exists.
+The optional jev adapter remains a subsequent implementation task.
+
 ## Architecture
 
 The host installation lives outside the repository under

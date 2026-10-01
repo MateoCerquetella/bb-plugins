@@ -28,6 +28,7 @@ All plugins in this repository are independently installable.
 | <img src="./plugins/clean-my-context/assets/icon.svg" width="128" height="128" alt="" /> | [Clean My Context](./plugins/clean-my-context) | [Git release](#clean-my-context-quick-start) | Resets visible chat and provider context in place while preserving the exact thread, branch, folder, workspace, and settings. Requires BB PR #2500. |
 | <img src="./plugins/dockside/assets/icon.svg" width="128" height="128" alt="" /> | [Dockside](./plugins/dockside) | [Git release](#dockside-quick-start) | Replaces BB's thread list with a compact project-first sidebar, semantic status colors, filters, safe multi-select deletion, and child-agent families. |
 | <img src="./plugins/host-monitor/assets/icon.svg" width="128" height="128" alt="" /> | [Host Monitor](./plugins/host-monitor) | [Git release](#host-monitor-quick-start) | Monitors CPU, RAM, disk, network, host details, and guarded process actions across every machine enrolled in BB. Requires BB 0.40+. |
+| <img src="./plugins/steel-browser/assets/icon.svg" width="128" height="128" alt="" /> | [Steel Browser](./plugins/steel-browser) | [Local install](#steel-browser-quick-start) | Operates self-hosted Steel browser sessions from BB with health, session lifecycle, CLI, and agent guidance. Requires BB 0.40+. |
 | <img src="./plugins/save-my-model/assets/icon.svg" width="128" height="128" alt="" /> | [Save My Model](./plugins/save-my-model) | [Git release](#save-my-model-quick-start) | Stores provider by BB host and model/reasoning separately for each host and provider. |
 | <img src="./plugins/taskboard/assets/icon.svg" width="128" height="128" alt="" /> | [Taskboard](./plugins/taskboard) | [Git release](#taskboard-quick-start) | Brings each BB project's GitHub, Linear, or Jira tasks into one focused List or Kanban board. |
 | <img src="./plugins/aura/assets/icon.svg" width="128" height="128" alt="" /> | [Aura](./plugins/aura) | [Git release](./plugins/aura#install) | Adds custom PNG/JPG backgrounds and softly faded pixel textures to conversations and New thread, with six saved slots and a live preview. |
@@ -148,6 +149,32 @@ bb plugin outdated
 bb plugin update host-monitor
 bb plugin remove host-monitor
 ```
+
+## Steel Browser quick start
+
+Steel Browser connects BB to a self-hosted
+[Steel](https://github.com/steel-dev/steel-browser) API. On `dyaus`, the
+service runs as a pinned Docker container on loopback port `3100`.
+
+Install the plugin from this checkout:
+
+```sh
+bb plugin install ./plugins/steel-browser
+bb plugin reload steel-browser
+```
+
+Open **Steel Browser** in BB or manage sessions from the CLI:
+
+```sh
+bb steel-browser status
+bb steel-browser sessions
+bb steel-browser create
+bb steel-browser release <session-id>
+```
+
+The plugin also ships agent guidance for choosing the local Steel service over
+KERNEL.SH. See the [Steel Browser README](./plugins/steel-browser) for service,
+configuration, and development details.
 
 ## Save My Model quick start
 
