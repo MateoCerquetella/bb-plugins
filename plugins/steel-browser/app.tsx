@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import {
   definePluginApp,
-  useBbNavigate,
   useRpc,
   type PluginMessageDirectiveProps,
   type PluginThreadPanelProps,
@@ -96,27 +95,45 @@ function SteelThreadPanel({ threadId }: PluginThreadPanelProps) {
 }
 
 function SteelBrowserDirective({ message }: PluginMessageDirectiveProps) {
-  const navigate = useBbNavigate();
-  const [opened, setOpened] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    setOpened(navigate.openThreadPanel({
-      actionId: THREAD_PANEL_ACTION_ID,
-      title: "Steel Browser",
-      params: { threadId: message.threadId },
-    }));
-  }, [message.threadId, navigate]);
+  const { dashboard, error, refresh } = useSteelDashboard();
+  const [playerKey, setPlayerKey] = useState(0);
+  const playerUrl = dashboard
+    ? new URL("v1/sessions/debug", dashboard.uiUrl.replace(/ui\/?$/, "")).toString()
+    : null;
+  const active = dashboard?.sessions.some(session => ["idle", "live"].includes(session.status));
 
   return (
-    <div className="steel-directive" role="status">
-      <Monitor aria-hidden="true" />
-      <span>{opened === false ? "Steel Browser is available from the panel launcher." : "Steel Browser opened in this thread."}</span>
-      <button type="button" onClick={() => navigate.openThreadPanel({
-        actionId: THREAD_PANEL_ACTION_ID,
-        title: "Steel Browser",
-        params: { threadId: message.threadId },
-      })}>Show browser</button>
-    </div>
+    <section className="steel-inline-browser" aria-label="Steel browser in this thread">
+      <header>
+        <div>
+          <Monitor aria-hidden="true" />
+          <span>
+            <strong>Steel Browser</strong>
+            <small>{active ? "Live" : dashboard?.connected ? "No active session" : "Connecting"}</small>
+          </span>
+        </div>
+        <button aria-label="Reload inline browser" onClick={() => {
+          void refresh();
+          setPlayerKey(key => key + 1);
+        }} title="Reload browser" type="button">
+          <RefreshCw aria-hidden="true" />
+        </button>
+      </header>
+      <div className="steel-inline-browser__viewport">
+        {error || dashboard?.error ? (
+          <div className="steel-panel-state" role="alert">{error ?? dashboard?.error}</div>
+        ) : playerUrl && active ? (
+          <iframe key={playerKey} src={playerUrl}
+            title={`Steel browser for ${message.threadId}`}
+            allow="clipboard-read; clipboard-write" />
+        ) : (
+          <div className="steel-panel-state">
+            <Monitor aria-hidden="true" />
+            <strong>{dashboard ? "Start a browser session" : "Loading browser..."}</strong>
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 

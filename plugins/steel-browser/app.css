@@ -44,21 +44,45 @@
 .steel-thread-panel iframe { width: 100%; min-height: 0; flex: 1; border: 0; background: #171717; }
 .steel-panel-state { display: grid; place-items: center; align-content: center; gap: 10px; min-height: 0; flex: 1; padding: 20px; color: var(--muted-foreground, #a4a5af); text-align: center; }
 .steel-panel-state svg { width: 28px; height: 28px; }
-.steel-directive {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.steel-inline-browser {
+  width: min(100%, 720px);
   margin-block: 8px;
-  padding: 9px 10px;
   border: 1px solid var(--border, #36373d);
   border-radius: 6px;
-  color: var(--muted-foreground, #a4a5af);
+  overflow: hidden;
+  color: var(--foreground, #ececef);
   background: var(--background, #18191c);
-  font-size: 12px;
 }
-.steel-directive > svg { width: 16px; height: 16px; flex: none; color: var(--steel-accent, #eddb63); }
-.steel-directive > span { min-width: 0; flex: 1; }
-.steel-directive button { min-height: 28px; padding: 4px 8px; white-space: nowrap; }
+.steel-inline-browser > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  height: 42px;
+  padding: 6px 8px 6px 11px;
+  border-bottom: 1px solid var(--border, #36373d);
+}
+.steel-inline-browser > header > div { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.steel-inline-browser > header svg { width: 16px; height: 16px; flex: none; color: var(--steel-accent, #eddb63); }
+.steel-inline-browser > header span,
+.steel-inline-browser > header strong,
+.steel-inline-browser > header small { display: block; }
+.steel-inline-browser > header strong { font-size: 12px; }
+.steel-inline-browser > header small { margin-top: 1px; color: var(--muted-foreground, #a4a5af); font-size: 10px; }
+.steel-inline-browser > header button {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 6px;
+  border: 1px solid var(--border, #464750);
+  border-radius: 5px;
+  color: inherit;
+  background: var(--secondary, #292a30);
+  cursor: pointer;
+}
+.steel-inline-browser__viewport { position: relative; width: 100%; aspect-ratio: 1 / 1; background: #171717; }
+.steel-inline-browser__viewport iframe { display: block; width: 100%; height: 100%; border: 0; }
 .steel-header, .steel-identity, .steel-actions, .steel-status, .steel-toolbar, .steel-links {
   display: flex;
   align-items: center;

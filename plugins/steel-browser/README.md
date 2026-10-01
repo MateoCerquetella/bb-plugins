@@ -12,10 +12,11 @@ Steel Browser gives BB a compact operational surface for a self-hosted
 health and active sessions, creates browser sessions, and releases them with an
 explicit confirmation.
 
-In a BB thread, open the panel launcher and choose **Steel Browser**. Agents can
-open the same live panel from chat by emitting `::steel-browser{}`. The panel
-and local CDP automation target the same Steel session, so agent actions remain
-visible without navigating away from the thread.
+In a BB thread, agents render the live browser as a square inside chat by
+emitting `::steel-browser{}`. The inline viewer and local CDP automation target
+the same Steel session, so agent actions remain visible without opening the
+right panel or navigating away from the thread. A manual **Steel Browser**
+thread-panel action remains available from the panel launcher.
 
 ## Install
 

@@ -14,9 +14,9 @@ directive on its own line:
 ::steel-browser{}
 ```
 
-The directive opens the Steel player in the current thread's right panel. Do
-not send the user to the BB Connect URL unless they explicitly request a
-separate browser window.
+The directive renders the live Steel player as a square directly inside the
+assistant message. It does not open the right panel. Do not send the user to
+the BB Connect URL unless they explicitly request a separate browser window.
 
 Use the local Steel service instead of KERNEL.SH when browser infrastructure is
 needed in this BB environment.
