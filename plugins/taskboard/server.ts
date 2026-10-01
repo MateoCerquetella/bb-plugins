@@ -1742,54 +1742,6 @@ export default async function plugin(bb: BbPluginApi) {
       await assertProjectExists(thread.projectId);
       return { projectId: thread.projectId };
     },
-    async bootstrap(input) {
-      // One round-trip for the panel open path.
-      const [projects, threadProjectId] = await Promise.all([
-        listProjects(),
-        input.threadId
-          ? bb.sdk.threads
-              .get({ threadId: input.threadId })
-              .then(thread => thread.projectId)
-              .catch(() => null)
-          : Promise.resolve(null)
-      ]);
-      const resolvedProjectId =
-        input.projectId ?? threadProjectId ?? projects[0]?.id ?? null;
-      if (resolvedProjectId === null) {
-        return {
-          projectId: null,
-          projects,
-          boardSettings: null,
-          items: [],
-          provider: null,
-          sources: null
-        };
-      }
-      const project = projects.find(entry => entry.id === resolvedProjectId);
-      if (!project) throw new Error('BB project was not found');
-      const [settingsResult, itemsResult, sourcesResult] = await Promise.all([
-        Promise.resolve(store.projectBoardSettings(resolvedProjectId)),
-        (async () => {
-          await waitForMutations(resolvedProjectId, SOURCES);
-          return {
-            items: store.list({
-              projectId: resolvedProjectId,
-              limit: 500
-            }),
-            provider: projectConfig(resolvedProjectId, true).source
-          };
-        })(),
-        statuses(resolvedProjectId).catch(() => null)
-      ]);
-      return {
-        projectId: resolvedProjectId,
-        projects,
-        boardSettings: settingsResult,
-        items: itemsResult.items,
-        provider: itemsResult.provider,
-        sources: sourcesResult
-      };
-    },
     async status(input) {
       await assertProjectExists(input.projectId);
       return { sources: await statuses(input.projectId) };
@@ -2639,7 +2591,12 @@ export default async function plugin(bb: BbPluginApi) {
                           SYNC_TROUBLE_BACKOFF_MS
                       )
                       .slice(0, 1)
-                      .map(projectId => syncAll(projectId, undefined, false))
+                      .map(projectId => {
+                        // Un-suspend so a persistent failure re-suspends
+                        // with a fresh timestamp.
+                        suspendedSync.delete(projectId);
+                        return syncAll(projectId, undefined, false);
+                      })
                   : []
               )
           );
@@ -2652,6 +2609,6 @@ export default async function plugin(bb: BbPluginApi) {
   });
 
   bb.log.info(
-    'Taskboard registered project-scoped Linear, GitHub, and Jira sources'
+    'Taskboard registered project-scoped Linear, GitHub, GitLab, and Jira sources'
   );
 }

@@ -187,11 +187,14 @@ async function resolveGlabPath(): Promise<string> {
 export function parseGitlabRef(ref: string): { host: string; path: string } {
   const firstSlash = ref.indexOf('/');
   const secondSlash = ref.indexOf('/', firstSlash + 1);
-  if (
+  const malformed =
+    /\s/u.test(ref) ||
+    ref.includes('#') ||
+    ref.includes('://') ||
     firstSlash <= 0 ||
     secondSlash === -1 ||
-    secondSlash + 1 >= ref.length
-  ) {
+    secondSlash + 1 >= ref.length;
+  if (malformed) {
     throw new Error(
       `GitLab project ref must be host/group/..., got: ${ref}`
     );
@@ -388,11 +391,32 @@ export class GitlabClient {
       jsonBody?: unknown;
     } = {}
   ): Promise<T> {
-    const session = await sessionFor(this.host);
-    if (session !== null && !stale(session)) {
-      return await this.restApi(session.token, pathArgs, options);
-    }
-    return await this.glabApi(pathArgs, options);
+    const attempt = async (allowRetry: boolean): Promise<T> => {
+      const session = await sessionFor(this.host);
+      if (session === null || stale(session)) {
+        return await this.glabApi(pathArgs, options);
+      }
+      try {
+        return await this.restApi(session.token, pathArgs, options);
+      } catch (error) {
+        const authStale =
+          error instanceof Error && error.message.includes('HTTP 401');
+        if (authStale && allowRetry) {
+          // Token was rotated or revoked — try one fresh acquisition.
+          const glabPath = this.glabPath ?? (await resolveGlabPath());
+          const fresh = await resolveToken(glabPath, this.host);
+          if (fresh !== null) {
+            sessionByHost.set(
+              this.host,
+              Promise.resolve(fresh)
+            );
+            return await this.restApi(fresh.token, pathArgs, options);
+          }
+        }
+        throw error;
+      }
+    };
+    return await attempt(true);
   }
 
   private baseUrl(): string {
@@ -415,7 +439,8 @@ export class GitlabClient {
     for (const field of options.fields ?? []) {
       const eq = field.indexOf('=');
       if (eq <= 0) continue;
-      search.set(field.slice(0, eq), field.slice(eq + 1));
+      // append keeps repeated params (GitLab reads arrays from repeats)
+      search.append(field.slice(0, eq), field.slice(eq + 1));
     }
     let body: string | undefined;
     if (options.jsonBody !== undefined) {

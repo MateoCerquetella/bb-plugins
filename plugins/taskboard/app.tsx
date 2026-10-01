@@ -5226,10 +5226,13 @@ function ProjectConfigForm({
     }
     if (config.source === 'gitlab') {
       const ref = config.gitlabProjectRef.trim();
-      const hasHostAndPath = /^(?<host>[^/\s]+)\/(?<path>[^/\s]+\/.+)$/u.exec(
-        ref
-      );
-      if (!hasHostAndPath?.groups) {
+      const validRef =
+        ref !== '' &&
+        !/\s/u.test(ref) &&
+        !ref.includes('#') &&
+        !ref.includes('://') &&
+        /^(?<host>[^/\s]+)\/(?<path>[^/\s]+\/[^/\s]+.*)$/u.test(ref);
+      if (!validRef) {
         setError(
           'Add a host-qualified GitLab project ref, e.g. gitlab.com/group/app.'
         );

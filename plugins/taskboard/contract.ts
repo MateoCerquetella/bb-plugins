@@ -332,32 +332,7 @@ const listInputSchema = z
   })
   .strict();
 
-export const projectBoardSettingsSummarySchema = projectSourceConfigSchema
-  .extend({
-    githubRepos: z.array(z.string()),
-    linearCredentialConfigured: z.boolean(),
-    jiraCredentialConfigured: z.boolean(),
-    gitlabConfigured: z.boolean()
-  })
-  .strict();
-
 export const taskboardRpcContract = defineRpcContract({
-  bootstrap: {
-    input: z.object({
-      projectId: bbProjectIdSchema.nullable().default(null),
-      threadId: z.string().min(1).nullable().default(null)
-    }).strict(),
-    output: z
-      .object({
-        projectId: bbProjectIdSchema.nullable(),
-        projects: z.array(trackerProjectSchema),
-        boardSettings: projectBoardSettingsSchema.nullable(),
-        items: z.array(workItemSchema),
-        provider: z.string().nullable(),
-        sources: z.array(workSourceStatusSchema).nullable()
-      })
-      .strict()
-  },
   listProjects: {
     input: z.null(),
     output: z.object({ projects: z.array(trackerProjectSchema) }).strict()
