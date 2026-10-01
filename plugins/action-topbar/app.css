@@ -1,3 +1,10 @@
+:root {
+  --action-topbar-z-index: 2147483000;
+  --action-topbar-launcher-z-index: 2147483001;
+  --action-topbar-drop-overlay-z-index: 2147483002;
+  --action-topbar-drag-ghost-z-index: 2147483003;
+}
+
 [data-action-topbar-native-strip] {
   display: none !important;
 }
@@ -22,6 +29,8 @@
 }
 
 .action-topbar {
+  position: relative;
+  z-index: var(--action-topbar-z-index);
   display: flex;
   min-width: 0;
   max-width: 100%;
@@ -91,6 +100,7 @@
   background: transparent;
   outline: none;
   text-align: left;
+  touch-action: none;
 }
 
 .action-topbar__tab-button:active {
@@ -262,7 +272,7 @@
 
 .action-topbar__launcher {
   position: fixed;
-  z-index: 120;
+  z-index: var(--action-topbar-launcher-z-index);
   max-width: calc(100vw - 1rem);
   overflow: hidden;
   padding: 0.25rem;
@@ -427,7 +437,7 @@
 
 .action-topbar__drag-ghost {
   position: fixed;
-  z-index: 131;
+  z-index: var(--action-topbar-drag-ghost-z-index);
   left: -9999px;
   top: -9999px;
   display: flex;
@@ -459,7 +469,7 @@
 
 .action-topbar__drop-overlay {
   position: fixed;
-  z-index: 130;
+  z-index: var(--action-topbar-drop-overlay-z-index);
   display: flex;
   pointer-events: none;
   align-items: center;

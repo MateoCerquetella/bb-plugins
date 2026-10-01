@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "sequence": 2,
+  "previousDigest": "sha256:359bab357d356161d6af735c57771652416c51e8747555fb9e222c137225c356",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Specified and user-approved the Action Topbar pointer-drag and topmost stacking repair, including an advisory UI/UX consult, clickable pointer/cancellation mockup, capability delta, observable criteria, scope, risks, and verification.",
+  "createdAt": "2026-10-01T17:03:01.579Z",
+  "stateBeforeDigest": "sha256:5e4909131efed733eefa957c41d37493a00cfa70e8ea466ec92dee64c558074f",
+  "stateAfterDigest": "sha256:e22d2f565cec4f00c83eeb81759425d780110ec587fde8f9fa8af441d52d8ef4",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 2,
+    "activeFeature": "fix-the-action-topbar-plugin-so-its-topbar-can-be",
+    "request": "Fix the Action Topbar plugin so its topbar can be dragged again, and ensure the topbar and its opened component/menu stack above all other BB UI, including the right sidebar which currently obscures it.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "design",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Specified and user-approved the Action Topbar pointer-drag and topmost stacking repair, including an advisory UI/UX consult, clickable pointer/cancellation mockup, capability delta, observable criteria, scope, risks, and verification.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:99e0d6f1636297aae2c16c8c0db2119260c761e29a404131b5ccf30bfbc5861b",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:23744f7230bd387e2b5b75cbb96feb3eee7ae1b20c9e01b6e0bbb2b79a812994",
+    "impactDigest": "sha256:246e487a7e836d673e1e745c58c9e87a9d48a4a88f0738a443951074846b5155",
+    "capabilityClaimId": "fix-the-action-topbar-plugin-so-its-topbar-can-be-4e5f9aac9396",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-01T17:03:01.579Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true
+    },
+    "reviewFirst": true,
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "fix-the-action-topbar-plugin-so-its-topbar-can-be-4e5f9aac9396",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "fix-the-action-topbar-plugin-so-its-topbar-can-be",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_5jjwmp8a9m-1/bb-plugins",
+      "worktreeId": "sha256:c41ae348acd6f7dd9b7c9147c93a2a06cd0f650dc889f1d56f118cadbbc29b38",
+      "baseCommit": "9614dd51fc203d740614aba4de44f31cda50ec04",
+      "baseTree": "41b659cfcdc3046ebe70fbe0fc4e4b9502d04e38",
+      "bases": {
+        "action-topbar-interaction": {
+          "capability": "action-topbar-interaction",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "durable topbar pointer dragging": null,
+            "topmost action topbar surfaces": null
+          }
+        }
+      },
+      "capabilities": [
+        "action-topbar-interaction"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-01T17:03:01.574Z",
+      "heartbeatAt": "2026-10-01T17:03:01.574Z",
+      "digest": "sha256:63142dea313d7bf2efe9b8ba877d05e4b3c0a6c2ef8b420c9e55f51db6355999"
+    }
+  },
+  "digest": "sha256:08a1aedea54a68858b52a83685611e6b17768167c63e32ecc04b9f0d1d15aaf0"
+}

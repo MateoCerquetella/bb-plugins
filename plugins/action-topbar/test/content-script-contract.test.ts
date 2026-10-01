@@ -39,6 +39,60 @@ test("keeps lifecycle and drag work event-driven and reversible", () => {
   assert.match(source, /window\.removeEventListener\("pointermove"/);
 });
 
+test("retains and releases the initiating pointer for topbar tab drags", () => {
+  assert.match(source, /pointerId:\s*event\.pointerId/);
+  assert.match(source, /tryCapturePointer\(sourceButton, event\.pointerId\)/);
+  assert.match(
+    source,
+    /tryReleasePointer\(current\.sourceButton, current\.pointerId\)/,
+  );
+  assert.match(
+    source,
+    /event\.pointerId !== topbarDrag\.pointerId/,
+  );
+  assert.doesNotMatch(
+    source,
+    /addEventListener\("pointer(?:up|cancel)",\s*handleTopbarDrag\w+,\s*\{\s*once:\s*true/,
+  );
+  assert.match(
+    styles,
+    /\.action-topbar__tab-button\s*\{[^}]*touch-action:\s*none/s,
+  );
+});
+
+test("keeps every Action Topbar surface above host application chrome", () => {
+  const tiers = [
+    "--action-topbar-z-index",
+    "--action-topbar-launcher-z-index",
+    "--action-topbar-drop-overlay-z-index",
+    "--action-topbar-drag-ghost-z-index",
+  ].map((name) =>
+    Number(styles.match(new RegExp(`${name}:\\s*(\\d+)`))?.[1]),
+  );
+  assert.deepEqual(tiers, [
+    2_147_483_000,
+    2_147_483_001,
+    2_147_483_002,
+    2_147_483_003,
+  ]);
+  assert.match(
+    styles,
+    /\.action-topbar\s*\{[^}]*position:\s*relative;[^}]*z-index:\s*var\(--action-topbar-z-index\)/s,
+  );
+  assert.match(
+    styles,
+    /\.action-topbar__launcher\s*\{[^}]*z-index:\s*var\(--action-topbar-launcher-z-index\)/s,
+  );
+  assert.match(
+    styles,
+    /\.action-topbar__drop-overlay\s*\{[^}]*z-index:\s*var\(--action-topbar-drop-overlay-z-index\)/s,
+  );
+  assert.match(
+    styles,
+    /\.action-topbar__drag-ghost\s*\{[^}]*z-index:\s*var\(--action-topbar-drag-ghost-z-index\)/s,
+  );
+});
+
 test("preserves keyboard focus and the bounded cross-pane relaunch path", () => {
   assert.match(source, /closeLauncher\(true\)/);
   assert.match(source, /"ArrowLeft"/);

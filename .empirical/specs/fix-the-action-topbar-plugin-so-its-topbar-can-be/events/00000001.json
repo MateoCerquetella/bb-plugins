@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "sequence": 1,
+  "previousDigest": "sha256:41583b63bd9c01bd4fde68764fc7053568a35c38563e05287d0362f3268cc8a4",
+  "actor": "empirical-start",
+  "type": "transition",
+  "summary": "Started fix-the-action-topbar-plugin-so-its-topbar-can-be",
+  "createdAt": "2026-10-01T16:52:07.439Z",
+  "stateBeforeDigest": "sha256:74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+  "stateAfterDigest": "sha256:5e4909131efed733eefa957c41d37493a00cfa70e8ea466ec92dee64c558074f",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 1,
+    "activeFeature": "fix-the-action-topbar-plugin-so-its-topbar-can-be",
+    "request": "Fix the Action Topbar plugin so its topbar can be dragged again, and ensure the topbar and its opened component/menu stack above all other BB UI, including the right sidebar which currently obscures it.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": null,
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:eb8fa73441593f510a00a287db823e3b1f0738fa4355405e8688e4b3f018d684",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": null,
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-01T16:52:07.439Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:359bab357d356161d6af735c57771652416c51e8747555fb9e222c137225c356"
+}
