@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 13,
+  "revision": 14,
   "activeFeature": "agent-canvas",
   "request": "Create a new BB plugin named Agent Canvas based closely on the supplied reference screenshot. Build a full-screen dark spatial canvas with draggable/resizable live thread panes using native ThreadChat, a persistent Coordinator native chat docked on the right, a compact workspace tab strip and add control, dotted background, minimap, zoom/fit/reorganize controls, and pane title/status metadata. Coordinator selection or creation must be an explicit user action through native BB controls; never autonomously spawn or message agents. Use current public Plugin SDK surfaces, preserve authorization and permission modes, persist bounded canvas layout safely, provide keyboard and narrow-screen fallbacks, add the package to the workspace catalog, install/reload it locally, and verify the visual experience against the screenshot without copying AgentGrid branding or proprietary assets.",
   "profile": "complex",
@@ -9,7 +9,7 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Implemented universal Control, colored workspace groups and free spatial navigation. Signed pane positions persist outside workspace squares; pan tool, Space-drag and middle-drag work over native panes; fit/minimap include displaced panes. Typecheck/build passed; installed plugin reloaded. Live Playwright confirmed negative movement, reload persistence, 150px pan, zoom and narrow layout without page errors. Unit tests and formal review remain pending; browser captures are snapshots, not interactive streams. Implementation commit ca6a0a73; target sync current with main.",
+  "message": "Remove the right-side universal Control chat and all Control-thread selection/creation UI from Agent Canvas for now. Let the spatial canvas use the full available width. Also simplify the plugin's own top chrome to avoid the duplicated Agent Canvas title visible inside BB: keep one compact workspace tab row and essential refresh/filter controls, with the canvas as the dominant surface. Preserve existing live agent/browser panes, free movement, zoom, pan, workspace grouping, and narrow-screen behavior. Update docs and the contract to mark universal Control as deferred rather than active.",
   "implementationActor": "agent",
   "workStartedAt": "2026-09-30T20:38:20.302Z",
   "specDigest": "sha256:c4b7d63b201e25b12dfc52963cfb4d43c9cbbcd5760b6a7f575b04e55d8cb5dd",
@@ -23,24 +23,25 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": true,
+    "implemented": false,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "implemented",
+    "highest": "none",
     "reasons": {
+      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-01T15:35:53.702Z",
+  "updatedAt": "2026-10-01T15:55:08.847Z",
   "lifecycle": {
     "stage": "iteration",
-    "iteration": 3,
-    "awaitingFeedback": true,
+    "iteration": 4,
+    "awaitingFeedback": false,
     "iterative": true,
     "contractBaseline": 13,
     "amendments": [
@@ -75,7 +76,7 @@
     "heartbeatAt": "2026-09-30T20:51:06.731Z",
     "digest": "sha256:680eb04a4556114e51a942e19296dbc5c10e2e96812df87f10027331a1489308"
   },
-  "trackerGeneration": 3,
+  "trackerGeneration": 4,
   "budgetExtensionMinutes": 1140,
   "reviewFirst": true
 }

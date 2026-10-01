@@ -7,8 +7,8 @@
 ## Goal
 
 Give a multi-project BB operator one spatial control room: live threads appear
-as readable, movable panes on a dark canvas while one persistent Coordinator
-conversation stays available at the right edge.
+as readable, movable panes on a full-width BB-themed canvas. The Control dock
+is deferred at the user's request.
 
 ## Acceptance Criteria
 
@@ -31,14 +31,12 @@ conversation stays available at the right edge.
   and keyboard navigation preserve a usable canvas. Space-drag, middle-drag,
   and an explicit pan tool allow navigation over live panes. Fit includes
   displaced panes; signed positions survive reload.
-- [ ] [AC-4] A right-side universal Control dock mounts one native conversation
-  across all workspaces with a server-persisted identity. Explicit bounded UI
-  tools navigate the mounted canvas and report acknowledgements or uncertainty.
-  Selection and creation remain explicit; the plugin never autonomously spawns
-  or messages agents.
+- [ ] [AC-4] The canvas occupies the full available width with no right-side
+  Control chat, selector, composer, toggle, or per-pane assignment action.
+  Existing conversations and stored identity remain intact. Previously selected
+  Control threads retain bounded backend commands; no replacement is created.
 - [ ] [AC-5] The canvas remains usable at narrow widths and with keyboard
-  navigation; on small screens it switches to a stacked pane list and keeps
-  Coordinator access visible.
+  navigation; on small screens it switches to a full-height stacked pane list.
 - [ ] [AC-6] Loading, stale/disconnected, permission/error, empty, and removed
   thread records render recoverable states without crashing. Lifecycle events
   refresh agent state independently of browser discovery. Available automation
@@ -49,8 +47,7 @@ conversation stays available at the right edge.
 
 One installable plugin package with a nav-panel canvas, bounded server
 projection of visible projects, environments, hosts, and threads, native
-ThreadChat panes, persisted layout state, and a native composer for explicit
-Coordinator selection/creation.
+ThreadChat panes and persisted layout state. Control chat UI is deferred.
 
 ## Non-goals
 

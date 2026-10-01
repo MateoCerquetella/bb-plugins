@@ -1,6 +1,6 @@
 # Agent Canvas
 
-A BB-native spatial workbench with one universal Control conversation.
+A BB-native full-width spatial workbench for live agents and browser captures.
 
 ## Workspace Canvas
 
@@ -24,13 +24,18 @@ With the canvas focused, `+`, `-`, and `0` zoom in, zoom out, and fit.
 Double-click an agent header to focus it at readable scale.
 Narrow screens use a scrollable stacked layout instead of spatial gestures.
 
-## Universal Control
+## Deferred Control Dock
 
-The right dock is one native BB conversation across all workspaces. Its selected
-identity is stored server-side and shared by open canvas views. Select an existing
-thread or create one with BB's native model, environment, and permission controls.
-JEV can be selected through those native controls; the plugin does not silently
-change models or routing.
+The right-side Control chat, selector, composer, toggle, and per-pane assignment
+actions are removed for now. The canvas uses the full available width.
+Existing conversations and persisted Control identity are not deleted.
+The previously implemented bounded backend UI commands remain available to an
+already selected Control thread; there is no Control chat surface in the canvas.
+
+### Retained Backend
+
+The selected identity remains stored server-side. The plugin does not silently
+change models or routing, delete conversations, or create a replacement thread.
 
 The selected Control thread receives `agent_canvas_snapshot` and
 `agent_canvas_control`. The latter can select a workspace, focus a thread,

@@ -111,3 +111,34 @@ spatial gestures and use a stacked layout.
 Typecheck/build passed. Live Playwright confirmed negative movement, persistence
 after reload, 150px panning, cursor zoom, narrow layout, and no page errors.
 Focused geometry tests were updated but have not been run this iteration.
+
+## D-004: Defer the Control Dock
+
+Status: Accepted
+
+### Evidence
+
+The user explicitly requested removal of the right-side Control chat for now
+and showed the duplicated title and stacked toolbar chrome.
+
+### Options
+
+1. Collapse the dock while retaining its exposed controls.
+2. Remove the dock and all selection, creation and assignment UI.
+
+### Chosen approach
+
+Choose option 2. Supersede the dock UI in D-002. Use the full width for canvas
+content, remove the duplicate plugin title, and compact partial browser coverage
+into the tab row. Preserve actual conversations and backend state.
+
+### Trade-offs and risks
+
+The canvas no longer offers Control-thread creation or selection. Existing
+selected threads retain bounded backend UI commands. This is a presentation
+change, not deletion of user data.
+
+### Verification
+
+Check type/build and inspect desktop and narrow layouts for absent dock controls,
+full-width canvas, and preserved agent panes. Unit suite remains pending.

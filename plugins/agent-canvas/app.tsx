@@ -1,7 +1,6 @@
 import "./app.css";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
-import { definePluginApp, ThreadChat, experimental_Icon as Icon, useRpc, useSdk, useBbNavigate, useRealtime, useRealtimeConnectionState, experimental_NewThreadComposer as NewThreadComposer } from "@get-bb/plugin-sdk/app";
-import type { NewThreadRequest } from "@get-bb/plugin-sdk";
+import { definePluginApp, ThreadChat, experimental_Icon as Icon, useRpc, useBbNavigate, useRealtime, useRealtimeConnectionState } from "@get-bb/plugin-sdk/app";
 import { browserTargetSchema, snapshotSchema, type rpcContract, type Snapshot } from "./contract";
 import { readState, writeState, type CanvasState } from "./lib_state";
 import { connectedThreads, freeBox, edgePath, browserNodeId, workspaceLayout, type Box } from "./graph";
@@ -46,7 +45,6 @@ export function Canvas() {
   const active = projects.find((project) => project.id === workspace);
   return <main className="ac-shell">
     <header className="ac-tabs">
-      <span className="ac-brand"><Icon name="Workflow" />Agent Canvas</span>
       <nav aria-label="Project workspaces">
         <button className={!active ? "ac-active" : ""} aria-current={!active ? "page" : undefined} onClick={() => setWorkspace(null)}>All</button>
         {projects.map((project) => <button key={project.id} className={active?.id === project.id ? "ac-active" : ""}
@@ -54,39 +52,30 @@ export function Canvas() {
           {project.name}
         </button>)}
       </nav>
+      {snapshot?.browsersPartial && <span className="ac-coverage" role="status" title="Browser-tab coverage is partial. Some hosts or tabs are unavailable.">Partial browser coverage</span>}
       <button className="ac-icon" title="Refresh workspaces" aria-label="Refresh workspaces" onClick={() => void refresh()}><Icon name="RotateCcw" /></button>
     </header>
     {(error || connection !== "connected" || snapshot?.truncated) && <div className="ac-notice" role="status">
       {error ? "Refresh failed. Showing the last available snapshot." : connection !== "connected" ? "Reconnecting. Status may be delayed." : "Showing the latest 80 threads."}
     </div>}
-    {snapshot?.browsersPartial && <div className="ac-notice" role="status">Browser-tab coverage is partial.</div>}
     {snapshot ? <Workspace projectId={active?.id} setProjectId={setWorkspace}
-      panes={snapshot.threads} browsers={snapshot.browsers} controlThreadId={snapshot.controlThreadId} refresh={refresh} />
+      panes={snapshot.threads} browsers={snapshot.browsers} controlThreadId={snapshot.controlThreadId} />
       : <div className="ac-empty"><Icon name="Workflow" /><h2>{snapshot ? "No active workspaces" : error ? "Workspaces unavailable" : "Loading workspaces..."}</h2></div>}
   </main>;
 }
 
-function Workspace({ projectId, setProjectId, panes, browsers, controlThreadId, refresh }: {
+function Workspace({ projectId, setProjectId, panes, browsers, controlThreadId }: {
   projectId?: string; setProjectId: (id: string | null) => void; panes: Pane[];
-  browsers: Snapshot["browsers"]; controlThreadId: string | null; refresh: () => Promise<void>;
+  browsers: Snapshot["browsers"]; controlThreadId: string | null;
 }) {
   const rpc = useRpc<typeof rpcContract>();
-  const sdk = useSdk();
   const navigate = useBbNavigate();
   const [layout, setLayout] = useState<CanvasState>(() => readState("global"));
-  const [showComposer, setShowComposer] = useState(false);
-  const [showChooser, setShowChooser] = useState(false);
-  const [dockOpen, setDockOpen] = useState(true);
   const [environment, setEnvironment] = useState("");
   const [zoom, setZoom] = useState(1);
   const [selected, setSelected] = useState<string | null>(null);
   const [drag, setDrag] = useState<{ id: string; mode: "move" | "resize"; sx: number; sy: number; x: number; y: number; w: number; h: number } | null>(null);
-  const [creating, setCreating] = useState(false);
-  const [createError, setCreateError] = useState<string | null>(null);
-  const [controlError, setControlError] = useState(false);
   const [pendingFocus, setPendingFocus] = useState<string | null>(null);
-  const choosing = useRef(false);
-  const launchPending = useRef(false);
   const canvasRef = useRef<HTMLDivElement>(null);
   const zoomTo = useCanvasNavigation(canvasRef, zoom, setZoom);
   const clientId = useRef(`canvas-${crypto.randomUUID()}`);
@@ -119,7 +108,6 @@ function Workspace({ projectId, setProjectId, panes, browsers, controlThreadId, 
       window.removeEventListener("blur", up);
     };
   }, []);
-  const coordinator = panes.find((pane) => pane.id === controlThreadId);
   const projectPanes = panes.filter((pane) => !projectId || pane.projectId === projectId);
   const environments = Array.from(new Map(projectPanes.map((pane) => [pane.environmentId ?? "", pane.environment])));
   const visible = useMemo(() => connectedThreads(panes.filter((pane) =>
@@ -211,29 +199,6 @@ function Workspace({ projectId, setProjectId, panes, browsers, controlThreadId, 
     pan.current = { x: event.clientX, y: event.clientY, left: canvas.scrollLeft, top: canvas.scrollTop };
     setPanning(true);
   }
-  async function chooseMain(id: string) {
-    if (choosing.current) return;
-    choosing.current = true; setControlError(false);
-    try {
-      await rpc.call("selectControl", { threadId: id || null });
-      setShowChooser(false); setDockOpen(true);
-      await refresh();
-    } catch { setControlError(true); }
-    finally { choosing.current = false; }
-  }
-  async function createCoordinator(request: NewThreadRequest) {
-    if (launchPending.current) throw new Error("Check BB's thread list before starting another thread.");
-    launchPending.current = true; setCreating(true); setCreateError(null);
-    try {
-      const thread = await sdk.threads.spawn({ ...request, pluginMetadata: { canvasControl: true } });
-      await rpc.call("selectControl", { threadId: thread.id });
-      setShowComposer(false); setDockOpen(true); await refresh();
-      launchPending.current = false;
-    } catch {
-      setCreateError("Creation could not be confirmed. Check BB's thread list before trying again.");
-      throw new Error("Creation could not be confirmed. Check BB's thread list.");
-    } finally { setCreating(false); }
-  }
   const boxes = [...visible.map((pane) => geometry(pane)), ...visibleBrowsers.map(browserGeometry)];
   const width = Math.max(1200, ...boxes.map((box) => box.x + box.w + 160), ...spatial.groups.map((group) => group.x + group.w + 48));
   const height = Math.max(900, ...boxes.map((box) => box.y + box.h + 160), ...spatial.groups.map((group) => group.y + group.h + 48));
@@ -298,10 +263,8 @@ function Workspace({ projectId, setProjectId, panes, browsers, controlThreadId, 
       </select></label>
       <span className="ac-count">{visible.length} agents · {visibleBrowsers.length} browser tabs</span>
       <div className="ac-spacer" />
-      <button className="ac-icon" title="New Control thread" aria-label="New Control thread" onClick={() => setShowComposer(true)}><Icon name="Plus" /></button>
-      <button className="ac-icon" title="Toggle Control thread" aria-label="Toggle Control thread" aria-pressed={dockOpen} onClick={() => setDockOpen((value) => !value)}><Icon name="PanelRight" /></button>
     </div>
-    <div className={`ac-layout ${dockOpen ? "" : "ac-dock-closed"}`}>
+    <div className="ac-layout ac-dock-closed">
       <section className="ac-canvas-wrap" aria-label="Worktree threads">
         <div className={`ac-canvas ${panning ? "ac-panning" : ""} ${panMode ? "ac-pan-mode" : ""}`} ref={canvasRef} onPointerDownCapture={beginPan} tabIndex={0} aria-label="Scrollable agent canvas"
           onKeyDown={(event) => {
@@ -346,7 +309,6 @@ function Workspace({ projectId, setProjectId, panes, browsers, controlThreadId, 
                       }}><Icon name="DragDropVertical" /></button>
                     <strong title={pane.title}>{pane.title}</strong>
                     <span className={`ac-status ac-${pane.state}`}>{labels[pane.state]}</span>
-                    <button className="ac-icon" title="Set as Control thread" aria-label={`Set ${pane.title} as Control thread`} onClick={() => chooseMain(pane.id)}><Icon name="PanelRight" /></button>
                   </header>
                   <div className="ac-context"><span title={pane.environment}>{pane.environment}</span><span title={pane.branch}>{pane.branch}</span><span>{pane.parentThreadId ? "Child agent" : pane.provider}</span></div>
                   <LiveTimeline threadId={pane.id} />
@@ -414,33 +376,7 @@ function Workspace({ projectId, setProjectId, panes, browsers, controlThreadId, 
           <button className="ac-icon" title="Reorganize panes" aria-label="Reorganize panes" onClick={() => { setLayout((current) => ({ ...current, panes: {} })); setZoom(1); }}><Icon name="GridView" /></button>
         </div>
       </section>
-      {dockOpen && <aside className="ac-coordinator">
-        {controlError && <div role="alert" className="ac-notice">Could not select the Control thread. Try again.</div>}
-        <header className="ac-coord-head"><h1>Control thread <span className="ac-universal">All workspaces</span></h1>
-          <button className="ac-icon" title="Choose Control thread" aria-label="Choose Control thread" aria-expanded={showChooser} onClick={() => setShowChooser((value) => !value)}><Icon name="ChevronDown" /></button>
-          <button className="ac-icon" title="Close Control thread" aria-label="Close Control thread" onClick={() => setDockOpen(false)}><Icon name="X" /></button>
-        </header>
-        {(showChooser || !coordinator) && <div className="ac-chooser">
-          <select aria-label="Control thread" value={coordinator?.id ?? ""} onChange={(event) => chooseMain(event.target.value)}>
-            <option value="">Select one Control thread</option>
-            {panes.map((pane) => <option key={pane.id} value={pane.id}>{pane.project} · {pane.title}</option>)}
-          </select>
-          <button className="ac-command" onClick={() => setShowComposer(true)}><Icon name="Plus" />New Control thread</button>
-        </div>}
-        {coordinator ? <>
-          <div className="ac-coord-identity"><strong>{coordinator.title}</strong><span>{coordinator.environment} · {labels[coordinator.state]}</span></div>
-          <ThreadChat key={coordinator.id} threadId={coordinator.id} variant="full" layout="contained" permissionPolicy="inherit" className="ac-chat" />
-        </> : <div className="ac-empty ac-dock-empty"><Icon name="MessageSquare" /><h2>{controlThreadId ? "Control thread unavailable" : "No Control thread selected"}</h2></div>}
-      </aside>}
     </div>
-    {showComposer && <div className="ac-compose-overlay">
-      <section className="ac-compose-panel" aria-label="Create Control thread">
-        <header className="ac-coord-head"><h1>New Control thread</h1><button className="ac-icon" title="Close composer" aria-label="Close composer" disabled={creating} onClick={() => setShowComposer(false)}><Icon name="X" /></button></header>
-        {createError && <div role="alert" className="ac-notice">{createError}</div>}
-        <NewThreadComposer defaultProjectId={projectId} layout="document" draftKey="agent-canvas:control"
-          placeholder="Coordinate the canvas..." onSubmit={createCoordinator} />
-      </section>
-    </div>}
   </>;
 }
 

@@ -16,6 +16,7 @@
 .ac-toolbar label { display: flex; align-items: center; gap: 8px; min-width: 0; color: var(--muted-foreground); }
 .ac-shell select { max-width: 280px; min-width: 0; height: 30px; padding: 0 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--background); }
 .ac-count { color: var(--muted-foreground); white-space: nowrap; font-size: 12px; }
+.ac-coverage { color: var(--muted-foreground); font-size: 11px; flex: 0 1 150px; }
 .ac-spacer { flex: 1; }
 .ac-notice { padding: 8px 16px; border-bottom: 1px solid var(--border); color: var(--muted-foreground); background: var(--muted); font-size: 12px; }
 .ac-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, 36%); flex: 1; min-height: 0; }
@@ -92,7 +93,7 @@
 @media (max-width: 900px) {
   .ac-brand { font-size: 0; gap: 0; }
   .ac-layout { display: flex; flex-direction: column; overflow: auto; }
-  .ac-canvas-wrap { min-height: 480px; flex: 0 0 60vh; }
+  .ac-canvas-wrap { min-height: 0; flex: 1; }
   .ac-coordinator { min-height: 500px; flex: 0 0 70vh; border-left: 0; border-top: 1px solid var(--border); }
   .ac-scroll-area { width: 100% !important; height: auto !important; }
   .ac-world { left: 0 !important; top: 0 !important; width: 100% !important; height: auto !important; transform: none !important; padding: 12px; display: grid; gap: 12px; }
