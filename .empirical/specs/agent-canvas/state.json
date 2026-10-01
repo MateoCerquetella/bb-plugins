@@ -1,23 +1,23 @@
 {
   "schemaVersion": 5,
-  "revision": 2,
+  "revision": 12,
   "activeFeature": "agent-canvas",
   "request": "Create a new BB plugin named Agent Canvas based closely on the supplied reference screenshot. Build a full-screen dark spatial canvas with draggable/resizable live thread panes using native ThreadChat, a persistent Coordinator native chat docked on the right, a compact workspace tab strip and add control, dotted background, minimap, zoom/fit/reorganize controls, and pane title/status metadata. Coordinator selection or creation must be an explicit user action through native BB controls; never autonomously spawn or message agents. Use current public Plugin SDK surfaces, preserve authorization and permission modes, persist bounded canvas layout safely, provide keyboard and narrow-screen fallbacks, add the package to the workspace catalog, install/reload it locally, and verify the visual experience against the screenshot without copying AgentGrid branding or proprietary assets.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "specify",
+  "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Approved isolated work started",
-  "implementationActor": null,
+  "message": "Refine Agent Canvas in English and commit the completed work. In the All view, show every workspace/worktree as a clearly bounded square group with a stable distinct color, containing its live agent, child-agent, and browser nodes while preserving verified parent/ownership edges. Make the right-side Control thread truly universal for the entire Agent Canvas and allow it to operate safe UI state through explicit bounded agent tools (for example select workspace, focus a thread, fit/reorganize the canvas, or adjust zoom) delivered to the mounted canvas over the public realtime plugin channel; it must not autonomously send messages or bypass permissions. Improve navigation fluidity with cursor-centered wheel zoom, trackpad/pinch gestures where supported, smooth zoom controls, panning, and sensible reset/fit behavior. Replace polling-only status refresh with public BB lifecycle-event-driven realtime refresh while retaining a low-frequency recovery poll. Show agents and BB child-agent threads live through native ThreadChat timelines and lifecycle refresh. Show browser sessions live only to the extent supported by the public SDK: use verified automation-tab ownership and bounded periodically refreshed visual captures, clearly identifying when the preview is a capture rather than an interactive embedded browser. Preserve narrow-screen and keyboard fallbacks, authorization, bounded storage, and existing safety constraints. Add focused tests, build, install/reload, visually verify, then create an English git commit containing all Agent Canvas and Empirical feature changes without including unrelated files.",
+  "implementationActor": "agent",
   "workStartedAt": "2026-09-30T20:38:20.302Z",
-  "specDigest": "sha256:5fa7fc5cd8435e773ed9e6362d8a1b5a406ac5e501db30e4ccbd4a5376e62fce",
-  "approvedSpecRevision": null,
+  "specDigest": "sha256:b52ea5d5697970a4c33eeea87efbe2cd03ea04e92c9961e953465b90e0d7790d",
+  "approvedSpecRevision": 3,
   "capabilityArchiveRequired": true,
-  "capabilityDeltaDigest": null,
-  "impactDigest": null,
-  "capabilityClaimId": null,
+  "capabilityDeltaDigest": "sha256:8bef0de86f9acf1762bee4b4340d64eb1e8923fccea7c2e0f38e767d1c0fd455",
+  "impactDigest": "sha256:382f9092e9dd968b272e4a93f5faf5b361fcbb3187f1f5f9fc8911cfe6fca189",
+  "capabilityClaimId": "agent-canvas-650d935693d7",
   "authorizationDigest": null,
   "evidence": [],
   "evidenceReceiptIds": [],
@@ -37,12 +37,43 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-30T20:38:20.302Z",
+  "updatedAt": "2026-10-01T15:23:06.705Z",
   "lifecycle": {
-    "stage": "development",
-    "iteration": 0,
+    "stage": "iteration",
+    "iteration": 3,
     "awaitingFeedback": false,
-    "iterative": true
+    "iterative": true,
+    "contractBaseline": 6
   },
-  "reviewFirst": true
+  "capabilityBase": {
+    "schemaVersion": 1,
+    "id": "agent-canvas-650d935693d7",
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "agent-canvas",
+    "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_d9jwij8av9-1/bb-plugins-agent-canvas",
+    "worktreeId": "sha256:8a250987bad129e642fdbaa95de404350bd85f0e44d14cd47ef648c26bb8ddbe",
+    "baseCommit": "4a44e3a25613250b5a82aa22e32741b089471959",
+    "baseTree": "24c7a8d92d0cccd7f06a561a86e80668729c8365",
+    "bases": {
+      "agent-canvas": {
+        "capability": "agent-canvas",
+        "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "requirements": {
+          "spatial canvas workbench": null,
+          "explicit coordination": null
+        }
+      }
+    },
+    "capabilities": [
+      "agent-canvas"
+    ],
+    "status": "active",
+    "integrationReceiptDigest": null,
+    "createdAt": "2026-09-30T20:51:06.731Z",
+    "heartbeatAt": "2026-09-30T20:51:06.731Z",
+    "digest": "sha256:680eb04a4556114e51a942e19296dbc5c10e2e96812df87f10027331a1489308"
+  },
+  "trackerGeneration": 3,
+  "reviewFirst": true,
+  "budgetExtensionMinutes": 1140
 }

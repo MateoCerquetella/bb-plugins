@@ -17,23 +17,33 @@ conversation stays available at the right edge.
 - [ ] [AC-UI-1] [UI] The result is visible in the browser.
 -->
 
-- [ ] [AC-1] The plugin opens as a full-screen dark spatial canvas with a
-  dotted background, compact workspace tab strip, add control, minimap, zoom,
-  fit, and reorganize controls.
+- [ ] [AC-1] The plugin opens as a BB-themed spatial canvas with a dotted
+  background, workspace tabs, and a colored square for each project workspace.
+  Worktrees remain filterable; a minimap, zoom, reset, fit, and reorganize controls are available.
 - [ ] [AC-2] Authorized existing threads appear as bounded panes showing title,
-  project/worktree context, provider/model, and semantic live state; each pane
-  mounts native `ThreadChat` with inherited permission behavior.
-- [ ] [AC-3] The user can drag panes, resize them within safe bounds, focus one
+  project/worktree context, provider/model, and semantic live state. Visible panes
+  mount streaming native `ThreadChat` timelines with inherited permission behavior.
+  BB child-thread and verified browser ownership relationships appear as edges.
+- [ ] [AC-3] The user can drag panes freely beyond workspace squares in all
+  directions, resize them within safe bounds, focus one
   pane, and persist/recover layout positions without exposing arbitrary paths or
-  secrets.
-- [ ] [AC-4] A right-side Coordinator dock mounts a clearly identified native
-  thread chat. Choosing an existing coordinator or creating one requires an
-  explicit user action; the plugin never autonomously spawns or messages agents.
+  secrets. Ctrl/Command-wheel, touch/trackpad pinch, animated zoom controls,
+  and keyboard navigation preserve a usable canvas. Space-drag, middle-drag,
+  and an explicit pan tool allow navigation over live panes. Fit includes
+  displaced panes; signed positions survive reload.
+- [ ] [AC-4] A right-side universal Control dock mounts one native conversation
+  across all workspaces with a server-persisted identity. Explicit bounded UI
+  tools navigate the mounted canvas and report acknowledgements or uncertainty.
+  Selection and creation remain explicit; the plugin never autonomously spawns
+  or messages agents.
 - [ ] [AC-5] The canvas remains usable at narrow widths and with keyboard
   navigation; on small screens it switches to a stacked pane list and keeps
   Coordinator access visible.
 - [ ] [AC-6] Loading, stale/disconnected, permission/error, empty, and removed
-  thread records render recoverable states without crashing.
+  thread records render recoverable states without crashing. Lifecycle events
+  refresh agent state independently of browser discovery. Available automation
+  tabs support bounded periodic captures with timestamps, pause controls,
+  verified ownership, and explicit unavailable/stale states.
 
 ## Scope
 
@@ -44,7 +54,7 @@ Coordinator selection/creation.
 
 ## Non-goals
 
-No embedded terminals or browsers, autonomous orchestration, cross-thread
+No embedded terminals or interactive browser streams, autonomous orchestration, cross-thread
 broadcasting, hidden permission escalation, arbitrary filesystem browsing,
 AgentGrid branding/assets, or an unbounded infinite-canvas data model.
 

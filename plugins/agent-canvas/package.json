@@ -22,6 +22,7 @@
     "typescript": "^5.7.0"
   },
   "scripts": {
+    "test": "node --experimental-strip-types --test *.test.ts",
     "build": "env -u BB_CLI bb plugin build .",
     "typecheck": "tsc --noEmit",
     "types:check": "env -u BB_CLI bb plugin types --check ."
