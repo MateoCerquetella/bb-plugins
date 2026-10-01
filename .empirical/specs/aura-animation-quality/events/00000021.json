@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "sequence": 21,
+  "previousDigest": "sha256:c0d9eba10950eb162ee0c23c55e27674f26a0a5c53796a612b5cd2611633a7a4",
+  "actor": "codex",
+  "type": "transition",
+  "summary": "Confirmed the executable release plan: update Aura release metadata/changelog, run focused checks, create and push an immutable Aura tag, refresh the configured BB marketplace, then verify the marketplace entry and Dyaus installation.",
+  "createdAt": "2026-10-01T16:14:01.891Z",
+  "stateBeforeDigest": "sha256:48fcb749d03f37c9f1ff37dba8c6956860c3c33c6e92ad091038a870d133a7e1",
+  "stateAfterDigest": "sha256:b61ea6b61469971d3dce3df989410c175f025b06b952f3994d44f00b32c77dfd",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 21,
+    "activeFeature": "aura-animation-quality",
+    "request": "Add Aura settings for 15, 30, and 60 FPS and selectable WebGL render resolution/quality; persist both choices, apply them to animation timing and canvas resolution, update tests and documentation, and install locally for verification. Do not publish.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Confirmed the executable release plan: update Aura release metadata/changelog, run focused checks, create and push an immutable Aura tag, refresh the configured BB marketplace, then verify the marketplace entry and Dyaus installation.",
+    "implementationActor": "codex",
+    "workStartedAt": "2026-09-30T22:23:03.535Z",
+    "specDigest": "sha256:190013b949b9c435d9790863dda37b50b067bf9839eb7a9d83b4b99ed8621160",
+    "approvedSpecRevision": 19,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:5e40fbc4eaa1eace3b55261e7ad94721fff7b8e1d7a7f471f22006f2e5ab14bd",
+    "impactDigest": "sha256:c647c6f898a476ae19623c2c863ea87ee47112e7b9bab7e96bf622d4013aba49",
+    "capabilityClaimId": "aura-animation-quality-d2cd1803c975",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-01T16:14:01.891Z",
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 7,
+      "capabilities": 1,
+      "reason": "The frame-rate and quality controls are one tightly coupled Aura rendering capability; splitting would separate persistence and shader behavior that must ship together to avoid mismatched settings.",
+      "actor": "codex",
+      "revision": 2
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "aura-animation-quality-d2cd1803c975",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "aura-animation-quality",
+      "worktree": "/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-aura-animation-quality",
+      "worktreeId": "sha256:0642230ca64a28e63e2d4313fe21a9d27bd21121f288299623843640f86e7321",
+      "baseCommit": "821855b07d68d9be4f9fd767b977c4c419b8acb4",
+      "baseTree": "79d3f064f319464896f18b80ae77417cf250e76f",
+      "bases": {
+        "aura-background-rendering": {
+          "capability": "aura-background-rendering",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "selectable animation frame rate": null,
+            "selectable render quality": null,
+            "legacy settings compatibility": null,
+            "saved background appearance": null
+          }
+        }
+      },
+      "capabilities": [
+        "aura-background-rendering"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-09-30T22:36:52.216Z",
+      "heartbeatAt": "2026-09-30T22:36:52.216Z",
+      "digest": "sha256:f5edd2e68871b63f0b6d57a1b04e08dcf71ec369c04dd45442e7382620ec3d48"
+    },
+    "trackerGeneration": 3,
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 3,
+      "awaitingFeedback": false,
+      "contractRevision": 17,
+      "riskRequest": "Prepare a new Aura release commit for the completed animation quality work, push it, and update Aura in the BB marketplace as explicitly requested by the user."
+    },
+    "budgetExtensionMinutes": 30,
+    "reviewFirst": true
+  },
+  "digest": "sha256:2d0aa725e542062811ca8e08b114f730aabd86b2355127c744fef9af79efe07b"
+}

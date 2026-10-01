@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "feature": "aura-animation-quality",
+  "revision": 17,
+  "reason": "Prepare a new Aura release commit for the completed animation quality work, push it, and update Aura in the BB marketplace as explicitly requested by the user.",
+  "spec": "# Aura Animation Quality\n\n## Request\n\n> Add Aura settings for 15, 30, and 60 FPS and selectable WebGL render resolution/quality; persist both choices, apply them to animation timing and canvas resolution, update tests and documentation, and install locally for verification. Do not publish.\n\n## Goal\n\nLet Aura users choose how smooth and sharp the animated Capy dithering is,\nwhile retaining a lower-cost default and preserving existing backgrounds.\n\n## Acceptance Criteria\n\n- [ ] [AC-1] Aura settings persist an animation frame-rate of 15, 30, or 60\n  FPS and a render-quality tier of Performance, Balanced, or Sharp, including\n  inside saved slots.\n- [ ] [AC-2] Existing stored settings that lack the new fields load with 15 FPS\n  and Balanced quality without a database migration or loss of image data.\n- [ ] [AC-3] The WebGL animation limits draws to the selected frame rate and\n  sizes its drawing buffer according to the selected quality tier, while\n  retaining the existing image-size safety cap.\n- [ ] [AC-4] Changing either option updates the live preview immediately and\n  applying the background updates conversation and New thread surfaces.\n- [ ] [AC-UI-1] [UI] When Capy dithering is selected, Aura exposes compact,\n  accessible segmented controls for Animation speed and Render quality, with\n  concise labels that remain usable at narrow settings-panel widths.\n- [ ] [AC-5] Reduced-motion preference still prevents continuous animation\n  regardless of the selected FPS, and hidden or non-intersecting surfaces do\n  not schedule animation frames.\n- [ ] [AC-6] Focused tests cover schema defaults, persistence, saved-slot\n  behavior, and shader configuration; Aura typechecks, tests, builds, and is\n  installed into the user's BB instance for local verification.\n\n## Scope\n\n- Extend Aura's validated background settings and defaults.\n- Add speed and quality controls to Aura's existing settings panel.\n- Parameterize the Capy shader loop and drawing-buffer resolution.\n- Update focused tests, README, and changelog.\n- Install the local plugin build in BB after verification.\n\n## Non-goals\n\n- Changing the dithering shader's visual algorithm or color palette.\n- Removing reduced-motion, visibility, intersection, or WebGL failure guards.\n- Supporting arbitrary numeric FPS or canvas-scale values.\n- Publishing a release or modifying unrelated plugins.\n\n## Risks\n\n- 60 FPS and Sharp quality intentionally consume more GPU resources. The UI\n  must communicate their relative cost and retain conservative defaults.\n- A quality change recreates the WebGL effect; disposal must release the prior\n  context and animation frame.\n- Legacy rows and saved slots must parse through defaults before use.\n\n## Verification\n\n- Run Aura's focused unit and browser-contract tests selected by Empirical.\n- Run Aura typecheck and production plugin build.\n- Inspect the settings UI at desktop and narrow widths, and verify the preview\n  canvas responds to speed and quality changes.\n- Install the verified local package and confirm `bb aura status` reports the\n  persisted selections.\n\n## Capability Deltas\n\n- `deltas/aura-background-rendering.md`\n",
+  "deltas": [
+    {
+      "capability": "aura-background-rendering",
+      "purpose": "Provide configurable, persistent Aura backgrounds whose animated dithering can\nbalance smoothness, image sharpness, and GPU cost.",
+      "requirements": [
+        {
+          "operation": "added",
+          "name": "Selectable animation frame rate",
+          "contents": "### Requirement: Selectable animation frame rate\n\nAura MUST let users select 15, 30, or 60 FPS for Capy dithering and MUST limit\nWebGL draws to the selected rate.\n\n#### Scenario: User chooses smoother motion\n\nGiven Capy dithering is enabled, when the user selects 60 FPS and applies the\nbackground, then the setting is persisted and visible Aura surfaces render at\nno more than 60 draws per second.\n\n#### Scenario: Reduced motion is enabled\n\nGiven the operating system requests reduced motion, when Aura is configured for\n60 FPS, then Aura renders a static frame and does not run a continuous loop."
+        },
+        {
+          "operation": "added",
+          "name": "Selectable render quality",
+          "contents": "### Requirement: Selectable render quality\n\nAura MUST offer Performance, Balanced, and Sharp render-quality tiers that map\nto bounded drawing-buffer scales and apply to both generated and image-backed\ndithering.\n\n#### Scenario: User chooses sharper rendering\n\nGiven an Aura image uses Capy dithering, when the user selects Sharp quality,\nthen the live preview and applied background recreate the shader with the Sharp\ndrawing-buffer scale while retaining the framebuffer pixel cap."
+        },
+        {
+          "operation": "added",
+          "name": "Legacy settings compatibility",
+          "contents": "### Requirement: Legacy settings compatibility\n\nAura MUST load settings and saved slots created before animation controls\nexisted, using 15 FPS and Balanced quality.\n\n#### Scenario: Existing background is read\n\nGiven a stored settings object omits frame rate and render quality, when Aura\nloads it, then validation supplies the conservative defaults without modifying\nthe image or other appearance values."
+        },
+        {
+          "operation": "added",
+          "name": "Saved background appearance",
+          "contents": "### Requirement: Saved background appearance\n\nSaved slots MUST retain frame rate and render quality as part of their\nappearance, while activation continues to preserve the global enabled, scope,\nand dimmer toggles.\n\n#### Scenario: Saved high-quality slot is activated\n\nGiven a slot was saved at 30 FPS and Sharp quality, when it is activated, then\nthose rendering selections become active together with the slot image and\nappearance."
+        }
+      ],
+      "source": ".empirical/specs/aura-animation-quality/deltas/aura-background-rendering.md"
+    }
+  ],
+  "specDigest": "sha256:190013b949b9c435d9790863dda37b50b067bf9839eb7a9d83b4b99ed8621160",
+  "approvedSpecRevision": 14,
+  "capabilityClaimId": "aura-animation-quality-d2cd1803c975",
+  "impactDigest": "sha256:c647c6f898a476ae19623c2c863ea87ee47112e7b9bab7e96bf622d4013aba49",
+  "evidenceReceiptIds": []
+}
