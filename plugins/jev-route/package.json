@@ -19,7 +19,7 @@
     "name": "Jev Routing",
     "description": "Shows each thread's latest model, reasoning effort, and model switches.",
     "branding": {
-      "icon": "ListTodo"
+      "icon": "./assets/icon.svg"
     },
     "server": "./server.ts",
     "app": "./app.tsx",

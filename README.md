@@ -22,10 +22,9 @@ All plugins in this repository are independently installable.
 
 | | Plugin | Install | What it does |
 | --- | --- | --- | --- |
-| | [Conversation Space (WIP)](./plugins/conversation-space) | [Local development install](./plugins/conversation-space#conversation-space-wip) | **Work in progress:** compact context usage, colored token percentages, and measured Jev routing diagnostics. |
-| | [Jev Routing](./plugins/jev-route) | [Git install](./plugins/jev-route#install) | Jev-only model history, custom model colors, and Codex-only automatic routing without cross-provider quota fallback. |
-| <img src="./plugins/action-topbar/assets/icon.svg" width="128" height="128" alt="" /> | [Action Topbar](./plugins/action-topbar) | [Experimental Git install](#action-topbar-experimental-install) | Adds a compact main-thread topbar with draggable BB Actions and persistent, per-thread workspace panes. Requires the matching experimental BB core/SDK build. |
-| <img src="./plugins/clean-my-context/assets/icon.svg" width="128" height="128" alt="" /> | [Clean My Context](./plugins/clean-my-context) | [Git release](#clean-my-context-quick-start) | Resets visible chat and provider context in place while preserving the exact thread, branch, folder, workspace, and settings. Requires BB PR #2500. |
+| <img src="./plugins/conversation-space/assets/icon.svg" width="128" height="128" alt="" /> | [Conversation Space (WIP)](./plugins/conversation-space) | [Local development install](./plugins/conversation-space#conversation-space-wip) | **Work in progress:** compact context usage, colored token percentages, and measured Jev routing diagnostics. |
+| <img src="./plugins/jev-route/assets/icon.svg" width="128" height="128" alt="" /> | [Jev Routing](./plugins/jev-route) | [Git install](./plugins/jev-route#install) | Jev-only model history, custom model colors, and Codex-only automatic routing without cross-provider quota fallback. |
+| <img src="./plugins/action-topbar/assets/icon.svg" width="128" height="128" alt="" /> | [Action Topbar](./plugins/action-topbar) | [Git install](#action-topbar-install) | Adds a compact main-thread topbar with draggable BB Actions and persistent, per-thread workspace panes. |
 | <img src="./plugins/dockside/assets/icon.svg" width="128" height="128" alt="" /> | [Dockside](./plugins/dockside) | [Git release](#dockside-quick-start) | Replaces BB's thread list with a compact project-first sidebar, semantic status colors, filters, safe multi-select deletion, and child-agent families. |
 | <img src="./plugins/host-monitor/assets/icon.svg" width="128" height="128" alt="" /> | [Host Monitor](./plugins/host-monitor) | [Git release](#host-monitor-quick-start) | Monitors CPU, RAM, disk, network, host details, and guarded process actions across every machine enrolled in BB. Requires BB 0.40+. |
 | <img src="./plugins/save-my-model/assets/icon.svg" width="128" height="128" alt="" /> | [Save My Model](./plugins/save-my-model) | [Git release](#save-my-model-quick-start) | Stores provider by BB host and model/reasoning separately for each host and provider. |
@@ -35,15 +34,9 @@ All plugins in this repository are independently installable.
 | <img src="./plugins/usage-tracker/assets/icon.svg" width="128" height="128" alt="" /> | [Usage Tracker](./plugins/usage-tracker) | [Git release](#usage-tracker-quick-start) | Keeps Codex and Claude Code 5-hour and weekly limits beside BB's sidebar utility icons. |
 | <img src="./plugins/lavender/assets/icon.svg" width="128" height="128" alt="" /> | [Lavender](./plugins/lavender) | [Git release](./plugins/lavender#install) | Adds coordinated pale-lilac light and charcoal-violet dark palettes for conversations and code. |
 
-## Action Topbar experimental install
+## Action Topbar install
 
-> [!WARNING]
-> Action Topbar is not being submitted to the BB Marketplace yet. It requires
-> the matching BB core changes and experimental Plugin SDK 0.4.33 Action
-> split-drag API. Stock BB releases without that API cannot provide its native
-> main-workspace panes.
-
-Install it from this repository on a compatible BB build:
+Install it from this repository:
 
 ```sh
 bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@main \
@@ -53,23 +46,6 @@ bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@main \
 
 See the [Action Topbar README](./plugins/action-topbar) for the local-path
 installation command and current compatibility details.
-
-## Clean My Context quick start
-
-Install the immutable Git release:
-
-```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.0 \
-  --subdirectory plugins/clean-my-context \
-  --tag-prefix clean-my-context/
-```
-
-Open an idle or failed thread and select **Clear this thread** beside the
-microphone, or run `bb clean-my-context clear <thread-id>`. BB stays on the
-same thread, branch, folder, and workspace; the active timeline starts at one
-`Context cleared` boundary and the next prompt starts with fresh model context.
-See the [Clean My Context README](./plugins/clean-my-context) for safety rules
-and development commands.
 
 ## Dockside quick start
 
