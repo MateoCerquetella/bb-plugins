@@ -35,7 +35,7 @@ try {
   for (const width of [1280, 390]) {
     const page = await browser.newPage({ viewport: { width, height: 900 } });
     let loads = 0;
-    await page.route("https://viewer.test/**", route => {
+    await page.context().route("https://viewer.test/**", route => {
       loads++;
       return route.fulfill({ body: "<body style='background:#edf1f5'><h2>Project A browser</h2><input aria-label='Fixture'></body>", contentType: "text/html" });
     });
