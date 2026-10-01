@@ -1,5 +1,12 @@
 # Steel Browser
 
+The inline viewer's sign-in icon opens the project's BB Connect viewer in a
+separate tab. Complete **Continue with GitHub** there, then select the check
+icon in the inline toolbar to reload. GitHub OAuth must run outside an iframe;
+the browser itself stays inline. Session availability does not confirm viewer
+authentication. Website logins inside the remote browser are separate from
+BB Connect authentication.
+
 The Browser viewport has a **Watch browser** play control and embeds Steel's
 session player, not the Steel dashboard. **Sign in / Take control** opens a modal
 with the live player and a new-tab fallback if BB Connect requires authentication.

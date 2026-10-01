@@ -13,6 +13,7 @@ import {
   LogIn,
   Maximize2,
   Minimize2,
+  Check,
   X,
 } from "lucide-react";
 import {
@@ -118,6 +119,7 @@ function ScopedSteelBrowser({ message }: PluginMessageDirectiveProps) {
   const { dashboard, error, refresh } = useSteelDashboard(scope);
   const [playerKey, setPlayerKey] = useState(0);
   const [minimized, setMinimized] = useState(false);
+  const [signingIn, setSigningIn] = useState(false);
   const playerUrl = dashboard
     ? new URL("v1/sessions/debug", dashboard.uiUrl.replace(/ui\/?$/, "")).toString()
     : null;
@@ -133,10 +135,28 @@ function ScopedSteelBrowser({ message }: PluginMessageDirectiveProps) {
           <Monitor aria-hidden="true" />
           <span>
             <strong>Steel Browser</strong>
-            <small>{active ? "Connected" : dashboard?.connected ? "No active session" : "Connecting"}</small>
+            <small>{signingIn ? "Sign-in opened in a new tab" : active ? "Session available" : dashboard?.connected ? "No active session" : "Connecting"}</small>
           </span>
         </div>
         <div className="steel-inline-browser__actions">
+          {playerUrl && (
+            <a href={playerUrl} target="_blank" rel="noopener noreferrer"
+              aria-label="Sign in to BB Connect in a new tab"
+              title="Sign in to BB Connect in a new tab"
+              onClick={() => setSigningIn(true)}>
+              <LogIn aria-hidden="true" />
+            </a>
+          )}
+          {signingIn && (
+            <button type="button" aria-label="Done signing in" title="Done signing in"
+              onClick={() => {
+                setSigningIn(false);
+                void refresh();
+                setPlayerKey(key => key + 1);
+              }}>
+              <Check aria-hidden="true" />
+            </button>
+          )}
           <button
             aria-expanded={!minimized}
             aria-label={minimized ? "Restore inline browser" : "Minimize inline browser"}

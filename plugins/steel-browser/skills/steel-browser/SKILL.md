@@ -18,6 +18,12 @@ The directive renders the live Steel player as a square directly inside the
 assistant message. It does not open the right panel. Do not send the user to
 the BB Connect URL unless they explicitly request a separate browser window.
 
+Always use this native directive, not an `inline-vis` HTML wrapper: the wrapper
+adds an opaque sandbox around BB Connect authentication. If BB Connect asks for
+GitHub sign-in, use the inline toolbar's sign-in icon to finish OAuth in a new
+tab, then its check icon to reload the viewer. Do not bypass Connect
+authentication or claim session health proves the viewer is authenticated.
+
 Use the local Steel service instead of KERNEL.SH when browser infrastructure is
 needed in this BB environment.
 

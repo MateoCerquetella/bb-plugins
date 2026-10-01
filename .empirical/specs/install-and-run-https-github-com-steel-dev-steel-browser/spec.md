@@ -24,6 +24,8 @@ Steel CDP session when the user supplies its external model credentials.
   exact-session release with JSON output.
 - [ ] [AC-UI-1] [UI] A compact BB page shows health, endpoint, active sessions,
   and refresh/create/confirmed-release controls with useful connection data.
+  The inline viewer provides top-level BB Connect sign-in and an explicit
+  reload after authentication, without opening the browser in the side panel.
 - [ ] [AC-UI-2] [UI] Loading, empty, and error states work at desktop and mobile
   sizes without clipped text or overlapping controls.
 - [ ] [AC-6] A bundled skill documents local Steel usage for agents and replaces

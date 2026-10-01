@@ -111,3 +111,14 @@ local install/reload, CLI smoke checks, and browser UI verification.
 - Decision: fail closed before RPC and retain host configuration.
 - Trade-off: no project policy edits from a context-free Tools surface.
 - Verification: browser coverage with and without project scope.
+
+# D-006 Top-Level Connect Authentication
+
+- Supersedes D-002 only for BB Connect authentication: OAuth must open outside
+  the viewer iframe. Website login inside the remote Chromium is separate.
+- The native thread directive exposes a sign-in link with noopener/noreferrer
+  and a Done control that reloads the embedded player.
+- Do not wrap the viewer in generic inline-vis: it adds an opaque sandbox.
+- API session availability is not proof that the viewer is authenticated.
+- Popup, opener isolation, and reload regression coverage added; execution
+  pending. Full GitHub login requires the user's interactive authentication.

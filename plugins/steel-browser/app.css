@@ -71,7 +71,8 @@
 .steel-inline-browser > header small { display: block; }
 .steel-inline-browser > header strong { font-size: 12px; }
 .steel-inline-browser > header small { margin-top: 1px; color: var(--muted-foreground, #a4a5af); font-size: 10px; }
-.steel-inline-browser > header button {
+.steel-inline-browser > header button,
+.steel-inline-browser > header a {
   display: grid;
   place-items: center;
   width: 30px;
@@ -82,9 +83,12 @@
   color: inherit;
   background: transparent;
   cursor: pointer;
+  text-decoration: none;
 }
-.steel-inline-browser > header button:hover { background: var(--secondary, #292a30); }
-.steel-inline-browser > header button:focus-visible { outline: 2px solid currentColor; outline-offset: 1px; }
+.steel-inline-browser > header button:hover,
+.steel-inline-browser > header a:hover { background: var(--secondary, #292a30); }
+.steel-inline-browser > header button:focus-visible,
+.steel-inline-browser > header a:focus-visible { outline: 2px solid currentColor; outline-offset: 1px; }
 .steel-agent-settings { padding: 16px; border-bottom: 1px solid var(--border, #36373d); font-size: 12px; }
 .steel-agent-settings p { color: var(--muted-foreground, #a4a5af); line-height: 1.5; }
 .steel-agent-settings dl { display: grid; grid-template-columns: minmax(80px, 1fr) minmax(0, 2fr); gap: 8px 12px; }
