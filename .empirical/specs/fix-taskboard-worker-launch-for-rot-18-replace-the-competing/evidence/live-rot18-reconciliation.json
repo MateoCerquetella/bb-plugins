@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-09-29T00:57:47.000Z",
+  "plugin": {
+    "id": "taskboard",
+    "version": "0.3.5-symphony.0",
+    "status": "running",
+    "service": "agent-thread-reconciliation"
+  },
+  "issue": {
+    "provider": "linear",
+    "key": "ROT-18",
+    "locator": "10dfb49a-064e-4999-9550-278db133e678",
+    "status": "Done",
+    "completedAt": "2026-09-29T00:57:46.752Z"
+  },
+  "threadLink": {
+    "threadId": "thr_g88227inzv",
+    "state": "completed",
+    "terminalEventSeq": 854,
+    "doneTransitionAt": "2026-09-29T00:57:46.946Z",
+    "providerError": null
+  },
+  "verification": {
+    "focusedTestsPassed": 45,
+    "typecheckPassed": true,
+    "buildPassed": true,
+    "configuredCheckTimedOutAfterMs": 300000
+  }
+}

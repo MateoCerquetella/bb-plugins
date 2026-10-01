@@ -1,0 +1,10 @@
+
+> bb-plugin-taskboard@0.3.3 build
+> env -u BB_CLI bb plugin build .
+
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+dist/app.js
+dist/app.css
+dist/app.meta.json

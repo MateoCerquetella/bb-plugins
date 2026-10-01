@@ -1,0 +1,171 @@
+
+> bb-plugin-taskboard@0.3.3 check
+> npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build
+
+
+> bb-plugin-taskboard@0.3.3 types:check
+> env -u BB_CLI bb plugin types --check .
+
+This plugin uses the npm package @get-bb/plugin-sdk; pin is 0.4.6, host is 0.4.6.
+The declarations are in node_modules/@get-bb/plugin-sdk/bundled-types/ — read them for exact signatures.
+
+> bb-plugin-taskboard@0.3.3 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-taskboard@0.3.3 test
+> node --test --experimental-strip-types test/*.test.ts
+
+✔ registers Taskboard for existing-thread and New Thread right panels (6.685ms)
+✔ accepts bounded Taskboard drops only on the visible composer textbox (1.977157ms)
+✔ makes constrained List and Kanban tickets composer drag sources (1.56986ms)
+✔ offers an accessible non-drag Add to chat detail action (10.588801ms)
+✔ shares durable project preferences between full and constrained surfaces (5.48395ms)
+✔ canonicalizes provider facet casing before rendering and persistence (0.961081ms)
+✔ applies project presets through the released preference store (32.396054ms)
+✔ keeps preset refreshes, drafts, and focus non-disruptive (2.14075ms)
+✔ announces preset apply and keeps save errors with the draft (1.815245ms)
+✔ keeps List measured and Kanban unconstrained (2.568805ms)
+✔ renders assignees as deterministic accessible avatars (0.860793ms)
+✔ uses an explicit constrained filter composition (1.148907ms)
+✔ centralizes and reuses decorative filter icons across surfaces (7.405702ms)
+✔ supports direct and manual composer capture through one dialog (28.277056ms)
+✔ captures the original composer prompt locally exactly once per open (1.286763ms)
+✔ contains no frontend issue-drafting lifecycle or generation copy (3.036486ms)
+✔ routes detail handoff through the external-content trust boundary (1.415308ms)
+✔ renders comments as one conversation rail (1.494426ms)
+✔ reconciles provider identity from the cached-list response (1.133837ms)
+✔ parses only strict version-1 browse records and normalizes values (33.458893ms)
+✔ restores project and Across-project preferences without scope leakage (3.948122ms)
+✔ restores collapsed groups from storage with the rest of a project view (1.053728ms)
+✔ board-setting seeds initialize only untouched preference scopes (1.517102ms)
+✔ storage failures fall back safely while in-window updates remain usable (1.969322ms)
+✔ one observable store notifies every surface and reloads external writes (1.475833ms)
+✔ structurally equal writes keep a stable snapshot and do not notify (0.478573ms)
+✔ clearing filters changes only the active scope and preserves its view and collapse state (1.561229ms)
+✔ provider reconciliation preserves view but drops provider-derived state (1.109665ms)
+✔ terminal collapse defaults use sparse overrides and search opens matches temporarily (1.068935ms)
+✔ create assignee defaults are versioned, fully scoped, and restored only from fresh options (3.450155ms)
+✔ create assignee scope canonicalizes Jira project keys (0.389429ms)
+✔ remembers only provider-confirmed create assignees and clears confirmed unassigned scopes (2.253015ms)
+✔ keeps the prior assignee when a successful create omits the requested assignment (0.500005ms)
+✔ scope helpers reject empty identities (1.373788ms)
+✔ storage keys remain collision-free for delimiter and Unicode identities (0.97216ms)
+✔ derives stable Unicode-safe assignee avatar identities (14.537602ms)
+✔ uses the backlog-first default before provider-specific states (28.139753ms)
+✔ defines the complete backlog-first default status order (0.550334ms)
+✔ builds case-insensitive assignee choices including Unassigned (71.183649ms)
+✔ keeps selected assignees available when other filters return no items (2.464128ms)
+✔ canonicalizes facet selections and toggles every case variant (1.190464ms)
+✔ uses a configurable exact workflow order (0.449672ms)
+✔ keeps the complete provider workflow ordered before and after a move (20.314736ms)
+✔ assigns distinct stable tones to the active workflow statuses (0.912113ms)
+✔ builds Linear-style field options including empty values (3.546329ms)
+✔ combines different filter fields with AND and values within a field with OR (1.414193ms)
+✔ builds and round-trips the bounded live Taskboard mention (6.81722ms)
+✔ writes only the private mention payload with the requested drag effect (3.65448ms)
+✔ rejects malformed, oversized, unsafe, and expanded drag payloads (0.702244ms)
+✔ fails closed when an item cannot form a safe mention or DataTransfer rejects it (0.511138ms)
+✔ delimits useful issue facts as untrusted external tracker data (4.938247ms)
+✔ keeps instruction-like issue text inside the untrusted boundary (2.110125ms)
+✔ prefixes control-character line separators inside external data (1.003021ms)
+✔ visibly escapes every C1 and bidirectional control inside ordered boundaries (2.132958ms)
+✔ visibly escapes every C0 control in inline CLI fields (0.67363ms)
+✔ keeps JSON CLI output readable around external controls (0.716741ms)
+✔ keeps detail handoff intent trusted while issue text stays inside the boundary (0.498815ms)
+✔ defaults optional provider-native issue creation properties (2.945011ms)
+✔ validates expanded provider-native issue creation properties (19.394762ms)
+✔ validates creation metadata and warning-bearing RPC results (9.504989ms)
+✔ returns authoritative provider identity with cached list results (0.890916ms)
+✔ Linear maps native metadata and sends it in IssueCreateInput (111.242059ms)
+✔ Linear paginates create options independently and preserves the native default state (27.515871ms)
+✔ Linear rejects invalid creation metadata cursors (3.231621ms)
+✔ Linear keeps explicit create rejection retryable without the uncertain marker (11.679652ms)
+✔ Linear marks malformed or lost post-dispatch create responses uncertain (36.367905ms)
+✔ Jira derives native fields from createmeta and forwards selections (14.84239ms)
+✔ Jira marks ambiguous create acknowledgement and detail failures uncertain (26.687829ms)
+✔ Jira paginates create metadata and canonicalizes issue types to native IDs (4.057829ms)
+✔ Jira exposes only priorities allowed for the selected project and issue type (1.426202ms)
+✔ GitHub loads native metadata and reports partially applied fields (8.300924ms)
+✔ GitHub confirms the submitted assignee from native response membership (1.615181ms)
+✔ GitHub paginates and deduplicates every create metadata collection (1.140112ms)
+✔ GitHub queues a fresh reconciliation after an overlapping pre-create refresh (1.58172ms)
+✔ GitHub queues a post-write refresh when issue confirmation is ambiguous (0.840309ms)
+✔ GitHub forced reconciliation refreshes before listing only project-scoped repos (0.535211ms)
+✔ keeps Taskboard private and Git-buildable without npm publication hooks (4.128811ms)
+✔ documents only BB Community and direct Git installation for Taskboard (2.884544ms)
+✔ keeps Usage Tracker private and documents its Git release too (44.830849ms)
+✔ has no active registry publication automation or credential path (1.778043ms)
+✔ credits merged contributors without reviving superseded filter storage (10.081405ms)
+✔ verification commands preserve quoted argv and never interpret shell operators (7.833607ms)
+✔ real workspace hook initializes context, preserves retries, seeds fixes, and rejects missing branches (4894.965254ms)
+✔ local remains default and direct routes cannot silently select Symphony (22.699391ms)
+✔ normalization omits raw internal data and approval covers scope (7.190268ms)
+✔ concurrent duplicate dispatch and restart preserve one execution (58.943773ms)
+✔ unavailable Symphony persists intent and never assumes success from 404 (5.359471ms)
+✔ state mapping never maps an agent finish to done or verified (0.52237ms)
+✔ runtime retries, failure, resume generations and duplicate events are durable (6.625969ms)
+✔ cancellation wins over late handoff and needs runtime acknowledgement (21.879691ms)
+✔ implementation handoff requires a revision and independent verification (4.244951ms)
+✔ fix creation atomically preserves approved scope, feedback, and duplicate protection (11.145085ms)
+✔ HTTP adapter uses actual Symphony observation and refresh routes (87.368638ms)
+✔ tracker cancellation uses Taskboard reads; completion is guarded and restart recovers verification (20.006963ms)
+✔ verification binds checks to Git content and refuses dirty, changed or deleted branches (6140.324427ms)
+✔ appends only the preset migration and round-trips complete state (74.165747ms)
+✔ isolates names and ids between projects (26.92986ms)
+✔ contains corrupt rows and makes reorder exact and atomic (22.453429ms)
+✔ enforces the per-project preset limit without blocking updates (81.343788ms)
+✔ bounds reads and fails closed when raw rows exceed the preset limit (55.213401ms)
+✔ rejects --from-state on wrong verbs and preserves explicit precedence (1.008978ms)
+✔ keeps maximum aggregate preset JSON compact and under the CLI cap (66.681577ms)
+✔ enforces a transactional aggregate state-byte limit per project (183.464517ms)
+✔ accepts a complete strict project browse preference snapshot (15.204442ms)
+✔ requires a project provider and matching source (1.967455ms)
+✔ bounds names, ids, positions, order size, and state fields (21.891973ms)
+✔ rejects control characters in preset identity and state (2.645955ms)
+✔ rejects oversized adversarial containers before inspecting elements (1.638266ms)
+✔ accepts the maximum valid browse state inside the UTF-8 envelope (54.756798ms)
+✔ normalizes unique names without depending on locale (1.154665ms)
+✔ resolves only exact preset order permutations (1.593392ms)
+✔ selects the active thread project only when it still exists (2.457382ms)
+✔ treats a different thread in the same project as new context (0.750494ms)
+✔ reads the project and thread from a BB project route (1.817936ms)
+✔ uses only the immediately previous navigation entry as source context (0.494179ms)
+✔ never replaces an explicit Taskboard project selection with route context (0.411589ms)
+✔ writes project credentials atomically with owner-only permissions (56.575416ms)
+✔ deleting a missing credential is harmless (3.151845ms)
+✔ cached summaries never retain provider comments (10.770571ms)
+✔ provider creation results carry strict native assignee confirmation (0.536202ms)
+✔ metadata failures expose only a fixed server-safe message (1.18064ms)
+✔ finds Jira project keys from common configured JQL scopes (2.576619ms)
+✔ binds issue creation to the tracker reviewed in the modal (21.964363ms)
+✔ refreshes authoritative provider data after successful issue creation (6.740084ms)
+✔ refreshes authoritative provider data after ambiguous issue creation failure (0.925464ms)
+✔ keeps structural headers on neutral host theme surfaces (2.881323ms)
+✔ uses restrained state glyph, focus, and conversation treatments (0.894661ms)
+✔ keeps constrained filter values inside the vertical menu measure (6.19339ms)
+✔ keeps assignee avatars compact with six theme-safe identity tones (2.587498ms)
+✔ shows restrained composer drop feedback and discoverable drag grips (1.55641ms)
+ℹ tests 130
+ℹ suites 0
+ℹ pass 130
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7928.797269
+
+> bb-plugin-taskboard@0.3.3 build
+> env -u BB_CLI bb plugin build .
+
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+dist/app.js
+dist/app.css
+dist/app.meta.json
+
+> bb-plugin-taskboard@0.3.3 verify:build
+> node scripts/verify-build.mjs
+
+Taskboard build metadata is valid.

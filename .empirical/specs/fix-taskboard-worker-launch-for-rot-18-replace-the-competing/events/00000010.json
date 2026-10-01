@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "sequence": 10,
+  "previousDigest": "sha256:c405bc3b9f9c394619ff86b7cd1d804a4fe50a38cd9a0e1e1ff6d14383e33f59",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Iterate: Continue from the failed focused verification: repair the exact TypeScript formatting damage in app.tsx and execution/defaults.ts without changing the approved product behavior, rerun focused verification, then install and reload Taskboard if verification passes.",
+  "createdAt": "2026-09-28T20:59:30.746Z",
+  "stateBeforeDigest": "sha256:cefbf4df2ac65164a22911e8c618d476fc7822f9925ef8b63f2d0c48cd5bca37",
+  "stateAfterDigest": "sha256:d3cd554bd33dea5bb1fce8d00683e3af69a1aebc2f44b94d57aa7f3fe9f1fa50",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 10,
+    "activeFeature": "fix-taskboard-worker-launch-for-rot-18-replace-the-competing",
+    "request": "Fix Taskboard worker launch for ROT-18: replace the competing Execute and Start agent actions with one preferred Start agent flow, keep the dedicated Worker page and kanban drag-to-in-progress launch behavior, and handle repositories with no initial commit so users are not blocked by the current raw validation error. Preserve existing uncommitted Taskboard work and verify the resulting UI and execution behavior.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Continue from the failed focused verification: repair the exact TypeScript formatting damage in app.tsx and execution/defaults.ts without changing the approved product behavior, rerun focused verification, then install and reload Taskboard if verification passes.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:3b12a3e15d51ca1c93859814c289b6b317cef34e6f5ca50f4b1272077239e8dc",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:d06f5edb7a862bcb93c930b2b48375afb8691d91686898cffdb2c2bf15f48036",
+    "impactDigest": "sha256:6e91b8d6579374a3580349469c769cf5e5435c14ec960dcb667074bdc5f82639",
+    "capabilityClaimId": "fix-taskboard-worker-launch-for-rot-18-replace-the-competing-61a96e508a43",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-28T20:59:30.746Z",
+    "lifecycle": {
+      "stage": "iteration",
+      "iteration": 3,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "contractBaseline": 5
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "fix-taskboard-worker-launch-for-rot-18-replace-the-competing-61a96e508a43",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "fix-taskboard-worker-launch-for-rot-18-replace-the-competing",
+      "worktree": "/Users/mateocerquetella/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_pshdwft79h-1/bb-plugins",
+      "worktreeId": "sha256:395846d2bd8b93cec3b36a115f6212cd55327cfb13ee99f3d5dae7563ac32740",
+      "baseCommit": "81d0072d3bafecc0202a701388b8c2f3c70d2f5c",
+      "baseTree": "0a7c3cfb8f35d6999f206bd20290abba066b2889",
+      "bases": {
+        "taskboard-execution": {
+          "capability": "taskboard-execution",
+          "digest": "sha256:a753c7c2ee2fe4796628ddf317a510326dbaa4f33c7852c33bcd124664f2c8ee",
+          "requirements": {
+            "optional execution infrastructure": "sha256:10884bdd22260197551fea0247efb046c5a6f0bb24e4618dc08440618c606b3a"
+          }
+        }
+      },
+      "capabilities": [
+        "taskboard-execution"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-09-28T20:15:45.820Z",
+      "heartbeatAt": "2026-09-28T20:15:45.820Z",
+      "digest": "sha256:22f2bd7b73c9e7c50f265f7b93cc9ed1f690c62f7e827f0f7aadb04a8efc239d"
+    },
+    "trackerGeneration": 3,
+    "reviewFirst": true
+  },
+  "digest": "sha256:f6b8336e691ca1c1bcd0ef7d82af47f4120abf9c572a1f217b97d73924be91ed"
+}

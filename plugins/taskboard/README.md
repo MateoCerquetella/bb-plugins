@@ -22,6 +22,11 @@ exactly one tracker for each BB project, browse a quiet List or Kanban view,
 open live task details, move work through real provider statuses, and hand a
 task to an agent without rebuilding context by hand.
 
+Optional [Symphony execution](execution/README.md) runs approved implementation
+work in isolated workspaces while Taskboard retains verification and tracker
+control. **Start agent** opens a dedicated Worker page when managed execution
+is enabled and keeps the existing local composer handoff when it is disabled.
+
 ## What it does
 
 - **Project-first tasks** — each BB project selects GitHub, Linear, or Jira;
@@ -55,8 +60,9 @@ task to an agent without rebuilding context by hand.
   appear when supported. Taskboard remembers the last successfully used
   assignee for that exact project and destination. Assisted creations attach a
   Taskboard mention so the thread continues with live issue context.
-- **Agent handoff** — prefill a BB prompt from any task or attach one with the
-  Taskboard mention result.
+- **Agent handoff** — start work from one action: managed projects open a
+  dedicated Worker page, while local projects prefill the BB composer. A task
+  can also be attached with the Taskboard mention result.
 - **CLI automation** — browse cached/live work, inspect transitions, move
   statuses, refresh providers, and manage project connections through
   `bb taskboard`. Issue creation remains an intentional review-and-confirm UI

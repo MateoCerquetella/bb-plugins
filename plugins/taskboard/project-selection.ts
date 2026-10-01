@@ -15,7 +15,8 @@ export type ContextSelectableRoute =
   | { kind: 'all' }
   | { kind: 'project'; projectId: string }
   | { kind: 'manage'; projectId: string | null }
-  | { kind: 'item'; projectId: string };
+  | { kind: 'item'; projectId: string }
+  | { kind: 'worker'; projectId: string };
 
 function decodedSegment(value: string | undefined): string | null {
   if (!value) return null;

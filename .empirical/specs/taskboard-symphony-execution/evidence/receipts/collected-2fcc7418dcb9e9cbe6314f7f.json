@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-2fcc7418dcb9e9cbe6314f7f",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "The full Taskboard suite passed 130 tests before the scoped review repair. After fixing F-1/F-2, all 12 affected execution tests (including a 700-file cache invalidation regression), typecheck and build passed. The unchanged Symphony extension has 100 passing pinned-upstream tests. Unaffected checks are carried forward; no paid coding run occurred.",
+  "passed": true,
+  "startedAt": "2026-09-28T03:31:12.432Z",
+  "completedAt": "2026-09-28T03:31:12.432Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "taskboard-symphony-execution",
+    "specRevision": 4,
+    "specDigest": "sha256:95a8cdc3f2754ae0a5c3fbb95bb46544e7dc1f07ca7bae776a0b1ae65427a3b7",
+    "treeDigest": "sha256:843d7854758d4c94231cb7b4d659a7aeade6013ed234999445fde399c71950ce",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:b585266690824112a4078d4837b2f9b882377a829b12b86b0b0366553c6886cf",
+  "kind": "collected",
+  "collector": "taskboard-review-repair-validation",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/taskboard-symphony-execution/evidence/repair-build.txt",
+      "mediaType": "text/plain",
+      "bytes": 170,
+      "digest": "sha256:d13de4d99415f44fb8f9948049ee2004a872e987e74a93e40a7d0be8d37f1640"
+    },
+    {
+      "path": ".empirical/specs/taskboard-symphony-execution/evidence/repair-tests.txt",
+      "mediaType": "text/plain",
+      "bytes": 1220,
+      "digest": "sha256:c56a78dfc1666f5ddd10abf465f7f467a8e6ed70ceb155c5992df17c0f2aabec"
+    },
+    {
+      "path": ".empirical/specs/taskboard-symphony-execution/evidence/symphony-tests.txt",
+      "mediaType": "text/plain",
+      "bytes": 277,
+      "digest": "sha256:e0789b028a54a15983fc09178c196ab25dfb9389baa6185d485e28999d26592b"
+    },
+    {
+      "path": ".empirical/specs/taskboard-symphony-execution/evidence/taskboard-check.txt",
+      "mediaType": "text/plain",
+      "bytes": 11756,
+      "digest": "sha256:f2b01bac8d9d957daae7a7c252c51a62f908d8f64d9aaea8ebbb6031be7a64cc"
+    }
+  ]
+}

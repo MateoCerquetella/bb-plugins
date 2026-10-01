@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "mode": "yolo",
+  "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+  "feature": "fix-the-installed-taskboard-symphony-execution-flow-shown-by-the",
+  "requestDigest": "sha256:90d41d81c70bcfd7d989986ddf4ba89cdc3b30762aa92a39ae2f89855a4bbeeb",
+  "ceiling": "integrated",
+  "targetBranch": null,
+  "allowExternalAgent": false,
+  "createdAt": "2026-09-28T15:55:17.428Z",
+  "expiresAt": null,
+  "digest": "sha256:3309d0b3661b115576d20c57cbffc3b38b76cd6790908dea9e005a658ed11ca1"
+}

@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Taskboard execution — layout preview</title>
+<style>
+  :root { color-scheme: light dark; --canvas: Canvas; --ink: CanvasText; --line: color-mix(in srgb, var(--ink) 16%, var(--canvas)); --soft: color-mix(in srgb, var(--ink) 63%, var(--canvas)); --surface: color-mix(in srgb, var(--ink) 4%, var(--canvas)); }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--canvas); color: var(--ink); font: 14px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  button, select, textarea { font: inherit; color: inherit; background: var(--canvas); border: 1px solid var(--line); border-radius: 6px; }
+  button, select { padding: 7px 12px; cursor: pointer; }
+  button:hover { background: var(--surface); }
+  button.primary { background: var(--ink); color: var(--canvas); border-color: var(--ink); }
+  button:focus-visible, select:focus-visible, summary:focus-visible, textarea:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+  button:disabled { cursor: default; opacity: .5; }
+  .preview { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding: 12px 20px; border-bottom: 1px solid var(--line); background: var(--surface); font-size: 12px; }
+  .preview label { display: flex; align-items: center; gap: 8px; }
+  .preview select { padding: 4px 8px; }
+  nav { padding: 15px 24px; border-bottom: 1px solid var(--line); color: var(--soft); font-size: 13px; }
+  main { max-width: 900px; margin: 0 auto; padding: 38px 28px 60px; }
+  .eyebrow, .actions, .row, .pill { display: flex; align-items: center; gap: 12px; }
+  .eyebrow { color: var(--soft); font-size: 12px; }
+  .pill { display: inline-flex; border: 1px solid var(--line); border-radius: 5px; padding: 2px 8px; gap: 6px; }
+  h1 { margin: 14px 0 20px; font-size: 27px; font-weight: 600; letter-spacing: -.6px; line-height: 1.2; }
+  h2 { font-size: 14px; font-weight: 600; margin: 0; }
+  h3 { font-size: 13px; margin: 24px 0 8px; }
+  p { margin: 10px 0; }
+  .actions { flex-wrap: wrap; }
+  .meta { display: flex; flex-wrap: wrap; gap: 12px 30px; padding: 18px 0; margin: 24px 0; border-block: 1px solid var(--line); font-size: 12px; }
+  .muted { color: var(--soft); }
+  .meta span { margin-right: 9px; color: var(--soft); }
+  .execution { border-block: 1px solid var(--line); padding: 20px 0; margin: 30px 0; }
+  .row { justify-content: space-between; flex-wrap: wrap; }
+  .description { max-width: 660px; }
+  .description ul { padding-left: 20px; }
+  .summary { margin-bottom: 12px; }
+  .status { font-weight: 500; }
+  .verification { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 17px 0; font-size: 13px; }
+  details { border-top: 1px solid var(--line); padding-top: 13px; margin-top: 18px; font-size: 12px; }
+  summary { cursor: pointer; color: var(--soft); width: fit-content; }
+  dl { display: grid; grid-template-columns: 135px minmax(0,1fr); gap: 9px 14px; margin: 18px 0 0; }
+  dt { color: var(--soft); }
+  dd { margin: 0; overflow-wrap: anywhere; }
+  code { font-size: 12px; }
+  dialog { background: var(--canvas); color: var(--ink); width: min(620px, calc(100% - 28px)); max-height: 90vh; border: 1px solid var(--line); border-radius: 10px; padding: 24px; }
+  dialog::backdrop { background: color-mix(in srgb, var(--ink) 25%, transparent); }
+  dialog h2 { font-size: 20px; }
+  dialog label { display: block; margin: 16px 0 6px; font-size: 12px; color: var(--soft); }
+  dialog select { width: 100%; }
+  textarea { width: 100%; padding: 10px; resize: vertical; font-size: 13px; line-height: 1.5; }
+  dialog footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 22px; }
+  .note { border-left: 2px solid var(--line); padding-left: 12px; color: var(--soft); font-size: 12px; }
+  [hidden] { display: none !important; }
+  @media (max-width: 520px) { main { padding: 26px 18px; } h1 { font-size: 23px; } dl { grid-template-columns: 92px 1fr; } .verification { flex-direction: column; gap: 4px; } }
+</style>
+<header class="preview">
+  <span><strong>Layout preview</strong> · Sample data and simulated actions</span>
+  <label>Scenario <select id="scenario">
+    <option value="local">Default / local</option>
+    <option value="ready" selected>Delegated / ready</option>
+    <option value="running">Implementation running</option>
+    <option value="complete">Implementation complete</option>
+    <option value="failed">Verification failed</option>
+    <option value="verified">Verification passed</option>
+    <option value="blocked">Execution blocked</option>
+    <option value="cancelled">Execution cancelled</option>
+  </select></label>
+</header>
+<nav>Taskboard <span aria-hidden="true"> / </span> BB plugins <span aria-hidden="true"> / </span> BB-123</nav>
+<main>
+  <div class="eyebrow"><span>BB-123</span><span class="pill">◐ In Progress</span><span>Linear</span></div>
+  <h1>Add configurable themes</h1>
+  <div class="actions"><button type="button">↗ Open</button><button type="button">Add to chat</button><button class="primary" id="execute" type="button">Execute</button></div>
+  <div class="meta"><div><span>Assignee</span>Mateo</div><div><span>Priority</span>Medium</div><div><span>Project</span>BB plugins</div></div>
+  <section class="description"><h2>Description</h2><p>Let users choose a theme in project settings and preserve their choice when they reopen BB.</p><ul><li>Reuse the existing theme palette and settings controls.</li><li>Keep the current theme as the default.</li><li>Cover persistence and fallback behavior.</li></ul></section>
+  <section class="execution" id="execution" aria-label="Task execution">
+    <div class="row summary"><h2>Execution</h2><span class="pill" id="route">Delegated</span></div>
+    <div class="row"><span class="status" id="status" role="status">Ready to execute</span><button id="action" type="button" hidden>Cancel execution</button></div>
+    <p class="muted" id="explanation">Review the plan and required checks before implementation starts.</p>
+    <div class="verification"><span>Verification</span><span class="muted" id="verification">Required after implementation</span></div>
+    <details><summary>Execution details</summary><dl>
+      <dt>Engine</dt><dd>Symphony</dd><dt>Agent</dt><dd>Codex</dd>
+      <dt>Execution</dt><dd><code>tb_4c298f · iteration 1</code></dd>
+      <dt>Workspace</dt><dd id="workspace">Created when execution starts</dd>
+      <dt>Branch</dt><dd><code>bb/BB-123</code></dd>
+      <dt>Started</dt><dd id="started">—</dd><dt>Retries</dt><dd id="retries">0</dd>
+      <dt>Pull request</dt><dd id="pr">—</dd><dt>Tracker</dt><dd>Linear · In Progress</dd>
+    </dl></details>
+    <details><summary>Approved work and verification</summary><h3>Plan</h3><ol><li>Add the setting using existing theme tokens.</li><li>Apply it to the project and restore it after reload.</li><li>Run persistence and fallback tests.</li></ol><h3>Acceptance criteria</h3><p>Users can select a theme; the choice survives reload; existing users keep the default.</p><h3>Required checks</h3><p><code>npm test</code> · <code>npm run typecheck</code> · Review acceptance criteria against the implemented revision.</p><p class="note">Implementation completion returns control to Taskboard. The tracker stays In Progress until verification passes and its workflow advances.</p></details>
+  </section>
+</main>
+<dialog id="review">
+  <h2>Review execution</h2><p class="muted">BB-123 · Add configurable themes</p>
+  <label for="route-choice">Route</label><select id="route-choice"><option>Delegated implementation</option><option>Structured — approved specification</option></select>
+  <label for="plan">Approved plan</label><textarea id="plan" rows="4">1. Add the setting using existing theme tokens.
+2. Apply it to the project and restore it after reload.
+3. Run persistence and fallback tests.</textarea>
+  <label for="criteria">Acceptance criteria</label><textarea id="criteria" rows="3">Users can select a theme.
+The choice survives reload.
+Existing users keep the default.</textarea>
+  <label for="checks">Required verification</label><textarea id="checks" rows="2">npm test
+npm run typecheck</textarea>
+  <details><summary>Advanced execution options</summary><dl><dt>Engine</dt><dd>Symphony · project configuration</dd><dt>Repository</dt><dd>MateoCerquetella/bb-plugins</dd><dt>Branch</dt><dd>bb/BB-123</dd></dl></details>
+  <p class="note">Approval applies to this plan and its checks. Changes to scope require a new review.</p>
+  <footer><button id="close-review" type="button">Back</button><button class="primary" id="approve" type="button">Approve and execute</button></footer>
+</dialog>
+<script>
+  const byId = id => document.getElementById(id);
+  const states = {
+    ready: ['Ready to execute', 'Review the plan and required checks before implementation starts.', 'Required after implementation', null],
+    running: ['Implementation running', 'The agent is implementing the approved plan.', 'Pending implementation', 'Cancel execution'],
+    complete: ['Implementation complete', 'The implementation is ready for Taskboard verification.', 'Not yet run', 'Verify implementation'],
+    failed: ['Changes required', 'Theme persistence check failed. The task remains In Progress.', 'Failed · persistence test', 'Review fix execution'],
+    verified: ['Verification passed', 'Required checks and acceptance criteria passed for the implemented revision.', 'Passed · current revision', 'Advance tracker…'],
+    blocked: ['Execution blocked', 'The agent requested input. Review the execution before resuming.', 'Pending implementation', 'Resume execution'],
+    cancelled: ['Execution cancelled', 'The workspace and execution record are retained.', 'Not run', null]
+  };
+  function render() {
+    const state = byId('scenario').value;
+    byId('execution').hidden = state === 'local';
+    byId('execute').textContent = state === 'local' ? 'Send to agent' : 'Execute';
+    byId('execute').disabled = !['local', 'ready', 'cancelled'].includes(state);
+    if (state === 'local') return;
+    const data = states[state];
+    ['status','explanation','verification'].forEach((id, index) => byId(id).textContent = data[index]);
+    byId('action').hidden = !data[3]; byId('action').textContent = data[3] || '';
+    byId('workspace').textContent = state === 'ready' ? 'Created when execution starts' : '~/symphony/workspaces/tb_4c298f';
+    byId('started').textContent = state === 'ready' ? '—' : 'Today, 14:32';
+    byId('pr').textContent = ['complete','failed','verified'].includes(state) ? '#123 · Add configurable themes' : '—';
+  }
+  byId('scenario').addEventListener('change', render);
+  byId('execute').addEventListener('click', () => {
+    if (byId('scenario').value === 'local') { alert('Preview: opens the existing BB composer with the task reference.'); return; }
+    byId('review').showModal();
+  });
+  byId('close-review').addEventListener('click', () => byId('review').close());
+  byId('approve').addEventListener('click', () => { byId('route').textContent = byId('route-choice').selectedIndex ? 'Structured' : 'Delegated'; byId('review').close(); byId('scenario').value = 'running'; render(); });
+  byId('action').addEventListener('click', () => {
+    const state = byId('scenario').value;
+    if (state === 'failed') { byId('review').showModal(); return; }
+    if (state === 'verified') { alert('Preview: opens the existing provider status menu. No tracker was updated.'); return; }
+    byId('scenario').value = state === 'running' ? 'cancelled' : state === 'complete' ? 'verified' : 'running'; render();
+  });
+  render();
+</script>
+</html>

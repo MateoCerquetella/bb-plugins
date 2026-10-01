@@ -18,8 +18,9 @@
   exposes inspect/clear settings; it does not replace BB's native picker.
 - `plugins/taskboard/server.ts` is the backend composition root. It wires typed
   RPC handlers, project-scoped configuration and credentials, the local cache,
-  provider adapters, background sync, mentions, CLI commands, and hidden helper
-  threads used for issue drafting.
+  provider adapters, background sync, mentions, CLI commands, and optional
+  managed execution registration. Issue creation uses explicit provider-native
+  forms rather than hidden drafting threads.
 - `plugins/taskboard/app.tsx` owns the BB frontend registrations and Taskboard
   UI: nav panel, full/right-panel boards, project management, List/Kanban,
   detail, composer creation, pending credential interaction, and realtime
@@ -27,6 +28,13 @@
 - `plugins/taskboard/contract.ts` and companion schemas define the strict JSON
   wire model. `store.ts` owns append-only SQLite migrations and cached work.
   `sources/` contains the GitHub, Linear, and Jira adapters behind one interface.
+- `plugins/taskboard/execution/` owns reviewed work requests, execution IDs,
+  approval digests, runtime events, restart/cancellation reconciliation, and
+  independent Git/command verification. The default local composer handoff is
+  preserved. The optional Symphony adapter includes a pinned upstream tracker
+  extension; Symphony consumes only approved Taskboard requests and never owns
+  external tracker transitions. Verification requires shared workspace access
+  and a human acceptance review after command checks pass.
 - `browse-preferences.ts` owns the observable device-local current view;
   `filter-presets.ts` validates complete named snapshots while `store.ts` owns
   their project-scoped SQLite CRUD/order and `server.ts` exposes RPC/CLI plus
@@ -73,6 +81,9 @@
 10. Named presets never auto-apply. UI application provider-checks a preset,
    atomically replaces the current project `BrowsePreferences`, and lets the
    existing observable store synchronize full/right-panel surfaces.
+    Managed implementation separately follows approved request → Symphony
+    workspace/agent → explicit implementation handoff → Taskboard verification
+    and bounded fix cycles → acceptance review → existing provider status menu.
 11. Host Monitor asks BB for enrolled hosts, samples only connected targets via
    the authenticated host-worker boundary, validates every response, and keeps
    the last good reading when a target becomes stale, fails, or disconnects.

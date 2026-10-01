@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-3ee585737bd6ac063f2b421d",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-09-28T16:29:42.935Z",
+  "completedAt": "2026-09-28T16:29:42.935Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-the-installed-taskboard-symphony-execution-flow-shown-by-the",
+    "specRevision": 3,
+    "specDigest": "sha256:366a8fb6979a0d66e71d9c21c2e2157d303d15dfdffa660ba9faf5854b9aa764",
+    "treeDigest": "sha256:7fdda50bad34b2be39d8a9e03bc26fd4963e500389d69843fad69453d2c64d27",
+    "policyDigest": "sha256:168cfa9fe1a343bc5a02663b51d27fc4808f530064f01faa64abed49e9580803"
+  },
+  "digest": "sha256:e70c333ad66665cb736f1f197383efedbc4b7587ff810388d564f17c4d3cf082",
+  "kind": "collected",
+  "collector": "empirical-review:fresh-context-agent",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/fix-the-installed-taskboard-symphony-execution-flow-shown-by-the/reviews/5e2380b15812e772b1f1ac8f.json",
+      "mediaType": "application/json",
+      "bytes": 1943,
+      "digest": "sha256:2aae52e2a9bb3937011bd9eb6c33a16fef48333d8ba33cfa531d732d5f8d4376"
+    },
+    {
+      "path": ".empirical/specs/fix-the-installed-taskboard-symphony-execution-flow-shown-by-the/reviews/5e2380b15812e772b1f1ac8f.md",
+      "mediaType": "text/markdown",
+      "bytes": 1168,
+      "digest": "sha256:c981535eba0267a0ee11dc8df721376d0dd9cded4d4828a2367f96a334e096cd"
+    }
+  ]
+}

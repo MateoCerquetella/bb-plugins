@@ -28,6 +28,7 @@ import {
   type PluginThreadPanelProps
 } from '@get-bb/plugin-sdk/app';
 import { toast } from 'sonner';
+import { TaskExecution } from './execution/panel.js';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -80,13 +81,14 @@ import type {
   WorkSource,
   WorkStateCategory,
   WorkStatusOption,
+  AgentThreadLink,
   TaskboardRpcContract
 } from './contract.js';
 import {
   CREATE_OUTCOME_UNCERTAIN_MARKER,
   FILTER_PRESET_NAME_MAX_LENGTH,
-  type FilterPreset,
-  formatWorkItemHandoffPrompt
+  formatWorkItemHandoffPrompt,
+  type FilterPreset
 } from './contract.js';
 import {
   defaultProjectBoardSettings,
@@ -171,7 +173,9 @@ interface ComposerDropTarget {
   form: HTMLFormElement;
 }
 
-function composerDropTarget(target: EventTarget | null): ComposerDropTarget | null {
+function composerDropTarget(
+  target: EventTarget | null
+): ComposerDropTarget | null {
   const element = target instanceof Element ? target : null;
   const editor = element?.closest<HTMLElement>(
     '[contenteditable="true"][role="textbox"]'
@@ -856,7 +860,9 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
         assigneeId
       );
       onCreated?.(result);
-      toast.success(`${result.item.key} created in ${sourceName(result.item.source)}`);
+      toast.success(
+        `${result.item.key} created in ${sourceName(result.item.source)}`
+      );
       if (result.warnings.length > 0) {
         toast.warning(result.warnings.join(' '));
       }
@@ -1053,8 +1059,13 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
                     setCreateError(null);
                   }}
                 >
-                  <SelectTrigger id={`${formId}-destination`} className="w-full">
-                    <SelectValue placeholder={`Choose ${context.destinationLabel.toLowerCase()}`} />
+                  <SelectTrigger
+                    id={`${formId}-destination`}
+                    className="w-full"
+                  >
+                    <SelectValue
+                      placeholder={`Choose ${context.destinationLabel.toLowerCase()}`}
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {context.destinations.map(destination => (
@@ -1072,9 +1083,11 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
                   {context.destinations[0]?.label}
                 </div>
               )}
-              {context.source === 'jira' && context.destinations.length === 0 ? (
+              {context.source === 'jira' &&
+              context.destinations.length === 0 ? (
                 <p className="text-xs text-muted-foreground">
-                  Taskboard could not infer a project key from the JQL, so enter it here.
+                  Taskboard could not infer a project key from the JQL, so enter
+                  it here.
                 </p>
               ) : null}
             </div>
@@ -1082,122 +1095,122 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
             <>
               {editablePromptFields}
 
-                <div className="flex flex-wrap items-center gap-1.5 border-t border-border-hairline pt-3">
-                  {metadataLoading ? (
-                    <>
-                      <Skeleton className="h-8 w-20 rounded-lg" />
-                      <Skeleton className="h-8 w-24 rounded-lg" />
-                      <Skeleton className="h-8 w-20 rounded-lg" />
-                    </>
-                  ) : metadata ? (
-                    <>
-                      {metadata.statusOptions.length > 0 ? (
-                        <IssuePropertySelect
-                          icon="Circle"
-                          label="Status"
-                          value={statusId}
-                          options={metadata.statusOptions}
-                          onChange={setStatusId}
-                          disabled={creating}
-                        />
-                      ) : null}
-                      {metadata.assigneeOptions.length > 0 ? (
-                        <IssuePropertySelect
-                          icon="UserRound"
-                          label="Assignee"
-                          value={assigneeId}
-                          options={metadata.assigneeOptions}
-                          onChange={setAssigneeId}
-                          disabled={creating}
-                        />
-                      ) : null}
-                      {metadata.priorityOptions.length > 0 ? (
-                        <IssuePropertySelect
-                          icon="ChartColumn"
-                          label="Priority"
-                          value={priorityId}
-                          options={metadata.priorityOptions}
-                          onChange={setPriorityId}
-                          disabled={creating}
-                        />
-                      ) : null}
-                      {metadata.labelOptions.length > 0 ? (
-                        <IssueLabelsSelect
-                          options={metadata.labelOptions}
-                          values={labelIds}
-                          onChange={setLabelIds}
-                          disabled={creating}
-                        />
-                      ) : null}
-                      {metadata.supportsDueDate ? (
-                        <label className="flex h-8 items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 text-xs font-medium focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1">
-                          <Icon
-                            name="Calendar"
-                            className="size-3.5 text-muted-foreground"
-                          />
-                          <span className="sr-only">Due date</span>
-                          <input
-                            type="date"
-                            value={dueDate}
-                            disabled={creating}
-                            aria-label="Due date"
-                            className="w-[7.3rem] border-0 bg-transparent p-0 text-xs outline-none disabled:opacity-60"
-                            onChange={event => setDueDate(event.target.value)}
-                          />
-                        </label>
-                      ) : null}
-                      {metadata.milestoneOptions.length > 0 ? (
-                        <IssuePropertySelect
-                          icon="Target"
-                          label="Milestone"
-                          value={milestoneId}
-                          options={metadata.milestoneOptions}
-                          onChange={setMilestoneId}
-                          disabled={creating}
-                        />
-                      ) : null}
-                      {metadata.issueTypeOptions.length > 0 ? (
-                        <IssuePropertySelect
-                          icon="Ticket"
-                          label="Issue type"
-                          value={issueType || null}
-                          options={metadata.issueTypeOptions}
-                          onChange={value => setIssueType(value ?? '')}
-                          disabled={creating}
-                        />
-                      ) : null}
-                    </>
-                  ) : null}
-                  {metadataError ? (
-                    <div
-                      id={metadataErrorId}
-                      role="alert"
-                      className="flex min-w-0 items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-destructive"
-                    >
-                      <Icon
-                        name="AlertCircle"
-                        className="mt-0.5 size-3.5 shrink-0"
-                        aria-hidden="true"
+              <div className="flex flex-wrap items-center gap-1.5 border-t border-border-hairline pt-3">
+                {metadataLoading ? (
+                  <>
+                    <Skeleton className="h-8 w-20 rounded-lg" />
+                    <Skeleton className="h-8 w-24 rounded-lg" />
+                    <Skeleton className="h-8 w-20 rounded-lg" />
+                  </>
+                ) : metadata ? (
+                  <>
+                    {metadata.statusOptions.length > 0 ? (
+                      <IssuePropertySelect
+                        icon="Circle"
+                        label="Status"
+                        value={statusId}
+                        options={metadata.statusOptions}
+                        onChange={setStatusId}
+                        disabled={creating}
                       />
-                      <div className="min-w-0 flex-1 space-y-0.5">
-                        <p className="text-xs font-medium">
-                          Couldn&apos;t load creation options
-                        </p>
-                        <p className="break-words text-xs">{metadataError}</p>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 shrink-0 px-2 text-xs"
-                        disabled={metadataLoading}
-                        onClick={() => setMetadataRevision(value => value + 1)}
-                      >
-                        {metadataLoading ? 'Retrying…' : 'Retry'}
-                      </Button>
+                    ) : null}
+                    {metadata.assigneeOptions.length > 0 ? (
+                      <IssuePropertySelect
+                        icon="UserRound"
+                        label="Assignee"
+                        value={assigneeId}
+                        options={metadata.assigneeOptions}
+                        onChange={setAssigneeId}
+                        disabled={creating}
+                      />
+                    ) : null}
+                    {metadata.priorityOptions.length > 0 ? (
+                      <IssuePropertySelect
+                        icon="ChartColumn"
+                        label="Priority"
+                        value={priorityId}
+                        options={metadata.priorityOptions}
+                        onChange={setPriorityId}
+                        disabled={creating}
+                      />
+                    ) : null}
+                    {metadata.labelOptions.length > 0 ? (
+                      <IssueLabelsSelect
+                        options={metadata.labelOptions}
+                        values={labelIds}
+                        onChange={setLabelIds}
+                        disabled={creating}
+                      />
+                    ) : null}
+                    {metadata.supportsDueDate ? (
+                      <label className="flex h-8 items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 text-xs font-medium focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1">
+                        <Icon
+                          name="Calendar"
+                          className="size-3.5 text-muted-foreground"
+                        />
+                        <span className="sr-only">Due date</span>
+                        <input
+                          type="date"
+                          value={dueDate}
+                          disabled={creating}
+                          aria-label="Due date"
+                          className="w-[7.3rem] border-0 bg-transparent p-0 text-xs outline-none disabled:opacity-60"
+                          onChange={event => setDueDate(event.target.value)}
+                        />
+                      </label>
+                    ) : null}
+                    {metadata.milestoneOptions.length > 0 ? (
+                      <IssuePropertySelect
+                        icon="Target"
+                        label="Milestone"
+                        value={milestoneId}
+                        options={metadata.milestoneOptions}
+                        onChange={setMilestoneId}
+                        disabled={creating}
+                      />
+                    ) : null}
+                    {metadata.issueTypeOptions.length > 0 ? (
+                      <IssuePropertySelect
+                        icon="Ticket"
+                        label="Issue type"
+                        value={issueType || null}
+                        options={metadata.issueTypeOptions}
+                        onChange={value => setIssueType(value ?? '')}
+                        disabled={creating}
+                      />
+                    ) : null}
+                  </>
+                ) : null}
+                {metadataError ? (
+                  <div
+                    id={metadataErrorId}
+                    role="alert"
+                    className="flex min-w-0 items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-destructive"
+                  >
+                    <Icon
+                      name="AlertCircle"
+                      className="mt-0.5 size-3.5 shrink-0"
+                      aria-hidden="true"
+                    />
+                    <div className="min-w-0 flex-1 space-y-0.5">
+                      <p className="text-xs font-medium">
+                        Couldn&apos;t load creation options
+                      </p>
+                      <p className="break-words text-xs">{metadataError}</p>
                     </div>
-                  ) : null}
-                </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 shrink-0 px-2 text-xs"
+                      disabled={metadataLoading}
+                      onClick={() => setMetadataRevision(value => value + 1)}
+                    >
+                      {metadataLoading ? 'Retrying…' : 'Retry'}
+                    </Button>
+                  </div>
+                ) : null}
+              </div>
             </>
 
             {createError ? (
@@ -1222,7 +1235,9 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
                 disabled={!canSubmit || creating}
                 aria-describedby={metadataError ? metadataErrorId : undefined}
               >
-                {creating ? 'Creating…' : `Create ${sourceName(context.source)} issue`}
+                {creating
+                  ? 'Creating…'
+                  : `Create ${sourceName(context.source)} issue`}
               </Button>
             </DialogFooter>
           </form>
@@ -1323,7 +1338,9 @@ function ComposerCreateIssueAction() {
                 onMouseDown={event => event.preventDefault()}
                 onClick={() => {
                   if (!projectId) {
-                    toast.error('Choose a BB project before creating an issue.');
+                    toast.error(
+                      'Choose a BB project before creating an issue.'
+                    );
                     return;
                   }
                   if (!hasPrompt) {
@@ -1411,8 +1428,72 @@ function routeToSubPath(route: TrackerRoute): string {
   }
 }
 
+function itemRouteFromPanelParams(
+  params: PluginThreadPanelProps['params']
+): Extract<TrackerRoute, { kind: 'item' }> | null {
+  if (!params || typeof params !== 'object' || Array.isArray(params)) {
+    return null;
+  }
+  const candidate = params as Record<string, unknown>;
+  if (
+    candidate.kind !== 'item' ||
+    typeof candidate.projectId !== 'string' ||
+    typeof candidate.source !== 'string' ||
+    !isWorkSource(candidate.source) ||
+    typeof candidate.locator !== 'string' ||
+    candidate.locator.length === 0
+  ) {
+    return null;
+  }
+  return {
+    kind: 'item',
+    projectId: candidate.projectId,
+    source: candidate.source,
+    locator: candidate.locator
+  };
+}
+
 function describeError(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+function useStartAgentThread() {
+  const rpc = useRpc<TaskboardRpcContract>();
+  const navigate = useBbNavigate();
+  const pending = useRef(new Set<string>());
+
+  return useCallback(
+    async (item: WorkItem) => {
+      const itemId = `${item.bbProjectId}:${item.source}:${item.locator}`;
+      if (pending.current.has(itemId)) return;
+      pending.current.add(itemId);
+      try {
+        const config = await rpc.call('executionConfig', null);
+        if (!config.enabled) {
+          navigate.toCompose({
+            initialPrompt: formatWorkItemHandoffPrompt(item),
+            focusPrompt: true
+          });
+          return;
+        }
+        const result = await rpc.call('startAgentThread', {
+          projectId: item.bbProjectId,
+          source: item.source,
+          locator: item.locator,
+          dispatchKey: crypto.randomUUID()
+        });
+        storeRightPanelPinned(true);
+        navigate.toThread(result.threadId);
+      } catch (error) {
+        toast.error(`Could not start work on ${item.key}.`, {
+          description: describeError(error)
+        });
+      } finally {
+        pending.current.delete(itemId);
+      }
+    },
+    [navigate, rpc]
+  );
 }
 
 function changedProjectId(payload: unknown): string | null {
@@ -1469,62 +1550,63 @@ function useProjectFilterPresets(projectId: string | null): {
   const projectIdRef = useRef(projectId);
   projectIdRef.current = projectId;
 
-  const reload = useCallback(async (
-    options: { background?: boolean } = {}
-  ) => {
-    if (projectIdRef.current !== projectId) return;
-    const requestRevision = ++requestRevisionRef.current;
-    if (projectId === null) {
-      setPresets([]);
-      setError(null);
-      setRefreshError(null);
-      setLoading(false);
-      setLoadedProjectId(null);
-      return;
-    }
-    if (!options.background) {
-      setPresets([]);
-      setLoading(true);
-      setLoadedProjectId(projectId);
-      setError(null);
-    }
-    setRefreshError(null);
-    try {
-      const result = await rpc.call('listFilterPresets', { projectId });
-      if (
-        requestRevision !== requestRevisionRef.current ||
-        projectIdRef.current !== projectId
-      ) {
-        return;
-      }
-      setPresets(result.presets);
-      setError(null);
-      setRefreshError(null);
-      setLoadedProjectId(projectId);
-    } catch (nextError) {
-      if (
-        requestRevision !== requestRevisionRef.current ||
-        projectIdRef.current !== projectId
-      ) {
-        return;
-      }
-      const message = describeError(nextError);
-      if (options.background) {
-        setRefreshError(message);
-      } else {
+  const reload = useCallback(
+    async (options: { background?: boolean } = {}) => {
+      if (projectIdRef.current !== projectId) return;
+      const requestRevision = ++requestRevisionRef.current;
+      if (projectId === null) {
         setPresets([]);
-        setError(message);
-      }
-      setLoadedProjectId(projectId);
-    } finally {
-      if (
-        requestRevision === requestRevisionRef.current &&
-        projectIdRef.current === projectId
-      ) {
+        setError(null);
+        setRefreshError(null);
         setLoading(false);
+        setLoadedProjectId(null);
+        return;
       }
-    }
-  }, [projectId, rpc]);
+      if (!options.background) {
+        setPresets([]);
+        setLoading(true);
+        setLoadedProjectId(projectId);
+        setError(null);
+      }
+      setRefreshError(null);
+      try {
+        const result = await rpc.call('listFilterPresets', { projectId });
+        if (
+          requestRevision !== requestRevisionRef.current ||
+          projectIdRef.current !== projectId
+        ) {
+          return;
+        }
+        setPresets(result.presets);
+        setError(null);
+        setRefreshError(null);
+        setLoadedProjectId(projectId);
+      } catch (nextError) {
+        if (
+          requestRevision !== requestRevisionRef.current ||
+          projectIdRef.current !== projectId
+        ) {
+          return;
+        }
+        const message = describeError(nextError);
+        if (options.background) {
+          setRefreshError(message);
+        } else {
+          setPresets([]);
+          setError(message);
+        }
+        setLoadedProjectId(projectId);
+      } finally {
+        if (
+          requestRevision === requestRevisionRef.current &&
+          projectIdRef.current === projectId
+        ) {
+          setLoading(false);
+        }
+      }
+    },
+    [projectId, rpc]
+  );
 
   useEffect(() => {
     void reload();
@@ -1583,10 +1665,7 @@ function loadRightPanelPinned(): boolean {
 
 function storeRightPanelPinned(pinned: boolean): void {
   try {
-    window.localStorage.setItem(
-      RIGHT_PANEL_PINNED_STORAGE_KEY,
-      String(pinned)
-    );
+    window.localStorage.setItem(RIGHT_PANEL_PINNED_STORAGE_KEY, String(pinned));
     window.dispatchEvent(new Event(RIGHT_PANEL_PIN_EVENT));
   } catch {
     // Persistence is best-effort in sandboxed browser contexts.
@@ -1677,7 +1756,11 @@ function WorkStateGlyph({
       ) : category === 'in_progress' ? (
         <>
           <circle {...common} cx="8" cy="8" r="5.25" opacity="0.35" />
-          <path {...common} d="M8 2.75a5.25 5.25 0 0 1 0 10.5" strokeWidth="2" />
+          <path
+            {...common}
+            d="M8 2.75a5.25 5.25 0 0 1 0 10.5"
+            strokeWidth="2"
+          />
         </>
       ) : category === 'done' ? (
         <>
@@ -1978,9 +2061,8 @@ function TrackerTopbar({
 
   const breadcrumb = (() => {
     if (route.kind === 'root') {
-      return (
-        <span className="whitespace-nowrap font-semibold">Taskboard</span>
-      );
+      return;
+      <span className="whitespace-nowrap font-semibold">Taskboard</span>;
     }
     if (route.kind === 'all') {
       return (
@@ -2226,7 +2308,8 @@ function TrackerViewToggle({
           onClick={() => onViewChange(option)}
           className={cn(
             'tb-view-toggle-option flex h-6 items-center gap-1.5 rounded px-2 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring max-md:pointer-coarse:h-9',
-            constrained && 'min-w-0 flex-1 justify-center gap-0 overflow-hidden px-2',
+            constrained &&
+              'min-w-0 flex-1 justify-center gap-0 overflow-hidden px-2',
             view === option
               ? 'text-foreground shadow-2xs'
               : 'text-muted-foreground hover:text-foreground'
@@ -2363,10 +2446,7 @@ function FilterPresetMenu({
           ) : null}
         </div>
         <div className="shrink-0 border-t border-border bg-popover p-1">
-          <DropdownMenuItem
-            disabled={!actionsReady}
-            onSelect={onSaveCurrent}
-          >
+          <DropdownMenuItem disabled={!actionsReady} onSelect={onSaveCurrent}>
             <Icon name="Plus" className="size-3.5" aria-hidden="true" />
             Save current view as…
           </DropdownMenuItem>
@@ -2467,9 +2547,8 @@ function TrackerFilterBar({
   ) =>
     selected.map(
       value =>
-        options.find(option =>
-          isFilterOptionSelected([value], option.value)
-        )?.label ?? value
+        options.find(option => isFilterOptionSelected([value], option.value))
+          ?.label ?? value
     );
   const [facetQuery, setFacetQuery] = useState('');
   const facetSearchRef = useRef<HTMLInputElement>(null);
@@ -2492,7 +2571,9 @@ function TrackerFilterBar({
           matchesFacet(STATE_CATEGORY_LABELS[category])
         ).length
       : 0) +
-    (enabledFilters.includes('status') ? filteredOptions(statusOptions).length : 0) +
+    (enabledFilters.includes('status')
+      ? filteredOptions(statusOptions).length
+      : 0) +
     (enabledFilters.includes('assignee')
       ? filteredOptions(assigneeOptions).length
       : 0) +
@@ -2502,7 +2583,9 @@ function TrackerFilterBar({
     (enabledFilters.includes('project')
       ? filteredOptions(projectOptions).length
       : 0) +
-    (enabledFilters.includes('labels') ? filteredOptions(labelOptions).length : 0);
+    (enabledFilters.includes('labels')
+      ? filteredOptions(labelOptions).length
+      : 0);
   const hasMatchingFacetValues =
     normalizedFacetQuery === '' || matchingFacetValueCount > 0;
   const activeFacetCount = [
@@ -2572,7 +2655,9 @@ function TrackerFilterBar({
               className="flex max-h-[var(--radix-dropdown-menu-content-available-height)] w-72 flex-col overflow-hidden p-0"
               onOpenAutoFocus={event => {
                 event.preventDefault();
-                window.requestAnimationFrame(() => facetSearchRef.current?.focus());
+                window.requestAnimationFrame(() =>
+                  facetSearchRef.current?.focus()
+                );
               }}
             >
               <div className="z-10 shrink-0 space-y-2 border-b border-border bg-popover p-2">
@@ -2613,168 +2698,196 @@ function TrackerFilterBar({
                   </p>
                 ) : (
                   <>
-                {showSourceFilter ? (
-                  <>
-                    <FilterSectionLabel filter="source" />
-                    {([ALL_SOURCES, 'linear', 'github', 'jira'] as const)
-                      .filter(option =>
-                        matchesFacet(
-                          option === ALL_SOURCES
-                            ? 'All sources'
-                            : sourceName(option)
-                        )
-                      )
-                      .map(option => (
-                        <DropdownMenuCheckboxItem
-                          key={option}
-                          checked={source === option}
-                          onSelect={keepOpen}
-                          onCheckedChange={checked => {
-                            if (checked === true) onSourceChange(option);
-                          }}
-                        >
-                          {option === ALL_SOURCES
-                            ? 'All sources'
-                            : sourceName(option)}
-                        </DropdownMenuCheckboxItem>
-                      ))}
-                    <DropdownMenuSeparator />
-                  </>
-                ) : null}
-
-                {enabledFilters.includes('state') ? (
-                  <>
-                    <FilterSectionLabel filter="state" />
-                    {STATE_CATEGORY_ORDER.filter(category =>
-                      matchesFacet(STATE_CATEGORY_LABELS[category])
-                    ).map(category => (
-                      <DropdownMenuCheckboxItem
-                        key={category}
-                        checked={stateCategories.includes(category)}
-                        onSelect={keepOpen}
-                        onCheckedChange={checked =>
-                          onStateCategoriesChange(
-                            toggled(stateCategories, category, checked === true)
-                          )
-                        }
-                      >
-                        <WorkStateGlyph category={category} />
-                        {STATE_CATEGORY_LABELS[category]}
-                      </DropdownMenuCheckboxItem>
-                    ))}
-                    <DropdownMenuSeparator />
-                  </>
-                ) : null}
-
-                {enabledFilters.includes('status') ? (
-                  <>
-                    <FilterSectionLabel filter="status" />
-                    {filteredOptions(statusOptions).map(option => (
-                      <DropdownMenuCheckboxItem
-                        key={option.value}
-                        checked={isFilterOptionSelected(statuses, option.value)}
-                        onSelect={keepOpen}
-                        onCheckedChange={() =>
-                          onStatusesChange(
-                            toggleFilterOptionSelection(statuses, option.value)
-                          )
-                        }
-                      >
-                        {option.label}
-                      </DropdownMenuCheckboxItem>
-                    ))}
-                    <DropdownMenuSeparator />
-                  </>
-                ) : null}
-
-                {enabledFilters.includes('assignee') ? (
-                  <>
-                    <FilterSectionLabel filter="assignee" />
-                    {filteredOptions(assigneeOptions).map(option => (
-                      <DropdownMenuCheckboxItem
-                        key={option.value}
-                        checked={isFilterOptionSelected(assignees, option.value)}
-                        onSelect={keepOpen}
-                        onCheckedChange={() =>
-                          onAssigneesChange(
-                            toggleFilterOptionSelection(assignees, option.value)
-                          )
-                        }
-                      >
-                        {option.label}
-                      </DropdownMenuCheckboxItem>
-                    ))}
-                    <DropdownMenuSeparator />
-                  </>
-                ) : null}
-
-                {enabledFilters.includes('priority') ? (
-                  <>
-                    <FilterSectionLabel filter="priority" />
-                    {filteredOptions(priorityOptions).map(option => (
-                      <DropdownMenuCheckboxItem
-                        key={option.value}
-                        checked={isFilterOptionSelected(priorities, option.value)}
-                        onSelect={keepOpen}
-                        onCheckedChange={() =>
-                          onPrioritiesChange(
-                            toggleFilterOptionSelection(priorities, option.value)
-                          )
-                        }
-                      >
-                        {option.label}
-                      </DropdownMenuCheckboxItem>
-                    ))}
-                    <DropdownMenuSeparator />
-                  </>
-                ) : null}
-
-                {enabledFilters.includes('project') ? (
-                  <>
-                    <FilterSectionLabel filter="project" />
-                    {filteredOptions(projectOptions).map(option => (
-                      <DropdownMenuCheckboxItem
-                        key={option.value}
-                        checked={isFilterOptionSelected(
-                          externalProjects,
-                          option.value
-                        )}
-                        onSelect={keepOpen}
-                        onCheckedChange={() =>
-                          onExternalProjectsChange(
-                            toggleFilterOptionSelection(
-                              externalProjects,
-                              option.value
+                    {showSourceFilter ? (
+                      <>
+                        <FilterSectionLabel filter="source" />
+                        {([ALL_SOURCES, 'linear', 'github', 'jira'] as const)
+                          .filter(option =>
+                            matchesFacet(
+                              option === ALL_SOURCES
+                                ? 'All sources'
+                                : sourceName(option)
                             )
                           )
-                        }
-                      >
-                        {option.label}
-                      </DropdownMenuCheckboxItem>
-                    ))}
-                    <DropdownMenuSeparator />
-                  </>
-                ) : null}
+                          .map(option => (
+                            <DropdownMenuCheckboxItem
+                              key={option}
+                              checked={source === option}
+                              onSelect={keepOpen}
+                              onCheckedChange={checked => {
+                                if (checked === true) onSourceChange(option);
+                              }}
+                            >
+                              {option === ALL_SOURCES
+                                ? 'All sources'
+                                : sourceName(option)}
+                            </DropdownMenuCheckboxItem>
+                          ))}
+                        <DropdownMenuSeparator />
+                      </>
+                    ) : null}
 
-                {enabledFilters.includes('labels') ? (
-                  <>
-                    <FilterSectionLabel filter="labels" />
-                    {filteredOptions(labelOptions).map(option => (
-                      <DropdownMenuCheckboxItem
-                        key={option.value}
-                        checked={isFilterOptionSelected(labels, option.value)}
-                        onSelect={keepOpen}
-                        onCheckedChange={() =>
-                          onLabelsChange(
-                            toggleFilterOptionSelection(labels, option.value)
-                          )
-                        }
-                      >
-                        {option.label}
-                      </DropdownMenuCheckboxItem>
-                    ))}
-                  </>
-                ) : null}
+                    {enabledFilters.includes('state') ? (
+                      <>
+                        <FilterSectionLabel filter="state" />
+                        {STATE_CATEGORY_ORDER.filter(category =>
+                          matchesFacet(STATE_CATEGORY_LABELS[category])
+                        ).map(category => (
+                          <DropdownMenuCheckboxItem
+                            key={category}
+                            checked={stateCategories.includes(category)}
+                            onSelect={keepOpen}
+                            onCheckedChange={checked =>
+                              onStateCategoriesChange(
+                                toggled(
+                                  stateCategories,
+                                  category,
+                                  checked === true
+                                )
+                              )
+                            }
+                          >
+                            <WorkStateGlyph category={category} />
+                            {STATE_CATEGORY_LABELS[category]}
+                          </DropdownMenuCheckboxItem>
+                        ))}
+                        <DropdownMenuSeparator />
+                      </>
+                    ) : null}
+
+                    {enabledFilters.includes('status') ? (
+                      <>
+                        <FilterSectionLabel filter="status" />
+                        {filteredOptions(statusOptions).map(option => (
+                          <DropdownMenuCheckboxItem
+                            key={option.value}
+                            checked={isFilterOptionSelected(
+                              statuses,
+                              option.value
+                            )}
+                            onSelect={keepOpen}
+                            onCheckedChange={() =>
+                              onStatusesChange(
+                                toggleFilterOptionSelection(
+                                  statuses,
+                                  option.value
+                                )
+                              )
+                            }
+                          >
+                            {option.label}
+                          </DropdownMenuCheckboxItem>
+                        ))}
+                        <DropdownMenuSeparator />
+                      </>
+                    ) : null}
+
+                    {enabledFilters.includes('assignee') ? (
+                      <>
+                        <FilterSectionLabel filter="assignee" />
+                        {filteredOptions(assigneeOptions).map(option => (
+                          <DropdownMenuCheckboxItem
+                            key={option.value}
+                            checked={isFilterOptionSelected(
+                              assignees,
+                              option.value
+                            )}
+                            onSelect={keepOpen}
+                            onCheckedChange={() =>
+                              onAssigneesChange(
+                                toggleFilterOptionSelection(
+                                  assignees,
+                                  option.value
+                                )
+                              )
+                            }
+                          >
+                            {option.label}
+                          </DropdownMenuCheckboxItem>
+                        ))}
+                        <DropdownMenuSeparator />
+                      </>
+                    ) : null}
+
+                    {enabledFilters.includes('priority') ? (
+                      <>
+                        <FilterSectionLabel filter="priority" />
+                        {filteredOptions(priorityOptions).map(option => (
+                          <DropdownMenuCheckboxItem
+                            key={option.value}
+                            checked={isFilterOptionSelected(
+                              priorities,
+                              option.value
+                            )}
+                            onSelect={keepOpen}
+                            onCheckedChange={() =>
+                              onPrioritiesChange(
+                                toggleFilterOptionSelection(
+                                  priorities,
+                                  option.value
+                                )
+                              )
+                            }
+                          >
+                            {option.label}
+                          </DropdownMenuCheckboxItem>
+                        ))}
+                        <DropdownMenuSeparator />
+                      </>
+                    ) : null}
+
+                    {enabledFilters.includes('project') ? (
+                      <>
+                        <FilterSectionLabel filter="project" />
+                        {filteredOptions(projectOptions).map(option => (
+                          <DropdownMenuCheckboxItem
+                            key={option.value}
+                            checked={isFilterOptionSelected(
+                              externalProjects,
+                              option.value
+                            )}
+                            onSelect={keepOpen}
+                            onCheckedChange={() =>
+                              onExternalProjectsChange(
+                                toggleFilterOptionSelection(
+                                  externalProjects,
+                                  option.value
+                                )
+                              )
+                            }
+                          >
+                            {option.label}
+                          </DropdownMenuCheckboxItem>
+                        ))}
+                        <DropdownMenuSeparator />
+                      </>
+                    ) : null}
+
+                    {enabledFilters.includes('labels') ? (
+                      <>
+                        <FilterSectionLabel filter="labels" />
+                        {filteredOptions(labelOptions).map(option => (
+                          <DropdownMenuCheckboxItem
+                            key={option.value}
+                            checked={isFilterOptionSelected(
+                              labels,
+                              option.value
+                            )}
+                            onSelect={keepOpen}
+                            onCheckedChange={() =>
+                              onLabelsChange(
+                                toggleFilterOptionSelection(
+                                  labels,
+                                  option.value
+                                )
+                              )
+                            }
+                          >
+                            {option.label}
+                          </DropdownMenuCheckboxItem>
+                        ))}
+                      </>
+                    ) : null}
                   </>
                 )}
               </div>
@@ -2808,188 +2921,190 @@ function TrackerFilterBar({
         )}
       >
         <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto py-px">
-        {presets !== null ? (
-          <FilterPresetMenu
-            presets={presets}
-            error={presetsError}
-            refreshError={presetsRefreshError}
-            loading={presetsLoading}
-            actionsReady={presetActionsReady}
-            onApply={onApplyPreset}
-            onRetry={onRetryPresets}
-            onSaveCurrent={onSaveCurrentPreset}
-          />
-        ) : null}
-        {showSourceFilter ? (
-          <FilterChip
-            icon={FILTER_PRESENTATION.source.icon}
-            label={FILTER_PRESENTATION.source.label}
-            selectedNames={source === ALL_SOURCES ? [] : [sourceName(source)]}
-          >
-            {([ALL_SOURCES, 'linear', 'github', 'jira'] as const).map(
-              option => (
+          {presets !== null ? (
+            <FilterPresetMenu
+              presets={presets}
+              error={presetsError}
+              refreshError={presetsRefreshError}
+              loading={presetsLoading}
+              actionsReady={presetActionsReady}
+              onApply={onApplyPreset}
+              onRetry={onRetryPresets}
+              onSaveCurrent={onSaveCurrentPreset}
+            />
+          ) : null}
+          {showSourceFilter ? (
+            <FilterChip
+              icon={FILTER_PRESENTATION.source.icon}
+              label={FILTER_PRESENTATION.source.label}
+              selectedNames={source === ALL_SOURCES ? [] : [sourceName(source)]}
+            >
+              {([ALL_SOURCES, 'linear', 'github', 'jira'] as const).map(
+                option => (
+                  <DropdownMenuCheckboxItem
+                    key={option}
+                    checked={source === option}
+                    onCheckedChange={checked => {
+                      if (checked === true) onSourceChange(option);
+                    }}
+                  >
+                    {option === ALL_SOURCES
+                      ? 'All sources'
+                      : sourceName(option)}
+                  </DropdownMenuCheckboxItem>
+                )
+              )}
+            </FilterChip>
+          ) : null}
+
+          {enabledFilters.includes('state') ? (
+            <FilterChip
+              icon={FILTER_PRESENTATION.state.icon}
+              label={FILTER_PRESENTATION.state.label}
+              selectedNames={stateCategories.map(
+                category => STATE_CATEGORY_LABELS[category]
+              )}
+            >
+              {STATE_CATEGORY_ORDER.map(category => (
                 <DropdownMenuCheckboxItem
-                  key={option}
-                  checked={source === option}
-                  onCheckedChange={checked => {
-                    if (checked === true) onSourceChange(option);
-                  }}
-                >
-                  {option === ALL_SOURCES ? 'All sources' : sourceName(option)}
-                </DropdownMenuCheckboxItem>
-              )
-            )}
-          </FilterChip>
-        ) : null}
-
-        {enabledFilters.includes('state') ? (
-          <FilterChip
-            icon={FILTER_PRESENTATION.state.icon}
-            label={FILTER_PRESENTATION.state.label}
-            selectedNames={stateCategories.map(
-              category => STATE_CATEGORY_LABELS[category]
-            )}
-          >
-            {STATE_CATEGORY_ORDER.map(category => (
-              <DropdownMenuCheckboxItem
-                key={category}
-                checked={stateCategories.includes(category)}
-                onSelect={keepOpen}
-                onCheckedChange={checked =>
-                  onStateCategoriesChange(
-                    toggled(stateCategories, category, checked === true)
-                  )
-                }
-              >
-                <span className="flex items-center gap-2">
-                  <WorkStateGlyph category={category} />
-                  {STATE_CATEGORY_LABELS[category]}
-                </span>
-              </DropdownMenuCheckboxItem>
-            ))}
-          </FilterChip>
-        ) : null}
-
-        {enabledFilters.includes('status') ? (
-          <FilterChip
-            icon={FILTER_PRESENTATION.status.icon}
-            label={FILTER_PRESENTATION.status.label}
-            selectedNames={selectedNames(statuses, statusOptions)}
-          >
-            {statusOptions.map(option => (
-              <DropdownMenuCheckboxItem
-                key={option.value}
-                checked={isFilterOptionSelected(statuses, option.value)}
-                onSelect={keepOpen}
-                onCheckedChange={() =>
-                  onStatusesChange(
-                    toggleFilterOptionSelection(statuses, option.value)
-                  )
-                }
-              >
-                {option.label}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </FilterChip>
-        ) : null}
-
-        {enabledFilters.includes('assignee') ? (
-          <FilterChip
-            icon={FILTER_PRESENTATION.assignee.icon}
-            label={FILTER_PRESENTATION.assignee.label}
-            selectedNames={selectedNames(assignees, assigneeOptions)}
-          >
-            {assigneeOptions.map(option => (
-              <DropdownMenuCheckboxItem
-                key={option.value}
-                checked={isFilterOptionSelected(assignees, option.value)}
-                onSelect={keepOpen}
-                onCheckedChange={() =>
-                  onAssigneesChange(
-                    toggleFilterOptionSelection(assignees, option.value)
-                  )
-                }
-              >
-                {option.label}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </FilterChip>
-        ) : null}
-
-        {enabledFilters.includes('priority') ? (
-          <FilterChip
-            icon={FILTER_PRESENTATION.priority.icon}
-            label={FILTER_PRESENTATION.priority.label}
-            selectedNames={selectedNames(priorities, priorityOptions)}
-          >
-            {priorityOptions.map(option => (
-              <DropdownMenuCheckboxItem
-                key={option.value}
-                checked={isFilterOptionSelected(priorities, option.value)}
-                onSelect={keepOpen}
-                onCheckedChange={() =>
-                  onPrioritiesChange(
-                    toggleFilterOptionSelection(priorities, option.value)
-                  )
-                }
-              >
-                {option.label}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </FilterChip>
-        ) : null}
-
-        {enabledFilters.includes('project') ? (
-          <FilterChip
-            icon={FILTER_PRESENTATION.project.icon}
-            label={FILTER_PRESENTATION.project.label}
-            selectedNames={selectedNames(externalProjects, projectOptions)}
-          >
-            {projectOptions.map(option => (
-              <DropdownMenuCheckboxItem
-                key={option.value}
-                checked={isFilterOptionSelected(
-                  externalProjects,
-                  option.value
-                )}
-                onSelect={keepOpen}
-                onCheckedChange={() =>
-                  onExternalProjectsChange(
-                    toggleFilterOptionSelection(
-                      externalProjects,
-                      option.value
+                  key={category}
+                  checked={stateCategories.includes(category)}
+                  onSelect={keepOpen}
+                  onCheckedChange={checked =>
+                    onStateCategoriesChange(
+                      toggled(stateCategories, category, checked === true)
                     )
-                  )
-                }
-              >
-                {option.label}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </FilterChip>
-        ) : null}
+                  }
+                >
+                  <span className="flex items-center gap-2">
+                    <WorkStateGlyph category={category} />
+                    {STATE_CATEGORY_LABELS[category]}
+                  </span>
+                </DropdownMenuCheckboxItem>
+              ))}
+            </FilterChip>
+          ) : null}
 
-        {enabledFilters.includes('labels') ? (
-          <FilterChip
-            icon={FILTER_PRESENTATION.labels.icon}
-            label={FILTER_PRESENTATION.labels.label}
-            selectedNames={selectedNames(labels, labelOptions)}
-          >
-            {labelOptions.map(option => (
-              <DropdownMenuCheckboxItem
-                key={option.value}
-                checked={isFilterOptionSelected(labels, option.value)}
-                onSelect={keepOpen}
-                onCheckedChange={() =>
-                  onLabelsChange(
-                    toggleFilterOptionSelection(labels, option.value)
-                  )
-                }
-              >
-                {option.label}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </FilterChip>
-        ) : null}
+          {enabledFilters.includes('status') ? (
+            <FilterChip
+              icon={FILTER_PRESENTATION.status.icon}
+              label={FILTER_PRESENTATION.status.label}
+              selectedNames={selectedNames(statuses, statusOptions)}
+            >
+              {statusOptions.map(option => (
+                <DropdownMenuCheckboxItem
+                  key={option.value}
+                  checked={isFilterOptionSelected(statuses, option.value)}
+                  onSelect={keepOpen}
+                  onCheckedChange={() =>
+                    onStatusesChange(
+                      toggleFilterOptionSelection(statuses, option.value)
+                    )
+                  }
+                >
+                  {option.label}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </FilterChip>
+          ) : null}
+
+          {enabledFilters.includes('assignee') ? (
+            <FilterChip
+              icon={FILTER_PRESENTATION.assignee.icon}
+              label={FILTER_PRESENTATION.assignee.label}
+              selectedNames={selectedNames(assignees, assigneeOptions)}
+            >
+              {assigneeOptions.map(option => (
+                <DropdownMenuCheckboxItem
+                  key={option.value}
+                  checked={isFilterOptionSelected(assignees, option.value)}
+                  onSelect={keepOpen}
+                  onCheckedChange={() =>
+                    onAssigneesChange(
+                      toggleFilterOptionSelection(assignees, option.value)
+                    )
+                  }
+                >
+                  {option.label}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </FilterChip>
+          ) : null}
+
+          {enabledFilters.includes('priority') ? (
+            <FilterChip
+              icon={FILTER_PRESENTATION.priority.icon}
+              label={FILTER_PRESENTATION.priority.label}
+              selectedNames={selectedNames(priorities, priorityOptions)}
+            >
+              {priorityOptions.map(option => (
+                <DropdownMenuCheckboxItem
+                  key={option.value}
+                  checked={isFilterOptionSelected(priorities, option.value)}
+                  onSelect={keepOpen}
+                  onCheckedChange={() =>
+                    onPrioritiesChange(
+                      toggleFilterOptionSelection(priorities, option.value)
+                    )
+                  }
+                >
+                  {option.label}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </FilterChip>
+          ) : null}
+
+          {enabledFilters.includes('project') ? (
+            <FilterChip
+              icon={FILTER_PRESENTATION.project.icon}
+              label={FILTER_PRESENTATION.project.label}
+              selectedNames={selectedNames(externalProjects, projectOptions)}
+            >
+              {projectOptions.map(option => (
+                <DropdownMenuCheckboxItem
+                  key={option.value}
+                  checked={isFilterOptionSelected(
+                    externalProjects,
+                    option.value
+                  )}
+                  onSelect={keepOpen}
+                  onCheckedChange={() =>
+                    onExternalProjectsChange(
+                      toggleFilterOptionSelection(
+                        externalProjects,
+                        option.value
+                      )
+                    )
+                  }
+                >
+                  {option.label}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </FilterChip>
+          ) : null}
+
+          {enabledFilters.includes('labels') ? (
+            <FilterChip
+              icon={FILTER_PRESENTATION.labels.icon}
+              label={FILTER_PRESENTATION.labels.label}
+              selectedNames={selectedNames(labels, labelOptions)}
+            >
+              {labelOptions.map(option => (
+                <DropdownMenuCheckboxItem
+                  key={option.value}
+                  checked={isFilterOptionSelected(labels, option.value)}
+                  onSelect={keepOpen}
+                  onCheckedChange={() =>
+                    onLabelsChange(
+                      toggleFilterOptionSelection(labels, option.value)
+                    )
+                  }
+                >
+                  {option.label}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </FilterChip>
+          ) : null}
 
           <TrackerSearchInput
             query={query}
@@ -3159,10 +3274,7 @@ function WorkItemStatusMenu({
         className="tb-status-pill h-7 gap-1.5 rounded-full px-2.5 text-xs"
         aria-label={`Change status for ${item.key}. Current status: ${item.status}`}
         data-state-category={item.stateCategory}
-        data-status-tone={workflowStatusTone(
-          item.status,
-          item.stateCategory
-        )}
+        data-status-tone={workflowStatusTone(item.status, item.stateCategory)}
         disabled={pendingStatusId !== null}
       >
         <WorkStateGlyph category={item.stateCategory} />
@@ -3210,7 +3322,9 @@ function WorkItemStatusMenu({
             );
           })
         ) : (
-          <DropdownMenuItem disabled>No status changes available</DropdownMenuItem>
+          <DropdownMenuItem disabled>
+            No status changes available
+          </DropdownMenuItem>
         )}
       </DropdownMenuContent>
     </DropdownMenu>
@@ -3315,10 +3429,7 @@ function ListStateGroups({
   nested?: boolean;
   collapsedGroups: Readonly<Record<string, boolean>>;
   searchActive: boolean;
-  onToggleGroup: (
-    groupKey: string,
-    category: WorkStateCategory
-  ) => void;
+  onToggleGroup: (groupKey: string, category: WorkStateCategory) => void;
   onMove: (item: WorkItem, option: WorkStatusOption) => Promise<void>;
   onOpen: (item: WorkItem) => void;
 }) {
@@ -3349,7 +3460,9 @@ function ListStateGroups({
             aria-controls={contentId}
             aria-expanded={!collapsed}
             disabled={searchActive}
-            title={searchActive ? 'Search keeps matching groups open' : undefined}
+            title={
+              searchActive ? 'Search keeps matching groups open' : undefined
+            }
             className="flex h-full w-full items-center gap-2 px-2.5 text-left text-2xs font-semibold uppercase tracking-[0.12em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:cursor-default"
             onClick={() => onToggleGroup(preferenceKey, group.category)}
           >
@@ -3528,6 +3641,7 @@ function KanbanCard({
   moveDisabled,
   composerDragEnabled,
   onOpen,
+  onStart,
   onPrepare,
   onDragStart,
   onDragEnd,
@@ -3539,8 +3653,9 @@ function KanbanCard({
   moveDisabled: boolean;
   composerDragEnabled: boolean;
   onOpen: () => void;
+  onStart: () => void;
   onPrepare: () => void;
-  onDragStart: (event: ReactDragEvent<HTMLButtonElement>) => void;
+  onDragStart: (event: ReactDragEvent<HTMLElement>) => void;
   onDragEnd: () => void;
   onKeyDown: (event: ReactKeyboardEvent<HTMLButtonElement>) => void;
 }) {
@@ -3552,12 +3667,9 @@ function KanbanCard({
     .slice(0, 2);
 
   return (
-    <button
-      type="button"
+    <article
       draggable={!pending && !moveDisabled}
-      aria-grabbed={pickedUp}
       aria-busy={pending}
-      aria-label={`${item.key}: ${item.title}. Status ${item.status}.${priority ? ` Priority ${priority}.` : ''}${assignee ? ` Assigned to ${assignee}.` : ''}${moveDisabled ? ' Workflow statuses are loading. Press Enter to open.' : ' Press Space to move, or Enter to open.'}`}
       data-state-category={item.stateCategory}
       data-status-tone={workflowStatusTone(item.status, item.stateCategory)}
       data-picked-up={pickedUp ? 'true' : 'false'}
@@ -3565,23 +3677,46 @@ function KanbanCard({
       data-move-disabled={moveDisabled ? 'true' : 'false'}
       data-composer-drag={composerDragEnabled ? 'true' : undefined}
       onPointerDown={onPrepare}
-      onFocus={onPrepare}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
-      onKeyDown={onKeyDown}
-      onClick={onOpen}
       className={cn(
-        'tb-kanban-card group w-full rounded-md px-3 py-2.5 text-left transition-[border-color,background-color,opacity,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        'tb-kanban-card group relative w-full rounded-md px-3 py-2.5 text-left transition-[border-color,background-color,opacity,transform]',
         composerDragEnabled && 'cursor-grab active:cursor-grabbing'
       )}
     >
-      <span className="flex items-center gap-2 text-xs">
+      <button
+        type="button"
+        aria-grabbed={pickedUp}
+        aria-label={`${item.key}: ${item.title}. Status ${item.status}.${priority ? ` Priority ${priority}.` : ''}${assignee ? ` Assigned to ${assignee}.` : ''}${moveDisabled ? ' Workflow statuses are loading. Press Enter to open.' : ' Press Space to move, or Enter to open.'}`}
+        onPointerDown={onPrepare}
+        onFocus={onPrepare}
+        onKeyDown={onKeyDown}
+        onClick={onOpen}
+        className="absolute inset-0 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      />
+      <span className="pointer-events-none relative z-[1] flex items-center gap-2 text-xs">
         <span className="tb-priority-slot flex size-4 items-center justify-center">
           {priority ? <PriorityMark priority={priority} /> : null}
         </span>
         <span className="tb-key min-w-0 truncate font-medium tabular-nums">
           {item.key}
         </span>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              className="pointer-events-auto relative z-[1] ml-auto flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-state-hover hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label={`Start work on ${item.key}`}
+              onClick={event => {
+                event.stopPropagation();
+                onStart();
+              }}
+            >
+              <Icon name="Play" className="size-3.5" aria-hidden="true" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="top">Start agent</TooltipContent>
+        </Tooltip>
         {composerDragEnabled ? (
           <span
             aria-hidden="true"
@@ -3591,7 +3726,7 @@ function KanbanCard({
           </span>
         ) : null}
       </span>
-      <span className="mt-1.5 flex items-start gap-1.5">
+      <span className="pointer-events-none relative z-[1] mt-1.5 flex items-start gap-1.5">
         <span className="mt-1 flex shrink-0">
           <WorkStateGlyph category={item.stateCategory} />
         </span>
@@ -3600,7 +3735,7 @@ function KanbanCard({
         </span>
       </span>
       {labels.length > 0 ? (
-        <span className="mt-2 flex min-w-0 gap-1 overflow-hidden">
+        <span className="pointer-events-none relative z-[1] mt-2 flex min-w-0 gap-1 overflow-hidden">
           {labels.map((label, index) => (
             <span
               key={`${label}-${index}`}
@@ -3612,7 +3747,7 @@ function KanbanCard({
           ))}
         </span>
       ) : null}
-      <span className="tb-meta mt-2 flex min-w-0 items-center gap-2 text-xs">
+      <span className="tb-meta pointer-events-none relative z-[1] mt-2 flex min-w-0 items-center gap-2 text-xs">
         <time className="shrink-0 tabular-nums" dateTime={item.updatedAt}>
           Updated {formatUpdatedAt(item.updatedAt)}
         </time>
@@ -3624,7 +3759,7 @@ function KanbanCard({
           </span>
         ) : null}
       </span>
-    </button>
+    </article>
   );
 }
 
@@ -3634,6 +3769,7 @@ function KanbanBoard({
   statusOrder,
   composerDragEnabled,
   onOpen,
+  onStart,
   onMove
 }: {
   items: readonly WorkItem[];
@@ -3641,6 +3777,7 @@ function KanbanBoard({
   statusOrder: readonly string[];
   composerDragEnabled: boolean;
   onOpen: (item: WorkItem) => void;
+  onStart: (item: WorkItem) => void;
   onMove: (item: WorkItem, option: WorkStatusOption) => Promise<void>;
 }) {
   const rpc = useRpc<TaskboardRpcContract>();
@@ -3789,7 +3926,7 @@ function KanbanBoard({
         candidate =>
           !candidate.current &&
           workflowStatusLaneKey(candidate.name, candidate.stateCategory) ===
-          laneKey
+            laneKey
       );
       if (!option) {
         try {
@@ -3797,10 +3934,8 @@ function KanbanBoard({
           option = options.find(
             candidate =>
               !candidate.current &&
-              workflowStatusLaneKey(
-                candidate.name,
-                candidate.stateCategory
-              ) === laneKey
+              workflowStatusLaneKey(candidate.name, candidate.stateCategory) ===
+                laneKey
           );
         } catch (error) {
           const message = describeError(error);
@@ -3825,6 +3960,12 @@ function KanbanBoard({
         await onMove(item, option);
         optionsRef.current.delete(itemId);
         setAnnouncement(`${item.key} moved to ${option.name}`);
+        if (
+          option.stateCategory === 'in_progress' &&
+          item.stateCategory !== 'in_progress'
+        ) {
+          onStart(item);
+        }
       } catch (error) {
         optionsRef.current.delete(itemId);
         const message = describeError(error);
@@ -3834,7 +3975,7 @@ function KanbanBoard({
         setPending(current => (current === itemId ? null : current));
       }
     },
-    [loadOptions, onMove, pending]
+    [loadOptions, onMove, onStart, pending]
   );
 
   const keyboardTargets =
@@ -3910,10 +4051,7 @@ function KanbanBoard({
                 }
                 data-drop-state={dropState}
                 data-state-category={lane.category}
-                data-status-tone={workflowStatusTone(
-                  lane.name,
-                  lane.category
-                )}
+                data-status-tone={workflowStatusTone(lane.name, lane.category)}
                 onDragOver={event => {
                   if (!pickup && !draggedItemRef.current) return;
                   event.preventDefault();
@@ -3966,14 +4104,14 @@ function KanbanBoard({
                           onPrepare={() => {
                             void loadOptions(item).catch(() => undefined);
                           }}
+                          onStart={() => onStart(item)}
                           onDragStart={event => {
                             if (pending || checking || !workflowReady) {
                               event.preventDefault();
                               return;
                             }
-                            event.dataTransfer.effectAllowed = composerDragEnabled
-                              ? 'copyMove'
-                              : 'move';
+                            event.dataTransfer.effectAllowed =
+                              composerDragEnabled ? 'copyMove' : 'move';
                             event.dataTransfer.setData('text/plain', itemId);
                             if (composerDragEnabled) {
                               writeTaskboardComposerDrag(
@@ -4094,13 +4232,15 @@ function TrackerList({
   projects,
   refreshGeneration,
   surfaceMode,
-  onOpen
+  onOpen,
+  onStart
 }: {
   projectId: string | null;
   projects: readonly TrackerProject[] | undefined;
   refreshGeneration: number;
   surfaceMode: 'full' | 'constrained';
   onOpen: (item: WorkItem) => void;
+  onStart?: (item: WorkItem) => void;
 }) {
   const rpc = useRpc<TaskboardRpcContract>();
   const preferenceScope: BrowsePreferenceScope =
@@ -4564,7 +4704,10 @@ function TrackerList({
             }))
           }
           onStatusesChange={nextStatuses =>
-            updatePreferences(current => ({ ...current, statuses: nextStatuses }))
+            updatePreferences(current => ({
+              ...current,
+              statuses: nextStatuses
+            }))
           }
           onAssigneesChange={nextAssignees =>
             updatePreferences(current => ({
@@ -4644,6 +4787,7 @@ function TrackerList({
               statusOrder={boardSettings.statusOrder}
               composerDragEnabled={surfaceMode === 'constrained'}
               onOpen={onOpen}
+              onStart={onStart ?? onOpen}
               onMove={moveItemStatus}
             />
           ) : visibleItems.length === 0 ? (
@@ -4727,8 +4871,8 @@ function TrackerList({
           <DialogHeader>
             <DialogTitle>Save filter preset</DialogTitle>
             <DialogDescription id={presetSaveDescriptionId}>
-              Save the current filters, search, layout, and collapsed groups
-              for this project.
+              Save the current filters, search, layout, and collapsed groups for
+              this project.
             </DialogDescription>
           </DialogHeader>
           <form
@@ -4821,17 +4965,117 @@ function DetailMetadata({
   );
 }
 
+const agentThreadLabels: Record<AgentThreadLink['state'], string> = {
+  running: 'Agent working',
+  completed: 'Agent completed',
+  failed: 'Agent failed',
+  canceled: 'Agent canceled'
+};
+
+const agentThreadIcons: Record<AgentThreadLink['state'], IconName> = {
+  running: 'Loading',
+  completed: 'CircleCheck',
+  failed: 'CircleX',
+  canceled: 'Circle'
+};
+
+function AgentThreadLifecycle({ item }: { item: WorkItem }) {
+  const rpc = useRpc<TaskboardRpcContract>();
+  const navigate = useBbNavigate();
+  const [link, setLink] = useState<AgentThreadLink | null>(null);
+  const revision = useRef(0);
+  const load = useCallback(async () => {
+    const token = ++revision.current;
+    try {
+      const result = await rpc.call('agentThreadStatus', {
+        projectId: item.bbProjectId,
+        source: item.source,
+        locator: item.locator
+      });
+      if (revision.current === token) setLink(result.link);
+    } catch {
+      if (revision.current === token) setLink(null);
+    }
+  }, [item.bbProjectId, item.locator, item.source, rpc]);
+
+  useEffect(() => {
+    void load();
+    return () => {
+      revision.current += 1;
+    };
+  }, [load]);
+  useRealtime('taskboard:changed', payload => {
+    const projectId = changedProjectId(payload);
+    if (projectId === null || projectId === item.bbProjectId) void load();
+  });
+  useRefreshOnReconnect(() => void load());
+
+  if (!link) return null;
+  const isRunning = link.state === 'running';
+  const lifecycleError = link.providerError ?? link.error;
+  const providerStatus =
+    link.doneTransitionAt !== null
+      ? 'External issue marked complete.'
+      : link.state === 'completed'
+        ? 'Updating the external issue to Done.'
+        : link.inProgressTransitionAt !== null
+          ? 'External issue moved to In Progress.'
+          : 'Updating the external issue to In Progress.';
+  return (
+    <section
+      className="mt-5 flex min-h-12 items-center gap-3 border-y py-2.5"
+      aria-label="Linked agent thread"
+    >
+      <Icon
+        name={agentThreadIcons[link.state]}
+        className={cn(
+          'size-4 shrink-0',
+          isRunning && 'animate-spin text-muted-foreground',
+          link.state === 'completed' && 'text-success',
+          link.state === 'failed' && 'text-destructive',
+          link.state === 'canceled' && 'text-muted-foreground'
+        )}
+      />
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-medium">
+          {agentThreadLabels[link.state]}
+        </p>
+        {lifecycleError ? (
+          <p
+            className="truncate text-xs text-destructive"
+            title={lifecycleError}
+          >
+            {lifecycleError}
+          </p>
+        ) : (
+          <p className="text-xs text-muted-foreground">{providerStatus}</p>
+        )}
+      </div>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={() => navigate.toThread(link.threadId)}
+      >
+        <Icon name="PanelRight" className="size-3.5" />
+        Open thread
+      </Button>
+    </section>
+  );
+}
+
 function TrackerDetail({
   route,
   refreshGeneration,
-  onAddToComposer
+  onAddToComposer,
+  onStart
 }: {
   route: Extract<TrackerRoute, { kind: 'item' }>;
   refreshGeneration: number;
   onAddToComposer?: (item: WorkItem) => void;
+  onStart: (item: WorkItem) => void;
 }) {
   const rpc = useRpc<TaskboardRpcContract>();
-  const navigate = useBbNavigate();
   const [item, setItem] = useState<WorkItemDetail | null | undefined>();
   const [error, setError] = useState<string | null>(null);
   const requestRevisionRef = useRef(0);
@@ -4929,8 +5173,6 @@ function TrackerDetail({
     );
   }
 
-  const prompt = formatWorkItemHandoffPrompt(item);
-
   return (
     <div className="@container flex min-h-full flex-col">
       <div className="tb-detail-frame flex flex-1 items-stretch">
@@ -4966,20 +5208,19 @@ function TrackerDetail({
                   Add to chat
                 </Button>
               ) : null}
-              <Button
-                size="sm"
-                onClick={() =>
-                  navigate.toCompose({
-                    initialPrompt: prompt,
-                    focusPrompt: true
-                  })
-                }
-              >
-                <Icon name="AiContentGenerator01" className="size-3.5" />
-                Send to agent
+              <Button size="sm" onClick={() => onStart(item)}>
+                <Icon name="Play" className="size-3.5" />
+                Start agent
               </Button>
             </div>
           </div>
+
+          <TaskExecution
+            key={`${item.bbProjectId}:${item.source}:${item.locator}`}
+            item={item}
+          />
+
+          <AgentThreadLifecycle item={item} />
 
           <DetailMetadata
             item={item}
@@ -5010,7 +5251,10 @@ function TrackerDetail({
           {item.comments.length > 0 ? (
             <section className="tb-comment-rail mt-8 border-t pt-5">
               <h2 className="mb-1 text-sm font-semibold">
-                Comments <span className="text-muted-foreground">{item.comments.length}</span>
+                Comments{' '}
+                <span className="text-muted-foreground">
+                  {item.comments.length}
+                </span>
               </h2>
               <div className="ml-2">
                 {item.comments.map((comment, index) => (
@@ -5364,7 +5608,7 @@ function ProjectConfigForm({
           </div>
           <div className="mt-4 grid gap-3 @lg:grid-cols-2">
             <label className="space-y-1.5 text-xs font-medium">
-              Linear API key{' '}
+              Linear API key
               <span className="font-normal text-muted-foreground">
                 (write-only)
               </span>
@@ -5390,7 +5634,7 @@ function ProjectConfigForm({
               />
             </label>
             <label className="space-y-1.5 text-xs font-medium">
-              Linear team key{' '}
+              Linear team key
               <span className="font-normal text-muted-foreground">
                 (required)
               </span>
@@ -5487,7 +5731,7 @@ function ProjectConfigForm({
               />
             </label>
             <label className="space-y-1.5 text-xs font-medium @lg:col-span-2">
-              Jira API token{' '}
+              Jira API token
               <span className="font-normal text-muted-foreground">
                 (write-only)
               </span>
@@ -5672,8 +5916,8 @@ function ProjectBoardSettingsForm({
       <div className="space-y-1">
         <h3 className="text-sm font-semibold">Board preferences</h3>
         <p className="max-w-2xl text-xs leading-relaxed text-muted-foreground">
-          Choose the filters shown for this project, its default layout, and
-          the workflow order shared by List and Kanban.
+          Choose the filters shown for this project, its default layout, and the
+          workflow order shared by List and Kanban.
         </p>
       </div>
 
@@ -6174,7 +6418,10 @@ function FilterPresetsForm({ projectId }: { projectId: string }) {
       )}
       {presetState.refreshError && !presetState.error ? (
         <div className="flex flex-wrap items-center gap-2 rounded-md border border-border px-3 py-2">
-          <p role="alert" className="min-w-0 flex-1 text-xs text-muted-foreground">
+          <p
+            role="alert"
+            className="min-w-0 flex-1 text-xs text-muted-foreground"
+          >
             Could not refresh presets. Keeping your loaded presets and edits.
           </p>
           <Button
@@ -6369,10 +6616,9 @@ function TaskboardPanel({ subPath }: PluginNavPanelProps) {
   const route = parseTrackerRoute(subPath);
   const rpc = useRpc<TaskboardRpcContract>();
   const navigate = useBbNavigate();
-  const {
-    projectId: contextProjectId,
-    threadId: contextThreadId
-  } = useBbContext();
+  const startAgent = useStartAgentThread();
+  const { projectId: contextProjectId, threadId: contextThreadId } =
+    useBbContext();
   const [sourceProjectContext] = useState(loadSourceProjectContext);
   const selectionContextProjectId = contextThreadId
     ? contextProjectId
@@ -6501,12 +6747,7 @@ function TaskboardPanel({ subPath }: PluginNavPanelProps) {
       }),
       replace: true
     });
-  }, [
-    contextTargetProjectId,
-    navigate,
-    preferredProjectId,
-    route.kind
-  ]);
+  }, [contextTargetProjectId, navigate, preferredProjectId, route.kind]);
   useEffect(() => {
     if (
       route.kind !== 'manage' ||
@@ -6612,7 +6853,11 @@ function TaskboardPanel({ subPath }: PluginNavPanelProps) {
     );
   } else if (route.kind === 'item') {
     outlet = (
-      <TrackerDetail route={route} refreshGeneration={refreshGeneration} />
+      <TrackerDetail
+        route={route}
+        refreshGeneration={refreshGeneration}
+        onStart={item => void startAgent(item)}
+      />
     );
   } else {
     const projectId =
@@ -6636,6 +6881,7 @@ function TaskboardPanel({ subPath }: PluginNavPanelProps) {
             locator: item.locator
           })
         }
+        onStart={item => void startAgent(item)}
       />
     );
   }
@@ -6719,10 +6965,7 @@ function useTaskboardComposerDrop(
 
     const onDragOver = (event: DragEvent) => {
       const transfer = event.dataTransfer;
-      if (
-        !transfer ||
-        !hasTaskboardComposerDragType(transfer.types)
-      ) {
+      if (!transfer || !hasTaskboardComposerDragType(transfer.types)) {
         clearTarget();
         return;
       }
@@ -6773,17 +7016,20 @@ function useTaskboardComposerDrop(
 }
 
 function TaskboardRightPanel({
-  projectId
+  projectId,
+  initialItemRoute = null
 }: {
   projectId: string | null | undefined;
+  initialItemRoute?: Extract<TrackerRoute, { kind: 'item' }> | null;
 }) {
   const rpc = useRpc<TaskboardRpcContract>();
   const navigate = useBbNavigate();
+  const startAgent = useStartAgentThread();
   const composer = useComposer();
   const [itemRoute, setItemRoute] = useState<Extract<
     TrackerRoute,
     { kind: 'item' }
-  > | null>(null);
+  > | null>(initialItemRoute);
   const [refreshing, setRefreshing] = useState(false);
   const [refreshError, setRefreshError] = useState<string | null>(null);
   const [refreshGeneration, setRefreshGeneration] = useState(0);
@@ -6814,9 +7060,9 @@ function TaskboardRightPanel({
   useTaskboardComposerDrop(insertComposerMention);
 
   useEffect(() => {
-    setItemRoute(null);
+    setItemRoute(initialItemRoute);
     setRefreshError(null);
-  }, [projectId]);
+  }, [initialItemRoute, projectId]);
   useEffect(() => {
     const syncPinned = () => setPinned(loadRightPanelPinned());
     const syncStoredPin = (event: StorageEvent) => {
@@ -6848,9 +7094,7 @@ function TaskboardRightPanel({
     projectId && itemRoute?.projectId === projectId ? itemRoute : null;
   const fullRoute: TrackerRoute =
     activeItemRoute ??
-    (projectId
-      ? { kind: 'project', projectId }
-      : { kind: 'root' });
+    (projectId ? { kind: 'project', projectId } : { kind: 'root' });
 
   return (
     <TooltipProvider delayDuration={250}>
@@ -6887,10 +7131,10 @@ function TaskboardRightPanel({
               {projectId === undefined
                 ? 'Loading thread project…'
                 : projectId
-                ? pinned
-                  ? 'Pinned across chats'
-                  : 'Open beside this chat'
-                : 'Choose a BB project'}
+                  ? pinned
+                    ? 'Pinned across chats'
+                    : 'Open beside this chat'
+                  : 'Choose a BB project'}
             </p>
           </div>
           {!activeItemRoute ? (
@@ -6914,14 +7158,13 @@ function TaskboardRightPanel({
                 aria-pressed={pinned}
                 onClick={() => storeRightPanelPinned(!pinned)}
               >
-                <Icon
-                  name={pinned ? 'Pin' : 'PinOff'}
-                  className="size-3.5"
-                />
+                <Icon name={pinned ? 'Pin' : 'PinOff'} className="size-3.5" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              {pinned ? 'Stop reopening across chats' : 'Keep open across chats'}
+              {pinned
+                ? 'Stop reopening across chats'
+                : 'Keep open across chats'}
             </TooltipContent>
           </Tooltip>
           <Tooltip>
@@ -6992,6 +7235,7 @@ function TaskboardRightPanel({
               route={activeItemRoute}
               refreshGeneration={refreshGeneration}
               onAddToComposer={addItemToComposer}
+              onStart={item => void startAgent(item)}
             />
           ) : (
             <TrackerList
@@ -7016,13 +7260,17 @@ function TaskboardRightPanel({
   );
 }
 
-function TaskboardThreadPanel({ threadId }: PluginThreadPanelProps) {
+function TaskboardThreadPanel({ threadId, params }: PluginThreadPanelProps) {
   const rpc = useRpc<TaskboardRpcContract>();
   const { projectId: contextProjectId, threadId: contextThreadId } =
     useBbContext();
   const fallbackProjectId =
     contextThreadId === threadId ? contextProjectId : null;
   const [projectId, setProjectId] = useState<string | null | undefined>();
+  const initialItemRoute = useMemo(
+    () => itemRouteFromPanelParams(params),
+    [params]
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -7044,7 +7292,12 @@ function TaskboardThreadPanel({ threadId }: PluginThreadPanelProps) {
     };
   }, [fallbackProjectId, rpc, threadId]);
 
-  return <TaskboardRightPanel projectId={projectId} />;
+  return (
+    <TaskboardRightPanel
+      projectId={projectId}
+      initialItemRoute={initialItemRoute}
+    />
+  );
 }
 
 function TaskboardNewThreadPanel({ projectId }: PluginNewThreadPanelProps) {
@@ -7071,10 +7324,7 @@ function TaskboardThreadHeaderAction({
   );
 
   useEffect(() => {
-    if (
-      !loadRightPanelPinned() ||
-      autoOpenedThreadRef.current === threadId
-    ) {
+    if (!loadRightPanelPinned() || autoOpenedThreadRef.current === threadId) {
       return;
     }
     autoOpenedThreadRef.current = threadId;
@@ -7382,9 +7632,7 @@ export default definePluginApp(app => {
   app.composer.customize({
     id: 'create-taskboard-issue',
     scopes: ['thread', 'new-thread'],
-    actions: [
-      { id: 'create-issue', component: ComposerCreateIssueAction }
-    ]
+    actions: [{ id: 'create-issue', component: ComposerCreateIssueAction }]
   });
   app.slots.threadPanelAction({
     id: THREAD_PANEL_ACTION_ID,

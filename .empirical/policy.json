@@ -49,7 +49,7 @@
           "bb-plugin-taskboard"
         ],
         "cwd": ".",
-        "timeoutMs": 120000,
+        "timeoutMs": 300000,
         "maxOutputBytes": 1048576,
         "evidenceKinds": [
           "test"

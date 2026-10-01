@@ -1,4 +1,7 @@
 import { execFile } from 'node:child_process';
+import { constants as fsConstants } from 'node:fs';
+import { access, realpath } from 'node:fs/promises';
+import path from 'node:path';
 import type { BbPluginApi } from '@get-bb/plugin-sdk';
 import { z } from 'zod';
 import { CREATE_OUTCOME_UNCERTAIN_MARKER } from '../contract.js';
@@ -9,6 +12,12 @@ import type {
   WorkSourceAdapter
 } from './types.js';
 import { withoutComments } from './types.js';
+import {
+  buildGithubCliDiscoveryEnvironment,
+  buildGithubCliEnvironment,
+  githubCliCanonicalPathAllowed,
+  githubCliCandidatePaths
+} from './github-environment.js';
 
 const githubItemSchema = z
   .object({
@@ -52,6 +61,8 @@ const detailOutputSchema = z
 export const githubStatusOutputSchema = z
   .object({
     ghOk: z.boolean(),
+    // Older official GitHub plugin versions do not include ghState.
+    ghState: z.enum(['ready', 'needs_configuration', 'unavailable']).optional(),
     ghError: z.string().nullable(),
     repos: z.array(
       z.object({ repo: z.string(), projectId: z.string().nullable() }).strict()
@@ -123,13 +134,18 @@ let resolvedGhPath: string | null = null;
 function runFile(
   file: string,
   args: string[],
-  timeoutMs = 20_000
+  timeoutMs = 20_000,
+  environment: NodeJS.ProcessEnv = buildGithubCliEnvironment()
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     execFile(
       file,
       args,
-      { timeout: timeoutMs, maxBuffer: 16 * 1024 * 1024 },
+      {
+        timeout: timeoutMs,
+        maxBuffer: 16 * 1024 * 1024,
+        env: environment
+      },
       (error, stdout, stderr) => {
         if (error) {
           reject(new Error(stderr.trim() || error.message));
@@ -143,17 +159,37 @@ function runFile(
 
 async function resolveGhPath(): Promise<string> {
   if (resolvedGhPath !== null) return resolvedGhPath;
-  for (const candidate of [
-    'gh',
-    '/opt/homebrew/bin/gh',
-    '/usr/local/bin/gh'
-  ]) {
+  const canonicalCwd = await realpath(process.cwd()).catch(() => process.cwd());
+  const configuredPath = process.env.GH_PATH;
+  const canonicalConfiguredPath = configuredPath && path.isAbsolute(configuredPath)
+    ? await realpath(configuredPath).catch(() => null)
+    : null;
+  for (const candidate of githubCliCandidatePaths()) {
     try {
-      await runFile(candidate, ['--version'], 5_000);
-      resolvedGhPath = candidate;
-      return candidate;
+      await access(
+        candidate,
+        process.platform === 'win32' ? fsConstants.F_OK : fsConstants.X_OK
+      );
+      const absoluteCandidate = await realpath(candidate);
+      if (
+        !githubCliCanonicalPathAllowed(
+          absoluteCandidate,
+          canonicalCwd,
+          canonicalConfiguredPath
+        )
+      ) {
+        continue;
+      }
+      await runFile(
+        absoluteCandidate,
+        ['--version'],
+        5_000,
+        buildGithubCliDiscoveryEnvironment()
+      );
+      resolvedGhPath = absoluteCandidate;
+      return absoluteCandidate;
     } catch {
-      // Try the next common GitHub CLI location.
+      // Try the next absolute candidate.
     }
   }
   throw new Error('GitHub CLI is not available');

@@ -12,6 +12,7 @@ import {
   filterPresetStateSchema,
   filterPresetSummary,
   formatWorkItemContext,
+  formatWorkItemHandoffPrompt,
   normalizePresetName,
   projectConfigMutationSchema,
   projectCredentialsInteractionResponseSchema,
@@ -34,7 +35,8 @@ import {
   type WorkItemFilterField,
   type WorkSource,
   type WorkStatusOption,
-  type WorkSourceStatus
+  type WorkSourceStatus,
+  type AgentThreadLink
 } from './contract.js';
 import { filterWorkItemsByAttributes } from './browse.js';
 import {
@@ -64,6 +66,13 @@ import {
   type WorkSourceAdapter
 } from './sources/types.js';
 import { createWorkItemStore } from './store.js';
+import { registerExecution } from './execution/server.js';
+import { resolveExecutionDefaults } from './execution/defaults.js';
+import {
+  agentThreadOutcome,
+  createAgentThreadStore
+} from './execution/agent-thread-store.js';
+import { selectAgentStatus } from './execution/provider-status.js';
 
 const SOURCES: readonly WorkSource[] = ['linear', 'github', 'jira'];
 const CREDENTIAL_SOURCES: readonly CredentialSource[] = ['linear', 'jira'];
@@ -144,6 +153,27 @@ function sleep(ms: number, signal: AbortSignal): Promise<void> {
         resolve();
       },
       { once: true }
+    );
+  });
+}
+
+function waitUntilAborted<T>(
+  work: Promise<T>,
+  signal: AbortSignal
+): Promise<T | null> {
+  if (signal.aborted) return Promise.resolve(null);
+  return new Promise((resolve, reject) => {
+    const aborted = () => resolve(null);
+    signal.addEventListener('abort', aborted, { once: true });
+    work.then(
+      value => {
+        signal.removeEventListener('abort', aborted);
+        resolve(value);
+      },
+      error => {
+        signal.removeEventListener('abort', aborted);
+        reject(error);
+      }
     );
   });
 }
@@ -409,7 +439,12 @@ function parseGithubRepoFromRemote(
 
 export default async function plugin(bb: BbPluginApi) {
   const store = createWorkItemStore(bb);
+  const agentThreads = createAgentThreadStore(bb.storage.database());
   const credentials = createProjectCredentialVault(bb);
+  const execution = registerExecution(bb, {
+    assertProject: assertProjectExists,
+    getItem: task => getLiveItem(task.projectId, task.source, task.locator)
+  });
 
   async function liveProjects() {
     return bb.sdk.projects.list({ includePersonal: true });
@@ -1479,6 +1514,11 @@ export default async function plugin(bb: BbPluginApi) {
           `${sourceName(source)} item is no longer cached for this BB project`
         );
       }
+      if (execution.hasManagedExecution({projectId, source, locator})) {
+        const target = (await adapter.statusOptions(locator)).find(option => option.id === statusId);
+        if (!target) throw new Error('Tracker status is no longer available');
+        await execution.guardTrackerTransition({projectId, source, locator}, target);
+      }
       advanceSourceRevision(projectId, source);
       let externalItem: ExternalWorkItemDetail;
       try {
@@ -1604,7 +1644,178 @@ export default async function plugin(bb: BbPluginApi) {
     return mutation;
   }
 
+  const agentThreadStarts = new Map<
+    string,
+    Promise<{ threadId: string }>
+  >();
+  const listThreadEvents = bb.sdk.threads.events.list as unknown as (input: {
+    threadId: string;
+    types: readonly ['turn/completed'];
+    order: 'desc';
+    limit: string;
+    signal?: AbortSignal;
+  }) => ReturnType<typeof bb.sdk.threads.events.list>;
+
+  async function ensureAgentThreadPanel(
+    link: AgentThreadLink,
+    item: WorkItemDetail
+  ): Promise<void> {
+    const tabId = `taskboard-${link.dispatchKey}`;
+    const currentTabs = await bb.sdk.threads.tabs.get({
+      threadId: link.threadId
+    });
+    if (currentTabs.tabs.some(tab => tab.id === tabId)) return;
+    await bb.sdk.threads.tabs.update({
+      threadId: link.threadId,
+      expectedRevision: currentTabs.revision,
+      tabs: [
+        ...currentTabs.tabs,
+        {
+          id: tabId,
+          kind: 'plugin-panel',
+          pluginId: 'taskboard',
+          actionId: 'taskboard-panel',
+          title: item.key,
+          paramsJson: JSON.stringify({
+            kind: 'item',
+            projectId: link.task.projectId,
+            source: link.task.source,
+            locator: link.task.locator
+          })
+        }
+      ]
+    });
+  }
+
+  async function recoverLegacyAgentThread(
+    task: AgentThreadLink['task'],
+    dispatchKey: string
+  ): Promise<AgentThreadLink | null> {
+    const candidates = (
+      await Promise.all(
+        [false, true].map(archived =>
+          bb.sdk.threads.list({
+            archived,
+            projectId: task.projectId,
+            originPluginId: 'taskboard',
+            includeHidden: true,
+            limit: 200
+          })
+        )
+      )
+    )
+      .flat()
+      .sort((left, right) => right.updatedAt - left.updatedAt);
+
+    for (const thread of candidates) {
+      const tabs = await bb.sdk.threads.tabs.get({ threadId: thread.id });
+      const matchesTask = tabs.tabs.some(tab => {
+        if (
+          tab.kind !== 'plugin-panel' ||
+          tab.pluginId !== 'taskboard' ||
+          tab.actionId !== 'taskboard-panel' ||
+          !tab.paramsJson
+        ) {
+          return false;
+        }
+        try {
+          const params = JSON.parse(tab.paramsJson) as Record<string, unknown>;
+          return (
+            params.kind === 'item' &&
+            params.projectId === task.projectId &&
+            params.source === task.source &&
+            params.locator === task.locator
+          );
+        } catch {
+          return false;
+        }
+      });
+      if (!matchesTask) continue;
+
+      const events = await listThreadEvents({
+        threadId: thread.id,
+        types: ['turn/completed'],
+        order: 'desc',
+        limit: '1'
+      });
+      const terminal =
+        events[0]?.type === 'turn/completed'
+          ? agentThreadOutcome(events[0])
+          : {
+              state: 'running' as const,
+              terminalEventSeq: null,
+              error: null
+            };
+      const now = new Date().toISOString();
+      return agentThreads.insert({
+        dispatchKey,
+        task,
+        threadId: thread.id,
+        ...terminal,
+        inProgressTransitionAt: null,
+        doneTransitionAt: null,
+        providerError: null,
+        createdAt: now,
+        updatedAt: now
+      });
+    }
+    return null;
+  }
+
+  async function transitionAgentThreadProvider(
+    link: AgentThreadLink,
+    category: 'in_progress' | 'done'
+  ): Promise<AgentThreadLink> {
+    if (
+      (category === 'in_progress' && link.inProgressTransitionAt) ||
+      (category === 'done' && link.doneTransitionAt)
+    ) {
+      return link;
+    }
+    try {
+      const options = await liveStatusOptions(
+        link.task.projectId,
+        link.task.source,
+        link.task.locator
+      );
+      const target = selectAgentStatus(options, category);
+      if (!target) {
+        throw new Error(
+          `${sourceName(link.task.source)} has no ${category === 'done' ? 'completed' : 'in-progress'} status available for this issue`
+        );
+      }
+      if (!target.current) {
+        await updateItemStatus(
+          link.task.projectId,
+          link.task.source,
+          link.task.locator,
+          target.id
+        );
+      }
+      const current = agentThreads.byDispatch(link.dispatchKey) ?? link;
+      const updated = agentThreads.providerTransition(current, category, null);
+      bb.realtime.publish('taskboard:changed', {
+        projectId: link.task.projectId,
+        source: link.task.source
+      });
+      return updated;
+    } catch (error) {
+      const current = agentThreads.byDispatch(link.dispatchKey) ?? link;
+      agentThreads.providerTransition(
+        current,
+        category,
+        `${category === 'done' ? 'Completion' : 'Start'} status update failed: ${errorMessage(error)}`
+      );
+      bb.realtime.publish('taskboard:changed', {
+        projectId: link.task.projectId,
+        source: link.task.source
+      });
+      throw error;
+    }
+  }
+
   const handlers: PluginRpcHandlers<typeof taskboardRpcContract> = {
+    ...execution.handlers,
     async listProjects() {
       return { projects: await listProjects() };
     },
@@ -1612,6 +1823,95 @@ export default async function plugin(bb: BbPluginApi) {
       const thread = await bb.sdk.threads.get({ threadId: input.threadId });
       await assertProjectExists(thread.projectId);
       return { projectId: thread.projectId };
+    },
+    async startAgentThread(input) {
+      const task = {
+        projectId: input.projectId,
+        source: input.source,
+        locator: input.locator
+      };
+      const taskKey = JSON.stringify([
+        input.projectId,
+        input.source,
+        input.locator
+      ]);
+      const existing = agentThreadStarts.get(taskKey);
+      if (existing) return existing;
+      const start = (async () => {
+        await assertProjectExists(input.projectId);
+        const item = await getLiveItem(
+          input.projectId,
+          input.source,
+          input.locator
+        );
+        const durable =
+          agentThreads.byDispatch(input.dispatchKey) ??
+          (() => {
+            const latest = agentThreads.latest(task);
+            return latest?.state === 'running' ? latest : null;
+          })() ??
+          (await recoverLegacyAgentThread(task, input.dispatchKey));
+        if (durable) {
+          await ensureAgentThreadPanel(durable, item);
+          await transitionAgentThreadProvider(
+            durable,
+            durable.state === 'completed' ? 'done' : 'in_progress'
+          );
+          return { threadId: durable.threadId };
+        }
+        const project = await bb.sdk.projects.get({
+          projectId: input.projectId
+        });
+        const source =
+          project.sources.find(candidate => candidate.isDefault) ??
+          project.sources[0];
+        if (!source) throw new Error('Configure a project repository first');
+
+        await resolveExecutionDefaults(source.path, {
+          initializeRepository: true
+        });
+        const thread = await bb.sdk.threads.spawn({
+          projectId: input.projectId,
+          title: `${item.key}: ${item.title}`.slice(0, 200),
+          prompt: formatWorkItemHandoffPrompt(item),
+          environment: { type: 'project-default' },
+          origin: 'plugin',
+          originPluginId: 'taskboard'
+        });
+        const now = new Date().toISOString();
+        const link = agentThreads.insert({
+          dispatchKey: input.dispatchKey,
+          task,
+          threadId: thread.id,
+          state: 'running',
+          terminalEventSeq: null,
+          error: null,
+          inProgressTransitionAt: null,
+          doneTransitionAt: null,
+          providerError: null,
+          createdAt: now,
+          updatedAt: now
+        });
+        bb.realtime.publish('taskboard:changed', {
+          projectId: input.projectId,
+          source: input.source
+        });
+        await ensureAgentThreadPanel(link, item);
+        await transitionAgentThreadProvider(link, 'in_progress');
+        return { threadId: thread.id };
+      })();
+      agentThreadStarts.set(taskKey, start);
+      try {
+        return await start;
+      } finally {
+        if (agentThreadStarts.get(taskKey) === start) {
+          agentThreadStarts.delete(taskKey);
+        }
+      }
+    },
+    async agentThreadStatus(input) {
+      await assertProjectExists(input.projectId);
+      return { link: agentThreads.latest(input) };
     },
     async status(input) {
       await assertProjectExists(input.projectId);
@@ -2415,6 +2715,86 @@ export default async function plugin(bb: BbPluginApi) {
     });
   }
 
+  bb.background.service('agent-thread-reconciliation', {
+    async start(signal) {
+      while (!signal.aborted) {
+        for (const link of agentThreads.pending()) {
+          if (signal.aborted) return;
+          let currentLink = link;
+          if (
+            currentLink.state === 'running' &&
+            currentLink.inProgressTransitionAt === null
+          ) {
+            try {
+              currentLink = await transitionAgentThreadProvider(
+                currentLink,
+                'in_progress'
+              );
+            } catch {
+              /* The durable provider error remains retryable on the next sweep. */
+              currentLink =
+                agentThreads.byDispatch(currentLink.dispatchKey) ?? currentLink;
+            }
+          }
+          if (currentLink.state === 'completed') {
+            try {
+              await transitionAgentThreadProvider(currentLink, 'done');
+            } catch {
+              /* The durable provider error remains retryable on the next sweep. */
+            }
+            continue;
+          }
+          try {
+            const events = await waitUntilAborted(
+              listThreadEvents({
+                threadId: currentLink.threadId,
+                types: ['turn/completed'],
+                order: 'desc',
+                limit: '1',
+                signal
+              }),
+              signal
+            );
+            if (!events || signal.aborted) return;
+            const event = events[0];
+            if (!event || event.type !== 'turn/completed') continue;
+            const result = agentThreads.transition(
+              currentLink,
+              agentThreadOutcome(event)
+            );
+            if (result.changed) {
+              bb.realtime.publish('taskboard:changed', {
+                projectId: currentLink.task.projectId,
+                source: currentLink.task.source
+              });
+            }
+            if (result.link.state === 'completed') {
+              try {
+                await transitionAgentThreadProvider(result.link, 'done');
+              } catch {
+                /* The durable provider error remains retryable on the next sweep. */
+              }
+            }
+          } catch (error) {
+            if (signal.aborted) return;
+            const result = agentThreads.transition(currentLink, {
+              state: 'running',
+              terminalEventSeq: null,
+              error: `Could not refresh worker state: ${errorMessage(error)}`
+            });
+            if (result.changed) {
+              bb.realtime.publish('taskboard:changed', {
+                projectId: currentLink.task.projectId,
+                source: currentLink.task.source
+              });
+            }
+          }
+        }
+        await sleep(2000, signal);
+      }
+    }
+  });
+
   bb.background.service('sync', {
     async start(signal) {
       let legacyMigrationFinished = false;
@@ -2431,9 +2811,13 @@ export default async function plugin(bb: BbPluginApi) {
         }
         try {
           const projectIds = await configuredLiveProjectIds();
-          await Promise.all(
-            projectIds.map(projectId => syncAll(projectId, undefined, false))
+          await waitUntilAborted(
+            Promise.all(
+              projectIds.map(projectId => syncAll(projectId, undefined, false))
+            ),
+            signal
           );
+          if (signal.aborted) return;
         } catch (error) {
           bb.log.warn(`Background sync failed: ${errorMessage(error)}`);
         }

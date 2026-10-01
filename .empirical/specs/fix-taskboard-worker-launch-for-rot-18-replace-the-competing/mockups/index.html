@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Taskboard Start Agent Flow</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        background: #161718;
+        color: #f4f4f2;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+      }
+      main {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        min-height: 100vh;
+      }
+      section {
+        padding: 32px;
+        border-right: 1px solid #343638;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      .crumb {
+        color: #9b9da1;
+        font-size: 12px;
+      }
+      h1 {
+        max-width: 680px;
+        margin: 12px 0 24px;
+        font-size: 26px;
+        line-height: 1.2;
+      }
+      button {
+        border: 1px solid #505256;
+        border-radius: 6px;
+        padding: 9px 13px;
+        background: #f4f4f2;
+        color: #151617;
+        font-weight: 650;
+      }
+      button.secondary {
+        background: transparent;
+        color: #f4f4f2;
+      }
+      .actions {
+        display: flex;
+        gap: 8px;
+      }
+      .body {
+        border-top: 1px solid #343638;
+        padding-top: 22px;
+        color: #c5c6c8;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+      .worker {
+        background: #111213;
+      }
+      .status {
+        display: flex;
+        min-height: 340px;
+        align-items: center;
+        justify-content: center;
+        border-block: 1px solid #343638;
+        text-align: center;
+      }
+      .pulse {
+        width: 9px;
+        height: 9px;
+        margin: 0 auto 14px;
+        border-radius: 50%;
+        background: #67d391;
+        box-shadow: 0 0 0 8px #67d3911f;
+      }
+      .status strong {
+        display: block;
+        margin-bottom: 7px;
+      }
+      .status p {
+        max-width: 360px;
+        margin: 0;
+        color: #9b9da1;
+        font-size: 13px;
+      }
+      @media (max-width: 800px) {
+        main {
+          grid-template-columns: 1fr;
+        }
+        section {
+          min-height: 50vh;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section aria-label="Issue detail">
+        <header>
+          <div class="crumb">ROT-18 / In progress</div>
+          <div class="actions">
+            <button class="secondary">Open</button>
+            <button>Start agent</button>
+          </div>
+        </header>
+        <h1>
+          Evitar que los popups de notificación tapen inputs y el chat de Work
+          Room
+        </h1>
+        <div class="body">
+          One primary start action replaces the separate agent handoff and
+          execution controls. Existing issue metadata and description remain
+          directly below it.
+        </div>
+      </section>
+      <section class="worker" aria-label="Worker page">
+        <header>
+          <div>
+            <div class="crumb">ROT-18 / Worker</div>
+            <h1>
+              Evitar que los popups de notificación tapen inputs y el chat de
+              Work Room
+            </h1>
+          </div>
+          <button class="secondary">Issue</button>
+        </header>
+        <div class="status">
+          <div>
+            <div class="pulse"></div>
+            <strong>Starting agent</strong>
+            <p>Preparing the repository and dispatching ROT-18 to Symphony.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

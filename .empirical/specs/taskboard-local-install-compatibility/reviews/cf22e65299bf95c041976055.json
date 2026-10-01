@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:dc5d6cf0fbe83c6f28ada2ee58551e919ee8efadc16c88c4b5548658e2b0b67d",
+  "mode": "fresh-context",
+  "baseRef": "feat/taskboard-symphony",
+  "baseCommit": "ea037e6cd1df7f1aecd9f1704f0349322a9d70d5",
+  "headCommit": "48b0768d91f238dc3bdde5fba361e17bc4b249e0",
+  "diffDigest": "sha256:0096df9341e0c20bede256f246bd85a8ddc2018d8c573b741b640c4630d954b7",
+  "verdict": "APPROVED",
+  "reviewerActor": "install_evidence_review",
+  "reviewerInvocationId": "install_evidence_review-48b0768d-20260928-01",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: Carry forward the previous PASS. The supplied changes retain optional ghState support, deliberate GitHub CLI environment forwarding, credential-free discovery, canonical workspace exclusion, and associated regression tests. The previous review records 143 passing tests plus successful type, build, and metadata checks. Increasing the focused workflow timeout changes no product behavior or assertion.\n- PASS AC-2: The committed installation record reports a running stable-source plugin, preserved project configurations, four preserved credential files, and a private rollback backup. It now records 378 cached items after migration, all 361 original items preserved, zero originals missing, and cachedWorkPreserved=true. These observations resolve F-1.\n- PASS AC-3: Carry forward the previous findings that the pinned native runtime is healthy, its queue is empty, full-setup configuration consistently selects Symphony, and plugin-only defaults disable managed execution. The installation record now identifies /usr/local/bin/codex as the service command, confirms authentication through the existing ChatGPT login, and records a successful app-server handshake without starting a thread or turn. No installer task was dispatched. These observations resolve F-2.\n\n## Security / correctness\n\nNo material security or correctness defect identified in the supplied packet. The added evidence contains no credential values and explicitly records that authentication checks dispatched no task. This review evaluated committed evidence only; it did not independently inspect live services or rerun checks.\n\n## Design / maintainability\n\nThe compatibility restoration remains narrowly scoped. The bounded workflow timeout increase preserves existing checks and follows accepted decision D-002. The added installation observations substantiate the two previously unresolved acceptance claims.",
+  "bodyDigest": "sha256:d392dfbd159d420d96cddff1b2f44fe9284bc1c20c4526c4b088a3d5653e8127",
+  "findings": [],
+  "digest": "sha256:cf22e65299bf95c0419760551c9ddafa8dbf44951827d976865aa506d5170f56"
+}

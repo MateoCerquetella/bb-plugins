@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-10de26bc18a5d70ce8e0c5af",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Run focused Taskboard verification after making source assertions formatter-agnostic.",
+  "passed": false,
+  "startedAt": "2026-09-28T20:37:54.198Z",
+  "completedAt": "2026-09-28T20:41:20.855Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-taskboard-worker-launch-for-rot-18-replace-the-competing",
+    "specRevision": 2,
+    "specDigest": "sha256:3b12a3e15d51ca1c93859814c289b6b317cef34e6f5ca50f4b1272077239e8dc",
+    "treeDigest": "sha256:17967172484d46a7297c4de50b53164b4b00bb25dca750e6fb24edee46a0d7f0",
+    "policyDigest": "sha256:168cfa9fe1a343bc5a02663b51d27fc4808f530064f01faa64abed49e9580803",
+    "workflowRevision": 7,
+    "gitCommit": "81d0072d3bafecc0202a701388b8c2f3c70d2f5c",
+    "textTreeDigest": "sha256:17967172484d46a7297c4de50b53164b4b00bb25dca750e6fb24edee46a0d7f0"
+  },
+  "digest": "sha256:d3c11842a7a8795e80115e32d830a2e97c10f518aa22e0703e59a2e7c8a28959",
+  "kind": "qa",
+  "matrixDigest": "sha256:ab98de0a1b97cf0906e14883f262be56d8260e7ebb343b540e3fc125d55a02e0",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "x64",
+    "node": "24.21.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "failed",
+      "summary": "Run focused Taskboard verification after making source assertions formatter-agnostic.",
+      "startedAt": "2026-09-28T20:37:54.198Z",
+      "completedAt": "2026-09-28T20:41:20.855Z",
+      "durationMs": 206657,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:f9b129d8080d6ae249324764ab9bf53ce8ebc569462bb37a19a9d1056d966f66",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-taskboard"
+        ],
+        "cwd": ".",
+        "timeoutMs": 300000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH",
+          "TMPDIR"
+        ]
+      },
+      "result": {
+        "exitCode": 1,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:d0b769a466b656e4bb552563f8f2faa50143b830adafd34f48d640fc6b76b127",
+        "stderrDigest": "sha256:3cbc05792742a7e45bb196e5a1d351e2d7011d2566be82eef215d6377ea02af7",
+        "stdoutTail": "rom \"./board-settings.js\";\\nimport {\\n  jiraBaseUrlSchema,\\n  projectCredentialsInteractionPayloadSchema,\\n  projectCredentialsInteractionResponseSchema,\\n} from \"./credential-contract.js\";\\nimport {\\n  assigneeAvatarIdentity,\\n  assigneeFilterOptions,\\n  canonicalizeSelectedFilterOptions,\\n  filterWorkItemsByAttributes,\\n  isFilterOptionSelected,\\n  labelFilterOptions,\\n  priorityFilterOptions,\\n  projectFilterOptions,\\n  sortWorkItemsByWorkflow,\\n  statusFilterOptions,\\n  toggleFilterOptionSelection,\\n  workflowStatusLaneKey,\\n  workflowStatusLanes,\\n  workflowStatusTone,\\n  workflowStatusGroups,\\n  type FilterOption,\\n} from \"./browse.js\";\\nimport {\\n  ACROSS_PROJECTS_SCOPE,\\n  MAX_BROWSE_QUERY_LENGTH,\\n  browsePreferenceStore,\\n  createAssigneeScope,\\n  isGroupCollapsed,\\n  projectBrowseScope,\\n  rememberCreateAssigneeAfterSuccess,\\n  restoreRememberedCreateAssignee,\\n  toggleGroupCollapsedOverride,\\n  type BrowsePreferences,\\n  type BrowsePreferenceScope,\\n} from \"./browse-preferences.js\";\\nimport {\\n  availableContextProjectId,\\n  contextSelectionToken,\\n  previousProjectRouteContext,\\n  projectRouteContext,\\n  shouldApplyContextProject,\\n  type NavigationEntryLike,\\n  type ProjectRouteContext,\\n} from \"./project-selection.js\";\\nimport {\\n  TASKBOARD_COMPOSER_MIME,\\n  hasTaskboardComposerDragType,\\n  parseTaskboardComposerMention,\\n  serializeTaskboardComposerMention,\\n  taskboardComposerMention,\\n  writeTaskboardComposerDrag,\\n} from \"./composer-handoff.js\";\\nimport \"./app.css\";\\n\\nconst PANEL_PATH = \"tasks\";\\nconst THREAD_PANEL_ACTION_ID = \"taskboard-panel\";\\nconst ALL_SOURCES = \"all\";\\nconst RIGHT_PANEL_PINNED_STORAGE_KEY = \"bb-taskboard:right-panel-pinned\";\\nconst RIGHT_PANEL_PIN_EVENT = \"bb-taskboard:right-panel-pin-changed\";\\nconst SIDEBAR_COLLAPSED_STORAGE_KEY = \"bb-taskboard:sidebar-collapsed\";\\nconst SIDEBAR_WIDTH_STORAGE_KEY = \"bb-taskboard:sidebar-width\";\\nconst LAST_PROJECT_STORAGE_KEY = \"bb-taskboard:last-project\";\\nconst SIDEBAR_AUTO_COLLAPSE_WIDTH = 720;\\nconst SIDEBAR_DEFAULT_WIDTH = 208;\\nconst SIDEBAR_MIN_WIDTH = 180;\\nconst SIDEBAR_MAX_WIDTH = 340;\\nconst CREATE_METADATA_NETWORK_ERROR =\\n  \"Taskboard could not load issue creation options. Check the connection and try again.\";\\nconst COMPOSER_DROP_CUE_TEXT = \"Drop to add ticket to chat\";\\n\\ninterface ComposerDropTarget {\\n  editor: HTMLElement;\\n  form: HTMLFormElement;\\n}\\n\\nfunction composerDropTarget(\\n  target: EventTarget | null,\\n): ComposerDropTarget | null {\\n  const element = target instanceof Element ? target : null;\\n  const editor = element?.closest<HTMLElement>(\\n    '[contenteditable=\"true\"][role=\"textbox\"]',\\n  );\\n  const form = editor?.closest<HTMLFormElement>(\"form\") ?? null;\\n  return editor && form ? { editor, form } : null;\\n}\\n\\nconst STATE_CATEGORY_ORDER: readonly WorkStateCategory[] = [\\n  \"in_progress\",\\n  \"todo\",\\n  \"backlog\",\\n  \"done\",\\n  \"canceled\",\\n];\\n\\nconst STATE_CATEGORY_LABELS: Readonly<Record<WorkStateCategory, string>> = {\\n  backlog: \"Backlog\",\\n  todo: \"Todo\",\\n  in_progress: \"In progress\",\\n  done: \"Done\",\\n  canceled: \"Canceled\",\\n};\\n\\ntype FilterPresentationKey = \"source\" | WorkItemFilterField;\\ninterface FilterPresentation {\\n  label: string;\\n  icon: IconName;\\n  description: string;\\n}\\n\\nconst FILTER_PRESENTATION = {\\n  source: {\\n    label: \"Source\",\\n    icon: \"GitBranch\",\\n    description: \"The external tracker selected for the work.\",\\n  },\\n  state: {\\n    label: \"State group\",\\n    icon: \"Circle\",\\n    description: \"Broad Backlog, Todo, In progress, Done, and Canceled groups.\",\\n  },\\n  status: {\\n    label: \"Status\",\\n    icon: \"Workflow\",\\n    description: \"Exact provider workflow states such as In Review or Blocked.\",\\n  },\\n  assignee: {\\n    label: \"Assignee\",\\n    icon: \"UserRound\",\\n    description: \"People assigned to the work, including Unassigned.\",\\n  },\\n  priority: {\\n    label: \"Priority\",\\n    icon: \"AlertCircle\",\\n    description: \"Urgent, High, Medium, Low, and unprioritized work.\",\\n  },\\n  project: {\\n    label: \"Project\",\\n    icon: \"Folder\",\\n    description: \"The provider project, repository, or Jira project.\",\\n  },\\n  labels: {\\n    label: \"Labels\",\\n    icon: \"Layers\",\\n    description: \"Provider labels, including work with no labels.\",\\n  },\\n} as const satisfies Record<FilterPresentationKey, FilterPresentation>;\\n\\nconst BOARD_FILTER_FIELDS = [\\n  \"state\",\\n  \"status\",\\n  \"assignee\",\\n  \"priority\",\\n  \"project\",\\n  \"labels\",\\n] as const satisfies readonly WorkItemFilterField[];\\n\\nconst BOARD_FILTER_OPTIONS = BOARD_FILTER_FIELDS.map((field) => ({\\n  field,\\n  ...FILTER_PRESENTATION[field],\\n}));\\n\\ntype SourceFilter = typeof ALL_SOURCES | WorkSource;\\n\\ntype TrackerRoute =\\n  | { kind: \"root\" }\\n  | { kind: \"all\" }\\n  | { kind: \"project\"; projectId: string }\\n  | { kind: \"manage\"; projectId: string | null }\\n  | {\\n      kind: \"item\";\\n      projectId: string;\\n      source: WorkSource;\\n      locator: string;\\n    }\\n  | {\\n      kind: \"worker\";\\n      projectId: string;\\n      source: WorkSource;\\n      locator: string;\\n      start: boolean;\\n    };\\n\\nfunction loadLastProjectId(): string | null {\\n  try {\\n    return window.localStorage.getItem(LAST_PROJECT_STORAGE_KEY);\\n  } catch {\\n    return null;\\n  }\\n}\\n\\nfunction storeLastProjectId(projectId: string): void {\\n  try {\\n    window.localStorage.setItem(LAST_PROJECT_STORAGE_KEY, projectId);\\n  } catch {\\n    // Persistence is best-effort in sandboxed browser contexts.\\n  }\\n}\\n\\nfunction loadSourceProjectContext(): ProjectRouteContext | null {\\n  const browserNavigation = (\\n    window as Window & {\\n      navigation?: {\\n        currentEntry?: { index: number } | null;\\n        entries(): NavigationEntryLike[];\\n      };\\n    }\\n  ).navigation;\\n  const currentIndex = browserNavigation?.currentEntry?.index;\\n  if (browserNavigation !== undefined && currentIndex !== undefined) {\\n    try {\\n      return previousProjectRouteContext(\\n        browserNavigation.entries(),\\n        currentIndex,\\n        window.location.origin,\\n      );\\n    } catch {\\n      // Fall back to the document referrer when navigation history is unavailable.\\n    }\\n  }\\n  return projectRouteContext(document.referrer, window.location.origin);\\n}\\n\\nfunction ManageHeaderAction({ subPath }: PluginNavPanelProps) {\\n  const route = parseTrackerRoute(subPath);\\n  const { projectId: contextProjectId } = useBbContext();\\n  const navigate = useBbNavigate();\\n  const routeProjectId =\\n    route.kind === \"project\" || route.kind === \"item\" || route.kind === \"worker\"\\n      ? route.projectId\\n      : route.kind === \"manage\"\\n        ? route.projectId\\n        : null;\\n  const projectId = routeProjectId ?? contextProjectId ?? loadLastProjectId();\\n  const showCreate = route.kind === \"root\" || route.kind === \"project\";\\n\\n  return (\\n    <div className=\"flex items-center gap-1.5\">\\n      {showCreate ? (\\n        <DirectCreateIssueAction projectId={projectId} variant=\"labeled\" />\\n      ) : null}\\n      <Button\\n        type=\"button\"\\n        size=\"sm\"\\n        variant=\"outline\"\\n        onClick={() =>\\n          navigate.toPluginPanel(PANEL_PATH, {\\n            subPath: projectId\\n              ? routeToSubPath({ kind: \"manage\", projectId })\\n              : \"manage\",\\n          })\\n        }\\n      >\\n        <Icon name=\"Settings\" className=\"size-4\" />\\n        Manage\\n      </Button>\\n    </div>\\n  );\\n}\\n\\nfunction encodeLocator(locator: string): string {\\n  // encodeURIComponent deliberately leaves \"~\" untouched, but this route uses\\n  // it as the percent-escape marker. Escape literal tildes first so arbitrary\\n  // external locators still round-trip without colliding with that marker.\\n  return encodeURIComponent(locator)\\n    .replaceAll(\"~\", \"%7E\")\\n    .replaceAll(\"%\", \"~\");\\n}\\n\\nfunction decodeLocator(locator: string): string {\\n  try {\\n    return decodeURIComponent(locator.replaceAll(\"~\", \"%\"));\\n  } catch {\\n    return \"\";\\n  }\\n}\\n\\nfunction decodeSegment(segment: string): string {\\n  try {\\n    return d`... 245182 more characters,\n    expected: /activeItemRoute \\? 'overflow-y-auto' : 'overflow-hidden'/u,\n    operator: 'match',\n    diff: 'simple'\n  }\n",
+        "stderrTail": "npm error Lifecycle script `test` failed with error:\nnpm error code 1\nnpm error path /Users/mateocerquetella/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_pshdwft79h-1/bb-plugins/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.5-symphony.0\nnpm error location /Users/mateocerquetella/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_pshdwft79h-1/bb-plugins/plugins/taskboard\nnpm error command failed\nnpm error command sh -c node --test --experimental-strip-types test/*.test.ts\nnpm error Lifecycle script `check` failed with error:\nnpm error code 1\nnpm error path /Users/mateocerquetella/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_pshdwft79h-1/bb-plugins/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.5-symphony.0\nnpm error location /Users/mateocerquetella/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_pshdwft79h-1/bb-plugins/plugins/taskboard\nnpm error command failed\nnpm error command sh -c npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build\n",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:17967172484d46a7297c4de50b53164b4b00bb25dca750e6fb24edee46a0d7f0",
+      "sourceTreeAfter": "sha256:17967172484d46a7297c4de50b53164b4b00bb25dca750e6fb24edee46a0d7f0",
+      "artifacts": []
+    }
+  ],
+  "anomalies": [
+    "outcome-failed"
+  ]
+}

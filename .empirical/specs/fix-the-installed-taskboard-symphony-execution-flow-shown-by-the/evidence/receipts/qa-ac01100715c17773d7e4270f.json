@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-ac01100715c17773d7e4270f",
+  "criteria": [
+    "AC-6"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "Stable local Taskboard source is at c52c63fd; BB reload reports taskboard@0.3.5-symphony.0 running; live executionDefaults now returns actionable repository configuration guidance for Roten's non-Git project source and no longer emits the observed symbolic-ref failure.",
+  "passed": true,
+  "startedAt": "2026-09-28T16:27:36.381Z",
+  "completedAt": "2026-09-28T16:27:36.381Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-the-installed-taskboard-symphony-execution-flow-shown-by-the",
+    "specRevision": 3,
+    "specDigest": "sha256:366a8fb6979a0d66e71d9c21c2e2157d303d15dfdffa660ba9faf5854b9aa764",
+    "treeDigest": "sha256:7fdda50bad34b2be39d8a9e03bc26fd4963e500389d69843fad69453d2c64d27",
+    "policyDigest": "sha256:168cfa9fe1a343bc5a02663b51d27fc4808f530064f01faa64abed49e9580803",
+    "workflowRevision": 12,
+    "gitCommit": "c52c63fdd025bc47d5adb11f76ab067a2abdab13",
+    "scope": [
+      "plugins/taskboard/execution/defaults.ts",
+      "plugins/taskboard/execution/server.ts"
+    ],
+    "scopeDigest": "sha256:b2b5e55e04226760f078aa606fe47ca69cc7e56d90ebf997f6cbc32461565d26",
+    "textTreeDigest": "sha256:7fdda50bad34b2be39d8a9e03bc26fd4963e500389d69843fad69453d2c64d27"
+  },
+  "digest": "sha256:94160232d9c494c8a8b331b2ab34878d78b699707027a9b9368180a102b4035b",
+  "kind": "qa",
+  "matrixDigest": "sha256:33a739c6c1787b6f5ed359603c86bba638a315abd094ed771c21b6e62b6d8324",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "x64",
+    "node": "24.21.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Stable local Taskboard source is at c52c63fd; BB reload reports taskboard@0.3.5-symphony.0 running; live executionDefaults now returns actionable repository configuration guidance for Roten's non-Git project source and no longer emits the observed symbolic-ref failure.",
+      "startedAt": "2026-09-28T16:27:36.381Z",
+      "completedAt": "2026-09-28T16:27:36.381Z",
+      "durationMs": 0,
+      "collector": "agent-live-install",
+      "command": null,
+      "result": null,
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:7fdda50bad34b2be39d8a9e03bc26fd4963e500389d69843fad69453d2c64d27",
+      "sourceTreeAfter": "sha256:7fdda50bad34b2be39d8a9e03bc26fd4963e500389d69843fad69453d2c64d27",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/fix-the-installed-taskboard-symphony-execution-flow-shown-by-the/live-install-evidence.md",
+          "mediaType": "text/plain",
+          "bytes": 906,
+          "digest": "sha256:4f599f59b3b46fa4084a2b562494cbb25bda3db4ef65184d187dca1899c29981"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}

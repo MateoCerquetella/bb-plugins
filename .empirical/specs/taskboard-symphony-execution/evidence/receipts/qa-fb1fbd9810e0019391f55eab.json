@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-fb1fbd9810e0019391f55eab",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Final Taskboard verification requested by the integration task, after independent review approval. Run the selected focused plugin check; other unchanged runtime/browser evidence is already recorded.",
+  "passed": true,
+  "startedAt": "2026-09-28T03:34:40.448Z",
+  "completedAt": "2026-09-28T03:35:25.842Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "taskboard-symphony-execution",
+    "specRevision": 4,
+    "specDigest": "sha256:95a8cdc3f2754ae0a5c3fbb95bb46544e7dc1f07ca7bae776a0b1ae65427a3b7",
+    "treeDigest": "sha256:843d7854758d4c94231cb7b4d659a7aeade6013ed234999445fde399c71950ce",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 12,
+    "gitCommit": "c75809baec1a9c470df3ae53a4b4dde385c5bc16",
+    "textTreeDigest": "sha256:843d7854758d4c94231cb7b4d659a7aeade6013ed234999445fde399c71950ce"
+  },
+  "digest": "sha256:b0a395d20cbe933474d2770fae44c754e2b79a751db630abae22a189e7d198ee",
+  "kind": "qa",
+  "matrixDigest": "sha256:0235a3519b8fb142dc8d12d1716da214592f941c69f8d2ce5fbc499d19063208",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "x64",
+    "node": "24.21.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Final Taskboard verification requested by the integration task, after independent review approval. Run the selected focused plugin check; other unchanged runtime/browser evidence is already recorded.",
+      "startedAt": "2026-09-28T03:34:40.448Z",
+      "completedAt": "2026-09-28T03:35:25.842Z",
+      "durationMs": 45394,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:f9b129d8080d6ae249324764ab9bf53ce8ebc569462bb37a19a9d1056d966f66",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-taskboard"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH",
+          "TMPDIR"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:e2c1219b59f055a281db63b64c4326c47da3fad6b3001eeb18055e23058503ad",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "9ms)\n✔ storage keys remain collision-free for delimiter and Unicode identities (1.308253ms)\n✔ derives stable Unicode-safe assignee avatar identities (17.946874ms)\n✔ uses the backlog-first default before provider-specific states (32.093361ms)\n✔ defines the complete backlog-first default status order (0.38311ms)\n✔ builds case-insensitive assignee choices including Unassigned (54.74095ms)\n✔ keeps selected assignees available when other filters return no items (0.719288ms)\n✔ canonicalizes facet selections and toggles every case variant (3.767341ms)\n✔ uses a configurable exact workflow order (0.510606ms)\n✔ keeps the complete provider workflow ordered before and after a move (3.171783ms)\n✔ assigns distinct stable tones to the active workflow statuses (0.908602ms)\n✔ builds Linear-style field options including empty values (21.540912ms)\n✔ combines different filter fields with AND and values within a field with OR (1.768337ms)\n✔ builds and round-trips the bounded live Taskboard mention (8.021037ms)\n✔ writes only the private mention payload with the requested drag effect (0.936857ms)\n✔ rejects malformed, oversized, unsafe, and expanded drag payloads (0.817224ms)\n✔ fails closed when an item cannot form a safe mention or DataTransfer rejects it (17.48921ms)\n✔ delimits useful issue facts as untrusted external tracker data (2.1377ms)\n✔ keeps instruction-like issue text inside the untrusted boundary (1.382431ms)\n✔ prefixes control-character line separators inside external data (0.377451ms)\n✔ visibly escapes every C1 and bidirectional control inside ordered boundaries (1.556647ms)\n✔ visibly escapes every C0 control in inline CLI fields (0.783199ms)\n✔ keeps JSON CLI output readable around external controls (17.511423ms)\n✔ keeps detail handoff intent trusted while issue text stays inside the boundary (0.809574ms)\n✔ defaults optional provider-native issue creation properties (5.211942ms)\n✔ validates expanded provider-native issue creation properties (3.474352ms)\n✔ validates creation metadata and warning-bearing RPC results (10.838941ms)\n✔ returns authoritative provider identity with cached list results (2.789678ms)\n✔ Linear maps native metadata and sends it in IssueCreateInput (112.943932ms)\n✔ Linear paginates create options independently and preserves the native default state (7.640319ms)\n✔ Linear rejects invalid creation metadata cursors (20.983435ms)\n✔ Linear keeps explicit create rejection retryable without the uncertain marker (12.977328ms)\n✔ Linear marks malformed or lost post-dispatch create responses uncertain (37.51784ms)\n✔ Jira derives native fields from createmeta and forwards selections (17.471137ms)\n✔ Jira marks ambiguous create acknowledgement and detail failures uncertain (11.879336ms)\n✔ Jira paginates create metadata and canonicalizes issue types to native IDs (22.246597ms)\n✔ Jira exposes only priorities allowed for the selected project and issue type (2.380451ms)\n✔ GitHub loads native metadata and reports partially applied fields (8.692044ms)\n✔ GitHub confirms the submitted assignee from native response membership (2.145113ms)\n✔ GitHub paginates and deduplicates every create metadata collection (2.021279ms)\n✔ GitHub queues a fresh reconciliation after an overlapping pre-create refresh (2.933128ms)\n✔ GitHub queues a post-write refresh when issue confirmation is ambiguous (1.059276ms)\n✔ GitHub forced reconciliation refreshes before listing only project-scoped repos (0.5288ms)\n✔ keeps Taskboard private and Git-buildable without npm publication hooks (4.417872ms)\n✔ documents only BB Community and direct Git installation for Taskboard (20.445784ms)\n✔ keeps Usage Tracker private and documents its Git release too (24.556705ms)\n✔ has no active registry publication automation or credential path (1.747249ms)\n✔ credits merged contributors without reviving superseded filter storage (39.859702ms)\n✔ verification commands preserve quoted argv and never interpret shell operators (8.772958ms)\n✔ real workspace hook initializes context, preserves retries, seeds fixes, and rejects missing branches (4866.843862ms)\n✔ local remains default and direct routes cannot silently select Symphony (5.396901ms)\n✔ normalization omits raw internal data and approval covers scope (25.190198ms)\n✔ concurrent duplicate dispatch and restart preserve one execution (53.909968ms)\n✔ unavailable Symphony persists intent and never assumes success from 404 (3.851849ms)\n✔ state mapping never maps an agent finish to done or verified (0.493271ms)\n✔ runtime retries, failure, resume generations and duplicate events are durable (6.219397ms)\n✔ cancellation wins over late handoff and needs runtime acknowledgement (7.223993ms)\n✔ implementation handoff requires a revision and independent verification (3.468533ms)\n✔ fix creation atomically preserves approved scope, feedback, and duplicate protection (26.894036ms)\n✔ HTTP adapter uses actual Symphony observation and refresh routes (96.735944ms)\n✔ tracker cancellation uses Taskboard reads; completion is guarded and restart recovers verification (19.912187ms)\n✔ verification binds checks to Git content and refuses dirty, changed or deleted branches (10574.606523ms)\n✔ appends only the preset migration and round-trips complete state (87.648457ms)\n✔ isolates names and ids between projects (9.816724ms)\n✔ contains corrupt rows and makes reorder exact and atomic (42.83298ms)\n✔ enforces the per-project preset limit without blocking updates (85.860565ms)\n✔ bounds reads and fails closed when raw rows exceed the preset limit (57.243904ms)\n✔ rejects --from-state on wrong verbs and preserves explicit precedence (1.247085ms)\n✔ keeps maximum aggregate preset JSON compact and under the CLI cap (85.176081ms)\n✔ enforces a transactional aggregate state-byte limit per project (163.384985ms)\n✔ accepts a complete strict project browse preference snapshot (32.597355ms)\n✔ requires a project provider and matching source (2.330231ms)\n✔ bounds names, ids, positions, order size, and state fields (4.194866ms)\n✔ rejects control characters in preset identity and state (2.890382ms)\n✔ rejects oversized adversarial containers before inspecting elements (1.733728ms)\n✔ accepts the maximum valid browse state inside the UTF-8 envelope (50.907223ms)\n✔ normalizes unique names without depending on locale (1.399568ms)\n✔ resolves only exact preset order permutations (2.005191ms)\n✔ selects the active thread project only when it still exists (3.139231ms)\n✔ treats a different thread in the same project as new context (0.86844ms)\n✔ reads the project and thread from a BB project route (3.299693ms)\n✔ uses only the immediately previous navigation entry as source context (0.765611ms)\n✔ never replaces an explicit Taskboard project selection with route context (0.879415ms)\n✔ writes project credentials atomically with owner-only permissions (88.638316ms)\n✔ deleting a missing credential is harmless (7.710681ms)\n✔ cached summaries never retain provider comments (4.71741ms)\n✔ provider creation results carry strict native assignee confirmation (0.66856ms)\n✔ metadata failures expose only a fixed server-safe message (1.659239ms)\n✔ finds Jira project keys from common configured JQL scopes (3.352819ms)\n✔ binds issue creation to the tracker reviewed in the modal (1.452792ms)\n✔ refreshes authoritative provider data after successful issue creation (0.690016ms)\n✔ refreshes authoritative provider data after ambiguous issue creation failure (0.656078ms)\n✔ keeps structural headers on neutral host theme surfaces (4.135061ms)\n✔ uses restrained state glyph, focus, and conversation treatments (0.72712ms)\n✔ keeps constrained filter values inside the vertical menu measure (0.488643ms)\n✔ keeps assignee avatars compact with six theme-safe identity tones (0.927229ms)\n✔ shows restrained composer drop feedback and discoverable drag grips (0.788439ms)\nℹ tests 130\nℹ suites 0\nℹ pass 130\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 12399.336465\n\n> bb-plugin-taskboard@0.3.3 build\n> env -u BB_CLI bb plugin build .\n\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\n\n> bb-plugin-taskboard@0.3.3 verify:build\n> node scripts/verify-build.mjs\n\nTaskboard build metadata is valid.\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:843d7854758d4c94231cb7b4d659a7aeade6013ed234999445fde399c71950ce",
+      "sourceTreeAfter": "sha256:843d7854758d4c94231cb7b4d659a7aeade6013ed234999445fde399c71950ce",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

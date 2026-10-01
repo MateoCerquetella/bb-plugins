@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:d1dd527aef4a61e2e6ba45c326ef49f6e17f76d2299d412ecbad0a18015d6a95",
+  "mode": "fresh-context",
+  "baseRef": "mine/main",
+  "baseCommit": "9614dd51fc203d740614aba4de44f31cda50ec04",
+  "headCommit": "c75809baec1a9c470df3ae53a4b4dde385c5bc16",
+  "diffDigest": "sha256:a53e900374fd45d13e47590bc1eda77be4210cfa6e5ba9bad2fd54282c0f49d1",
+  "verdict": "APPROVED",
+  "reviewerActor": "/root/taskboard_rereview",
+  "reviewerInvocationId": "/root/taskboard_rereview",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: Carried forward. The delta preserves local composer handoff and explicit route/backend selection.\n- PASS AC-2: Carried forward. Request persistence, digest binding, dispatch uniqueness, and generation checks are unchanged. Approval preserves the request, digest, and dispatch key.\n- PASS AC-3: Carried forward. The pinned Symphony tracker integration and workspace/context responsibilities are unchanged.\n- PASS AC-4: Carried forward. Durable execution states and runtime/Git metadata remain separate from tracker completion.\n- PASS AC-5: Carried forward. Recovery, cancellation, retry limits, and workspace preservation are unchanged. The prior limitation concerning synthetic runtime evidence remains.\n- PASS AC-6: F-2 is fixed. Declared-input fingerprints now incorporate a SHA-256 digest of every stdout byte from a NUL-delimited Git listing, independently of the display-output cap. Failed or timed-out fingerprint commands reject verification. The regression adds 700 files, changes the final file beyond the former cap, and requires a fresh failing check instead of cached success.\n- PASS AC-7: Carried forward. Opt-in configuration, credential handling, and exclusive external-status ownership remain unchanged.\n- PASS AC-UI-1: F-1 is fixed. Prepared state projects request and digest, and approval explicitly sends only request, digest, and dispatchKey. The browser fixture now validates execution inputs against the production RPC schemas before dispatch and asserts that approval reaches running status with exactly one dispatch.\n\n## Security / correctness\n\nBoth blocking findings are closed. No material security or correctness regression was found in the committed delta. Review used the packet and exact committed context; no working-tree files were inspected or changed, and tests were not independently executed.\n\n## Design / maintainability\n\nThe fixes are focused and preserve existing interfaces. Approval makes the strict RPC boundary explicit, while streaming input hashing separates evidence identity from bounded display output. Added regression coverage targets both previously missed boundaries.",
+  "bodyDigest": "sha256:8cf1057786b247d0089e66d763ca03408af37b22f7c655b383d06e8a46af7356",
+  "findings": [],
+  "digest": "sha256:80d922aee861fdf2b0194d536568ed8d465b9999864547a12a6ed9ca574cc730"
+}

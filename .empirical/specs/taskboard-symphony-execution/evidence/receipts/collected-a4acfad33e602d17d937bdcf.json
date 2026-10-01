@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-a4acfad33e602d17d937bdcf",
+  "criteria": [
+    "AC-1",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Reran the actual plugin in isolated BB after F-1 repair. The browser fixture now validates execution RPC inputs using the production schemas. Local-only compatibility, review, single dispatch, running state, acceptance review, and mobile verified state passed. Updated review/running screenshots were inspected; unchanged local/mobile screenshots remain faithful. Backend responses are synthetic; no real issue or agent was started.",
+  "passed": true,
+  "startedAt": "2026-09-28T03:31:15.078Z",
+  "completedAt": "2026-09-28T03:31:15.078Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "taskboard-symphony-execution",
+    "specRevision": 4,
+    "specDigest": "sha256:95a8cdc3f2754ae0a5c3fbb95bb46544e7dc1f07ca7bae776a0b1ae65427a3b7",
+    "treeDigest": "sha256:843d7854758d4c94231cb7b4d659a7aeade6013ed234999445fde399c71950ce",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:79dcd8c2ecd3f35f16e58eba8d0ad01260109b97092643b83e5ce1f58326adc4",
+  "kind": "collected",
+  "collector": "schema-validating-taskboard-browser",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/taskboard-symphony-execution/evidence/repair-browser.txt",
+      "mediaType": "text/plain",
+      "bytes": 33,
+      "digest": "sha256:bea66e73128ca097e2d52f9447218b7e48679a7fd47d2fbe1b78bfda9379d71f"
+    },
+    {
+      "path": ".empirical/specs/taskboard-symphony-execution/qa/local.png",
+      "mediaType": "image/png",
+      "bytes": 60000,
+      "digest": "sha256:d315ea5a9f5512bd66276604aee484326761c4eb807d6df6095631c1fc03eb3c"
+    },
+    {
+      "path": ".empirical/specs/taskboard-symphony-execution/qa/mobile-verified.png",
+      "mediaType": "image/png",
+      "bytes": 45618,
+      "digest": "sha256:4a1e66b51f38b012a023cb559a59434274aa2da9105b4adcc3f5753418dbed5f"
+    },
+    {
+      "path": ".empirical/specs/taskboard-symphony-execution/qa/result.json",
+      "mediaType": "application/json",
+      "bytes": 432,
+      "digest": "sha256:86c523824346a0862cd869369cbe56a33452be00c3f1ac0c6cb75e381a0e10c6"
+    },
+    {
+      "path": ".empirical/specs/taskboard-symphony-execution/qa/review.png",
+      "mediaType": "image/png",
+      "bytes": 101740,
+      "digest": "sha256:4697154fdd73e3d47e44ac1700a7c01d712fbaf324c4c3c672d2bdce95a1dab5"
+    },
+    {
+      "path": ".empirical/specs/taskboard-symphony-execution/qa/running.png",
+      "mediaType": "image/png",
+      "bytes": 94992,
+      "digest": "sha256:694de3706501f1cba6ed5c950eed258423a75bc168d24aeb9d1976ed95cc1142"
+    }
+  ]
+}

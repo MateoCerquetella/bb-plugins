@@ -1,0 +1,15 @@
+{
+  "url": "http://127.0.0.1:50577/plugins/taskboard/tasks/item/proj_fixture/github/owner~2Frepo~231",
+  "passed": true,
+  "dispatched": 1,
+  "scenarios": [
+    "disabled local compatibility",
+    "review approved work",
+    "one dispatch",
+    "running status",
+    "independent acceptance review",
+    "mobile verified status"
+  ],
+  "pageErrors": [],
+  "backend": "synthetic RPC fixtures; plugin rendered by isolated BB 0.40.0"
+}

@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-45cf10a45f10578a18c2205b",
+  "criteria": [
+    "AC-10",
+    "AC-11",
+    "AC-12",
+    "AC-6",
+    "AC-7",
+    "AC-8",
+    "AC-UI-1",
+    "AC-UI-2"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "Rebuilt and reinstalled Taskboard successfully; plugin status is running with agent-thread-reconciliation. ROT-18 legacy thread thr_g88227inzv was discovered from its persisted Taskboard panel metadata, imported with terminal event seq 854, and stored as completed. Linear live issue ROT-18 now reports Done with completedAt and state history showing In Progress -> In Review -> Done. Target Roten-App has schemaVersion 5/setupComplete true Empirical files, and the rebuilt handoff prompt includes the repository-local Empirical workflow requirement.",
+  "passed": true,
+  "startedAt": "2026-09-29T01:22:13.421Z",
+  "completedAt": "2026-09-29T01:22:13.421Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-taskboard-worker-launch-for-rot-18-replace-the-competing",
+    "specRevision": 22,
+    "specDigest": "sha256:0fc21b29f88acb4b4345eafb1fe1bf7eb8d0443153026832c0f788e1de307a2b",
+    "treeDigest": "sha256:92a1abb0b990e1ecafd2a6973d0a24e223f808a1e9a84abacac7dbb40eb5f65b",
+    "policyDigest": "sha256:168cfa9fe1a343bc5a02663b51d27fc4808f530064f01faa64abed49e9580803",
+    "workflowRevision": 29,
+    "gitCommit": "927865a7e843c5037bd19253dd09dd14e3d3de74",
+    "scope": [
+      "plugins/taskboard/server.ts",
+      "plugins/taskboard/test/agent-thread-store.test.ts",
+      "plugins/taskboard/test/app-ui.test.ts",
+      "plugins/taskboard/test/contract.test.ts",
+      "plugins/taskboard/test/execution-ui.test.ts"
+    ],
+    "scopeDigest": "sha256:4810a5be8bdbea28704813865336472698eb43e5fceb3efd0cedf7521b510d0e",
+    "textTreeDigest": "sha256:92a1abb0b990e1ecafd2a6973d0a24e223f808a1e9a84abacac7dbb40eb5f65b"
+  },
+  "digest": "sha256:b5c8c2a3602c71f03204ad23799f554ffe3a702cf005b0ce7277a04f92e07a18",
+  "kind": "qa",
+  "matrixDigest": "sha256:aff5a3ebcdb0893294c53b55945d0f7c61274e1550d3e633c851fa516a26f377",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "x64",
+    "node": "24.21.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Rebuilt and reinstalled Taskboard successfully; plugin status is running with agent-thread-reconciliation. ROT-18 legacy thread thr_g88227inzv was discovered from its persisted Taskboard panel metadata, imported with terminal event seq 854, and stored as completed. Linear live issue ROT-18 now reports Done with completedAt and state history showing In Progress -> In Review -> Done. Target Roten-App has schemaVersion 5/setupComplete true Empirical files, and the rebuilt handoff prompt includes the repository-local Empirical workflow requirement.",
+      "startedAt": "2026-09-29T01:22:13.421Z",
+      "completedAt": "2026-09-29T01:22:13.421Z",
+      "durationMs": 0,
+      "collector": "Codex live runtime inspection",
+      "command": null,
+      "result": null,
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:92a1abb0b990e1ecafd2a6973d0a24e223f808a1e9a84abacac7dbb40eb5f65b",
+      "sourceTreeAfter": "sha256:92a1abb0b990e1ecafd2a6973d0a24e223f808a1e9a84abacac7dbb40eb5f65b",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/fix-taskboard-worker-launch-for-rot-18-replace-the-competing/evidence/live-rot18-reconciliation.json",
+          "mediaType": "application/json",
+          "bytes": 748,
+          "digest": "sha256:40cf2edaad1b56a72c1b7d517786be27e05d7726cb0e9bdf83265c221d0441f2"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}

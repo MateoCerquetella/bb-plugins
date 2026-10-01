@@ -56,6 +56,12 @@ Commands below are verified from workspace and plugin manifests.
   current or explicitly selected BB project.
 - `bb taskboard list --preset <name>` — apply a named preset to CLI listing;
   explicit `--source` and `--query` flags take precedence.
+- `node --test --experimental-strip-types plugins/taskboard/test/execution*.test.ts`
+  — focused execution lifecycle and real Git workspace-hook tests.
+- Symphony setup and configuration are in
+  `plugins/taskboard/execution/README.md`. Execution is disabled by default;
+  the pinned tracker extension requires a separate Symphony runtime and shared
+  workspace root. No tracker credential is sent to Symphony.
 
 ## Verification evidence
 

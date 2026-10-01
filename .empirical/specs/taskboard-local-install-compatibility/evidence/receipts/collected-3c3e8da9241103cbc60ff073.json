@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-3c3e8da9241103cbc60ff073",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "143 Taskboard tests plus types/build passed. Live local plugin install preserved five project configurations, four credential files and the preexisting cache via a private backup. Pinned native Symphony has healthy empty runtime status; Taskboard execution is enabled. No task was dispatched.",
+  "passed": true,
+  "startedAt": "2026-09-28T15:13:22.592Z",
+  "completedAt": "2026-09-28T15:13:22.592Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "taskboard-local-install-compatibility",
+    "specRevision": 2,
+    "specDigest": "sha256:be87f0e68cffeb96fe020e48a378038441b6131b3932025f4e7a65aa7b81397c",
+    "treeDigest": "sha256:38a220e6cb770a88abdead8e970f1ade8e1424956f95b9b6b0d92c0baec04b6d",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:be0a53739d5e19f5113b6a124f3939646e39af3de77055f55d2af897190ccf61",
+  "kind": "collected",
+  "collector": "live-taskboard-installation",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/taskboard-local-install-compatibility/evidence/taskboard-check.txt",
+      "mediaType": "text/plain",
+      "bytes": 12820,
+      "digest": "sha256:ad65301f73375f05907637d30f19a3b7cb536de62402b1e5fe50a449ecd778d7"
+    },
+    {
+      "path": ".empirical/specs/taskboard-local-install-compatibility/qa/installation.json",
+      "mediaType": "application/json",
+      "bytes": 700,
+      "digest": "sha256:c0107c534bc3d07ad7c56eb7c2a9a62b8d7f1f20190bc5f3f1f5db0845a45d5c"
+    }
+  ]
+}

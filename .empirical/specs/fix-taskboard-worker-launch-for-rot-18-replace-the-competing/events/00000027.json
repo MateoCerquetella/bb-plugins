@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "sequence": 27,
+  "previousDigest": "sha256:13602d56e83de1c95287b567e750831170f787904d8c443fddfeae4989d93f9b",
+  "actor": "user",
+  "type": "transition",
+  "summary": "Checkpoint: continue with 30 more minutes",
+  "createdAt": "2026-09-29T00:12:38.549Z",
+  "stateBeforeDigest": "sha256:9fa8b0e114c9354859f390b526836695d8423343b2517c33807e6b942262531d",
+  "stateAfterDigest": "sha256:1d794ad6a6c14eec0d39011c20d32316d52a2808f9f329e24106db597f1d1b38",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 27,
+    "activeFeature": "fix-taskboard-worker-launch-for-rot-18-replace-the-competing",
+    "request": "Fix Taskboard worker launch for ROT-18: replace the competing Execute and Start agent actions with one preferred Start agent flow, keep the dedicated Worker page and kanban drag-to-in-progress launch behavior, and handle repositories with no initial commit so users are not blocked by the current raw validation error. Preserve existing uncommitted Taskboard work and verify the resulting UI and execution behavior.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Implemented provider-native tracker synchronization and trusted Empirical handoff requirements. Managed launch now resolves the provider's canonical in-progress state, records an exact-once receipt, retries failures after reload, and exposes provider errors. Structured successful worker completion resolves and applies the canonical done state exactly once; failed/interrupted workers never close the ticket. The handoff requires the target repository's initialized Empirical workflow. Committed as 8efbf6fa; target branch sync is current.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:0fc21b29f88acb4b4345eafb1fe1bf7eb8d0443153026832c0f788e1de307a2b",
+    "approvedSpecRevision": 22,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:b7b84699123e991cda0b68185cf7cac25fb89008b50578253ed6da36673646e7",
+    "impactDigest": "sha256:6e91b8d6579374a3580349469c769cf5e5435c14ec960dcb667074bdc5f82639",
+    "capabilityClaimId": "fix-taskboard-worker-launch-for-rot-18-replace-the-competing-61a96e508a43",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-29T00:12:38.549Z",
+    "lifecycle": {
+      "stage": "iteration",
+      "iteration": 6,
+      "awaitingFeedback": true,
+      "iterative": true,
+      "contractRevision": 20,
+      "riskRequest": "Fix the missing native-thread lifecycle integration: when a Taskboard-provisioned issue thread completes or reports its final result, Taskboard must reconcile that thread back into its internal execution/tracker state and expose the completion rather than leaving the issue unchanged. Preserve tracker authority: do not automatically mark an external issue done unless the configured workflow explicitly allows it, but always record/link the provisioned thread and its completion outcome so ROT-18 no longer appears untouched after successful work.",
+      "contractBaseline": 26
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "fix-taskboard-worker-launch-for-rot-18-replace-the-competing-61a96e508a43",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "fix-taskboard-worker-launch-for-rot-18-replace-the-competing",
+      "worktree": "/Users/mateocerquetella/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_pshdwft79h-1/bb-plugins",
+      "worktreeId": "sha256:395846d2bd8b93cec3b36a115f6212cd55327cfb13ee99f3d5dae7563ac32740",
+      "baseCommit": "81d0072d3bafecc0202a701388b8c2f3c70d2f5c",
+      "baseTree": "0a7c3cfb8f35d6999f206bd20290abba066b2889",
+      "bases": {
+        "taskboard-execution": {
+          "capability": "taskboard-execution",
+          "digest": "sha256:a753c7c2ee2fe4796628ddf317a510326dbaa4f33c7852c33bcd124664f2c8ee",
+          "requirements": {
+            "optional execution infrastructure": "sha256:10884bdd22260197551fea0247efb046c5a6f0bb24e4618dc08440618c606b3a"
+          }
+        }
+      },
+      "capabilities": [
+        "taskboard-execution"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-09-28T20:15:45.820Z",
+      "heartbeatAt": "2026-09-28T20:15:45.820Z",
+      "digest": "sha256:22f2bd7b73c9e7c50f265f7b93cc9ed1f690c62f7e827f0f7aadb04a8efc239d"
+    },
+    "trackerGeneration": 6,
+    "budgetExtensionMinutes": 102,
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 14,
+      "capabilities": 1,
+      "reason": "Provider transitions, Empirical handoff requirements, and native-thread reconciliation are one lifecycle; splitting would again allow a launch to report success without proving the ticket update and harness gate.",
+      "actor": "agent",
+      "revision": 22
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:81ece25e320b0d2e42874ee3720de0b495341bb1cdaffc9d5c6447fc15636531"
+}
