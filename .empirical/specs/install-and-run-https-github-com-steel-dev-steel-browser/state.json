@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 20,
+  "revision": 23,
   "activeFeature": "install-and-run-https-github-com-steel-dev-steel-browser",
   "request": "Install and run https://github.com/steel-dev/steel-browser on the dyaus host for use from this BB environment, then create a new independently installable BB plugin in this repository that integrates Steel as the replacement browser infrastructure for the prior KERNEL.SH-based workflow. Keep the root orchestration-only conventions, align manifest/package/CLI/UI/docs/tests, avoid committing generated artifacts, and verify the Steel service plus the plugin's human UI and CLI surface.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
   "phase": "implement",
-  "status": "awaiting_human",
+  "status": "waiting",
   "repairAttempts": 0,
-  "message": "Reworked Steel Browser for the native BB thread-panel workflow requested by the user. Registered a flush threadPanelAction rendering the live Steel session player, plus a steel-browser messageDirective that calls useBbNavigate.openThreadPanel for the current thread and provides a Show browser fallback button. Updated the bundled skill and README so agents open the in-thread panel instead of sending users to an external BB Connect URL. Typecheck and plugin build passed; the plugin was reloaded. Connected to Steel's actual Chrome over local CDP on dyaus and navigated the visible session to a 'Steel is live' page identifying this BB thread, proving the agent and panel target the same page. Also validated BB's native browser CLI behavior on the connected Mac, then released and closed the temporary native test tab. Waiting for user confirmation that the emitted directive opens and displays the Steel panel in their current BB thread. Broader formal verification/review and jev-ultrafast adapter remain pending.",
+  "message": null,
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:1470a114871c2de56687be5f20fd2c1664295d2ba7abb50f038f6bbdaa04edc0",
@@ -37,7 +37,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-01T18:44:50.504Z",
+  "updatedAt": "2026-10-01T18:51:02.535Z",
   "lifecycle": {
     "stage": "development",
     "iteration": 1,
