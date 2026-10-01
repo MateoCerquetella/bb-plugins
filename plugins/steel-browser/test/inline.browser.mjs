@@ -4,8 +4,8 @@ import assert from "node:assert/strict";
 import { fileURLToPath } from "node:url";
 const result = await build({
   stdin: { contents: `import React from "react"; import {createRoot} from "react-dom/client";
-    import {SteelBrowserDirective,SteelAgentSettings} from "./app.tsx";
-    createRoot(document.getElementById("root")).render(location.search ? <SteelAgentSettings /> : <><SteelBrowserDirective
+    import {SteelBrowserDirective,SteelAgentSettings,SteelBrowserPage} from "./app.tsx";
+    createRoot(document.getElementById("root")).render(location.search ? <SteelBrowserPage /> : <><SteelBrowserDirective
       message={{id:"m",threadId:"t",projectId:"p",turnId:null}} source="" attributes={{}} openWorkspaceFile={null} />
       <div id="settings"><SteelAgentSettings /></div></>);`,
     resolveDir: fileURLToPath(new URL("../", import.meta.url)), loader: "tsx" },
@@ -83,6 +83,9 @@ try {
     assert.equal(await page.evaluate(() => (window.rpcCalls || []).length), 0);
     assert(await page.getByText("jev-ultrafast", { exact: true }).isVisible());
     assert.equal(await page.getByRole("alert").count(), 0);
+    assert.equal(await page.getByText("Connecting", { exact: true }).count(), 0);
+    assert.equal(await page.getByText("Loading endpoint...", { exact: true }).count(), 0);
+    assert.equal(await page.getByRole("button", { name: "New session", exact: true }).count(), 0);
     await page.close();
   }
 } finally { await browser.close(); }

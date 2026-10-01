@@ -57,6 +57,11 @@ function useSteelDashboard(scope: Scope) {
   const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
+    if (!scope.threadId && !scope.projectId) {
+      setDashboard(null);
+      setError("No project selected.");
+      return;
+    }
     setError(null);
     try {
       setDashboard(await rpc.call("dashboard", scope));
@@ -87,7 +92,7 @@ function ScopedSteelThreadPanel({ threadId }: { threadId: string }) {
       <header className="steel-thread-panel__bar">
         <div>
           <strong>Steel Browser</strong>
-          <span>{active ? "Live in this thread" : dashboard?.connected ? "No active session" : "Connecting..."}</span>
+          <span>{error ? "Unavailable" : active ? "Live in this thread" : dashboard?.connected ? "No active session" : "Connecting..."}</span>
         </div>
         <button aria-label="Reload Steel browser panel" className="steel-icon-button"
           onClick={() => { void refresh(); setPlayerKey(key => key + 1); }}
@@ -135,7 +140,7 @@ function ScopedSteelBrowser({ message }: PluginMessageDirectiveProps) {
           <Monitor aria-hidden="true" />
           <span>
             <strong>Steel Browser</strong>
-            <small>{signingIn ? "Sign-in opened in a new tab" : active ? "Session available" : dashboard?.connected ? "No active session" : "Connecting"}</small>
+            <small>{error ? "Unavailable" : signingIn ? "Sign-in opened in a new tab" : active ? "Session available" : dashboard?.connected ? "No active session" : "Connecting"}</small>
           </span>
         </div>
         <div className="steel-inline-browser__actions">
@@ -295,6 +300,19 @@ function SessionRow({
 
 export function SteelBrowserPage() {
   const scope = useScope();
+  if (!scope.threadId && !scope.projectId) {
+    return (
+      <main className="steel-page">
+        <header className="steel-header">
+          <div className="steel-identity">
+            <span className="steel-brand" aria-hidden="true"><PanelsTopLeft /></span>
+            <h1>Steel Browser</h1>
+          </div>
+        </header>
+        <SteelAgentSettings />
+      </main>
+    );
+  }
   return <ScopedSteelBrowserPage key={JSON.stringify(scope)} scope={scope} />;
 }
 
@@ -369,7 +387,7 @@ function ScopedSteelBrowserPage({ scope }: { scope: Scope }) {
 
   const connected = dashboard?.connected === true;
   const sessions = dashboard?.sessions ?? [];
-  const endpoint = dashboard?.endpoint ?? "Loading endpoint...";
+  const endpoint = dashboard?.endpoint ?? (error ? "Endpoint unavailable" : "Loading endpoint...");
   const activeSession = sessions.find(session => ["idle", "live"].includes(session.status));
   const playerUrl = dashboard ? new URL("v1/sessions/debug", dashboard.uiUrl.replace(/ui\/?$/, "")).toString() : null;
 
@@ -410,7 +428,7 @@ function ScopedSteelBrowserPage({ scope }: { scope: Scope }) {
       <div className="steel-status">
         <span className={`steel-dot ${connected ? "steel-dot--ok" : "steel-dot--down"}`} />
         <span className={connected ? "steel-connected" : "steel-disconnected"}>
-          {dashboard === null ? "Connecting" : connected ? "Connected" : "Unavailable"}
+          {error ? "Unavailable" : dashboard === null ? "Connecting" : connected ? "Connected" : "Unavailable"}
         </span>
         <span className="steel-divider">/</span>
         <code>{endpoint}</code>

@@ -122,3 +122,13 @@ local install/reload, CLI smoke checks, and browser UI verification.
 - API session availability is not proof that the viewer is authenticated.
 - Popup, opener isolation, and reload regression coverage added; execution
   pending. Full GitHub login requires the user's interactive authentication.
+
+# D-007 Context-Free Dashboard
+
+- Extends D-005 to the full Steel page: without a thread or project, do not
+  mount the operational dashboard or expose session mutation controls.
+- Retain host-side Jev configuration and the project-unavailable state.
+- The shared viewer hook also refuses empty scope before RPC. Request failures
+  show unavailable instead of indefinite connection and endpoint loading.
+- Regression fixture now mounts the full context-free page, not settings alone.
+  Test execution remains pending under the iterative policy.
