@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "kind": "baseline",
+  "feature": "install-and-run-https-github-com-steel-dev-steel-browser",
+  "revision": 8,
+  "reason": "Approved contract retained before feedback",
+  "spec": "# Install And Run Https Github Com Steel Dev Steel Browser\n\n## Request\n\n> Install and run https://github.com/steel-dev/steel-browser on the dyaus host for use from this BB environment, then create a new independently installable BB plugin in this repository that integrates Steel as the replacement browser infrastructure for the prior KERNEL.SH-based workflow. Keep the root orchestration-only conventions, align manifest/package/CLI/UI/docs/tests, avoid committing generated artifacts, and verify the Steel service plus the plugin's human UI and CLI surface.\n\n## Goal\n\nRun durable self-hosted Steel on dyaus and provide an independently installable\nBB plugin for its health and browser session lifecycle without KERNEL.SH.\n\n## Acceptance Criteria\n\n- [ ] [AC-1] Steel runs from a pinned upstream combined image with automatic restart,\n  persistent data, and loopback-only ports 3100 (API/UI) and 9223 (debugger).\n- [ ] [AC-2] Health and a real create/list/release session lifecycle succeed.\n- [ ] [AC-3] plugins/steel-browser is independently installable, cataloged, and\n  pins the SDK shipped by the workspace's pinned BB release.\n- [ ] [AC-4] Typed bounded health, list, create, and release operations expose\n  useful errors without providing an arbitrary HTTP proxy.\n- [ ] [AC-5] The bb steel-browser CLI supports status, sessions, create, and\n  exact-session release with JSON output.\n- [ ] [AC-UI-1] [UI] A compact BB page shows health, endpoint, active sessions,\n  and refresh/create/confirmed-release controls with useful connection data.\n- [ ] [AC-UI-2] [UI] Loading, empty, and error states work at desktop and mobile\n  sizes without clipped text or overlapping controls.\n- [ ] [AC-6] A bundled skill documents local Steel usage for agents and replaces\n  the KERNEL.SH browser workflow without altering unrelated integrations.\n- [ ] [AC-7] Focused unit/type/build checks, workspace checks, local BB\n  install/reload, CLI lifecycle, and browser UI verification pass.\n\n## Scope\n\n- Durable pinned Steel deployment on dyaus.\n- Plugin server, app, host support if BB server is remote, CLI, contracts,\n  focused tests, assets, skill, README, and workspace catalog entries.\n- Default endpoint http://127.0.0.1:3100 with validated configuration.\n\n## Non-goals\n\n- Public Steel exposure, cloud tunnel installation, or paid service setup.\n- Reimplementing Chromium automation, Steel, proxy infrastructure, or stealth.\n- Migrating unknown application code or deleting existing KERNEL.SH settings.\n- Marketplace publication or repository pushes.\n\n## Verification\n\n- Inspect deployment bindings and persistence, restart, then run health and a\n  real session lifecycle smoke test.\n- Run focused unit tests, SDK compatibility, TypeScript, and build checks.\n- Run npm install and npm run check at workspace root; full-suite execution\n  remains subject to Empirical's exact approval requirement.\n- Install and reload the local plugin, exercise CLI, and inspect the BB page\n  in a browser at desktop and mobile viewports with screenshots.\n\n## Capability Deltas\n\nSee deltas/steel-browser-infrastructure.md.\n",
+  "deltas": [
+    {
+      "capability": "steel-browser-infrastructure",
+      "purpose": "Give BB agents and users a local, self-hosted browser session service with a\nsmall operational surface that can replace the paid KERNEL.SH dependency.",
+      "requirements": [
+        {
+          "operation": "added",
+          "name": "Durable local service",
+          "contents": "### Requirement: Durable local service\nThe dyaus host SHALL run a pinned Steel image with persistent data, automatic\nrestart, and loopback-only API/UI and debugger ports.\n\n#### Scenario: Service restarts\n- WHEN the service restarts\n- THEN health is restored on port 3100\n- AND its API and debugger remain loopback-only"
+        },
+        {
+          "operation": "added",
+          "name": "Browser session lifecycle",
+          "contents": "### Requirement: Browser session lifecycle\nBB SHALL provide bounded typed operations and CLI commands for Steel health,\nsession listing, creation, and exact-session release.\n\n#### Scenario: Session lifecycle\n- WHEN a user creates a session\n- THEN its identifier and connection data are returned and it appears in the list\n- WHEN the user confirms release of that identifier\n- THEN only that session is released\n\n#### Scenario: Unavailable service\n- WHEN Steel cannot be reached before the timeout\n- THEN BB remains responsive and reports a concise error without secrets"
+        },
+        {
+          "operation": "added",
+          "name": "Operational app",
+          "contents": "### Requirement: Operational app\nThe Steel Browser page SHALL expose status, endpoint, active sessions, refresh,\ncreate, and confirmed-release controls with loading, empty, and error states.\n\n#### Scenario: Responsive page\n- WHEN the page opens on desktop or mobile\n- THEN status and session controls are usable without clipping or overlap"
+        },
+        {
+          "operation": "added",
+          "name": "Agent and plugin distribution",
+          "contents": "### Requirement: Agent and plugin distribution\nThe plugin SHALL be independently installable and ship a local Steel skill.\n\n#### Scenario: Installation\n- WHEN installed locally and reloaded\n- THEN its app and CLI work and its agent skill explains local Steel usage\n- AND generated build and dependency artifacts remain untracked"
+        }
+      ],
+      "source": ".empirical/specs/install-and-run-https-github-com-steel-dev-steel-browser/deltas/steel-browser-infrastructure.md"
+    }
+  ],
+  "decisions": "# Decisions: Install And Run Https Github Com Steel Dev Steel Browser\n\nRecord concise, externally reviewable evidence and choices here. Do not store\nprivate chain-of-thought, prompts, credentials, secrets, or scratchpad text.\n\n## D-001: Select the implementation approach\n\nStatus: Accepted\n\n### Evidence\n\n* The host already has Docker 29.7.2 and Compose 5.4.0.\n* Port 3000 is occupied by Empirical Forge, so Steel needs a loopback remap.\n* Upstream documents the combined image and the `/v1/sessions` lifecycle.\n* The repository's plugin convention is package-layout with `server.ts`,\n  `app.tsx`, strict contracts, tests, and an SDK devDependency.\n\n### Options\n\n1. Run upstream Steel through Docker Compose with a pinned image digest.\n2. Build Steel from source and run its Node development stack.\n3. Use Steel Cloud or expose a public tunnel.\n\n### Chosen approach\n\nUse the pinned upstream combined Docker image with loopback port remapping,\npersistent named volumes, and a user-service restart policy. Add a focused\nBB plugin client rather than embedding Steel or exposing a generic proxy.\n\n### Trade-offs and risks\n\nThe image depends on Docker and Chrome resources; restart and health checks\ncover transient failures. Loopback binding avoids accidental public exposure.\nThe plugin intentionally supports only health and session lifecycle, leaving\nadvanced Steel endpoints available through its own local documentation link.\n\n### Verification\n\nInspect the image digest and bindings, restart the service, run real\nhealth/create/list/release requests, then run plugin type/build/contract checks,\nlocal install/reload, CLI smoke checks, and browser UI verification.\n",
+  "specDigest": "sha256:169559cd1bd2db265f3912c55c0523835d8355b4d8e05fca885591c36c86e1d8",
+  "approvedSpecRevision": 5,
+  "capabilityClaimId": "install-and-run-https-github-com-steel-dev-steel-browser-a8ef2053ff39",
+  "impactDigest": "sha256:12589f53cfe5df3acd8d844396ff6eac97966c4679bd63007e9b6c8b888d7a7b",
+  "evidenceReceiptIds": []
+}
