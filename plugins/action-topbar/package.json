@@ -1,6 +1,6 @@
 {
   "name": "bb-plugin-action-topbar",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A compact main-thread topbar for BB panel tabs and draggable Actions.",
   "license": "MIT",
   "author": "Mateo Cerquetella",
@@ -47,6 +47,7 @@
     "dist/app.css",
     "assets/",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE",
     "THIRD_PARTY_NOTICES.md",
     "server.ts",
@@ -85,9 +86,10 @@
   },
   "scripts": {
     "dev": "bun ../../scripts/dev-plugin.ts",
-    "build": "bb plugin build .",
+    "build": "env -u BB_CLI bb plugin build .",
     "typecheck": "tsc --noEmit",
     "test": "node --test --experimental-strip-types test/*.test.ts",
+    "check": "npm run typecheck && npm test && npm run build",
     "clean": "rm -rf dist"
   }
 }

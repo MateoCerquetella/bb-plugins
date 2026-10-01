@@ -1,11 +1,11 @@
 # Action Topbar
 
 > [!WARNING]
-> This plugin is experimental and is not being submitted to the BB
-> Marketplace yet. It requires the matching BB core changes and the
+> This plugin is experimental. Action pane dragging requires the matching BB core changes and the
 > experimental Action split-drag API introduced in Plugin SDK 0.4.33. Install
-> it only on a compatible BB build; older BB releases cannot provide its native
-> main-workspace panes.
+> it only on a compatible BB build. Stock BB 0.44.0 does not expose this API;
+> upgrading BB or the SDK alone does not enable Action pane dragging.
+> The v0.1.1 release includes the matching core patch for BB 0.44.0.
 
 Action Topbar projects BB Actions opened as main-workspace panes into the
 **main thread topbar**. Pane content stays under BB's ownership; the topbar
@@ -13,18 +13,20 @@ adds a compact tab strip and searchable **+** combobox while the right panel
 keeps its original New Tab / Actions launcher.
 
 Action-to-pane dragging requires BB's experimental thread Action split-drag
-content-script API. Older compatible BB clients keep the menu visible but do
-not start a split gesture.
+content-script API. Clients missing that API show a status in the launcher
+instead of silently ignoring the drag.
 
 - Click a tab to focus its main-workspace pane without opening the right panel.
 - Close a tab from the left-side **×** shown on hover, focus, or activation.
 - Drag topbar tabs inside the strip to persist their new order.
+- Drag an open Action tab out of the strip to move its existing workspace pane
+  through BB's native split zones.
 - Drag an Action directly from the topbar **+** menu onto BB's pane zones.
   Edge drops create a main-workspace split; a center drop replaces that pane.
 - Action rows are drag-only. Clicking or pressing Enter does not open them in
   the native right panel.
-- Drag an already-open relaunchable panel tab onto another existing split pane
-  to open that panel for the target thread.
+- Legacy relaunchable panel tabs can still open their panel for another thread
+  pane when no native Action pane is available.
 - Select the topbar **+** for an auto-focused combobox. Its empty state lists actions;
   typing searches both actions and already-open tabs, with keyboard navigation.
 - Open BB's native New Tab once after installing or removing another plugin;
@@ -55,7 +57,7 @@ plugin.
 Install from Git on a compatible BB build:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@main \
+bb plugin install 'git:https://github.com/MateoCerquetella/bb-plugins.git@semver:action-topbar/:^0.1.1' \
   --subdirectory plugins/action-topbar \
   --yes
 ```

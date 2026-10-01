@@ -751,6 +751,7 @@ export function mountActionTopbar(
   let loadSerial = 0;
   let currentMirrors: MirroredTab[] = [];
   let currentNativeFingerprint = "";
+  let renderedTopbarFingerprint = "";
   let topbar: TopbarElements | null = null;
   let topbarResizeObserver: ResizeObserver | null = null;
   let launcher: LauncherElements | null = null;
@@ -759,6 +760,7 @@ export function mountActionTopbar(
   let launcherQuery = "";
   let launcherError: string | null = null;
   let topbarDrag: TopbarDragState | null = null;
+  let actionDragActive = false;
   let clearSwallowedClick: (() => void) | null = null;
   let reconcileFrame: number | null = null;
   let disposed = false;
@@ -818,6 +820,7 @@ export function mountActionTopbar(
   };
 
   const removeTopbar = (): void => {
+    renderedTopbarFingerprint = "";
     closeLauncher(false);
     topbarResizeObserver?.disconnect();
     topbarResizeObserver = null;
@@ -1098,7 +1101,7 @@ export function mountActionTopbar(
   };
 
   const renderLauncher = (): void => {
-    if (launcher === null) return;
+    if (launcher === null || actionDragActive) return;
     launcherOptions = buildLauncherOptions(
       mainWorkspaceMirrors(currentMirrors, actions).map(
         (mirror) => mirror.summary,
@@ -1161,11 +1164,20 @@ export function mountActionTopbar(
           applyLauncherSelection(index),
         );
         row.addEventListener("pointerdown", (event) => {
-          if (
-            option.kind !== "action" ||
-            event.button !== 0 ||
-            beginThreadActionSplitDrag === undefined
-          ) {
+          if (option.kind !== "action" || event.button !== 0) {
+            return;
+          }
+          const showDragError = (message: string): void => {
+            row.dataset.actionTopbarDragState = "unavailable";
+            launcherError = message;
+            if (launcher !== null) {
+              launcher.status.textContent = message;
+              launcher.status.hidden = false;
+            }
+            announce(message);
+          };
+          if (beginThreadActionSplitDrag === undefined) {
+            showDragError("Reload BB to load Action dragging support.");
             return;
           }
           const threadId = currentThreadId();
@@ -1181,23 +1193,25 @@ export function mountActionTopbar(
             ? "started"
             : "unavailable";
           if (!started) {
-            announce("Action split dragging is unavailable here.");
+            showDragError(`${option.label} is not available in this workspace.`);
             return;
           }
+          actionDragActive = true;
           const pointerId = event.pointerId;
           tryCapturePointer(row, pointerId);
-          const finish = () => {
+          const finish = (finishEvent: PointerEvent) => {
+            if (finishEvent.pointerId !== pointerId) return;
             window.removeEventListener("pointerup", finish);
             window.removeEventListener("pointercancel", finish);
             tryReleasePointer(row, pointerId);
+            actionDragActive = false;
             closeLauncher(false);
+            scheduleReconcile();
           };
           window.addEventListener("pointerup", finish, {
-            once: true,
             signal,
           });
           window.addEventListener("pointercancel", finish, {
-            once: true,
             signal,
           });
         });
@@ -1433,6 +1447,43 @@ export function mountActionTopbar(
 
   const handleTopbarDragMove = (event: PointerEvent): void => {
     if (topbarDrag === null || event.pointerId !== topbarDrag.pointerId) return;
+    const strip = topbar?.tabs.getBoundingClientRect();
+    const sourcePane = mainActionPane(topbarDrag.source);
+    const paneHandle = sourcePane?.querySelector<HTMLElement>(
+      `${HEADER_ROW_SELECTOR} .cursor-grab`,
+    );
+    if (
+      strip !== undefined &&
+      (event.clientY < strip.top || event.clientY > strip.bottom) &&
+      paneHandle !== null &&
+      paneHandle !== undefined &&
+      Math.hypot(
+        event.clientX - topbarDrag.startX,
+        event.clientY - topbarDrag.startY,
+      ) >= POINTER_DRAG_DISTANCE_PX
+    ) {
+      const current = topbarDrag;
+      endTopbarDrag(false);
+      paneHandle.dispatchEvent(
+        new PointerEvent("pointerdown", {
+          bubbles: true,
+          button: 0,
+          buttons: 1,
+          pointerId: current.pointerId,
+          clientX: current.startX,
+          clientY: current.startY,
+        }),
+      );
+      window.dispatchEvent(
+        new PointerEvent("pointermove", {
+          pointerId: current.pointerId,
+          buttons: 1,
+          clientX: event.clientX,
+          clientY: event.clientY,
+        }),
+      );
+      return;
+    }
     const hoveredTabId = topbarTabAt(event.clientX, event.clientY);
     const reorderTargetId =
       hoveredTabId !== topbarDrag.source.summary.id ? hoveredTabId : null;
@@ -1556,14 +1607,24 @@ export function mountActionTopbar(
   };
 
   const renderTopbar = (): void => {
-    if (topbar === null) return;
+    if (topbar === null || topbarDrag !== null) return;
+    const mirrors = mainWorkspaceMirrors(currentMirrors, actions);
+    const fingerprint = JSON.stringify([
+      currentNativeFingerprint,
+      mirrors.map((mirror) => [
+        mirror.summary,
+        mainActionPane(mirror)?.dataset.focused === "true" ||
+          (mainActionPane(mirror) === null && mirror.native?.active === true),
+      ]),
+    ]);
+    if (fingerprint === renderedTopbarFingerprint) return;
     const focusedTabId =
       document.activeElement instanceof HTMLButtonElement &&
       topbar.tabs.contains(document.activeElement)
         ? document.activeElement.dataset.actionTopbarTabId
         : undefined;
     const fragment = document.createDocumentFragment();
-    for (const mirror of mainWorkspaceMirrors(currentMirrors, actions)) {
+    for (const mirror of mirrors) {
       const actionPane = mainActionPane(mirror);
       const isActive =
         actionPane?.dataset.focused === "true" ||
@@ -1624,6 +1685,7 @@ export function mountActionTopbar(
       fragment.append(wrapper);
     }
     topbar.tabs.replaceChildren(fragment);
+    renderedTopbarFingerprint = fingerprint;
     if (
       topbar.tabs.querySelector<HTMLButtonElement>(
         'button[data-action-topbar-tab-id][tabindex="0"]',
