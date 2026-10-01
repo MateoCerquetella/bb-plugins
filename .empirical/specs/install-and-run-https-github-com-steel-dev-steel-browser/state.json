@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 23,
+  "revision": 24,
   "activeFeature": "install-and-run-https-github-com-steel-dev-steel-browser",
   "request": "Install and run https://github.com/steel-dev/steel-browser on the dyaus host for use from this BB environment, then create a new independently installable BB plugin in this repository that integrates Steel as the replacement browser infrastructure for the prior KERNEL.SH-based workflow. Keep the root orchestration-only conventions, align manifest/package/CLI/UI/docs/tests, avoid committing generated artifacts, and verify the Steel service plus the plugin's human UI and CLI surface.",
   "profile": "complex",
@@ -9,7 +9,7 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": null,
+  "message": "Added minimize and restore controls to the square inline Steel browser directive. Minimizing collapses it to a compact header while preserving the live iframe and Steel session; restoring reveals the same browser without reload. Updated plugin documentation, passed plugin typecheck and build, reloaded the installed plugin, and demonstrated the same active Steel session navigating from Example Domain to Wikipedia to the Steel GitHub repository. Committed and pushed the UI change, committed the workflow journal, merged current origin/main without conflicts, and pushed the merged feature branch.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:1470a114871c2de56687be5f20fd2c1664295d2ba7abb50f038f6bbdaa04edc0",
@@ -23,28 +23,28 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": false,
+    "implemented": true,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "none",
+    "highest": "implemented",
     "reasons": {
-      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-01T18:51:02.535Z",
+  "updatedAt": "2026-10-01T18:56:11.899Z",
   "lifecycle": {
-    "stage": "development",
+    "stage": "iteration",
     "iteration": 1,
-    "awaitingFeedback": false,
+    "awaitingFeedback": true,
     "iterative": true,
     "contractRevision": 10,
-    "riskRequest": "Keep Steel hosted on the connected dyaus machine as the primary host; do not move or duplicate it to another machine. Extend the existing Steel browser plugin scope to evaluate and, where supported, integrate browser-use/jev-ultrafast as an optional browser-agent layer over the existing Steel CDP endpoint. Preserve the existing Steel service and plugin behavior, keep credentials out of repository state, and document any unsupported direct integration as an explicit limitation."
+    "riskRequest": "Keep Steel hosted on the connected dyaus machine as the primary host; do not move or duplicate it to another machine. Extend the existing Steel browser plugin scope to evaluate and, where supported, integrate browser-use/jev-ultrafast as an optional browser-agent layer over the existing Steel CDP endpoint. Preserve the existing Steel service and plugin behavior, keep credentials out of repository state, and document any unsupported direct integration as an explicit limitation.",
+    "contractBaseline": 24
   },
   "sizeDecision": {
     "choice": "keep",
