@@ -1,5 +1,5 @@
 .steel-page {
-  --steel-accent: #eddb63;
+  --steel-accent: #cbd0d6;
   --steel-ok: #34885a;
   --steel-down: #ef8c8c;
   height: 100dvh;
@@ -45,26 +45,27 @@
 .steel-panel-state { display: grid; place-items: center; align-content: center; gap: 10px; min-height: 0; flex: 1; padding: 20px; color: var(--muted-foreground, #a4a5af); text-align: center; }
 .steel-panel-state svg { width: 28px; height: 28px; }
 .steel-inline-browser {
-  width: min(100%, 720px);
+  width: min(100%, 640px);
   margin-block: 8px;
   border: 1px solid var(--border, #36373d);
-  border-radius: 6px;
+  border-radius: 8px;
   overflow: hidden;
   color: var(--foreground, #ececef);
   background: var(--background, #18191c);
 }
+.steel-inline-browser * { box-sizing: border-box; letter-spacing: 0; }
 .steel-inline-browser > header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  height: 42px;
-  padding: 6px 8px 6px 11px;
+  min-height: 48px;
+  padding: 8px 10px 8px 14px;
   border-bottom: 1px solid var(--border, #36373d);
 }
 .steel-inline-browser > header > div { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .steel-inline-browser > header > .steel-inline-browser__actions { gap: 6px; flex: none; }
-.steel-inline-browser > header svg { width: 16px; height: 16px; flex: none; color: var(--steel-accent, #eddb63); }
+.steel-inline-browser > header svg { width: 16px; height: 16px; flex: none; color: var(--muted-foreground, #b3b6bd); }
 .steel-inline-browser > header span,
 .steel-inline-browser > header strong,
 .steel-inline-browser > header small { display: block; }
@@ -76,24 +77,24 @@
   width: 30px;
   height: 30px;
   padding: 6px;
-  border: 1px solid var(--border, #464750);
+  border: 1px solid transparent;
   border-radius: 5px;
   color: inherit;
-  background: var(--secondary, #292a30);
+  background: transparent;
   cursor: pointer;
 }
+.steel-inline-browser > header button:hover { background: var(--secondary, #292a30); }
+.steel-inline-browser > header button:focus-visible { outline: 2px solid currentColor; outline-offset: 1px; }
+.steel-agent-settings { padding: 16px; border-bottom: 1px solid var(--border, #36373d); font-size: 12px; }
+.steel-agent-settings p { color: var(--muted-foreground, #a4a5af); line-height: 1.5; }
+.steel-agent-settings dl { display: grid; grid-template-columns: minmax(80px, 1fr) minmax(0, 2fr); gap: 8px 12px; }
+.steel-agent-settings dt { color: var(--muted-foreground, #a4a5af); }
+.steel-agent-settings dd { margin: 0; overflow-wrap: anywhere; }
 .steel-inline-browser__viewport { position: relative; width: 100%; aspect-ratio: 1 / 1; background: #171717; }
 .steel-inline-browser__viewport iframe { display: block; width: 100%; height: 100%; border: 0; }
 .steel-inline-browser--minimized { width: min(100%, 360px); }
 .steel-inline-browser--minimized > header { border-bottom: 0; }
-.steel-inline-browser--minimized .steel-inline-browser__viewport {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  aspect-ratio: auto;
-  overflow: hidden;
-  clip-path: inset(50%);
-}
+.steel-inline-browser__viewport[hidden] { display: none; }
 .steel-header, .steel-identity, .steel-actions, .steel-status, .steel-toolbar, .steel-links {
   display: flex;
   align-items: center;
@@ -115,7 +116,7 @@
   height: 36px;
   flex: none;
   color: var(--steel-accent);
-  border: 1px solid #747044;
+  border: 1px solid var(--border, #464750);
   border-radius: 6px;
 }
 .steel-brand svg { width: 24px; height: 24px; }
@@ -207,7 +208,7 @@
 .steel-tile-title strong, .steel-tile-title span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .steel-tile-title strong { font-size: 13px; font-weight: 600; }
 .steel-tile-title span { margin-top: 3px; color: var(--muted-foreground, #a4a5af); font-size: 11px; }
-.steel-browser-icon { display: grid !important; place-items: center; width: 30px; height: 30px; flex: 0 0 30px; border: 1px solid #747044; border-radius: 5px; color: var(--steel-accent); }
+.steel-browser-icon { display: grid !important; place-items: center; width: 30px; height: 30px; flex: 0 0 30px; border: 1px solid var(--border, #464750); border-radius: 5px; color: var(--steel-accent); }
 .steel-browser-icon svg { width: 16px; height: 16px; }
 .steel-tile-actions { display: flex; justify-content: flex-end; gap: 8px; padding: 0 12px 12px; }
 .steel-tile-actions button:not(.steel-icon-button) { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; }

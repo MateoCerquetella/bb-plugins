@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "sequence": 25,
+  "previousDigest": "sha256:b6c67ff07d186e0077dfe7e940cdc3766548902b988622b528380cd34464f94b",
+  "actor": "codex",
+  "type": "transition",
+  "summary": "Iterate: Improve the inline Steel browser UI inside the BB thread with a neutral non-yellow palette and a more polished compact chrome. Add a visible, understandable jev-ultrafast configuration/status surface so the user can see whether it is enabled and what secure host-side configuration is missing. Then run a faster navigation demo in the same visible Steel session and clearly distinguish direct CDP control from an actual jev-ultrafast run.",
+  "createdAt": "2026-10-01T18:58:58.324Z",
+  "stateBeforeDigest": "sha256:e098698e18cbfadb3b943d3e6593edb47d8d053ac3d215a742c17bbb6cc56ebc",
+  "stateAfterDigest": "sha256:04adf23888c07b5c7a3a2502500e141a32497cd93ba90d275dac464171555387",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 25,
+    "activeFeature": "install-and-run-https-github-com-steel-dev-steel-browser",
+    "request": "Install and run https://github.com/steel-dev/steel-browser on the dyaus host for use from this BB environment, then create a new independently installable BB plugin in this repository that integrates Steel as the replacement browser infrastructure for the prior KERNEL.SH-based workflow. Keep the root orchestration-only conventions, align manifest/package/CLI/UI/docs/tests, avoid committing generated artifacts, and verify the Steel service plus the plugin's human UI and CLI surface.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Improve the inline Steel browser UI inside the BB thread with a neutral non-yellow palette and a more polished compact chrome. Add a visible, understandable jev-ultrafast configuration/status surface so the user can see whether it is enabled and what secure host-side configuration is missing. Then run a faster navigation demo in the same visible Steel session and clearly distinguish direct CDP control from an actual jev-ultrafast run.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:1470a114871c2de56687be5f20fd2c1664295d2ba7abb50f038f6bbdaa04edc0",
+    "approvedSpecRevision": 13,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:2e5e1ae01f38a490fd2b9b94e2a2c874d2dd8b9020c2cfd934ce3aa0ae789b36",
+    "impactDigest": "sha256:12589f53cfe5df3acd8d844396ff6eac97966c4679bd63007e9b6c8b888d7a7b",
+    "capabilityClaimId": "install-and-run-https-github-com-steel-dev-steel-browser-a8ef2053ff39",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-01T18:58:58.324Z",
+    "lifecycle": {
+      "riskRequest": "Keep Steel hosted on the connected dyaus machine as the primary host; do not move or duplicate it to another machine. Extend the existing Steel browser plugin scope to evaluate and, where supported, integrate browser-use/jev-ultrafast as an optional browser-agent layer over the existing Steel CDP endpoint. Preserve the existing Steel service and plugin behavior, keep credentials out of repository state, and document any unsupported direct integration as an explicit limitation.",
+      "stage": "iteration",
+      "iteration": 2,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "contractRevision": 10,
+      "contractBaseline": 24
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 11,
+      "capabilities": 1,
+      "reason": "Keep Steel hosting and the optional jev-ultrafast adapter together because the adapter's only supported browser target is the existing Steel CDP session, and splitting them would make the integration contract unverifiable as separate slices.",
+      "actor": "codex",
+      "revision": 11
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "install-and-run-https-github-com-steel-dev-steel-browser-a8ef2053ff39",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "install-and-run-https-github-com-steel-dev-steel-browser",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_cj9zf3k5m4-1/bb-plugins",
+      "worktreeId": "sha256:fe30a202fa07d32cabf7c31f25dde37e3d9687d7450ba2d5cd220a37a360bd56",
+      "baseCommit": "9614dd51fc203d740614aba4de44f31cda50ec04",
+      "baseTree": "41b659cfcdc3046ebe70fbe0fc4e4b9502d04e38",
+      "bases": {
+        "steel-browser-infrastructure": {
+          "capability": "steel-browser-infrastructure",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "durable local service": null,
+            "browser session lifecycle": null,
+            "operational app": null,
+            "agent and plugin distribution": null,
+            "optional jev-ultrafast agent adapter": null
+          }
+        }
+      },
+      "capabilities": [
+        "steel-browser-infrastructure"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-01T16:17:45.656Z",
+      "heartbeatAt": "2026-10-01T17:43:19.254Z",
+      "digest": "sha256:efa8ca283ae3136b5a925a85da7322d186e02fd4a256f0f7a983c7091f2d12f6"
+    },
+    "trackerGeneration": 2,
+    "budgetExtensionMinutes": 60,
+    "reviewFirst": true
+  },
+  "digest": "sha256:3804c665d0eb6741f0e2fe605cc61345ec719f6a4d0c2bab2038ca71065c4dbc"
+}

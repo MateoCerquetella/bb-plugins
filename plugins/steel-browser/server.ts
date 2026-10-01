@@ -27,6 +27,24 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
       description: "HTTP(S) endpoint for the self-hosted Steel Browser API.",
       default: DEFAULT_ENDPOINT,
     },
+    jevCheckout: {
+      type: "string",
+      label: "jev-ultrafast checkout",
+      description: "Absolute path on dyaus. Configuration only: the Jev runner is not yet integrated.",
+      default: "",
+    },
+    jevEnvFile: {
+      type: "string",
+      label: "jev-ultrafast credentials file",
+      description: "Host-only dotenv path containing TYPESAFE_API_KEY and TEXT_MODEL_API_KEY. Enter a path, never a key. No file is read or executed yet.",
+      default: "",
+    },
+    jevTextModel: {
+      type: "string",
+      label: "jev-ultrafast text model",
+      description: "Model identifier for the text helper. Live Jev runs require potentially billable external API calls.",
+      default: "inception/mercury-2.5",
+    },
   });
 
   async function client(): Promise<SteelClient> {

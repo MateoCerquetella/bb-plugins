@@ -13,11 +13,13 @@ import {
   LogIn,
   Maximize2,
   Minimize2,
+  Settings2,
   X,
 } from "lucide-react";
 import {
   definePluginApp,
   useRpc,
+  useSettings,
   type PluginMessageDirectiveProps,
   type PluginThreadPanelProps,
 } from "@get-bb/plugin-sdk/app";
@@ -100,6 +102,7 @@ function SteelBrowserDirective({ message }: PluginMessageDirectiveProps) {
   const { dashboard, error, refresh } = useSteelDashboard();
   const [playerKey, setPlayerKey] = useState(0);
   const [minimized, setMinimized] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const playerUrl = dashboard
     ? new URL("v1/sessions/debug", dashboard.uiUrl.replace(/ui\/?$/, "")).toString()
     : null;
@@ -115,10 +118,14 @@ function SteelBrowserDirective({ message }: PluginMessageDirectiveProps) {
           <Monitor aria-hidden="true" />
           <span>
             <strong>Steel Browser</strong>
-            <small>{active ? "Live" : dashboard?.connected ? "No active session" : "Connecting"}</small>
+            <small>{active ? "Connected" : dashboard?.connected ? "No active session" : "Connecting"}</small>
           </span>
         </div>
         <div className="steel-inline-browser__actions">
+          <button aria-label="Browser agent configuration" title="Agent configuration"
+            aria-expanded={settingsOpen} onClick={() => setSettingsOpen(value => !value)} type="button">
+            <Settings2 aria-hidden="true" />
+          </button>
           <button
             aria-expanded={!minimized}
             aria-label={minimized ? "Restore inline browser" : "Minimize inline browser"}
@@ -136,7 +143,8 @@ function SteelBrowserDirective({ message }: PluginMessageDirectiveProps) {
           </button>
         </div>
       </header>
-      <div className="steel-inline-browser__viewport" aria-hidden={minimized}>
+      {settingsOpen && <SteelAgentSettings />}
+      <div className="steel-inline-browser__viewport" hidden={minimized}>
         {error || dashboard?.error ? (
           <div className="steel-panel-state" role="alert">{error ?? dashboard?.error}</div>
         ) : playerUrl && active ? (
@@ -150,6 +158,23 @@ function SteelBrowserDirective({ message }: PluginMessageDirectiveProps) {
           </div>
         )}
       </div>
+    </section>
+  );
+}
+
+function SteelAgentSettings() {
+  const { values, isLoading } = useSettings();
+  return (
+    <section className="steel-agent-settings" aria-label="Browser agent configuration">
+      <strong>jev-ultrafast</strong>
+      <p role="status">Runner not integrated</p>
+      <dl>
+        <dt>Checkout</dt><dd>{isLoading ? "Loading..." : String(values?.jevCheckout || "Not configured")}</dd>
+        <dt>Credentials file</dt><dd>{isLoading ? "Loading..." : String(values?.jevEnvFile || "Not configured")}</dd>
+        <dt>Text model</dt><dd>{isLoading ? "Loading..." : String(values?.jevTextModel || "Not configured")}</dd>
+      </dl>
+      <p>Configuration: BB Tools / Steel Browser. Credentials stay on the host.
+        Live Jev runs use potentially billable TypeSafe and text-model APIs.</p>
     </section>
   );
 }
@@ -470,6 +495,11 @@ export function SteelBrowserPage() {
 }
 
 export default definePluginApp((app) => {
+  app.slots.settingsSection({
+    id: "steel-agent-status",
+    title: "Browser agent",
+    component: SteelAgentSettings,
+  });
   app.slots.threadPanelAction({
     id: THREAD_PANEL_ACTION_ID,
     title: "Steel Browser",

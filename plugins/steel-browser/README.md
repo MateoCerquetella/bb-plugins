@@ -20,6 +20,20 @@ minimized to its compact header and restored without stopping the session or
 reloading the browser. A manual **Steel Browser**
 thread-panel action remains available from the panel launcher.
 
+### Agent Configuration
+
+BB Tools / Steel Browser exposes the jev-ultrafast checkout path, host-only
+credentials file path, and text-model identifier. The inline viewer's settings
+icon shows those saved values and the integration status. These fields are
+configuration preparation only: this plugin does not yet execute Jev, read the
+credentials file, or validate a Browser Harness connection. The status therefore
+remains **Runner not integrated**, even with all fields populated.
+
+Never put API keys in these fields or in chat. Jev requires `TYPESAFE_API_KEY`
+and `TEXT_MODEL_API_KEY` in the host-side environment. Its live runs make
+potentially billable external API calls. Direct Playwright/CDP navigation demos
+are not Jev runs.
+
 ## Install
 
 Steel must be reachable from the BB server. This host uses the loopback-only
