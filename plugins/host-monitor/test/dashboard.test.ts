@@ -141,6 +141,45 @@ describe("resource health", () => {
     );
   });
 
+  it("applies disk thresholds to extra volumes and skips unavailable ones", () => {
+    const base = snapshot({ diskPercent: 30 });
+    assert.deepEqual(deriveResourceHealth(base, 0), {
+      health: "healthy",
+      alert: null,
+    });
+
+    const breached = deriveResourceHealth(
+      {
+        ...base,
+        extraDisks: [
+          { path: "/mnt/missing", capacity: null },
+          { path: "/mnt/HC_Volume_106978058", capacity: capacity(96) },
+        ],
+      },
+      0,
+    );
+    assert.equal(breached.health, "critical");
+    assert.equal(breached.alert?.metric, "disk");
+    assert.match(
+      breached.alert?.message ?? "",
+      /^Volume \/mnt\/HC_Volume_106978058 is nearly full/u,
+    );
+
+    assert.deepEqual(
+      deriveResourceHealth(
+        {
+          ...base,
+          extraDisks: [
+            { path: "/mnt/missing", capacity: null },
+            { path: "/srv", capacity: capacity(50) },
+          ],
+        },
+        0,
+      ),
+      { health: "healthy", alert: null },
+    );
+  });
+
   it("requires a sustained CPU streak and never alerts on swap alone", () => {
     assert.deepEqual(
       deriveResourceHealth(

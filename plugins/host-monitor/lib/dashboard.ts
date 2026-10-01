@@ -102,6 +102,7 @@ function capacityCandidate(
   usagePercent: number,
   availableBytes: number,
   thresholds: HealthThresholds,
+  volumePath: string | null = null,
 ): AlertCandidate | null {
   if (usagePercent < thresholds.attentionPercent) return null;
   const health =
@@ -118,14 +119,15 @@ function capacityCandidate(
       },
     };
   }
+  const volume = volumePath === null ? "System disk" : `Volume ${volumePath}`;
   return {
     health,
     alert: {
       metric,
       message:
         health === "critical"
-          ? `System disk is nearly full — ${formatBytes(availableBytes)} free.`
-          : `System disk is filling up — ${formatBytes(availableBytes)} free.`,
+          ? `${volume} is nearly full — ${formatBytes(availableBytes)} free.`
+          : `${volume} is filling up — ${formatBytes(availableBytes)} free.`,
     },
   };
 }
@@ -160,9 +162,10 @@ function compareCandidates(left: AlertCandidate, right: AlertCandidate): number 
 }
 
 /**
- * Derive resource health from one successful snapshot. Memory and disk react
- * immediately at the configured percentages; CPU reacts only after the
- * caller-provided streak is sustained. Swap is intentionally absent: swap
+ * Derive resource health from one successful snapshot. Memory, the system
+ * disk, and every measured extra volume react immediately at the configured
+ * percentages; CPU reacts only after the caller-provided streak is sustained.
+ * Swap is intentionally absent: swap
  * occupancy alone is not evidence of current memory pressure.
  */
 export function deriveResourceHealth(
@@ -185,6 +188,17 @@ export function deriveResourceHealth(
           snapshot.disk.availableBytes,
           thresholds,
         ),
+    ...(snapshot.extraDisks ?? []).map((extraDisk) =>
+      extraDisk.capacity === null
+        ? null
+        : capacityCandidate(
+            "disk",
+            extraDisk.capacity.usagePercent,
+            extraDisk.capacity.availableBytes,
+            thresholds,
+            extraDisk.path,
+          ),
+    ),
     cpuCandidate(snapshot.cpu.usagePercent, cpuHighStreak, thresholds),
   ].filter((candidate): candidate is AlertCandidate => candidate !== null);
 

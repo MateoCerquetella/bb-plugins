@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  hostContract,
+  machineSnapshotSchema,
   networkSnapshotSchema,
   processListResultSchema,
   processRowSchema,
@@ -173,5 +175,29 @@ test("process list result is strict and bounded", () => {
       truncated: false,
       processes: [],
     }),
+  );
+});
+
+test("extra volume fields stay optional for existing hosts and servers", () => {
+  const snapshotInput = hostContract.snapshot.input;
+  assert.deepEqual(snapshotInput.parse({ cpuSampleMs: 300 }), {
+    cpuSampleMs: 300,
+  });
+  assert.deepEqual(
+    snapshotInput.parse({ cpuSampleMs: 300, extraDiskPaths: ["/srv"] }),
+    { cpuSampleMs: 300, extraDiskPaths: ["/srv"] },
+  );
+  assert.throws(() =>
+    snapshotInput.parse({
+      cpuSampleMs: 300,
+      extraDiskPaths: Array.from({ length: 9 }, (_, index) => `/v${index}`),
+    }),
+  );
+
+  const extraDisks = machineSnapshotSchema.shape.extraDisks;
+  assert.equal(extraDisks.parse(undefined), undefined);
+  assert.deepEqual(
+    extraDisks.parse([{ path: "/mnt/missing", capacity: null }]),
+    [{ path: "/mnt/missing", capacity: null }],
   );
 });
