@@ -86,3 +86,19 @@ endpoint to jev-ultrafast without vendoring or proxying its implementation.
 - WHEN required jev-ultrafast credentials are absent
 - THEN the adapter fails before creating browser actions
 - AND no credential values are included in logs, plugin state, or errors
+
+### Requirement: Tools project policy configuration
+The Tools settings surface SHALL request project policy only when BB supplies a
+concrete thread or project identifier. Host-side Jev configuration SHALL remain
+readable without a project context.
+
+#### Scenario: Tools without project context
+- WHEN BB renders Steel Browser settings without a thread or project identifier
+- THEN no project RPC is dispatched
+- AND the UI reports that project engine controls require a project context
+- AND host-side Jev configuration remains visible
+
+#### Scenario: Tools with project context
+- WHEN BB renders Steel Browser settings for a project
+- THEN its Playwright, Jev or Auto selection and fallback toggle are loaded
+- AND no undefined value is present in the RPC input

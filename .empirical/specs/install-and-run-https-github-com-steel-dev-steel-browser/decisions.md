@@ -104,3 +104,10 @@ advanced Steel endpoints available through its own local documentation link.
 Inspect the image digest and bindings, restart the service, run real
 health/create/list/release requests, then run plugin type/build/contract checks,
 local install/reload, CLI smoke checks, and browser UI verification.
+# D-005 Tools Without Project Context
+
+- Evidence: BB Tools supplied no project ID and serialization rejected undefined.
+- Options: guess a project; suppress serialization only; or fail closed in UI.
+- Decision: fail closed before RPC and retain host configuration.
+- Trade-off: no project policy edits from a context-free Tools surface.
+- Verification: browser coverage with and without project scope.

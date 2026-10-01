@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "sequence": 36,
+  "previousDigest": "sha256:595e680dae6bd631ab705ffa61246a31ecea11019739e3601eac8d8a9179ef3c",
+  "actor": "codex",
+  "type": "transition",
+  "summary": "Revise contract: Fix the Steel Browser Tools settings panel so it never sends undefined projectId values over RPC. When no BB project context is available, render a clear project-unavailable state instead of calling project RPC, while keeping Jev host configuration visible. Add focused coverage, rebuild, reload, and update the existing draft PR.",
+  "createdAt": "2026-10-01T20:54:24.481Z",
+  "stateBeforeDigest": "sha256:ab14968a72bcc94fd7a90fe8d94879c7a5b881a1aa5fd33349a8f913a54b23d8",
+  "stateAfterDigest": "sha256:1653ef2c97956a6586b415c765a4bb85d590d2e49f1b3217f2affa7a498334a8",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 36,
+    "activeFeature": "install-and-run-https-github-com-steel-dev-steel-browser",
+    "request": "Install and run https://github.com/steel-dev/steel-browser on the dyaus host for use from this BB environment, then create a new independently installable BB plugin in this repository that integrates Steel as the replacement browser infrastructure for the prior KERNEL.SH-based workflow. Keep the root orchestration-only conventions, align manifest/package/CLI/UI/docs/tests, avoid committing generated artifacts, and verify the Steel service plus the plugin's human UI and CLI surface.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Fix the Steel Browser Tools settings panel so it never sends undefined projectId values over RPC. When no BB project context is available, render a clear project-unavailable state instead of calling project RPC, while keeping Jev host configuration visible. Add focused coverage, rebuild, reload, and update the existing draft PR.",
+    "implementationActor": "codex",
+    "workStartedAt": null,
+    "specDigest": "sha256:bb68c8d68fe4a899c4cad21644b524a41587b16e29b40a720e8abd9bb75082a1",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": "install-and-run-https-github-com-steel-dev-steel-browser-a8ef2053ff39",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-01T20:54:24.481Z",
+    "lifecycle": {
+      "riskRequest": "Fix the Steel Browser Tools settings panel so it never sends undefined projectId values over RPC. When no BB project context is available, render a clear project-unavailable state instead of calling project RPC, while keeping Jev host configuration visible. Add focused coverage, rebuild, reload, and update the existing draft PR.",
+      "stage": "development",
+      "iteration": 4,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "contractRevision": 35
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 14,
+      "capabilities": 1,
+      "reason": "Keep as one because the project isolation, engine routing, UI, and Steel lifecycle form one installable plugin capability and splitting now would leave the requested end-to-end behavior unshippable.",
+      "actor": "codex",
+      "revision": 32
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "install-and-run-https-github-com-steel-dev-steel-browser-a8ef2053ff39",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "install-and-run-https-github-com-steel-dev-steel-browser",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_cj9zf3k5m4-1/bb-plugins",
+      "worktreeId": "sha256:fe30a202fa07d32cabf7c31f25dde37e3d9687d7450ba2d5cd220a37a360bd56",
+      "baseCommit": "9614dd51fc203d740614aba4de44f31cda50ec04",
+      "baseTree": "41b659cfcdc3046ebe70fbe0fc4e4b9502d04e38",
+      "bases": {
+        "steel-browser-infrastructure": {
+          "capability": "steel-browser-infrastructure",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "project browser isolation": null,
+            "project engine policy": null,
+            "durable local service": null,
+            "browser session lifecycle": null,
+            "operational app": null,
+            "agent and plugin distribution": null,
+            "optional jev-ultrafast agent adapter": null
+          }
+        }
+      },
+      "capabilities": [
+        "steel-browser-infrastructure"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-01T16:17:45.656Z",
+      "heartbeatAt": "2026-10-01T19:19:56.727Z",
+      "digest": "sha256:d6ec2ea82a7c4b02afd08d3c2f0c619121aa2a52de8779c2202a71fb547e21ff"
+    },
+    "trackerGeneration": 4,
+    "budgetExtensionMinutes": 135,
+    "reviewFirst": true
+  },
+  "digest": "sha256:2f75e1d39c41ce9b87fae854258fd135f35ca7029452a2b5b57bec276a90b009"
+}

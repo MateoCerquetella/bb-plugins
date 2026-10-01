@@ -47,7 +47,7 @@ function shortId(id: string): string {
 function useScope(threadId?: string): Scope {
   const context = useBbContext();
   const id = threadId ?? context.threadId;
-  return useMemo(() => id ? { threadId: id } : { projectId: context.projectId ?? undefined }, [id, context.projectId]);
+  return useMemo(() => id ? { threadId: id } : context.projectId ? { projectId: context.projectId } : {}, [id, context.projectId]);
 }
 
 function useSteelDashboard(scope: Scope) {
@@ -173,6 +173,13 @@ function ScopedSteelBrowser({ message }: PluginMessageDirectiveProps) {
 }
 
 function ProjectControls({ scope }: { scope: Scope }) {
+  if (!scope.threadId && !scope.projectId) {
+    return <p role="status">No project selected. Project engine settings are available from a project context.</p>;
+  }
+  return <ScopedProjectControls key={JSON.stringify(scope)} scope={scope} />;
+}
+
+function ScopedProjectControls({ scope }: { scope: Scope }) {
   const rpc = useRpc<typeof rpcContract>();
   const { values } = useSettings();
   const [project, setProject] = useState<ProjectState | null>(null);

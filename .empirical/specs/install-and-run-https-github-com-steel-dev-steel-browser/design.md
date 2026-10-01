@@ -77,3 +77,10 @@ Client and contract tests use a local HTTP fixture. Host verification uses
 Docker inspect, curl, and a real Steel session lifecycle. Plugin verification
 uses SDK types, TypeScript, build output inspection, local install/reload, CLI
 smoke checks, and browser screenshots at desktop/mobile widths.
+# Tools Context Correction
+
+Represent absent BB scope as an empty JSON object, never an object with an
+undefined property. Project controls short-circuit before RPC when neither a
+thread nor project ID is present. Settings retain the Jev host fields and show
+a concise project-unavailable state. Existing thread-scoped operations remain
+unchanged.

@@ -61,6 +61,10 @@ Steel CDP session when the user supplies its external model credentials.
 - [ ] [AC-12] Engine routing preflights configuration, requires explicit paid-call
   permission for Jev, and never retries through another engine after execution
   begins or its outcome is uncertain.
+- [ ] [AC-13] [UI] BB Tools never serializes an undefined project identifier.
+  With project context it shows and persists that project's engine policy; without
+  project context it shows a concise unavailable state while retaining host-side
+  Jev configuration.
 
 - Durable pinned Steel deployment on dyaus.
 - Plugin server, app, host support if BB server is remote, CLI, contracts,
@@ -84,6 +88,8 @@ Steel CDP session when the user supplies its external model credentials.
   cookie separation, per-project engine preferences and preflight-only fallback.
 - Use an isolated local fixture to verify both project profiles; do not inspect
   or log real login cookies. No paid model calls during verification.
+- Render Tools both with and without project context; assert that the latter
+  dispatches no project RPC and exposes no serialization error.
 
 - Inspect deployment bindings and persistence, restart, then run health and a
   real session lifecycle smoke test.

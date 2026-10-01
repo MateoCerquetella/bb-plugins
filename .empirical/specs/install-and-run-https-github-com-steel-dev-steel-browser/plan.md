@@ -46,3 +46,9 @@ The host service can be stopped/disabled with the documented compose and
 systemd commands. The plugin can be removed with `bb plugin remove
 steel-browser`; source changes are isolated to the new plugin and catalog
 entries.
+# Tools Scope Fix
+
+1. Normalize absent scope without undefined JSON properties.
+2. Short-circuit project controls before RPC without project context.
+3. Cover absent and present context in browser tests.
+4. Build, reload, and push the focused correction to the current PR.

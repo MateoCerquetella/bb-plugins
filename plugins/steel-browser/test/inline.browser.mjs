@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 const result = await build({
   stdin: { contents: `import React from "react"; import {createRoot} from "react-dom/client";
     import {SteelBrowserDirective,SteelAgentSettings} from "./app.tsx";
-    createRoot(document.getElementById("root")).render(<><SteelBrowserDirective
+    createRoot(document.getElementById("root")).render(location.search ? <SteelAgentSettings /> : <><SteelBrowserDirective
       message={{id:"m",threadId:"t",projectId:"p",turnId:null}} source="" attributes={{}} openWorkspaceFile={null} />
       <div id="settings"><SteelAgentSettings /></div></>);`,
     resolveDir: fileURLToPath(new URL("../", import.meta.url)), loader: "tsx" },
@@ -15,13 +15,15 @@ const result = await build({
     b.onLoad({ filter: /.*/, namespace: "mock" }, () => ({ loader: "js", contents: `
       const project={projectId:"p",projectName:"Project A",binding:null,policy:{engine:"playwright",fallback:false}};
       const rpc={call:async(method,input)=>{
+        window.rpcCalls=(window.rpcCalls||[]).concat([{method,input}]);
+        if(Object.values(input).some(value=>value===undefined))throw new Error("undefined RPC input");
         if(method==="project")return {...project};
         if(method==="setEngine"){project.policy=input.policy;return {...project};}
         return {connected:true,uiUrl:"https://viewer.test/ui",sessions:[{status:"idle"}]};
       }};
       export const useRpc=()=>rpc;
       export const useSettings=()=>({values:{},isLoading:false});
-      export const useBbContext=()=>({threadId:"t",projectId:"p"});
+      export const useBbContext=()=>location.search ? {threadId:null,projectId:null} : {threadId:"t",projectId:"p"};
       export const definePluginApp=()=>null;
     ` }));
   } }],
@@ -60,6 +62,12 @@ try {
     assert(Math.abs(viewport.width - viewport.height) <= 1, "inline viewport must stay square");
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     if (process.env.BB_THREAD_STORAGE) await page.screenshot({ path: `${process.env.BB_THREAD_STORAGE}/steel-project-inline-${width}.png` });
+    await page.goto("http://inline.test/?no-project");
+    await page.getByText(/No project selected/).waitFor();
+    assert.equal(await page.getByRole("combobox").count(), 0);
+    assert.equal(await page.evaluate(() => (window.rpcCalls || []).length), 0);
+    assert(await page.getByText("jev-ultrafast", { exact: true }).isVisible());
+    assert.equal(await page.getByRole("alert").count(), 0);
     await page.close();
   }
 } finally { await browser.close(); }

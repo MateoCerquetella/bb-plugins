@@ -10,9 +10,11 @@ Verdict: advisory
   when no project binding exists. Never render the legacy global viewer.
 - Severity: medium
   Category: interaction
-  Location: engine selector
+  Location: Tools engine selector
   Recommendation: Use a select and a distinct fallback checkbox; show
-  unavailable Jev state without implying readiness from saved paths alone.
+  unavailable Jev state without implying readiness from saved paths alone. If
+  Tools has no project context, replace the controls with a concise explanatory
+  state and keep host-side Jev configuration visible.
 - Severity: low
   Category: accessibility
   Location: inline browser toolbar
