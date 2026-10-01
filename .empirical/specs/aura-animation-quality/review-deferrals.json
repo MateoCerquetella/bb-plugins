@@ -11,6 +11,16 @@
       "reason": "Non-blocking review findings are deferred automatically so they never start another fix lap; track them as a follow-up.",
       "ticket": null,
       "recordedAt": "2026-09-30T23:14:46.547Z"
+    },
+    {
+      "schemaVersion": 1,
+      "resultDigest": "sha256:0faa815d025f7a828757509a09ebef5a73ec45daec36ed9f3b7bfd4ddcdafe18",
+      "findingIds": [
+        "F-2"
+      ],
+      "reason": "Non-blocking review findings are deferred automatically so they never start another fix lap; track them as a follow-up.",
+      "ticket": null,
+      "recordedAt": "2026-10-01T15:27:02.196Z"
     }
   ]
 }

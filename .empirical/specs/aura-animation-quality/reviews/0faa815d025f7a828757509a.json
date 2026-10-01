@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:2484a85ecce750cfa364b6b3791c86aebb883ff0e3f2147d2a40e0fd9ecba592",
+  "mode": "fresh-context",
+  "baseRef": "origin/main",
+  "baseCommit": "9614dd51fc203d740614aba4de44f31cda50ec04",
+  "headCommit": "0345504e79ab331ec36cf1a49a3c53bf32c766d4",
+  "diffDigest": "sha256:e779e128c28182b2b2c78030c8ed8946d837f3ed6cebe8e404670a7da047526f",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "codex-fresh-context-reviewer",
+  "reviewerInvocationId": "aura-review-0345504-20261001-aura-reviewer-01",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- PASS AC-1: The strict settings schema accepts only 15, 30, or 60 FPS and Performance, Balanced, or Sharp quality. Active settings and saved slots share this schema, and the added slot test verifies both values survive save and activation.\n- PASS AC-2: Zod defaults supply 15 FPS and Balanced quality when legacy settings omit the fields. The persistence shape remains unchanged, and the legacy-row test verifies the defaults load without a migration.\n- PASS AC-3: The selected FPS controls draw eligibility through frameIsDue, and every successful immediate draw now updates lastDraw before the next RAF. Fixed quality scales size the drawing buffer, with image-backed buffers clamped to 2,073,600 pixels.\n- PASS AC-4: Draft changes flow directly into CapyPreview; fps or quality changes dispose and remount its shader immediately. Apply persists the complete settings object through the existing notification path used by conversation and New thread surfaces.\n- PASS AC-UI-1: Capy dithering exposes two compact three-column button groups with concise labels, native keyboard-focusable buttons, aria-pressed selection state, associated labels and help text, and min-width/overflow rules for narrow panels.\n- PASS AC-5: The existing reduced-motion, document-visibility, and intersection guards remain intact. schedule cancels pending RAF work, draws at most one static frame for reduced motion, and starts no RAF while hidden or non-intersecting.\n- FAIL AC-6: The committed tests cover legacy defaults, validation, active and slot persistence, FPS cadence, quality scaling, and the image cap. The packet contains no successful typecheck, test, build, local installation, or bb aura status evidence; its committed workflow state explicitly records no evidence receipts and verified=false.\n\n## Security / correctness\n\nNo security vulnerability was found in the reviewed diff. Strict enum validation prevents unsupported scheduler and quality values, the framebuffer cap remains enforced for image-backed rendering, and shader replacement retains disposal of RAF, observers, listeners, GL resources, and the prior context. The earlier immediate-draw frame-cap defect is corrected because draw records lastDraw.\n\n## Design / maintainability\n\nThe change follows the accepted design: it parameterizes the existing shader loop, keeps named quality tiers in one typed mapping, and extracts deterministic helpers for cadence and canvas sizing. The settings UI and persistence reuse established Aura paths. One low-severity documentation-maintenance issue remains: the context index still links to manifest.json although this diff deletes that file.",
+  "bodyDigest": "sha256:c90fe18842f2d15000af3cf6e7dd2d62a7e9b36084ee5af2fd33d69e6a651e9f",
+  "findings": [
+    {
+      "id": "F-1",
+      "severity": "medium",
+      "category": "acceptance",
+      "summary": "AC-6 lacks committed evidence that Aura typechecks, tests, builds, and was installed and inspected in the user's BB instance.",
+      "path": ".empirical/specs/aura-animation-quality/state.json"
+    },
+    {
+      "id": "F-2",
+      "severity": "low",
+      "category": "docs",
+      "summary": "The context index links to manifest.json even though the same diff deletes that file.",
+      "path": ".empirical/context/index.md"
+    }
+  ],
+  "digest": "sha256:0faa815d025f7a828757509a09ebef5a73ec45daec36ed9f3b7bfd4ddcdafe18"
+}

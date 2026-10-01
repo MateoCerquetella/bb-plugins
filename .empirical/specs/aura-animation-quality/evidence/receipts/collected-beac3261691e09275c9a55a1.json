@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-beac3261691e09275c9a55a1",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review requested changes to the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-09-30T23:24:14.078Z",
+  "completedAt": "2026-09-30T23:24:14.078Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "aura-animation-quality",
+    "specRevision": 4,
+    "specDigest": "sha256:190013b949b9c435d9790863dda37b50b067bf9839eb7a9d83b4b99ed8621160",
+    "treeDigest": "sha256:2f9214cf5c182589ccd9747e5474190fac85e984ccc21c354ff50b03648aaa79",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:a6078ccc9fa3795a64ede341394016c4bce6aeb5e34901eb4f744a6ea2a6057e",
+  "kind": "collected",
+  "collector": "empirical-review:codex-fresh-context-rereviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/aura-animation-quality/reviews/db540ca24f5c533c76a3bb1f.json",
+      "mediaType": "application/json",
+      "bytes": 2349,
+      "digest": "sha256:a2dde516626b25685acf63480a94507449b018c577c187da19d64a13368832b7"
+    },
+    {
+      "path": ".empirical/specs/aura-animation-quality/reviews/db540ca24f5c533c76a3bb1f.md",
+      "mediaType": "text/markdown",
+      "bytes": 1241,
+      "digest": "sha256:5c3a765e9656ce9295644132f80f8f16bf04e827a9c4862e70eeb0513ed31022"
+    }
+  ]
+}

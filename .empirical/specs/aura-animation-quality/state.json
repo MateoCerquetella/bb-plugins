@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 9,
+  "revision": 16,
   "activeFeature": "aura-animation-quality",
   "request": "Add Aura settings for 15, 30, and 60 FPS and selectable WebGL render resolution/quality; persist both choices, apply them to animation timing and canvas resolution, update tests and documentation, and install locally for verification. Do not publish.",
   "profile": "complex",
@@ -9,11 +9,11 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Fix AC-3 and AC-6 from review: update immediate shader draws so frame-cap bookkeeping cannot permit an early next RAF draw, add deterministic tests for FPS cadence and quality/canvas sizing including the image cap, then run verification and install locally.",
+  "message": "Confirmed the existing plan remains executable; this iteration consists only of focused verification, exact-branch delivery to Dyaus, runtime status inspection, and evidence recording.",
   "implementationActor": "codex",
   "workStartedAt": "2026-09-30T22:23:03.535Z",
   "specDigest": "sha256:190013b949b9c435d9790863dda37b50b067bf9839eb7a9d83b4b99ed8621160",
-  "approvedSpecRevision": 4,
+  "approvedSpecRevision": 14,
   "capabilityArchiveRequired": true,
   "capabilityDeltaDigest": "sha256:5e40fbc4eaa1eace3b55261e7ad94721fff7b8e1d7a7f471f22006f2e5ab14bd",
   "impactDigest": "sha256:c647c6f898a476ae19623c2c863ea87ee47112e7b9bab7e96bf622d4013aba49",
@@ -37,7 +37,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-30T23:15:10.123Z",
+  "updatedAt": "2026-10-01T15:35:28.757Z",
   "sizeDecision": {
     "choice": "keep",
     "criteria": 7,
@@ -76,11 +76,14 @@
     "heartbeatAt": "2026-09-30T22:36:52.216Z",
     "digest": "sha256:f5edd2e68871b63f0b6d57a1b04e08dcf71ec369c04dd45442e7382620ec3d48"
   },
-  "reviewFirst": true,
-  "trackerGeneration": 1,
+  "trackerGeneration": 2,
   "lifecycle": {
-    "stage": "iteration",
-    "iteration": 1,
-    "awaitingFeedback": false
-  }
+    "stage": "development",
+    "iteration": 2,
+    "awaitingFeedback": false,
+    "contractRevision": 12,
+    "riskRequest": "Complete the user-authorized final fix lap for AC-6/F-1 by recording the already-required verification and local installation evidence: run Aura typecheck, tests, and build; push the exact feature branch; install that branch into the user's BB server on Dyaus; verify Aura is running and its status exposes the new FPS and quality settings; record evidence and finish the workflow."
+  },
+  "budgetExtensionMinutes": 30,
+  "reviewFirst": true
 }

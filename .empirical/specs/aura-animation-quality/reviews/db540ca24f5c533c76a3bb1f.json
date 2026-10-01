@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:7d615d97a378b30e36fde6d51c8eff9b2ab373e127d9dd6891c11b3556104ab7",
+  "mode": "fresh-context",
+  "baseRef": "origin/main",
+  "baseCommit": "9614dd51fc203d740614aba4de44f31cda50ec04",
+  "headCommit": "0345504e79ab331ec36cf1a49a3c53bf32c766d4",
+  "diffDigest": "sha256:e127b5bf5c5006145388f49adba50c9af5f7a6a3c7ffec90bca730966f3cd149",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "codex-fresh-context-rereviewer",
+  "reviewerInvocationId": "aura-rereview-0345504-20260930-02",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- PASS AC-1: fps and quality remain strictly validated and persist with active settings and saved slots.\n- PASS AC-2: Legacy active and slot settings receive 15 FPS and balanced defaults without migration or image loss.\n- PASS AC-3: draw records lastDraw on every successful draw; RAF and immediate scheduling use frameIsDue; canvasSize applies tiers and enforces the framebuffer cap.\n- PASS AC-4: Draft changes update preview immediately and Apply propagates persisted settings to conversation and New thread surfaces.\n- PASS AC-UI-1: Conditional segmented controls remain compact, accessible, and suitable for narrow panels.\n- PASS AC-5: Reduced motion and hidden/non-intersecting guards stop continuous animation scheduling.\n- FAIL AC-6: Deterministic cadence, tier sizing, and cap tests resolve the code coverage gap, but local BB installation evidence is unavailable because the CLI returned HTTP 401 Unauthorized.\n\n## Security / correctness\n\nNo security vulnerabilities or new correctness defects found. The prior frame-cap issue is resolved.\n\n## Design / maintainability\n\nThe extracted frameIsDue and canvasSize helpers improve clarity and regression coverage without disrupting Aura lifecycle behavior.",
+  "bodyDigest": "sha256:c91a22c3087753a4d1efffd37917ad8313fd5bec7632875bd057919f8b953da1",
+  "findings": [
+    {
+      "id": "F-3",
+      "severity": "medium",
+      "category": "acceptance",
+      "summary": "Local BB installation and status verification evidence remain unavailable because the configured BB CLI server returned HTTP 401 Unauthorized.",
+      "path": ".empirical/specs/aura-animation-quality/state.json"
+    }
+  ],
+  "digest": "sha256:db540ca24f5c533c76a3bb1fe206c02b1ea397cc3150f28c6841905551c9e23c"
+}
