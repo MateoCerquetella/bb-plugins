@@ -40,6 +40,28 @@ Steel CDP session when the user supplies its external model credentials.
 
 ## Scope
 
+- Project-scoped routing derives project identity from BB thread records.
+  Each project uses a separate Steel instance and persistent Chromium volume.
+  Unconfigured projects fail closed; they never reuse the legacy global browser.
+- The inline browser is at most 560px wide and shows its project identity.
+- Engine preferences are project-scoped: Playwright, Jev, or Auto, with a
+  separate fallback toggle. Fallback is permitted only after preflight failure,
+  never after an action may have been dispatched. Paid Jev calls are opt-in.
+- Cookie values and browser storage remain in host volumes, outside Git and
+  plugin RPC responses. Concurrent projects must not share API/CDP bindings.
+- Existing global browser state is preserved, not silently migrated or deleted.
+
+## Project Acceptance Criteria
+
+- [ ] [AC-10] Two BB projects resolve to different Steel instances and persistent
+  profiles; reopening a project retains its own cookies without exposing another
+  project's viewer or storage. Missing bindings fail closed.
+- [ ] [AC-11] [UI] Inline viewer width is bounded at 560px; engine selection and
+  fallback preference persist per project and show unavailable engines honestly.
+- [ ] [AC-12] Engine routing preflights configuration, requires explicit paid-call
+  permission for Jev, and never retries through another engine after execution
+  begins or its outcome is uncertain.
+
 - Durable pinned Steel deployment on dyaus.
 - Plugin server, app, host support if BB server is remote, CLI, contracts,
   focused tests, assets, skill, README, and workspace catalog entries.
@@ -57,6 +79,11 @@ Steel CDP session when the user supplies its external model credentials.
   inference implementation.
 
 ## Verification
+
+- Test project resolution, endpoint uniqueness, no global fallback, persistent
+  cookie separation, per-project engine preferences and preflight-only fallback.
+- Use an isolated local fixture to verify both project profiles; do not inspect
+  or log real login cookies. No paid model calls during verification.
 
 - Inspect deployment bindings and persistence, restart, then run health and a
   real session lifecycle smoke test.

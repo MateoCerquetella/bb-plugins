@@ -22,14 +22,18 @@ const result = await build({
     setup(b) {
       b.onResolve({ filter: /^@get-bb\/plugin-sdk\/app$/ }, () => ({ path: "sdk", namespace: "mock" }));
       b.onLoad({ filter: /.*/, namespace: "mock" }, () => ({
-        contents: `const rpc={call:async()=>({
+        contents: `const rpc={call:async(method)=>method==="project" ? ({
+          projectId:"test-project",projectName:"Test",binding:null,policy:{engine:"playwright",fallback:false}
+        }) : ({
           connected:true,endpoint:"http://127.0.0.1:3100",error:null,
           checkedAt:new Date().toISOString(),uiUrl:"https://steel.test/ui",
           docsUrl:"https://steel.test/documentation",
           sessions:Array.from({length:8},(_,i)=>({id:"browser-"+i,
             status:i===0?"idle":"released",createdAt:new Date().toISOString(),
             websocketUrl:"ws://127.0.0.1:3100/"}))
-        })}; export const useRpc=()=>rpc;export const definePluginApp=()=>null;`,
+        })}; export const useRpc=()=>rpc;export const definePluginApp=()=>null;
+        export const useBbContext=()=>({threadId:"test-thread",projectId:"test-project"});
+        export const useSettings=()=>({values:{},isLoading:false});`,
         loader: "js",
       }));
     },

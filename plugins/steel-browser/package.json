@@ -49,9 +49,14 @@
     "app.css",
     "contract.ts",
     "server.ts",
-    "steel-client.ts"
+    "steel-client.ts",
+    "projects.ts",
+    "engines.ts",
+    "provisioning.ts",
+    "scripts/"
   ],
   "dependencies": {
+    "playwright": "1.63.0",
     "lucide-react": "^1.49.0",
     "zod": "^4.3.6"
   },

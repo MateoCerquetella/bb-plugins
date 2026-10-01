@@ -45,7 +45,7 @@
 .steel-panel-state { display: grid; place-items: center; align-content: center; gap: 10px; min-height: 0; flex: 1; padding: 20px; color: var(--muted-foreground, #a4a5af); text-align: center; }
 .steel-panel-state svg { width: 28px; height: 28px; }
 .steel-inline-browser {
-  width: min(100%, 640px);
+  width: min(100%, 560px);
   margin-block: 8px;
   border: 1px solid var(--border, #36373d);
   border-radius: 8px;
@@ -90,10 +90,18 @@
 .steel-agent-settings dl { display: grid; grid-template-columns: minmax(80px, 1fr) minmax(0, 2fr); gap: 8px 12px; }
 .steel-agent-settings dt { color: var(--muted-foreground, #a4a5af); }
 .steel-agent-settings dd { margin: 0; overflow-wrap: anywhere; }
-.steel-inline-browser__viewport { position: relative; width: 100%; aspect-ratio: 1 / 1; background: #171717; }
-.steel-inline-browser__viewport iframe { display: block; width: 100%; height: 100%; border: 0; }
+.steel-agent-settings__project { margin-bottom: 18px; }
+.steel-agent-settings__project > .steel-project-controls { margin-top: 8px; padding-inline: 0; border: 0; }
+.steel-inline-browser__viewport { position: relative; width: 100%; aspect-ratio: 1 / 1; padding: 12px; background: #111214; }
+.steel-inline-browser__viewport iframe { display: block; width: 100%; height: 100%; border: 1px solid var(--border, #36373d); border-radius: 5px; background: #171717; }
 .steel-inline-browser--minimized { width: min(100%, 360px); }
 .steel-inline-browser--minimized > header { border-bottom: 0; }
+.steel-project-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--border, #36373d); font-size: 11px; }
+.steel-project-controls > span { flex: 1 1 100px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.steel-project-controls label { display: inline-flex; align-items: center; gap: 5px; }
+.steel-project-controls select { max-width: 150px; padding: 4px; border: 1px solid var(--border, #464750); border-radius: 4px; color: inherit; background: var(--background, #18191c); font: inherit; }
+.steel-project-controls input { accent-color: #607e9c; }
+.steel-project-controls p { width: 100%; margin: 0; color: #b95252; overflow-wrap: anywhere; }
 .steel-inline-browser__viewport[hidden] { display: none; }
 .steel-header, .steel-identity, .steel-actions, .steel-status, .steel-toolbar, .steel-links {
   display: flex;

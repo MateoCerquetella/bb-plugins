@@ -1,5 +1,27 @@
 # Design
 
+## Project Profiles And Engines
+
+Resolve threadId through bb.sdk.threads.get, not directive attributes. Store
+non-secret endpoint bindings and engine policy under project-prefixed KV keys.
+All UI lifecycle calls carry a thread or project reference; missing bindings
+return a setup error instead of the global endpoint. Bindings are immutable
+and endpoint reuse across projects is rejected.
+
+Provision one pinned Steel container per project using a hashed project ID,
+loopback API/CDP ports and its own Chromium volume. CHROME_USER_DATA_DIR points
+to that volume. The existing global instance remains untouched. A host setup
+script prepares this infrastructure; binding requires explicit CLI action.
+
+Playwright provides deterministic navigation; Jev requires a configured upstream
+runtime and credentials plus per-run paid authorization. Auto prefers Jev
+when permitted and ready, otherwise Playwright when fallback is enabled.
+Preflight is separate from execution: dispatch failure never invokes fallback.
+No natural-language task is silently translated into mere navigation.
+
+The 560px square inline viewer retains minimize/reload, adds project identity
+and compact engine/fallback controls, and shows setup failures inline.
+
 ## Live Viewer Correction
 
 The user explicitly requested a visible browser and play control. Put Steel's

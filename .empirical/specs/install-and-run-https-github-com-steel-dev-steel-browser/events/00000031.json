@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "sequence": 31,
+  "previousDigest": "sha256:0ec9a2a0205c15c920fe1201b3e905fbdfae65bd1f46383c031a30d840970e37",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Designed project profile isolation and preflight-only engine fallback; decisions include evidence, options, trade-offs and verification.",
+  "createdAt": "2026-10-01T19:21:48.368Z",
+  "stateBeforeDigest": "sha256:cd34f1dad6657c80d403b9474c702c685947027022cd5fe9cbf940edf7657327",
+  "stateAfterDigest": "sha256:13a3ac95225705e6a7922366034fcfcb2753f79f7168fd8bb8408c01d849d7f0",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 31,
+    "activeFeature": "install-and-run-https-github-com-steel-dev-steel-browser",
+    "request": "Install and run https://github.com/steel-dev/steel-browser on the dyaus host for use from this BB environment, then create a new independently installable BB plugin in this repository that integrates Steel as the replacement browser infrastructure for the prior KERNEL.SH-based workflow. Keep the root orchestration-only conventions, align manifest/package/CLI/UI/docs/tests, avoid committing generated artifacts, and verify the Steel service plus the plugin's human UI and CLI surface.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "plan",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Designed project profile isolation and preflight-only engine fallback; decisions include evidence, options, trade-offs and verification.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:bb68c8d68fe4a899c4cad21644b524a41587b16e29b40a720e8abd9bb75082a1",
+    "approvedSpecRevision": 30,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:89ecad82801738142d71eb8c492b19c2fcbe6457166d0d1a6aa51ac93aef5a57",
+    "impactDigest": "sha256:12589f53cfe5df3acd8d844396ff6eac97966c4679bd63007e9b6c8b888d7a7b",
+    "capabilityClaimId": "install-and-run-https-github-com-steel-dev-steel-browser-a8ef2053ff39",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-01T19:21:48.368Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 3,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "contractRevision": 28,
+      "riskRequest": "Keep Steel hosted on the connected dyaus machine as the primary host; do not move or duplicate it to another machine. Extend the existing Steel browser plugin scope to evaluate and, where supported, integrate browser-use/jev-ultrafast as an optional browser-agent layer over the existing Steel CDP endpoint. Preserve the existing Steel service and plugin behavior, keep credentials out of repository state, and document any unsupported direct integration as an explicit limitation."
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 11,
+      "capabilities": 1,
+      "reason": "Keep Steel hosting and the optional jev-ultrafast adapter together because the adapter's only supported browser target is the existing Steel CDP session, and splitting them would make the integration contract unverifiable as separate slices.",
+      "actor": "codex",
+      "revision": 11
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "install-and-run-https-github-com-steel-dev-steel-browser-a8ef2053ff39",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "install-and-run-https-github-com-steel-dev-steel-browser",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_cj9zf3k5m4-1/bb-plugins",
+      "worktreeId": "sha256:fe30a202fa07d32cabf7c31f25dde37e3d9687d7450ba2d5cd220a37a360bd56",
+      "baseCommit": "9614dd51fc203d740614aba4de44f31cda50ec04",
+      "baseTree": "41b659cfcdc3046ebe70fbe0fc4e4b9502d04e38",
+      "bases": {
+        "steel-browser-infrastructure": {
+          "capability": "steel-browser-infrastructure",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "project browser isolation": null,
+            "project engine policy": null,
+            "durable local service": null,
+            "browser session lifecycle": null,
+            "operational app": null,
+            "agent and plugin distribution": null,
+            "optional jev-ultrafast agent adapter": null
+          }
+        }
+      },
+      "capabilities": [
+        "steel-browser-infrastructure"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-01T16:17:45.656Z",
+      "heartbeatAt": "2026-10-01T19:19:56.727Z",
+      "digest": "sha256:d6ec2ea82a7c4b02afd08d3c2f0c619121aa2a52de8779c2202a71fb547e21ff"
+    },
+    "trackerGeneration": 3,
+    "budgetExtensionMinutes": 120,
+    "reviewFirst": true
+  },
+  "digest": "sha256:ba69c8a19958e5657de071d9a4d0dcaccc02f16078502ceb587c49449140b18a"
+}

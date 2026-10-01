@@ -22,7 +22,8 @@ test("ships the required operational and responsive UI states", async () => {
   assert.match(app, /window\.confirm/u);
   assert.match(app, /Steel is not connected/u);
   assert.match(css, /@media \(max-width: 560px\)/u);
-  assert.match(css, /#eddb63/u);
+  assert.doesNotMatch(css, /#eddb63/u);
+  assert.match(css, /width: min\(100%, 560px\)/u);
   assert.match(skill, /instead of KERNEL\.SH/u);
   assert.match(skill, /bb steel-browser release/u);
 });

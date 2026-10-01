@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   BookOpen,
   ExternalLink,
@@ -13,17 +13,17 @@ import {
   LogIn,
   Maximize2,
   Minimize2,
-  Settings2,
   X,
 } from "lucide-react";
 import {
   definePluginApp,
   useRpc,
   useSettings,
+  useBbContext,
   type PluginMessageDirectiveProps,
   type PluginThreadPanelProps,
 } from "@get-bb/plugin-sdk/app";
-import type { BrowserSession, Dashboard, rpcContract } from "./contract.ts";
+import type { BrowserSession, Dashboard, Scope, ProjectState, EnginePolicy, rpcContract } from "./contract.ts";
 import "./app.css";
 
 const CREATE_OPTIONS = { blockAds: true, width: 1440, height: 900 } as const;
@@ -44,7 +44,13 @@ function shortId(id: string): string {
   return id.length <= 18 ? id : `${id.slice(0, 8)}...${id.slice(-4)}`;
 }
 
-function useSteelDashboard() {
+function useScope(threadId?: string): Scope {
+  const context = useBbContext();
+  const id = threadId ?? context.threadId;
+  return useMemo(() => id ? { threadId: id } : { projectId: context.projectId ?? undefined }, [id, context.projectId]);
+}
+
+function useSteelDashboard(scope: Scope) {
   const rpc = useRpc<typeof rpcContract>();
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -52,18 +58,23 @@ function useSteelDashboard() {
   const refresh = useCallback(async () => {
     setError(null);
     try {
-      setDashboard(await rpc.call("dashboard", null));
+      setDashboard(await rpc.call("dashboard", scope));
     } catch (cause) {
       setError(errorMessage(cause));
     }
-  }, [rpc]);
+  }, [rpc, scope]);
 
   useEffect(() => { void refresh(); }, [refresh]);
   return { dashboard, error, refresh };
 }
 
 function SteelThreadPanel({ threadId }: PluginThreadPanelProps) {
-  const { dashboard, error, refresh } = useSteelDashboard();
+  return <ScopedSteelThreadPanel key={threadId} threadId={threadId} />;
+}
+
+function ScopedSteelThreadPanel({ threadId }: { threadId: string }) {
+  const scope = useScope(threadId);
+  const { dashboard, error, refresh } = useSteelDashboard(scope);
   const [playerKey, setPlayerKey] = useState(0);
   const playerUrl = dashboard
     ? new URL("v1/sessions/debug", dashboard.uiUrl.replace(/ui\/?$/, "")).toString()
@@ -98,11 +109,15 @@ function SteelThreadPanel({ threadId }: PluginThreadPanelProps) {
   );
 }
 
-function SteelBrowserDirective({ message }: PluginMessageDirectiveProps) {
-  const { dashboard, error, refresh } = useSteelDashboard();
+export function SteelBrowserDirective(props: PluginMessageDirectiveProps) {
+  return <ScopedSteelBrowser key={props.message.threadId} {...props} />;
+}
+
+function ScopedSteelBrowser({ message }: PluginMessageDirectiveProps) {
+  const scope = useScope(message.threadId);
+  const { dashboard, error, refresh } = useSteelDashboard(scope);
   const [playerKey, setPlayerKey] = useState(0);
   const [minimized, setMinimized] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const playerUrl = dashboard
     ? new URL("v1/sessions/debug", dashboard.uiUrl.replace(/ui\/?$/, "")).toString()
     : null;
@@ -122,10 +137,6 @@ function SteelBrowserDirective({ message }: PluginMessageDirectiveProps) {
           </span>
         </div>
         <div className="steel-inline-browser__actions">
-          <button aria-label="Browser agent configuration" title="Agent configuration"
-            aria-expanded={settingsOpen} onClick={() => setSettingsOpen(value => !value)} type="button">
-            <Settings2 aria-hidden="true" />
-          </button>
           <button
             aria-expanded={!minimized}
             aria-label={minimized ? "Restore inline browser" : "Minimize inline browser"}
@@ -143,7 +154,6 @@ function SteelBrowserDirective({ message }: PluginMessageDirectiveProps) {
           </button>
         </div>
       </header>
-      {settingsOpen && <SteelAgentSettings />}
       <div className="steel-inline-browser__viewport" hidden={minimized}>
         {error || dashboard?.error ? (
           <div className="steel-panel-state" role="alert">{error ?? dashboard?.error}</div>
@@ -162,12 +172,57 @@ function SteelBrowserDirective({ message }: PluginMessageDirectiveProps) {
   );
 }
 
-function SteelAgentSettings() {
+function ProjectControls({ scope }: { scope: Scope }) {
+  const rpc = useRpc<typeof rpcContract>();
+  const { values } = useSettings();
+  const [project, setProject] = useState<ProjectState | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    let current = true;
+    setProject(null);
+    void rpc.call("project", scope).then(value => { if (current) setProject(value); })
+      .catch(cause => { if (current) setError(errorMessage(cause)); });
+    return () => { current = false; };
+  }, [rpc, scope]);
+  async function save(policy: EnginePolicy) {
+    setBusy(true);
+    setError(null);
+    try { setProject(await rpc.call("setEngine", { scope, policy })); }
+    catch (cause) { setError(errorMessage(cause)); }
+    finally { setBusy(false); }
+  }
+  return <div className="steel-project-controls">
+    <span title={project?.projectId}>{project?.projectName ?? "Project browser"}</span>
+    <label>Engine
+      <select aria-label="Browser engine" disabled={!project || busy}
+        value={project?.policy.engine ?? "playwright"}
+        onChange={event => project && void save({ ...project.policy, engine: event.target.value as EnginePolicy["engine"] })}>
+        <option value="playwright">Playwright</option>
+        <option value="jev">Jev</option>
+        <option value="auto">Auto (Jev first)</option>
+      </select>
+    </label>
+    <label><input type="checkbox" disabled={!project || busy}
+      checked={project?.policy.fallback ?? false}
+      onChange={event => project && void save({ ...project.policy, fallback: event.target.checked })} />Fallback</label>
+    {error && <p role="alert">{error}</p>}
+    {project?.policy.engine !== "playwright" && project && !values?.jevEnvFile &&
+      <p role="status">Jev: credentials not configured</p>}
+  </div>;
+}
+
+export function SteelAgentSettings() {
   const { values, isLoading } = useSettings();
+  const scope = useScope();
   return (
     <section className="steel-agent-settings" aria-label="Browser agent configuration">
+      <div className="steel-agent-settings__project">
+        <strong>Project browser</strong>
+        <ProjectControls scope={scope} />
+      </div>
       <strong>jev-ultrafast</strong>
-      <p role="status">Runner not integrated</p>
+      <p role="status">Jev adapter installed · Live run not verified</p>
       <dl>
         <dt>Checkout</dt><dd>{isLoading ? "Loading..." : String(values?.jevCheckout || "Not configured")}</dd>
         <dt>Credentials file</dt><dd>{isLoading ? "Loading..." : String(values?.jevEnvFile || "Not configured")}</dd>
@@ -212,6 +267,11 @@ function SessionRow({
 }
 
 export function SteelBrowserPage() {
+  const scope = useScope();
+  return <ScopedSteelBrowserPage key={JSON.stringify(scope)} scope={scope} />;
+}
+
+function ScopedSteelBrowserPage({ scope }: { scope: Scope }) {
   const rpc = useRpc<typeof rpcContract>();
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [busy, setBusy] = useState<"refresh" | "create" | string | null>("refresh");
@@ -233,14 +293,14 @@ export function SteelBrowserPage() {
     setBusy("refresh");
     setError(null);
     try {
-      const next = await rpc.call("dashboard", null);
+      const next = await rpc.call("dashboard", scope);
       if (mounted.current) setDashboard(next);
     } catch (cause) {
       if (mounted.current) setError(errorMessage(cause));
     } finally {
       if (mounted.current) setBusy(null);
     }
-  }, [rpc]);
+  }, [rpc, scope]);
 
   useEffect(() => {
     mounted.current = true;
@@ -253,8 +313,8 @@ export function SteelBrowserPage() {
     setBusy("create");
     setError(null);
     try {
-      await rpc.call("createSession", CREATE_OPTIONS);
-      if (mounted.current) setDashboard(await rpc.call("dashboard", null));
+      await rpc.call("createSession", { scope, options: CREATE_OPTIONS });
+      if (mounted.current) setDashboard(await rpc.call("dashboard", scope));
     } catch (cause) {
       if (mounted.current) setError(errorMessage(cause));
     } finally {
@@ -271,8 +331,8 @@ export function SteelBrowserPage() {
     setBusy(session.id);
     setError(null);
     try {
-      await rpc.call("releaseSession", { sessionId: session.id });
-      if (mounted.current) setDashboard(await rpc.call("dashboard", null));
+      await rpc.call("releaseSession", { scope, sessionId: session.id });
+      if (mounted.current) setDashboard(await rpc.call("dashboard", scope));
     } catch (cause) {
       if (mounted.current) setError(errorMessage(cause));
     } finally {
@@ -319,6 +379,7 @@ export function SteelBrowserPage() {
         </div>
       </header>
 
+      <ProjectControls scope={scope} />
       <div className="steel-status">
         <span className={`steel-dot ${connected ? "steel-dot--ok" : "steel-dot--down"}`} />
         <span className={connected ? "steel-connected" : "steel-disconnected"}>

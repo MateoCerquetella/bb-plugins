@@ -1,5 +1,15 @@
 # Implementation Plan
 
+## Current Project Iteration
+
+1. Add project binding store, strict scope contracts and server-side resolution.
+2. Route all UI and CLI session operations through the project binding.
+3. Add persistent engine selection, preflight-only fallback and bounded runners.
+4. Add host provisioning helper with separate persistent profiles; preserve legacy.
+5. Provision this project and verify with disposable cookie fixtures in two
+   independent instances; run focused tests only, no full CI or paid Jev calls.
+6. Reload plugin and demonstrate 560px project-scoped inline viewer.
+
 ## Immediate Viewer Repair
 
 1. Derive the player URL from the validated configured viewer origin.

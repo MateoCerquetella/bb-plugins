@@ -2,6 +2,25 @@ import { defineRpcContract } from "@get-bb/plugin-sdk";
 import { z } from "zod";
 
 export const sessionStatusSchema = z.enum(["idle", "live", "released", "failed"]);
+export const scopeSchema = z.object({
+  threadId: z.string().min(1).max(200).optional(),
+  projectId: z.string().min(1).max(200).optional(),
+}).strict().refine(value => !!value.threadId || !!value.projectId, "A BB project or thread is required.");
+export const enginePolicySchema = z.object({
+  engine: z.enum(["playwright", "jev", "auto"]),
+  fallback: z.boolean(),
+}).strict();
+export const bindingSchema = z.object({
+  apiUrl: z.string().url(),
+  cdpUrl: z.string().url(),
+  viewerUrl: z.string().url(),
+}).strict();
+export const projectStateSchema = z.object({
+  projectId: z.string(),
+  projectName: z.string(),
+  policy: enginePolicySchema,
+  binding: bindingSchema.nullable(),
+}).strict();
 
 export const browserSessionSchema = z
   .object({
@@ -46,15 +65,15 @@ export const createOptionsSchema = z
 
 export const rpcContract = defineRpcContract({
   dashboard: {
-    input: z.null(),
+    input: scopeSchema,
     output: dashboardSchema,
   },
   createSession: {
-    input: createOptionsSchema,
+    input: z.object({ scope: scopeSchema, options: createOptionsSchema }).strict(),
     output: browserSessionSchema,
   },
   releaseSession: {
-    input: z.object({ sessionId: z.string().uuid() }).strict(),
+    input: z.object({ scope: scopeSchema, sessionId: z.string().uuid() }).strict(),
     output: z
       .object({
         sessionId: z.string().uuid(),
@@ -62,8 +81,17 @@ export const rpcContract = defineRpcContract({
       })
       .strict(),
   },
+  project: { input: scopeSchema, output: projectStateSchema },
+  setEngine: {
+    input: z.object({ scope: scopeSchema, policy: enginePolicySchema }).strict(),
+    output: projectStateSchema,
+  },
 });
 
 export type BrowserSession = z.infer<typeof browserSessionSchema>;
 export type Dashboard = z.infer<typeof dashboardSchema>;
 export type CreateOptions = z.infer<typeof createOptionsSchema>;
+export type Scope = z.infer<typeof scopeSchema>;
+export type EnginePolicy = z.infer<typeof enginePolicySchema>;
+export type ProjectState = z.infer<typeof projectStateSchema>;
+export type Binding = z.infer<typeof bindingSchema>;

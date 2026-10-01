@@ -7,6 +7,31 @@ small operational surface that can replace the paid KERNEL.SH dependency.
 
 ## ADDED Requirements
 
+### Requirement: Project browser isolation
+Each BB project SHALL have a dedicated Steel endpoint and persistent Chromium
+volume. Thread operations SHALL resolve project identity from BB records.
+
+#### Scenario: Missing project binding
+- WHEN a thread's project has no dedicated browser
+- THEN the plugin reports setup required instead of showing the global viewer
+
+#### Scenario: Independent cookies
+- WHEN two projects visit the same site and store distinct cookies
+- THEN each project retains only its own cookies after reconnecting
+
+### Requirement: Project engine policy
+Each project SHALL save Playwright, Jev or Auto selection and a fallback toggle.
+Fallback SHALL occur only during preflight, before browser execution starts.
+
+#### Scenario: Unavailable primary engine
+- WHEN the primary engine fails preflight and fallback is enabled
+- THEN an available permitted engine is selected for the same project
+- AND paid Jev execution still requires explicit authorization
+
+#### Scenario: Uncertain action
+- WHEN execution has begun and an action fails
+- THEN the plugin stops without replaying it through another engine
+
 ### Requirement: Durable local service
 The dyaus host SHALL run a pinned Steel image with persistent data, automatic
 restart, and loopback-only API/UI and debugger ports.

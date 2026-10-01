@@ -1,5 +1,42 @@
 # Decisions: Install And Run Https Github Com Steel Dev Steel Browser
 
+## D-003: Isolated Project Instances
+
+Status: Accepted
+
+### Evidence
+Installed Steel session.service.ts chooses a fixed directory when
+userDataDir is supplied, and serves one current browser. BB provides projectId
+in thread metadata. The user requested distinct project cookies and engines.
+
+### Options
+Swap shared browser cookies, rely on userDataDir, or dedicate instances.
+### Chosen approach
+Dedicated containers and profile volumes with immutable project
+bindings; fail closed on unconfigured projects. Supersedes global viewer routing.
+### Trade-offs and risks
+More memory per open project and explicit host provisioning.
+### Verification
+Two independent fixture cookies persist without crossing profiles;
+project resolver and binding tests prevent accidental reuse.
+
+## D-004: Engine Safety And Compact Inline UI
+
+Status: Accepted
+
+### Evidence
+User approved neutral UI and requested smaller 560px viewer, engine
+selection and fallback. Jev live runs require external potentially paid calls.
+### Options
+Retry arbitrary failures, or fallback only before execution begins.
+### Chosen approach
+Persist project engine preference and fallback separately;
+preflight-only fallback, with paid execution opt-in. Preserve the neutral UI.
+### Trade-offs and risks
+No automatic recovery after uncertain browser actions.
+### Verification
+Preflight failures may fallback; execution failures may not.
+
 ## D-002: Show The Browser
 
 Status: Accepted
