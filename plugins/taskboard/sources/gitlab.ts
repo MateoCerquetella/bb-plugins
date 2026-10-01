@@ -145,6 +145,27 @@ function runFile(
   });
 }
 
+async function runFileErr(
+  file: string,
+  args: string[],
+  timeoutMs: number
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    execFile(
+      file,
+      args,
+      { timeout: timeoutMs, maxBuffer: 16 * 1024 * 1024 },
+      (error, _stdout, stderr) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(stderr);
+        }
+      }
+    );
+  });
+}
+
 async function resolveGlabPath(): Promise<string> {
   if (resolvedGlabPath !== null) return resolvedGlabPath;
   for (const candidate of [
@@ -270,15 +291,75 @@ export async function glabStatusProbe(
   };
 }
 
+const TOKEN_TIMEOUT_MS = 15_000;
+const SESSION_STALE_MS = 6 * 60 * 60 * 1000;
+
+interface GitlabSession {
+  token: string;
+  acquiredAt: number;
+}
+
+const sessionByHost = new Map<string, Promise<GitlabSession | null>>();
+
+export function parseTokenOutput(output: string): string | null {
+  for (const line of output.split(/\r?\n/u)) {
+    const marker = line.indexOf('Token found in');
+    if (marker === -1) continue;
+    const value = line
+      .slice(marker + 'Token found in'.length)
+      .replace(/^\s*(?:configuration file \(plaintext\)|operating system keyring):\s*/u, '')
+      .trim();
+    if (value.length > 0) return value;
+  }
+  return null;
+}
+
+async function resolveToken(
+  glabPath: string,
+  host: string
+): Promise<GitlabSession | null> {
+  try {
+    // glab prints `auth status` (including the token) on stderr.
+    const stderrLike = await runFileErr(
+      glabPath,
+      ['auth', 'status', '--hostname', host, '--show-token'],
+      TOKEN_TIMEOUT_MS
+    );
+    const token = parseTokenOutput(stderrLike);
+    if (token === null) return null;
+    return { token, acquiredAt: Date.now() };
+  } catch {
+    return null;
+  }
+}
+
+function sessionFor(host: string): Promise<GitlabSession | null> {
+  let entry = sessionByHost.get(host);
+  if (entry === undefined) {
+    entry = (async () => {
+      try {
+    const glabPath = await resolveGlabPath();
+        const session = await resolveToken(glabPath, host);
+        return session;
+      } catch (error) {
+        return null;
+      }
+    })();
+    sessionByHost.set(host, entry);
+  }
+  return entry;
+}
+
+function stale(session: GitlabSession): boolean {
+  return Date.now() - session.acquiredAt > SESSION_STALE_MS;
+}
+
 export class GitlabClient {
-  private readonly glabPath: string;
+  private readonly glabPath: string | null;
 
   readonly host: string;
 
-  constructor(glabPath: string, host: string) {
-    if (!glabPath) {
-      throw new Error('GitLab CLI (glab) is not available');
-    }
+  constructor(glabPath: string | null, host: string) {
     this.glabPath = glabPath;
     this.host = host;
   }
@@ -291,10 +372,9 @@ export class GitlabClient {
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
     }
-    if (glabPath === null) {
-      throw new Error(
-        `GitLab CLI (glab) is not available: ${failure ?? 'unknown error'}`
-      );
+    if (glabPath === null && failure !== null) {
+      // No glab binary at all — REST-only client; token resolution will fail
+      // and surface a clear error at call time.
     }
     return new GitlabClient(glabPath, host);
   }
@@ -307,6 +387,87 @@ export class GitlabClient {
       timeoutMs?: number;
       jsonBody?: unknown;
     } = {}
+  ): Promise<T> {
+    const session = await sessionFor(this.host);
+    if (session !== null && !stale(session)) {
+      return await this.restApi(session.token, pathArgs, options);
+    }
+    return await this.glabApi(pathArgs, options);
+  }
+
+  private baseUrl(): string {
+    return `https://${this.host}/api/v4/`;
+  }
+
+  private async restApi<T>(
+    token: string,
+    pathArgs: string[],
+    options: {
+      method?: string;
+      fields?: string[];
+      timeoutMs?: number;
+      jsonBody?: unknown;
+    }
+  ): Promise<T> {
+    const raw = pathArgs[0] ?? '';
+    const [path, query = ''] = raw.split('?');
+    const search = new URLSearchParams(query);
+    for (const field of options.fields ?? []) {
+      const eq = field.indexOf('=');
+      if (eq <= 0) continue;
+      search.set(field.slice(0, eq), field.slice(eq + 1));
+    }
+    let body: string | undefined;
+    if (options.jsonBody !== undefined) {
+      body = JSON.stringify(options.jsonBody);
+    }
+    const url = `${this.baseUrl()}${path}${search.toString() ? `?${search}` : ''}`;
+    const controller = new AbortController();
+    const timer = setTimeout(
+      () => controller.abort(),
+      options.timeoutMs ?? GLAB_TIMEOUT_MS
+    );
+    try {
+      const response = await fetch(url, {
+        method: options.method ?? 'GET',
+        headers: {
+          authorization: `Bearer ${token}`,
+          ...(options.jsonBody !== undefined
+            ? { 'content-type': 'application/json' }
+            : {})
+        },
+        body
+      });
+      const text = await response.text();
+      if (!response.ok) {
+        if (response.status === 401) {
+          // The cached token is stale — drop it so the next call re-resolves.
+          sessionByHost.delete(this.host);
+        }
+        throw new Error(
+          `glab: HTTP ${response.status}${text ? `: ${text.slice(0, 200)}` : ''}`
+        );
+      }
+      return (text.trim() ? JSON.parse(text) : null) as T;
+    } catch (error) {
+      if (error instanceof Error && error.message.startsWith('glab:')) {
+        throw error;
+      }
+      // fetch/abort/parse problems fall back to the CLI path once.
+      return await this.glabApi(pathArgs, options);
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  private async glabApi<T>(
+    pathArgs: string[],
+    options: {
+      method?: string;
+      fields?: string[];
+      timeoutMs?: number;
+      jsonBody?: unknown;
+    }
   ): Promise<T> {
     const glabPath = this.glabPath ?? (await resolveGlabPath());
     const bodyGiven = options.jsonBody !== undefined;
@@ -332,6 +493,7 @@ export class GitlabClient {
     return (stdout.trim() ? JSON.parse(stdout) : null) as T;
   }
 }
+
 
 export function createGitlabAdapter(
   bb: BbPluginApi,
@@ -564,12 +726,20 @@ export function createGitlabAdapter(
       if (!ref) throw new Error('GitLab project is not configured');
       const client = await clientFor(host);
       const enc = encodedPath(path);
-      const issues = await apiArrayPage(
-        client,
-        `projects/${enc}/issues?state=all&order_by=updated_at&sort=desc`
+      // Board-critical path: one page only; older pages load on refreshes
+      // as the background loop keeps paginating through the cache refreshes.
+      const issues = await client.api<unknown>(
+        [
+          `projects/${enc}/issues?state=all&order_by=updated_at&sort=desc&per_page=100&page=1`
+        ],
+        { timeoutMs: GLAB_TIMEOUT_MS }
       );
-      const parsed = glabIssueListSchema.parse(issues);
-      return parsed.map(issue => withoutComments(toIssue({ ...issue, notes: [] })));
+      const parsed = glabIssueListSchema.parse(
+        Array.isArray(issues) ? issues : []
+      );
+      return parsed.map(issue =>
+        withoutComments(toIssue({ ...issue, notes: [] }))
+      );
     },
     async get(locator: string) {
       return scopedIssue(locator);

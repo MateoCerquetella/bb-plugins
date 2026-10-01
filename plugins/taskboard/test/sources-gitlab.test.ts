@@ -26,7 +26,8 @@ const {
   statusLabelCategory,
   statusLabels,
   issueStateCategory,
-  issueStatusName
+  issueStatusName,
+  parseTokenOutput
 } = await import('../sources/gitlab.ts');
 const { withoutComments } = await import('../sources/types.ts');
 const { workSourceSchema } = await import('../contract.ts');
@@ -141,4 +142,19 @@ test('untriaged issues keep native open/closed choices current-flagged', () => {
 
 test('stripped status names keep facet and dropdown consistent', () => {
   assert.equal(issueStatusName(['status/backlog'], 'opened'), 'backlog');
+});
+test('token line is parsed from glab stderr output', () => {
+  const stderr = [
+    'gitlab.com',
+    '  \u2713 Logged in to gitlab.com as user',
+    '  \u2713 REST API Endpoint: https://gitlab.com/api/v4/',
+    '  \u2713 Token found in operating system keyring: glpat-abcd',
+    '  ! secure it later'
+  ].join('\n');
+  assert.equal(parseTokenOutput(stderr), 'glpat-abcd');
+  const plaintext = [
+    '  \u2713 Token found in configuration file (plaintext): 5c4a5f'
+  ].join('\n');
+  assert.equal(parseTokenOutput(plaintext), '5c4a5f');
+  assert.equal(parseTokenOutput(' nothing here '), null);
 });

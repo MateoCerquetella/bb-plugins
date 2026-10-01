@@ -73,6 +73,10 @@ import { createWorkItemStore } from './store.js';
 const SOURCES: readonly WorkSource[] = ['linear', 'github', 'jira', 'gitlab'];
 const CREDENTIAL_SOURCES: readonly CredentialSource[] = ['linear', 'jira'];
 const SYNC_INTERVAL_MS = 5 * 60_000;
+const BOOT_SYNC_DELAY_MS = 2_500;
+const SYNC_TROUBLE_BACKOFF_MS = 15 * 60_000;
+const suspendedSync = new Set<string>();
+const suspendedSyncAt = new Map<string, number>();
 const KEEP_SECRET = { operation: 'keep' } as const;
 const DEFAULT_PROJECT_CONFIG = {
   source: 'github',
@@ -87,6 +91,7 @@ const DEFAULT_PROJECT_CONFIG = {
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
+
 
 export function formatFilterPresetCliJson(value: unknown): string {
   const output = escapeExternalJsonOutput(JSON.stringify(value));
@@ -754,9 +759,10 @@ export default async function plugin(bb: BbPluginApi) {
       await Promise.all([
         credentials.configured(config.projectId, 'linear'),
         credentials.configured(config.projectId, 'jira'),
-        glabStatusProbe(gitlabProbeHosts(config))
-          .then(status => status.glabOk)
-          .catch(() => false),
+        // Non-blocking: infer glab auth from the last successful sync; the
+        // network probe runs in the background and refreshes the view via
+        // realtime when it settles.
+        glabGlabOkHeuristic(config),
         bb.sdk.plugins
           .callRpc({
             pluginId: 'github',
@@ -774,6 +780,25 @@ export default async function plugin(bb: BbPluginApi) {
       jiraCredentialConfigured,
       gitlabConfigured
     };
+  }
+
+  let glabProbeAt = 0;
+  let glabLastProbeResult = false;
+  const GLAB_PROBE_TTL_MS = 60_000;
+
+  function glabGlabOkHeuristic(config: ProjectSourceConfig): boolean {
+    // Warm the cached probe in the background; reads never block on it.
+    if (Date.now() - glabProbeAt > GLAB_PROBE_TTL_MS) {
+      glabProbeAt = Date.now();
+      void glabStatusProbe(gitlabProbeHosts(config))
+        .then(status => {
+          glabLastProbeResult = status.glabOk;
+        })
+        .catch(() => {
+          glabLastProbeResult = false;
+        });
+    }
+    return glabLastProbeResult;
   }
 
   async function readConsistentProjectConfigView(
@@ -1011,7 +1036,7 @@ export default async function plugin(bb: BbPluginApi) {
     currentAdapters: Map<WorkSource, WorkSourceAdapter>,
     revision: number,
     forceRefresh: boolean
-  ): Promise<void> {
+  ): Promise<boolean> {
     const adapter = currentAdapters.get(source);
     if (!adapter) throw new Error(`Missing ${source} adapter`);
     if (!adapter.configured()) {
@@ -1023,38 +1048,66 @@ export default async function plugin(bb: BbPluginApi) {
             `${sourceName(source)} is not configured`
         );
       }
-      return;
+      return false;
     }
     try {
       const items = (await adapter.list({ refresh: forceRefresh })).map(item =>
         scopedItem(projectId, item)
       );
-      if (currentRevision(projectId, source) !== revision) return;
+      if (currentRevision(projectId, source) !== revision) return false;
+      const fingerprint = JSON.stringify(
+        items.map(item => [item.locator, item.status, item.updatedAt])
+      );
+      const unchanged =
+        lastSyncFingerprint.get(syncKey(projectId, source)) === fingerprint;
+      lastSyncFingerprint.set(syncKey(projectId, source), fingerprint);
+      if (unchanged && !forceRefresh) {
+        // Nothing changed since the last snapshot — keep the board quiet
+        // (no store write, no realtime publish from this sync).
+        return false;
+      }
       store.replaceSource(projectId, source, items, new Date().toISOString());
+      if (suspendedSync.delete(projectId)) {
+        suspendedSyncAt.delete(projectId);
+      }
+      return true;
     } catch (error) {
       const message = errorMessage(error);
-      if (currentRevision(projectId, source) !== revision) return;
+      if (currentRevision(projectId, source) !== revision) return false;
       store.setSourceError(projectId, source, message);
       bb.log.warn(
         `${sourceName(source)} sync failed for ${projectId}: ${message}`
       );
+      suspendSync(projectId, message);
+      return false;
     }
   }
 
   const activeSyncs = new Map<
     string,
-    { revision: number; forceRefresh: boolean; promise: Promise<void> }
+    { revision: number; forceRefresh: boolean; promise: Promise<boolean> }
   >();
+  const lastSyncFingerprint = new Map<string, string>();
+  function suspendSync(projectId: string, message: string) {
+    const environmentTrouble =
+      message.includes('HTTP 404') ||
+      message.toLowerCase().includes('unknown plugin') ||
+      message.toLowerCase().includes('not authenticated') ||
+      message.toLowerCase().includes('not available');
+    if (!environmentTrouble) return;
+    suspendedSync.add(projectId);
+    suspendedSyncAt.set(projectId, Date.now());
+  }
   function syncSource(
     projectId: string,
     source: WorkSource,
     currentAdapters: Map<WorkSource, WorkSourceAdapter>,
     revision: number,
     forceRefresh: boolean
-  ): Promise<void> {
+  ): Promise<boolean> {
     const key = syncKey(projectId, source);
     if (currentRevision(projectId, source) !== revision) {
-      return Promise.resolve();
+      return Promise.resolve(false);
     }
     const active = activeSyncs.get(key);
     if (
@@ -1067,8 +1120,10 @@ export default async function plugin(bb: BbPluginApi) {
       syncOne(projectId, source, currentAdapters, revision, forceRefresh);
     const pending =
       active?.revision === revision
-        ? active.promise.then(() => {
-            if (currentRevision(projectId, source) !== revision) return;
+        ? active.promise.then(changed => {
+            if (currentRevision(projectId, source) !== revision) return false;
+            // Chain after an in-flight sync only when it missed updates.
+            if (changed && !forceRefresh) return false;
             return run();
           })
         : run();
@@ -1096,7 +1151,7 @@ export default async function plugin(bb: BbPluginApi) {
       if (currentAdapters.has(selected)) break;
       if (source) assertSelectedSource(projectId, source);
     }
-    await syncSource(
+    const changed = await syncSource(
       projectId,
       selected,
       currentAdapters,
@@ -1104,10 +1159,12 @@ export default async function plugin(bb: BbPluginApi) {
       forceRefresh
     );
     const nextStatuses = await statuses(projectId);
-    bb.realtime.publish('taskboard:changed', {
-      projectId,
-      source: source ?? null
-    });
+    if (changed) {
+      bb.realtime.publish('taskboard:changed', {
+        projectId,
+        source: source ?? null
+      });
+    }
     return nextStatuses;
   }
 
@@ -1685,6 +1742,54 @@ export default async function plugin(bb: BbPluginApi) {
       await assertProjectExists(thread.projectId);
       return { projectId: thread.projectId };
     },
+    async bootstrap(input) {
+      // One round-trip for the panel open path.
+      const [projects, threadProjectId] = await Promise.all([
+        listProjects(),
+        input.threadId
+          ? bb.sdk.threads
+              .get({ threadId: input.threadId })
+              .then(thread => thread.projectId)
+              .catch(() => null)
+          : Promise.resolve(null)
+      ]);
+      const resolvedProjectId =
+        input.projectId ?? threadProjectId ?? projects[0]?.id ?? null;
+      if (resolvedProjectId === null) {
+        return {
+          projectId: null,
+          projects,
+          boardSettings: null,
+          items: [],
+          provider: null,
+          sources: null
+        };
+      }
+      const project = projects.find(entry => entry.id === resolvedProjectId);
+      if (!project) throw new Error('BB project was not found');
+      const [settingsResult, itemsResult, sourcesResult] = await Promise.all([
+        Promise.resolve(store.projectBoardSettings(resolvedProjectId)),
+        (async () => {
+          await waitForMutations(resolvedProjectId, SOURCES);
+          return {
+            items: store.list({
+              projectId: resolvedProjectId,
+              limit: 500
+            }),
+            provider: projectConfig(resolvedProjectId, true).source
+          };
+        })(),
+        statuses(resolvedProjectId).catch(() => null)
+      ]);
+      return {
+        projectId: resolvedProjectId,
+        projects,
+        boardSettings: settingsResult,
+        items: itemsResult.items,
+        provider: itemsResult.provider,
+        sources: sourcesResult
+      };
+    },
     async status(input) {
       await assertProjectExists(input.projectId);
       return { sources: await statuses(input.projectId) };
@@ -1715,6 +1820,8 @@ export default async function plugin(bb: BbPluginApi) {
     },
     async refresh(input) {
       await assertProjectExists(input.projectId);
+      // A manual refresh always retries despite trouble-suspension.
+      suspendedSync.delete(input.projectId);
       const nextStatuses = await syncAll(input.projectId, input.source, true);
       return {
         sources: nextStatuses,
@@ -2502,6 +2609,8 @@ export default async function plugin(bb: BbPluginApi) {
 
   bb.background.service('sync', {
     async start(signal) {
+      // Let the UI paint from the SQLite cache first; sync right after.
+      await sleep(BOOT_SYNC_DELAY_MS, signal);
       let legacyMigrationFinished = false;
       while (!signal.aborted) {
         if (!legacyMigrationFinished) {
@@ -2517,7 +2626,22 @@ export default async function plugin(bb: BbPluginApi) {
         try {
           const projectIds = await configuredLiveProjectIds();
           await Promise.all(
-            projectIds.map(projectId => syncAll(projectId, undefined, false))
+            projectIds
+              .filter(projectId => !suspendedSync.has(projectId))
+              .map(projectId => syncAll(projectId, undefined, false))
+              .concat(
+                // Suspended projects retry on their slower cadence.
+                suspendedSync.size > 0
+                  ? [...suspendedSync]
+                      .filter(
+                        projectId =>
+                          Date.now() - (suspendedSyncAt.get(projectId) ?? 0) >
+                          SYNC_TROUBLE_BACKOFF_MS
+                      )
+                      .slice(0, 1)
+                      .map(projectId => syncAll(projectId, undefined, false))
+                  : []
+              )
           );
         } catch (error) {
           bb.log.warn(`Background sync failed: ${errorMessage(error)}`);

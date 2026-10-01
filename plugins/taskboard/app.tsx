@@ -4216,7 +4216,9 @@ function TrackerList({
   }, [preferenceScope, projectId, rpc]);
 
   const loadItems = useCallback(async () => {
-    if (!boardSettingsReady) return;
+    // First paint must not wait on the board-settings RPC: items use the
+    // in-memory defaults until the real settings arrive (this effect reruns
+    // on boardSettingsReady and re-applies the committed view).
     const requestRevision = ++requestRevisionRef.current;
     if (projectId !== null) setAuthoritativeProvider(null);
     setError(null);
