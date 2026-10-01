@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "workflow": "fast",
+  "classification": "behavioral",
+  "request": "Remove Clean My Context from the README and plugin catalog because it is already in BB main; change Aura and Lavender icon colors to violet; add icons for Jev Routing and Conversation Space; inspect whether Jev Routing and Conversation Space are active installable plugins.",
+  "capabilities": [],
+  "surfaces": [
+    "request-scoped-implementation"
+  ],
+  "canonical": false,
+  "verification": "skipped",
+  "digest": "sha256:ee9cbf8d6317f56f610d4afc62a8895f242d67c5352bab6895eb842ea0fcc167"
+}
