@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 14,
+  "revision": 15,
   "activeFeature": "agent-canvas",
   "request": "Create a new BB plugin named Agent Canvas based closely on the supplied reference screenshot. Build a full-screen dark spatial canvas with draggable/resizable live thread panes using native ThreadChat, a persistent Coordinator native chat docked on the right, a compact workspace tab strip and add control, dotted background, minimap, zoom/fit/reorganize controls, and pane title/status metadata. Coordinator selection or creation must be an explicit user action through native BB controls; never autonomously spawn or message agents. Use current public Plugin SDK surfaces, preserve authorization and permission modes, persist bounded canvas layout safely, provide keyboard and narrow-screen fallbacks, add the package to the workspace catalog, install/reload it locally, and verify the visual experience against the screenshot without copying AgentGrid branding or proprietary assets.",
   "profile": "complex",
@@ -9,10 +9,10 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Remove the right-side universal Control chat and all Control-thread selection/creation UI from Agent Canvas for now. Let the spatial canvas use the full available width. Also simplify the plugin's own top chrome to avoid the duplicated Agent Canvas title visible inside BB: keep one compact workspace tab row and essential refresh/filter controls, with the canvas as the dominant surface. Preserve existing live agent/browser panes, free movement, zoom, pan, workspace grouping, and narrow-screen behavior. Update docs and the contract to mark universal Control as deferred rather than active.",
+  "message": "Removed right Control dock, selector, composer, toggle and pane assignment actions. Removed duplicate plugin title and compacted partial browser coverage into tab row. Full-width desktop and full-height narrow canvas retained. Existing conversations and backend identity/commands preserved. Typecheck/build passed; plugin reloaded. Live Playwright confirmed absent dock/control buttons and 1280px full canvas width plus 764px narrow canvas height; screenshot inspected. Unit suite and formal review pending. English implementation commit fa98f2c2; target sync current with main.",
   "implementationActor": "agent",
   "workStartedAt": "2026-09-30T20:38:20.302Z",
-  "specDigest": "sha256:c4b7d63b201e25b12dfc52963cfb4d43c9cbbcd5760b6a7f575b04e55d8cb5dd",
+  "specDigest": "sha256:9a4c582e0a39afdb8a0337ed31149affc6c56dff51d6421dc56970bec2397230",
   "approvedSpecRevision": 3,
   "capabilityArchiveRequired": true,
   "capabilityDeltaDigest": "sha256:8bef0de86f9acf1762bee4b4340d64eb1e8923fccea7c2e0f38e767d1c0fd455",
@@ -23,29 +23,29 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": false,
+    "implemented": true,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "none",
+    "highest": "implemented",
     "reasons": {
-      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-01T15:55:08.847Z",
+  "updatedAt": "2026-10-01T16:17:24.296Z",
   "lifecycle": {
     "stage": "iteration",
     "iteration": 4,
-    "awaitingFeedback": false,
+    "awaitingFeedback": true,
     "iterative": true,
-    "contractBaseline": 13,
+    "contractBaseline": 15,
     "amendments": [
-      12
+      12,
+      14
     ]
   },
   "capabilityBase": {
