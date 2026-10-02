@@ -102,7 +102,10 @@ export async function runBrowser(
     throw new Error("Navigation requires an HTTP(S) URL without credentials.");
   }
   let jev: Awaited<ReturnType<typeof jevEnvironment>> | undefined;
-  const selected = await chooseEngine(policy, async engine => {
+  const effectivePolicy: EnginePolicy = request.goal?.trim()
+    ? policy
+    : { engine: "playwright", fallback: false };
+  const selected = await chooseEngine(effectivePolicy, async engine => {
     if (engine === "jev") {
       if (!request.goal?.trim()) throw new Error("Jev requires a goal.");
       jev = await jevEnvironment(config, request.allowPaid);
