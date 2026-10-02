@@ -601,6 +601,12 @@ function ScopedSteelBrowserPage({ scope }: { scope: Scope }) {
 }
 
 export default definePluginApp((app) => {
+  app.slots.sidebarFooterAction({
+    id: "steel-browser",
+    title: "Steel Browser",
+    icon: "Monitor",
+    run: ({ openSettings }) => openSettings(),
+  });
   app.slots.settingsSection({
     id: "steel-agent-status",
     title: "Browser agent",

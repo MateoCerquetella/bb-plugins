@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 53,
+  "revision": 55,
   "activeFeature": "install-and-run-https-github-com-steel-dev-steel-browser",
   "request": "Install and run https://github.com/steel-dev/steel-browser on the dyaus host for use from this BB environment, then create a new independently installable BB plugin in this repository that integrates Steel as the replacement browser infrastructure for the prior KERNEL.SH-based workflow. Keep the root orchestration-only conventions, align manifest/package/CLI/UI/docs/tests, avoid committing generated artifacts, and verify the Steel service plus the plugin's human UI and CLI surface.",
   "profile": "complex",
@@ -9,7 +9,7 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Replaced the Steel Browser black icon with a pale steel-blue icon and dark blue linework, built the plugin successfully, reinstalled it with confirmation, and reloaded the running dyaus plugin.",
+  "message": "Keep the current pale steel-blue, dark blue, and teal Steel Browser branding colors unchanged. Add the missing BB sidebar footer action so Steel Browser is visible in the sidebar; use the existing Monitor icon hint and have the action open the plugin's Steel Browser settings surface. Build, reinstall, reload, and confirm the running plugin.",
   "implementationActor": "codex",
   "workStartedAt": null,
   "specDigest": "sha256:aeaac90fb3141226d8c291b5bb1dcaedae49d348cd2d0618f65518e6a021b867",
@@ -23,24 +23,25 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": true,
+    "implemented": false,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "implemented",
+    "highest": "none",
     "reasons": {
+      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-02T15:58:17.556Z",
+  "updatedAt": "2026-10-02T16:07:37.090Z",
   "lifecycle": {
     "stage": "iteration",
-    "iteration": 8,
-    "awaitingFeedback": true,
+    "iteration": 9,
+    "awaitingFeedback": false,
     "iterative": true,
     "contractRevision": 35,
     "riskRequest": "Fix the Steel Browser Tools settings panel so it never sends undefined projectId values over RPC. When no BB project context is available, render a clear project-unavailable state instead of calling project RPC, while keeping Jev host configuration visible. Add focused coverage, rebuild, reload, and update the existing draft PR.",
@@ -91,7 +92,7 @@
     "heartbeatAt": "2026-10-01T20:58:38.682Z",
     "digest": "sha256:4985eb2e97ebab2d49b4dae59c3505a4e45f689035e19f21adf6a5332b2c478c"
   },
-  "trackerGeneration": 8,
-  "budgetExtensionMinutes": 220,
+  "trackerGeneration": 9,
+  "budgetExtensionMinutes": 233,
   "reviewFirst": true
 }
