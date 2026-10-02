@@ -54,6 +54,13 @@ export const dashboardSchema = z
     sessions: z.array(browserSessionSchema),
   })
   .strict();
+export const projectSummarySchema = z.object({
+  projectId: z.string(),
+  projectName: z.string(),
+  configured: z.boolean(),
+  connected: z.boolean(),
+  activeSessions: z.number().int().nonnegative(),
+}).strict();
 
 export const createOptionsSchema = z
   .object({
@@ -67,6 +74,10 @@ export const rpcContract = defineRpcContract({
   dashboard: {
     input: scopeSchema,
     output: dashboardSchema,
+  },
+  allProjects: {
+    input: z.object({}).strict(),
+    output: z.array(projectSummarySchema),
   },
   createSession: {
     input: z.object({ scope: scopeSchema, options: createOptionsSchema }).strict(),

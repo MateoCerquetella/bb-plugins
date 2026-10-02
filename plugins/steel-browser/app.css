@@ -20,6 +20,11 @@
 .steel-page * { box-sizing: border-box; letter-spacing: 0; }
 .steel-project-picker { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-block: 16px; }
 .steel-project-picker select { min-width: 0; max-width: 100%; padding: 7px 10px; border: 1px solid var(--border, #36373d); border-radius: 5px; color: inherit; background: var(--background, #18191c); font: inherit; }
+.steel-project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
+.steel-project-card { display: grid; grid-template-columns: auto 1fr; gap: 4px 8px; min-width: 0; padding: 12px; border: 1px solid var(--border, #36373d); border-radius: 6px; color: inherit; background: color-mix(in srgb, var(--background, #18191c) 92%, white); text-align: left; }
+.steel-project-card:hover { border-color: var(--steel-accent); }
+.steel-project-card__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.steel-project-card__meta { grid-column: 2; color: var(--muted-foreground, #a4a5af); font-size: 12px; }
 .steel-thread-panel {
   display: flex;
   flex-direction: column;

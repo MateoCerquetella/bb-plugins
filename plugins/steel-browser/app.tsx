@@ -299,6 +299,35 @@ function SessionRow({
   );
 }
 
+function AllProjectsOverview({ projects, onSelect }: { projects: readonly { id: string; name: string }[]; onSelect: (id: string) => void }) {
+  const rpc = useRpc<typeof rpcContract>();
+  const [rows, setRows] = useState<Record<string, { configured: boolean; connected: boolean; activeSessions: number }>>({});
+  useEffect(() => {
+    let mounted = true;
+    void rpc.call("allProjects", {}).then(summaries => {
+      if (mounted) setRows(Object.fromEntries(summaries.map(summary => [summary.projectId, summary])));
+    });
+    return () => { mounted = false; };
+  }, [rpc]);
+  return (
+    <section className="steel-project-overview" aria-labelledby="steel-project-overview-heading">
+      <div className="steel-toolbar"><div><h2 id="steel-project-overview-heading">All projects</h2><span className="steel-updated">{projects.length} projects</span></div></div>
+      <div className="steel-project-grid">
+        {projects.map(project => {
+          const summary = rows[project.id];
+          return <button className="steel-project-card" key={project.id} onClick={() => onSelect(project.id)} type="button">
+            <span className={`steel-dot ${summary?.connected ? "steel-dot--ok" : "steel-dot--down"}`} />
+            <span className="steel-project-card__name">{project.name}</span>
+            <span className="steel-project-card__meta">{summary?.connected
+              ? `${summary.activeSessions} active browser${summary.activeSessions === 1 ? "" : "s"}`
+              : summary?.configured ? "Offline" : "Not configured"}</span>
+          </button>;
+        })}
+      </div>
+    </section>
+  );
+}
+
 export function SteelBrowserPage() {
   const contextScope = useScope();
   const { projects, status } = experimental_useSidebarThreads();
@@ -331,7 +360,7 @@ export function SteelBrowserPage() {
           </div>
         </header>
         {picker}
-        <p role="status">{status === "error" ? "Projects could not be loaded." : "Select a project to view its active browsers."}</p>
+        <AllProjectsOverview projects={projects} onSelect={id => setSelectedProjectId(id)} />
       </main>
     );
   }

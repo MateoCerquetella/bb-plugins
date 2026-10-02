@@ -75,6 +75,25 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
   }
 
   const handlers = {
+    async allProjects() {
+      const available = await bb.sdk.projects.list({ includePersonal: true });
+      return Promise.all(available.map(async project => {
+        const binding = await projects.binding(project.id);
+        if (!binding) return { projectId: project.id, projectName: project.name, configured: false, connected: false, activeSessions: 0 };
+        try {
+          const dashboard = await new SteelClient(binding.apiUrl).dashboard();
+          return {
+            projectId: project.id,
+            projectName: project.name,
+            configured: true,
+            connected: dashboard.connected,
+            activeSessions: dashboard.sessions.filter(session => ["idle", "live"].includes(session.status)).length,
+          };
+        } catch {
+          return { projectId: project.id, projectName: project.name, configured: true, connected: false, activeSessions: 0 };
+        }
+      }));
+    },
     async project(scope: Scope) {
       const project = await resolve(scope);
       return { ...project, binding: await projects.binding(project.projectId), policy: await projects.policy(project.projectId) };

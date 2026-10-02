@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 57,
+  "revision": 60,
   "activeFeature": "install-and-run-https-github-com-steel-dev-steel-browser",
   "request": "Install and run https://github.com/steel-dev/steel-browser on the dyaus host for use from this BB environment, then create a new independently installable BB plugin in this repository that integrates Steel as the replacement browser infrastructure for the prior KERNEL.SH-based workflow. Keep the root orchestration-only conventions, align manifest/package/CLI/UI/docs/tests, avoid committing generated artifacts, and verify the Steel service plus the plugin's human UI and CLI surface.",
   "profile": "complex",
@@ -9,7 +9,7 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Correct the Steel Browser UI regression shown in the screenshot. Remove the sidebar footer/bottom-bar action that was just added. Keep the Steel Browser navigation entry, replace its black-square/unsupported Monitor icon with a supported BB icon, and diagnose/fix why opening Steel Browser does not show active browser sessions or the inner browser page. Preserve the current pale steel-blue, dark blue, and teal branding colors. Build, reinstall, reload, and verify the actual navigation page behavior.",
+  "message": "Add an All projects overview to Steel Browser. Keep project isolation: show each BB project with its configured connection status and active browser/session count, and let the user select a project to open its existing detailed controls and viewer. Do not merge sessions across projects or expose another project's browser. Preserve current icon/colors and remove no existing controls. Build, reinstall, reload, and verify the overview on desktop and mobile.",
   "implementationActor": "codex",
   "workStartedAt": null,
   "specDigest": "sha256:aeaac90fb3141226d8c291b5bb1dcaedae49d348cd2d0618f65518e6a021b867",
@@ -37,11 +37,11 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-02T16:10:50.586Z",
+  "updatedAt": "2026-10-02T16:48:58.823Z",
   "lifecycle": {
     "riskRequest": "Fix the Steel Browser Tools settings panel so it never sends undefined projectId values over RPC. When no BB project context is available, render a clear project-unavailable state instead of calling project RPC, while keeping Jev host configuration visible. Add focused coverage, rebuild, reload, and update the existing draft PR.",
     "stage": "iteration",
-    "iteration": 10,
+    "iteration": 11,
     "awaitingFeedback": false,
     "iterative": true,
     "contractRevision": 35,
@@ -92,7 +92,7 @@
     "heartbeatAt": "2026-10-01T20:58:38.682Z",
     "digest": "sha256:4985eb2e97ebab2d49b4dae59c3505a4e45f689035e19f21adf6a5332b2c478c"
   },
-  "trackerGeneration": 10,
-  "budgetExtensionMinutes": 233,
+  "trackerGeneration": 11,
+  "budgetExtensionMinutes": 275,
   "reviewFirst": true
 }
