@@ -22,6 +22,7 @@ const result = await build({
         return {connected:true,uiUrl:"https://viewer.test/ui",sessions:[{status:"idle"}]};
       }};
       export const useRpc=()=>rpc;
+      export const experimental_useSidebarThreads=()=>({status:"ready",projects:[]});
       export const useSettings=()=>({values:{},isLoading:false});
       export const useBbContext=()=>location.search ? {threadId:null,projectId:null} : {threadId:"t",projectId:"p"};
       export const definePluginApp=()=>null;

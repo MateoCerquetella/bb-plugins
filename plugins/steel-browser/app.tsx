@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   BookOpen,
   ExternalLink,
@@ -21,6 +21,7 @@ import {
   useRpc,
   useSettings,
   useBbContext,
+  experimental_useSidebarThreads,
   type PluginMessageDirectiveProps,
   type PluginThreadPanelProps,
 } from "@get-bb/plugin-sdk/app";
@@ -299,7 +300,27 @@ function SessionRow({
 }
 
 export function SteelBrowserPage() {
-  const scope = useScope();
+  const contextScope = useScope();
+  const { projects, status } = experimental_useSidebarThreads();
+  const [selectedProjectId, setSelectedProjectId] = useState(() => {
+    try { return sessionStorage.getItem("steel-browser:selected-project") ?? ""; }
+    catch { return ""; }
+  });
+  const projectId = projects.some(project => project.id === selectedProjectId) ? selectedProjectId : "";
+  const scope = useMemo<Scope>(() => projectId ? { projectId } : contextScope, [projectId, contextScope]);
+  const picker = (
+    <label className="steel-project-picker">
+      Project
+      <select aria-label="Browser project" value={projectId || contextScope.projectId || ""}
+        onChange={event => {
+          setSelectedProjectId(event.target.value);
+          try { sessionStorage.setItem("steel-browser:selected-project", event.target.value); } catch {}
+        }}>
+        <option value="" disabled>{status === "loading" ? "Loading projects..." : "Select a project"}</option>
+        {projects.map(project => <option key={project.id} value={project.id}>{project.name}</option>)}
+      </select>
+    </label>
+  );
   if (!scope.threadId && !scope.projectId) {
     return (
       <main className="steel-page">
@@ -309,20 +330,21 @@ export function SteelBrowserPage() {
             <h1>Steel Browser</h1>
           </div>
         </header>
-        <SteelAgentSettings />
+        {picker}
+        <p role="status">{status === "error" ? "Projects could not be loaded." : "Select a project to view its active browsers."}</p>
       </main>
     );
   }
-  return <ScopedSteelBrowserPage key={JSON.stringify(scope)} scope={scope} />;
+  return <ScopedSteelBrowserPage key={JSON.stringify(scope)} scope={scope} picker={picker} />;
 }
 
-function ScopedSteelBrowserPage({ scope }: { scope: Scope }) {
+function ScopedSteelBrowserPage({ scope, picker }: { scope: Scope; picker: ReactNode }) {
   const rpc = useRpc<typeof rpcContract>();
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [busy, setBusy] = useState<"refresh" | "create" | string | null>("refresh");
   const [error, setError] = useState<string | null>(null);
   const mounted = useRef(true);
-  const [watching, setWatching] = useState(false);
+  const [watching, setWatching] = useState(true);
   const [playerKey, setPlayerKey] = useState(0);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [loginOpen, setLoginOpen] = useState(false);
@@ -424,6 +446,7 @@ function ScopedSteelBrowserPage({ scope }: { scope: Scope }) {
         </div>
       </header>
 
+      {picker}
       <ProjectControls scope={scope} />
       <div className="steel-status">
         <span className={`steel-dot ${connected ? "steel-dot--ok" : "steel-dot--down"}`} />
@@ -451,6 +474,10 @@ function ScopedSteelBrowserPage({ scope }: { scope: Scope }) {
               aria-label="Reload viewer" onClick={() => setPlayerKey(key => key + 1)} type="button">
               <RefreshCw aria-hidden="true" />
             </button>}
+            {playerUrl && <a className="steel-secondary steel-modal-link" href={playerUrl}
+              target="_blank" rel="noopener noreferrer" title="Open viewer and sign in to BB Connect">
+              <ExternalLink aria-hidden="true" /> Open viewer
+            </a>}
             <button className="steel-secondary" disabled={!playerUrl || !activeSession}
               onClick={() => setLoginOpen(true)} type="button">
               <LogIn aria-hidden="true" /> Sign in / Take control
@@ -473,8 +500,7 @@ function ScopedSteelBrowserPage({ scope }: { scope: Scope }) {
           )}
         </div>
         {watching && <p className="steel-viewer-note">
-          Need to authenticate a website? Use <strong>Sign in / Take control</strong>, complete login in the
-          browser window, then reload this viewer.
+          BB Connect sign-in required? Open the viewer in a new tab, sign in, then reload the viewer here.
         </p>}
       </section>
 
@@ -601,12 +627,6 @@ function ScopedSteelBrowserPage({ scope }: { scope: Scope }) {
 }
 
 export default definePluginApp((app) => {
-  app.slots.sidebarFooterAction({
-    id: "steel-browser",
-    title: "Steel Browser",
-    icon: "Monitor",
-    run: ({ openSettings }) => openSettings(),
-  });
   app.slots.settingsSection({
     id: "steel-agent-status",
     title: "Browser agent",

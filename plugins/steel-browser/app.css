@@ -18,6 +18,8 @@
 }
 
 .steel-page * { box-sizing: border-box; letter-spacing: 0; }
+.steel-project-picker { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-block: 16px; }
+.steel-project-picker select { min-width: 0; max-width: 100%; padding: 7px 10px; border: 1px solid var(--border, #36373d); border-radius: 5px; color: inherit; background: var(--background, #18191c); font: inherit; }
 .steel-thread-panel {
   display: flex;
   flex-direction: column;

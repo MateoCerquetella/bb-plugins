@@ -32,7 +32,8 @@ const result = await build({
             status:i===0?"idle":"released",createdAt:new Date().toISOString(),
             websocketUrl:"ws://127.0.0.1:3100/"}))
         })}; export const useRpc=()=>rpc;export const definePluginApp=()=>null;
-        export const useBbContext=()=>({threadId:"test-thread",projectId:"test-project"});
+        export const useBbContext=()=>({threadId:null,projectId:null});
+        export const experimental_useSidebarThreads=()=>({status:"ready",projects:[{id:"test-project",name:"Test"}]});
         export const useSettings=()=>({values:{},isLoading:false});`,
         loader: "js",
       }));
@@ -51,7 +52,11 @@ try {
       contentType: "text/html",
     }));
     await page.goto("http://steel-ui.test");
-    await page.getByRole("button", { name: "Watch browser", exact: true }).first().waitFor();
+    await page.getByRole("combobox", { name: "Browser project" }).selectOption("test-project");
+    await page.getByTitle("Live Steel browser", { exact: true }).waitFor();
+    await page.reload();
+    await page.getByTitle("Live Steel browser", { exact: true }).waitFor();
+    assert.equal(await page.getByRole("combobox", { name: "Browser project" }).inputValue(), "test-project");
     const main = page.locator("main");
     assert(await main.evaluate(e => e.scrollHeight > e.clientHeight), "workspace must scroll");
     await main.evaluate(e => e.scrollTop = e.scrollHeight);

@@ -30,7 +30,8 @@
     "name": "Steel Browser",
     "description": "Operate self-hosted Steel browser sessions from BB.",
     "branding": {
-      "icon": "./assets/icon.svg"
+      "icon": "./assets/nav-icon.svg",
+      "logo": { "light": "./assets/icon.svg", "dark": "./assets/icon.svg" }
     },
     "server": "./server.ts",
     "app": "./app.tsx",
