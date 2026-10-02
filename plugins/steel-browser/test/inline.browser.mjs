@@ -18,6 +18,7 @@ const result = await build({
         window.rpcCalls=(window.rpcCalls||[]).concat([{method,input}]);
         if(Object.values(input).some(value=>value===undefined))throw new Error("undefined RPC input");
         if(method==="project")return {...project};
+        if(method==="allProjects")return [];
         if(method==="setEngine"){project.policy=input.policy;return {...project};}
         return {connected:true,uiUrl:"https://viewer.test/ui",sessions:[{status:"idle"}]};
       }};
@@ -59,18 +60,8 @@ try {
     await page.getByRole("button", { name: "Restore inline browser" }).click();
     assert.equal(await page.frameLocator("iframe").getByRole("textbox").inputValue(), "Retained");
     assert.equal(loads, 1, "minimizing must not reload the viewer");
-    const signIn = page.getByRole("link", { name: "Sign in to BB Connect in a new tab" });
-    assert.equal(await signIn.getAttribute("href"), "https://viewer.test/v1/sessions/debug");
-    assert.equal(await signIn.getAttribute("target"), "_blank");
-    assert.equal(await signIn.getAttribute("rel"), "noopener noreferrer");
-    const popupPromise = page.waitForEvent("popup");
-    await signIn.click();
-    const popup = await popupPromise;
-    await popup.waitForLoadState();
-    assert.equal(popup.url(), "https://viewer.test/v1/sessions/debug");
-    assert.equal(await popup.evaluate(() => window.opener), null);
-    await popup.close();
-    await page.getByRole("button", { name: "Done signing in" }).click();
+    assert.equal(await page.locator('a[target="_blank"]').count(), 0);
+    await page.getByRole("button", { name: "Reload inline browser" }).click();
     await page.frameLocator("iframe").getByRole("textbox").waitFor();
     assert.equal(await page.frameLocator("iframe").getByRole("textbox").inputValue(), "");
     assert.equal(await page.getByRole("button", { name: "Done signing in" }).count(), 0);
@@ -79,10 +70,9 @@ try {
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     if (process.env.BB_THREAD_STORAGE) await page.screenshot({ path: `${process.env.BB_THREAD_STORAGE}/steel-project-inline-${width}.png` });
     await page.goto("http://inline.test/?no-project");
-    await page.getByText(/No project selected/).waitFor();
-    assert.equal(await page.getByRole("combobox").count(), 0);
-    assert.equal(await page.evaluate(() => (window.rpcCalls || []).length), 0);
-    assert(await page.getByText("jev-ultrafast", { exact: true }).isVisible());
+    await page.getByRole("heading", { name: "All projects" }).waitFor();
+    assert.equal(await page.getByRole("combobox").count(), 1);
+    assert.deepEqual(await page.evaluate(() => window.rpcCalls), [{method:"allProjects",input:{}}]);
     assert.equal(await page.getByRole("alert").count(), 0);
     assert.equal(await page.getByText("Connecting", { exact: true }).count(), 0);
     assert.equal(await page.getByText("Loading endpoint...", { exact: true }).count(), 0);

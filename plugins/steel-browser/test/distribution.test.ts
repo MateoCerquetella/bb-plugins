@@ -12,6 +12,15 @@ test("declares an independent BB app, server, CLI skill, and pinned SDK", async 
   assert.match(packageJson.scripts.build, /^env -u BB_CLI /u);
 });
 
+test("contributes Steel discovery instructions to new agent sessions", async () => {
+  const server = await readFile(new URL("../server.ts", import.meta.url), "utf8");
+  assert.match(server, /bb\.agents\.contributeInstructions/u);
+  assert.match(server, /first run `bb steel-browser project`/u);
+  assert.match(server, /Never claim Steel is unavailable/u);
+  assert.match(server, /emit ::steel-browser\{\}/u);
+  assert.match(server, /Do not launch a separate browser/u);
+});
+
 test("ships the required operational and responsive UI states", async () => {
   const [app, css, skill] = await Promise.all([
     readFile(new URL("../app.tsx", import.meta.url), "utf8"),
@@ -25,5 +34,7 @@ test("ships the required operational and responsive UI states", async () => {
   assert.doesNotMatch(css, /#eddb63/u);
   assert.match(css, /width: min\(100%, 560px\)/u);
   assert.match(skill, /instead of KERNEL\.SH/u);
+  assert.match(skill, /Never send the user to a/u);
+  assert.match(skill, /current thread is the only browser surface/u);
   assert.match(skill, /bb steel-browser release/u);
 });

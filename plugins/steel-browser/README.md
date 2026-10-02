@@ -1,16 +1,22 @@
 # Steel Browser
 
-The inline viewer's sign-in icon opens the project's BB Connect viewer in a
-separate tab. Complete **Continue with GitHub** there, then select the check
-icon in the inline toolbar to reload. GitHub OAuth must run outside an iframe;
-the browser itself stays inline. Session availability does not confirm viewer
-authentication. Website logins inside the remote browser are separate from
-BB Connect authentication.
+The installed plugin contributes browser instructions to every new BB agent
+session through `bb.agents.contributeInstructions`. Agents must check
+`bb steel-browser project` before claiming browser access is unavailable,
+including when no dedicated browser tool appears in their tool list.
+Existing live sessions retain their original instructions until BB constructs
+a new provider session. This is agent guidance, not an OS-level browser lock.
+
+Browser navigation stays in the current BB thread with no external viewer
+links. Website logins happen inside the remote browser. BB Connect
+authentication is separate: GitHub OAuth may refuse iframe embedding.
+If that blocks the viewer, report the authentication limitation rather than
+opening an external browser. Session health does not prove viewer access.
 
 The Browser viewport has a **Watch browser** play control and embeds Steel's
 session player, not the Steel dashboard. **Sign in / Take control** opens a modal
-with the live player and a new-tab fallback if BB Connect requires authentication.
-After signing in, select **Done** to reload the main viewer. Disconnecting the viewer leaves
+with the live player inside the thread. After signing in, select **Done** to
+reload the main viewer. Disconnecting the viewer leaves
 the browser running; releasing a session closes it. Idle sessions remain usable.
 The play control connects the viewer; it does not start a jev-ultrafast agent.
 

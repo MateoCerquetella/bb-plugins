@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
-  BookOpen,
-  ExternalLink,
   PanelsTopLeft,
   Plus,
   RefreshCw,
@@ -13,7 +11,6 @@ import {
   LogIn,
   Maximize2,
   Minimize2,
-  Check,
   X,
 } from "lucide-react";
 import {
@@ -112,10 +109,6 @@ function ScopedSteelThreadPanel({ threadId }: { threadId: string }) {
           <strong>Steel Browser</strong>
           <span>{error ? "Unavailable" : active ? "Live in this thread" : dashboard?.connected ? "No active session" : "Connecting..."}</span>
         </div>
-        {playerUrl && <a href={playerUrl} target="_blank" rel="noopener noreferrer"
-          aria-label="Sign in to BB Connect in a new tab" title="Sign in to BB Connect">
-          <LogIn aria-hidden="true" />
-        </a>}
         <button aria-label="Reload Steel browser panel" className="steel-icon-button"
           onClick={() => { void refresh(); setPlayerKey(key => key + 1); }}
           title="Reload viewer" type="button">
@@ -150,7 +143,6 @@ function ScopedSteelBrowser({ message }: PluginMessageDirectiveProps) {
   const { dashboard, error, refresh, start, starting } = useSteelDashboard(scope);
   const [playerKey, setPlayerKey] = useState(0);
   const [minimized, setMinimized] = useState(false);
-  const [signingIn, setSigningIn] = useState(false);
   const playerUrl = dashboard
     ? new URL("v1/sessions/debug", dashboard.uiUrl.replace(/ui\/?$/, "")).toString()
     : null;
@@ -166,28 +158,10 @@ function ScopedSteelBrowser({ message }: PluginMessageDirectiveProps) {
           <Monitor aria-hidden="true" />
           <span>
             <strong>Steel Browser</strong>
-            <small>{error ? "Unavailable" : signingIn ? "Sign-in opened in a new tab" : active ? "Session available" : dashboard?.connected ? "No active session" : "Connecting"}</small>
+            <small>{error ? "Unavailable" : active ? "Session available" : dashboard?.connected ? "No active session" : "Connecting"}</small>
           </span>
         </div>
         <div className="steel-inline-browser__actions">
-          {playerUrl && (
-            <a href={playerUrl} target="_blank" rel="noopener noreferrer"
-              aria-label="Sign in to BB Connect in a new tab"
-              title="Sign in to BB Connect in a new tab"
-              onClick={() => setSigningIn(true)}>
-              <LogIn aria-hidden="true" />
-            </a>
-          )}
-          {signingIn && (
-            <button type="button" aria-label="Done signing in" title="Done signing in"
-              onClick={() => {
-                setSigningIn(false);
-                void refresh();
-                setPlayerKey(key => key + 1);
-              }}>
-              <Check aria-hidden="true" />
-            </button>
-          )}
           <button
             aria-expanded={!minimized}
             aria-label={minimized ? "Restore inline browser" : "Minimize inline browser"}
@@ -532,10 +506,6 @@ function ScopedSteelBrowserPage({ scope, picker }: { scope: Scope; picker: React
               aria-label="Reload viewer" onClick={() => setPlayerKey(key => key + 1)} type="button">
               <RefreshCw aria-hidden="true" />
             </button>}
-            {playerUrl && <a className="steel-secondary steel-modal-link" href={playerUrl}
-              target="_blank" rel="noopener noreferrer" title="Open viewer and sign in to BB Connect">
-              <ExternalLink aria-hidden="true" /> Open viewer
-            </a>}
             <button className="steel-secondary" disabled={!playerUrl || !activeSession}
               onClick={() => setLoginOpen(true)} type="button">
               <LogIn aria-hidden="true" /> Sign in / Take control
@@ -558,7 +528,7 @@ function ScopedSteelBrowserPage({ scope, picker }: { scope: Scope; picker: React
           )}
         </div>
         {watching && <p className="steel-viewer-note">
-          BB Connect sign-in required? Open the viewer in a new tab, sign in, then reload the viewer here.
+          If BB Connect blocks this embedded viewer, authentication needs repair. External navigation is disabled.
         </p>}
       </section>
 
@@ -638,14 +608,6 @@ function ScopedSteelBrowserPage({ scope, picker }: { scope: Scope; picker: React
       <details className="steel-connection">
         <summary>Developer connection</summary>
         <code>{activeSession?.websocketUrl || "No active connection"}</code>
-        <div className="steel-links">
-          <a href={dashboard?.uiUrl} rel="noreferrer" target="_blank">
-            <ExternalLink aria-hidden="true" />Steel UI
-          </a>
-          <a href={dashboard?.docsUrl} rel="noreferrer" target="_blank">
-            <BookOpen aria-hidden="true" />API documentation
-          </a>
-        </div>
       </details>
 
       <dialog ref={loginDialog} onClose={() => setLoginOpen(false)}
@@ -670,9 +632,6 @@ function ScopedSteelBrowserPage({ scope, picker }: { scope: Scope; picker: React
             )}
             <div className="steel-modal-actions">
               <button onClick={() => setLoginOpen(false)} type="button">Cancel</button>
-              <a className="steel-primary steel-modal-link" href={playerUrl ?? undefined} rel="noreferrer" target="_blank">
-                <ExternalLink aria-hidden="true" /> Sign in in a new tab
-              </a>
               <button type="button" onClick={() => {
                 setWatching(true);
                 setPlayerKey(key => key + 1);
