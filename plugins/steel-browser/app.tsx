@@ -56,6 +56,8 @@ function useSteelDashboard(scope: Scope) {
   const rpc = useRpc<typeof rpcContract>();
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [starting, setStarting] = useState(false);
+  const startingRef = useRef(false);
 
   const refresh = useCallback(async () => {
     if (!scope.threadId && !scope.projectId) {
@@ -71,8 +73,23 @@ function useSteelDashboard(scope: Scope) {
     }
   }, [rpc, scope]);
 
+  const start = useCallback(async () => {
+    if (startingRef.current || (!scope.threadId && !scope.projectId)) return;
+    startingRef.current = true;
+    setStarting(true);
+    setError(null);
+    try {
+      await rpc.call("createSession", { scope, options: CREATE_OPTIONS });
+      await refresh();
+    } catch (cause) {
+      setError(errorMessage(cause));
+    } finally {
+      startingRef.current = false;
+      setStarting(false);
+    }
+  }, [rpc, scope, refresh]);
   useEffect(() => { void refresh(); }, [refresh]);
-  return { dashboard, error, refresh };
+  return { dashboard, error, refresh, start, starting };
 }
 
 function SteelThreadPanel({ threadId }: PluginThreadPanelProps) {
@@ -81,7 +98,7 @@ function SteelThreadPanel({ threadId }: PluginThreadPanelProps) {
 
 function ScopedSteelThreadPanel({ threadId }: { threadId: string }) {
   const scope = useScope(threadId);
-  const { dashboard, error, refresh } = useSteelDashboard(scope);
+  const { dashboard, error, refresh, start, starting } = useSteelDashboard(scope);
   const [playerKey, setPlayerKey] = useState(0);
   const playerUrl = dashboard
     ? new URL("v1/sessions/debug", dashboard.uiUrl.replace(/ui\/?$/, "")).toString()
@@ -95,6 +112,10 @@ function ScopedSteelThreadPanel({ threadId }: { threadId: string }) {
           <strong>Steel Browser</strong>
           <span>{error ? "Unavailable" : active ? "Live in this thread" : dashboard?.connected ? "No active session" : "Connecting..."}</span>
         </div>
+        {playerUrl && <a href={playerUrl} target="_blank" rel="noopener noreferrer"
+          aria-label="Sign in to BB Connect in a new tab" title="Sign in to BB Connect">
+          <LogIn aria-hidden="true" />
+        </a>}
         <button aria-label="Reload Steel browser panel" className="steel-icon-button"
           onClick={() => { void refresh(); setPlayerKey(key => key + 1); }}
           title="Reload viewer" type="button">
@@ -110,6 +131,10 @@ function ScopedSteelThreadPanel({ threadId }: { threadId: string }) {
         <div className="steel-panel-state">
           <Monitor aria-hidden="true" />
           <strong>{dashboard ? "Start a browser session" : "Loading browser..."}</strong>
+          {dashboard?.connected && <button type="button" className="steel-primary"
+            disabled={starting} onClick={() => void start()}>
+            <Play aria-hidden="true" />{starting ? "Starting..." : "Start browser"}
+          </button>}
         </div>
       )}
     </section>
@@ -122,7 +147,7 @@ export function SteelBrowserDirective(props: PluginMessageDirectiveProps) {
 
 function ScopedSteelBrowser({ message }: PluginMessageDirectiveProps) {
   const scope = useScope(message.threadId);
-  const { dashboard, error, refresh } = useSteelDashboard(scope);
+  const { dashboard, error, refresh, start, starting } = useSteelDashboard(scope);
   const [playerKey, setPlayerKey] = useState(0);
   const [minimized, setMinimized] = useState(false);
   const [signingIn, setSigningIn] = useState(false);
@@ -191,6 +216,10 @@ function ScopedSteelBrowser({ message }: PluginMessageDirectiveProps) {
           <div className="steel-panel-state">
             <Monitor aria-hidden="true" />
             <strong>{dashboard ? "Start a browser session" : "Loading browser..."}</strong>
+            {dashboard?.connected && <button type="button" className="steel-primary"
+              disabled={starting} onClick={() => void start()}>
+              <Play aria-hidden="true" />{starting ? "Starting..." : "Start browser"}
+            </button>}
           </div>
         )}
       </div>
