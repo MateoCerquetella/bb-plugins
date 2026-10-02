@@ -40,7 +40,7 @@ All plugins in this repository are independently installable.
 Install it from this repository:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@main \
+bb plugin install 'git:https://github.com/MateoCerquetella/bb-plugins.git@semver:action-topbar/:^0.1.1' \
   --subdirectory plugins/action-topbar \
   --yes
 ```
