@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 65,
+  "revision": 66,
   "activeFeature": "install-and-run-https-github-com-steel-dev-steel-browser",
   "request": "Install and run https://github.com/steel-dev/steel-browser on the dyaus host for use from this BB environment, then create a new independently installable BB plugin in this repository that integrates Steel as the replacement browser infrastructure for the prior KERNEL.SH-based workflow. Keep the root orchestration-only conventions, align manifest/package/CLI/UI/docs/tests, avoid committing generated artifacts, and verify the Steel service plus the plugin's human UI and CLI surface.",
   "profile": "complex",
@@ -9,7 +9,7 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Finish the live-thread Steel Browser repair. Fix the discovered CLI bug where URL-only runs incorrectly honor a Jev project preference and fail preflight; URL-only navigation must always use project-scoped Playwright without paid-model authorization, while goal-based runs keep existing engine policy and no-replay safety. Rebuild, reload, run the fixed CLI in this exact thread, verify the active page through CDP, and re-emit the inline browser directive. Preserve BB Connect authentication requirements; improve sign-in/reload guidance only if needed, without bypassing authentication.",
+  "message": "Fixed URL-only Steel runs to force project-scoped Playwright without consulting Jev preference or paid credentials; goal-based runs retain existing engine policy and safety. Typecheck/build/reload passed. In exact current thread thr_i9qhar6ezf with project proj_ykxahiys47, `bb steel-browser run https://example.com` returned engine playwright, status navigated, correct URL and title. CDP inspection confirmed the active Example Domain page; upstream local cast player rendered live 1120x630 canvas with prior tab preserved. Native inline directive was emitted in the thread. BB Connect remote authentication remains an explicit user sign-in step and was not bypassed. Branch is current with main; full workflow verification is pending.",
   "implementationActor": "codex",
   "workStartedAt": null,
   "specDigest": "sha256:aeaac90fb3141226d8c291b5bb1dcaedae49d348cd2d0618f65518e6a021b867",
@@ -23,28 +23,27 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": false,
+    "implemented": true,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "none",
+    "highest": "implemented",
     "reasons": {
-      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-02T17:07:43.197Z",
+  "updatedAt": "2026-10-02T17:09:31.577Z",
   "lifecycle": {
-    "riskRequest": "Fix the Steel Browser Tools settings panel so it never sends undefined projectId values over RPC. When no BB project context is available, render a clear project-unavailable state instead of calling project RPC, while keeping Jev host configuration visible. Add focused coverage, rebuild, reload, and update the existing draft PR.",
     "stage": "iteration",
     "iteration": 13,
-    "awaitingFeedback": false,
+    "awaitingFeedback": true,
     "iterative": true,
     "contractRevision": 35,
+    "riskRequest": "Fix the Steel Browser Tools settings panel so it never sends undefined projectId values over RPC. When no BB project context is available, render a clear project-unavailable state instead of calling project RPC, while keeping Jev host configuration visible. Add focused coverage, rebuild, reload, and update the existing draft PR.",
     "contractBaseline": 46,
     "amendments": [
       45
