@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 84,
+  "revision": 85,
   "activeFeature": "install-and-run-https-github-com-steel-dev-steel-browser",
   "request": "Install and run https://github.com/steel-dev/steel-browser on the dyaus host for use from this BB environment, then create a new independently installable BB plugin in this repository that integrates Steel as the replacement browser infrastructure for the prior KERNEL.SH-based workflow. Keep the root orchestration-only conventions, align manifest/package/CLI/UI/docs/tests, avoid committing generated artifacts, and verify the Steel service plus the plugin's human UI and CLI surface.",
   "profile": "complex",
@@ -9,7 +9,7 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Fix thread project browser creation and CDP recovery. A project container can report API health while Chromium fails to start because preserved profiles contain stale SingletonLock, SingletonCookie, or SingletonSocket entries after a validated container recreation, causing `Project CDP endpoint is unavailable`. During safe recreation of a validated plugin-owned container, remove only stale Chromium singleton lock artifacts from its named profile after the old container is stopped and before the replacement starts. Also make `bb steel-browser project` actively validate/recover existing bound project instances instead of returning the stored binding without checking CDP. Add focused tests proving stale-lock cleanup is scoped to the validated profile and that an existing binding self-heals. Rebuild, reload, run a real project/create/status browser lifecycle, commit, and push.",
+  "message": "Implemented bound project readiness validation with serialized/coalesced checks and one recovery attempt for validated unready containers. Scoped singleton cleanup occurs after stop/removal; other running profile users and changed saved bindings refuse destructive repair. Fixed an additional live-discovered creation bug: upstream idle bootstrap sessions no longer block CLI create or UI New session, while live sessions still require release. Pushed 5dd985335 and reloaded built plugin. Latest typecheck/build passed. Earlier 26-test suite passed before later safety and idle-session edits; added/updated final regression tests remain unrun. Live thread project/CDP succeeded; create returned live session 4c22500b-b8c8-41d0-855a-f1e0fd15bc0f, run navigated to example.com, rendered DOM and screenshot inspected, exact test session released successfully. Browser.close shutdown check recovered upstream without container replacement, so live stale-lock container replacement not independently proven. Full verification pending; local-only tracker; target sync current.",
   "implementationActor": "codex",
   "workStartedAt": null,
   "specDigest": "sha256:0c50ba317dd0e4272049186127c49945bb58d0ecae970026cc45a4ebe600e972",
@@ -23,28 +23,27 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": false,
+    "implemented": true,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "none",
+    "highest": "implemented",
     "reasons": {
-      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-03T17:23:49.400Z",
+  "updatedAt": "2026-10-03T17:40:42.817Z",
   "lifecycle": {
-    "riskRequest": "Fix the Steel Browser Tools settings panel so it never sends undefined projectId values over RPC. When no BB project context is available, render a clear project-unavailable state instead of calling project RPC, while keeping Jev host configuration visible. Add focused coverage, rebuild, reload, and update the existing draft PR.",
     "stage": "iteration",
     "iteration": 22,
-    "awaitingFeedback": false,
+    "awaitingFeedback": true,
     "iterative": true,
     "contractRevision": 35,
+    "riskRequest": "Fix the Steel Browser Tools settings panel so it never sends undefined projectId values over RPC. When no BB project context is available, render a clear project-unavailable state instead of calling project RPC, while keeping Jev host configuration visible. Add focused coverage, rebuild, reload, and update the existing draft PR.",
     "contractBaseline": 73,
     "amendments": [
       45,
