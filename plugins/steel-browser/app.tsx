@@ -488,7 +488,7 @@ function ScopedSteelBrowserPage({ scope, picker }: { scope: Scope; picker: React
           </button>
           <button
             className="steel-primary"
-            disabled={busy !== null || !!activeSession}
+            disabled={busy !== null || sessions.some(session => session.status === "live")}
             onClick={() => void createSession()}
             type="button"
           >

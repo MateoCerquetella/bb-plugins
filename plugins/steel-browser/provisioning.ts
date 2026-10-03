@@ -35,6 +35,7 @@ export async function provisionProjectInstance(projectId: string, dependencies: 
   available?: (port: number) => Promise<boolean>;
   host?: string;
   dns?: readonly string[];
+  existing?: Binding | null;
   ready?: (binding: Binding) => Promise<void>;
 } = {}): Promise<Binding> {
   if (!/^[a-zA-Z0-9_-]{1,200}$/.test(projectId)) throw new Error("Invalid project id.");
@@ -48,11 +49,15 @@ export async function provisionProjectInstance(projectId: string, dependencies: 
   }
   const hash = createHash("sha256").update(projectId).digest("hex");
   const name = `bb-steel-${hash.slice(0, 24)}`;
+  const profile = `${name}-profile`;
   // Explicit host selection is essential when the requesting thread is on a different machine.
   const expose = async (port: string) =>
     viewerOrigin(await command("bb", ["connect", "expose", port, "--host", host]));
   const names = await command("docker", ["ps", "-a", "--filter", `name=^/${name}$`, "--format", "{{.Names}}"]);
   let binding: Binding;
+  let existingValidated = false;
+  let recreated = false;
+  let recreate: (() => Promise<void>) | null = null;
   if (names.trim()) {
     const [instance] = JSON.parse(await command("docker", ["inspect", name]));
     const ports = instance.HostConfig.PortBindings;
@@ -70,20 +75,36 @@ export async function provisionProjectInstance(projectId: string, dependencies: 
       || !instance.Config.Env.includes("CHROME_USER_DATA_DIR=/profiles/chrome")
       || !instance.Config.Env.includes("USE_SSL=true")
       || !instance.Mounts.some((m: { Type: string; Name: string; Destination: string }) =>
-        m.Type === "volume" && m.Name === `${name}-profile` && m.Destination === "/profiles")) {
+        m.Type === "volume" && m.Name === profile && m.Destination === "/profiles")) {
       throw new Error("Existing project container does not match its dedicated profile; refusing replacement.");
     }
+    existingValidated = true;
     const expected = viewerOrigin(`https://${domain}`);
     const actual = await expose(apiPort);
     if (actual !== expected) throw new Error("Existing project viewer differs from BB Connect; refusing rebinding.");
     binding = { apiUrl: `http://127.0.0.1:${apiPort}`, cdpUrl: `http://127.0.0.1:${cdpPort}`, viewerUrl: actual };
+    if (dependencies.existing && (Object.keys(binding) as (keyof Binding)[]).some(
+      key => binding[key] !== dependencies.existing![key],
+    )) throw new Error("Existing project container differs from its saved binding; refusing repair.");
+    recreate = async () => {
+      const users = (await command("docker", ["ps", "--filter", `volume=${profile}`, "--format", "{{.Names}}"]))
+        .trim().split("\n").filter(Boolean);
+      if (users.some(user => user !== name)) throw new Error("Project profile is used by another running container; refusing repair.");
+      await command("docker", ["stop", name]);
+      await command("docker", ["rm", "-f", name]);
+      await command("docker", ["run", "--rm", "--entrypoint", "sh", "-v", `${profile}:/profiles`, IMAGE,
+        "-lc", "rm -f /profiles/chrome/SingletonLock /profiles/chrome/SingletonCookie /profiles/chrome/SingletonSocket"]);
+      await command("docker", dockerRunArgs(name, projectId, apiPort, cdpPort, domain, dns));
+      recreated = true;
+    };
     const configuredDns = instance.HostConfig.Dns ?? [];
     if (!dns.every(server => configuredDns.includes(server)) || configuredDns.length !== dns.length) {
-      // Recreate only the validated project-owned container; the named profile volume survives.
-      await command("docker", ["rm", "-f", name]);
-      await command("docker", dockerRunArgs(name, projectId, apiPort, cdpPort, domain, dns));
+      await recreate();
     } else if (!instance.State.Running) await command("docker", ["start", name]);
   } else {
+    if (dependencies.existing) {
+      throw new Error("The bound project container is missing; refusing to replace its saved endpoints or profile automatically.");
+    }
     const used = new Set<number>();
     const shares = JSON.parse(await command("bb", ["connect", "shares", "--host", host, "--json"]));
     for (const share of shares.shares) used.add(share.port);
@@ -114,7 +135,14 @@ export async function provisionProjectInstance(projectId: string, dependencies: 
     // Docker owns the final port reservation. A race fails closed; never remove or replace a profile.
     await command("docker", dockerRunArgs(name, projectId, apiPort, apiPort + 1, new URL(origin).host, dns));
   }
-  await (dependencies.ready ?? waitForBrowser)(binding);
+  const ready = dependencies.ready ?? waitForBrowser;
+  try {
+    await ready(binding);
+  } catch (error) {
+    if (!existingValidated || recreated || !recreate) throw error;
+    await recreate();
+    await ready(binding);
+  }
   return binding;
 }
 

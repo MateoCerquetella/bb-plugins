@@ -48,7 +48,8 @@ First run `bb steel-browser project` in the current thread. It resolves the
 project from BB, returning its dedicated API/CDP/viewer endpoints and engine
 policy. Never use the old global ports 3100/9223 as a fallback. A missing
 binding is automatically provisioned by this command with dedicated ports and
-a persistent project profile. Repeated calls reuse the same binding.
+a persistent project profile. Repeated calls validate readiness and reuse the
+same binding; an unready validated container gets one bounded recovery attempt.
 Never copy cookies from another project's profile.
 
 The inline engine select and fallback checkbox persist per project. CLI:
@@ -68,6 +69,8 @@ Do not replay actions after an uncertain execution error, cancellation or timeou
 1. Check `bb steel-browser status`.
 2. Reuse an appropriate active session from `bb steel-browser sessions`, or
    create one with `bb steel-browser create`.
+   Steel's idle bootstrap session does not block creation. A live session must
+   be explicitly selected for release before replacing it.
 3. Use `binding.cdpUrl` from `project` for local CDP. Fetch `/json/version`;
    retain its WebSocket path but replace its host/port with that CDP binding
    because upstream may omit the mapped port. Do not use another project's URL.

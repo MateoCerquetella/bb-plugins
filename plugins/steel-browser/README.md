@@ -17,6 +17,18 @@ Setup is serialized within the plugin; Docker reserves the container name and
 ports across processes. A conflicting container fails without replacement.
 Docker and an enrolled BB Connect host matching the server's hostname are required.
 
+Existing bindings also pass through readiness checks: API health alone is not
+enough; Chromium CDP must respond. A validated project container that remains
+unready gets one recovery attempt. Recovery stops the old container before
+clearing only Chromium's three singleton lock artifacts from its named profile,
+then starts a replacement with the same endpoints and profile volume.
+Conflicting saved bindings and profiles used by other running containers fail
+closed. Recovery never replays a browser navigation or paid agent task.
+
+Steel automatically maintains an idle bootstrap session, including after a
+release. `create` and **New session** may start a new session from that idle
+state. A live session still requires explicit release before replacement.
+
 Frontend project/dashboard reads retry once after 15 seconds without a response.
 If both attempts stall, the page reports the failed request and enables Refresh
 instead of staying at Connecting indefinitely. Session mutations time out after

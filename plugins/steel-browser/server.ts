@@ -83,10 +83,10 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
   }
 
   async function ensureBinding(projectId: string) {
-    return projects.ensure(projectId, async id => {
+    return projects.ensure(projectId, async (id, existing) => {
       const config = await settings.get();
       const dns = String(config.dnsServers || "1.1.1.1,8.8.8.8").split(",").map(value => value.trim()).filter(Boolean);
-      const binding = await provisionProjectInstance(id, { dns });
+      const binding = await provisionProjectInstance(id, { dns, existing });
       await verifyProjectInstance(id, binding);
       return binding;
     });

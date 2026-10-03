@@ -88,8 +88,9 @@ test("creates and releases an exact session", async () => {
   assert.deepEqual(await client.releaseSession(SESSION_ID), { sessionId: SESSION_ID, success: true });
 });
 
-test("idle sessions can be released and block duplicate creation", async () => {
+test("idle bootstrap sessions allow new session creation; live sessions do not", async () => {
   const client = new SteelClient(await fixture());
+  assert.equal((await client.createSession({ blockAds: true, width: 1440, height: 900 })).status, "live");
   await assert.rejects(client.createSession({ blockAds: true, width: 1440, height: 900 }), /already live/);
   assert.deepEqual(await client.releaseSession(SESSION_ID), { sessionId: SESSION_ID, success: true });
 });

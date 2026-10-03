@@ -60,9 +60,68 @@ test("existing project with inherited DNS is recreated with the same profile", a
     },
   });
   assert(calls.some(args => args[0] === "rm" && args[1] === "-f" && args[2] === name));
-  const run = calls.find(args => args[0] === "run")!;
+  const cleanup = calls.find(args => args.includes("--entrypoint"))!;
+  assert(cleanup.includes(`${name}-profile:/profiles`));
+  assert.equal(cleanup.at(-1), "rm -f /profiles/chrome/SingletonLock /profiles/chrome/SingletonCookie /profiles/chrome/SingletonSocket");
+  assert(calls.findIndex(args => args[0] === "stop") < calls.indexOf(cleanup));
+  assert(calls.findIndex(args => args[0] === "rm") < calls.indexOf(cleanup));
+  const run = calls.find(args => args[0] === "run" && args.includes("--name"))!;
   assert(run.includes("--dns") && run.includes("1.1.1.1") && run.includes("8.8.8.8"));
   assert(run.includes(`${name}-profile:/profiles`));
+});
+
+test("dead CDP on a validated project triggers one scoped repair", async () => {
+  const calls: string[][] = [];
+  let attempts = 0;
+  await provisionProjectInstance(project, {
+    ready: async () => { if (++attempts === 1) throw new Error("CDP unavailable"); },
+    run: async (cmd, args) => {
+      calls.push(args);
+      if (cmd === "bb") return "https://viewer.test";
+      if (args[0] === "ps") return name;
+      if (args[0] === "inspect") return JSON.stringify([instance()]);
+      return "";
+    },
+  });
+  assert.equal(attempts, 2);
+  assert.equal(calls.filter(args => args[0] === "rm").length, 1);
+  assert(calls.some(args => args.includes(`${name}-profile:/profiles`) && args.includes("--entrypoint")));
+});
+
+test("persistent CDP failure is bounded to one recovery attempt", async () => {
+  const calls: string[][] = [];
+  await assert.rejects(provisionProjectInstance(project, {
+    ready: async () => { throw new Error("CDP unavailable"); },
+    run: async (cmd, args) => {
+      calls.push(args);
+      if (cmd === "bb") return "https://viewer.test";
+      if (args[0] === "ps") return name;
+      if (args[0] === "inspect") return JSON.stringify([instance()]);
+      return "";
+    },
+  }), /CDP unavailable/);
+  assert.equal(calls.filter(args => args[0] === "rm").length, 1);
+});
+
+test("shared profile or changed saved binding cannot trigger destructive repair", async () => {
+  for (const shared of [true, false]) {
+    const calls: string[][] = [];
+    await assert.rejects(provisionProjectInstance(project, {
+      existing: shared ? null : {
+        apiUrl: "http://127.0.0.1:9999", cdpUrl: "http://127.0.0.1:9300", viewerUrl: "https://viewer.test",
+      },
+      ready: async () => { throw new Error("CDP unavailable"); },
+      run: async (cmd, args) => {
+        calls.push(args);
+        if (cmd === "bb") return "https://viewer.test";
+        if (args.some(arg => arg.startsWith("volume="))) return `${name}\nforeign-container`;
+        if (args[0] === "ps") return name;
+        if (args[0] === "inspect") return JSON.stringify([instance()]);
+        return "";
+      },
+    }), shared ? /another running container/ : /saved binding/);
+    assert(!calls.some(args => ["stop", "rm", "run"].includes(args[0]!)));
+  }
 });
 
 test("existing stopped project is validated and resumed without replacing its profile", async () => {

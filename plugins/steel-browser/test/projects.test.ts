@@ -31,7 +31,7 @@ test("engine preferences do not leak between projects", async () => {
   assert.deepEqual(await projects.policy("a"), { engine: "auto", fallback: true });
 });
 
-test("automatic setup serializes projects, coalesces duplicates, and reuses bindings", async () => {
+test("automatic setup serializes projects, coalesces duplicates, and revalidates bindings", async () => {
   const projects = store();
   const calls: string[] = [];
   let active = 0;
@@ -49,7 +49,7 @@ test("automatic setup serializes projects, coalesces duplicates, and reuses bind
   assert.notEqual(a.apiUrl, b.apiUrl);
   assert.deepEqual(calls, ["a", "b"]);
   assert.deepEqual(await projects.ensure("a", provision), a);
-  assert.equal(calls.length, 2);
+  assert.deepEqual(calls, ["a", "b", "a"]);
 });
 
 test("failed provisioning persists nothing and a later request can retry", async () => {
@@ -59,6 +59,17 @@ test("failed provisioning persists nothing and a later request can retry", async
   assert.deepEqual(await projects.ensure("a", async () => binding), binding);
   await assert.rejects(projects.ensure("b", async () => binding), /another project/);
   assert.equal(await projects.binding("b"), null);
+});
+
+test("existing bindings are passed into recovery and retained after a failed check", async () => {
+  const projects = store();
+  await projects.bind("a", binding);
+  await assert.rejects(projects.ensure("a", async (_id, existing) => {
+    assert.deepEqual(existing, binding);
+    throw new Error("CDP unavailable");
+  }), /CDP unavailable/);
+  assert.deepEqual(await projects.binding("a"), binding);
+  assert.deepEqual(await projects.ensure("a", async (_id, existing) => existing!), binding);
 });
 test("fallback is opt-in and only selects an engine during preflight", async () => {
   const calls: string[] = [];

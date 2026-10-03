@@ -131,7 +131,7 @@ export class SteelClient {
 
   async createSession(options: CreateOptions): Promise<BrowserSession> {
     const sessions = await this.listSessions();
-    if (sessions.some((session) => session.status === "live" || session.status === "idle")) {
+    if (sessions.some((session) => session.status === "live")) {
       throw new SteelClientError("A browser session is already live. Reuse it or release it first.");
     }
     const payload = await this.request("/v1/sessions", {
