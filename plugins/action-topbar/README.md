@@ -5,7 +5,7 @@
 > experimental Action split-drag API introduced in Plugin SDK 0.4.33. Install
 > it only on a compatible BB build. Stock BB 0.44.0 does not expose this API;
 > upgrading BB or the SDK alone does not enable Action pane dragging.
-> The v0.1.1 release includes the matching core patch for BB 0.44.0.
+> The v0.1.2 release includes the matching core patch for BB 0.45.0.
 
 Action Topbar projects BB Actions opened as main-workspace panes into the
 **main thread topbar**. Pane content stays under BB's ownership; the topbar
@@ -57,7 +57,7 @@ plugin.
 Install from Git on a compatible BB build:
 
 ```sh
-bb plugin install 'git:https://github.com/MateoCerquetella/bb-plugins.git@semver:action-topbar/:^0.1.1' \
+bb plugin install 'git:https://github.com/MateoCerquetella/bb-plugins.git@semver:action-topbar/:^0.1.2' \
   --subdirectory plugins/action-topbar \
   --yes
 ```
