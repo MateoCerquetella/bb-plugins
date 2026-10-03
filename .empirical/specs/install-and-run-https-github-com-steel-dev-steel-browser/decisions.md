@@ -145,3 +145,20 @@ local install/reload, CLI smoke checks, and browser UI verification.
   in-thread. Report iframe authentication restrictions without opening Safari.
 - New-session instructions advertise the CLI and automatic binding, while
   preserving explicit authorization for paid calls and project isolation.
+
+# D-009 Operational Setup And Bounded Frontend Requests
+
+- Extends D-008: selected-project dashboard and create actions ensure their
+  binding; the all-projects overview and project settings remain read-only.
+- Direct HTTP observation and the actual local BB frontend both returned
+  Bandely's dedicated binding and idle session. The remote screenshot showed
+  pending dashboard and settings requests. Its transport cause is unconfirmed.
+- Bound frontend reads to two 15-second attempts and mutations to one
+  30-second attempt. The dashboard's setup is coalesced server-side, making its
+  retry safe. Never automatically replay create, release, or policy mutations.
+- Timeout is not cancellation: errors state that work can still finish and ask
+  for a status refresh before another mutation. Ignore late responses.
+- Verification uses the installed BB frontend in the current project's Steel
+  session with real local RPC responses and injected request stalls.
+- Remote BB Connect authentication and embedded viewer content must be verified
+  separately; a healthy session or a rendered iframe does not prove access.

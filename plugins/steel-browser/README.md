@@ -17,6 +17,12 @@ Setup is serialized within the plugin; Docker reserves the container name and
 ports across processes. A conflicting container fails without replacement.
 Docker and an enrolled BB Connect host matching the server's hostname are required.
 
+Frontend project/dashboard reads retry once after 15 seconds without a response.
+If both attempts stall, the page reports the failed request and enables Refresh
+instead of staying at Connecting indefinitely. Session mutations time out after
+30 seconds without automatic replay; work may still finish on the server, so
+refresh before trying again. Late responses do not replace the recovered state.
+
 Browser navigation stays in the current BB thread with no external viewer
 links. Website logins happen inside the remote browser. BB Connect
 authentication is separate: GitHub OAuth may refuse iframe embedding.

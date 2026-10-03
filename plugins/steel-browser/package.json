@@ -52,6 +52,7 @@
     "server.ts",
     "steel-client.ts",
     "projects.ts",
+    "rpc-timeout.ts",
     "engines.ts",
     "provisioning.ts",
     "scripts/"

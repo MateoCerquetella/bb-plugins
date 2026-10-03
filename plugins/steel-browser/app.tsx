@@ -19,10 +19,12 @@ import {
   useSettings,
   useBbContext,
   experimental_useSidebarThreads,
+  type PluginRpcClient,
   type PluginMessageDirectiveProps,
   type PluginThreadPanelProps,
 } from "@get-bb/plugin-sdk/app";
 import type { BrowserSession, Dashboard, Scope, ProjectState, EnginePolicy, rpcContract } from "./contract.ts";
+import { callSteelRpc } from "./rpc-timeout.ts";
 import "./app.css";
 
 const CREATE_OPTIONS = { blockAds: true, width: 1440, height: 900 } as const;
@@ -30,6 +32,13 @@ const THREAD_PANEL_ACTION_ID = "steel-live-browser";
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+function useSteelRpc(): PluginRpcClient<typeof rpcContract> {
+  const rpc = useRpc<typeof rpcContract>();
+  return useMemo(() => ({
+    call: (method, ...args) => callSteelRpc(() => rpc.call(method, ...args), method),
+  }) as PluginRpcClient<typeof rpcContract>, [rpc]);
 }
 
 function relativeTime(timestamp: string): string {
@@ -50,7 +59,7 @@ function useScope(threadId?: string): Scope {
 }
 
 function useSteelDashboard(scope: Scope) {
-  const rpc = useRpc<typeof rpcContract>();
+  const rpc = useSteelRpc();
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
@@ -209,18 +218,20 @@ function ProjectControls({ scope }: { scope: Scope }) {
 }
 
 function ScopedProjectControls({ scope }: { scope: Scope }) {
-  const rpc = useRpc<typeof rpcContract>();
+  const rpc = useSteelRpc();
   const { values } = useSettings();
   const [project, setProject] = useState<ProjectState | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     let current = true;
     setProject(null);
+    setError(null);
     void rpc.call("project", scope).then(value => { if (current) setProject(value); })
       .catch(cause => { if (current) setError(errorMessage(cause)); });
     return () => { current = false; };
-  }, [rpc, scope]);
+  }, [rpc, scope, attempt]);
   async function save(policy: EnginePolicy) {
     setBusy(true);
     setError(null);
@@ -243,6 +254,10 @@ function ScopedProjectControls({ scope }: { scope: Scope }) {
       checked={project?.policy.fallback ?? false}
       onChange={event => project && void save({ ...project.policy, fallback: event.target.checked })} />Fallback</label>
     {error && <p role="alert">{error}</p>}
+    {error && <button type="button" className="steel-icon-button" title="Retry project settings"
+      aria-label="Retry project settings" onClick={() => setAttempt(value => value + 1)}>
+      <RefreshCw aria-hidden="true" />
+    </button>}
     {project?.policy.engine !== "playwright" && project && !values?.jevEnvFile &&
       <p role="status">Jev: credentials not configured</p>}
   </div>;
@@ -303,18 +318,20 @@ function SessionRow({
 }
 
 function AllProjectsOverview({ projects, onSelect }: { projects: readonly { id: string; name: string }[]; onSelect: (id: string) => void }) {
-  const rpc = useRpc<typeof rpcContract>();
+  const rpc = useSteelRpc();
   const [rows, setRows] = useState<Record<string, { configured: boolean; connected: boolean; activeSessions: number }>>({});
+  const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     let mounted = true;
     void rpc.call("allProjects", {}).then(summaries => {
       if (mounted) setRows(Object.fromEntries(summaries.map(summary => [summary.projectId, summary])));
-    });
+    }).catch(cause => { if (mounted) setError(errorMessage(cause)); });
     return () => { mounted = false; };
   }, [rpc]);
   return (
     <section className="steel-project-overview" aria-labelledby="steel-project-overview-heading">
       <div className="steel-toolbar"><div><h2 id="steel-project-overview-heading">All projects</h2><span className="steel-updated">{projects.length} projects</span></div></div>
+      {error && <p className="steel-error" role="alert">{error}</p>}
       <div className="steel-project-grid">
         {projects.map(project => {
           const summary = rows[project.id];
@@ -371,7 +388,7 @@ export function SteelBrowserPage() {
 }
 
 function ScopedSteelBrowserPage({ scope, picker }: { scope: Scope; picker: ReactNode }) {
-  const rpc = useRpc<typeof rpcContract>();
+  const rpc = useSteelRpc();
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [busy, setBusy] = useState<"refresh" | "create" | string | null>("refresh");
   const [error, setError] = useState<string | null>(null);
@@ -413,7 +430,8 @@ function ScopedSteelBrowserPage({ scope, picker }: { scope: Scope; picker: React
     setError(null);
     try {
       await rpc.call("createSession", { scope, options: CREATE_OPTIONS });
-      if (mounted.current) setDashboard(await rpc.call("dashboard", scope));
+      const next = await rpc.call("dashboard", scope);
+      if (mounted.current) setDashboard(next);
     } catch (cause) {
       if (mounted.current) setError(errorMessage(cause));
     } finally {
@@ -431,7 +449,8 @@ function ScopedSteelBrowserPage({ scope, picker }: { scope: Scope; picker: React
     setError(null);
     try {
       await rpc.call("releaseSession", { scope, sessionId: session.id });
-      if (mounted.current) setDashboard(await rpc.call("dashboard", scope));
+      const next = await rpc.call("dashboard", scope);
+      if (mounted.current) setDashboard(next);
     } catch (cause) {
       if (mounted.current) setError(errorMessage(cause));
     } finally {
@@ -489,7 +508,7 @@ function ScopedSteelBrowserPage({ scope, picker }: { scope: Scope; picker: React
         <code>{endpoint}</code>
       </div>
 
-      {(error ?? dashboard?.error) !== null ? (
+      {(error ?? dashboard?.error) ? (
         <p className="steel-error" role="alert">{error ?? dashboard?.error}</p>
       ) : null}
 
