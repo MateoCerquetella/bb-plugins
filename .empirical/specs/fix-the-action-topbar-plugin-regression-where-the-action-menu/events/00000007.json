@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "sequence": 7,
+  "previousDigest": "sha256:f967e88b80a861278b86cb38f00c24f2cd8be4d05d2c646d215dc70ff616ac20",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Ported and installed exact BB 0.45.0 frontend repair with backup and per-file hash validation. Focused core/SDK/plugin tests and app/SDK typechecks/build passed; server serves the new index. Durable patch and raw evidence saved. Live browser drag/screenshot requires user sign-in at BB Connect in the project-bound Steel browser and a BB tab reload; AC-UI-1 and formal review/verification remain pending.",
+  "createdAt": "2026-10-03T01:34:21.006Z",
+  "stateBeforeDigest": "sha256:37f9e8a333fddf7ce5e4cef7ffe5f99ed794bbc12e312c001fe83d0b5495490b",
+  "stateAfterDigest": "sha256:2f4962eed5564521ac32fe2c2b540c71ba0746c95562e533a17fe673a886f9ae",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 7,
+    "activeFeature": "fix-the-action-topbar-plugin-regression-where-the-action-menu",
+    "request": "Fix the Action Topbar plugin regression where the action menu opens with “Search open tabs or actions…” but actions cannot be dragged and instead show “Reload BB to load Action dragging support.” Restore working action dragging from the topbar menu, add regression coverage, and verify the plugin UI and relevant checks.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "awaiting_human",
+    "repairAttempts": 0,
+    "message": "Ported and installed exact BB 0.45.0 frontend repair with backup and per-file hash validation. Focused core/SDK/plugin tests and app/SDK typechecks/build passed; server serves the new index. Durable patch and raw evidence saved. Live browser drag/screenshot requires user sign-in at BB Connect in the project-bound Steel browser and a BB tab reload; AC-UI-1 and formal review/verification remain pending.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:d1b015081c57fec5505f01038621eda0b25b1d49da20fb997f8c7df8a8372e3d",
+    "approvedSpecRevision": 4,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:b55e70bcde4e90abad590e66de7bc58255e2f62e23125f016a668a7fa0edd70e",
+    "impactDigest": "sha256:dcf654b30757da6492dd4b96daac756470d900df956d15239ab609129dfc34e1",
+    "capabilityClaimId": "fix-the-action-topbar-plugin-regression-where-the-action-menu-190d9e80d5ed",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-03T01:34:21.006Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "fix-the-action-topbar-plugin-regression-where-the-action-menu-190d9e80d5ed",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "fix-the-action-topbar-plugin-regression-where-the-action-menu",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mqiu26r5gh-1/bb-plugins",
+      "worktreeId": "sha256:ce3c9e6d50ea5ef52102d2d6de7f2dfb2b5726be98e711228356a81dacb9ebed",
+      "baseCommit": "96eeb943a3985b65c5070e81ac5c2768950b26cc",
+      "baseTree": "e8a3599522cb36b49ebfd1f5245e823ebb05448e",
+      "bases": {
+        "action-topbar-distribution": {
+          "capability": "action-topbar-distribution",
+          "digest": "sha256:bf598e17d291f7c478d63be9524f5ca42de72f57d1967898ba61b8a14ebda120",
+          "requirements": {
+            "installable experimental plugin source": "sha256:98332483c8557927f17709e30a6b384e5aa316770cd8a9b0e8a5f80ce504c490"
+          }
+        }
+      },
+      "capabilities": [
+        "action-topbar-distribution"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-03T01:08:54.566Z",
+      "heartbeatAt": "2026-10-03T01:08:54.566Z",
+      "digest": "sha256:2c77c2b0f972f161695e2846aeb8767b9d1e0cf6df76228e2ae1fcfd7f2ada6c"
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:52faf5552feff1dbf24358f25e4cd2520b0809e6e23e153b3ff0f7f0851eefc8"
+}
