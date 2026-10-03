@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "sequence": 3,
+  "previousDigest": "sha256:df05d9358e8bd7c81b9a116576cd3c4defdaa44bc5f6ac8560c5e1612da25189",
+  "actor": "codex",
+  "type": "transition",
+  "summary": "Resumed workflow",
+  "createdAt": "2026-10-03T01:04:42.365Z",
+  "stateBeforeDigest": "sha256:09680d37227f32b95e6fea5bfc9a0834b3c891dace28bfdcc65b0dace4ec3de2",
+  "stateAfterDigest": "sha256:0c60253dcbb03b11d3d9f54948e40dacaf9229b42666309a05c8c1a8c3fa0215",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 3,
+    "activeFeature": "fix-the-action-topbar-plugin-regression-where-the-action-menu",
+    "request": "Fix the Action Topbar plugin regression where the action menu opens with “Search open tabs or actions…” but actions cannot be dragged and instead show “Reload BB to load Action dragging support.” Restore working action dragging from the topbar menu, add regression coverage, and verify the plugin UI and relevant checks.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": null,
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:eacc87572c9c6f5b9d1e581bcbe79e98a73caa46e91f25c8ded20df4d23a36b6",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": null,
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-03T01:04:42.365Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:aac6b85643cc4eea809f208261bff45a37d4f4aac9ef216291bfbbd9a9a8867d"
+}

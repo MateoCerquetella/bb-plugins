@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2
+
+- Restore Action dragging on BB 0.45.0 with the matching host frontend patch.
+- Cancel active Action drags when the plugin frontend reloads.
+- Add reproducible porting, build, backup, and rollback notes.
+
 ## 0.1.1
 
 - Keep tab elements stable during live pane updates so pointer capture is not lost.

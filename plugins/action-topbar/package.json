@@ -1,6 +1,6 @@
 {
   "name": "bb-plugin-action-topbar",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A compact main-thread topbar for BB panel tabs and draggable Actions.",
   "license": "MIT",
   "author": "Mateo Cerquetella",

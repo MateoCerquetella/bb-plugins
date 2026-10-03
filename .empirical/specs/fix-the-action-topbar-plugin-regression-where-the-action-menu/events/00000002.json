@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "sequence": 2,
+  "previousDigest": "sha256:872334c4f2bf884b199334e337600eeab56bd3b2f2468453391b5be08d59cbd9",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Diagnosed missing host capability: installed BB 0.45.0 frontend assets do not contain experimental_beginThreadActionSplitDrag or thread-action-pane markers; installed custom 0.44.0 assets contain both. Action Topbar still depends on that experimental bridge, and its README explicitly requires the matching core patch. Located preserved prior 0.44.0 core patch source in /home/dyaus/.bb/thread-storage/thr_6vv3sdjrq2/bb-action-drag-0.44.0 (35 changed files). Stock current upstream has no equivalent Action-to-main-pane API or renderer. No plugin product changes or runtime changes made. Awaiting user's authorization to expand to porting and installing a BB 0.45.0 core/frontend patch, or prepare it without changing running BB. Tracker local-only.",
+  "createdAt": "2026-10-03T01:02:40.702Z",
+  "stateBeforeDigest": "sha256:6548ba72c3b499136104061c17d3ef06858f8c0d27e4c602785f88c16a70f9d0",
+  "stateAfterDigest": "sha256:09680d37227f32b95e6fea5bfc9a0834b3c891dace28bfdcc65b0dace4ec3de2",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 2,
+    "activeFeature": "fix-the-action-topbar-plugin-regression-where-the-action-menu",
+    "request": "Fix the Action Topbar plugin regression where the action menu opens with “Search open tabs or actions…” but actions cannot be dragged and instead show “Reload BB to load Action dragging support.” Restore working action dragging from the topbar menu, add regression coverage, and verify the plugin UI and relevant checks.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "awaiting_human",
+    "repairAttempts": 0,
+    "message": "Diagnosed missing host capability: installed BB 0.45.0 frontend assets do not contain experimental_beginThreadActionSplitDrag or thread-action-pane markers; installed custom 0.44.0 assets contain both. Action Topbar still depends on that experimental bridge, and its README explicitly requires the matching core patch. Located preserved prior 0.44.0 core patch source in /home/dyaus/.bb/thread-storage/thr_6vv3sdjrq2/bb-action-drag-0.44.0 (35 changed files). Stock current upstream has no equivalent Action-to-main-pane API or renderer. No plugin product changes or runtime changes made. Awaiting user's authorization to expand to porting and installing a BB 0.45.0 core/frontend patch, or prepare it without changing running BB. Tracker local-only.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:eacc87572c9c6f5b9d1e581bcbe79e98a73caa46e91f25c8ded20df4d23a36b6",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": null,
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-03T01:02:40.702Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:df05d9358e8bd7c81b9a116576cd3c4defdaa44bc5f6ac8560c5e1612da25189"
+}
