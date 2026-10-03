@@ -275,12 +275,13 @@ export function SteelAgentSettings() {
       <strong>jev-ultrafast</strong>
       <p role="status">Jev adapter installed · Live run not verified</p>
       <dl>
+        <dt>Container DNS</dt><dd>{isLoading ? "Loading..." : String(values?.dnsServers || "1.1.1.1,8.8.8.8")}</dd>
         <dt>Checkout</dt><dd>{isLoading ? "Loading..." : String(values?.jevCheckout || "Not configured")}</dd>
         <dt>Credentials file</dt><dd>{isLoading ? "Loading..." : String(values?.jevEnvFile || "Not configured")}</dd>
         <dt>Text model</dt><dd>{isLoading ? "Loading..." : String(values?.jevTextModel || "Not configured")}</dd>
       </dl>
       <p>Configuration: BB Tools / Steel Browser. Credentials stay on the host.
-        Live Jev runs use potentially billable TypeSafe and text-model APIs.</p>
+        Live Jev runs use potentially billable TypeSafe and text-model APIs. DNS changes apply when a project browser is next provisioned or repaired.</p>
     </section>
   );
 }

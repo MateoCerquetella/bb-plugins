@@ -7,7 +7,7 @@ import type { Binding } from "./contract.ts";
 
 const exec = promisify(execFile);
 const IMAGE = "ghcr.io/steel-dev/steel-browser@sha256:f5cd68fbc2cb27e5d7766269860fd0fb29cbe5fe506245a49c82f85ba210e7da";
-const DNS_SERVERS = ["1.1.1.1", "8.8.8.8"] as const;
+export const DEFAULT_DNS_SERVERS = ["1.1.1.1", "8.8.8.8"] as const;
 type Runner = (command: string, args: string[]) => Promise<string>;
 const run: Runner = async (command, args) => (await exec(command, args, {
   timeout: 120000, maxBuffer: 262144,
@@ -34,12 +34,18 @@ export async function provisionProjectInstance(projectId: string, dependencies: 
   run?: Runner;
   available?: (port: number) => Promise<boolean>;
   host?: string;
+  dns?: readonly string[];
   ready?: (binding: Binding) => Promise<void>;
 } = {}): Promise<Binding> {
   if (!/^[a-zA-Z0-9_-]{1,200}$/.test(projectId)) throw new Error("Invalid project id.");
   const command = dependencies.run ?? run;
   const available = dependencies.available ?? portAvailable;
   const host = dependencies.host ?? hostname();
+  const dns = dependencies.dns?.length ? [...dependencies.dns] : [...DEFAULT_DNS_SERVERS];
+  if (!dns.every(value => /^(?:\d{1,3}\.){3}\d{1,3}$/.test(value)
+    && value.split(".").every(part => Number(part) <= 255))) {
+    throw new Error("DNS servers must be IPv4 addresses.");
+  }
   const hash = createHash("sha256").update(projectId).digest("hex");
   const name = `bb-steel-${hash.slice(0, 24)}`;
   // Explicit host selection is essential when the requesting thread is on a different machine.
@@ -72,10 +78,10 @@ export async function provisionProjectInstance(projectId: string, dependencies: 
     if (actual !== expected) throw new Error("Existing project viewer differs from BB Connect; refusing rebinding.");
     binding = { apiUrl: `http://127.0.0.1:${apiPort}`, cdpUrl: `http://127.0.0.1:${cdpPort}`, viewerUrl: actual };
     const configuredDns = instance.HostConfig.Dns ?? [];
-    if (!DNS_SERVERS.every(server => configuredDns.includes(server)) || configuredDns.length !== DNS_SERVERS.length) {
+    if (!dns.every(server => configuredDns.includes(server)) || configuredDns.length !== dns.length) {
       // Recreate only the validated project-owned container; the named profile volume survives.
       await command("docker", ["rm", "-f", name]);
-      await command("docker", dockerRunArgs(name, projectId, apiPort, cdpPort, domain));
+      await command("docker", dockerRunArgs(name, projectId, apiPort, cdpPort, domain, dns));
     } else if (!instance.State.Running) await command("docker", ["start", name]);
   } else {
     const used = new Set<number>();
@@ -106,16 +112,16 @@ export async function provisionProjectInstance(projectId: string, dependencies: 
     const origin = await expose(String(apiPort));
     binding = { apiUrl: `http://127.0.0.1:${apiPort}`, cdpUrl: `http://127.0.0.1:${apiPort + 1}`, viewerUrl: origin };
     // Docker owns the final port reservation. A race fails closed; never remove or replace a profile.
-    await command("docker", dockerRunArgs(name, projectId, apiPort, apiPort + 1, new URL(origin).host));
+    await command("docker", dockerRunArgs(name, projectId, apiPort, apiPort + 1, new URL(origin).host, dns));
   }
   await (dependencies.ready ?? waitForBrowser)(binding);
   return binding;
 }
 
-function dockerRunArgs(name: string, projectId: string, apiPort: number, cdpPort: number, domain: string): string[] {
+function dockerRunArgs(name: string, projectId: string, apiPort: number | string, cdpPort: number | string, domain: string, dns: readonly string[]): string[] {
   return ["run", "-d", "--init", "--restart", "unless-stopped", "--shm-size", "1g",
     "--name", name, "--label", `bb.steel.project=${projectId}`,
-    "--dns", DNS_SERVERS[0], "--dns", DNS_SERVERS[1],
+    ...dns.flatMap(server => ["--dns", server]),
     "-p", `127.0.0.1:${apiPort}:3000`, "-p", `127.0.0.1:${cdpPort}:9223`,
     "-e", `DOMAIN=${domain}`, "-e", "USE_SSL=true",
     "-e", "CHROME_USER_DATA_DIR=/profiles/chrome", "-v", `${name}-profile:/profiles`, IMAGE];

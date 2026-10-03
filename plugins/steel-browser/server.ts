@@ -58,6 +58,12 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
       description: "Model identifier for the text helper. Live Jev runs require potentially billable external API calls.",
       default: "inception/mercury-2.5",
     },
+    dnsServers: {
+      type: "string",
+      label: "Steel container DNS servers",
+      description: "Comma-separated IPv4 resolvers used for new or repaired project containers. Changes apply on the next provision or repair.",
+      default: "1.1.1.1,8.8.8.8",
+    },
   });
 
   async function resolve(input: Scope) {
@@ -78,7 +84,9 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
 
   async function ensureBinding(projectId: string) {
     return projects.ensure(projectId, async id => {
-      const binding = await provisionProjectInstance(id);
+      const config = await settings.get();
+      const dns = String(config.dnsServers || "1.1.1.1,8.8.8.8").split(",").map(value => value.trim()).filter(Boolean);
+      const binding = await provisionProjectInstance(id, { dns });
       await verifyProjectInstance(id, binding);
       return binding;
     });
