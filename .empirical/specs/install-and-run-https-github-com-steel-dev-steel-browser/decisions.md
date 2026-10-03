@@ -132,3 +132,16 @@ local install/reload, CLI smoke checks, and browser UI verification.
   show unavailable instead of indefinite connection and endpoint loading.
 - Regression fixture now mounts the full context-free page, not settings alone.
   Test execution remains pending under the iterative policy.
+
+# D-008 Automatic Project Setup And In-Thread Browsing
+
+- Supersedes D-003's manual-only setup: the project and run CLI commands now
+  ensure a dedicated project container and immutable binding on demand.
+- Overview/settings reads stay read-only. Setup is serialized; existing
+  containers are checked before reuse, and collisions fail without deletion.
+- Select the server host explicitly for Connect even for remote-thread calls.
+  Never expose CDP or reuse a port already shared through Connect.
+- Supersedes D-006's external sign-in fallback: agents and viewer controls stay
+  in-thread. Report iframe authentication restrictions without opening Safari.
+- New-session instructions advertise the CLI and automatic binding, while
+  preserving explicit authorization for paid calls and project isolation.

@@ -30,6 +30,36 @@ test("engine preferences do not leak between projects", async () => {
   assert.deepEqual(await projects.policy("b"), { engine: "playwright", fallback: false });
   assert.deepEqual(await projects.policy("a"), { engine: "auto", fallback: true });
 });
+
+test("automatic setup serializes projects, coalesces duplicates, and reuses bindings", async () => {
+  const projects = store();
+  const calls: string[] = [];
+  let active = 0;
+  const provision = async (id: string) => {
+    calls.push(id);
+    assert.equal(++active, 1);
+    await new Promise(resolve => setTimeout(resolve, 5));
+    active--;
+    return id === "a" ? binding : { apiUrl: "http://127.0.0.1:3202", cdpUrl: "http://127.0.0.1:9302", viewerUrl: "https://b.test" };
+  };
+  const [a, repeated, b] = await Promise.all([
+    projects.ensure("a", provision), projects.ensure("a", provision), projects.ensure("b", provision),
+  ]);
+  assert.deepEqual(a, repeated);
+  assert.notEqual(a.apiUrl, b.apiUrl);
+  assert.deepEqual(calls, ["a", "b"]);
+  assert.deepEqual(await projects.ensure("a", provision), a);
+  assert.equal(calls.length, 2);
+});
+
+test("failed provisioning persists nothing and a later request can retry", async () => {
+  const projects = store();
+  await assert.rejects(projects.ensure("a", async () => { throw new Error("Docker offline"); }), /Docker offline/);
+  assert.equal(await projects.binding("a"), null);
+  assert.deepEqual(await projects.ensure("a", async () => binding), binding);
+  await assert.rejects(projects.ensure("b", async () => binding), /another project/);
+  assert.equal(await projects.binding("b"), null);
+});
 test("fallback is opt-in and only selects an engine during preflight", async () => {
   const calls: string[] = [];
   const preflight = async (engine: string) => { calls.push(engine); if (engine === "jev") throw new Error("no key"); };

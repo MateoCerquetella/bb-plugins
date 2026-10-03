@@ -11,8 +11,10 @@ Steel is accessible through the terminal CLI even when no browser-specific
 tool appears in the agent's tool list. Before claiming it is unavailable, run
 `bb steel-browser project` in the current thread and inspect the result.
 Use the returned project binding, never a remembered endpoint from another
-thread. A missing binding means provisioning is required, not that BB lacks
-browser support. Do not silently provision or substitute another browser.
+thread. The command automatically provisions and binds a missing project
+browser on the Steel server host. Wait for setup, then continue the requested
+navigation; do not stop at "no binding" or substitute another browser.
+If Docker, BB Connect, or startup fails, report the actual command error.
 
 ## Show the live browser in the current thread
 
@@ -45,7 +47,8 @@ each step in the thread.
 First run `bb steel-browser project` in the current thread. It resolves the
 project from BB, returning its dedicated API/CDP/viewer endpoints and engine
 policy. Never use the old global ports 3100/9223 as a fallback. A missing
-binding requires provisioning using the README's project setup commands.
+binding is automatically provisioned by this command with dedicated ports and
+a persistent project profile. Repeated calls reuse the same binding.
 Never copy cookies from another project's profile.
 
 The inline engine select and fallback checkbox persist per project. CLI:

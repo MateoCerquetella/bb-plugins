@@ -7,6 +7,14 @@ including when no dedicated browser tool appears in their tool list.
 Existing live sessions retain their original instructions until BB constructs
 a new provider session. This is agent guidance, not an OS-level browser lock.
 
+`bb steel-browser project` and `bb steel-browser run` automatically provision
+and bind a missing project browser on the plugin server host. They reuse a
+matching container after interrupted setup, wait for Chromium, and verify its
+project label, profile volume, and loopback ports before saving the binding.
+Setup is serialized within the plugin; Docker reserves the container name and
+ports across processes. A conflicting container fails without replacement.
+Docker and an enrolled BB Connect host matching the server's hostname are required.
+
 Browser navigation stays in the current BB thread with no external viewer
 links. Website logins happen inside the remote browser. BB Connect
 authentication is separate: GitHub OAuth may refuse iframe embedding.
@@ -56,11 +64,12 @@ authorized Jev preflight; values are not returned through the plugin API.
 
 Thread operations resolve BB's project identity server-side. Every project
 requires its own Steel container and named Chromium volume. Missing bindings
-fail closed, and existing bindings cannot be silently overwritten or reused by
+are created on demand by the CLI, and existing bindings cannot be silently overwritten or reused by
 another project. Legacy global endpoint settings remain for compatibility but
 are no longer used by the viewer or CLI. Existing global cookies are not copied.
 
-From a thread belonging to the intended project:
+From a thread belonging to the intended project, run `bb steel-browser project`
+for automatic setup. The following manual commands are for recovery only:
 
 ```sh
 bb steel-browser project
@@ -71,7 +80,7 @@ bb steel-browser bind <loopback-api-url> <loopback-cdp-url> <returned-https-orig
 
 Use exact values returned by these commands. Binding verifies the running
 container's project label, profile volume, ports and viewer domain. Provisioning
-is explicit, not automatic when a thread opens. Ports stay on loopback and the
+is triggered by CLI browser work, not by opening an overview or thread. Ports stay on loopback and the
 viewer uses authenticated BB Connect. Cookie/profile volumes are sensitive host
 data: never commit or export them through chat. Volume deletion loses logins.
 Persistent cookies survive restart after Chromium flushes them to its profile.

@@ -14,7 +14,23 @@ function localEndpoint(value: string): string {
 
 export class ProjectBrowsers {
   private writing = false;
+  private provisioning: Promise<unknown> = Promise.resolve();
   constructor(private readonly kv: PluginKvStorage) {}
+
+  async ensure(projectId: string, provision: (projectId: string) => Promise<Binding>): Promise<Binding> {
+    const existing = await this.binding(projectId);
+    if (existing) return existing;
+    // Serialize setup and persistence across projects; recheck after waiting.
+    const task = this.provisioning.then(async () => {
+      const current = await this.binding(projectId);
+      if (current) return current;
+      const binding = await provision(projectId);
+      await this.bind(projectId, binding);
+      return binding;
+    });
+    this.provisioning = task.catch(() => {});
+    return task;
+  }
 
   async policy(projectId: string): Promise<EnginePolicy> {
     const value = await this.kv.get(`policy:${projectId}`);

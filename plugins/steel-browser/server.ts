@@ -3,7 +3,7 @@ import { rpcContract, scopeSchema, type CreateOptions, type Scope, type EnginePo
 import { normalizeBaseUrl, SteelClient, SteelClientError } from "./steel-client.ts";
 import { ProjectBrowsers } from "./projects.ts";
 import { runBrowser } from "./engines.ts";
-import { verifyProjectInstance } from "./provisioning.ts";
+import { provisionProjectInstance, verifyProjectInstance } from "./provisioning.ts";
 
 const DEFAULT_ENDPOINT = "http://127.0.0.1:3100";
 const DEFAULT_OPTIONS: CreateOptions = {
@@ -21,7 +21,7 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
     "Steel Browser is installed in this BB environment and is available through the terminal CLI, even without a browser-specific tool in your tool list.",
     "For any browser task (including AWS Console, website sign-in, screenshots, scraping, or navigation between web apps), read the steel-browser skill and first run `bb steel-browser project` in the current thread.",
     "Never claim Steel is unavailable merely because no dedicated browser tool is exposed. Check the CLI result and report the exact binding or connection error.",
-    "When the project is bound, use `bb steel-browser run <url>` or Playwright attached to the returned project CDP endpoint. Do not launch a separate browser or use another project's binding or cookies. If unbound, report that provisioning is needed; do not silently provision or use global endpoints.",
+    "The `bb steel-browser project` command automatically provisions and binds a dedicated Steel browser if missing. Run it and continue, instead of stopping at 'no binding'. Use `bb steel-browser run <url>` or Playwright attached to the returned project CDP endpoint. Do not launch a separate browser or use another project's binding or cookies.",
     "Before visible browser work, emit ::steel-browser{} on its own line in this thread. Keep navigation in that same Steel session so the user can watch. Never open Safari, local Chrome, an external window, or an external viewer link.",
     "Let the user enter website credentials and MFA directly into the embedded browser, never chat. If viewer authentication is blocked, report it without an external-browser fallback.",
     "Do not use --allow-paid without explicit permission. Inspect and verify results; an agent-handoff response is not task completion.",
@@ -73,6 +73,14 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
   async function client(scope: Scope): Promise<SteelClient> {
     const { projectId } = await resolve(scope);
     return new SteelClient((await projects.require(projectId)).apiUrl);
+  }
+
+  async function ensureBinding(projectId: string) {
+    return projects.ensure(projectId, async id => {
+      const binding = await provisionProjectInstance(id);
+      await verifyProjectInstance(id, binding);
+      return binding;
+    });
   }
 
   let mutating = false;
@@ -155,7 +163,7 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
       { name: "sessions", summary: "List active Steel sessions", usage: "bb steel-browser sessions" },
       { name: "create", summary: "Create a browser session", usage: "bb steel-browser create" },
       { name: "release", summary: "Release one exact browser session", usage: "bb steel-browser release <session-id>" },
-      { name: "project", summary: "Show this project's browser and engine policy", usage: "bb steel-browser project" },
+      { name: "project", summary: "Ensure this project's isolated browser and show its engine policy", usage: "bb steel-browser project" },
       { name: "bind", summary: "Assign a dedicated browser to this project", usage: "bb steel-browser bind <api-url> <cdp-url> <viewer-origin>" },
       { name: "engine", summary: "Set project engine and fallback policy", usage: "bb steel-browser engine <playwright|jev|auto> <fallback-on|fallback-off>" },
       { name: "run", summary: "Execute or hand off a project browser task", usage: "bb steel-browser run <url> [goal] [--allow-paid]" },
@@ -171,7 +179,7 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
             return { exitCode: 1, stderr: usage };
           }
           const { projectId } = await resolve(scope);
-          const binding = await projects.require(projectId);
+          const binding = await ensureBinding(projectId);
           const policy = await projects.policy(projectId);
           const config = await settings.get();
           const result = await mutate(() => runBrowser(binding, policy, config, {
@@ -180,6 +188,8 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
           return { exitCode: 0, stdout: JSON.stringify(result, null, 2) };
         }
         if (command === "project" && args.length === 0) {
+          const { projectId } = await resolve(scope);
+          await ensureBinding(projectId);
           return { exitCode: 0, stdout: JSON.stringify(await handlers.project(scope), null, 2) };
         }
         if (command === "bind" && args.length === 3) {

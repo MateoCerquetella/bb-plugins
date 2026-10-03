@@ -19,6 +19,8 @@ test("contributes Steel discovery instructions to new agent sessions", async () 
   assert.match(server, /Never claim Steel is unavailable/u);
   assert.match(server, /emit ::steel-browser\{\}/u);
   assert.match(server, /Do not launch a separate browser/u);
+  assert.match(server, /automatically provisions and binds/u);
+  assert.match(server, /await ensureBinding\(projectId\)/u);
 });
 
 test("ships the required operational and responsive UI states", async () => {
