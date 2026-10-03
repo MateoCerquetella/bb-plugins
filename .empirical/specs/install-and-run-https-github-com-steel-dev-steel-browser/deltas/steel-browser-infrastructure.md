@@ -12,12 +12,13 @@ Each BB project SHALL have a dedicated Steel endpoint and persistent Chromium
 volume. Thread operations SHALL resolve project identity from BB records.
 
 #### Scenario: Missing project binding
-- WHEN CLI project or run is requested and the thread's project has no dedicated browser
+- WHEN CLI project/run or the selected project's operational dashboard/session action
+  is requested and the project has no dedicated browser
 - THEN the plugin provisions and verifies its isolated container and profile,
   obtains an authenticated viewer origin, and saves the immutable binding
 - AND repeated or concurrent calls reuse the project instance
 - AND failures report the actual setup problem without using the global viewer
-- AND overview and settings reads do not provision browsers
+- AND the all-projects overview and settings reads do not provision browsers
 
 #### Scenario: Independent cookies
 - WHEN two projects visit the same site and store distinct cookies

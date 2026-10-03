@@ -57,8 +57,10 @@ Steel CDP session when the user supplies its external model credentials.
 
 - [ ] [AC-10] Two BB projects resolve to different Steel instances and persistent
   profiles; reopening a project retains its own cookies without exposing another
-  project's viewer or storage. CLI project/run requests automatically provision
-  missing bindings, verify ownership and readiness, and reuse the result.
+  project's viewer or storage. CLI project/run requests and selected-project
+  operational dashboard/session actions automatically provision missing bindings,
+  verify ownership and readiness, and reuse the result. The all-projects overview
+  and settings reads remain non-provisioning.
   Provisioning failures never fall back to another project's browser.
 - [ ] [AC-11] [UI] Inline viewer width is bounded at 560px; engine selection and
   fallback preference persist per project and show unavailable engines honestly.

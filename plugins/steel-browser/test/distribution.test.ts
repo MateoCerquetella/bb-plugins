@@ -21,6 +21,11 @@ test("contributes Steel discovery instructions to new agent sessions", async () 
   assert.match(server, /Do not launch a separate browser/u);
   assert.match(server, /automatically provisions and binds/u);
   assert.match(server, /await ensureBinding\(projectId\)/u);
+  assert.match(server, /const binding = await ensureBinding\(projectId\);/u);
+  assert.match(server, /client\(scope, true\)/u);
+  const allProjects = server.slice(server.indexOf("async allProjects()"), server.indexOf("async project(scope"));
+  assert.match(allProjects, /projects\.binding\(project\.id\)/u);
+  assert.doesNotMatch(allProjects, /ensureBinding/u);
 });
 
 test("ships the required operational and responsive UI states", async () => {

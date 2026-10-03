@@ -468,7 +468,7 @@ function ScopedSteelBrowserPage({ scope, picker }: { scope: Scope; picker: React
           </button>
           <button
             className="steel-primary"
-            disabled={!connected || busy !== null || !!activeSession}
+            disabled={busy !== null || !!activeSession}
             onClick={() => void createSession()}
             type="button"
           >
@@ -518,8 +518,8 @@ function ScopedSteelBrowserPage({ scope, picker }: { scope: Scope; picker: React
           ) : (
             <div className="steel-viewer-empty">
               <Monitor aria-hidden="true" />
-              <strong>{activeSession ? "Browser ready" : "No active browser"}</strong>
-              <button className="steel-primary" disabled={!connected || busy !== null}
+              <strong>{busy === "refresh" && !dashboard ? "Preparing project browser..." : activeSession ? "Browser ready" : "No active browser"}</strong>
+              <button className="steel-primary" disabled={busy !== null}
                 onClick={() => activeSession ? setWatching(true) : void createSession().then(() => setWatching(true))}
                 type="button">
                 <Play aria-hidden="true" />{activeSession ? "Watch browser" : "Start browser"}
@@ -552,8 +552,8 @@ function ScopedSteelBrowserPage({ scope, picker }: { scope: Scope; picker: React
         {sessions.length === 0 ? (
           <div className="steel-empty">
             <PanelsTopLeft aria-hidden="true" />
-            <strong>{connected ? "No active sessions" : "Steel is not connected"}</strong>
-            <span>{connected ? "Start a browser when an agent needs one." : "Check the service and endpoint setting."}</span>
+            <strong>{busy === "refresh" && !dashboard ? "Preparing project browser..." : connected ? "No active sessions" : "Steel is not connected"}</strong>
+            <span>{busy === "refresh" && !dashboard ? "Connecting..." : connected ? "Start a browser when an agent needs one." : "Retry with Start browser or Refresh."}</span>
           </div>
         ) : viewMode === "grid" ? (
           <div className="steel-browser-grid">

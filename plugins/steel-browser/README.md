@@ -7,10 +7,12 @@ including when no dedicated browser tool appears in their tool list.
 Existing live sessions retain their original instructions until BB constructs
 a new provider session. This is agent guidance, not an OS-level browser lock.
 
-`bb steel-browser project` and `bb steel-browser run` automatically provision
-and bind a missing project browser on the plugin server host. They reuse a
-matching container after interrupted setup, wait for Chromium, and verify its
-project label, profile volume, and loopback ports before saving the binding.
+`bb steel-browser project`, `bb steel-browser run`, and the selected project's
+operational dashboard/session actions automatically provision and bind a missing
+project browser on the plugin server host. The all-projects overview remains
+read-only. Setup reuses a matching container after interrupted setup, waits for
+Chromium, and verifies its project label, profile volume, and loopback ports
+before saving the binding.
 Setup is serialized within the plugin; Docker reserves the container name and
 ports across processes. A conflicting container fails without replacement.
 Docker and an enrolled BB Connect host matching the server's hostname are required.

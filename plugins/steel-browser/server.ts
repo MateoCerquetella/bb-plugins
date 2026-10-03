@@ -70,9 +70,10 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
     return { projectId, projectName: project.name };
   }
 
-  async function client(scope: Scope): Promise<SteelClient> {
+  async function client(scope: Scope, ensure = false): Promise<SteelClient> {
     const { projectId } = await resolve(scope);
-    return new SteelClient((await projects.require(projectId)).apiUrl);
+    const binding = ensure ? await ensureBinding(projectId) : await projects.require(projectId);
+    return new SteelClient(binding.apiUrl);
   }
 
   async function ensureBinding(projectId: string) {
@@ -123,7 +124,7 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
     async dashboard(scope: Scope) {
       try {
         const { projectId } = await resolve(scope);
-        const binding = await projects.require(projectId);
+        const binding = await ensureBinding(projectId);
         const result = await new SteelClient(binding.apiUrl).dashboard();
         const base = normalizeBaseUrl(binding.viewerUrl).toString();
         result.uiUrl = new URL("ui", base).toString();
@@ -135,7 +136,7 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
       }
     },
     async createSession({ scope, options }: { scope: Scope; options: CreateOptions }) {
-      return mutate(async () => (await client(scope)).createSession(options));
+      return mutate(async () => (await client(scope, true)).createSession(options));
     },
     async releaseSession({ scope, sessionId }: { scope: Scope; sessionId: string }) {
       return mutate(async () => (await client(scope)).releaseSession(sessionId));
