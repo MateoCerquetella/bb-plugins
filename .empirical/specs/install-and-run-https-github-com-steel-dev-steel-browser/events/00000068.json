@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "sequence": 68,
+  "previousDigest": "sha256:b569f3084335d3802a85d3bf72b0bc078eddd2d127040193e1c930d4eb723edf",
+  "actor": "codex",
+  "type": "transition",
+  "summary": "Checkpoint: continue with 60 more minutes",
+  "createdAt": "2026-10-02T19:45:47.590Z",
+  "stateBeforeDigest": "sha256:b8b1ab25b2bb32e7809e4b4013114d8bdc22974c1df942de424cdb3390448837",
+  "stateAfterDigest": "sha256:a1ae332452212e0b3923f40a837c656d79e981e70a3e4277337bc001af9c49cc",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 68,
+    "activeFeature": "install-and-run-https-github-com-steel-dev-steel-browser",
+    "request": "Install and run https://github.com/steel-dev/steel-browser on the dyaus host for use from this BB environment, then create a new independently installable BB plugin in this repository that integrates Steel as the replacement browser infrastructure for the prior KERNEL.SH-based workflow. Keep the root orchestration-only conventions, align manifest/package/CLI/UI/docs/tests, avoid committing generated artifacts, and verify the Steel service plus the plugin's human UI and CLI surface.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Make installed Steel Browser the mandatory browser path for agents in this BB environment. Update the bundled skill so agents must use project-scoped Steel instead of Safari, Chrome, external browser windows, or KERNEL.SH whenever Steel is installed and bound; they must emit the native ::steel-browser{} directive in the current thread when browser visibility is requested. Remove external/new-tab viewer navigation from the Steel thread and inline surfaces so browser viewing and authentication remain inside the current BB thread. Preserve safe project isolation, paid-call authorization, and normal external website navigation inside Steel itself. Build, reinstall/reload, and verify the current thread surface does not offer external viewer navigation.",
+    "implementationActor": "codex",
+    "workStartedAt": null,
+    "specDigest": "sha256:aeaac90fb3141226d8c291b5bb1dcaedae49d348cd2d0618f65518e6a021b867",
+    "approvedSpecRevision": 39,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:980c37eda4ce98ee2200bc089477b13288442ea04c3a849d33248609dbfc6e83",
+    "impactDigest": "sha256:12589f53cfe5df3acd8d844396ff6eac97966c4679bd63007e9b6c8b888d7a7b",
+    "capabilityClaimId": "install-and-run-https-github-com-steel-dev-steel-browser-a8ef2053ff39",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-02T19:45:47.590Z",
+    "lifecycle": {
+      "stage": "iteration",
+      "iteration": 14,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "contractRevision": 35,
+      "riskRequest": "Fix the Steel Browser Tools settings panel so it never sends undefined projectId values over RPC. When no BB project context is available, render a clear project-unavailable state instead of calling project RPC, while keeping Jev host configuration visible. Add focused coverage, rebuild, reload, and update the existing draft PR.",
+      "contractBaseline": 46,
+      "amendments": [
+        45
+      ]
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 15,
+      "capabilities": 1,
+      "reason": "This is a narrow correction to the existing Steel Browser Tools surface and must ship with the same plugin capability; splitting would leave the known settings error unresolved.",
+      "actor": "codex",
+      "revision": 39
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "install-and-run-https-github-com-steel-dev-steel-browser-a8ef2053ff39",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "install-and-run-https-github-com-steel-dev-steel-browser",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_cj9zf3k5m4-1/bb-plugins",
+      "worktreeId": "sha256:fe30a202fa07d32cabf7c31f25dde37e3d9687d7450ba2d5cd220a37a360bd56",
+      "baseCommit": "9614dd51fc203d740614aba4de44f31cda50ec04",
+      "baseTree": "41b659cfcdc3046ebe70fbe0fc4e4b9502d04e38",
+      "bases": {
+        "steel-browser-infrastructure": {
+          "capability": "steel-browser-infrastructure",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "project browser isolation": null,
+            "project engine policy": null,
+            "durable local service": null,
+            "browser session lifecycle": null,
+            "operational app": null,
+            "agent and plugin distribution": null,
+            "optional jev-ultrafast agent adapter": null,
+            "tools project policy configuration": null
+          }
+        }
+      },
+      "capabilities": [
+        "steel-browser-infrastructure"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-01T16:17:45.656Z",
+      "heartbeatAt": "2026-10-01T20:58:38.682Z",
+      "digest": "sha256:4985eb2e97ebab2d49b4dae59c3505a4e45f689035e19f21adf6a5332b2c478c"
+    },
+    "trackerGeneration": 14,
+    "budgetExtensionMinutes": 397,
+    "reviewFirst": true
+  },
+  "digest": "sha256:7509358a94cf6f8d824cd8292fcea20a5d2c731d97784e7a81cc8895f9fd2942"
+}

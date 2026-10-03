@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "sequence": 10,
+  "previousDigest": "sha256:fdf0dbfab610ae9c6bac7edc917cf7bbb53f68b293e2c0219f4dbc1e2a81a2f0",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Reconciled repository overview with Steel's single-instance boundary; context refresh reports no stale, missing, or refinement-required paths. Plugin is installed; focused six tests, types and build pass, and live CLI create/release plus external-page CDP smoke succeeded. Broader verification remains pending.",
+  "createdAt": "2026-10-01T16:51:57.545Z",
+  "stateBeforeDigest": "sha256:8a624ec55a3f4b41ddb3ac90567468273477f7cc34d786c1593dc26d4c71b4ec",
+  "stateAfterDigest": "sha256:0bb98a3c064f9e045f78dab3b2a56e0e88d854d71f49f71916ebd3f8dbfe0e20",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 10,
+    "activeFeature": "install-and-run-https-github-com-steel-dev-steel-browser",
+    "request": "Install and run https://github.com/steel-dev/steel-browser on the dyaus host for use from this BB environment, then create a new independently installable BB plugin in this repository that integrates Steel as the replacement browser infrastructure for the prior KERNEL.SH-based workflow. Keep the root orchestration-only conventions, align manifest/package/CLI/UI/docs/tests, avoid committing generated artifacts, and verify the Steel service plus the plugin's human UI and CLI surface.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "review",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Reconciled repository overview with Steel's single-instance boundary; context refresh reports no stale, missing, or refinement-required paths. Plugin is installed; focused six tests, types and build pass, and live CLI create/release plus external-page CDP smoke succeeded. Broader verification remains pending.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:169559cd1bd2db265f3912c55c0523835d8355b4d8e05fca885591c36c86e1d8",
+    "approvedSpecRevision": 5,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:c891e5b0336b7535d02815ac6739527ec765ffe77e03e8fed5ecb29770ef34aa",
+    "impactDigest": "sha256:12589f53cfe5df3acd8d844396ff6eac97966c4679bd63007e9b6c8b888d7a7b",
+    "capabilityClaimId": "install-and-run-https-github-com-steel-dev-steel-browser-a8ef2053ff39",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-01T16:51:57.545Z",
+    "lifecycle": {
+      "stage": "consolidation",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "contractBaseline": 8
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 9,
+      "capabilities": 1,
+      "reason": "The service, plugin server/app/CLI, and verification form one independently shippable capability. Splitting would leave the replacement browser workflow unusable until the slices were recombined, while the contract already bounds the surface to one endpoint and four operations.",
+      "actor": "root",
+      "revision": 3
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "install-and-run-https-github-com-steel-dev-steel-browser-a8ef2053ff39",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "install-and-run-https-github-com-steel-dev-steel-browser",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_cj9zf3k5m4-1/bb-plugins",
+      "worktreeId": "sha256:fe30a202fa07d32cabf7c31f25dde37e3d9687d7450ba2d5cd220a37a360bd56",
+      "baseCommit": "9614dd51fc203d740614aba4de44f31cda50ec04",
+      "baseTree": "41b659cfcdc3046ebe70fbe0fc4e4b9502d04e38",
+      "bases": {
+        "steel-browser-infrastructure": {
+          "capability": "steel-browser-infrastructure",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "durable local service": null,
+            "browser session lifecycle": null,
+            "operational app": null,
+            "agent and plugin distribution": null
+          }
+        }
+      },
+      "capabilities": [
+        "steel-browser-infrastructure"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-01T16:17:45.656Z",
+      "heartbeatAt": "2026-10-01T16:17:45.656Z",
+      "digest": "sha256:af06b9d8821d3126666af5d93a34a1c75de97afeb9612ae07821629a83307d3c"
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:383ede3ec25f868d649866cc212d602b549549536753529ebd82421a2e801665"
+}

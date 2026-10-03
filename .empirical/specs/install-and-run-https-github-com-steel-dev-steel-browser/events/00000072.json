@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "sequence": 72,
+  "previousDigest": "sha256:02727bd94b9b40460f919eebd6e2e7d69c8a888807e2801dcc3ee15ccd872df1",
+  "actor": "codex",
+  "type": "transition",
+  "summary": "Iterate: Fix the Steel Browser UI regression immediately: selecting an unbound project such as Bandely on the operational page must automatically provision and bind its isolated Steel instance before loading the dashboard, and New session must also ensure the binding. The All Projects overview remains read-only and must not provision every project. Show a truthful provisioning/loading state instead of 'Endpoint unavailable' and the obsolete manual-provisioning error. Rebuild, reload, verify the real Bandely project can start a browser from the UI, commit, and push.",
+  "createdAt": "2026-10-03T01:07:36.510Z",
+  "stateBeforeDigest": "sha256:e55578995e78447cd0397eb492e5fb606a162fe32f12bebc2f6881b5ba705e2d",
+  "stateAfterDigest": "sha256:2ddf6ff2f6d0bbc16a3b673040fdc5531ea85b87b62969678a69dc0519355de9",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 72,
+    "activeFeature": "install-and-run-https-github-com-steel-dev-steel-browser",
+    "request": "Install and run https://github.com/steel-dev/steel-browser on the dyaus host for use from this BB environment, then create a new independently installable BB plugin in this repository that integrates Steel as the replacement browser infrastructure for the prior KERNEL.SH-based workflow. Keep the root orchestration-only conventions, align manifest/package/CLI/UI/docs/tests, avoid committing generated artifacts, and verify the Steel service plus the plugin's human UI and CLI surface.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Fix the Steel Browser UI regression immediately: selecting an unbound project such as Bandely on the operational page must automatically provision and bind its isolated Steel instance before loading the dashboard, and New session must also ensure the binding. The All Projects overview remains read-only and must not provision every project. Show a truthful provisioning/loading state instead of 'Endpoint unavailable' and the obsolete manual-provisioning error. Rebuild, reload, verify the real Bandely project can start a browser from the UI, commit, and push.",
+    "implementationActor": "codex",
+    "workStartedAt": null,
+    "specDigest": "sha256:d7ebed9ed58df77c0342babb593a7d7bf3717e2e6f0de565c1db628852641f47",
+    "approvedSpecRevision": 39,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:1a4dc16b3f7c1f4930ca86abd390ee5659550197115ed9f33b07e1e6545a6e64",
+    "impactDigest": "sha256:12589f53cfe5df3acd8d844396ff6eac97966c4679bd63007e9b6c8b888d7a7b",
+    "capabilityClaimId": "install-and-run-https-github-com-steel-dev-steel-browser-a8ef2053ff39",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-03T01:07:36.510Z",
+    "lifecycle": {
+      "riskRequest": "Fix the Steel Browser Tools settings panel so it never sends undefined projectId values over RPC. When no BB project context is available, render a clear project-unavailable state instead of calling project RPC, while keeping Jev host configuration visible. Add focused coverage, rebuild, reload, and update the existing draft PR.",
+      "stage": "iteration",
+      "iteration": 17,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "contractRevision": 35,
+      "contractBaseline": 71,
+      "amendments": [
+        45,
+        70
+      ]
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 15,
+      "capabilities": 1,
+      "reason": "This is a narrow correction to the existing Steel Browser Tools surface and must ship with the same plugin capability; splitting would leave the known settings error unresolved.",
+      "actor": "codex",
+      "revision": 39
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "install-and-run-https-github-com-steel-dev-steel-browser-a8ef2053ff39",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "install-and-run-https-github-com-steel-dev-steel-browser",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_cj9zf3k5m4-1/bb-plugins",
+      "worktreeId": "sha256:fe30a202fa07d32cabf7c31f25dde37e3d9687d7450ba2d5cd220a37a360bd56",
+      "baseCommit": "9614dd51fc203d740614aba4de44f31cda50ec04",
+      "baseTree": "41b659cfcdc3046ebe70fbe0fc4e4b9502d04e38",
+      "bases": {
+        "steel-browser-infrastructure": {
+          "capability": "steel-browser-infrastructure",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "project browser isolation": null,
+            "project engine policy": null,
+            "durable local service": null,
+            "browser session lifecycle": null,
+            "operational app": null,
+            "agent and plugin distribution": null,
+            "optional jev-ultrafast agent adapter": null,
+            "tools project policy configuration": null
+          }
+        }
+      },
+      "capabilities": [
+        "steel-browser-infrastructure"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-01T16:17:45.656Z",
+      "heartbeatAt": "2026-10-01T20:58:38.682Z",
+      "digest": "sha256:4985eb2e97ebab2d49b4dae59c3505a4e45f689035e19f21adf6a5332b2c478c"
+    },
+    "trackerGeneration": 17,
+    "budgetExtensionMinutes": 397,
+    "reviewFirst": true
+  },
+  "digest": "sha256:d81b5deabf6e8d27d05d892bf7de8215145f8e3cb1723f675ca6a78315ab32ff"
+}

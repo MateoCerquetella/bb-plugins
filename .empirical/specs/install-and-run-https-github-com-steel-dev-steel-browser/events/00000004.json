@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "sequence": 4,
+  "previousDigest": "sha256:1e33743fab72e2c732561676e56794fec7683a51a97552b9b26c6d369c677396",
+  "actor": "root",
+  "type": "transition",
+  "summary": "Size: keep as one (The service, plugin server/app/CLI, and verification form one independently shippable capability. Splitting would leave the replacement browser workflow unusable until the slices were recombined, while the contract already bounds the surface to one endpoint and four operations.)",
+  "createdAt": "2026-10-01T16:15:18.091Z",
+  "stateBeforeDigest": "sha256:7b7c86a29ed3a1f270ab6d1aa10a6afb374fdec52cdab38fe3d55798e391c194",
+  "stateAfterDigest": "sha256:81851f9d742dbfff68abed9fdcaef614c988626f01c6638a8191b93b3e47020e",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 4,
+    "activeFeature": "install-and-run-https-github-com-steel-dev-steel-browser",
+    "request": "Install and run https://github.com/steel-dev/steel-browser on the dyaus host for use from this BB environment, then create a new independently installable BB plugin in this repository that integrates Steel as the replacement browser infrastructure for the prior KERNEL.SH-based workflow. Keep the root orchestration-only conventions, align manifest/package/CLI/UI/docs/tests, avoid committing generated artifacts, and verify the Steel service plus the plugin's human UI and CLI surface.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": null,
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:169559cd1bd2db265f3912c55c0523835d8355b4d8e05fca885591c36c86e1d8",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": null,
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-01T16:15:18.091Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true
+    },
+    "reviewFirst": true,
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 9,
+      "capabilities": 1,
+      "reason": "The service, plugin server/app/CLI, and verification form one independently shippable capability. Splitting would leave the replacement browser workflow unusable until the slices were recombined, while the contract already bounds the surface to one endpoint and four operations.",
+      "actor": "root",
+      "revision": 3
+    }
+  },
+  "digest": "sha256:b0a45264748f50733d520e888412c2f6de837037aa413a991ba5bc7e7c78acc6"
+}

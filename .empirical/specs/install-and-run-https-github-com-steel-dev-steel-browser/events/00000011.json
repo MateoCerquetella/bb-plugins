@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "sequence": 11,
+  "previousDigest": "sha256:383ede3ec25f868d649866cc212d602b549549536753529ebd82421a2e801665",
+  "actor": "codex",
+  "type": "transition",
+  "summary": "Revise contract: Keep Steel hosted on the connected dyaus machine as the primary host; do not move or duplicate it to another machine. Extend the existing Steel browser plugin scope to evaluate and, where supported, integrate browser-use/jev-ultrafast as an optional browser-agent layer over the existing Steel CDP endpoint. Preserve the existing Steel service and plugin behavior, keep credentials out of repository state, and document any unsupported direct integration as an explicit limitation.",
+  "createdAt": "2026-10-01T16:57:48.749Z",
+  "stateBeforeDigest": "sha256:0bb98a3c064f9e045f78dab3b2a56e0e88d854d71f49f71916ebd3f8dbfe0e20",
+  "stateAfterDigest": "sha256:92182cc393769a6803e821adf4864e01b484a070e6195078b00c9051af27cc8c",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 11,
+    "activeFeature": "install-and-run-https-github-com-steel-dev-steel-browser",
+    "request": "Install and run https://github.com/steel-dev/steel-browser on the dyaus host for use from this BB environment, then create a new independently installable BB plugin in this repository that integrates Steel as the replacement browser infrastructure for the prior KERNEL.SH-based workflow. Keep the root orchestration-only conventions, align manifest/package/CLI/UI/docs/tests, avoid committing generated artifacts, and verify the Steel service plus the plugin's human UI and CLI surface.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Keep Steel hosted on the connected dyaus machine as the primary host; do not move or duplicate it to another machine. Extend the existing Steel browser plugin scope to evaluate and, where supported, integrate browser-use/jev-ultrafast as an optional browser-agent layer over the existing Steel CDP endpoint. Preserve the existing Steel service and plugin behavior, keep credentials out of repository state, and document any unsupported direct integration as an explicit limitation.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:169559cd1bd2db265f3912c55c0523835d8355b4d8e05fca885591c36c86e1d8",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": "install-and-run-https-github-com-steel-dev-steel-browser-a8ef2053ff39",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-01T16:57:48.749Z",
+    "lifecycle": {
+      "riskRequest": "Keep Steel hosted on the connected dyaus machine as the primary host; do not move or duplicate it to another machine. Extend the existing Steel browser plugin scope to evaluate and, where supported, integrate browser-use/jev-ultrafast as an optional browser-agent layer over the existing Steel CDP endpoint. Preserve the existing Steel service and plugin behavior, keep credentials out of repository state, and document any unsupported direct integration as an explicit limitation.",
+      "stage": "development",
+      "iteration": 1,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "contractRevision": 10
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 9,
+      "capabilities": 1,
+      "reason": "The service, plugin server/app/CLI, and verification form one independently shippable capability. Splitting would leave the replacement browser workflow unusable until the slices were recombined, while the contract already bounds the surface to one endpoint and four operations.",
+      "actor": "root",
+      "revision": 3
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "install-and-run-https-github-com-steel-dev-steel-browser-a8ef2053ff39",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "install-and-run-https-github-com-steel-dev-steel-browser",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_cj9zf3k5m4-1/bb-plugins",
+      "worktreeId": "sha256:fe30a202fa07d32cabf7c31f25dde37e3d9687d7450ba2d5cd220a37a360bd56",
+      "baseCommit": "9614dd51fc203d740614aba4de44f31cda50ec04",
+      "baseTree": "41b659cfcdc3046ebe70fbe0fc4e4b9502d04e38",
+      "bases": {
+        "steel-browser-infrastructure": {
+          "capability": "steel-browser-infrastructure",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "durable local service": null,
+            "browser session lifecycle": null,
+            "operational app": null,
+            "agent and plugin distribution": null
+          }
+        }
+      },
+      "capabilities": [
+        "steel-browser-infrastructure"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-01T16:17:45.656Z",
+      "heartbeatAt": "2026-10-01T16:17:45.656Z",
+      "digest": "sha256:af06b9d8821d3126666af5d93a34a1c75de97afeb9612ae07821629a83307d3c"
+    },
+    "reviewFirst": true,
+    "trackerGeneration": 1
+  },
+  "digest": "sha256:6138694e47f782c305c551bc1a8d414ec0f0201ac3f012d47135d3c6758b92dc"
+}

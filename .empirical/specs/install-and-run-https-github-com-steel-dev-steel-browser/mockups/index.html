@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Steel Browser - proposed BB panel</title>
+  <style>
+    * { box-sizing: border-box; letter-spacing: 0; }
+    :root { font-family: system-ui, sans-serif; color: #ececef; background: #18191c; font-size: 14px; }
+    body { margin: 0; }
+    main { max-width: 1100px; margin: auto; padding: 24px; }
+    header, .toolbar, .identity, .actions, .status { display: flex; align-items: center; gap: 12px; }
+    header { justify-content: space-between; padding-bottom: 20px; border-bottom: 1px solid #36373d; flex-wrap: wrap; }
+    h1 { font-size: 23px; line-height: 1.2; margin: 0; font-weight: 620; }
+    h2 { font-size: 16px; font-weight: 600; margin: 0; }
+    p { margin: 6px 0 0; }
+    .muted { color: #a4a5af; }
+    .brand { width: 36px; height: 36px; color: #eddb63; display: grid; place-items: center; border: 1px solid #747044; border-radius: 6px; }
+    button, a { font: inherit; }
+    button { cursor: pointer; background: #292a30; color: inherit; border: 1px solid #464750; border-radius: 5px; padding: 8px 11px; display: inline-flex; justify-content: center; align-items: center; gap: 7px; min-height: 34px; }
+    button:hover { background: #363740; }
+    button.primary { background: #eddb63; border-color: #eddb63; color: #23231e; font-weight: 600; }
+    button.icon { width: 34px; padding: 7px; flex-shrink: 0; }
+    svg { width: 17px; height: 17px; flex-shrink: 0; }
+    .brand svg { width: 24px; height: 24px; }
+    .status { padding: 18px 0; gap: 8px; flex-wrap: wrap; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: #7aca9e; }
+    .healthy { color: #91dab0; }
+    .endpoint { color: #b6b7c3; font-family: ui-monospace, monospace; font-size: 12px; overflow-wrap: anywhere; }
+    .divider { color: #60616c; padding: 0 4px; }
+    .toolbar { justify-content: space-between; padding: 16px 0 12px; border-top: 1px solid #36373d; flex-wrap: wrap; }
+    .count { color: #a4a5af; font-weight: 400; margin-left: 5px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; min-width: 520px; }
+    th { color: #a4a5af; font-size: 11px; text-transform: uppercase; font-weight: 500; padding: 10px 12px; border-block: 1px solid #36373d; background: #212226; }
+    td { padding: 15px 12px; border-bottom: 1px solid #36373d; }
+    td:last-child { text-align: right; }
+    .session { font-family: ui-monospace, monospace; font-size: 12px; }
+    .badge { color: #91dab0; font-size: 12px; }
+    .connection { padding: 20px 0; }
+    .connection code { display: block; margin: 10px 0 0; padding: 11px 0; color: #c4c5d0; overflow-wrap: anywhere; font-size: 12px; }
+    .links { display: flex; gap: 16px; margin-top: 14px; flex-wrap: wrap; }
+    .links button { background: none; border: 0; padding: 0; color: #bebed0; font-size: 12px; min-height: 30px; }
+    .empty { padding: 34px 0; text-align: center; color: #a4a5af; }
+    #notice { min-height: 24px; font-size: 12px; color: #eddb63; }
+    @media (max-width: 560px) {
+      main { padding: 16px; }
+      h1 { font-size: 20px; }
+      .status .endpoint { flex-basis: 100%; margin-top: 4px; }
+      .status .divider { display: none; }
+      .toolbar { align-items: center; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="identity">
+      <div class="brand"><i data-lucide="panels-top-left"></i></div>
+      <div><h1>Steel Browser</h1><p class="muted">dyaus</p></div>
+    </div>
+    <div class="actions">
+      <button class="icon" title="Refresh" aria-label="Refresh" onclick="notify('Refreshed just now')"><i data-lucide="refresh-cw"></i></button>
+      <button class="primary" onclick="createSession()"><i data-lucide="plus"></i>New session</button>
+    </div>
+  </header>
+  <div class="status"><span class="dot"></span><span class="healthy">Connected</span><span class="divider">/</span><span class="endpoint">http://127.0.0.1:3100</span></div>
+  <div class="toolbar"><h2>Sessions <span class="count" id="count">1</span></h2><span class="muted" style="font-size:12px">Updated just now</span></div>
+  <div class="table-wrap">
+    <table><thead><tr><th>Session</th><th>Status</th><th>Started</th><th>Actions</th></tr></thead>
+      <tbody id="sessions"><tr id="initial"><td class="session">48d8bf10...2c3e</td><td class="badge">Live</td><td class="muted">Just now</td><td><button class="icon" title="Release session" aria-label="Release session" onclick="releaseSession('initial')"><i data-lucide="square"></i></button></td></tr></tbody>
+    </table>
+  </div>
+  <div class="connection">
+    <h2>Browser connection</h2>
+    <code>ws://127.0.0.1:3100</code>
+    <div class="links">
+      <button onclick="notify('The installed plugin will open the Steel session viewer through an authenticated BB-accessible route.')"><i data-lucide="external-link"></i>Session viewer</button>
+      <button onclick="notify('API documentation: /documentation on the local Steel service')"><i data-lucide="book-open"></i>API documentation</button>
+    </div>
+  </div>
+  <div id="notice" role="status"></div>
+</main>
+<script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+<script>
+  function icons() { if (window.lucide) lucide.createIcons(); }
+  function notify(text) { document.getElementById('notice').textContent = text; }
+  function updateCount() { document.getElementById('count').textContent = document.querySelectorAll('#sessions tr').length; icons(); }
+  function createSession() {
+    if (document.querySelectorAll('#sessions tr').length) { notify('For this single-browser deployment, release the current session before starting another.'); return; }
+    const row = document.createElement('tr');
+    row.id = 'new-session';
+    row.innerHTML = '<td class="session">79a3dc21...8f42</td><td class="badge">Live</td><td class="muted">Just now</td><td><button class="icon" title="Release session" aria-label="Release session" onclick="releaseSession(\'new-session\')"><i data-lucide="square"></i></button></td>';
+    document.getElementById('sessions').append(row);
+    notify('Session created');
+    updateCount();
+  }
+  function releaseSession(id) {
+    if (!confirm('Release this session? Its open pages and unsaved browser state will be closed.')) return;
+    document.getElementById(id).remove();
+    updateCount();
+    notify('Session released');
+  }
+  icons();
+</script>
+</body>
+</html>

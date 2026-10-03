@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "page": ".empirical/context/design-language.md",
+  "head": "9614dd51fc203d740614aba4de44f31cda50ec04",
+  "units": [
+    "plugins/steel-browser"
+  ],
+  "pending": {
+    "plugins/steel-browser/app.css": "git:a5e6f8c348e9665953d8879d78ca0812f848a0bf",
+    "plugins/steel-browser/app.tsx": "git:ebb7137c69ca38f1329f81c4824274d6404862bc"
+  }
+}
