@@ -7,6 +7,7 @@ import type { Binding } from "./contract.ts";
 
 const exec = promisify(execFile);
 const IMAGE = "ghcr.io/steel-dev/steel-browser@sha256:f5cd68fbc2cb27e5d7766269860fd0fb29cbe5fe506245a49c82f85ba210e7da";
+const DNS_SERVERS = ["1.1.1.1", "8.8.8.8"] as const;
 type Runner = (command: string, args: string[]) => Promise<string>;
 const run: Runner = async (command, args) => (await exec(command, args, {
   timeout: 120000, maxBuffer: 262144,
@@ -70,7 +71,12 @@ export async function provisionProjectInstance(projectId: string, dependencies: 
     const actual = await expose(apiPort);
     if (actual !== expected) throw new Error("Existing project viewer differs from BB Connect; refusing rebinding.");
     binding = { apiUrl: `http://127.0.0.1:${apiPort}`, cdpUrl: `http://127.0.0.1:${cdpPort}`, viewerUrl: actual };
-    if (!instance.State.Running) await command("docker", ["start", name]);
+    const configuredDns = instance.HostConfig.Dns ?? [];
+    if (!DNS_SERVERS.every(server => configuredDns.includes(server)) || configuredDns.length !== DNS_SERVERS.length) {
+      // Recreate only the validated project-owned container; the named profile volume survives.
+      await command("docker", ["rm", "-f", name]);
+      await command("docker", dockerRunArgs(name, projectId, apiPort, cdpPort, domain));
+    } else if (!instance.State.Running) await command("docker", ["start", name]);
   } else {
     const used = new Set<number>();
     const shares = JSON.parse(await command("bb", ["connect", "shares", "--host", host, "--json"]));
@@ -100,14 +106,19 @@ export async function provisionProjectInstance(projectId: string, dependencies: 
     const origin = await expose(String(apiPort));
     binding = { apiUrl: `http://127.0.0.1:${apiPort}`, cdpUrl: `http://127.0.0.1:${apiPort + 1}`, viewerUrl: origin };
     // Docker owns the final port reservation. A race fails closed; never remove or replace a profile.
-    await command("docker", ["run", "-d", "--init", "--restart", "unless-stopped", "--shm-size", "1g",
-      "--name", name, "--label", `bb.steel.project=${projectId}`,
-      "-p", `127.0.0.1:${apiPort}:3000`, "-p", `127.0.0.1:${apiPort + 1}:9223`,
-      "-e", `DOMAIN=${new URL(origin).host}`, "-e", "USE_SSL=true",
-      "-e", "CHROME_USER_DATA_DIR=/profiles/chrome", "-v", `${name}-profile:/profiles`, IMAGE]);
+    await command("docker", dockerRunArgs(name, projectId, apiPort, apiPort + 1, new URL(origin).host));
   }
   await (dependencies.ready ?? waitForBrowser)(binding);
   return binding;
+}
+
+function dockerRunArgs(name: string, projectId: string, apiPort: number, cdpPort: number, domain: string): string[] {
+  return ["run", "-d", "--init", "--restart", "unless-stopped", "--shm-size", "1g",
+    "--name", name, "--label", `bb.steel.project=${projectId}`,
+    "--dns", DNS_SERVERS[0], "--dns", DNS_SERVERS[1],
+    "-p", `127.0.0.1:${apiPort}:3000`, "-p", `127.0.0.1:${cdpPort}:9223`,
+    "-e", `DOMAIN=${domain}`, "-e", "USE_SSL=true",
+    "-e", "CHROME_USER_DATA_DIR=/profiles/chrome", "-v", `${name}-profile:/profiles`, IMAGE];
 }
 
 async function waitForBrowser(binding: Binding): Promise<void> {

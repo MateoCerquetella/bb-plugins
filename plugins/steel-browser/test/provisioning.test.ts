@@ -10,7 +10,7 @@ const image = "ghcr.io/steel-dev/steel-browser@sha256:f5cd68fbc2cb27e5d776626986
 const instance = () => ({
   Config: { Image: image, Labels: { "bb.steel.project": project },
     Env: ["DOMAIN=viewer.test", "USE_SSL=true", "CHROME_USER_DATA_DIR=/profiles/chrome"] },
-  HostConfig: { PortBindings: {
+  HostConfig: { Dns: ["1.1.1.1", "8.8.8.8"], PortBindings: {
     "3000/tcp": [{HostIp: "127.0.0.1", HostPort: "3200"}],
     "9223/tcp": [{HostIp: "127.0.0.1", HostPort: "9300"}],
   }},
@@ -41,6 +41,28 @@ test("new setup skips occupied/shared ports and exposes only API on the server h
   assert(docker.includes(`bb.steel.project=${project}`));
   assert(docker.includes(image));
   assert(ready);
+  assert.equal(docker[docker.indexOf("--dns") + 1], "1.1.1.1");
+  assert.equal(docker[docker.indexOf("--dns", docker.indexOf("--dns") + 1) + 1], "8.8.8.8");
+});
+
+test("existing project with inherited DNS is recreated with the same profile", async () => {
+  const existing = instance();
+  existing.HostConfig.Dns = ["192.168.88.1"];
+  const calls: string[][] = [];
+  await provisionProjectInstance(project, {
+    ready: async () => {},
+    run: async (cmd, args) => {
+      calls.push(args);
+      if (cmd === "bb") return "https://viewer.test";
+      if (args[0] === "ps") return name;
+      if (args[0] === "inspect") return JSON.stringify([existing]);
+      return "";
+    },
+  });
+  assert(calls.some(args => args[0] === "rm" && args[1] === "-f" && args[2] === name));
+  const run = calls.find(args => args[0] === "run")!;
+  assert(run.includes("--dns") && run.includes("1.1.1.1") && run.includes("8.8.8.8"));
+  assert(run.includes(`${name}-profile:/profiles`));
 });
 
 test("existing stopped project is validated and resumed without replacing its profile", async () => {

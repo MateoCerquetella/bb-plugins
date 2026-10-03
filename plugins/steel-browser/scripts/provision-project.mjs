@@ -19,6 +19,7 @@ if (existing) {
 }
 docker(["run", "-d", "--init", "--restart", "unless-stopped", "--shm-size", "1g",
   "--name", name, "--label", `bb.steel.project=${projectId}`,
+  "--dns", "1.1.1.1", "--dns", "8.8.8.8",
   "-p", `127.0.0.1:${apiPort}:3000`, "-p", `127.0.0.1:${cdpPort}:9223`,
   "-e", `DOMAIN=${viewer.host}`, "-e", "USE_SSL=true",
   "-e", "CHROME_USER_DATA_DIR=/profiles/chrome",
