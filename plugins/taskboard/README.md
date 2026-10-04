@@ -119,6 +119,10 @@ Choose Linear in **Manage**, then provide the project's Linear personal API key
 and required team key. Taskboard loads that team's queue rather than a broad
 user-wide assigned-issues feed.
 
+Completed and canceled issues are hidden by default. Set **Show finished
+issues** to a number of days (up to 365) to also load issues finished within
+that window; they appear in the collapsed finished groups.
+
 ### Jira
 
 Choose Jira, then provide the project's Atlassian Cloud URL, account email, API

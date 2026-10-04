@@ -86,7 +86,8 @@ import {
   CREATE_OUTCOME_UNCERTAIN_MARKER,
   FILTER_PRESET_NAME_MAX_LENGTH,
   type FilterPreset,
-  formatWorkItemHandoffPrompt
+  formatWorkItemHandoffPrompt,
+  LINEAR_FINISHED_DAYS_MAX
 } from './contract.js';
 import {
   defaultProjectBoardSettings,
@@ -5071,6 +5072,7 @@ function configFingerprint(config: ProjectConfigView): string {
   return JSON.stringify({
     source: config.source,
     linearTeamKey: config.linearTeamKey,
+    linearFinishedDays: config.linearFinishedDays,
     jiraBaseUrl: config.jiraBaseUrl,
     jiraEmail: config.jiraEmail,
     jiraJql: config.jiraJql,
@@ -5186,6 +5188,16 @@ function ProjectConfigForm({
         setError('Add a Linear team key for this project.');
         return;
       }
+      if (
+        !Number.isInteger(config.linearFinishedDays) ||
+        config.linearFinishedDays < 0 ||
+        config.linearFinishedDays > LINEAR_FINISHED_DAYS_MAX
+      ) {
+        setError(
+          `Show finished issues for 0 to ${LINEAR_FINISHED_DAYS_MAX} whole days.`
+        );
+        return;
+      }
       if (!linearWillBeConfigured && linearCredential.operation !== 'clear') {
         setError('Add a Linear API key for this project.');
         return;
@@ -5253,6 +5265,7 @@ function ProjectConfigForm({
         projectId: config.projectId,
         source: config.source,
         linearTeamKey: config.linearTeamKey.trim(),
+        linearFinishedDays: config.linearFinishedDays,
         jiraBaseUrl,
         jiraEmail: config.jiraEmail.trim(),
         jiraJql: config.jiraJql.trim(),
@@ -5452,6 +5465,33 @@ function ProjectConfigForm({
                 disabled={saving}
                 onChange={event => {
                   setConfig({ ...config, linearTeamKey: event.target.value });
+                  setSaved(false);
+                }}
+              />
+            </label>
+            <label className="space-y-1.5 text-xs font-medium">
+              Show finished issues{' '}
+              <span className="font-normal text-muted-foreground">
+                (days, 0 hides them)
+              </span>
+              <Input
+                type="number"
+                inputMode="numeric"
+                min={0}
+                max={LINEAR_FINISHED_DAYS_MAX}
+                step={1}
+                aria-label="Show Linear issues finished within days"
+                value={String(config.linearFinishedDays)}
+                className="tb-field tb-field-mono"
+                disabled={saving}
+                onChange={event => {
+                  setConfig({
+                    ...config,
+                    linearFinishedDays:
+                      event.target.value === ''
+                        ? 0
+                        : Number(event.target.value)
+                  });
                   setSaved(false);
                 }}
               />

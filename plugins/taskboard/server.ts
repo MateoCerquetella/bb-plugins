@@ -12,6 +12,7 @@ import {
   filterPresetStateSchema,
   filterPresetSummary,
   formatWorkItemContext,
+  LINEAR_FINISHED_DAYS_MAX,
   normalizePresetName,
   projectConfigMutationSchema,
   projectCredentialsInteractionResponseSchema,
@@ -81,6 +82,7 @@ const KEEP_SECRET = { operation: 'keep' } as const;
 const DEFAULT_PROJECT_CONFIG = {
   source: 'github',
   linearTeamKey: '',
+  linearFinishedDays: 0,
   jiraBaseUrl: '',
   jiraEmail: '',
   jiraJql:
@@ -165,6 +167,7 @@ interface ParsedCliArguments {
   source: string | undefined;
   query: string | undefined;
   linearTeam: string | undefined;
+  linearFinishedDays: number | undefined;
   jiraUrl: string | undefined;
   jiraEmail: string | undefined;
   jiraJql: string | undefined;
@@ -199,6 +202,7 @@ const CLI_OPTIONS_BY_COMMAND = new Map<string, ReadonlySet<string>>([
       '--project',
       '--source',
       '--linear-team',
+      '--linear-finished-days',
       '--jira-url',
       '--jira-email',
       '--jira-jql',
@@ -223,6 +227,7 @@ export function parseTaskboardCliArguments(
   let source: string | undefined;
   let query: string | undefined;
   let linearTeam: string | undefined;
+  let linearFinishedDays: number | undefined;
   let jiraUrl: string | undefined;
   let jiraEmail: string | undefined;
   let jiraJql: string | undefined;
@@ -276,6 +281,16 @@ export function parseTaskboardCliArguments(
     } else if (argument === '--linear-team') {
       linearTeam = valueAfter(argument, index);
       index += 1;
+    } else if (argument === '--linear-finished-days') {
+      const value = valueAfter(argument, index);
+      const days = /^\d+$/u.test(value) ? Number(value) : Number.NaN;
+      if (!(days <= LINEAR_FINISHED_DAYS_MAX)) {
+        throw new Error(
+          `--linear-finished-days requires whole days from 0 to ${LINEAR_FINISHED_DAYS_MAX}`
+        );
+      }
+      linearFinishedDays = days;
+      index += 1;
     } else if (argument === '--jira-url') {
       jiraUrl = valueAfter(argument, index);
       index += 1;
@@ -321,6 +336,7 @@ export function parseTaskboardCliArguments(
     source,
     query,
     linearTeam,
+    linearFinishedDays,
     jiraUrl,
     jiraEmail,
     jiraJql,
@@ -371,6 +387,7 @@ function formatProjectConfig(config: ProjectConfigView): string {
     `Source\t${sourceName(config.source)}`,
     `GitHub repos\t${config.githubRepos.join(', ') || 'none mapped'}`,
     `Linear team\t${config.linearTeamKey || 'not configured'}`,
+    `Linear finished issues\t${config.linearFinishedDays ? `last ${config.linearFinishedDays} days` : 'hidden'}`,
     `Linear credential\t${config.linearCredentialConfigured ? 'configured' : 'not configured'}`,
     `Jira URL\t${config.jiraBaseUrl || 'not configured'}`,
     `Jira email\t${config.jiraEmail || 'not configured'}`,
@@ -970,7 +987,8 @@ export default async function plugin(bb: BbPluginApi) {
           ? createLinearAdapter({
               enabled: true,
               apiKey: credential,
-              teamKey: config.linearTeamKey
+              teamKey: config.linearTeamKey,
+              finishedDays: config.linearFinishedDays
             })
           : config.source === 'jira'
             ? createJiraAdapter({
@@ -1189,6 +1207,7 @@ export default async function plugin(bb: BbPluginApi) {
     const changed = new Set<WorkSource>();
     if (
       previous.linearTeamKey !== next.linearTeamKey ||
+      previous.linearFinishedDays !== next.linearFinishedDays ||
       next.linearCredential.operation !== 'keep'
     ) {
       changed.add('linear');
@@ -1223,6 +1242,7 @@ export default async function plugin(bb: BbPluginApi) {
       left.projectId === right.projectId &&
       left.source === right.source &&
       left.linearTeamKey === right.linearTeamKey &&
+      left.linearFinishedDays === right.linearFinishedDays &&
       left.jiraBaseUrl === right.jiraBaseUrl &&
       left.jiraEmail === right.jiraEmail &&
       left.jiraJql === right.jiraJql
@@ -1297,6 +1317,7 @@ export default async function plugin(bb: BbPluginApi) {
           projectId: input.projectId,
           source: input.source,
           linearTeamKey: input.linearTeamKey,
+          linearFinishedDays: input.linearFinishedDays,
           jiraBaseUrl: input.jiraBaseUrl,
           jiraEmail: input.jiraEmail,
           jiraJql: input.jiraJql,
@@ -2255,6 +2276,7 @@ export default async function plugin(bb: BbPluginApi) {
           const changed =
             parsedSource !== null ||
             args.linearTeam !== undefined ||
+            args.linearFinishedDays !== undefined ||
             args.jiraUrl !== undefined ||
             args.jiraEmail !== undefined ||
             args.jiraJql !== undefined ||
@@ -2265,6 +2287,8 @@ export default async function plugin(bb: BbPluginApi) {
                   projectId: previous.projectId,
                   source: parsedSource?.data ?? previous.source,
                   linearTeamKey: args.linearTeam ?? previous.linearTeamKey,
+                  linearFinishedDays:
+                    args.linearFinishedDays ?? previous.linearFinishedDays,
                   jiraBaseUrl: args.jiraUrl ?? previous.jiraBaseUrl,
                   jiraEmail: args.jiraEmail ?? previous.jiraEmail,
                   jiraJql: args.jiraJql ?? previous.jiraJql,
@@ -2306,6 +2330,7 @@ export default async function plugin(bb: BbPluginApi) {
                 projectId: project.id,
                 projectName: project.name,
                 linearTeamKey: previous.linearTeamKey,
+                linearFinishedDays: previous.linearFinishedDays,
                 jiraBaseUrl: previous.jiraBaseUrl,
                 jiraEmail: previous.jiraEmail,
                 linearCredentialConfigured: previous.linearCredentialConfigured,
@@ -2331,6 +2356,7 @@ export default async function plugin(bb: BbPluginApi) {
               projectId: previous.projectId,
               source: previous.source,
               linearTeamKey: previous.linearTeamKey,
+              linearFinishedDays: previous.linearFinishedDays,
               jiraBaseUrl: previous.jiraBaseUrl,
               jiraEmail: previous.jiraEmail,
               jiraJql: previous.jiraJql,

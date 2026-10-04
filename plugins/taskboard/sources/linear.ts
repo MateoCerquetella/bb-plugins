@@ -45,6 +45,31 @@ const teamIssuesQuery = `
   }
 `;
 
+const teamIssuesWithRecentlyFinishedQuery = `
+  query TeamIssuesWithRecentlyFinished(
+    $teamKey: String!
+    $after: String
+    $finishedSince: DateTimeOrDuration!
+  ) {
+    issues(
+      first: 100
+      after: $after
+      orderBy: updatedAt
+      filter: {
+        team: { key: { eqIgnoreCase: $teamKey } }
+        or: [
+          { state: { type: { nin: ["completed", "canceled"] } } }
+          { completedAt: { gte: $finishedSince } }
+          { canceledAt: { gte: $finishedSince } }
+        ]
+      }
+    ) {
+      nodes { ${issueFields} }
+      pageInfo { hasNextPage endCursor }
+    }
+  }
+`;
+
 const issueQuery = `
   query TaskboardLinearIssue($id: String!) {
     issue(id: $id) {
@@ -270,8 +295,17 @@ export function createLinearAdapter(options: {
   enabled: boolean;
   apiKey: string | undefined;
   teamKey: string;
+  finishedDays: number;
 }): WorkSourceAdapter {
   const teamKey = options.teamKey.trim();
+  const listQuery =
+    options.finishedDays > 0
+      ? teamIssuesWithRecentlyFinishedQuery
+      : teamIssuesQuery;
+  const listVariables =
+    options.finishedDays > 0
+      ? { teamKey, finishedSince: `-P${options.finishedDays}D` }
+      : { teamKey };
   const apiKey = options.apiKey?.trim() ?? '';
   const hasApiKey = Boolean(apiKey);
   const configured = options.enabled && hasApiKey && Boolean(teamKey);
@@ -460,8 +494,8 @@ export function createLinearAdapter(options: {
       const seenCursors = new Set<string>();
       let after: string | undefined;
       for (;;) {
-        const data = await requestLinear(apiKey, teamIssuesQuery, {
-          teamKey,
+        const data = await requestLinear(apiKey, listQuery, {
+          ...listVariables,
           ...(after ? { after } : {})
         });
         const connection = z

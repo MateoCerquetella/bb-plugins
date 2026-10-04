@@ -80,7 +80,8 @@ test('Linear maps native metadata and sends it in IssueCreateInput', async () =>
   const adapter = createLinearAdapter({
     enabled: true,
     apiKey: 'linear-token',
-    teamKey: 'ENG'
+    teamKey: 'ENG',
+    finishedDays: 0
   });
 
   await withMockFetch(
@@ -193,7 +194,8 @@ test('Linear paginates create options independently and preserves the native def
   const adapter = createLinearAdapter({
     enabled: true,
     apiKey: 'linear-token',
-    teamKey: 'ENG'
+    teamKey: 'ENG',
+    finishedDays: 0
   });
 
   await withMockFetch(
@@ -361,7 +363,8 @@ test('Linear rejects invalid creation metadata cursors', async () => {
   const adapter = createLinearAdapter({
     enabled: true,
     apiKey: 'linear-token',
-    teamKey: 'ENG'
+    teamKey: 'ENG',
+    finishedDays: 0
   });
   await assert.rejects(
     () =>
@@ -402,7 +405,8 @@ test('Linear keeps explicit create rejection retryable without the uncertain mar
   const adapter = createLinearAdapter({
     enabled: true,
     apiKey: 'linear-token',
-    teamKey: 'ENG'
+    teamKey: 'ENG',
+    finishedDays: 0
   });
 
   await withMockFetch(
@@ -490,7 +494,8 @@ test('Linear marks malformed or lost post-dispatch create responses uncertain', 
   const adapter = createLinearAdapter({
     enabled: true,
     apiKey: 'linear-token',
-    teamKey: 'ENG'
+    teamKey: 'ENG',
+    finishedDays: 0
   });
 
   await withMockFetch(
