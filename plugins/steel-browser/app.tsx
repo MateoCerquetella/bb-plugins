@@ -159,7 +159,7 @@ export function SteelBrowserDirective(props: PluginMessageDirectiveProps) {
 }
 
 function ScopedSteelBrowser({ message }: PluginMessageDirectiveProps) {
-  const { anchor, style } = useFollowViewer(message.threadId);
+  const { anchor, style, anchorStyle } = useFollowViewer(message.threadId);
   const scope = useScope(message.threadId);
   const shouldPoll = useCallback(() => {
     const viewers = document.querySelectorAll(`[data-steel-thread="${CSS.escape(message.threadId)}"]`);
@@ -174,7 +174,7 @@ function ScopedSteelBrowser({ message }: PluginMessageDirectiveProps) {
   const active = dashboard?.sessions.some(session => ["idle", "live"].includes(session.status));
 
   return (
-    <div ref={anchor} className="steel-inline-anchor" data-steel-thread={message.threadId}>
+    <div ref={anchor} style={anchorStyle} className="steel-inline-anchor" data-steel-thread={message.threadId}>
     <section style={style}
       className={`steel-inline-browser${minimized ? " steel-inline-browser--minimized" : ""}${style ? " steel-inline-browser--following" : ""}`}
       aria-label="Steel browser in this thread"

@@ -52,7 +52,6 @@
 .steel-panel-state { display: grid; place-items: center; align-content: center; gap: 10px; min-height: 0; flex: 1; padding: 20px; color: var(--muted-foreground, #a4a5af); text-align: center; }
 .steel-panel-state svg { width: 28px; height: 28px; }
 .steel-inline-anchor { width: min(100%, 560px); min-height: 56px; }
-.steel-inline-anchor:has(.steel-inline-browser--following) { aspect-ratio: 1 / 1; }
 .steel-inline-browser {
   box-sizing: border-box;
   width: min(100%, 560px);

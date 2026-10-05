@@ -4,10 +4,13 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 export function useFollowViewer(threadId: string) {
   const anchor = useRef<HTMLDivElement>(null);
   const [style, setStyle] = useState<CSSProperties>();
+  const [anchorStyle, setAnchorStyle] = useState<CSSProperties>();
   useEffect(() => {
     const element = anchor.current;
     if (!element) return;
     let frame = 0;
+    let following = false;
+    let placeholderHeight = 0;
     let scrollport: HTMLElement | null = element.parentElement;
     while (scrollport && !/(auto|scroll)/.test(getComputedStyle(scrollport).overflowY)) {
       scrollport = scrollport.parentElement;
@@ -23,7 +26,10 @@ export function useFollowViewer(threadId: string) {
       const left = Math.max(8, bounds?.left ?? 0, Math.min(rect.left, right - rect.width));
       const siblings = Array.from(document.querySelectorAll<HTMLElement>("[data-steel-thread]"))
         .filter(item => item.dataset.steelThread === threadId);
-      const follow = siblings.at(-1) === element && rect.top < top - 56 && rect.width > 0 && bottom - top > 160;
+      const eligible = siblings.at(-1) === element && rect.width > 0 && bottom - top > 160;
+      const follow = eligible && (following ? rect.top < top + 56 : rect.top < top - 56);
+      if (follow && !following) placeholderHeight = rect.height;
+      following = follow;
       const next: CSSProperties | undefined = follow ? {
         position: "fixed", top, left,
         width: Math.min(560, rect.width, right - left),
@@ -31,6 +37,8 @@ export function useFollowViewer(threadId: string) {
         zIndex: 20,
       } : undefined;
       setStyle(previous => JSON.stringify(previous) === JSON.stringify(next) ? previous : next);
+      const nextAnchorStyle = follow ? { height: placeholderHeight } : undefined;
+      setAnchorStyle(previous => JSON.stringify(previous) === JSON.stringify(nextAnchorStyle) ? previous : nextAnchorStyle);
     };
     const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
     window.addEventListener("scroll", schedule, true);
