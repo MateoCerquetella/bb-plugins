@@ -58,5 +58,5 @@ export function useFollowViewer(threadId: string) {
       window.visualViewport?.removeEventListener("scroll", schedule);
     };
   }, [threadId]);
-  return { anchor, style };
+  return { anchor, style, anchorStyle };
 }
