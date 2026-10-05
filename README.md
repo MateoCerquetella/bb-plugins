@@ -28,7 +28,6 @@ All plugins in this repository are independently installable.
 | <img src="./plugins/dockside/assets/icon.svg" width="128" height="128" alt="" /> | [Dockside](./plugins/dockside) | [Git release](#dockside-quick-start) | Replaces BB's thread list with a compact project-first sidebar, semantic status colors, filters, safe multi-select deletion, and child-agent families. |
 | <img src="./plugins/host-monitor/assets/icon.svg" width="128" height="128" alt="" /> | [Host Monitor](./plugins/host-monitor) | [Git release](#host-monitor-quick-start) | Monitors CPU, RAM, disk, network, host details, and guarded process actions across every machine enrolled in BB. Requires BB 0.40+. |
 | <img src="./plugins/steel-browser/assets/icon.svg" width="128" height="128" alt="" /> | [Steel Browser](./plugins/steel-browser) | [Local install](#steel-browser-quick-start) | Operates self-hosted Steel browser sessions from BB with health, session lifecycle, CLI, and agent guidance. Requires BB 0.40+. |
-| <img src="./plugins/save-my-model/assets/icon.svg" width="128" height="128" alt="" /> | [Save My Model](./plugins/save-my-model) | [Git release](#save-my-model-quick-start) | Stores provider by BB host and model/reasoning separately for each host and provider. |
 | <img src="./plugins/taskboard/assets/icon.svg" width="128" height="128" alt="" /> | [Taskboard](./plugins/taskboard) | [Git release](#taskboard-quick-start) | Brings each BB project's GitHub, GitLab, Linear, or Jira tasks into one focused List or Kanban board. |
 | <img src="./plugins/aura/assets/icon.svg" width="128" height="128" alt="" /> | [Aura](./plugins/aura) | [Git release](./plugins/aura#install) | Adds custom PNG/JPG backgrounds and softly faded pixel textures to conversations and New thread, with six saved slots and a live preview. |
 | <img src="./plugins/touchbar/assets/icon.svg" width="128" height="128" alt="" /> | [Touch Bar Agent Monitor](./plugins/touchbar) | [Git release](#touch-bar-agent-monitor-quick-start) | Adds a native persistent Control Strip badge and fullscreen BB agent panel to Touch Bar Macs. Requires BB 0.40+. |
@@ -151,33 +150,6 @@ bb steel-browser release <session-id>
 The plugin also ships agent guidance for choosing the local Steel service over
 KERNEL.SH. See the [Steel Browser README](./plugins/steel-browser) for service,
 configuration, and development details.
-
-## Save My Model quick start
-
-Install the latest immutable Save My Model release directly from this monorepo:
-
-```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.2 --subdirectory plugins/save-my-model --tag-prefix save-my-model/
-```
-
-After [the BB Community entry](https://github.com/get-bb/marketplace/pull/154)
-is merged and live, install it by its short name:
-
-```sh
-bb plugin install save-my-model
-```
-
-Save My Model keeps provider defaults separate for each host and keeps model
-and reasoning separate for each host and provider. Open **Settings → Save My Model** to inspect or clear saved
-values. See the [Save My Model README](./plugins/save-my-model) for details.
-
-Update or remove it with BB:
-
-```sh
-bb plugin outdated
-bb plugin update save-my-model
-bb plugin remove save-my-model
-```
 
 ## Taskboard quick start
 
