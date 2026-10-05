@@ -107,11 +107,14 @@ export const gitlabProjectRefSchema = z
   });
 export type GitLabProjectRef = z.infer<typeof gitlabProjectRefSchema>;
 
+export const LINEAR_FINISHED_DAYS_MAX = 365;
+
 export const projectSourceConfigSchema = z
   .object({
     projectId: bbProjectIdSchema,
     source: workSourceSchema,
     linearTeamKey: z.string().trim(),
+    linearFinishedDays: z.number().int().min(0).max(LINEAR_FINISHED_DAYS_MAX),
     jiraBaseUrl: jiraBaseUrlSchema,
     jiraEmail: z.string().trim(),
     jiraJql: z.string().trim().min(1),

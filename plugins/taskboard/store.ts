@@ -56,6 +56,7 @@ interface ProjectConfigRow {
   bb_project_id: string;
   source: string;
   linear_team_key: string;
+  linear_finished_days: number;
   jira_base_url: string;
   jira_email: string;
   jira_jql: string;
@@ -124,6 +125,7 @@ function configFromRow(row: ProjectConfigRow): ProjectSourceConfig {
     projectId: row.bb_project_id,
     source: row.source,
     linearTeamKey: row.linear_team_key,
+    linearFinishedDays: row.linear_finished_days,
     jiraBaseUrl: row.jira_base_url,
     jiraEmail: row.jira_email,
     jiraJql: row.jira_jql,
@@ -500,6 +502,10 @@ export function createWorkItemStore(bb: BbPluginApi) {
     `
       CREATE INDEX idx_all_project_work_items_updated
         ON work_items_by_project(updated_at DESC, bb_project_id, source, locator);
+    `,
+    `
+      ALTER TABLE project_source_config
+        ADD COLUMN linear_finished_days INTEGER NOT NULL DEFAULT 0;
     `
   ]);
 
@@ -590,6 +596,7 @@ export function createWorkItemStore(bb: BbPluginApi) {
       bb_project_id,
       source,
       linear_team_key,
+      linear_finished_days,
       jira_base_url,
       jira_email,
       jira_jql,
@@ -807,19 +814,30 @@ export function createWorkItemStore(bb: BbPluginApi) {
     ): ProjectSourceConfig {
       const config = defaultConfig(projectId, defaults);
       db.prepare<
-        [string, WorkSource, string, string, string, string, string, string]
+        [
+          string,
+          WorkSource,
+          string,
+          number,
+          string,
+          string,
+          string,
+          string,
+          string
+        ]
       >(
         `
         INSERT INTO project_source_config (
-          bb_project_id, source, linear_team_key, jira_base_url, jira_email,
-          jira_jql, gitlab_project_ref, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          bb_project_id, source, linear_team_key, linear_finished_days,
+          jira_base_url, jira_email, jira_jql, gitlab_project_ref, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(bb_project_id) DO NOTHING
       `
       ).run(
         config.projectId,
         config.source,
         config.linearTeamKey,
+        config.linearFinishedDays,
         config.jiraBaseUrl,
         config.jiraEmail,
         config.jiraJql,
@@ -833,16 +851,27 @@ export function createWorkItemStore(bb: BbPluginApi) {
       return db.transaction(() => {
         const previous = readProjectConfig.get(config.projectId);
         db.prepare<
-          [string, WorkSource, string, string, string, string, string, string]
+          [
+            string,
+            WorkSource,
+            string,
+            number,
+            string,
+            string,
+            string,
+            string,
+            string
+          ]
         >(
           `
           INSERT INTO project_source_config (
-            bb_project_id, source, linear_team_key, jira_base_url, jira_email,
-            jira_jql, gitlab_project_ref, updated_at
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            bb_project_id, source, linear_team_key, linear_finished_days,
+            jira_base_url, jira_email, jira_jql, gitlab_project_ref, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
           ON CONFLICT(bb_project_id) DO UPDATE SET
             source = excluded.source,
             linear_team_key = excluded.linear_team_key,
+            linear_finished_days = excluded.linear_finished_days,
             jira_base_url = excluded.jira_base_url,
             jira_email = excluded.jira_email,
             jira_jql = excluded.jira_jql,
@@ -853,6 +882,7 @@ export function createWorkItemStore(bb: BbPluginApi) {
           config.projectId,
           config.source,
           config.linearTeamKey,
+          config.linearFinishedDays,
           config.jiraBaseUrl,
           config.jiraEmail,
           config.jiraJql,
