@@ -79,9 +79,11 @@ Do not replay actions after an uncertain execution error, cancellation or timeou
    The CDP loopback belongs to the Steel host and may be unreachable from this
    thread's machine. If so, use routed `bb steel-browser inspect`,
    `click <role> <exact-name>`, `fill <role> <exact-name> <value>`,
-   `press <key>`, and `screenshot`. These act on the same project page
-   server-side. `screenshot` returns JSON with a base64 PNG; redirect and decode
-   it locally for inspection. Do not put credentials or MFA in CLI arguments.
+   `press <key>`, and `screenshot`. These default to the newest open tab.
+   Use `bb steel-browser tabs` to list open tabs and append `--tab <index>`
+   to a routed action to target an earlier tab. `screenshot` returns JSON with
+   a base64 PNG; redirect and decode it locally for inspection. Do not put
+   credentials or MFA in CLI arguments.
 4. Release the exact session with `bb steel-browser release <session-id>` when
    the work is complete.
 

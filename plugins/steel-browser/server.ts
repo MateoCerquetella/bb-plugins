@@ -6,7 +6,6 @@ import { runBrowser } from "./engines.ts";
 import { bindingReady, provisionProjectInstance, verifyProjectInstance } from "./provisioning.ts";
 import { actOnProject, parseBrowserAction } from "./actions.ts";
 
-const DEFAULT_ENDPOINT = "http://127.0.0.1:3100";
 const DEFAULT_OPTIONS: CreateOptions = {
   blockAds: true,
   width: 1440,
@@ -26,22 +25,10 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
     "Before visible browser work, emit ::steel-browser{} on its own line in this thread. Keep navigation in that same Steel session so the user can watch. Never open Safari, local Chrome, an external window, or an external viewer link.",
     "Let the user enter website credentials and MFA directly into the embedded browser, never chat. If viewer authentication is blocked, report it without an external-browser fallback.",
     "Do not use --allow-paid without explicit permission. Inspect and verify results; an agent-handoff response is not task completion.",
-    "If the project CDP loopback is on another host, use bb steel-browser inspect/click/fill/press/screenshot. These routed commands act on the same project page; do not enter credentials in CLI arguments.",
+    "If the project CDP loopback is on another host, use bb steel-browser tabs/inspect/click/fill/press/screenshot. Routed actions default to the newest tab; use --tab <index> to target an older one. Do not enter credentials in CLI arguments.",
   ].join("\n"));
   const projects = new ProjectBrowsers(bb.storage.kv);
   const settings = bb.settings.define({
-    viewerBaseUrl: {
-      type: "string",
-      label: "Browser-accessible Steel URL",
-      description: "Optional authenticated BB Connect URL for UI and documentation links.",
-      default: "",
-    },
-    baseUrl: {
-      type: "string",
-      label: "Steel endpoint",
-      description: "HTTP(S) endpoint for the self-hosted Steel Browser API.",
-      default: DEFAULT_ENDPOINT,
-    },
     jevCheckout: {
       type: "string",
       label: "jev-ultrafast checkout",
@@ -164,6 +151,7 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
     "bb steel-browser bind <api-url> <cdp-url> <viewer-origin>",
     "bb steel-browser engine <playwright|jev|auto> <fallback-on|fallback-off>",
     "bb steel-browser run <url> [goal] [--allow-paid]",
+    "bb steel-browser tabs",
     "bb steel-browser inspect",
     "bb steel-browser click <role> <exact-name>",
     "bb steel-browser fill <role> <exact-name> <value>",
@@ -183,6 +171,7 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
       { name: "bind", summary: "Assign a dedicated browser to this project", usage: "bb steel-browser bind <api-url> <cdp-url> <viewer-origin>" },
       { name: "engine", summary: "Set project engine and fallback policy", usage: "bb steel-browser engine <playwright|jev|auto> <fallback-on|fallback-off>" },
       { name: "run", summary: "Execute or hand off a project browser task", usage: "bb steel-browser run <url> [goal] [--allow-paid]" },
+      { name: "tabs", summary: "List open project tabs by index", usage: "bb steel-browser tabs" },
       { name: "inspect", summary: "Read the current page's accessibility tree", usage: "bb steel-browser inspect" },
       { name: "click", summary: "Click one exactly named accessible element", usage: "bb steel-browser click <role> <exact-name>" },
       { name: "fill", summary: "Fill one exactly named accessible field", usage: "bb steel-browser fill <role> <exact-name> <value>" },
@@ -208,7 +197,7 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
           }, context.signal));
           return { exitCode: 0, stdout: JSON.stringify(result, null, 2) };
         }
-        if (["inspect", "click", "fill", "press", "screenshot"].includes(command)) {
+        if (["tabs", "inspect", "click", "fill", "press", "screenshot"].includes(command)) {
           const action = parseBrowserAction(command, args);
           const { projectId } = await resolve(scope);
           const binding = await ensureBinding(projectId);

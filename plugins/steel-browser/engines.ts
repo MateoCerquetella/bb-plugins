@@ -7,6 +7,7 @@ import { isAbsolute, join } from "node:path";
 import { createRequire } from "node:module";
 import { parseEnv, promisify } from "node:util";
 import type { EnginePolicy, Binding } from "./contract.ts";
+import { projectPages } from "./actions.ts";
 
 const exec = promisify(execFile);
 // Playwright loads driver assets relative to its package, so keep it external.
@@ -133,7 +134,7 @@ export async function runBrowser(
     signal?.throwIfAborted();
     const context = browser.contexts()[0];
     if (!context) throw new Error("Project browser has no persistent context.");
-    const page = context.pages()[0] ?? await context.newPage();
+    const page = projectPages(context).at(-1) ?? await context.newPage();
     await page.goto(url.toString(), { waitUntil: "domcontentloaded", timeout: 30000 });
     signal?.throwIfAborted();
     if (selected.engine === "playwright") {

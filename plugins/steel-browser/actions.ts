@@ -1,5 +1,5 @@
 import { createRequire } from "node:module";
-import type { Page } from "playwright";
+import type { BrowserContext, Page } from "playwright";
 import type { Binding } from "./contract.ts";
 
 const loadPlaywright = () =>
@@ -16,27 +16,52 @@ const roles = new Set([
   "option",
 ]);
 
-export type BrowserAction =
+export type BrowserAction = (
+  | { kind: "tabs" }
   | { kind: "inspect" }
   | { kind: "click"; role: string; name: string }
   | { kind: "fill"; role: string; name: string; value: string }
   | { kind: "press"; key: string }
-  | { kind: "screenshot" };
+  | { kind: "screenshot" }
+) & { tab?: number };
+
+export function projectPages(context: BrowserContext): Page[] {
+  return context.pages().filter(page => !page.isClosed());
+}
+
+export function selectProjectPage(context: BrowserContext, tab?: number): Page {
+  const pages = projectPages(context);
+  const page = tab === undefined ? pages.at(-1) : pages[tab];
+  if (!page) throw new Error(
+    pages.length
+      ? `Tab ${tab} is unavailable. Use \`bb steel-browser tabs\` to list open tabs.`
+      : "No active project browser page. Navigate with `bb steel-browser run <url>` first.",
+  );
+  return page;
+}
 
 export function parseBrowserAction(
   command: string,
   args: string[],
 ): BrowserAction {
-  if (command === "inspect" && args.length === 0) return { kind: "inspect" };
+  let tab: number | undefined;
+  if (args.length >= 2 && args.at(-2) === "--tab") {
+    const value = args.at(-1)!;
+    if (!/^(0|[1-9]\d{0,3})$/.test(value)) throw new Error("Invalid tab index. Use `bb steel-browser tabs`.");
+    tab = Number(value);
+    args = args.slice(0, -2);
+  }
+  if (command === "tabs" && args.length === 0 && tab === undefined) return { kind: "tabs" };
+  if (command === "inspect" && args.length === 0) return { kind: "inspect", tab };
   if (command === "screenshot" && args.length === 0)
-    return { kind: "screenshot" };
+    return { kind: "screenshot", tab };
   if (
     command === "press" &&
     args.length === 1 &&
     args[0] &&
     args[0].length <= 80
   ) {
-    return { kind: "press", key: args[0] };
+    return { kind: "press", key: args[0], tab };
   }
   if (
     (command === "click" || command === "fill") &&
@@ -52,16 +77,17 @@ export function parseBrowserAction(
       (value === undefined || value.length <= 8000)
     ) {
       return command === "click"
-        ? { kind: "click", role, name }
-        : { kind: "fill", role, name, value: value! };
+        ? { kind: "click", role, name, tab }
+        : { kind: "fill", role, name, value: value!, tab };
     }
   }
   throw new Error(
-    "Use inspect, click <role> <exact-name>, fill <role> <exact-name> <value>, press <key>, or screenshot.",
+    "Use tabs, inspect, click <role> <exact-name>, fill <role> <exact-name> <value>, press <key>, or screenshot. Actions accept --tab <index>.",
   );
 }
 
 export async function executeBrowserAction(page: Page, action: BrowserAction) {
+  if (action.kind === "tabs") throw new Error("List tabs with the project browser context.");
   if (action.kind === "inspect") {
     const snapshot = await page
       .locator("body")
@@ -121,11 +147,14 @@ export async function actOnProject(
   );
   try {
     signal?.throwIfAborted();
-    const page = browser.contexts()[0]?.pages()[0];
-    if (!page)
-      throw new Error(
-        "No active project browser page. Navigate with `bb steel-browser run <url>` first.",
-      );
+    const context = browser.contexts()[0];
+    if (!context) throw new Error("Project browser has no persistent context.");
+    if (action.kind === "tabs") {
+      return await Promise.all(projectPages(context).map(async (page, index) => ({
+        index, url: page.url(), title: await page.title(),
+      })));
+    }
+    const page = selectProjectPage(context, action.tab);
     const result = await executeBrowserAction(page, action);
     signal?.throwIfAborted();
     return result;
