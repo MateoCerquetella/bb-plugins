@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { test } from "node:test";
-import { bindingReady, provisionProjectInstance, viewerOrigin } from "../provisioning.ts";
+import { bindingReady, ensureViewerShare, provisionProjectInstance, viewerOrigin } from "../provisioning.ts";
 
 const project = "proj_fixture";
 const hash = createHash("sha256").update(project).digest("hex");
@@ -16,6 +16,72 @@ const instance = () => ({
   }},
   State: { Running: true },
   Mounts: [{Type: "volume", Name: `${name}-profile`, Destination: "/profiles"}],
+});
+
+const binding = { apiUrl: "http://127.0.0.1:3200", cdpUrl: "http://127.0.0.1:9300", viewerUrl: "https://viewer.test" };
+
+test("missing viewer share validates the container then exposes only API on the Steel host", async () => {
+  const calls: string[][] = [];
+  await ensureViewerShare(project, binding, {
+    host: "steel-host",
+    verify: async (id, saved) => {
+      assert.equal(id, project);
+      assert.deepEqual(saved, binding);
+      calls.push(["verify"]);
+    },
+    run: async (cmd, args) => {
+      assert.equal(cmd, "bb");
+      calls.push(args);
+      if (args.includes("shares")) return JSON.stringify({ shares: [{ port: 9300, url: "https://unrelated.test" }] });
+      return binding.viewerUrl;
+    },
+  });
+  assert.deepEqual(calls, [
+    ["connect", "shares", "--host", "steel-host", "--json"],
+    ["verify"],
+    ["connect", "expose", "3200", "--host", "steel-host"],
+  ]);
+});
+
+test("matching viewer share is reused without container or share mutations", async () => {
+  await ensureViewerShare(project, binding, {
+    verify: async () => { assert.fail("unexpected container validation"); },
+    run: async (_cmd, args) => {
+      assert(args.includes("shares"));
+      return JSON.stringify({ shares: [{ port: 3200, url: binding.viewerUrl }] });
+    },
+  });
+});
+
+test("viewer share validation and Connect errors propagate without repair", async () => {
+  for (const failure of ["list", "verify", "expose", "existing-origin", "restored-origin", "malformed"]) {
+    let exposed = false;
+    await assert.rejects(ensureViewerShare(project, binding, {
+      verify: async () => {
+        if (failure === "verify") throw new Error("container mismatch");
+      },
+      run: async (_cmd, args) => {
+        if (args.includes("shares")) {
+          if (failure === "list") throw new Error("Connect unavailable");
+          if (failure === "malformed") return "{}";
+          return JSON.stringify({ shares: failure === "existing-origin"
+            ? [{ port: 3200, url: "https://wrong.test" }] : [] });
+        }
+        exposed = true;
+        if (failure === "expose") throw new Error("Connect unavailable");
+        return "https://wrong.test";
+      },
+    }));
+    assert.equal(exposed, ["expose", "restored-origin"].includes(failure));
+  }
+});
+
+test("viewer recovery refuses nonlocal and CDP ports before calling Connect", async () => {
+  for (const apiUrl of ["http://remote.test:3200", binding.cdpUrl, "http://127.0.0.1", "http://127.0.0.1:3200/path"]) {
+    await assert.rejects(ensureViewerShare(project, { ...binding, apiUrl }, {
+      run: async () => { assert.fail("unsafe endpoint must not reach Connect"); },
+    }), /dedicated loopback/);
+  }
 });
 
 test("readiness probes API and CDP concurrently and rejects unhealthy responses", async () => {

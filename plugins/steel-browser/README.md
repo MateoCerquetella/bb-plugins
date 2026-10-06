@@ -20,9 +20,14 @@ Docker and an enrolled BB Connect host matching the server's hostname are requir
 Existing bindings also pass through readiness checks: API health alone is not
 enough; Chromium CDP must respond. Both local probes run concurrently with a
 900ms timeout. A healthy result is reused for ten seconds; subsequent actions
-recheck for a stopped browser. Healthy saved bindings skip Docker and BB Connect setup and do
-not wait for another project's provisioning; concurrent requests for the same
-project share the readiness check. Only failed readiness enters validated repair.
+recheck for a stopped browser. Healthy saved bindings also check the viewer's
+BB Connect share on the Steel host. A missing share is restored only after
+validating the dedicated container, exposing only its API port and requiring
+the saved viewer origin to match. CDP is never exposed. Matching shares skip
+setup and do not wait for another project's provisioning; concurrent requests
+for the same project share the readiness check. Connect errors are reported
+without restarting the browser and can be retried. Only failed local browser
+readiness enters validated container repair.
 A validated project container that remains
 unready gets one recovery attempt. Recovery stops the old container before
 clearing only Chromium's three singleton lock artifacts from its named profile,

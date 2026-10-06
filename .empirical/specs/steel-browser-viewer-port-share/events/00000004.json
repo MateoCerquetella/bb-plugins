@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "sequence": 4,
+  "previousDigest": "sha256:fd50e7f56dd6a3605bcc336a1cd71db25b226a56f4ccd6ba9e666cdaf69239c4",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Accepted D-001: verify and repair host-side shares without entering container repair, preserve isolation and caching.",
+  "createdAt": "2026-10-06T05:54:03.122Z",
+  "stateBeforeDigest": "sha256:5e7e82f507ffaba403c8ae31dad9333d51ced560af666bba4226ce1eb47aa79b",
+  "stateAfterDigest": "sha256:0a78c010b8cbc985244ec538cca7dcd03ee12355c00f1ebcb1888ea31610f77c",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 4,
+    "activeFeature": "steel-browser-viewer-port-share",
+    "request": "Fix Steel Browser embedded viewer displaying 'this port is not shared'. Diagnose and repair port-share recovery without changing project isolation, verify regression tests and runtime behavior. User requests finish autonomously and merge the fix PR after verification.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "yolo",
+    "phase": "plan",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Accepted D-001: verify and repair host-side shares without entering container repair, preserve isolation and caching.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:f3b1e095610e85000093bdbe3acf0281b577550f809086bd4c22b3275f7784b4",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:b71eb160fed0e0019012464f418609e9c52a9370658b50a439bb79efb370d9a6",
+    "impactDigest": "sha256:f6d77a4fed828be597167b4855c2535dd0ed9160c4e323e42ba753b8ad5c0b08",
+    "capabilityClaimId": "steel-browser-viewer-port-share-9880a3911478",
+    "authorizationDigest": "sha256:0dd541634ab9a6a3910fc3bfa071b0ba70a4076832c8c002d247a5f39861ef98",
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-06T05:54:03.122Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "steel-browser-viewer-port-share-9880a3911478",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "steel-browser-viewer-port-share",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_93e5633gqa-1/bb-plugins",
+      "worktreeId": "sha256:9908c8cedd17df34c236c0d61da62a79e3809f274508fb38992359a8cdbd507b",
+      "baseCommit": "0955a343edfee5f130e8a2daeb2b3d94afea79e7",
+      "baseTree": "6ca993e8eeebfedc4b8c626f7a537968574bfbea",
+      "bases": {
+        "steel-browser-viewer": {
+          "capability": "steel-browser-viewer",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "recover missing viewer shares": null
+          }
+        }
+      },
+      "capabilities": [
+        "steel-browser-viewer"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-06T03:33:47.017Z",
+      "heartbeatAt": "2026-10-06T03:33:47.017Z",
+      "digest": "sha256:bb31f4f7400923951c59c5ed3306114e550f38149986e1f7e61c4bf3eaf837af"
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:62ca2f340e0643676952b33576927eece4abc096a5f122de0ca86375a510945a"
+}

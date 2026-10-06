@@ -114,6 +114,22 @@ test("failed readiness repairs only the stored project and preserves its binding
   assert.equal(repairs, 1);
 });
 
+test("viewer readiness errors are not cached and never enter container provisioning", async () => {
+  const projects = store();
+  await projects.bind("a", binding);
+  let attempts = 0;
+  const ready = async () => {
+    if (++attempts === 1) throw new Error("Connect unavailable");
+    return true;
+  };
+  const provision = async () => { assert.fail("share failures must not recreate containers"); };
+  await assert.rejects(projects.ensure("a", provision, ready), /Connect unavailable/);
+  assert.deepEqual(await projects.require("a"), binding);
+  assert.deepEqual(await projects.ensure("a", provision, ready), binding);
+  await projects.ensure("a", provision, ready);
+  assert.equal(attempts, 2);
+});
+
 test("healthy projects do not wait for another project's slow setup", async () => {
   const projects = store();
   await projects.bind("a", binding);
