@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-372e7d94e6a07e316ae1a802",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-10-06T13:45:32.969Z",
+  "completedAt": "2026-10-06T13:45:32.969Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "steel-browser-viewer-port-share",
+    "specRevision": 3,
+    "specDigest": "sha256:f3b1e095610e85000093bdbe3acf0281b577550f809086bd4c22b3275f7784b4",
+    "treeDigest": "sha256:8b126e22f398e2c6d1579af252cd6a0902e2503f6f66ffbaa14f659a2ddd7203",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:b934c6eb30ba56b3faeb79857580cae8aad4d52102fdd481462d8ce097cb103a",
+  "kind": "collected",
+  "collector": "empirical-review:distribution_rereview",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/steel-browser-viewer-port-share/reviews/ca23183a230eecda285f3ba5.json",
+      "mediaType": "application/json",
+      "bytes": 1607,
+      "digest": "sha256:4a407f4218ed8d015f9aaa7eae62f5d41efaae000466fa5be9418c8a16b37aa9"
+    },
+    {
+      "path": ".empirical/specs/steel-browser-viewer-port-share/reviews/ca23183a230eecda285f3ba5.md",
+      "mediaType": "text/markdown",
+      "bytes": 854,
+      "digest": "sha256:a70ba3aa31e6d6565600f1e3c9791b8f24e2091658596b36a69a08c0d9464ab6"
+    }
+  ]
+}

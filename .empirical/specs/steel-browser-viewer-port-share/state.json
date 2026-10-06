@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 16,
+  "revision": 18,
   "activeFeature": "steel-browser-viewer-port-share",
   "request": "Fix Steel Browser embedded viewer displaying 'this port is not shared'. Diagnose and repair port-share recovery without changing project isolation, verify regression tests and runtime behavior. User requests finish autonomously and merge the fix PR after verification.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "review",
+  "phase": "integrate",
   "status": "waiting",
   "repairAttempts": 1,
-  "message": "Consolidate the test-only CI repair and continue the explicitly requested delivery and merge of PR #68.",
+  "message": "Empirical-selected focused verification passed and the fresh-context review approved all criteria; proceed to integration and PR CI.",
   "implementationActor": "codex",
   "workStartedAt": null,
   "specDigest": "sha256:f3b1e095610e85000093bdbe3acf0281b577550f809086bd4c22b3275f7784b4",
@@ -20,23 +20,25 @@
   "capabilityClaimId": "steel-browser-viewer-port-share-9880a3911478",
   "authorizationDigest": null,
   "evidence": [],
-  "evidenceReceiptIds": [],
+  "evidenceReceiptIds": [
+    "collected-372e7d94e6a07e316ae1a802",
+    "qa-3046a6a7eb62d39b236e8efc"
+  ],
   "legacyEvidenceCount": 0,
   "completion": {
     "implemented": true,
-    "verified": false,
+    "verified": true,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "implemented",
+    "highest": "verified",
     "reasons": {
-      "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-06T13:42:57.963Z",
+  "updatedAt": "2026-10-06T13:46:46.870Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "steel-browser-viewer-port-share-9880a3911478",
@@ -71,5 +73,13 @@
     "iteration": 1,
     "awaitingFeedback": false
   },
-  "reviewFirst": true
+  "reviewFirst": true,
+  "verificationCoverage": {
+    "kind": "review-derived",
+    "checkId": "qa-fresh-context",
+    "receiptId": "collected-372e7d94e6a07e316ae1a802",
+    "matrixDigest": "sha256:aa936bb70043acb042de052c0897bec853e5d793bc1176dfb4766a7f30fdc161",
+    "specDigest": "sha256:f3b1e095610e85000093bdbe3acf0281b577550f809086bd4c22b3275f7784b4",
+    "revision": 18
+  }
 }
