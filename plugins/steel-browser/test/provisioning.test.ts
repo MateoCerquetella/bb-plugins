@@ -37,20 +37,34 @@ test("missing viewer share validates the container then exposes only API on the 
     },
   });
   assert.deepEqual(calls, [
-    ["connect", "shares", "--host", "steel-host", "--json"],
     ["verify"],
+    ["connect", "shares", "--host", "steel-host", "--json"],
     ["connect", "expose", "3200", "--host", "steel-host"],
   ]);
 });
 
-test("matching viewer share is reused without container or share mutations", async () => {
+test("matching viewer share validates ownership and is reused without share mutations", async () => {
+  let verified = false;
   await ensureViewerShare(project, binding, {
-    verify: async () => { assert.fail("unexpected container validation"); },
+    verify: async () => { verified = true; },
     run: async (_cmd, args) => {
       assert(args.includes("shares"));
       return JSON.stringify({ shares: [{ port: 3200, url: binding.viewerUrl }] });
     },
   });
+  assert.equal(verified, true);
+});
+
+test("matching viewer share rejects container mismatch without calling Connect", async () => {
+  let called = false;
+  await assert.rejects(ensureViewerShare(project, binding, {
+    verify: async () => { throw new Error("container mismatch"); },
+    run: async () => {
+      called = true;
+      return JSON.stringify({ shares: [{ port: 3200, url: binding.viewerUrl }] });
+    },
+  }), /container mismatch/);
+  assert.equal(called, false);
 });
 
 test("viewer share validation and Connect errors propagate without repair", async () => {

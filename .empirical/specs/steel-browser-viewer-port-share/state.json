@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 5,
+  "revision": 8,
   "activeFeature": "steel-browser-viewer-port-share",
   "request": "Fix Steel Browser embedded viewer displaying 'this port is not shared'. Diagnose and repair port-share recovery without changing project isolation, verify regression tests and runtime behavior. User requests finish autonomously and merge the fix PR after verification.",
   "profile": "complex",
@@ -8,9 +8,9 @@
   "mode": "yolo",
   "phase": "implement",
   "status": "waiting",
-  "repairAttempts": 0,
-  "message": "Planned focused helper, server integration, regression tests, runtime verification, independent review and CI-gated PR merge.",
-  "implementationActor": null,
+  "repairAttempts": 1,
+  "message": "Automated verification passed, but the required security consult found blocking SEC-001: matching existing shares could be trusted before dedicated-container ownership validation, allowing a healthy-looking local port impersonation path.",
+  "implementationActor": "codex",
   "workStartedAt": null,
   "specDigest": "sha256:f3b1e095610e85000093bdbe3acf0281b577550f809086bd4c22b3275f7784b4",
   "approvedSpecRevision": 3,
@@ -23,21 +23,20 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": false,
+    "implemented": true,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "none",
+    "highest": "implemented",
     "reasons": {
-      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-06T06:05:14.711Z",
+  "updatedAt": "2026-10-06T13:12:06.779Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "steel-browser-viewer-port-share-9880a3911478",

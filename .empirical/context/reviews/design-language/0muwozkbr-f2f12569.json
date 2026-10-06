@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "page": ".empirical/context/design-language.md",
+  "head": "1ea9eed7952b6b6ec3358932ba126eef7a5c7a8b",
+  "units": [
+    "plugins/action-topbar",
+    "plugins/aura",
+    "plugins/clean-my-context",
+    "plugins/conversation-space",
+    "plugins/dockside",
+    "plugins/host-monitor",
+    "plugins/jev-route",
+    "plugins/save-my-model",
+    "plugins/steel-browser",
+    "plugins/taskboard",
+    "plugins/usage-tracker"
+  ],
+  "pending": {}
+}

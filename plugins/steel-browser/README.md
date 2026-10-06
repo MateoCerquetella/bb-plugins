@@ -23,11 +23,12 @@ enough; Chromium CDP must respond. Both local probes run concurrently with a
 recheck for a stopped browser. Healthy saved bindings also check the viewer's
 BB Connect share on the Steel host. A missing share is restored only after
 validating the dedicated container, exposing only its API port and requiring
-the saved viewer origin to match. CDP is never exposed. Matching shares skip
-setup and do not wait for another project's provisioning; concurrent requests
-for the same project share the readiness check. Connect errors are reported
-without restarting the browser and can be retried. Only failed local browser
-readiness enters validated container repair.
+the saved viewer origin to match. Every share check validates container
+ownership before trusting an existing route, and CDP is never exposed. Matching
+shares skip setup and do not wait for another project's provisioning;
+concurrent requests for the same project share the readiness check. Connect
+errors are reported without restarting the browser and can be retried. Only
+failed local browser readiness enters validated container repair.
 A validated project container that remains
 unready gets one recovery attempt. Recovery stops the old container before
 clearing only Chromium's three singleton lock artifacts from its named profile,

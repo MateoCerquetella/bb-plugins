@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-3d378b7f61c7e35d4f69ab60",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Run the Empirical-selected final verification command for the Steel viewer share recovery acceptance criteria.",
+  "passed": true,
+  "startedAt": "2026-10-06T13:10:43.862Z",
+  "completedAt": "2026-10-06T13:10:47.359Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "steel-browser-viewer-port-share",
+    "specRevision": 3,
+    "specDigest": "sha256:f3b1e095610e85000093bdbe3acf0281b577550f809086bd4c22b3275f7784b4",
+    "treeDigest": "sha256:1c14400746852c06405fce36f871de0ff0bff09c6b95cd796ed05bce0230b836",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 7,
+    "gitCommit": "1ea9eed7952b6b6ec3358932ba126eef7a5c7a8b",
+    "textTreeDigest": "sha256:1c14400746852c06405fce36f871de0ff0bff09c6b95cd796ed05bce0230b836"
+  },
+  "digest": "sha256:c6a0a816d3506586899459fd7fbf653349130e7cfad902f709f1ec9afd04592a",
+  "kind": "qa",
+  "matrixDigest": "sha256:aa936bb70043acb042de052c0897bec853e5d793bc1176dfb4766a7f30fdc161",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Run the Empirical-selected final verification command for the Steel viewer share recovery acceptance criteria.",
+      "startedAt": "2026-10-06T13:10:43.862Z",
+      "completedAt": "2026-10-06T13:10:47.359Z",
+      "durationMs": 3497,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:3102e0660c5a28fb09072a92af73601c0704a8badb5519082e7545d1f876aa50",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-aura"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:faf1667abaa523d0975b1e5b0896164fc96ec675c458efea64e512078b8dff49",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "\n> bb-plugin-aura@0.2.2 check\n> npm run typecheck && npm test && npm run build\n\n\n> bb-plugin-aura@0.2.2 typecheck\n> tsc --noEmit\n\n\n> bb-plugin-aura@0.2.2 test\n> node --experimental-strip-types --test test/*.test.ts\n\nTAP version 13\n# Subtest: applies scoped backgrounds, disables cleanly and ignores a late fetch after disposal\nok 1 - applies scoped backgrounds, disables cleanly and ignores a late fetch after disposal\n  ---\n  duration_ms: 83.980203\n  type: 'test'\n  ...\n# Subtest: six independent slots retain images and appearance across switches and reload\nok 2 - six independent slots retain images and appearance across switches and reload\n  ---\n  duration_ms: 20.295744\n  type: 'test'\n  ...\n# Subtest: invalid image or slot rejects the entire apply without partially changing settings\nok 3 - invalid image or slot rejects the entire apply without partially changing settings\n  ---\n  duration_ms: 15.7284\n  type: 'test'\n  ...\n# Subtest: scope stays global across slots; clearing/resetting preserves saved work\nok 4 - scope stays global across slots; clearing/resetting preserves saved work\n  ---\n  duration_ms: 4.131419\n  type: 'test'\n  ...\n# Subtest: image type must match bytes; legacy settings get the new scope default\nok 5 - image type must match bytes; legacy settings get the new scope default\n  ---\n  duration_ms: 1.553591\n  type: 'test'\n  ...\n# Subtest: versioned images use an immutable private browser cache\nok 6 - versioned images use an immutable private browser cache\n  ---\n  duration_ms: 15.783973\n  type: 'test'\n  ...\n# Subtest: New thread dimmer toggles without replacing images or saved slots\nok 7 - New thread dimmer toggles without replacing images or saved slots\n  ---\n  duration_ms: 3.093207\n  type: 'test'\n  ...\n1..7\n# tests 7\n# suites 0\n# pass 7\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 562.097576\n\n> bb-plugin-aura@0.2.2 build\n> env -u BB_CLI bb plugin build .\n\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:1c14400746852c06405fce36f871de0ff0bff09c6b95cd796ed05bce0230b836",
+      "sourceTreeAfter": "sha256:1c14400746852c06405fce36f871de0ff0bff09c6b95cd796ed05bce0230b836",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

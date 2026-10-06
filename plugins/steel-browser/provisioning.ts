@@ -44,6 +44,7 @@ export async function ensureViewerShare(projectId: string, binding: Binding, dep
     || api.port === new URL(binding.cdpUrl).port) {
     throw new Error("Viewer share requires a dedicated loopback API port distinct from CDP.");
   }
+  await (dependencies.verify ?? verifyProjectInstance)(projectId, binding);
   const shares = JSON.parse(await command("bb", ["connect", "shares", "--host", host, "--json"]));
   const share = shares.shares.find((entry: { port: number }) => entry.port === Number(api.port));
   if (share) {
@@ -53,7 +54,6 @@ export async function ensureViewerShare(projectId: string, binding: Binding, dep
     return;
   }
   // A healthy local API does not imply its authenticated viewer is still shared.
-  await (dependencies.verify ?? verifyProjectInstance)(projectId, binding);
   const actual = viewerOrigin(await command("bb", ["connect", "expose", api.port, "--host", host]));
   if (actual !== expected) {
     throw new Error("Restored project viewer differs from its saved binding; refusing rebinding.");
