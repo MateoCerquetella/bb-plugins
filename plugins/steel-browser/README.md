@@ -204,3 +204,16 @@ npm run check --workspace bb-plugin-steel-browser
 
 Steel is Apache-2.0 software maintained by Steel.dev. This plugin is not
 affiliated with or endorsed by Steel.dev.
+
+## Canvas portals
+
+The `navigate` RPC accepts `{scope: {projectId} | {threadId}, url}` and returns
+`{url, title, viewerUrl}` after confirming navigation. It resolves the existing
+project binding, rejects URLs with embedded credentials or non-web schemes,
+and uses that project's page CDP target. It does not start a separate browser
+or a paid engine. Agent Canvas embeds the returned viewer for interaction;
+website credentials and MFA belong in that embedded browser.
+
+Page-level navigation avoids browser-wide attachment stalls caused by unrelated
+browser UI targets in newer Chromium builds. Navigation failures are not replayed;
+inspect the same session before retrying an uncertain result.

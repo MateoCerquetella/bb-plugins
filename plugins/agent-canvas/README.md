@@ -21,7 +21,7 @@ Settings lists shortcuts and configurable grid/default node sizes.
 Authored connections are solid; recorded parent/browser ownership connections
 are dashed. Creating a connection sends no message. Groups, roles, note
 collections, ensembles and undo/redo belong to the validated document.
-Settings exports/imports a bounded versioned JSON backup. Ensemble placement
+Settings exports/imports a bounded versioned JSON backup. Ensembles and reusable note collections also export/import separate versioned libraries, preserving roles, groups and cables with new IDs. Ensemble placement
 remaps IDs and preserves connections and groups without copying running threads.
 
 The document is stored server-side with revision checks. Conflicting edits
@@ -41,7 +41,7 @@ session, rather than changing an existing runtime silently.
 Notes explicitly linked to a thread in the same project are accessible through
 `agent_canvas_notes` and `agent_canvas_write_note`. Each call rechecks the live
 thread and current links; unrelated notes and hidden/deleted identities are denied.
-Note contents are context, not system instructions.
+Note contents are context, not system instructions. Connected notes appear under @ in the native composer; signed mention identities are revalidated against their source connection and fetch fresh contents at send time. Mentions are explicit user-provided context; agent-tool access stays bound to the calling thread.
 
 A thread assigned a Maestro role receives `agent_canvas_team`. It can inspect,
 recruit, reassign or stop direct teammates for user-authorized coordination.
@@ -55,18 +55,28 @@ No recruitment runs merely because a canvas opens or a link is created.
 
 Workspaces and floors include actual BB projects/environments, including empty
 floors. New isolated floor uses the native composer to create its initial agent
-on a new worktree. Review floor loads real uncommitted changes and pull request
+on a new worktree using the registered `git-worktree` environment provider. Review floor loads real uncommitted changes and pull request
 status and offers the native BB surface for full review and landing actions.
 File trees search the chosen environment and preview UTF-8 files up to 200 KB.
 Saving checks the original file hash and binds access to the environment root.
 
 Existing verified automation tabs support visible captures every three seconds,
 with pause, refresh and timestamp. Capture authorization rechecks thread, host,
-generation and automation profile. These are visual captures. Saved portal nodes
-currently store a URL; project Steel navigation/interaction is still outstanding.
+generation and automation profile. These are visual captures. Portal nodes navigate the actual project Steel session and embed its interactive viewer after confirmed navigation. All portals in a workspace share that browser; BB Connect and website authentication happen in the embedded viewer. The portal requires Steel Browser with the new `navigate` RPC shipped in this branch.
 
-Other outstanding parity work includes routines, terminal surfaces, connected
-composer mentions and full library transfer controls. The authoritative inventory
+Thread terminal view chooses a real BB PTY or creates one explicitly, renders
+it with xterm, sends real input, and synchronizes size. It is a separate shell
+on the thread's environment; it does not impersonate the provider's private
+agent runtime. Off-screen views suspend polling without killing the process.
+Terminal process IDs are not stored in exported compositions.
+
+Routines use BB's native Automations service, target an existing agent, and
+inherit its execution configuration when saved. Create a paused routine, then
+activate explicitly; edit, pause/resume, and delete controls use native records.
+Sequential prompt chains separated by `&&` are still outstanding.
+
+Other outstanding parity work includes search refinements, sequential routine
+chains and complete host/live-UI verification. The authoritative inventory
 is `.empirical/specs/agent-canvas-maestri-parity/parity.md`; this implementation
 checkpoint does not establish complete Maestri parity.
 

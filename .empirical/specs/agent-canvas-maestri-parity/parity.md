@@ -6,20 +6,20 @@ Reference: https://www.themaestri.app/en and public /en/docs pages recorded in r
 | --- | --- | --- | --- |
 | Fine grid, insertion pill, sidebar, node chrome | Dot grid, project tabs, plain chrome | Square grid, toolbar, sidebar and controls implemented in workbench.tsx/css; fixture screenshots collected | Implemented; live UI evidence pending |
 | Pan, zoom, fit, minimap, free positioning | Present | Alt-wheel, viewport minimap and shared remembered viewport implemented | Implemented; fixture checked |
-| Terminal/chat nodes | Native live BB ThreadChat timeline | Creation, composition, roles; terminal only when real PTY available | Partial |
+| Terminal/chat nodes | Native live BB ThreadChat timeline | Native composition/roles; real thread PTY terminal view with xterm, separate from the provider runtime | Adapted; native PTY smoke passed, UI evidence partial |
 | Notes / text / drawings | Absent | Editable persistent nodes, Markdown preview and drawing implemented | Implemented; fixture checked |
 | Resize/selection/lock/blur/lift/dock | Move/resize/single selection | Multi-selection, privacy blur, lock and lifted/docked panels implemented | Implemented; some browser checks pending |
 | Groups, align/distribute/tidy/snapping | Automatic workspace squares | Authored groups and nine arrangement operations; locked geometry preserved | Implemented; model tests pass |
 | Undo/redo, copy/paste, clone, import/export | Saved pane geometry | Bounded validated v1 document/history, remapped composition copies and JSON backup | Implemented; model and fixture tests pass |
 | Connections, cross-workspace context | Recorded parent and browser links | Authored links, deterministic traversal and per-call scoped note tools implemented | Implemented; authorization tests pass |
 | Maestro and reusable agent roles | Removed Control UI; bounded retained backend | Role editor and explicit native recruitment/assignment/stop; scoped Maestro team tool | Implemented; authorization tests pass; live actions pending |
-| Composer mentions/drafts/images/chat subjects | Native timeline only | Native ThreadChat/composer supplies draft/image behavior; connected-node mention integration remains | Partial |
+| Composer mentions/drafts/images/chat subjects | Native timeline only | Native composer draft/image behavior and signed connected-note mention provider, with fresh content resolution | Implemented; native mention UI evidence pending |
 | Workspaces and floors | Workspace/worktree filters | Shared workspace viewports, native worktree composer, real changes/PR review and native floor navigation; further landing preparation pending | Partial |
-| Partituras | Absent | Save/search/rename/delete/place ensembles and whole-canvas JSON transfer; individual library transfer remains | Partial |
-| Fichários | Absent | Named collections and member focus; search/placement/export refinements remain | Partial |
+| Partituras | Absent | Save/search/rename/delete/place plus independent versioned library transfer preserving roles/cables/groups | Implemented; model tests and fixture placement pass |
+| Fichários | Absent | Named collections, member focus, search, reusable templates, cross-workspace placement and versioned transfer | Implemented; model tests and fixture placement pass |
 | File tree/editor/search | Absent | Real environment paths/read/write with hash checks and root binding; integration tests remain | Implemented; host evidence pending |
-| Portals / design mode | Authorized browser captures | Project Steel portal controls and annotated selection | Partial |
-| Routines | Absent | BB automation integration | Outstanding |
+| Portals / design mode | Authorized browser captures | Project Steel navigation RPC and embedded interactive viewer; annotation/design-mode controls remain | Partial; navigation smoke passed, authenticated viewer pending |
+| Routines | Absent | Native Automations create/edit/pause/resume/delete, target execution inheritance; sequential chains remain | Partial; paused native lifecycle smoke passed |
 | Batuta search and shortcuts/settings | Basic navigation shortcuts | Search palette, keyboard actions and default-size/grid settings implemented | Implemented; fixture checked |
 | Agent usage | No per-node usage | Supported BB provider usage integration | Outstanding |
 | SSH/Docker/runtime environments | BB environment labels | Use actual BB host/environment facilities | Partial |
@@ -35,3 +35,11 @@ Portable outstanding rows keep this feature and user goal active. Screenshots al
 - Steel development fixture checked Shift selection, search, node insertion, undo/redo, reload persistence and stacked narrow-screen access. Screenshots: `docs/media/agent-canvas-workbench-{light,dark,narrow}.png`. SDK testing icons are placeholders; these images do not prove the native icon or chat integration.
 - Direct project CDP page actions were used because browser-level Playwright attachment stalled against the current Chromium build. The fixture was served within the same project Steel container. The public shared fixture URL requires BB Connect sign-in. Authenticated BB human UI verification is still pending; fixture evidence is not substituted for it.
 - Empirical remains at Implement revision 5, local-only. Fresh-context review, required verification receipts and independent integration have not occurred.
+
+## Second implementation pass
+
+Evidence is detailed in `research/verification-2026-10-06.md`. Agent Canvas has
+24 passing tests; Steel Browser has 40. The workspace check passed during this
+pass, followed by focused validation and a browser regression for stacked-layout
+viewport preservation. This remains implementation progress, not completion of
+the original portable parity contract.

@@ -52,3 +52,29 @@ there were used.
 
 Unrelated initial .empirical config changes and journal deletions/closure files
 were left untouched and unstaged. Continue preserving them.
+
+## Pass 2 — native integrations
+
+Added native routine CRUD/activation controls (created paused), portal navigation
+and interactive viewer, real thread PTY+xterm view, signed native note mentions,
+independent versioned ensemble/note libraries and reusable collection placement.
+Added responsive viewport preservation after the library browser check found
+nodes off-screen on return from narrow mode. New floor defaults now use the
+registered provider id `git-worktree`; legacy host/worktree requests still work.
+Checks/evidence are in research/verification-2026-10-06.md. Latest focused checks:
+Agent Canvas 24 tests and Steel 40 tests, types, SDK and build; root checks passed
+before the final viewport fix. Both fixture scripts now pass and guard origin.
+
+Installed Steel was externally switched to thr_93e5633gqa during this pass. Its
+thread is errored and its PR #68 merged; running Steel lacks our new navigate
+RPC. Do not repeatedly overwrite installation choices. Reconcile PR #68's
+healthy-share recovery against this branch before final combined integration.
+The project binding remains API 3210/CDP 9320; validate before browser work.
+
+Next: sequential routine chains (native SendMessageResponse has no turn id;
+queue group/create/send semantics need evidence), richer fuzzy/body/action search,
+portal design/annotation, settings/navigation and remaining reference audit,
+more host filesystem and installed UI evidence, then review/Empirical receipts,
+sync target and independent integration. The default verification command
+selection still names other plugins; configure evidence for this feature rather
+than treating an Action Topbar check as Agent Canvas acceptance evidence.

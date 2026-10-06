@@ -16,12 +16,12 @@ export const nodeSchema = z.object({
 export const edgeSchema = z.object({ id, source: id, target: id });
 const groupSchema = z.object({ id, title: z.string().max(240), members: z.array(id).min(2).max(200) });
 export const roleSchema = z.object({ id, name: z.string().min(1).max(120), color: z.string().regex(/^#[a-fA-F0-9]{6}$/), instructions: z.string().max(30000), maestro: z.boolean() });
-const presentationSchema = z.object({ box: boxSchema.optional(), locked: z.boolean().default(false), blurred: z.boolean().default(false), roleId: id.nullable().default(null) });
+const presentationSchema = z.object({ box: boxSchema.optional(), locked: z.boolean().default(false), blurred: z.boolean().default(false), roleId: id.nullable().default(null), face:z.enum(["chat","terminal"]).optional() });
 export const ensembleSchema = z.object({ id, title: z.string().min(1).max(240), nodes: z.array(nodeSchema).max(200), edges: z.array(edgeSchema).max(400), groups: z.array(groupSchema).max(100) });
 const collectionSchema = z.object({ id, title: z.string().min(1).max(240), members: z.array(id).max(200) });
 const baseSchema = z.object({
   version: z.literal(1), nodes: z.array(nodeSchema).max(300), edges: z.array(edgeSchema).max(600), groups: z.array(groupSchema).max(150),
-  roles: z.array(roleSchema).max(100), ensembles: z.array(ensembleSchema).max(50), collections: z.array(collectionSchema).max(100),
+  roles: z.array(roleSchema).max(100), ensembles: z.array(ensembleSchema).max(50), collectionTemplates:z.array(ensembleSchema).max(100).default([]), collections: z.array(collectionSchema).max(100),
   presentations: z.record(id, presentationSchema).refine(v=>Object.keys(v).length<=300),
   viewports: z.record(id,z.object({x:coordinate,y:coordinate,zoom:z.number().finite().min(.1).max(1.5),environmentId:id.nullable()})).refine(v=>Object.keys(v).length<=100),
   settings: z.object({ nodeWidth:z.number().min(320).max(1500), nodeHeight:z.number().min(260).max(1500), noteWidth:z.number().min(120).max(1000), noteHeight:z.number().min(80).max(1000), grid:z.boolean() }),
@@ -33,7 +33,7 @@ export type Ensemble = z.infer<typeof ensembleSchema>;
 function duplicates(values:string[]) { return new Set(values).size!==values.length; }
 export const documentSchema = baseSchema.superRefine((d,ctx)=>{
   const fail=(message:string)=>ctx.addIssue({code:"custom",message});
-  for(const [label,values] of Object.entries({nodes:d.nodes,edges:d.edges,groups:d.groups,roles:d.roles,ensembles:d.ensembles,collections:d.collections})) if(duplicates(values.map(v=>v.id))) fail(`Duplicate ${label} IDs`);
+  for(const [label,values] of Object.entries({nodes:d.nodes,edges:d.edges,groups:d.groups,roles:d.roles,ensembles:d.ensembles,collectionTemplates:d.collectionTemplates,collections:d.collections})) if(duplicates(values.map(v=>v.id))) fail(`Duplicate ${label} IDs`);
   const known=new Set([...d.nodes.map(n=>n.id),...Object.keys(d.presentations)]);
   const roles=new Set(d.roles.map(r=>r.id));
   if(d.nodes.some(n=>n.roleId&&!roles.has(n.roleId)))fail("Unknown node role");
@@ -43,13 +43,14 @@ export const documentSchema = baseSchema.superRefine((d,ctx)=>{
   const grouped=new Set<string>();
   for(const group of d.groups){if(duplicates(group.members)||group.members.some(v=>!known.has(v)||grouped.has(v)))fail("Invalid group membership");for(const member of group.members)grouped.add(member);}
   for(const collection of d.collections)if(duplicates(collection.members)||collection.members.some(v=>!d.nodes.some(n=>n.id===v&&n.kind==="note")))fail("Invalid note collection");
-  for(const ensemble of d.ensembles){
+  for(const ensemble of [...d.ensembles,...d.collectionTemplates]){
     const ids=new Set(ensemble.nodes.map(n=>n.id)),members=new Set<string>();
     if(duplicates(ensemble.nodes.map(n=>n.id))||duplicates(ensemble.edges.map(e=>e.id))||duplicates(ensemble.groups.map(g=>g.id))||duplicates(ensemble.edges.map(e=>[e.source,e.target].sort().join("\0")))||ensemble.edges.some(e=>e.source===e.target||!ids.has(e.source)||!ids.has(e.target)))fail("Invalid ensemble references");
     for(const group of ensemble.groups){if(duplicates(group.members)||group.members.some(v=>!ids.has(v)||members.has(v)))fail("Invalid ensemble group membership");for(const member of group.members)members.add(member);}
   }
+  if(d.collectionTemplates.some(e=>e.nodes.some(n=>n.kind!=="note")))fail("Collection templates may contain only notes");
 });
-export function emptyDocument():CanvasDocument{return {version:1,nodes:[],edges:[],groups:[],roles:[],ensembles:[],collections:[],presentations:{},viewports:{},settings:{nodeWidth:540,nodeHeight:420,noteWidth:320,noteHeight:300,grid:true}};}
+export function emptyDocument():CanvasDocument{return {version:1,nodes:[],edges:[],groups:[],roles:[],ensembles:[],collectionTemplates:[],collections:[],presentations:{},viewports:{},settings:{nodeWidth:540,nodeHeight:420,noteWidth:320,noteHeight:300,grid:true}};}
 export const newId=()=>crypto.randomUUID();
 export const snap=(v:number)=>Math.round(v/20)*20;
 export const boundedBox=(box:Box):Box=>({x:Math.max(-100000,Math.min(100000,box.x)),y:Math.max(-100000,Math.min(100000,box.y)),w:Math.max(120,Math.min(4000,box.w)),h:Math.max(80,Math.min(4000,box.h))});

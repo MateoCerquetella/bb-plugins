@@ -59,6 +59,7 @@
     "use-follow-viewer.ts",
     "engines.ts",
     "actions.ts",
+    "navigation.ts",
     "provisioning.ts",
     "scripts/"
   ],
