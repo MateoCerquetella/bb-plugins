@@ -50,6 +50,10 @@
     {
       "name": "conversation-space",
       "source": "./plugins/conversation-space"
+    },
+    {
+      "name": "agent-canvas",
+      "source": "./plugins/agent-canvas"
     }
   ]
 }

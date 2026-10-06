@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "agent-canvas"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:382f9092e9dd968b272e4a93f5faf5b361fcbb3187f1f5f9fc8911cfe6fca189"
+}

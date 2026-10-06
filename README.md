@@ -22,6 +22,7 @@ All plugins in this repository are independently installable.
 
 | | Plugin | Install | What it does |
 | --- | --- | --- | --- |
+| | [Agent Canvas (WIP)](./plugins/agent-canvas) | [Local install](./plugins/agent-canvas#cli-and-development) | A spatial workbench for live BB agents, persistent notes, drawings, ensembles and scoped team context. Requires BB 0.44+. |
 | <img src="./plugins/conversation-space/assets/icon.svg" width="128" height="128" alt="" /> | [Conversation Space (WIP)](./plugins/conversation-space) | [Local development install](./plugins/conversation-space#conversation-space-wip) | **Work in progress:** compact context usage, colored token percentages, and measured Jev routing diagnostics. |
 | <img src="./plugins/jev-route/assets/icon.svg" width="128" height="128" alt="" /> | [Jev Routing](./plugins/jev-route) | [Git install](./plugins/jev-route#install) | Jev-only model history, custom model colors, and Codex-only automatic routing without cross-provider quota fallback. |
 | <img src="./plugins/action-topbar/assets/icon.svg" width="128" height="128" alt="" /> | [Action Topbar](./plugins/action-topbar) | [Git install](#action-topbar-install) | Adds a compact main-thread topbar with draggable BB Actions and persistent, per-thread workspace panes. |
@@ -293,3 +294,4 @@ directory to `.bb/plugins.json`; the root workspace picks it up automatically.
 ## License
 
 [MIT](./LICENSE) © 2026 Mateo Cerquetella.
+
