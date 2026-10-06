@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {call,evaluate,ws} from './cdp.mjs';
+const delay=()=>new Promise(r=>setTimeout(r,700));
+async function click(selector,modifiers=0){const r=await evaluate(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});if(!e)throw Error('Missing '+${JSON.stringify(selector)});const r=e.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);await call('Input.dispatchMouseEvent',{type:'mousePressed',button:'left',clickCount:1,modifiers,...r});await call('Input.dispatchMouseEvent',{type:'mouseReleased',button:'left',clickCount:1,modifiers,...r});}
+async function key(key,modifiers=0,code=key){await call('Input.dispatchKeyEvent',{type:'keyDown',key,code,modifiers});await call('Input.dispatchKeyEvent',{type:'keyUp',key,code,modifiers});}
+try{
+ await evaluate('localStorage.removeItem("fixture-shared-canvas");localStorage.removeItem("agent-canvas:document:v1")');await call("Page.reload");await delay();assert.equal(await evaluate('document.querySelectorAll(".node").length'),3);
+ await click('.node.note .name');
+ await click('.node:nth-of-type(2) .name',8);assert.equal(await evaluate('document.querySelectorAll(".node.selected").length'),2);
+ await key('k',2,'KeyK');await delay();assert.equal(await evaluate('document.querySelector("[role=dialog]").getAttribute("aria-label")'),'Search');await key('Escape');
+ await click('button[aria-label="Note"]');const rect=await evaluate('document.querySelector(".canvas").getBoundingClientRect().toJSON()');await call('Input.dispatchMouseEvent',{type:'mousePressed',button:'left',clickCount:1,x:rect.x+900,y:220});await call('Input.dispatchMouseEvent',{type:'mouseReleased',button:'left',clickCount:1,x:rect.x+900,y:220});await delay();assert.equal(await evaluate('document.querySelectorAll(".node").length'),4);
+ await key('z',2,'KeyZ');await delay();assert.equal(await evaluate('document.querySelectorAll(".node").length'),3);await key('z',10,'KeyZ');await delay();assert.equal(await evaluate('document.querySelectorAll(".node").length'),4);
+ await call('Page.reload');await delay();assert.equal(await evaluate('document.querySelectorAll(".node").length'),4);
+ await fs.mkdir('docs/media',{recursive:true});let shot=await call('Page.captureScreenshot');await fs.writeFile('docs/media/agent-canvas-workbench-light.png',Buffer.from(shot.data,'base64'));
+ await evaluate('document.documentElement.classList.add("dark");document.documentElement.style.cssText="--background:#1c1d21;--foreground:#e4e4e9;--muted-foreground:#9b9ba7;--border:#2b2d33;--primary:#087ef5"');shot=await call('Page.captureScreenshot');await fs.writeFile('docs/media/agent-canvas-workbench-dark.png',Buffer.from(shot.data,'base64'));
+ await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:false});await delay();assert.equal(await evaluate('document.querySelectorAll(".node").length'),4);assert.ok(await evaluate('[...document.querySelectorAll(".node")].every(n=>n.getBoundingClientRect().width<=390)'));shot=await call('Page.captureScreenshot');await fs.writeFile('docs/media/agent-canvas-workbench-narrow.png',Buffer.from(shot.data,'base64'));console.log('Fixture checks passed: multiselect, search, insertion, undo/redo, reload persistence and narrow layout.');
+}finally{await call('Emulation.clearDeviceMetricsOverride');ws.close();}

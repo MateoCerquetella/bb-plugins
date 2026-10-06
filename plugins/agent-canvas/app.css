@@ -1,0 +1,108 @@
+.ac-shell { position: relative; height: 100%; min-height: 0; display: flex; flex-direction: column; overflow: hidden; background: var(--background); color: var(--foreground); font: inherit; font-size: 13px; letter-spacing: 0; }
+.ac-shell * { box-sizing: border-box; }
+.ac-shell button, .ac-shell select { font: inherit; color: inherit; }
+.ac-shell button { cursor: pointer; }
+.ac-shell button:disabled { opacity: .5; cursor: default; }
+.ac-shell button:focus-visible, .ac-shell select:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.ac-icon svg, .ac-brand svg, .ac-command svg, .ac-resize svg { width: 16px; height: 16px; flex-shrink: 0; }
+.ac-tabs { min-height: 44px; display: flex; align-items: center; border-bottom: 1px solid var(--border); gap: 12px; padding: 0 8px 0 16px; }
+.ac-brand { display: flex; align-items: center; gap: 8px; font-weight: 600; white-space: nowrap; }
+.ac-tabs nav { display: flex; flex: 1; min-width: 0; overflow: auto; align-self: stretch; }
+.ac-tabs nav button { flex-shrink: 0; padding: 0 14px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--muted-foreground); }
+.ac-tabs nav button.ac-active { border-bottom-color: var(--primary); color: var(--foreground); background: var(--accent); }
+.ac-icon { display: inline-grid; place-items: center; width: 30px; height: 30px; flex: 0 0 30px; border: 0; border-radius: 4px; background: transparent; color: var(--muted-foreground); }
+.ac-icon:hover { background: var(--accent); color: var(--accent-foreground); }
+.ac-toolbar { min-height: 44px; display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-bottom: 1px solid var(--border); }
+.ac-toolbar label { display: flex; align-items: center; gap: 8px; min-width: 0; color: var(--muted-foreground); }
+.ac-shell select { max-width: 280px; min-width: 0; height: 30px; padding: 0 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--background); }
+.ac-count { color: var(--muted-foreground); white-space: nowrap; font-size: 12px; }
+.ac-coverage { color: var(--muted-foreground); font-size: 11px; flex: 0 1 150px; }
+.ac-spacer { flex: 1; }
+.ac-notice { padding: 8px 16px; border-bottom: 1px solid var(--border); color: var(--muted-foreground); background: var(--muted); font-size: 12px; }
+.ac-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, 36%); flex: 1; min-height: 0; }
+.ac-dock-closed { grid-template-columns: minmax(0, 1fr); }
+.ac-canvas-wrap { position: relative; min-width: 0; min-height: 0; background: color-mix(in srgb, var(--muted) 35%, var(--background)); }
+.ac-canvas { height: 100%; overflow: auto; overscroll-behavior: contain; cursor: grab; background-image: radial-gradient(var(--border) 1px, transparent 1px); background-size: 24px 24px; }
+.ac-canvas:focus-visible { outline: 2px solid var(--ring); outline-offset: -2px; }
+.ac-panning { cursor: grabbing; user-select: none; }
+.ac-pan-mode .ac-pane, .ac-pan-mode .ac-pane-head { cursor: grab; }
+.ac-panning * { cursor: grabbing !important; }
+.ac-icon[aria-pressed="true"] { background: var(--accent); color: var(--accent-foreground); }
+.ac-links { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
+.ac-links path { fill: none; stroke: var(--primary); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.ac-links .ac-browser-link { stroke: var(--muted-foreground); stroke-dasharray: 6 5; }
+.ac-pane { cursor: auto; }
+.ac-pane-head { cursor: grab; touch-action: none; }
+.ac-browser-body { display: grid; gap: 10px; padding: 20px; overflow: auto; align-content: center; flex: 1; }
+.ac-browser-body > svg { width: 24px; height: 24px; color: var(--muted-foreground); }
+.ac-browser-body strong, .ac-browser-body span { overflow-wrap: anywhere; }
+.ac-browser-body span { font-size: 12px; color: var(--muted-foreground); }
+.ac-browser-image { width: 100%; height: 180px; object-fit: contain; background: var(--muted); }
+.ac-scroll-area { position: relative; overflow: hidden; }
+.ac-world { position: relative; transform-origin: top left; }
+.ac-workspace-group { position: absolute; border: 1px solid color-mix(in srgb, var(--workspace-color) 65%, var(--border)); border-radius: 8px; background: color-mix(in srgb, var(--workspace-color) 7%, transparent); pointer-events: none; }
+.ac-workspace-group > header { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 12px 20px; }
+.ac-workspace-group strong { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; }
+.ac-workspace-group header > span:not(.ac-workspace-swatch) { font-size: 11px; color: var(--muted-foreground); }
+.ac-workspace-group button { pointer-events: auto; }
+.ac-workspace-swatch { width: 10px; height: 10px; border-radius: 2px; background: var(--workspace-color); flex: 0 0 10px; }
+.ac-browser-preview { display: grid; gap: 8px; }
+.ac-browser-placeholder { height: 180px; display: grid; place-items: center; background: var(--muted); }
+.ac-browser-placeholder svg { width: 28px; height: 28px; color: var(--muted-foreground); }
+.ac-preview-controls { display: flex; align-items: center; gap: 8px; font-size: 11px; }
+.ac-preview-controls label { display: flex; align-items: center; gap: 4px; }
+.ac-preview-controls > span { flex: 1; text-align: right; }
+.ac-universal { color: var(--muted-foreground); font-size: 11px; font-weight: 400; margin-left: 10px; }
+.ac-working::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: currentColor; margin-right: 5px; }
+.ac-pane { position: absolute; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border); border-radius: 8px; background: var(--background); box-shadow: 0 3px 12px color-mix(in srgb, var(--foreground) 6%, transparent); }
+.ac-pane.ac-selected { border-color: var(--ring); z-index: 2; }
+.ac-pane-head { display: flex; align-items: center; gap: 6px; min-height: 40px; padding: 4px 8px; border-bottom: 1px solid var(--border); background: var(--card, var(--background)); }
+.ac-pane-head strong { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 600; }
+.ac-grip { cursor: grab; touch-action: none; }
+.ac-grip:active { cursor: grabbing; }
+.ac-status { flex-shrink: 0; color: var(--muted-foreground); font-size: 11px; }
+.ac-working { color: var(--primary); }
+.ac-waiting { color: var(--foreground); font-weight: 600; }
+.ac-failed { color: var(--destructive); }
+.ac-context { display: flex; align-items: center; gap: 12px; min-height: 28px; padding: 4px 12px; color: var(--muted-foreground); font-size: 11px; border-bottom: 1px solid var(--border); }
+.ac-context span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ac-context span:first-child { flex: 1; }
+.ac-chat { flex: 1; min-height: 0; }
+.ac-live-timeline { display: flex; flex-direction: column; overflow: hidden; }
+.ac-resize { position: absolute; right: 2px; bottom: 2px; width: 22px; height: 22px; display: grid; place-items: center; border: 0; background: var(--background); color: var(--muted-foreground); cursor: nwse-resize; touch-action: none; }
+.ac-coordinator { display: flex; flex-direction: column; min-width: 0; min-height: 0; border-left: 1px solid var(--border); background: var(--background); }
+.ac-coord-head { display: flex; align-items: center; gap: 4px; min-height: 44px; padding: 6px 12px; border-bottom: 1px solid var(--border); }
+.ac-coord-head h1 { flex: 1; margin: 0; font-size: 13px; font-weight: 600; }
+.ac-coord-identity { display: grid; gap: 4px; padding: 10px 16px; border-bottom: 1px solid var(--border); }
+.ac-coord-identity strong { font-size: 12px; overflow-wrap: anywhere; }
+.ac-coord-identity span { color: var(--muted-foreground); font-size: 11px; overflow-wrap: anywhere; }
+.ac-chooser { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; border-bottom: 1px solid var(--border); }
+.ac-chooser select { flex: 1; max-width: 100%; width: 100%; }
+.ac-command { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 10px; background: var(--secondary); color: var(--secondary-foreground); border: 1px solid var(--border); border-radius: 4px; }
+.ac-empty { display: grid; flex: 1; place-content: center; justify-items: center; gap: 12px; color: var(--muted-foreground); padding: 24px; }
+.ac-empty h2 { margin: 0; font-size: 13px; font-weight: 500; }
+.ac-dock-empty { text-align: center; }
+.ac-tools { position: absolute; bottom: 12px; right: 12px; display: flex; align-items: center; gap: 2px; padding: 4px; border: 1px solid var(--border); border-radius: 6px; background: var(--background); }
+.ac-tools span { min-width: 44px; text-align: center; font-size: 11px; color: var(--muted-foreground); }
+.ac-minimap { position: absolute; left: 12px; bottom: 12px; width: 150px; height: 100px; border: 1px solid var(--border); border-radius: 6px; background: var(--background); padding: 6px; }
+.ac-minimap svg { width: 100%; height: 100%; }
+.ac-minimap button { position: absolute; bottom: 4px; right: 4px; background: var(--background); }
+.ac-compose-overlay { position: absolute; inset: 44px 0 0; z-index: 20; overflow: auto; background: var(--background); padding: 32px; }
+.ac-compose-panel { max-width: 850px; margin: 0 auto; }
+.ac-compose-panel > header { margin-bottom: 24px; }
+@media (max-width: 900px) {
+  .ac-brand { font-size: 0; gap: 0; }
+  .ac-layout { display: flex; flex-direction: column; overflow: auto; }
+  .ac-canvas-wrap { min-height: 0; flex: 1; }
+  .ac-coordinator { min-height: 500px; flex: 0 0 70vh; border-left: 0; border-top: 1px solid var(--border); }
+  .ac-scroll-area { width: 100% !important; height: auto !important; }
+  .ac-world { left: 0 !important; top: 0 !important; width: 100% !important; height: auto !important; transform: none !important; padding: 12px; display: grid; gap: 12px; }
+  .ac-pane { position: relative; left: auto !important; top: auto !important; width: 100% !important; height: 460px !important; }
+  .ac-tools, .ac-grip, .ac-resize, .ac-links, .ac-minimap { display: none; }
+  .ac-workspace-group { display: none; }
+  .ac-canvas, .ac-pane-head { cursor: auto; touch-action: auto; }
+  .ac-toolbar label { flex: 1; font-size: 0; gap: 0; }
+  .ac-toolbar select { width: 100%; font-size: 12px; }
+  .ac-count { display: none; }
+  .ac-compose-overlay { padding: 12px; }
+}

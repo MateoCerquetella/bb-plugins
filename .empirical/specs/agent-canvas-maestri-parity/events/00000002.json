@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "sequence": 2,
+  "previousDigest": "sha256:7076e5333149209da831e3e0acff2370ef918de74b8747d44e6f5dd8d92974f8",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Size: keep as one (The user explicitly requests a complex continuation with full Maestri parity. Retain one authoritative feature and parity inventory so portable requirements cannot disappear between slices; implement and verify internal milestones incrementally without shrinking final scope.)",
+  "createdAt": "2026-10-06T02:07:07.920Z",
+  "stateBeforeDigest": "sha256:946e72a7aee4e05c425644f61050b5e6acc272fc843e3c42023a47fa29e8f783",
+  "stateAfterDigest": "sha256:2c9be9cede205802195b1f4d9e2982c2fcb24ff125fda9ba3caa6d814b5e2648",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 2,
+    "activeFeature": "agent-canvas-maestri-parity",
+    "request": "Continue working on Agent Canvas. This is a complex task: inspect https://www.themaestri.app/en and mimic all observable features and, as far as possible, its style and interactions in our independently installable BB plugin.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": null,
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:b2e64529319a756faa229cfc72fba4ff5032b1a32eef0999522fc2bb0e459543",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": null,
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-06T02:07:07.920Z",
+    "reviewFirst": true,
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 14,
+      "capabilities": 1,
+      "reason": "The user explicitly requests a complex continuation with full Maestri parity. Retain one authoritative feature and parity inventory so portable requirements cannot disappear between slices; implement and verify internal milestones incrementally without shrinking final scope.",
+      "actor": "agent",
+      "revision": 1
+    }
+  },
+  "digest": "sha256:6a0511926552477c48d5f85514b8691d5f9aae6107c2bcf2b868c49c4c3dafb8"
+}
