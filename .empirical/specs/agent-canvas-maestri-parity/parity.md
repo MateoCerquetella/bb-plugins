@@ -12,16 +12,16 @@ Reference: https://www.themaestri.app/en and public /en/docs pages recorded in r
 | Groups, align/distribute/tidy/snapping | Automatic workspace squares | Authored groups and nine arrangement operations; locked geometry preserved | Implemented; model tests pass |
 | Undo/redo, copy/paste, clone, import/export | Saved pane geometry | Bounded validated v1 document/history, remapped composition copies and JSON backup | Implemented; model and fixture tests pass |
 | Connections, cross-workspace context | Recorded parent and browser links | Authored links, deterministic traversal and per-call scoped note tools implemented | Implemented; authorization tests pass |
-| Maestro and reusable agent roles | Removed Control UI; bounded retained backend | Role editor and explicit native recruitment/assignment/stop; scoped Maestro team tool | Implemented; authorization tests pass; live actions pending |
+| Maestro and reusable agent roles | Removed Control UI; bounded retained backend | Role editor, five editable instruction presets seeded once, and explicit native recruitment/assignment/stop; scoped Maestro team tool | Implemented; authorization tests pass; live actions pending |
 | Composer mentions/drafts/images/chat subjects | Native timeline only | Native composer draft/image behavior and signed connected-note mention provider, with fresh content resolution | Implemented; native mention UI evidence pending |
-| Workspaces and floors | Workspace/worktree filters | Shared workspace viewports, native worktree composer, real changes/PR review and native floor navigation; further landing preparation pending | Partial |
+| Workspaces and floors | Workspace/worktree filters | Explicit workspace pickers in sidebar and agent panel, compact native floor navigation, shared workspace viewports, native worktree composer and real changes/PR review; further landing preparation pending | Partial |
 | Partituras | Absent | Save/search/rename/delete/place plus independent versioned library transfer preserving roles/cables/groups | Implemented; model tests and fixture placement pass |
 | Fichários | Absent | Named collections, member focus, search, reusable templates, cross-workspace placement and versioned transfer | Implemented; model tests and fixture placement pass |
 | File tree/editor/search | Absent | Real environment paths/read/write with hash checks and root binding; integration tests remain | Implemented; host evidence pending |
 | Portals / design mode | Authorized browser captures | Project Steel navigation RPC and embedded interactive viewer; annotation/design-mode controls remain | Partial; navigation smoke passed, authenticated viewer pending |
-| Routines | Absent | Native Automations create/edit/pause/resume/delete, target execution inheritance; sequential chains remain | Partial; paused native lifecycle smoke passed |
+| Routines | Absent | Native Automations create/edit/pause/resume/delete, target execution inheritance and sequential chains with completion ordering, pause and interruption protection | Implemented; native lifecycle and two-step ordered chain smoke passed |
 | Batuta search and shortcuts/settings | Basic navigation shortcuts | Search palette, keyboard actions and default-size/grid settings implemented | Implemented; fixture checked |
-| Agent usage | No per-node usage | Supported BB provider usage integration | Outstanding |
+| Agent usage | No per-node usage | Supported BB provider usage integration in agent actions | Implemented; live UI evidence pending |
 | SSH/Docker/runtime environments | BB environment labels | Use actual BB host/environment facilities | Partial |
 | Native devices, Metal/APFS, Spotlight | No native runtime | Demonstrate host/API limits; document BB alternatives | Capability assessment pending |
 | Ombro / Wire | No on-device companion or native mobile app | BB attention/summary and remote access adaptations; no false native parity | Capability assessment pending |
@@ -43,3 +43,31 @@ Evidence is detailed in `research/verification-2026-10-06.md`. Agent Canvas has
 pass, followed by focused validation and a browser regression for stacked-layout
 viewport preservation. This remains implementation progress, not completion of
 the original portable parity contract.
+
+## Usability continuation from thr_i92zicydn5
+
+The urgent UI/workspace/role slice is implemented and installed. Native composer
+and chat controls are excluded from canvas CSS resets. The create panel is wider,
+workspace/floor labels use authoritative host metadata, drafts survive a workspace
+change, and created-agent navigation follows the submitted workspace. Missing
+canvas icons use local SVG artwork instead of the host Zap fallback.
+
+Five presets migrate once with a document revision update. The installed plugin's
+readDocument RPC confirmed Maestro, Engineer, Reviewer, Designer and Researcher
+with their instructions and rolePresetsVersion 1. Custom roles and intentional
+preset deletion are covered by migration tests.
+
+Root npm install and npm run check passed; the final Agent Canvas check passed
+32 tests plus TypeScript, SDK pin validation and build. Steel fixture flows checked
+workspace/floor selection, role options, draft retention, environment reset,
+submitted workspace/role instructions, and desktop/mobile panel bounds.
+Screenshots: docs/media/agent-canvas-agent-setup-{desktop,mobile}.png and
+agent-canvas-role-presets.png. The fixture uses SDK testing mocks for native
+composition/icons and does not prove the real host composer or a real agent launch.
+Authenticated BB UI verification remains pending: the public app required sign-in.
+
+The existing native two-step chain proof is preserved in
+research/chain-runtime-proof.json. Full parity, fresh-context review, Empirical
+phase receipts and independent integration remain open. Sync was refused because
+unrelated journal changes leave this checkout dirty; the prior Steel server merge
+conflict was not changed during this slice.

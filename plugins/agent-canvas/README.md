@@ -32,8 +32,8 @@ layouts and pre-shared/conflict backups remain in browser storage.
 
 Visible conversations use native BB `ThreadChat`, including its composer,
 attachments and permission handling. Off-screen chats suspend their rendering.
-New agents use BB's native provider/model/environment picker. Role instructions
-are included in the launch prompt. Roles can be assigned from node actions;
+Choose a workspace from the sidebar or the new-agent panel. Changing the new-agent workspace keeps the prompt draft and resets any floor selection from the previous workspace. New agents use BB's native provider/model/environment picker. The wider panel preserves native composer styling. Role instructions
+are included in the launch prompt. Maestro, Engineer, Reviewer, Designer and Researcher presets include editable instructions and colors. Existing canvases receive these presets once; custom roles, edits and deletions are preserved. Roles can be assigned from node actions;
 Send role instructions explicitly sends them to an existing conversation.
 Dynamic role instructions/tools take effect when BB constructs the next provider
 session, rather than changing an existing runtime silently.
@@ -73,10 +73,9 @@ Terminal process IDs are not stored in exported compositions.
 Routines use BB's native Automations service, target an existing agent, and
 inherit its execution configuration when saved. Create a paused routine, then
 activate explicitly; edit, pause/resume, and delete controls use native records.
-Sequential prompt chains separated by `&&` are still outstanding.
+Put `&&` on its own line between prompts to create a sequential chain (up to 20 steps). Each step waits for its accepted BB turn to complete. Pausing, changing or stopping a routine prevents later steps; interrupted runs are not automatically resent.
 
-Other outstanding parity work includes search refinements, sequential routine
-chains and complete host/live-UI verification. The authoritative inventory
+Search covers nodes, roles, workspaces, floors, ensembles, collections and actions; shortcuts can be customized in settings. Agent actions include supported BB provider usage. Other outstanding parity work includes complete host/live-UI verification and the remaining capability adaptations. The authoritative inventory
 is `.empirical/specs/agent-canvas-maestri-parity/parity.md`; this implementation
 checkpoint does not establish complete Maestri parity.
 

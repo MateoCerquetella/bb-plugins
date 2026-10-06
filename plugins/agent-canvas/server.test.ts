@@ -47,6 +47,22 @@ test("shared document writes serialize revisions and reject stale views", async(
  const {bb,harness}=createFakePluginHost({pluginId:"agent-canvas"});await plugin(bb);
  try{const {emptyDocument,createNode}=await import("./document.ts");const d=emptyDocument();d.nodes.push(createNode("note","project",{x:0,y:0,w:300,h:200}));const results=await Promise.allSettled([harness.behavior.callRpc("saveDocument",{revision:0,document:d}),harness.behavior.callRpc("saveDocument",{revision:0,document:d})]);assert.equal(results.filter(r=>r.status==="fulfilled").length,1);assert.equal(results.filter(r=>r.status==="rejected").length,1);const read=await harness.behavior.callRpc("readDocument",null) as {revision:number;document:typeof d};assert.equal(read.revision,1);assert.deepEqual(read.document,d);}finally{await harness.lifecycle.dispose();}
 });
+test("stored role presets migrate once and invalidate previously loaded revisions",async()=>{
+ const {emptyDocument}=await import("./document.ts");
+ const {bb,harness}=createFakePluginHost({pluginId:"agent-canvas"});
+ await bb.storage.kv.set("canvas-document-v1",{revision:7,document:emptyDocument()});
+ await plugin(bb);
+ try{
+  const current=await harness.behavior.callRpc("readDocument",null) as {revision:number;document:ReturnType<typeof emptyDocument>};
+  assert.equal(current.revision,8);assert.equal(current.document.roles.length,5);
+  await assert.rejects(harness.behavior.callRpc("saveDocument",{revision:7,document:emptyDocument()}));
+  const edited={...current.document,roles:current.document.roles.filter(role=>role.name!=="Reviewer")};
+  await harness.behavior.callRpc("saveDocument",{revision:8,document:edited});
+  const stored=await bb.storage.kv.get<{revision:number;document:typeof edited}>("canvas-document-v1");
+  assert.equal(stored?.document.settings.rolePresetsVersion,1);
+  assert.equal(stored?.document.roles.some(role=>role.name==="Reviewer"),false);
+ }finally{await harness.lifecycle.dispose();}
+});
 test("connected-note tools enforce the calling project and explicit current links",async()=>{
  const {emptyDocument,createNode,connect}=await import("./document.ts");let deleted=false;
  const {bb,harness}=createFakePluginHost({pluginId:"agent-canvas",sdk:{threads:{get:async(args:any)=>makeThreadResponse({id:args.threadId,projectId:args.threadId==="outsider"?"other":"project",deletedAt:deleted?1:null})}}});await plugin(bb);

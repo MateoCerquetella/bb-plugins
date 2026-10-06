@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { Box } from "./graph.ts";
+import { seedStarterRoles } from "./roles.ts";
 const id = z.string().min(1).max(240);
 const coordinate = z.number().finite().min(-100000).max(100000);
 export const boxSchema = z.object({ x: coordinate, y: coordinate, w: z.number().finite().min(120).max(4000), h: z.number().finite().min(80).max(4000) });
@@ -24,7 +25,7 @@ const baseSchema = z.object({
   roles: z.array(roleSchema).max(100), ensembles: z.array(ensembleSchema).max(50), collectionTemplates:z.array(ensembleSchema).max(100).default([]), collections: z.array(collectionSchema).max(100),
   presentations: z.record(id, presentationSchema).refine(v=>Object.keys(v).length<=300),
   viewports: z.record(id,z.object({x:coordinate,y:coordinate,zoom:z.number().finite().min(.1).max(1.5),environmentId:id.nullable()})).refine(v=>Object.keys(v).length<=100),
-  settings: z.object({ nodeWidth:z.number().min(320).max(1500), nodeHeight:z.number().min(260).max(1500), noteWidth:z.number().min(120).max(1000), noteHeight:z.number().min(80).max(1000), grid:z.boolean() }),
+  settings: z.object({ nodeWidth:z.number().min(320).max(1500), nodeHeight:z.number().min(260).max(1500), noteWidth:z.number().min(120).max(1000), noteHeight:z.number().min(80).max(1000), grid:z.boolean(),shortcuts:z.record(z.string().max(30),z.string().min(1).max(60)).default({}),rolePresetsVersion:z.number().int().min(0).max(1).default(0) }),
 });
 export type CanvasDocument = z.infer<typeof baseSchema>;
 export type CanvasNode = z.infer<typeof nodeSchema>;
@@ -50,7 +51,7 @@ export const documentSchema = baseSchema.superRefine((d,ctx)=>{
   }
   if(d.collectionTemplates.some(e=>e.nodes.some(n=>n.kind!=="note")))fail("Collection templates may contain only notes");
 });
-export function emptyDocument():CanvasDocument{return {version:1,nodes:[],edges:[],groups:[],roles:[],ensembles:[],collectionTemplates:[],collections:[],presentations:{},viewports:{},settings:{nodeWidth:540,nodeHeight:420,noteWidth:320,noteHeight:300,grid:true}};}
+export function emptyDocument():CanvasDocument{return {version:1,nodes:[],edges:[],groups:[],roles:[],ensembles:[],collectionTemplates:[],collections:[],presentations:{},viewports:{},settings:{nodeWidth:540,nodeHeight:420,noteWidth:320,noteHeight:300,grid:true,shortcuts:{},rolePresetsVersion:0}};}
 export const newId=()=>crypto.randomUUID();
 export const snap=(v:number)=>Math.round(v/20)*20;
 export const boundedBox=(box:Box):Box=>({x:Math.max(-100000,Math.min(100000,box.x)),y:Math.max(-100000,Math.min(100000,box.y)),w:Math.max(120,Math.min(4000,box.w)),h:Math.max(80,Math.min(4000,box.h))});
@@ -89,7 +90,7 @@ export function placeEnsemble(d:CanvasDocument,e:Ensemble,workspaceId:string,env
 }
 export function importDocument(raw:string):CanvasDocument{if(raw.length>5_000_000)throw Error("Canvas import exceeds 5 MB");return documentSchema.parse(JSON.parse(raw));}
 export function exportDocument(d:CanvasDocument):string{return JSON.stringify(documentSchema.parse(d),null,2);}
-export function readDocument():CanvasDocument{try{const raw=localStorage.getItem("agent-canvas:document:v1");return raw?importDocument(raw):emptyDocument();}catch{return emptyDocument();}}
+export function readDocument():CanvasDocument{try{const raw=localStorage.getItem("agent-canvas:document:v1");return seedStarterRoles(raw?importDocument(raw):emptyDocument());}catch{return seedStarterRoles(emptyDocument());}}
 export function writeDocument(d:CanvasDocument):void{localStorage.setItem("agent-canvas:document:v1",exportDocument(d));}
 export type History={past:CanvasDocument[];present:CanvasDocument;future:CanvasDocument[]};
 export function commit(h:History,d:CanvasDocument):History{if(h.present===d)return h;return {past:[...h.past,h.present].slice(-60),present:documentSchema.parse(d),future:[]};}

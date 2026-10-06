@@ -1,3 +1,4 @@
+import {createChainEngine} from "./chains.ts";
 import {randomBytes} from "node:crypto";
 import {noteMentionToken,readNoteMentionToken} from "./mentions.ts";
 import {routineBridge} from "./routines.ts";
@@ -8,6 +9,7 @@ import { z } from "zod";
 import { rpcContract, snapshotSchema, type Snapshot } from "./contract.ts";
 import { uiCommandSchema, uiMessageSchema, type CanvasView, type UiCommand } from "./control.ts";
 import {documentSchema,emptyDocument,presentation,setPresentation,connect,type CanvasDocument} from "./document.ts";
+import {seedStarterRoles} from "./roles.ts";
 import { workspaceId } from "./graph.ts";
 
 function locationLabel(raw: string) {
@@ -34,6 +36,8 @@ export default async function plugin(bb: BbPluginApi) {
   const noteKey=mentionKey;
   const storedDocument = await bb.storage.kv.get<{revision:number;document:CanvasDocument}>("canvas-document-v1");
   let canvasDocument = {revision:storedDocument?.revision??0, document:documentSchema.safeParse(storedDocument?.document).success?documentSchema.parse(storedDocument!.document):emptyDocument()};
+  const seeded=seedStarterRoles(canvasDocument.document);
+  if(seeded!==canvasDocument.document){canvasDocument={revision:canvasDocument.revision+(storedDocument?1:0),document:seeded};await bb.storage.kv.set("canvas-document-v1",canvasDocument);}
   let documentQueue:Promise<unknown> = Promise.resolve();
   function saveCanvas(document:CanvasDocument,revision:number) {
     const task=documentQueue.then(async()=>{
@@ -177,8 +181,11 @@ export default async function plugin(bb: BbPluginApi) {
     if(environment.status!=="ready"||!environment.path)throw Error("Selected environment is unavailable");
     const path=relativeResourcePath(raw);return {hostId:environment.hostId,rootPath:environment.path,path:`${environment.path.replace(/\/$/,"")}/${path}`};
   }
-  const routines=routineBridge(bb);
+  const chains=await createChainEngine(bb,lifetime.signal);
+  const routines=routineBridge(bb,chains);
   bb.rpc.register(rpcContract, {
+    beginRoutineChain:input=>chains.begin(input),
+    routineChainStatus:input=>chains.status(input),
     listRoutines:({projectId})=>routines.list(projectId),
     createRoutine:input=>routines.create(input),
     updateRoutine:input=>routines.update(input),

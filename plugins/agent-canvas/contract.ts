@@ -1,6 +1,7 @@
 import { defineRpcContract } from "@get-bb/plugin-sdk";
 import { z } from "zod";
 import {documentSchema} from "./document.ts";
+import {chainStateSchema} from "./chains.ts";
 import {routineSchema,triggerSchema} from "./routines.ts";
 import { viewSchema } from "./control.ts";
 
@@ -26,9 +27,11 @@ export const snapshotSchema = z.object({
 });
 export type Snapshot = z.infer<typeof snapshotSchema>;
 export const rpcContract = defineRpcContract({
+  beginRoutineChain:{input:z.object({automationId:id,runId:id}),output:chainStateSchema},
+  routineChainStatus:{input:z.object({automationId:id,runId:id}),output:chainStateSchema},
   listRoutines:{input:z.object({projectId:id}),output:z.array(routineSchema).max(500)},
-  createRoutine:{input:z.object({projectId:id,threadId:id,name:z.string().min(1).max(200),prompt:z.string().min(1).max(30000),trigger:triggerSchema}),output:routineSchema},
-  updateRoutine:{input:z.object({projectId:id,automationId:id,threadId:id,name:z.string().min(1).max(200),prompt:z.string().min(1).max(30000),trigger:triggerSchema}),output:routineSchema},
+  createRoutine:{input:z.object({projectId:id,threadId:id,name:z.string().min(1).max(200),prompt:z.string().min(1).max(30000),trigger:triggerSchema,enabled:z.boolean().optional()}),output:routineSchema},
+  updateRoutine:{input:z.object({projectId:id,automationId:id,threadId:id,name:z.string().min(1).max(200),prompt:z.string().min(1).max(30000),trigger:triggerSchema,enabled:z.boolean().optional()}),output:routineSchema},
   deleteRoutine:{input:z.object({projectId:id,automationId:id}),output:z.object({ok:z.literal(true)})},
   setRoutineEnabled:{input:z.object({projectId:id,automationId:id,enabled:z.boolean()}),output:routineSchema},
   listFiles: {input:z.object({environmentId:id,query:z.string().max(240)}),output:z.object({paths:z.array(z.object({path:z.string(),name:z.string(),kind:z.enum(["file","directory"])})).max(200),truncated:z.boolean()})},
