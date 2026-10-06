@@ -16,10 +16,6 @@
       "source": "./plugins/dockside"
     },
     {
-      "name": "save-my-model",
-      "source": "./plugins/save-my-model"
-    },
-    {
       "name": "host-monitor",
       "source": "./plugins/host-monitor"
     },

@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "sequence": 3,
+  "previousDigest": "sha256:9569c07f5bec0dc01f9ade111b5b9476d0ce553e17f77eacbfbf233cbc583a50",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Specified the approved Save My Model retirement with observable catalog, workspace, README, and immutable-history criteria; accepted the focused removal decision and verified the branch is current with remotes/mine/main.",
+  "createdAt": "2026-10-06T00:01:27.444Z",
+  "stateBeforeDigest": "sha256:d6db8897fde352bff5d335f06c99a3a1c30d16f5d71c772941c589bd0945a355",
+  "stateAfterDigest": "sha256:f350fbd6b2b61dfe1211f834918cb1ef65c4d1f899acea7efd405d2b6179d2e3",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 3,
+    "activeFeature": "retire-the-unused-save-my-model-plugin-from-the-mateocerquetella",
+    "request": "Retire the unused Save My Model plugin from the MateoCerquetella/bb-plugins repository. The user explicitly approved deleting plugins/save-my-model/, removing its .bb/plugins.json catalog entry and package-lock workspace references, while retaining immutable historical Git releases. Its top-level README catalog row and quick-start section were already removed on main at 960fe62a. Keep unrelated .empirical historical evidence intact, update current project metadata only where necessary, verify workspace installation/checks and catalog alignment, and integrate the focused removal to main.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "design",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Specified the approved Save My Model retirement with observable catalog, workspace, README, and immutable-history criteria; accepted the focused removal decision and verified the branch is current with remotes/mine/main.",
+    "implementationActor": null,
+    "workStartedAt": "2026-10-05T23:56:02.290Z",
+    "specDigest": "sha256:eb2df10fb13e2ae0a97bd5abc92a6e4ad0713f6e8c415ddf73a07fbba35e9b94",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:8512a5fb93ac248d3fe6eca3f717210b840abef8646757303217361954a2a3c9",
+    "impactDigest": "sha256:0ef2490ec0f0e93898cd2a2844c877df03835199d8011d5476417ab6fdbda821",
+    "capabilityClaimId": "retire-the-unused-save-my-model-plugin-from-the-mateocerquetella-05a8ee8dda3b",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-06T00:01:27.444Z",
+    "reviewFirst": true,
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "retire-the-unused-save-my-model-plugin-from-the-mateocerquetella-05a8ee8dda3b",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "retire-the-unused-save-my-model-plugin-from-the-mateocerquetella",
+      "worktree": "/Users/mateocerquetella/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_7kmqftumn2-1/bb-plugins-retire-the-unused-save-my-model-plugin-from-the-mateocerquetella",
+      "worktreeId": "sha256:286799f90486329f5eb8f413539f85f9006cce3c656144da68417af91d983fce",
+      "baseCommit": "960fe62ad10347bb17167f067e1f6a38a98b6c77",
+      "baseTree": "84554c444bd312230b828154d46a88979f988f29",
+      "bases": {
+        "plugin-git-distribution": {
+          "capability": "plugin-git-distribution",
+          "digest": "sha256:a32930971c97dd3612b83783fb6bff5cd69102dc6267b6b56640e62cdf684950",
+          "requirements": {
+            "retired save my model is absent from active distribution": null
+          }
+        }
+      },
+      "capabilities": [
+        "plugin-git-distribution"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-06T00:01:27.392Z",
+      "heartbeatAt": "2026-10-06T00:01:27.392Z",
+      "digest": "sha256:4db3b542c59fad9123c2d28a72e32a9c05368192c81568757ddb20e5905d9008"
+    }
+  },
+  "digest": "sha256:e7a78a0a191721808ee638afe35ddd245f639b7fc61f4e05411a26c64edcf2c0"
+}
