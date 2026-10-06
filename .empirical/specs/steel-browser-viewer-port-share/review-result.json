@@ -1,7 +1,16 @@
 {
   "schemaVersion": 1,
-  "packetDigest": "sha256:e74229f51452fefc3de312b99383e88508a7e723df051a67bbadbae9e958017c",
-  "resultPath": ".empirical/specs/steel-browser-viewer-port-share/reviews/361b60104b72044177ac4ae4.json",
-  "resultDigest": "sha256:361b60104b72044177ac4ae476eded055e6551d843f6edab38ff9134c88e868c",
-  "receiptId": "collected-f4ae18fabfc7ff003a050e3d"
+  "packetDigest": "sha256:6d6428e20791afb33359698d3ff0e04dbfa5740ff153238a2f42e211bd256648",
+  "resultPath": ".empirical/specs/steel-browser-viewer-port-share/reviews/ed8ca141119b4416906cebe9.json",
+  "resultDigest": "sha256:ed8ca141119b4416906cebe9022c22c6e7c9ab779f9978d9b5b2a5715c540336",
+  "receiptId": "collected-6958a67b2dc9a52017e02e16",
+  "reReview": {
+    "previousResultDigest": "sha256:361b60104b72044177ac4ae476eded055e6551d843f6edab38ff9134c88e868c",
+    "previousBaseCommit": "235147a554a9f5f48287766ae461acace0877bd3",
+    "previousHeadCommit": "1ea9eed7952b6b6ec3358932ba126eef7a5c7a8b",
+    "previousVerdict": "APPROVED",
+    "previousReview": "# Verdict: APPROVED\n\n- PASS AC-1: The healthy-readiness callback checks local API/CDP first, then ensureViewerShare lists shares on the Steel host, validates the saved container when the API share is missing, and exposes only the saved loopback API port.\n- PASS AC-2: A matching API-port share with the exact saved HTTPS origin returns without verification or mutation. Unrelated shares are only read, the CDP port is explicitly rejected as an API share target, and the recovery path contains no session, profile, or container lifecycle mutation.\n- PASS AC-3: Container verification, Connect listing/exposure, and exact-origin errors propagate from the readiness callback. ProjectBrowsers does not convert rejected readiness into provisioning, does not populate the readiness cache, removes the in-flight coalescing entry, and permits a later retry.\n- PASS AC-4: The existing 10-second recentlyReady cache and per-project active-promise coalescing are unchanged. Share readiness participates in the same successful probe, expired entries re-run readiness, and rejected share checks remain retryable.\n\n## Security / correctness\n\nThe recovery preserves the authenticated HTTPS origin invariant, validates a missing share against the running project-specific container, requires a dedicated loopback API port distinct from CDP, explicitly selects the Steel host, and never exposes CDP. No material security or correctness issue was found.\n\n## Design / maintainability\n\nThe implementation follows D-001 cleanly: share registration recovery is isolated in a dependency-injected helper and composed after local liveness, while false local readiness alone retains the established provisioning path. Focused tests cover reuse, exact host and port selection, mismatch and Connect failures, retry behavior, coalescing, and cache expiry.",
+    "openFindings": [],
+    "deferredFindings": []
+  }
 }

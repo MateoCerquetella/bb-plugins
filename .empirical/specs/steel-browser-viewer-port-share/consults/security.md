@@ -1,28 +1,22 @@
 # Security Advisory
 
 - Specialist: security
-- Verdict: blocking
+- Verdict: advisory
 
-## Finding SEC-001: Existing shares can bypass container ownership validation
+## Findings
 
-- Severity: high
-- Category: trust boundary / project isolation
-- Location: `design.md` matching-share path and AC-3
-- Finding: If the saved dedicated container is gone or mismatched, an
-  attacker-controlled local process can bind the saved API and CDP ports and
-  answer the liveness probes. When a matching Connect share already exists,
-  accepting it without validating container ownership leaves the authenticated
-  viewer routing to that process. Exact origin comparison does not close this
-  path because the existing share already has the expected origin.
-- Recommendation: Run the existing dedicated-container verifier before
-  accepting either a matching share or creating a missing one. On mismatch,
-  propagate a non-recreation readiness failure, do not cache success, permit a
-  later retry, and cover the matching-share/container-mismatch case with a
-  regression test that proves no expose call or browser recreation occurs.
+None. No blocking security issue remains in the reviewed specification, design,
+or capability delta.
 
 ## Exploit Review
 
-The viewer-origin mismatch and Connect-error guards otherwise respond
-correctly: failures propagate, success is not cached, and the container repair
-path is not entered. SEC-001 remains blocking until every healthy-looking
-viewer path validates ownership of the dedicated project container.
+The earlier exploit required a local process to impersonate Steel on the saved
+API port, satisfy liveness checks, and cause BB Connect to reuse or create a
+share targeting the attacker-controlled listener. The revised design closes
+that path by validating the running dedicated container's ownership before
+listing, trusting, or creating any share. A listener that merely occupies the
+saved port is therefore insufficient.
+
+The smallest effective fix is the one now specified: make successful container
+ownership validation a mandatory precondition for share inspection and API-port
+exposure, propagate validation failures, and never cache success on failure.

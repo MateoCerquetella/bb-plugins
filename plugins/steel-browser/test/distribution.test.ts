@@ -23,7 +23,10 @@ test("contributes Steel discovery instructions to new agent sessions", async () 
   assert.match(server, /automatically provisions and binds/u);
   assert.match(server, /await ensureBinding\(projectId\)/u);
   assert.match(server, /const binding = await ensureBinding\(projectId\);/u);
-  assert.match(server, /\}, bindingReady\)/u);
+  assert.match(server, /async binding => \{/u);
+  assert.match(server, /if \(!await bindingReady\(binding\)\) return false;/u);
+  assert.match(server, /await ensureViewerShare\(projectId, binding\);/u);
+  assert.match(server, /return true;/u);
   assert.match(server, /client\(scope, true\)/u);
   const allProjects = server.slice(server.indexOf("async allProjects()"), server.indexOf("async project(scope"));
   assert.match(allProjects, /projects\.binding\(project\.id\)/u);
