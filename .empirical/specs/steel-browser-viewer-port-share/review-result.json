@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:1b875a834c61dccd90b16cec903a630d2d247e5bbc8d48fcb68e82367a3bfd87",
+  "resultPath": ".empirical/specs/steel-browser-viewer-port-share/reviews/ca23183a230eecda285f3ba5.json",
+  "resultDigest": "sha256:ca23183a230eecda285f3ba501890d78424737252bf64945286dc45fd0777edf",
+  "receiptId": "collected-372e7d94e6a07e316ae1a802",
+  "reReview": {
+    "previousResultDigest": "sha256:ed8ca141119b4416906cebe9022c22c6e7c9ab779f9978d9b5b2a5715c540336",
+    "previousBaseCommit": "235147a554a9f5f48287766ae461acace0877bd3",
+    "previousHeadCommit": "aa5a30e3f97d346a36356082a479d6f77985b6ac",
+    "previousVerdict": "APPROVED",
+    "previousReview": "# Verdict: APPROVED\n\n- PASS AC-1: Prior passing verdict preserved. Healthy saved bindings still run share recovery through the readiness callback. Ownership verification now precedes share discovery; a missing share exposes only the validated API port with explicit Steel-host selection.\n- PASS AC-2: Prior passing verdict preserved. Matching shares still return without exposure or provisioning after read-only ownership verification. The delta introduces no changes to unrelated shares, CDP exposure, sessions, or profiles.\n- PASS AC-3: Strengthened. Container verification now executes even when a matching viewer share already exists, rejecting a missing, stopped, or mismatched dedicated container before Connect is called. Verification, origin, and Connect errors propagate out of the readiness callback rather than becoming false readiness results, so they neither invoke browser repair nor cache successful readiness.\n- PASS AC-4: Prior passing verdict preserved. The 10-second successful-readiness cache, binding comparison, per-project active promise coalescing, and expiry-triggered recovery are unchanged. Rejected verification cannot refresh the success timestamp; the active promise is cleared in finally for subsequent retries.\n\n## Security / correctness\n\nThe new pre-share verifyProjectInstance call closes the identified local-port impersonation path in which healthy-looking loopback responses plus an existing matching Connect route could previously bypass container ownership verification. It checks the named running project container, project label, API/CDP loopback port mappings, viewer domain, and dedicated profile before trusting any share. This is not a replacement for Docker-host trust and does not eliminate general post-check races or the intentionally retained 10-second cache window. Error propagation remains fail-closed. No new actionable security or correctness findings were identified in the re-review delta. Tests were inspected but not run, as instructed.\n\n## Design / maintainability\n\nD-001 is preserved: share-specific validation remains in the healthy readiness callback, while provisioning and container repair remain separate. The implementation is a minimal ordering change using the existing verifier, accompanied by updated documentation and focused tests for verification ordering and rejection before Connect. Prior criterion verdicts are carried forward; unrelated historical changes in the broad base-to-head diff were not independently re-reviewed.",
+    "openFindings": [],
+    "deferredFindings": []
+  }
+}

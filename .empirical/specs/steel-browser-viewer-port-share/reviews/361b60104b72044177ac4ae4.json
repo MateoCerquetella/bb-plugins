@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:e74229f51452fefc3de312b99383e88508a7e723df051a67bbadbae9e958017c",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "235147a554a9f5f48287766ae461acace0877bd3",
+  "headCommit": "1ea9eed7952b6b6ec3358932ba126eef7a5c7a8b",
+  "diffDigest": "sha256:7e6e987b5e93d0fb67c8b463433c476a744037451ea75d137a9612b947de42d6",
+  "verdict": "APPROVED",
+  "reviewerActor": "fresh-context-reviewer",
+  "reviewerInvocationId": "/root/fresh_review",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: The healthy-readiness callback checks local API/CDP first, then ensureViewerShare lists shares on the Steel host, validates the saved container when the API share is missing, and exposes only the saved loopback API port.\n- PASS AC-2: A matching API-port share with the exact saved HTTPS origin returns without verification or mutation. Unrelated shares are only read, the CDP port is explicitly rejected as an API share target, and the recovery path contains no session, profile, or container lifecycle mutation.\n- PASS AC-3: Container verification, Connect listing/exposure, and exact-origin errors propagate from the readiness callback. ProjectBrowsers does not convert rejected readiness into provisioning, does not populate the readiness cache, removes the in-flight coalescing entry, and permits a later retry.\n- PASS AC-4: The existing 10-second recentlyReady cache and per-project active-promise coalescing are unchanged. Share readiness participates in the same successful probe, expired entries re-run readiness, and rejected share checks remain retryable.\n\n## Security / correctness\n\nThe recovery preserves the authenticated HTTPS origin invariant, validates a missing share against the running project-specific container, requires a dedicated loopback API port distinct from CDP, explicitly selects the Steel host, and never exposes CDP. No material security or correctness issue was found.\n\n## Design / maintainability\n\nThe implementation follows D-001 cleanly: share registration recovery is isolated in a dependency-injected helper and composed after local liveness, while false local readiness alone retains the established provisioning path. Focused tests cover reuse, exact host and port selection, mismatch and Connect failures, retry behavior, coalescing, and cache expiry.",
+  "bodyDigest": "sha256:cf1e0a1b2cadcd622d5ab8346f787eadb920574b159eff946516bb2a91faa454",
+  "findings": [],
+  "digest": "sha256:361b60104b72044177ac4ae476eded055e6551d843f6edab38ff9134c88e868c"
+}

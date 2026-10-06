@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:1b875a834c61dccd90b16cec903a630d2d247e5bbc8d48fcb68e82367a3bfd87",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "235147a554a9f5f48287766ae461acace0877bd3",
+  "headCommit": "ff03e6c0cf54ad6b0477618878e5c0708b77de0e",
+  "diffDigest": "sha256:2f46f50ae1c674a7c9594923668cea49f0111126b87f4d5d79d80097c6db1b2b",
+  "verdict": "APPROVED",
+  "reviewerActor": "distribution_rereview",
+  "reviewerInvocationId": "distribution-rereview-ff03e6c0",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: A healthy saved binding with a missing viewer share restores only its API port on the Steel host.\n- PASS AC-2: Existing matching shares are reused; unrelated shares, CDP ports, sessions and profiles are unchanged.\n- PASS AC-3: Container mismatch, viewer origin mismatch or Connect failure fails closed without caching success or recreating the browser.\n- PASS AC-4: The existing ten-second readiness cache and concurrent request coalescing remain effective, with recovery after expiry.\n\n## Security / correctness\n\nThe delta is test-only and accurately asserts the committed async readiness callback behavior; no security or correctness issue found.\n\n## Design / maintainability\n\nThe assertions are clearer and more behavior-specific than the prior regex, while remaining scoped to the requested distribution-test delta.",
+  "bodyDigest": "sha256:50ccadc9481769667e4313762f0902322ef408e71174d61d0d9906053b07deba",
+  "findings": [],
+  "digest": "sha256:ca23183a230eecda285f3ba501890d78424737252bf64945286dc45fd0777edf"
+}

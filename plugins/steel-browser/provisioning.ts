@@ -30,6 +30,36 @@ export function viewerOrigin(value: string): string {
   return url.origin;
 }
 
+export async function ensureViewerShare(projectId: string, binding: Binding, dependencies: {
+  run?: Runner;
+  host?: string;
+  verify?: typeof verifyProjectInstance;
+} = {}): Promise<void> {
+  const command = dependencies.run ?? run;
+  const host = dependencies.host ?? hostname();
+  const expected = viewerOrigin(binding.viewerUrl);
+  const api = new URL(binding.apiUrl);
+  if (api.protocol !== "http:" || api.hostname !== "127.0.0.1" || !api.port
+    || api.username || api.password || api.pathname !== "/" || api.search || api.hash
+    || api.port === new URL(binding.cdpUrl).port) {
+    throw new Error("Viewer share requires a dedicated loopback API port distinct from CDP.");
+  }
+  await (dependencies.verify ?? verifyProjectInstance)(projectId, binding);
+  const shares = JSON.parse(await command("bb", ["connect", "shares", "--host", host, "--json"]));
+  const share = shares.shares.find((entry: { port: number }) => entry.port === Number(api.port));
+  if (share) {
+    if (viewerOrigin(share.url) !== expected) {
+      throw new Error("Existing project viewer differs from BB Connect; refusing rebinding.");
+    }
+    return;
+  }
+  // A healthy local API does not imply its authenticated viewer is still shared.
+  const actual = viewerOrigin(await command("bb", ["connect", "expose", api.port, "--host", host]));
+  if (actual !== expected) {
+    throw new Error("Restored project viewer differs from its saved binding; refusing rebinding.");
+  }
+}
+
 export async function provisionProjectInstance(projectId: string, dependencies: {
   run?: Runner;
   available?: (port: number) => Promise<boolean>;

@@ -3,7 +3,7 @@ import { rpcContract, scopeSchema, type CreateOptions, type Scope, type EnginePo
 import { normalizeBaseUrl, SteelClient, SteelClientError } from "./steel-client.ts";
 import { ProjectBrowsers } from "./projects.ts";
 import { runBrowser } from "./engines.ts";
-import { bindingReady, provisionProjectInstance, verifyProjectInstance } from "./provisioning.ts";
+import { bindingReady, ensureViewerShare, provisionProjectInstance, verifyProjectInstance } from "./provisioning.ts";
 import { actOnProject, parseBrowserAction } from "./actions.ts";
 
 const DEFAULT_OPTIONS: CreateOptions = {
@@ -78,7 +78,11 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
       const binding = await provisionProjectInstance(id, { dns, existing });
       await verifyProjectInstance(id, binding);
       return binding;
-    }, bindingReady);
+    }, async binding => {
+      if (!await bindingReady(binding)) return false;
+      await ensureViewerShare(projectId, binding);
+      return true;
+    });
   }
 
   let mutating = false;
