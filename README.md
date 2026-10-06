@@ -294,4 +294,3 @@ directory to `.bb/plugins.json`; the root workspace picks it up automatically.
 ## License
 
 [MIT](./LICENSE) © 2026 Mateo Cerquetella.
-
