@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "resultPath": ".empirical/specs/fix-https-github-com-mateocerquetella-bb-plugins-issues-64-review/reviews/b6385592c27e07203f19d9f6.json",
+  "resultDigest": "sha256:b6385592c27e07203f19d9f603c883f6573b8e1a44c640447b4d2a25e2b53325",
+  "contractDigest": "sha256:b2d9015817aeb0c9d8f6e05c873d94b0f34a53995c42754d433f0ef6b14a705e",
+  "carriedDeferred": []
+}

@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "feature": "fix-https-github-com-mateocerquetella-bb-plugins-issues-64-review",
+  "lastSequence": 10,
+  "lastEventDigest": "sha256:ed0d818dabfb4b7f0df2fc8af822376e5f7b706445b95a9cdcbc629eb1313828",
+  "stateDigest": "sha256:b32fad8ac66272d7b462ed19d4f5cac45fe8d14fd591fdef49112bc230a95ffd",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 10,
+    "activeFeature": "fix-https-github-com-mateocerquetella-bb-plugins-issues-64-review",
+    "request": "Fix https://github.com/MateoCerquetella/bb-plugins/issues/64, review every other open pull request, address necessary changes where appropriate, and merge only the pull requests that are ready and safe to merge.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "yolo",
+    "phase": "done",
+    "status": "done",
+    "repairAttempts": 0,
+    "message": "Integrated capability changes: dockside-thread-management, usage-tracker-provider-usage",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:1977cdfd64b5571a0f91a673410b117488411693cec06a888153d0d40c2f47cb",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:6c91ad403fe1a5e74fdabe68879aae67278a2e0896806ccc7aa4038b8a34534f",
+    "impactDigest": "sha256:714d7a2ef81feebbdbe4eb543d80bf2915873a718bb452b7ca70c5b5d16ecf96",
+    "capabilityClaimId": "fix-https-github-com-mateocerquetella-bb-plugins-issues-64-review-e28b574c8119",
+    "authorizationDigest": "sha256:e284d00f4cb354705f315655c1441dce5717eb40e521c8ea14ca8a9c675f98c5",
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "collected-59e2d089c78594429729785b",
+      "qa-288112bb85fdd8a6f8ab89c5",
+      "qa-678115212c919b790689d41a"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": true,
+      "integrated": true,
+      "delivered": false,
+      "published": false,
+      "highest": "integrated",
+      "reasons": {
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-07T21:44:10.218Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "fix-https-github-com-mateocerquetella-bb-plugins-issues-64-review-e28b574c8119",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "fix-https-github-com-mateocerquetella-bb-plugins-issues-64-review",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_htgkytnzr9-1/bb-plugins",
+      "worktreeId": "sha256:bc9c0f1fea1fbd844fb249829779e40565496eb79ae8cc5812a7ca9bf147da8e",
+      "baseCommit": "c359938700b20695f8f4e6fd88815d93e63cd4e9",
+      "baseTree": "e1cb005857ceef70e6d3f52f6a19afcade7069c6",
+      "bases": {
+        "dockside-thread-management": {
+          "capability": "dockside-thread-management",
+          "digest": "sha256:eb6aadc29d0c246fc4a2b9865ff4993c44f31ea935df97eb7fa3866147e18398",
+          "requirements": {
+            "projects remain reachable before their first thread": null
+          }
+        },
+        "usage-tracker-provider-usage": {
+          "capability": "usage-tracker-provider-usage",
+          "digest": "sha256:b7d93dc3f6c18265ec2f97a4754d672ad29c54a16f5c4d9d474f876825d35123",
+          "requirements": {
+            "provider activity remains json-safe when attribution is incomplete": null
+          }
+        }
+      },
+      "capabilities": [
+        "dockside-thread-management",
+        "usage-tracker-provider-usage"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-07T19:30:54.817Z",
+      "heartbeatAt": "2026-10-07T19:30:54.817Z",
+      "digest": "sha256:dbae9a84435014c6f3264514874d810ec374ed7c51b12954ec81cbf0a04a253a"
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 9,
+      "capabilities": 2,
+      "reason": "This is one bounded repository maintenance request with two small independent code fixes and a shared integration verification pass. Unfinished PRs are dispositioned only, not implemented.",
+      "actor": "agent",
+      "revision": 3
+    },
+    "verificationCoverage": {
+      "kind": "review-derived",
+      "checkId": "qa-fresh-context",
+      "receiptId": "collected-59e2d089c78594429729785b",
+      "matrixDigest": "sha256:3404e0124fc4b85cc3f1b67046caa83cafc6fb2bcfecf46a7d60d952669ed062",
+      "specDigest": "sha256:1977cdfd64b5571a0f91a673410b117488411693cec06a888153d0d40c2f47cb",
+      "revision": 9
+    },
+    "reviewFirst": true,
+    "completionRecord": {
+      "schemaVersion": 1,
+      "implementedBy": "agent",
+      "completedBy": "agent",
+      "decisionBy": null,
+      "method": "workflow",
+      "reason": "Integrated capability changes: dockside-thread-management, usage-tracker-provider-usage",
+      "at": "2026-10-07T21:44:10.218Z",
+      "revision": 10,
+      "completion": "integrated",
+      "sourceTreeDigest": "sha256:891c1f325f62d9b66e26d8aa3f21125885032117f56d532b394f62061e82c106",
+      "artifactTreeDigest": "sha256:9cc3373983fe8a2d6c10f29fefad6010641034265b3485cf44d7faebdd561474",
+      "digest": "sha256:989f5b9a53a872d824123b9d8a8ed0f4d2d18da1f1f6de55095cdb57b29a34f5"
+    }
+  },
+  "compactedAt": "2026-10-07T21:44:10.905Z",
+  "digest": "sha256:6b3d3837cf0b33af36795810cf9e7767ea4d15c134a3c9ca82abe4c5453fcd2f"
+}

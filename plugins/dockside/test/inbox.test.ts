@@ -257,6 +257,47 @@ describe("project thread groups", () => {
     assert.equal(groups[0]?.families[0]?.root.id, "child");
   });
 
+  it("emits a project with no threads so it stays reachable and startable", () => {
+    const groups = groupThreadsByProject(
+      [thread({ id: "root", projectId: "p1" })],
+      [project("p1", "First"), project("p2", "Second")],
+    );
+    assert.deepEqual(
+      groups.map((group) => group.project.id),
+      ["p1", "p2"],
+    );
+    assert.deepEqual(
+      groups[1]?.families,
+      [],
+    );
+  });
+
+  it("emits every project when no thread exists at all", () => {
+    const groups = groupThreadsByProject(
+      [],
+      [project("p1", "First"), project("p2", "Second")],
+    );
+    assert.deepEqual(
+      groups.map((group) => group.project.id),
+      ["p1", "p2"],
+    );
+    assert.ok(
+      groups.every((group) => group.families.length === 0),
+    );
+  });
+
+  it("keeps a thread's unknown project alongside the known empty ones", () => {
+    const groups = groupThreadsByProject(
+      [thread({ id: "root", projectId: "gone" })],
+      [project("p1", "First")],
+    );
+    assert.deepEqual(
+      groups.map((group) => group.project.id),
+      ["p1", "gone"],
+    );
+    assert.equal(groups[1]?.project.name, "Other project");
+  });
+
   it("keeps a parent as context when only its child matches search", () => {
     const groups = groupThreadsByProject(
       [
@@ -288,6 +329,16 @@ describe("project thread groups", () => {
       [project("proj_1", "Storefront")],
     );
     assert.equal(searchProjectThreadGroups(groups, "store").length, 1);
+  });
+
+  it("preserves matching empty project launchers in search", () => {
+    const groups = [
+      { project: project("empty", "Empty Storefront"), families: [] },
+      { project: project("other", "Other"), families: [] },
+    ];
+    assert.deepEqual(searchProjectThreadGroups(groups, " STORE "), [groups[0]]);
+    assert.deepEqual(searchProjectThreadGroups(groups, "missing"), []);
+    assert.deepEqual(searchProjectThreadGroups(groups, "   "), groups);
   });
 });
 
