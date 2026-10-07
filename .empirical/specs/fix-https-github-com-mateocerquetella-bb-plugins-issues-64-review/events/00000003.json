@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "sequence": 3,
+  "previousDigest": "sha256:b55ff20a2cbb8208caab624a1838fe0a2283c8cc1156e957e127e64c59a6c4e8",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Specified JSON-safe Usage Tracker activity semantics, the Dockside empty-project search correction, patch release metadata, exact-head PR review dispositions, and focused plus root verification.",
+  "createdAt": "2026-10-07T19:30:54.821Z",
+  "stateBeforeDigest": "sha256:0776f3d1f22bab7f203a1a62f88760cc798b40f707da4b6cb8a0bed30ee924a5",
+  "stateAfterDigest": "sha256:a81d250c153c00cc963576746daba5ad675215fc2c9b381c81c5f0d29bc04892",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 3,
+    "activeFeature": "fix-https-github-com-mateocerquetella-bb-plugins-issues-64-review",
+    "request": "Fix https://github.com/MateoCerquetella/bb-plugins/issues/64, review every other open pull request, address necessary changes where appropriate, and merge only the pull requests that are ready and safe to merge.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "yolo",
+    "phase": "design",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Specified JSON-safe Usage Tracker activity semantics, the Dockside empty-project search correction, patch release metadata, exact-head PR review dispositions, and focused plus root verification.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:1977cdfd64b5571a0f91a673410b117488411693cec06a888153d0d40c2f47cb",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:6c91ad403fe1a5e74fdabe68879aae67278a2e0896806ccc7aa4038b8a34534f",
+    "impactDigest": "sha256:714d7a2ef81feebbdbe4eb543d80bf2915873a718bb452b7ca70c5b5d16ecf96",
+    "capabilityClaimId": "fix-https-github-com-mateocerquetella-bb-plugins-issues-64-review-e28b574c8119",
+    "authorizationDigest": "sha256:e284d00f4cb354705f315655c1441dce5717eb40e521c8ea14ca8a9c675f98c5",
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-07T19:30:54.821Z",
+    "reviewFirst": true,
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "fix-https-github-com-mateocerquetella-bb-plugins-issues-64-review-e28b574c8119",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "fix-https-github-com-mateocerquetella-bb-plugins-issues-64-review",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_htgkytnzr9-1/bb-plugins",
+      "worktreeId": "sha256:bc9c0f1fea1fbd844fb249829779e40565496eb79ae8cc5812a7ca9bf147da8e",
+      "baseCommit": "c359938700b20695f8f4e6fd88815d93e63cd4e9",
+      "baseTree": "e1cb005857ceef70e6d3f52f6a19afcade7069c6",
+      "bases": {
+        "dockside-thread-management": {
+          "capability": "dockside-thread-management",
+          "digest": "sha256:eb6aadc29d0c246fc4a2b9865ff4993c44f31ea935df97eb7fa3866147e18398",
+          "requirements": {
+            "projects remain reachable before their first thread": null
+          }
+        },
+        "usage-tracker-provider-usage": {
+          "capability": "usage-tracker-provider-usage",
+          "digest": "sha256:b7d93dc3f6c18265ec2f97a4754d672ad29c54a16f5c4d9d474f876825d35123",
+          "requirements": {
+            "provider activity remains json-safe when attribution is incomplete": null
+          }
+        }
+      },
+      "capabilities": [
+        "dockside-thread-management",
+        "usage-tracker-provider-usage"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-07T19:30:54.817Z",
+      "heartbeatAt": "2026-10-07T19:30:54.817Z",
+      "digest": "sha256:dbae9a84435014c6f3264514874d810ec374ed7c51b12954ec81cbf0a04a253a"
+    }
+  },
+  "digest": "sha256:68a30e1b843750c81f2a9fb6cad6f99785177046f612665f1f3e96159d2bdb83"
+}

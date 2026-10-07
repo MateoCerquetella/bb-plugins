@@ -132,9 +132,9 @@ export function markProvidersInUse(
     ...snapshot,
     providers: snapshot.providers.map((provider) => {
       const inUse = inUseIds.has(provider.id);
-      return inUse || complete
-        ? { ...provider, inUse }
-        : { ...provider, inUse: undefined };
+      if (inUse || complete) return { ...provider, inUse };
+      const { inUse: _unknownActivity, ...rest } = provider;
+      return rest;
     }),
   };
 }
