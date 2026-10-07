@@ -289,6 +289,16 @@ describe("project thread groups", () => {
     );
     assert.equal(searchProjectThreadGroups(groups, "store").length, 1);
   });
+
+  it("preserves matching empty project launchers in search", () => {
+    const groups = [
+      { project: project("empty", "Empty Storefront"), families: [] },
+      { project: project("other", "Other"), families: [] },
+    ];
+    assert.deepEqual(searchProjectThreadGroups(groups, " STORE "), [groups[0]]);
+    assert.deepEqual(searchProjectThreadGroups(groups, "missing"), []);
+    assert.deepEqual(searchProjectThreadGroups(groups, "   "), groups);
+  });
 });
 
 describe("threadIsWorking", () => {

@@ -186,7 +186,7 @@ export function searchProjectThreadGroups(
       );
       return children.length > 0 ? [{ ...family, children }] : [];
     });
-    return families.length > 0 ? [{ ...group, families }] : [];
+    return projectMatches || families.length > 0 ? [{ ...group, families }] : [];
   });
 }
 
