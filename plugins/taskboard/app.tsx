@@ -86,7 +86,6 @@ import {
   CREATE_OUTCOME_UNCERTAIN_MARKER,
   FILTER_PRESET_NAME_MAX_LENGTH,
   type FilterPreset,
-  formatWorkItemHandoffPrompt,
   LINEAR_FINISHED_DAYS_MAX
 } from './contract.js';
 import {
@@ -149,6 +148,7 @@ import {
   taskboardComposerMention,
   writeTaskboardComposerDrag
 } from './composer-handoff.js';
+import { FactoryProgress } from './factory/app.js';
 import './app.css';
 
 const PANEL_PATH = 'tasks';
@@ -4957,8 +4957,6 @@ function TrackerDetail({
     );
   }
 
-  const prompt = formatWorkItemHandoffPrompt(item);
-
   return (
     <div className="@container flex min-h-full flex-col">
       <div className="tb-detail-frame flex flex-1 items-stretch">
@@ -4994,20 +4992,10 @@ function TrackerDetail({
                   Add to chat
                 </Button>
               ) : null}
-              <Button
-                size="sm"
-                onClick={() =>
-                  navigate.toCompose({
-                    initialPrompt: prompt,
-                    focusPrompt: true
-                  })
-                }
-              >
-                <Icon name="AiContentGenerator01" className="size-3.5" />
-                Send to agent
-              </Button>
             </div>
           </div>
+
+          <FactoryProgress item={item} pin={() => storeRightPanelPinned(true)} />
 
           <DetailMetadata
             item={item}
@@ -6909,9 +6897,11 @@ function useTaskboardComposerDrop(
 }
 
 function TaskboardRightPanel({
-  projectId
+  projectId,
+  threadId
 }: {
   projectId: string | null | undefined;
+  threadId?: string;
 }) {
   const rpc = useRpc<TaskboardRpcContract>();
   const navigate = useBbNavigate();
@@ -6953,6 +6943,18 @@ function TaskboardRightPanel({
     setItemRoute(null);
     setRefreshError(null);
   }, [projectId]);
+  useEffect(() => {
+    let canceled = false;
+    if (!threadId || !projectId) return;
+    void rpc.call('factoryForThread', { threadId }).then(({ record }) => {
+      if (!canceled && record?.projectId === projectId) {
+        setItemRoute({ kind: 'item', projectId, source: record.source, locator: record.locator });
+      }
+    }).catch(error => {
+      if (!canceled) setRefreshError(describeError(error));
+    });
+    return () => { canceled = true; };
+  }, [projectId, threadId, rpc]);
   useEffect(() => {
     const syncPinned = () => setPinned(loadRightPanelPinned());
     const syncStoredPin = (event: StorageEvent) => {
@@ -7180,7 +7182,7 @@ function TaskboardThreadPanel({ threadId }: PluginThreadPanelProps) {
     };
   }, [fallbackProjectId, rpc, threadId]);
 
-  return <TaskboardRightPanel projectId={projectId} />;
+  return <TaskboardRightPanel projectId={projectId} threadId={threadId} />;
 }
 
 function TaskboardNewThreadPanel({ projectId }: PluginNewThreadPanelProps) {

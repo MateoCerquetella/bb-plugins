@@ -70,6 +70,8 @@ import {
   type WorkSourceAdapter
 } from './sources/types.js';
 import { createWorkItemStore } from './store.js';
+import { createFactoryStore } from './factory/store.js';
+import { createFactoryService } from './factory/service.js';
 
 const SOURCES: readonly WorkSource[] = ['linear', 'github', 'jira', 'gitlab'];
 const CREDENTIAL_SOURCES: readonly CredentialSource[] = ['linear', 'jira'];
@@ -149,15 +151,13 @@ function parseMentionId(value: string): {
 function sleep(ms: number, signal: AbortSignal): Promise<void> {
   if (signal.aborted) return Promise.resolve();
   return new Promise(resolve => {
-    const timeout = setTimeout(resolve, ms);
-    signal.addEventListener(
-      'abort',
-      () => {
-        clearTimeout(timeout);
-        resolve();
-      },
-      { once: true }
-    );
+    const finish = () => {
+      clearTimeout(timeout);
+      signal.removeEventListener('abort', finish);
+      resolve();
+    };
+    const timeout = setTimeout(finish, ms);
+    signal.addEventListener('abort', finish, { once: true });
   });
 }
 
@@ -446,6 +446,19 @@ function parseGithubRepoFromRemote(
 
 export default async function plugin(bb: BbPluginApi) {
   const store = createWorkItemStore(bb);
+  const factory = createFactoryService(bb.sdk, createFactoryStore(bb.storage.database()), projectId =>
+    bb.realtime.publish('taskboard:factory', { projectId })
+  );
+  bb.background.service('taskboard-factory-progress', {
+    async start(signal) {
+      await factory.recover();
+      while (!signal.aborted) {
+        try { await factory.poll(signal); }
+        catch (error) { if (!signal.aborted) bb.log.warn(`Factory progress: ${errorMessage(error)}`); }
+        await sleep(2500, signal);
+      }
+    }
+  });
   const credentials = createProjectCredentialVault(bb);
 
   let projectRemotesForProbe: Awaited<
@@ -1755,6 +1768,38 @@ export default async function plugin(bb: BbPluginApi) {
   }
 
   const handlers: PluginRpcHandlers<typeof taskboardRpcContract> = {
+    async factoryRecover(input) {
+      await assertProjectExists(input.projectId);
+      const item = await getLiveItem(input.projectId, input.source, input.locator);
+      return { record: await factory.linkRecovered(item, input.expectedVersion, input.threadId) };
+    },
+    async factoryGet(input) {
+      await assertProjectExists(input.projectId);
+      const item = store.get(input.projectId, input.source, input.locator);
+      return { record: item ? await factory.get(item) : null };
+    },
+    async factoryForThread(input) {
+      const thread = await bb.sdk.threads.get({ threadId: input.threadId });
+      await assertProjectExists(thread.projectId);
+      const record = factory.forThread(input.threadId);
+      if (record && record.projectId !== thread.projectId) throw new Error('Thread project mismatch.');
+      return { record };
+    },
+    async factoryStart(input) {
+      await assertProjectExists(input.projectId);
+      const item = await getLiveItem(input.projectId, input.source, input.locator);
+      return { record: await factory.start(item, input) };
+    },
+    async factorySavePlan(input) {
+      await assertProjectExists(input.projectId);
+      const item = await getLiveItem(input.projectId, input.source, input.locator);
+      return { record: await factory.savePlan(item, input.expectedVersion, input.body) };
+    },
+    async factoryApprovePlan(input) {
+      await assertProjectExists(input.projectId);
+      const item = await getLiveItem(input.projectId, input.source, input.locator);
+      return { record: await factory.approve(item, input.expectedVersion, input.digest) };
+    },
     async listProjects() {
       return { projects: await listProjects() };
     },

@@ -282,8 +282,10 @@ test('contains no frontend issue-drafting lifecycle or generation copy', () => {
   );
 });
 
-test('routes detail handoff through the external-content trust boundary', () => {
-  assert.match(app, /const prompt = formatWorkItemHandoffPrompt\(item\)/u);
+test('routes detail handoff through native factory with external-content trust boundary', async () => {
+  const service = await readFile(new URL('../factory/service.ts', import.meta.url), 'utf8');
+  assert.match(app, /<FactoryProgress item=\{item\}/u);
+  assert.match(service, /formatWorkItemContext\(item\)/u);
   assert.doesNotMatch(app, /const prompt = \[\s*`Work on \$\{sourceName/u);
 });
 

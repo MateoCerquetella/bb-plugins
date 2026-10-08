@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 5,
+  "revision": 7,
+  "activeFeature": "extend-the-existing-taskboard-plugin-into-a-bb-native-software",
+  "request": "Extend the EXISTING Taskboard plugin into a BB-native software factory, using Mastra Factory as the product and workflow reference. Inspect current Taskboard main, the installed plugin source, and PR #57 first; identify reusable code and regressions; preserve existing tracker credentials, data, integrations, and user edits; do not merge #57 wholesale or replace the live installation. Taskboard owns Intake -> Triage -> Planning -> Build -> Review -> Done with configurable manual-by-default stage policies and explicit opt-in automation, while factory stage, agent-run status, and external tracker status remain separate. Retain original tracker identity and link native BB sessions, investigation, versioned plans, approvals, workspace, verification, and PRs. Reuse authoring context across stages and allow a separate linked review session. Use BB provider/account/model/environment/worktree/thread/permission systems and exact SDK contracts. Empirical, Symphony, Mastra, and LangGraph are not required runtimes and Taskboard must not inject Empirical policy globally. Reuse suitable #57 lifecycle and verification code, but a successful turn or completed event must never by itself mark a ticket Done. Deliver a working vertical slice: existing ticket -> Investigate -> inspect findings -> generate/revise plan -> approve exact plan revision -> Build in a BB-managed workspace -> inspect tests and changes -> Review with linked PR/evidence. Expose native sessions and actionable failures; support steering, cancellation, bounded retries, restart recovery, duplicate-dispatch prevention, and stale-approval invalidation. Keep merge, deployment, and tracker closure explicitly gated. Test transitions, stale approvals, duplicate starts, crash recovery, cancellation, and the regression where an agent turn finishes without the task finishing. Verify an actual native BB execution path. Implement in this clean branch. Do not merge, deploy, close real tickets, or replace the live Taskboard installation. Report reuse from #57, checks, demonstrated workflow, and limitations.",
+  "profile": "complex",
+  "workflow": "complex",
+  "mode": "normal",
+  "phase": "implement",
+  "status": "waiting",
+  "repairAttempts": 0,
+  "message": "Executable plan records native service, additive persistence, right-panel integration, lifecycle tests, isolated native execution and browser verification without replacing the live plugin.",
+  "implementationActor": null,
+  "workStartedAt": null,
+  "specDigest": "sha256:6eb6d50c9ea5308eea8eb2bf73c6adde304911bf4c699f269d88b142cb7c805e",
+  "approvedSpecRevision": 4,
+  "capabilityArchiveRequired": true,
+  "capabilityDeltaDigest": "sha256:9c71624bba962844c6f2b3c1b053a57992a674081b4c74762ecbde5340ff53a4",
+  "impactDigest": "sha256:1c040f2382d90732b51e3640f2104fd6b1aebd7cb6e3cf31a3005ec8714e0238",
+  "capabilityClaimId": "extend-the-existing-taskboard-plugin-into-a-bb-native-software-23c140730dcf",
+  "authorizationDigest": null,
+  "evidence": [],
+  "evidenceReceiptIds": [],
+  "legacyEvidenceCount": 0,
+  "completion": {
+    "implemented": false,
+    "verified": false,
+    "integrated": false,
+    "delivered": false,
+    "published": false,
+    "highest": "none",
+    "reasons": {
+      "implemented": "implemented has not been proven by a durable receipt.",
+      "verified": "verified has not been proven by a durable receipt.",
+      "integrated": "integrated has not been proven by a durable receipt.",
+      "delivered": "delivered has not been proven by a durable receipt.",
+      "published": "published has not been proven by a durable receipt."
+    }
+  },
+  "updatedAt": "2026-10-08T02:32:49.106Z",
+  "capabilityBase": {
+    "schemaVersion": 1,
+    "id": "extend-the-existing-taskboard-plugin-into-a-bb-native-software-23c140730dcf",
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "extend-the-existing-taskboard-plugin-into-a-bb-native-software",
+    "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_suvnn4i6np-1/bb-plugins",
+    "worktreeId": "sha256:2841d40170e68735bce22d35915ff7d2f6e8f4c3eb06362e1c9ed18025042038",
+    "baseCommit": "fc814c22f4d26170ff0b8a5a0ac6619a438480ac",
+    "baseTree": "a75defcdb9d57f6ed091f9243f5ace4fde5ee6f3",
+    "bases": {
+      "taskboard-software-factory": {
+        "capability": "taskboard-software-factory",
+        "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "requirements": {
+          "independent workflow authorities": null,
+          "manual stage policy": null,
+          "durable work identity": null,
+          "versioned plans and exact approval": null,
+          "native bb stage sessions": null,
+          "idempotent dispatch and bounded recovery": null,
+          "evidence-bound implementation and review": null,
+          "actionable factory ui": null,
+          "existing taskboard detail and tracker behavior": null
+        }
+      }
+    },
+    "capabilities": [
+      "taskboard-software-factory"
+    ],
+    "status": "active",
+    "integrationReceiptDigest": null,
+    "createdAt": "2026-10-08T02:30:11.560Z",
+    "heartbeatAt": "2026-10-08T02:30:11.560Z",
+    "digest": "sha256:2d96837708650abdd57c1d4c4399d3f093442b87dfa3da02edcc1f30293cf63f"
+  },
+  "sizeDecision": {
+    "choice": "keep",
+    "criteria": 17,
+    "capabilities": 1,
+    "reason": "User approved one bounded vertical slice of the existing native thread/right-panel workflow. Dispatch, durable linkage and completion safety must ship together to avoid misleading progress.",
+    "actor": "agent",
+    "revision": 4
+  },
+  "reviewFirst": true
+}

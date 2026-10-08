@@ -4,6 +4,45 @@
 
 <h1 align="center">Taskboard</h1>
 
+## Native Agent Progress (Development)
+
+**Send to agent** starts an investigation in a BB-managed worktree, opens its
+native thread and keeps Taskboard pinned on the originating ticket. The
+existing right panel shows native activity, plan steps, command exit codes,
+reported file changes and findings. Conversation, steering, permissions and
+stop remain native BB controls. No additional credentials or workflow runtime
+are required.
+
+Investigation can continue to plan generation in the same thread. Plans have
+immutable revisions and exact-content approval; changing scope invalidates
+approval. Build requires approval and a managed worktree. Review opens a
+separate linked session. A finished turn is **not** accepted work and never
+updates tracker status.
+
+Dispatch intent is saved before calling BB. Duplicate starts reuse the original
+dispatch. Confirmed failed/stopped attempts have bounded retries; ambiguous
+starts never retry automatically. Use **Link recovered session** after inspecting
+the matching recent native thread.
+
+This is the native progress slice, not the complete factory implementation.
+Stage automation, independently executed verification bound to workspace
+revision, PR evidence capture, accepted-review and Done gates remain pending.
+Command results are observations, not proof that all required checks passed.
+No factory action merges, deploys or closes a ticket.
+
+Run `npm run check --workspace bb-plugin-taskboard` from the workspace root.
+The opt-in native harness uses isolated storage and does not install a plugin
+or contact a tracker:
+
+```sh
+FACTORY_SMOKE_DB=/absolute/path/to/smoke.sqlite \
+  node --experimental-strip-types plugins/taskboard/scripts/factory-native-smoke.ts
+```
+
+It requires BB thread/project context. The browser harness uses the dedicated
+Steel project's `STEEL_CDP_URL` and an installed `PLAYWRIGHT_MODULE`; mocked BB
+hooks exercise the real progress component, not the live panel host.
+
 <p align="center">
   GitHub, GitLab, Linear, or Jira tasks inside BB—one focused tracker for every project.
 </p>
