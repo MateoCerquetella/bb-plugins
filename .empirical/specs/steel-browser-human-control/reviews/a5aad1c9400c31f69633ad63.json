@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:2ea14c6d9caf5568f99a7fd4536c4df3ec01ec63652446d73d83bbc470c46f84",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "c359938700b20695f8f4e6fd88815d93e63cd4e9",
+  "headCommit": "5d66e66e020d2eaa04d5d1813e282c6b98f5bde2",
+  "diffDigest": "sha256:3793ccab30fbcb7df42af49c03acb2120160c1b9c465608ca17019fd2b475367",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "bb-isolated-empirical-reviewer",
+  "reviewerInvocationId": "/root/empirical_reviewer",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- PASS AC-1: Clipboard handling is centralized, source/origin validated, user initiated, manually fallback-capable, and never routed through RPC, storage, logs, or CLI arguments.\n- PASS AC-2: Only the latest inline viewer streams, minimized or hidden viewers unmount, and expanded control keeps one iframe.\n- PASS AC-3: GitHub, Linear, and Google records are project scoped, explicitly user confirmed, refreshable, editable, timestamped, and removable.\n- PASS AC-4: Service login navigation is constrained to the fixed HTTPS catalog and does not change engine policy or invoke models.\n- PASS AC-UI-1: The shared toolbar and responsive account/session layout pass desktop and mobile overflow checks.\n- FAIL AC-5: The review packet does not itself include durable execution evidence for focused checks, full workspace checks, installed integration, and push completion.\n\n## Security / correctness\n\nPass: no material product security or correctness defect was found.\n\n## Design / maintainability\n\nPass: the shared viewer, sign-in persistence, catalog, and request coalescing boundaries are maintainable. Medium F-1: AC-5 needs durable verification evidence.",
+  "bodyDigest": "sha256:b4463d7657c3821e0cc8a4aee2dca9226430194adae9f0a0c0dc22f50d94018a",
+  "digest": "sha256:a5aad1c9400c31f69633ad63ca0e2bb09e76a78e41d5a09d60ba9a8157c6144f"
+}
