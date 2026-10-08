@@ -1,6 +1,8 @@
 import { createRequire } from "node:module";
 import type { BrowserContext, Page } from "playwright";
 import type { Binding } from "./contract.ts";
+import type { ServiceId } from "./contract.ts";
+import { SERVICES } from "./service-catalog.ts";
 
 const loadPlaywright = () =>
   createRequire(import.meta.url)("playwright") as typeof import("playwright");
@@ -23,6 +25,7 @@ export type BrowserAction = (
   | { kind: "fill"; role: string; name: string; value: string }
   | { kind: "press"; key: string }
   | { kind: "screenshot" }
+  | { kind: "openSignIn"; service: ServiceId }
 ) & { tab?: number };
 
 export function projectPages(context: BrowserContext): Page[] {
@@ -87,6 +90,13 @@ export function parseBrowserAction(
 }
 
 export async function executeBrowserAction(page: Page, action: BrowserAction) {
+  if (action.kind === "openSignIn") {
+    const service = SERVICES.find(item => item.id === action.service);
+    if (!service) throw new Error("Unsupported sign-in service.");
+    await page.goto(service.url, { waitUntil: "domcontentloaded", timeout: 15000 });
+    await page.bringToFront();
+    return { opened: true };
+  }
   if (action.kind === "tabs") throw new Error("List tabs with the project browser context.");
   if (action.kind === "inspect") {
     const snapshot = await page
@@ -154,7 +164,7 @@ export async function actOnProject(
         index, url: page.url(), title: await page.title(),
       })));
     }
-    const page = selectProjectPage(context, action.tab);
+    const page = action.kind === "openSignIn" ? await context.newPage() : selectProjectPage(context, action.tab);
     const result = await executeBrowserAction(page, action);
     signal?.throwIfAborted();
     return result;

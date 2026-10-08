@@ -70,7 +70,29 @@ export const createOptionsSchema = z
   })
   .strict();
 
+export const serviceIdSchema = z.enum(["github", "linear", "google"]);
+export const accountRecordSchema = z.object({
+  service: serviceIdSchema,
+  label: z.string().trim().min(1).max(120).refine(value => !/[\u0000-\u001f\u007f]/u.test(value)),
+  confirmedAt: z.string().datetime(),
+}).strict();
+export type ServiceId = z.infer<typeof serviceIdSchema>;
+export type AccountRecord = z.infer<typeof accountRecordSchema>;
+
 export const rpcContract = defineRpcContract({
+  signIns: { input: scopeSchema, output: z.array(accountRecordSchema) },
+  confirmSignIn: {
+    input: z.object({ scope: scopeSchema, service: serviceIdSchema, label: accountRecordSchema.shape.label }).strict(),
+    output: z.array(accountRecordSchema),
+  },
+  forgetSignIn: {
+    input: z.object({ scope: scopeSchema, service: serviceIdSchema }).strict(),
+    output: z.array(accountRecordSchema),
+  },
+  openSignIn: {
+    input: z.object({ scope: scopeSchema, service: serviceIdSchema }).strict(),
+    output: z.object({ opened: z.boolean() }).strict(),
+  },
   dashboard: {
     input: scopeSchema,
     output: dashboardSchema,

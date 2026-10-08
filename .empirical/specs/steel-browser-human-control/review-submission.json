@@ -1,0 +1,16 @@
+{
+  "packetDigest": "sha256:2ea14c6d9caf5568f99a7fd4536c4df3ec01ec63652446d73d83bbc470c46f84",
+  "verdict": "CHANGES_REQUESTED",
+  "criteria": [
+    {"id":"AC-1","passed":true,"detail":"Clipboard handling is centralized, source/origin validated, user initiated, manually fallback-capable, and never routed through RPC, storage, logs, or CLI arguments."},
+    {"id":"AC-2","passed":true,"detail":"Only the latest inline viewer streams, minimized or hidden viewers unmount, and expanded control keeps one iframe."},
+    {"id":"AC-3","passed":true,"detail":"GitHub, Linear, and Google records are project scoped, explicitly user confirmed, refreshable, editable, timestamped, and removable."},
+    {"id":"AC-4","passed":true,"detail":"Service login navigation is constrained to the fixed HTTPS catalog and does not change engine policy or invoke models."},
+    {"id":"AC-UI-1","passed":true,"detail":"The shared toolbar and responsive account/session layout pass desktop and mobile overflow checks."},
+    {"id":"AC-5","passed":false,"detail":"The review packet does not itself include durable execution evidence for focused checks, full workspace checks, installed integration, and push completion."}
+  ],
+  "securityCorrectness": "Pass: no material product security or correctness defect was found.",
+  "designMaintainability": "Pass: the shared viewer, sign-in persistence, catalog, and request coalescing boundaries are maintainable. Medium F-1: AC-5 needs durable verification evidence.",
+  "reviewerActor": "bb-isolated-empirical-reviewer",
+  "reviewerInvocationId": "/root/empirical_reviewer"
+}
