@@ -189,7 +189,7 @@ export function createWorkItemStore(bb: BbPluginApi) {
   bb.storage.migrate(db, [
     `
       CREATE TABLE work_items (
-        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira', 'gitlab')),
+        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira')),
         locator TEXT NOT NULL,
         item_key TEXT NOT NULL,
         title TEXT NOT NULL,
@@ -208,7 +208,7 @@ export function createWorkItemStore(bb: BbPluginApi) {
       );
 
       CREATE TABLE source_sync (
-        source TEXT PRIMARY KEY CHECK (source IN ('linear', 'github', 'jira', 'gitlab')),
+        source TEXT PRIMARY KEY CHECK (source IN ('linear', 'github', 'jira')),
         last_synced_at TEXT,
         error TEXT,
         item_count INTEGER NOT NULL DEFAULT 0 CHECK (item_count >= 0)
@@ -224,7 +224,7 @@ export function createWorkItemStore(bb: BbPluginApi) {
     `
       CREATE TABLE work_items_by_project (
         bb_project_id TEXT NOT NULL,
-        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira', 'gitlab')),
+        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira')),
         locator TEXT NOT NULL,
         item_key TEXT NOT NULL,
         title TEXT NOT NULL,
@@ -244,7 +244,7 @@ export function createWorkItemStore(bb: BbPluginApi) {
 
       CREATE TABLE source_sync_by_project (
         bb_project_id TEXT NOT NULL,
-        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira', 'gitlab')),
+        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira')),
         last_synced_at TEXT,
         error TEXT,
         item_count INTEGER NOT NULL DEFAULT 0 CHECK (item_count >= 0),
@@ -276,6 +276,8 @@ export function createWorkItemStore(bb: BbPluginApi) {
         ADD COLUMN jira_enabled INTEGER NOT NULL DEFAULT 0
         CHECK (jira_enabled IN (0, 1));
 
+      CREATE INDEX idx_all_project_work_items_updated
+        ON work_items_by_project(updated_at DESC, bb_project_id, source, locator);
 
       DROP TABLE work_items;
       DROP TABLE source_sync;
@@ -294,7 +296,7 @@ export function createWorkItemStore(bb: BbPluginApi) {
     `
       CREATE TABLE project_source_config_next (
         bb_project_id TEXT PRIMARY KEY,
-        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira', 'gitlab')),
+        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira')),
         linear_team_key TEXT NOT NULL,
         jira_base_url TEXT NOT NULL,
         jira_email TEXT NOT NULL,
