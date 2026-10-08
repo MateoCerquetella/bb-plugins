@@ -186,6 +186,27 @@ function parseJsonSafely(value: string): unknown {
 
 export function createWorkItemStore(bb: BbPluginApi) {
   const db = bb.storage.database();
+  // The reverted Work board left a durable migration in some installations.
+  const hasMigrationTable = db.prepare(
+    "SELECT name FROM sqlite_master WHERE type = 'table' AND name = '_bb_migrations'"
+  ).get();
+  const legacyWork = hasMigrationTable ? db.prepare(
+    'SELECT statement_hash FROM _bb_migrations WHERE id = 7'
+  ).get() as { statement_hash: string } | undefined : undefined;
+  const legacyWorkMigrations = legacyWork?.statement_hash ===
+    '2ed0e2eda3103f718fe67e4f50324116a3dfddcd1959b05959e083a2cc80e1ca' ? [`
+  CREATE TABLE work_board_cards (
+    id TEXT PRIMARY KEY, project_id TEXT NOT NULL, source_key TEXT,
+    revision INTEGER NOT NULL, data_json TEXT NOT NULL,
+    UNIQUE(project_id, source_key)
+  );
+  CREATE INDEX idx_work_board_project ON work_board_cards(project_id);
+  CREATE TABLE work_board_requests (
+    project_id TEXT NOT NULL, request_id TEXT NOT NULL, input_hash TEXT NOT NULL,
+    card_id TEXT NOT NULL, PRIMARY KEY(project_id, request_id)
+  );
+  CREATE TABLE work_board_settings (project_id TEXT PRIMARY KEY, data_json TEXT NOT NULL);
+`] : [];
   bb.storage.migrate(db, [
     `
       CREATE TABLE work_items (
@@ -415,6 +436,7 @@ export function createWorkItemStore(bb: BbPluginApi) {
           bb_project_id, position, created_at, id
         );
     `,
+    ...legacyWorkMigrations,
     `
       CREATE TABLE work_items_by_project_next (
         bb_project_id TEXT NOT NULL,
