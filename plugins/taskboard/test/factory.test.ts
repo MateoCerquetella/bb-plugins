@@ -14,6 +14,8 @@ registerHooks({
     return next(specifier, context);
   }
 });
+const { factoryRecordSchema } = await import('../factory/contract.ts');
+const { progressStatus } = await import('../factory/tracker.ts');
 const { newRecord, savePlan, approvePlan, startRun } = await import('../factory/state.ts');
 const { createFactoryStore } = await import('../factory/store.ts');
 const { createFactoryService, applyNativeEvent, factoryPrompt } = await import('../factory/service.ts');
@@ -27,29 +29,66 @@ function fixture() {
   const db = new Database(':memory:');
   const store = createFactoryStore(db);
   let spawns = 0;
+  let sends = 0;
+  let progressWrites = 0;
+  let failProgress = false;
+  let output = 'Observed repository findings';
+  let threadStatus = 'idle';
   let failSpawn = false;
+  let rejectSpawn = false;
+  let rejectWorktree = false;
+  let managed = true;
+  let spawnInput: unknown;
   const events: Parameters<typeof applyNativeEvent>[1][] = [];
   const sdk = {
     threads: {
-      spawn: async () => {
+      spawn: async (input: unknown) => {
+        spawnInput = input;
         spawns++;
+        if (rejectSpawn) throw new Error('HTTP 400: hostId is required unless workspace.type is personal');
+        if (rejectWorktree) throw new Error('HTTP 409: This project checkout has no usable git branch.');
         if (failSpawn) throw new Error('Response lost');
-        return { id: 'thr_native', environmentId: 'env_test', projectId: item.bbProjectId };
+        const fork = (input as { originKind?: string }).originKind === 'fork';
+        return { id: fork ? 'thr_build' : 'thr_native', environmentId: fork ? 'env_build' : 'env_test', projectId: item.bbProjectId };
       },
-      get: async () => ({ id: 'thr_native', status: 'idle', projectId: item.bbProjectId, environmentId: 'env_test', providerId: 'codex' }),
+      get: async ({ threadId }: { threadId: string }) => ({ id: threadId, status: threadStatus, projectId: item.bbProjectId, environmentId: threadId === 'thr_build' ? 'env_build' : 'env_test', providerId: 'codex' }),
       defaultExecutionOptions: async () => ({ model: 'test', permissionMode: 'accept-edits', reasoningLevel: 'medium', serviceTier: 'default' }),
-      send: async () => ({}),
-      events: { list: async (input: { limit?: string }) => {
+      send: async () => { sends++; return {}; },
+      events: { list: async (input: { limit?: string; order?: string; afterSeq?: string }) => {
         assert.ok(Number(input.limit) <= 100, 'Native event limit must not exceed 100');
-        return events;
+        return input.order === 'desc' ? events.slice(-1) : events.filter(event => event.seq > Number(input.afterSeq ?? 0));
       } },
-      output: async () => ({ output: 'Observed repository findings' })
+      output: async () => ({ output })
     },
     projects: { defaultExecutionOptions: async () => ({ model: 'test', providerId: 'codex' }) },
-    environments: { get: async () => ({ id: 'env_test', managed: true, isWorktree: true, hostId: 'host_test' }) }
+    environments: { get: async ({ environmentId }: { environmentId: string }) => ({ id: environmentId, managed: managed || environmentId === 'env_build', isWorktree: managed || environmentId === 'env_build', hostId: 'host_test' }) }
   } as unknown as Parameters<typeof createFactoryService>[0];
-  const service = createFactoryService(sdk, store, () => {});
-  return { db, store, service, events, spawns: () => spawns, fail: () => { failSpawn = true; } };
+  const service = createFactoryService(sdk, store, () => {}, {
+    getItem: () => item,
+    async markInProgress() {
+      progressWrites++;
+      if (failProgress) throw new Error('Provider permission denied');
+      return { status: 'synced', message: null };
+    }
+  });
+  return {
+    db, store, service, events, spawns: () => spawns, spawnInput: () => spawnInput,
+    fail: () => { failSpawn = true; },
+    sends: () => sends, progressWrites: () => progressWrites,
+    threadStatus: (value: string) => { threadStatus = value; },
+    unmanaged: () => { managed = false; },
+    failProgress: (value = true) => { failProgress = value; },
+    complete: (body = 'Implementation plan and verification commands') => {
+      output = body;
+      events.push({
+        id: String(events.length + 1), threadId: 'thr_native', seq: events.length + 1, createdAt: Date.now(),
+        scope: { kind: 'turn', turnId: `turn_${events.length + 1}` }, type: 'turn/completed',
+        data: { status: 'completed', providerThreadId: null }
+      });
+    },
+    reject: (value = true) => { rejectSpawn = value; },
+    rejectWorktree: () => { rejectWorktree = true; }
+  };
 }
 test('immutable plan revisions and exact approvals gate Build', () => {
   const record = newRecord(item);
@@ -84,6 +123,41 @@ test('concurrent and stale duplicate starts spawn exactly once', async () => {
     assert.equal(f.spawns(), 1);
     assert.equal(a.runs[0].threadId, b.runs[0].threadId);
     assert.equal(f.store.forThread('thr_native')?.locator, item.locator);
+  } finally { f.db.close(); }
+});
+test('a start without thread context uses the project default environment', async () => {
+  const f = fixture();
+  try {
+    await f.service.start(item, {
+      expectedVersion: 0, kind: 'investigate', contextThreadId: null, retry: false
+    });
+    const input = f.spawnInput() as { environment: unknown };
+    assert.deepEqual(input.environment, { type: 'project-default' });
+  } finally { f.db.close(); }
+});
+test('a confirmed environment rejection is retryable and legacy records are repaired', async () => {
+  const f = fixture();
+  try {
+    f.reject();
+    let record = await f.service.start(item, {
+      expectedVersion: 0, kind: 'investigate', contextThreadId: null, retry: false
+    });
+    assert.equal(record.runs[0].status, 'failed');
+    f.reject(false);
+    record = await f.service.start(item, {
+      expectedVersion: record.version, kind: 'investigate', contextThreadId: null, retry: true
+    });
+    assert.equal(record.runs.at(-1)?.status, 'running');
+
+    const legacyItem = { ...item, locator: 'gitlab.com/group/repo#legacy' };
+    const legacy = newRecord(legacyItem);
+    const run = startRun(legacy, 'investigate', false);
+    run.status = 'uncertain';
+    run.error = 'Native dispatch outcome uncertain: HTTP 400: hostId is required unless workspace.type is personal. Inspect recent BB threads; no automatic retry.';
+    f.store.save(legacy);
+    const repaired = await f.service.get(legacyItem);
+    assert.equal(repaired.runs[0].status, 'failed');
+    assert.match(repaired.runs[0].error ?? '', /Retry using the project default/);
   } finally { f.db.close(); }
 });
 test('crash recovery preserves an ambiguous intent and refuses duplicate dispatch', async () => {
@@ -207,4 +281,235 @@ test('recovery rejects a different project thread', async () => {
     ), /project/);
     assert.equal(f.spawns(), 0);
   } finally { f.db.close(); }
+});
+
+test('Start task moves status once and automatically reuses the session through planning and build', async () => {
+  const f = fixture();
+  try {
+    const [a, b] = await Promise.all([f.service.startTask(item, null), f.service.startTask(item, null)]);
+    assert.equal(a.runs[0].threadId, b.runs[0].threadId);
+    assert.equal(f.spawns(), 1);
+    assert.equal(f.progressWrites(), 1);
+    f.complete('Investigation findings');
+    await f.service.poll(new AbortController().signal);
+    let record = f.store.all()[0];
+    assert.equal(record.runs.at(-1)?.kind, 'plan');
+    assert.equal(f.sends(), 1);
+    f.complete('Implement current scope and run npm test');
+    await Promise.all([f.service.get(item), f.service.get(item), f.service.startTask(item, null)]);
+    record = f.store.all()[0];
+    assert.equal(record.runs.at(-1)?.kind, 'build');
+    assert.equal(record.runs.at(-1)?.planDigest, record.plans[0].digest);
+    assert.equal(record.approvedDigest, record.plans[0].digest);
+    assert.equal(record.plans[0].body, 'Implement current scope and run npm test');
+    assert.equal(f.sends(), 2);
+    assert.equal(f.spawns(), 1);
+    f.complete('Implemented and tested');
+    record = await f.service.get(item);
+    await f.service.startTask(item, null);
+    assert.equal(record.stage, 'Build');
+    assert.equal(record.runs.at(-1)?.status, 'finished');
+    assert.equal(f.sends(), 2);
+    assert.equal(f.progressWrites(), 1);
+  } finally { f.db.close(); }
+});
+
+test('completion before native idle continues automatically on the next poll', async () => {
+  const f = fixture();
+  try {
+    await f.service.startTask(item, null);
+    f.threadStatus('active');
+    f.complete('Investigation findings');
+    let record = await f.service.get(item);
+    assert.equal(record.runs.at(-1)?.status, 'finished');
+    assert.equal(record.automationError, null);
+    assert.equal(f.sends(), 0);
+    f.threadStatus('idle');
+    await f.service.poll(new AbortController().signal);
+    record = f.store.all()[0];
+    assert.equal(record.runs.at(-1)?.kind, 'plan');
+    f.threadStatus('active');
+    f.complete('Plan with verification');
+    record = await f.service.get(item);
+    assert.equal(record.runs.at(-1)?.status, 'finished');
+    assert.equal(record.automationError, null);
+    assert.equal(f.sends(), 1);
+    f.threadStatus('idle');
+    await f.service.poll(new AbortController().signal);
+    record = f.store.all()[0];
+    assert.equal(record.runs.at(-1)?.kind, 'build');
+    assert.equal(f.sends(), 2);
+    assert.equal(f.spawns(), 1);
+  } finally { f.db.close(); }
+});
+
+test('planning in a project checkout forks Build into a managed worktree exactly once', async () => {
+  const f = fixture();
+  try {
+    f.unmanaged();
+    await f.service.startTask(item, null);
+    f.complete('Investigation findings');
+    await f.service.get(item);
+    f.complete('Implement current scope and verify');
+    const [record] = await Promise.all([f.service.get(item), f.service.get(item)]);
+    const input = f.spawnInput() as { originKind: string; sourceThreadId: string; environment: unknown; prompt: string };
+    assert.equal(input.originKind, 'fork');
+    assert.equal(input.sourceThreadId, 'thr_native');
+    assert.deepEqual(input.environment, {
+      type: 'host', hostId: 'host_test', workspace: { type: 'managed-worktree', baseBranch: { kind: 'default' } }
+    });
+    assert.match(input.prompt, /Implement current scope and verify/);
+    assert.equal(record.runs.at(-1)?.kind, 'build');
+    assert.equal(record.runs.at(-1)?.threadId, 'thr_build');
+    assert.equal(record.runs.at(-1)?.environmentId, 'env_build');
+    assert.equal(f.store.forThread('thr_native')?.locator, item.locator);
+    assert.equal(f.store.forThread('thr_build')?.locator, item.locator);
+    assert.equal(f.spawns(), 2);
+    assert.equal(f.sends(), 1);
+    await f.service.startTask(item, null);
+    assert.equal(f.spawns(), 2);
+  } finally { f.db.close(); }
+});
+
+test('a lost Build fork response pauses without creating another worktree or changing status again', async () => {
+  const f = fixture();
+  try {
+    f.unmanaged();
+    await f.service.startTask(item, null);
+    f.complete('Investigation findings');
+    await f.service.get(item);
+    f.fail();
+    f.complete('Implement current scope and verify');
+    let record = await f.service.get(item);
+    assert.equal(record.runs.at(-1)?.kind, 'build');
+    assert.equal(record.runs.at(-1)?.status, 'uncertain');
+    record = await f.service.startTask(item, null);
+    assert.equal(record.runs.at(-1)?.status, 'uncertain');
+    await f.service.poll(new AbortController().signal);
+    assert.equal(f.spawns(), 2);
+    assert.equal(f.progressWrites(), 1);
+  } finally { f.db.close(); }
+});
+
+test('a broken checkout is a confirmed retryable Build failure, including legacy records', async () => {
+  const f = fixture();
+  try {
+    f.unmanaged();
+    await f.service.startTask(item, null);
+    f.complete('Investigation findings');
+    await f.service.get(item);
+    f.rejectWorktree();
+    f.complete('Implement current scope and verify');
+    let record = await f.service.get(item);
+    assert.equal(record.runs.at(-1)?.kind, 'build');
+    assert.equal(record.runs.at(-1)?.status, 'failed');
+    assert.equal(record.runs.at(-1)?.threadId, null);
+    assert.match(record.runs.at(-1)?.error ?? '', /Repair the project checkout, then retry/);
+    await f.service.poll(new AbortController().signal);
+    assert.equal(f.spawns(), 2);
+
+    record.runs.at(-1)!.status = 'uncertain';
+    record.runs.at(-1)!.error = 'Native dispatch outcome uncertain: HTTP 409: This project checkout has no usable git branch.. Inspect recent BB threads; no automatic retry.';
+    f.store.save(record);
+    record = await f.service.get(item);
+    assert.equal(record.runs.at(-1)?.status, 'failed');
+    assert.equal(f.spawns(), 2);
+    assert.equal(f.progressWrites(), 1);
+  } finally { f.db.close(); }
+});
+
+test('closing an issue during investigation pauses automatic dispatch', async () => {
+  const f = fixture();
+  try {
+    await f.service.startTask(item, null);
+    f.complete('Investigation findings');
+    const record = await f.service.get({ ...item, stateCategory: 'done' });
+    assert.equal(record.runs.at(-1)?.kind, 'investigate');
+    assert.match(record.automationError!, /closed or canceled/);
+    assert.equal(f.sends(), 0);
+  } finally { f.db.close(); }
+});
+
+test('tracker failures are visible and retry independently without another agent dispatch', async () => {
+  const f = fixture();
+  try {
+    f.failProgress();
+    let record = await f.service.startTask(item, null);
+    assert.equal(record.runs.at(-1)?.status, 'running');
+    assert.equal(record.trackerProgress.status, 'failed');
+    assert.match(record.trackerProgress.message!, /permission denied/);
+    await f.service.get(item);
+    assert.equal(f.progressWrites(), 1);
+    f.failProgress(false);
+    record = await f.service.retryStatus(item);
+    assert.equal(record.trackerProgress.status, 'synced');
+    assert.equal(f.progressWrites(), 2);
+    assert.equal(f.spawns(), 1);
+  } finally { f.db.close(); }
+});
+
+test('uncertain and rejected dispatches never change provider status', async () => {
+  for (const mode of ['fail', 'reject'] as const) {
+    const f = fixture();
+    try {
+      f[mode]();
+      await f.service.startTask(item, null);
+      assert.equal(f.progressWrites(), 0);
+      await f.service.get(item);
+      assert.equal(f.spawns(), 1);
+    } finally { f.db.close(); }
+  }
+});
+
+test('legacy completed planning resumes automatically after restart without another planning turn', async () => {
+  const f = fixture();
+  try {
+    const record = newRecord(item);
+    const run = startRun(record, 'investigate', false);
+    run.kind = 'plan'; run.threadId = 'thr_native'; run.environmentId = 'env_test';
+    run.status = 'finished'; run.output = 'Existing plan to implement';
+    const legacy = { ...record } as Partial<typeof record>;
+    delete legacy.automatic; delete legacy.automationError; delete legacy.trackerProgress;
+    f.store.save(factoryRecordSchema.parse(legacy));
+    await f.service.recover();
+    await f.service.poll(new AbortController().signal);
+    const resumed = f.store.all()[0];
+    assert.equal(resumed.runs.at(-1)?.kind, 'build');
+    assert.equal(resumed.plans[0].body, 'Existing plan to implement');
+    assert.equal(f.sends(), 1);
+    assert.equal(f.spawns(), 0);
+  } finally { f.db.close(); }
+});
+
+test('scope changes and an empty plan pause automatic build', async () => {
+  const f = fixture();
+  try {
+    await f.service.startTask(item, null);
+    f.complete('Findings');
+    await f.service.get(item);
+    f.complete('');
+    let record = await f.service.get(item);
+    assert.match(record.automationError!, /without a plan/);
+    assert.equal(record.plans.length, 0);
+    assert.equal(f.sends(), 1);
+    await f.service.get(item);
+    assert.equal(f.sends(), 1);
+    const changed = { ...item, description: 'Changed requirements' };
+    record = await f.service.get(changed);
+    assert.equal(record.automatic, false);
+    assert.match(record.automationError!, /scope changed/);
+    record = await f.service.startTask(changed, null);
+    assert.equal(record.runs.at(-1)?.kind, 'investigate');
+    assert.equal(record.plans.length, 0);
+  } finally { f.db.close(); }
+});
+
+test('only provider-supported In progress transitions are selected', () => {
+  const option = (id: string, name: string, stateCategory: 'todo' | 'in_progress') => ({
+    id, name, stateCategory, current: false
+  });
+  assert.equal(progressStatus([option('open', 'Open', 'todo')]), undefined);
+  assert.equal(progressStatus([
+    option('review', 'In review', 'in_progress'), option('work', 'In Progress', 'in_progress')
+  ])?.id, 'work');
 });

@@ -73,6 +73,7 @@ import {
 import { createWorkItemStore } from './store.js';
 import { createFactoryStore } from './factory/store.js';
 import { createFactoryService } from './factory/service.js';
+import { progressStatus } from './factory/tracker.js';
 
 const SOURCES: readonly WorkSource[] = ['linear', 'github', 'jira', 'gitlab'];
 const CREDENTIAL_SOURCES: readonly CredentialSource[] = ['linear', 'jira'];
@@ -448,7 +449,24 @@ function parseGithubRepoFromRemote(
 export default async function plugin(bb: BbPluginApi) {
   const store = createWorkItemStore(bb);
   const factory = createFactoryService(bb.sdk, createFactoryStore(bb.storage.database()), projectId =>
-    bb.realtime.publish('taskboard:factory', { projectId })
+    bb.realtime.publish('taskboard:factory', { projectId }), {
+      getItem: identity => store.get(identity.projectId, identity.source, identity.locator) ?? null,
+      async markInProgress(item) {
+        const live = await getLiveItem(item.bbProjectId, item.source, item.locator);
+        if (live.stateCategory === 'in_progress') return { status: 'synced', message: null };
+        if (['done', 'canceled'].includes(live.stateCategory)) {
+          return { status: 'unavailable', message: 'Issue is closed or canceled. Reopen it to update its status.' };
+        }
+        const option = progressStatus(await liveStatusOptions(item.bbProjectId, item.source, item.locator));
+        if (!option) return {
+          status: 'unavailable',
+          message: `${sourceName(item.source)} has no In progress transition for this issue. Agent work is tracked here.`
+        };
+        const updated = await updateItemStatus(item.bbProjectId, item.source, item.locator, option.id);
+        if (updated.stateCategory !== 'in_progress') throw new Error('The tracker did not confirm In progress.');
+        return { status: 'synced', message: null };
+      }
+    }
   );
   bb.background.service('taskboard-factory-progress', {
     async start(signal) {
@@ -1769,6 +1787,16 @@ export default async function plugin(bb: BbPluginApi) {
   }
 
   const handlers: PluginRpcHandlers<typeof taskboardRpcContract> = {
+    async factoryStartTask(input) {
+      await assertProjectExists(input.projectId);
+      const item = await getLiveItem(input.projectId, input.source, input.locator);
+      return { record: await factory.startTask(item, input.contextThreadId) };
+    },
+    async factoryRetryStatus(input) {
+      await assertProjectExists(input.projectId);
+      const item = await getLiveItem(input.projectId, input.source, input.locator);
+      return { record: await factory.retryStatus(item) };
+    },
     async factoryRecover(input) {
       await assertProjectExists(input.projectId);
       const item = await getLiveItem(input.projectId, input.source, input.locator);

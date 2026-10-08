@@ -24,6 +24,7 @@ export const factoryRunSchema = z.object({
   cursor: z.number().int().nonnegative(),
   turnId: z.string().nullable(),
   planDigest: z.string().nullable(),
+  scopeDigest: z.string().nullable().default(null),
   activity: z.string(),
   error: z.string().nullable(),
   output: z.string(),
@@ -46,6 +47,13 @@ export const factoryRecordSchema = factoryIdentitySchema.extend({
   scopeDigest: z.string(),
   plans: z.array(planSchema),
   approvedDigest: z.string().nullable(),
+  // Older dispatched items also adopt the automatic investigate -> plan -> build flow.
+  automatic: z.boolean().default(true),
+  automationError: z.string().nullable().default(null),
+  trackerProgress: z.object({
+    status: z.enum(['pending', 'synced', 'unavailable', 'failed']),
+    message: z.string().nullable()
+  }).strict().default({ status: 'pending', message: null }),
   runs: z.array(factoryRunSchema),
   updatedAt: z.string()
 }).strict();
@@ -54,6 +62,16 @@ export const factoryVersionInputSchema = factoryIdentitySchema.extend({
   expectedVersion: z.number().int().nonnegative()
 }).strict();
 export const factoryRpcMethods = {
+  factoryStartTask: {
+    input: factoryIdentitySchema.extend({
+      contextThreadId: z.string().min(1).nullable()
+    }).strict(),
+    output: z.object({ record: factoryRecordSchema }).strict()
+  },
+  factoryRetryStatus: {
+    input: factoryIdentitySchema,
+    output: z.object({ record: factoryRecordSchema }).strict()
+  },
   factoryRecover: {
     input: factoryVersionInputSchema.extend({ threadId: z.string().min(1).max(500) }).strict(),
     output: z.object({ record: factoryRecordSchema }).strict()

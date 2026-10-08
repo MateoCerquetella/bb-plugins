@@ -6,18 +6,28 @@
 
 ## Native Agent Progress (Development)
 
-**Send to agent** starts an investigation in a BB-managed worktree, opens its
+**Start task**, available on Kanban cards and issue details, starts a native investigation, opens its
 native thread and keeps Taskboard pinned on the originating ticket. The
 existing right panel shows native activity, plan steps, command exit codes,
 reported file changes and findings. Conversation, steering, permissions and
 stop remain native BB controls. No additional credentials or workflow runtime
 are required.
 
-Investigation can continue to plan generation in the same thread. Plans have
-immutable revisions and exact-content approval; changing scope invalidates
-approval. Build requires approval and a managed worktree. Review opens a
-separate linked session. A finished turn is **not** accepted work and never
-updates tracker status.
+Investigation continues to planning and build automatically in the same thread.
+If investigation used the project's plain checkout, Build forks the planning
+session into a BB-managed worktree, preserving its conversation and ticket link.
+Starting a task authorizes that sequence: the generated plan is saved as an
+immutable revision and its exact digest is approved before build dispatch.
+Existing investigation/planning runs adopt this behavior on reload. Scope
+changes, missing plans, stopped runs and uncertain dispatches pause automatic
+work with an actionable message. Build uses a managed worktree. Review
+opens a separate linked session and remains an explicit action.
+
+After a confirmed agent dispatch, Taskboard moves the provider issue to its
+available In progress status. Providers without that transition retain their
+status with an explanation in the panel. Permission or connection failures
+are shown with a separate status-update retry; retrying never launches another
+agent. A finished turn is **not** accepted work and never closes an issue.
 
 Dispatch intent is saved before calling BB. Duplicate starts reuse the original
 dispatch. Confirmed failed/stopped attempts have bounded retries; ambiguous
@@ -25,7 +35,7 @@ starts never retry automatically. Use **Link recovered session** after inspectin
 the matching recent native thread.
 
 This is the native progress slice, not the complete factory implementation.
-Stage automation, independently executed verification bound to workspace
+Independently executed verification bound to workspace
 revision, PR evidence capture, accepted-review and Done gates remain pending.
 Command results are observations, not proof that all required checks passed.
 No factory action merges, deploys or closes a ticket.

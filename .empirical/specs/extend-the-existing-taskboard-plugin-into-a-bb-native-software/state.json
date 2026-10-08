@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 10,
+  "revision": 15,
   "activeFeature": "extend-the-existing-taskboard-plugin-into-a-bb-native-software",
   "request": "Extend the EXISTING Taskboard plugin into a BB-native software factory, using Mastra Factory as the product and workflow reference. Inspect current Taskboard main, the installed plugin source, and PR #57 first; identify reusable code and regressions; preserve existing tracker credentials, data, integrations, and user edits; do not merge #57 wholesale or replace the live installation. Taskboard owns Intake -> Triage -> Planning -> Build -> Review -> Done with configurable manual-by-default stage policies and explicit opt-in automation, while factory stage, agent-run status, and external tracker status remain separate. Retain original tracker identity and link native BB sessions, investigation, versioned plans, approvals, workspace, verification, and PRs. Reuse authoring context across stages and allow a separate linked review session. Use BB provider/account/model/environment/worktree/thread/permission systems and exact SDK contracts. Empirical, Symphony, Mastra, and LangGraph are not required runtimes and Taskboard must not inject Empirical policy globally. Reuse suitable #57 lifecycle and verification code, but a successful turn or completed event must never by itself mark a ticket Done. Deliver a working vertical slice: existing ticket -> Investigate -> inspect findings -> generate/revise plan -> approve exact plan revision -> Build in a BB-managed workspace -> inspect tests and changes -> Review with linked PR/evidence. Expose native sessions and actionable failures; support steering, cancellation, bounded retries, restart recovery, duplicate-dispatch prevention, and stale-approval invalidation. Keep merge, deployment, and tracker closure explicitly gated. Test transitions, stale approvals, duplicate starts, crash recovery, cancellation, and the regression where an agent turn finishes without the task finishing. Verify an actual native BB execution path. Implement in this clean branch. Do not merge, deploy, close real tickets, or replace the live Taskboard installation. Report reuse from #57, checks, demonstrated workflow, and limitations.",
   "profile": "complex",
@@ -9,7 +9,7 @@
   "phase": "implement",
   "status": "awaiting_human",
   "repairAttempts": 0,
-  "message": "User explicitly approved installing and reloading integrated Taskboard. Installation and reload succeeded with factory progress, preparation and sync services running. 153 Taskboard tests, type checks, build and metadata passed. Historical migration guards required preserving original SQL and a reverted Work-board entry; isolated actual-database upgrade preserved checked row counts and integrity across two startups. Authenticated live panel verification is pending because Steel reaches BB sign-in. Broader factory criteria remain incomplete. No real task dispatched, ticket closed or PR merged.",
+  "message": "Completed and installed the latest user-authorized Taskboard follow-up from thr_dy84xshx5z: Start task in Kanban/detail, provider-supported In progress update after confirmed native dispatch, automatic investigation/planning/build continuation with immutable plan approval, automatic native Build fork into managed worktrees when planning used a plain checkout, exact preflight rejection recovery, responsive metadata and compact Agent UI. Root npm run check passed; Taskboard 166/166 tests, types, build, metadata passed; Steel fixture checks passed 1280/800/390px, navigation, realtime status and stale approval. Installed/reloaded services are running. Actual saved SDD-134 is In Progress with plan r1; native Build creation is blocked by a broken project checkout whose .git points to a missing repository, independently confirmed as not_git_repo. Asked the user for a valid checkout path and did not alter the target repository or project source. Authenticated host UI remains behind Connect login. Broader revision-bound verification, PR evidence, review acceptance and Done specification are incomplete and not certified. Logs and screenshots are linked in checkpoint.md; artifact evidence collector correctly refused the current Implement phase, so no receipt or full-feature completion is claimed.",
   "implementationActor": null,
   "workStartedAt": null,
   "specDigest": "sha256:6eb6d50c9ea5308eea8eb2bf73c6adde304911bf4c699f269d88b142cb7c805e",
@@ -37,7 +37,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-08T15:03:16.875Z",
+  "updatedAt": "2026-10-08T20:42:09.226Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "extend-the-existing-taskboard-plugin-into-a-bb-native-software-23c140730dcf",
@@ -81,5 +81,6 @@
     "actor": "agent",
     "revision": 4
   },
+  "budgetExtensionMinutes": 176,
   "reviewFirst": true
 }

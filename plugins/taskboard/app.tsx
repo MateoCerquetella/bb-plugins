@@ -149,7 +149,7 @@ import {
   taskboardComposerMention,
   writeTaskboardComposerDrag
 } from './composer-handoff.js';
-import { FactoryProgress } from './factory/app.js';
+import { FactoryProgress, StartTaskButton } from './factory/app.js';
 import './app.css';
 
 const PANEL_PATH = 'tasks';
@@ -3579,6 +3579,11 @@ function KanbanCard({
     .slice(0, 2);
 
   return (
+    <div className="tb-kanban-card group w-full rounded-md px-3 py-2.5 text-left"
+      data-state-category={item.stateCategory}
+      data-status-tone={workflowStatusTone(item.status, item.stateCategory)}
+      data-picked-up={pickedUp ? 'true' : 'false'}
+      data-pending={pending ? 'true' : 'false'}>
     <button
       type="button"
       draggable={!pending && !moveDisabled}
@@ -3598,7 +3603,7 @@ function KanbanCard({
       onKeyDown={onKeyDown}
       onClick={onOpen}
       className={cn(
-        'tb-kanban-card group w-full rounded-md px-3 py-2.5 text-left transition-[border-color,background-color,opacity,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        'block w-full rounded-md text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         composerDragEnabled && 'cursor-grab active:cursor-grabbing'
       )}
     >
@@ -3652,6 +3657,10 @@ function KanbanCard({
         ) : null}
       </span>
     </button>
+    {!['done', 'canceled'].includes(item.stateCategory) && <div className="mt-2 border-t border-border-hairline pt-2">
+      <StartTaskButton item={item} pin={() => storeRightPanelPinned(true)} disabled={pending} />
+    </div>}
+    </div>
   );
 }
 
@@ -4839,11 +4848,11 @@ function DetailMetadata({
     ['Updated', formatUpdatedAt(item.updatedAt)]
   ] as const;
   return (
-    <dl className={cn('grid grid-cols-2 gap-x-4 gap-y-3', className)}>
+    <dl className={cn('tb-detail-metadata grid grid-cols-2 gap-x-4 gap-y-3', className)}>
       {fields.map(([label, value]) => (
         <div key={label} className="min-w-0">
           <dt className="text-xs text-muted-foreground">{label}</dt>
-          <dd className="truncate text-sm font-medium">{value}</dd>
+          <dd className="truncate text-sm font-medium" title={value}>{value}</dd>
         </div>
       ))}
     </dl>
@@ -4959,7 +4968,7 @@ function TrackerDetail({
   }
 
   return (
-    <div className="@container flex min-h-full flex-col">
+    <div className="tb-issue-detail @container flex min-h-full flex-col">
       <div className="tb-detail-frame flex flex-1 items-stretch">
         <article className="mx-auto w-full min-w-0 max-w-[52rem] flex-1 px-5 pb-16 pt-7 @3xl:px-10 @3xl:pt-10">
           <div className="mb-3 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
@@ -4971,7 +4980,7 @@ function TrackerDetail({
             />
             <SourceMark source={item.source} />
           </div>
-          <div className="flex flex-col gap-4 @lg:flex-row @lg:items-start">
+          <div className="flex flex-col gap-4 @[60rem]:flex-row @[60rem]:items-start">
             <h1 className="min-w-0 flex-1 text-2xl font-semibold leading-tight">
               {item.title}
             </h1>
@@ -5000,7 +5009,7 @@ function TrackerDetail({
 
           <DetailMetadata
             item={item}
-            className="tb-detail-meta mt-5 border-y py-4 @[45rem]:hidden"
+            className="tb-detail-meta mt-5 border-y py-4"
           />
 
           {item.labels.length > 0 ? (
@@ -5049,7 +5058,7 @@ function TrackerDetail({
           ) : null}
         </article>
 
-        <aside className="hidden w-56 shrink-0 border-l border-border-hairline py-10 pl-4 pr-6 @[45rem]:block">
+        <aside className="tb-detail-aside hidden w-56 shrink-0 border-l border-border-hairline py-10 pl-4 pr-6">
           <DetailMetadata item={item} className="grid-cols-1" />
         </aside>
       </div>

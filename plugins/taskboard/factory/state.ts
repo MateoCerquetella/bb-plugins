@@ -16,6 +16,8 @@ export function newRecord(item: WorkItem): FactoryRecord {
     schemaVersion: 1, projectId: item.bbProjectId, source: item.source,
     locator: item.locator, version: 0, stage: 'Intake',
     scopeDigest: scopeDigest(item), plans: [], approvedDigest: null, runs: [],
+    automatic: false, automationError: null,
+    trackerProgress: { status: 'pending', message: null },
     updatedAt: new Date().toISOString()
   };
 }
@@ -75,7 +77,7 @@ export function startRun(record: FactoryRecord, kind: FactoryRunKind, retry: boo
   const run: FactoryRun = {
     id: randomUUID(), kind, status: 'starting' as const, threadId: null,
     environmentId: null, cursor: 0, turnId: null,
-    planDigest: record.approvedDigest, activity: 'Starting native BB session',
+    planDigest: record.approvedDigest, scopeDigest: record.scopeDigest, activity: 'Starting native BB session',
     error: null, output: '', checks: [], changedFiles: [], steps: [],
     startedAt: new Date().toISOString(), finishedAt: null
   };

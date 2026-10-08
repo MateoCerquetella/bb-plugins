@@ -22,6 +22,8 @@ const sdk = createBBSdk({ baseUrl: process.env.BB_SERVER_URL });
 const db = new Database(process.env.FACTORY_SMOKE_DB);
 const store = createFactoryStore(db);
 const service = createFactoryService(sdk, store, () => {});
+const contextThreadId = process.env.FACTORY_SMOKE_NO_CONTEXT === '1'
+  ? null : process.env.BB_THREAD_ID;
 const item = {
   bbProjectId: process.env.BB_PROJECT_ID, source: 'github' as const,
   locator: 'synthetic/taskboard-smoke#0', key: 'TASKBOARD-SMOKE',
@@ -34,13 +36,13 @@ let record = await service.get(item);
 try {
   if (!record.runs.length) record = await service.start(item, {
     expectedVersion: record.version, kind: 'investigate',
-    contextThreadId: process.env.BB_THREAD_ID, retry: false
+    contextThreadId, retry: false
   });
   const run = record.runs.at(-1)!;
   console.log(JSON.stringify({ threadId: run.threadId, environmentId: run.environmentId, status: run.status }));
   if (!run.threadId) throw new Error(run.error ?? 'No native thread');
   const duplicate = await service.start(item, {
-    expectedVersion: 0, kind: 'investigate', contextThreadId: process.env.BB_THREAD_ID, retry: false
+    expectedVersion: 0, kind: 'investigate', contextThreadId, retry: false
   });
   if (duplicate.runs.length !== record.runs.length) throw new Error('Duplicate dispatch');
   for (let i = 0; i < 120; i++) {

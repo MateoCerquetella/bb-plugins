@@ -8,6 +8,16 @@ type Store = ReturnType<typeof createFactoryStore>;
 type Sdk = BbPluginApi['sdk'];
 type Event = Awaited<ReturnType<Sdk['threads']['events']['list']>>[number];
 const message = (error: unknown) => (error instanceof Error ? error.message : String(error)).slice(0, 1000);
+function dispatchRejection(value: string) {
+  if (/HTTP 400: hostId is required unless workspace\.type is personal/i.test(value)) {
+    return 'BB rejected the environment before starting a session. Retry using the project default environment.';
+  }
+  if (/HTTP 409: This project checkout has no usable git branch\./i.test(value)) {
+    return 'BB could not create a worktree because the project checkout has no usable Git branch. Repair the project checkout, then retry.';
+  }
+  return null;
+}
+class SessionBusyError extends Error {}
 
 export function applyNativeEvent(run: FactoryRun, event: Event) {
   if (event.seq <= run.cursor) return;
@@ -78,7 +88,11 @@ export function factoryPrompt(item: WorkItem, record: FactoryRecord, kind: Facto
 }
 
 export function createFactoryService(
-  sdk: Sdk, store: Store, changed: (projectId: string) => void
+  sdk: Sdk, store: Store, changed: (projectId: string) => void,
+  tracker?: {
+    getItem: (identity: FactoryIdentity) => WorkItem | null;
+    markInProgress: (item: WorkItem) => Promise<FactoryRecord['trackerProgress']>;
+  }
 ) {
   const locks = new Map<string, Promise<unknown>>();
   async function locked<T>(identity: FactoryIdentity, operation: () => Promise<T>): Promise<T> {
@@ -100,12 +114,24 @@ export function createFactoryService(
     if (record.scopeDigest !== scope) {
       record.scopeDigest = scope;
       record.approvedDigest = null;
+      record.automatic = false;
+      record.automationError = 'Issue scope changed. Automatic work paused; inspect the session and updated plan.';
       return persist(record);
     }
     return record;
   }
   async function reconcile(record: FactoryRecord, signal?: AbortSignal) {
     let dirty = false;
+    // Only known preflight rejections are safe to expose as retryable.
+    for (const run of record.runs) {
+      const rejection = run.error && dispatchRejection(run.error);
+      if (run.status === 'uncertain' && !run.threadId && rejection) {
+        run.status = 'failed';
+        run.activity = 'Native session was not started';
+        run.error = rejection;
+        dirty = true;
+      }
+    }
     // Also observe resumed native turns on the newest author/review session.
     const sessions = new Set<string>();
     for (const run of [...record.runs].reverse()) {
@@ -123,7 +149,8 @@ export function createFactoryService(
         if (thread.status === 'error' || thread.deletedAt || thread.archivedAt) {
           run.status = 'failed';
           run.error = 'Native session is unavailable or failed. Open its thread for details.';
-        } else if (['active', 'starting', 'stopping'].includes(thread.status)) {
+        } else if (['active', 'starting', 'stopping'].includes(thread.status) &&
+          !['finished', 'failed', 'canceled'].includes(run.status)) {
           run.status = 'running';
           if (thread.status === 'stopping') run.activity = 'Stopping agent';
         }
@@ -140,10 +167,155 @@ export function createFactoryService(
     }
     return dirty ? persist(record) : record;
   }
+  async function syncProgress(item: WorkItem, record: FactoryRecord) {
+    if (!tracker || record.trackerProgress.status !== 'pending' ||
+      !record.runs.some(run => run.threadId && ['running', 'finished'].includes(run.status))) return record;
+    try {
+      record.trackerProgress = await tracker.markInProgress(item);
+    } catch (error) {
+      record.trackerProgress = { status: 'failed', message: `Could not move issue to In progress: ${message(error)}` };
+    }
+    return persist(record);
+  }
+  async function advance(item: WorkItem, record: FactoryRecord, signal?: AbortSignal) {
+    record = await syncProgress(item, record);
+    const run = record.runs.at(-1);
+    if (!record.automatic || record.automationError || !run || run.status !== 'finished' ||
+      run.error || signal?.aborted || !['investigate', 'plan'].includes(run.kind)) return record;
+    try {
+      if (['done', 'canceled'].includes(item.stateCategory)) {
+        throw new Error('Issue was closed or canceled. Reopen it before starting more work.');
+      }
+      if (run.scopeDigest && run.scopeDigest !== record.scopeDigest) {
+        throw new Error('Issue scope changed since this run. Start task again to investigate the updated issue.');
+      }
+      if (run.kind === 'plan') {
+        if (!run.output.trim()) throw new Error('Planning finished without a plan. Inspect the native session and retry planning.');
+        const saved = record.plans.at(-1);
+        // Preserve a human-edited plan saved after this planning turn started.
+        if (!saved || saved.scopeDigest !== record.scopeDigest || saved.createdAt < run.startedAt) savePlan(record, run.output);
+        approvePlan(record, record.plans.at(-1)!.digest);
+        // Approval is durable before any native build dispatch.
+        record = persist(record);
+      }
+      return await dispatch(item, record, {
+        kind: run.kind === 'investigate' ? 'plan' : 'build', contextThreadId: null, retry: false
+      });
+    } catch (error) {
+      if (signal?.aborted) throw error;
+      // Completion events can precede the native session becoming idle. Keep
+      // the completed run and let the next poll continue instead of pausing.
+      if (error instanceof SessionBusyError) return record;
+      record.automationError = `Automatic work paused: ${message(error)}`;
+      return persist(record);
+    }
+  }
+  async function dispatch(item: WorkItem, record: FactoryRecord, input: {
+    kind: FactoryRunKind; contextThreadId: string | null; retry: boolean;
+  }) {
+    const author = [...record.runs].reverse().find(run => run.kind !== 'review' && run.threadId);
+    const contextId = author?.threadId ?? input.contextThreadId;
+    const context = contextId ? await sdk.threads.get({ threadId: contextId }) : null;
+    if (context && context.projectId !== item.bbProjectId) throw new Error('Select a thread in this ticket project.');
+    if (author && context?.status !== 'idle') throw new SessionBusyError('Stop or finish the authoring session first.');
+    const defaults = context
+      ? await sdk.threads.defaultExecutionOptions({ threadId: context.id })
+      : await sdk.projects.defaultExecutionOptions({ projectId: item.bbProjectId });
+    if (!defaults) throw new Error('Choose native BB model and execution settings for this project first.');
+    const environment = context?.environmentId
+      ? await sdk.environments.get({ environmentId: context.environmentId }) : null;
+    const isolateBuild = input.kind === 'build' && (!environment?.managed || !environment.isWorktree);
+    if (isolateBuild && (!author?.threadId || !environment)) {
+      throw new Error('Build requires a linked native planning session and environment.');
+    }
+    // Project-default investigation can use a plain checkout. Preserve its
+    // conversation by forking Build into a managed worktree in one dispatch.
+    const reuse = input.kind !== 'review' && !isolateBuild && author?.threadId;
+    const events = reuse
+      ? await sdk.threads.events.list({ threadId: reuse, order: 'desc', limit: '1' }) : [];
+    const draft = startRun(record, input.kind, input.retry);
+    if (reuse) {
+      draft.threadId = reuse;
+      draft.environmentId = context!.environmentId;
+      draft.cursor = events[0]?.seq ?? 0;
+    }
+    const id = draft.id;
+    record = persist(record);
+    const run = record.runs.find(run => run.id === id)!;
+    try {
+      const prompt = factoryPrompt(item, record, input.kind);
+      if (reuse) {
+        await sdk.threads.send({
+          threadId: reuse, input: [{ type: 'text', text: prompt, mentions: [] }], mode: 'start'
+        });
+      } else {
+        const thread = await sdk.threads.spawn({
+          ...defaults,
+          ...(context ? { providerId: context.providerId } : {}),
+          ...(isolateBuild ? { originKind: 'fork' as const, sourceThreadId: author!.threadId! } : {}),
+          projectId: item.bbProjectId,
+          environment: input.kind === 'review' && environment
+            ? { type: 'reuse', environmentId: environment.id }
+            : environment
+              ? { type: 'host', hostId: environment.hostId,
+                  workspace: { type: 'managed-worktree', baseBranch: { kind: 'default' } } }
+              : { type: 'project-default' },
+          title: `${item.key}: ${input.kind}`,
+          prompt
+        });
+        run.threadId = thread.id;
+        run.environmentId = thread.environmentId;
+      }
+      run.status = 'running';
+      run.activity = 'Waiting for native agent events';
+    } catch (error) {
+      const detail = message(error);
+      const rejection = dispatchRejection(detail);
+      if (rejection) {
+        run.status = 'failed';
+        run.activity = 'Native session was not started';
+        run.error = rejection;
+      } else {
+        // Even a transport exception may have committed a native dispatch.
+        run.status = 'uncertain';
+        run.error = `Native dispatch outcome uncertain: ${detail}. Inspect recent BB threads; no automatic retry.`;
+      }
+    }
+    return syncProgress(item, persist(record));
+  }
   return {
     async get(item: WorkItem, signal?: AbortSignal) {
       return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () =>
-        reconcile(current(item), signal));
+        advance(item, await reconcile(current(item), signal), signal));
+    },
+    async startTask(item: WorkItem, contextThreadId: string | null) {
+      return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () => {
+        let record = current(item);
+        const run = record.runs.at(-1);
+        if (run && ['starting', 'running', 'uncertain'].includes(run.status)) return syncProgress(item, record);
+        if (run?.status === 'finished' && ['build', 'review'].includes(run.kind)) return record;
+        if (['done', 'canceled'].includes(item.stateCategory)) throw new Error('Reopen the issue before starting a task.');
+        record.automatic = true;
+        record.automationError = null;
+        record = persist(record);
+        if (run?.scopeDigest && run.scopeDigest !== record.scopeDigest) {
+          return dispatch(item, record, { kind: 'investigate', contextThreadId, retry: false });
+        }
+        if (!run || ['failed', 'canceled'].includes(run.status)) {
+          return dispatch(item, record, { kind: run?.kind ?? 'investigate', contextThreadId, retry: !!run });
+        }
+        if (run.kind === 'plan' && !run.output.trim()) {
+          return dispatch(item, record, { kind: 'plan', contextThreadId, retry: false });
+        }
+        return advance(item, record);
+      });
+    },
+    async retryStatus(item: WorkItem) {
+      return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () => {
+        const record = current(item);
+        record.trackerProgress = { status: 'pending', message: null };
+        return syncProgress(item, persist(record));
+      });
     },
     forThread: (threadId: string) => store.forThread(threadId),
     async linkRecovered(item: WorkItem, expectedVersion: number, threadId: string) {
@@ -173,6 +345,7 @@ export function createFactoryService(
         const record = current(item);
         assertVersion(record, expectedVersion);
         savePlan(record, body);
+        record.automatic = false;
         return persist(record);
       });
     },
@@ -194,60 +367,8 @@ export function createFactoryService(
         if (last && last.kind === input.kind && input.expectedVersion < record.version &&
           last.status !== 'uncertain') return record;
         assertVersion(record, input.expectedVersion);
-        const author = [...record.runs].reverse().find(run => run.kind !== 'review' && run.threadId);
-        const contextId = author?.threadId ?? input.contextThreadId;
-        const context = contextId ? await sdk.threads.get({ threadId: contextId }) : null;
-        if (context && context.projectId !== item.bbProjectId) throw new Error('Select a thread in this ticket project.');
-        if (author && context?.status !== 'idle') throw new Error('Stop or finish the authoring session first.');
-        const defaults = context
-          ? await sdk.threads.defaultExecutionOptions({ threadId: context.id })
-          : await sdk.projects.defaultExecutionOptions({ projectId: item.bbProjectId });
-        if (!defaults) throw new Error('Choose native BB model and execution settings for this project first.');
-        const environment = context?.environmentId
-          ? await sdk.environments.get({ environmentId: context.environmentId }) : null;
-        if (input.kind === 'build' && (!environment?.managed || !environment.isWorktree)) {
-          throw new Error('Build requires the linked BB-managed worktree. Open the native session and check its environment.');
-        }
-        const draft = startRun(record, input.kind, input.retry);
-        const reuse = input.kind !== 'review' && author?.threadId;
-        if (reuse) {
-          draft.threadId = reuse;
-          draft.environmentId = context!.environmentId;
-          const events = await sdk.threads.events.list({ threadId: reuse, order: 'desc', limit: '1' });
-          draft.cursor = events[0]?.seq ?? 0;
-        }
-        const id = draft.id;
-        record = persist(record);
-        let run = record.runs.find(run => run.id === id)!;
-        try {
-          const prompt = factoryPrompt(item, record, input.kind);
-          if (reuse) {
-            await sdk.threads.send({
-              threadId: reuse, input: [{ type: 'text', text: prompt, mentions: [] }], mode: 'start'
-            });
-          } else {
-            const thread = await sdk.threads.spawn({
-              ...defaults,
-              ...(context ? { providerId: context.providerId } : {}),
-              projectId: item.bbProjectId,
-              environment: input.kind === 'review' && environment
-                ? { type: 'reuse', environmentId: environment.id }
-                : { type: 'host', ...(environment ? { hostId: environment.hostId } : {}),
-                    workspace: { type: 'managed-worktree', baseBranch: { kind: 'default' } } },
-              title: `${item.key}: ${input.kind}`,
-              prompt
-            });
-            run.threadId = thread.id;
-            run.environmentId = thread.environmentId;
-          }
-          run.status = 'running';
-          run.activity = 'Waiting for native agent events';
-        } catch (error) {
-          // Even a transport exception may have committed a native dispatch.
-          run.status = 'uncertain';
-          run.error = `Native dispatch outcome uncertain: ${message(error)}. Inspect recent BB threads; no automatic retry.`;
-        }
-        return persist(record);
+        record.automationError = null;
+        return dispatch(item, record, input);
       });
     },
     async recover() {
@@ -267,7 +388,11 @@ export function createFactoryService(
     async poll(signal: AbortSignal) {
       for (const record of store.all()) {
         if (signal.aborted) return;
-        await locked(record, async () => reconcile(store.get(record)!, signal));
+        await locked(record, async () => {
+          const item = tracker?.getItem(record);
+          if (item) await advance(item, await reconcile(current(item), signal), signal);
+          else await reconcile(store.get(record)!, signal);
+        });
       }
     }
   };
