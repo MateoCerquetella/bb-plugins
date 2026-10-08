@@ -1,5 +1,31 @@
 # Native Progress Checkpoint
 
+## Live Installation Follow-Up
+
+On 2026-10-08 the user explicitly selected "Install and reload" for the
+integrated local build. The installation now points to this worktree's
+`plugins/taskboard`, and `bb plugin reload taskboard` succeeded with
+`taskboard-factory-progress`, `preparation-jobs`, and `sync` running.
+
+- Imported the installed preparation source and retained its uncommitted
+  composer UI behavior without modifying its original checkout.
+- The integrated Taskboard check passed 153 tests, types, build, and metadata
+  verification. Log: `$BB_THREAD_STORAGE/taskboard-install-check.log`.
+- Initial installs were rejected by migration guards and retained the old
+  installation. Restored immutable historical migrations and preserved the
+  reverted Work-board migration when its exact known hash is recorded.
+- Tested startup twice against an isolated SQLite backup of the actual
+  installation: checked table counts preserved, integrity check OK, 12
+  migrations recorded. Added an automated historical-upgrade regression.
+- Final installation and reload succeeded; settings, secrets and schedules
+  were retained by BB. No real task was dispatched or tracker item changed.
+- Steel inspection of the actual BB URL reached its sign-in gate. Authenticated
+  panel verification remains pending; no authentication bypass was attempted.
+- Threads dispatched by the previous version are not automatically linked to
+  factory progress records.
+
+The historical sections below describe the earlier draft checkpoint.
+
 ## Delivered In The Draft Branch
 
 Commit `11211cc7e` on `taskboard-with-mastra-factory-thr_suvnn4i6np`.
