@@ -148,5 +148,5 @@ feature journals unrelated to this change. These tool-generated changes must be
 reviewed and excluded or reconciled deliberately before a product commit; they
 are not Taskboard implementation changes.
 
-Specification revision 1 is waiting for user approval of the mockup. Do not
-invent an approval or proceed to product code before that gate is satisfied.
+The user subsequently approved the revised native-thread/right-panel direction.
+See checkpoint.md for current implementation evidence and remaining work.

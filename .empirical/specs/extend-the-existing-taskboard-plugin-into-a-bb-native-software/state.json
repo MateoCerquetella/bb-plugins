@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 7,
+  "revision": 8,
   "activeFeature": "extend-the-existing-taskboard-plugin-into-a-bb-native-software",
   "request": "Extend the EXISTING Taskboard plugin into a BB-native software factory, using Mastra Factory as the product and workflow reference. Inspect current Taskboard main, the installed plugin source, and PR #57 first; identify reusable code and regressions; preserve existing tracker credentials, data, integrations, and user edits; do not merge #57 wholesale or replace the live installation. Taskboard owns Intake -> Triage -> Planning -> Build -> Review -> Done with configurable manual-by-default stage policies and explicit opt-in automation, while factory stage, agent-run status, and external tracker status remain separate. Retain original tracker identity and link native BB sessions, investigation, versioned plans, approvals, workspace, verification, and PRs. Reuse authoring context across stages and allow a separate linked review session. Use BB provider/account/model/environment/worktree/thread/permission systems and exact SDK contracts. Empirical, Symphony, Mastra, and LangGraph are not required runtimes and Taskboard must not inject Empirical policy globally. Reuse suitable #57 lifecycle and verification code, but a successful turn or completed event must never by itself mark a ticket Done. Deliver a working vertical slice: existing ticket -> Investigate -> inspect findings -> generate/revise plan -> approve exact plan revision -> Build in a BB-managed workspace -> inspect tests and changes -> Review with linked PR/evidence. Expose native sessions and actionable failures; support steering, cancellation, bounded retries, restart recovery, duplicate-dispatch prevention, and stale-approval invalidation. Keep merge, deployment, and tracker closure explicitly gated. Test transitions, stale approvals, duplicate starts, crash recovery, cancellation, and the regression where an agent turn finishes without the task finishing. Verify an actual native BB execution path. Implement in this clean branch. Do not merge, deploy, close real tickets, or replace the live Taskboard installation. Report reuse from #57, checks, demonstrated workflow, and limitations.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
   "phase": "implement",
-  "status": "waiting",
+  "status": "awaiting_human",
   "repairAttempts": 0,
-  "message": "Executable plan records native service, additive persistence, right-panel integration, lifecycle tests, isolated native execution and browser verification without replacing the live plugin.",
+  "message": "Native thread and right-panel progress checkpoint is implemented in draft PR #72. Root checks, 145 Taskboard tests, Steel real-component checks and an isolated actual BB native execution passed. The broader factory specification is incomplete: automatic policies, revision-bound verification, PR evidence and acceptance/Done gates remain pending. Live Taskboard was not replaced; switching the installed plugin remains explicitly gated on user approval and preservation of its preparation UI/user edits. No full implementation or integration completion is claimed.",
   "implementationActor": null,
   "workStartedAt": null,
   "specDigest": "sha256:6eb6d50c9ea5308eea8eb2bf73c6adde304911bf4c699f269d88b142cb7c805e",
@@ -37,7 +37,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-08T02:32:49.106Z",
+  "updatedAt": "2026-10-08T03:02:02.581Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "extend-the-existing-taskboard-plugin-into-a-bb-native-software-23c140730dcf",
