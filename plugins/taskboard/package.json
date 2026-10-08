@@ -27,7 +27,7 @@
     "gitlab"
   ],
   "engines": {
-    "bb": ">=0.40",
+    "bb": ">=0.40.0",
     "bbPluginSdk": ">=0.4.21"
   },
   "bb": {
@@ -38,7 +38,8 @@
     },
     "server": "./server.ts",
     "app": "./app.tsx",
-    "skills": []
+    "skills": [],
+    "host": "./host.ts"
   },
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.1.3",

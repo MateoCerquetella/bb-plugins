@@ -1,3 +1,4 @@
+import { registerPreparationApp } from './preparation/app.js';
 import {
   useCallback,
   useEffect,
@@ -7517,9 +7518,10 @@ function TaskboardSettingsInfo() {
 }
 
 export default definePluginApp(app => {
+  registerPreparationApp(app);
   app.composer.customize({
     id: 'create-taskboard-issue',
-    scopes: ['thread', 'new-thread'],
+    scopes: ['new-thread'],
     actions: [
       { id: 'create-issue', component: ComposerCreateIssueAction }
     ]
