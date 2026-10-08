@@ -59,6 +59,12 @@
     "use-follow-viewer.ts",
     "engines.ts",
     "actions.ts",
+    "viewer-protocol.ts",
+    "live-viewer.tsx",
+    "service-catalog.ts",
+    "sign-ins.ts",
+    "sign-ins-panel.tsx",
+    "dashboard-cache.ts",
     "provisioning.ts",
     "scripts/"
   ],

@@ -5,6 +5,7 @@ export function useFollowViewer(threadId: string) {
   const anchor = useRef<HTMLDivElement>(null);
   const [style, setStyle] = useState<CSSProperties>();
   const [anchorStyle, setAnchorStyle] = useState<CSSProperties>();
+  const [latest, setLatest] = useState(false);
   useEffect(() => {
     const element = anchor.current;
     if (!element) return;
@@ -27,6 +28,7 @@ export function useFollowViewer(threadId: string) {
       const siblings = Array.from(document.querySelectorAll<HTMLElement>("[data-steel-thread]"))
         .filter(item => item.dataset.steelThread === threadId);
       const eligible = siblings.at(-1) === element && rect.width > 0 && bottom - top > 160;
+      setLatest(siblings.at(-1) === element && rect.width > 0);
       const follow = eligible && (following ? rect.top < top + 56 : rect.top < top - 56);
       if (follow && !following) placeholderHeight = rect.height;
       following = follow;
@@ -43,20 +45,24 @@ export function useFollowViewer(threadId: string) {
     const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
     window.addEventListener("scroll", schedule, true);
     window.addEventListener("resize", schedule);
+    window.addEventListener("steel-viewers-changed", schedule);
     window.visualViewport?.addEventListener("resize", schedule);
     window.visualViewport?.addEventListener("scroll", schedule);
     const observer = new ResizeObserver(schedule);
     observer.observe(element);
     if (scrollport) observer.observe(scrollport);
     schedule();
+    window.dispatchEvent(new Event("steel-viewers-changed"));
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
       window.removeEventListener("scroll", schedule, true);
       window.removeEventListener("resize", schedule);
+      window.removeEventListener("steel-viewers-changed", schedule);
+      queueMicrotask(() => window.dispatchEvent(new Event("steel-viewers-changed")));
       window.visualViewport?.removeEventListener("resize", schedule);
       window.visualViewport?.removeEventListener("scroll", schedule);
     };
   }, [threadId]);
-  return { anchor, style, anchorStyle };
+  return { anchor, style, anchorStyle, latest };
 }

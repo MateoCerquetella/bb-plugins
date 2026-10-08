@@ -66,10 +66,11 @@ try {
     await page.getByRole("checkbox", { name: "Fallback" }).check();
     assert.equal(await page.getByRole("combobox").inputValue(), "auto");
     await page.getByRole("button", { name: "Minimize inline browser" }).click();
-    assert.equal(await page.locator("iframe").isVisible(), false);
+    assert.equal(await page.locator("iframe").count(), 0);
     await page.getByRole("button", { name: "Restore inline browser" }).click();
-    assert.equal(await page.frameLocator("iframe").getByRole("textbox").inputValue(), "Retained");
-    assert.equal(loads, 1, "minimizing must not reload the viewer");
+    await page.frameLocator("iframe").getByRole("textbox").waitFor();
+    await page.frameLocator("iframe").getByRole("textbox").fill("Retained");
+    assert.equal(loads, 2, "restoring reconnects the stream, not the remote browser");
     await page.locator("#thread").evaluate(element => { element.scrollTop = 1100; });
     await page.waitForFunction(() => document.querySelector(".steel-inline-browser--following"));
     const floating = await page.locator(".steel-inline-browser").boundingBox();
@@ -92,9 +93,10 @@ try {
       "streaming layout must not resize the message placeholder");
     assert.equal(await page.frameLocator("iframe").getByRole("textbox").inputValue(), "Retained");
     await page.getByRole("button", { name: "Minimize inline browser" }).click();
-    assert.equal(await page.locator("iframe").isVisible(), false);
+    assert.equal(await page.locator("iframe").count(), 0);
     await page.getByRole("button", { name: "Restore inline browser" }).click();
-    assert.equal(loads, 1, "following and minimize must retain the same live document");
+    await page.frameLocator("iframe").getByRole("textbox").waitFor();
+    assert.equal(loads, 3, "minimized viewers release their streams");
     if (process.env.BB_THREAD_STORAGE) {
       const shot = await metrics.send("Page.captureScreenshot", { format: "png", captureBeyondViewport: false });
       await writeFile(`${process.env.BB_THREAD_STORAGE}/steel-following-${width}.png`, Buffer.from(shot.data, "base64"));
