@@ -33,6 +33,13 @@ function ChangedFiles({ record, run }: { record: FactoryRecord; run: FactoryRun 
   const [result, setResult] = useState<{ patch: string | null; message: string | null; truncated: boolean } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [refresh, setRefresh] = useState(0);
+  const counts = result?.patch ? result.patch.split('\n').reduce((total, line) => {
+    if (line.startsWith('@@')) total.inHunk = true;
+    else if (line.startsWith('diff --git')) total.inHunk = false;
+    else if (total.inHunk && line.startsWith('+')) total.additions++;
+    else if (total.inHunk && line.startsWith('-')) total.deletions++;
+    return total;
+  }, { additions: 0, deletions: 0, inHunk: false }) : null;
   useEffect(() => {
     if (!open || !path) return;
     let canceled = false;
@@ -47,14 +54,21 @@ function ChangedFiles({ record, run }: { record: FactoryRecord; run: FactoryRun 
     <summary><Icon name="FileDiff" className="size-3.5" />Changed files <span className="tb-run-caption">{run.changedFiles.length}</span></summary>
     {open && <div className="tb-diff-workspace">
       <div className="tb-diff-toolbar">
-        <select aria-label="Changed file" value={path} onChange={event => setPath(event.target.value)}>
-          {run.changedFiles.map(file => <option key={file} value={file}>{file}</option>)}
-        </select>
+        <div className="tb-diff-files" aria-label="Changed files">
+          {run.changedFiles.map(file => <button type="button" key={file} aria-pressed={file === path}
+            onClick={() => { if (file !== path) { setResult(null); setPath(file); } }}>
+            <Icon name="FileDiff" className="size-3.5 shrink-0" /><span>{file}</span>
+          </button>)}
+        </div>
         <span title="Refresh diff"><Button size="sm" variant="ghost" aria-label="Refresh diff" onClick={() => setRefresh(value => value + 1)}>
           <Icon name="RotateCcw" className="size-3.5" />
         </Button></span>
       </div>
-      <p className="tb-run-caption">Current workspace diff</p>
+      <p className="tb-run-caption">Current workspace diff{counts && <>
+        {' · '}<span className="tb-check-pass">+{counts.additions} added</span>
+        {' · '}<span className="tb-check-fail">-{counts.deletions} removed</span>
+        {result?.truncated ? ' (shown portion)' : ''}
+      </>}</p>
       {error ? <p role="alert">{error}</p> : !result ? <p role="status">Loading diff...</p> :
         <>
           {result.truncated && <p role="status">Partial diff: this file exceeds the preview limit.</p>}
@@ -71,12 +85,14 @@ function RunDetail({ run, record, historical = false }: { run: FactoryRun; recor
   const failed = run.checks.filter(check => check.exitCode !== null && check.exitCode !== 0).length;
   const unknown = run.checks.length - passed - failed;
   const live = !historical && tone(run) === 'active' && !record.automationError;
+  const needsAttention = tone(run) === 'attention' || tone(run) === 'failed' || !!record.automationError;
   return <section className="tb-run" data-tone={tone(run)} data-live={live}>
     {!historical && <div className="tb-run-heading">
       <Icon name={live ? 'Loading' : tone(run) === 'attention' || tone(run) === 'failed' ? 'AlertCircle' : 'Circle'} className="tb-live-mark size-4" />
       <strong>{labels[run.kind]}</strong><span className="tb-run-status">{runStatus(run)}</span>
-      {run.threadId && <span className="tb-session-action" title="Open session"><Button size="sm" variant="ghost" aria-label="Open session" onClick={() => navigate.toThread(run.threadId!)}>
+      {run.threadId && <span className="tb-session-action"><Button size="sm" variant={needsAttention ? 'outline' : 'ghost'} onClick={() => navigate.toThread(run.threadId!)}>
         <Icon name="MessageCirclePlus" className="size-3.5" />
+        {needsAttention ? 'Continue in thread' : 'Open session'}
       </Button></span>}
     </div>}
     <div className="tb-run-now"><p key={run.activity} aria-live={live ? 'polite' : 'off'}>{run.error ?? run.activity}</p>
@@ -369,7 +385,7 @@ export function FactoryProgress({ item }: { item: WorkItem }) {
         <p className="notice">Addressing review findings in the Build workspace. Review will run again automatically.</p>}
       {run.status === 'finished' && run.kind === 'build' && !run.repairOf && !['needs_input', 'blocked'].includes(run.buildResult?.verdict ?? '') &&
         <p className="notice">Build turn finished. Start review to check the implementation.</p>}
-      {run.status === 'finished' && run.kind === 'build' && ['needs_input', 'blocked'].includes(run.buildResult?.verdict ?? '') &&
+      {run.status === 'finished' && run.kind === 'build' && !run.threadId && ['needs_input', 'blocked'].includes(run.buildResult?.verdict ?? '') &&
         <p className="notice">Build has not completed the implementation. Open the Build session to resolve its reported blocker.</p>}
       {run.status === 'finished' && run.kind === 'review' &&
         <p className="notice">{run.reviewResult?.verdict === 'blocked'

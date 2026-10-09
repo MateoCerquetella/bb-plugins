@@ -713,6 +713,12 @@
 .tb-progress-ui { color: var(--ink); font-size: 12px; line-height: 1.5; }
 .tb-progress-ui .tb-run-heading { gap: 8px; margin-bottom: 6px; min-height: 30px; }
 .tb-run-heading > .tb-session-action { margin-left: auto; }
+.tb-progress-ui .tb-run-heading { flex-wrap: wrap; }
+.tb-diff-files { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.tb-diff-files button { display: flex; align-items: center; gap: 8px; text-align: left; padding: 7px 8px; border-radius: 4px; font: 12px ui-monospace, monospace; }
+.tb-diff-files button span { overflow-wrap: anywhere; min-width: 0; }
+.tb-diff-files button[aria-pressed='true'] { background: var(--accent); color: var(--accent-foreground); }
+.tb-diff-files button:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 .tb-progress-ui .tb-run-status { font-size: 11px; font-weight: 600; color: var(--progress-tone); }
 .tb-live-mark { flex: none; color: var(--progress-tone); }
 .tb-progress-ui .tb-run-now {
