@@ -8,6 +8,15 @@ export const factoryIdentitySchema = z.object({
 export type FactoryIdentity = z.infer<typeof factoryIdentitySchema>;
 export const factoryRunKindSchema = z.enum(['investigate', 'plan', 'build', 'review']);
 export type FactoryRunKind = z.infer<typeof factoryRunKindSchema>;
+export const factoryReviewResultSchema = z.object({
+  verdict: z.enum(['blocked', 'passed', 'unknown']),
+  findings: z.string().max(100_000)
+}).strict();
+export const factoryBuildResultSchema = z.object({
+  verdict: z.enum(['implemented', 'blocked', 'needs_input', 'unknown']),
+  summary: z.string().max(100_000),
+  revision: z.string().max(500).nullable()
+}).strict();
 const planSchema = z.object({
   revision: z.number().int().positive(),
   body: z.string().min(1).max(100_000),
@@ -28,6 +37,10 @@ export const factoryRunSchema = z.object({
   activity: z.string(),
   error: z.string().nullable(),
   output: z.string(),
+  reviewResult: factoryReviewResultSchema.nullable().default(null),
+  buildResult: factoryBuildResultSchema.nullable().default(null),
+  repairOf: z.string().nullable().default(null),
+  updates: z.array(z.object({ id: z.string(), text: z.string(), at: z.string() }).strict()).default([]),
   checks: z.array(z.object({
     id: z.string(), command: z.string(), exitCode: z.number().nullable(),
     output: z.string()

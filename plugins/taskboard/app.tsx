@@ -149,7 +149,7 @@ import {
   taskboardComposerMention,
   writeTaskboardComposerDrag
 } from './composer-handoff.js';
-import { FactoryProgress, StartTaskButton } from './factory/app.js';
+import { FactoryProgress, FactoryThreadProgress, StartTaskButton } from './factory/app.js';
 import './app.css';
 
 const PANEL_PATH = 'tasks';
@@ -7528,6 +7528,11 @@ function TaskboardSettingsInfo() {
 
 export default definePluginApp(app => {
   registerPreparationApp(app);
+  app.slots.experimental_threadHeaderAction({
+    id: 'taskboard-live-progress',
+    title: 'Task progress',
+    component: FactoryThreadProgress
+  });
   app.composer.customize({
     id: 'create-taskboard-issue',
     scopes: ['new-thread'],

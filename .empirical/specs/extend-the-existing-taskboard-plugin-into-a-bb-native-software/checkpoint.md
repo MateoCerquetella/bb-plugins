@@ -1,5 +1,42 @@
 # Native Progress Checkpoint
 
+## Automatic Review Repair Follow-Up
+
+Continued in `thr_njudjkt9rt` on 2026-10-08. The user requested automatic
+recovery from the completed-but-blocked ROT-5 review instead of instructions
+to manually paste a prompt into Build.
+
+- Final review output now records a blocked, passed, or unknown verdict.
+  Explicit negative legacy reviews can be recovered on reload; ambiguous
+  results remain actionable without inferring acceptance from a finished turn.
+- Automatic tasks return blocked review findings to the original Build thread
+  and managed environment. Build checks the workspace/revision mismatch and
+  reports implementation evidence. A repaired implementation starts a fresh
+  review in the same environment, with a limit of two repairs per approved
+  plan/scope. Unknown dispatches, stale scope, workspace drift, busy sessions,
+  missing revisions, and Builds needing input pause the cycle.
+- The panel shows Review found blockers and Return to Build with findings.
+  At the repair limit, the plan can be revised. Builds awaiting decisions show
+  Build needs input and cannot request another review.
+- Root npm install and npm run check passed. After the final reviewer-idle
+  guard, Taskboard's full check passed SDK contracts, typecheck, 179 tests,
+  build and metadata verification. git diff --check passed.
+- Steel component verification passed 1280px, 800px and 390px layouts, blocked
+  review actions, native-navigation recording, repair limits and plan recovery.
+  It uses mocked BB hooks and does not prove authenticated host-panel rendering.
+- Installed the same local Taskboard path and reloaded successfully. All three
+  background services are running; installed frontend hash 7f8bb265430a674e.
+- Actual ROT-5 automatically resumed Build in thr_hbhai5vt8x, environment
+  env_g9zid36t9b, linked to review thr_jd5eu9546r. Native activity confirmed
+  it inspecting worktrees and implementation references. Its exact tracker
+  identity remains In Progress. The implementation itself is not certified
+  complete; the preceding Build stopped for required product decisions.
+- Logs, screenshots, install/reload results and sanitized live readback are in
+  /home/dyaus/.bb/thread-storage/thr_njudjkt9rt/taskboard-review-*.
+- The selected broader factory feature remains in Implement at revision 19.
+  Empirical refused evidence collection in that phase, so no receipt or whole
+  feature completion was fabricated. Tracker workflow health is local-only.
+
 ## Automatic Continuation And Tracker Status Follow-Up
 
 Continued from `thr_dy84xshx5z` in `thr_4cdin3vcbr` on 2026-10-08.

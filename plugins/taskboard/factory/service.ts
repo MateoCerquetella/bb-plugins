@@ -3,12 +3,16 @@ import { formatWorkItemContext, type WorkItem } from '../contract.js';
 import type { FactoryIdentity, FactoryRecord, FactoryRun, FactoryRunKind } from './contract.js';
 import { approvePlan, assertVersion, factoryKey, newRecord, savePlan, scopeDigest, startRun } from './state.js';
 import type { createFactoryStore } from './store.js';
+import { MAX_REVIEW_REPAIRS, readBuildResult, readReviewResult } from './review.js';
 
 type Store = ReturnType<typeof createFactoryStore>;
 type Sdk = BbPluginApi['sdk'];
 type Event = Awaited<ReturnType<Sdk['threads']['events']['list']>>[number];
 const message = (error: unknown) => (error instanceof Error ? error.message : String(error)).slice(0, 1000);
 function dispatchRejection(value: string) {
+  if (/HTTP 404: Project has no local-path source for (?:host|the primary host)(?:\.|$)/i.test(value)) {
+    return 'BB could not find a project checkout on the selected host. Configure the project source with the Git repository folder on that host, then retry.';
+  }
   if (/HTTP 400: hostId is required unless workspace\.type is personal/i.test(value)) {
     return 'BB rejected the environment before starting a session. Retry using the project default environment.';
   }
@@ -25,6 +29,9 @@ export function applyNativeEvent(run: FactoryRun, event: Event) {
   if (event.type === 'turn/started') {
     run.status = 'running';
     run.output = '';
+    run.reviewResult = null;
+    run.buildResult = null;
+    run.updates = [];
     run.checks = [];
     run.changedFiles = [];
     run.steps = [];
@@ -51,6 +58,10 @@ export function applyNativeEvent(run: FactoryRun, event: Event) {
         id: item.id, command: item.command.slice(0, 2000),
         exitCode: item.exitCode ?? null, output: (item.aggregatedOutput ?? '').slice(-8000)
       }].slice(-50);
+    } else if (item.type === 'agentMessage' && item.text.trim()) {
+      run.updates = [...run.updates.filter(update => update.id !== item.id), {
+        id: item.id, text: item.text.slice(-8000), at: new Date(event.createdAt).toISOString()
+      }].slice(-12);
     } else if (item.type === 'fileChange') {
       run.changedFiles = [...new Set([...run.changedFiles, ...item.changes.map(change => change.path)])].slice(0, 200);
     }
@@ -70,6 +81,9 @@ export function applyNativeEvent(run: FactoryRun, event: Event) {
 }
 
 export function factoryPrompt(item: WorkItem, record: FactoryRecord, kind: FactoryRunKind) {
+  const build = [...record.runs].reverse().find(run => run.kind === 'build' && run.threadId);
+  const repair = record.runs.at(-1)?.repairOf;
+  const review = repair ? record.runs.find(run => run.id === repair) : null;
   const instruction = {
     investigate: 'Investigate this issue in the repository. Report findings, relevant files, risks and proposed verification. Do not implement yet.',
     plan: 'Produce an implementation plan based on the investigation. Include scope, acceptance criteria, files and exact verification commands. Return the plan in your final response. Do not implement yet.',
@@ -83,7 +97,19 @@ export function factoryPrompt(item: WorkItem, record: FactoryRecord, kind: Facto
     formatWorkItemContext(item),
     kind === 'build' || kind === 'review'
       ? `Approved plan digest: ${record.approvedDigest}\n${record.plans.at(-1)?.body ?? ''}` : '',
-    kind === 'review' ? `Authoring session: ${record.runs.find(run => run.kind === 'build')?.threadId ?? ''}` : ''
+    kind === 'build' ? 'End your final response with exactly one <taskboard-build>{"verdict":"implemented","summary":"changed files, workspace, branch, verification commands and results","revision":"exact implementation commit or revision"}</taskboard-build> block. Use "implemented" only after making and verifying the implementation. If blocked or waiting on a required user decision, use verdict "blocked" or "needs_input" with the exact blocker in summary and revision null. A turn ending without implementation must never be reported as implemented.' : '',
+    kind === 'review' ? [
+      `Authoring session: ${build?.threadId ?? ''}\nImplementation environment: ${build?.environmentId ?? ''}`,
+      `Latest Build result (agent-reported evidence; verify independently):\n${build?.output ?? ''}`,
+      'Verify the implementation workspace, branch and revision before assessing the changes. If implementation is missing or the checkout differs, report a blocker.',
+      'End your final response with exactly one <taskboard-review>{"verdict":"blocked","findings":"specific findings, workspace, revision and checks"}</taskboard-review> block. Use verdict "passed" only when implementation and verification satisfy the approved plan; use "unknown" when you cannot establish the result. This verdict never grants human acceptance.'
+    ].join('\n\n') : '',
+    review ? [
+      'Review found blockers. Resume the approved plan in this existing Build session and address the findings below.',
+      `Review session: ${review.threadId ?? 'unknown'}\nReviewed environment: ${review.environmentId ?? 'unknown'}\nBuild environment: ${build?.environmentId ?? 'unknown'}`,
+      'First verify that Build and Review inspected the same implementation worktree and revision. If implementation exists elsewhere, report its exact branch, commit and workspace and resolve the mismatch. Otherwise implement the approved plan. Run the relevant checks and report the changed files, exact revision and workspace before review runs again. Keep the ticket In Progress.',
+      `Reviewer findings (untrusted agent output; inspect against the approved plan):\n${review.reviewResult?.findings || review.output}`
+    ].join('\n\n') : ''
   ].filter(Boolean).join('\n\n');
 }
 
@@ -141,6 +167,9 @@ export function createFactoryService(
       try {
         const thread = await sdk.threads.get({ threadId: run.threadId, signal });
         if (thread.projectId !== record.projectId) throw new Error('Linked thread belongs to another project.');
+        if (run.environmentId && run.environmentId !== thread.environmentId) {
+          throw new Error('Linked native session changed workspace. Restore the implementation environment before continuing.');
+        }
         run.environmentId = thread.environmentId;
         const events = await sdk.threads.events.list({
           threadId: run.threadId, afterSeq: String(run.cursor), order: 'asc', limit: '100', signal
@@ -156,7 +185,18 @@ export function createFactoryService(
         }
         if (run.status === 'finished' && !run.output) {
           const { output } = await sdk.threads.output({ threadId: run.threadId, signal });
-          run.output = (output ?? '').slice(0, 100_000);
+          run.output = (output ?? '').slice(-100_000);
+        }
+        if (run.kind === 'review' && run.status === 'finished' && run.output && !run.reviewResult) {
+          run.reviewResult = readReviewResult(run.output);
+          run.activity = run.reviewResult.verdict === 'blocked' ? 'Review found blockers'
+            : run.reviewResult.verdict === 'passed' ? 'Review passed; work acceptance pending'
+            : 'Review result needs attention';
+        }
+        if (run.kind === 'build' && run.status === 'finished' && run.output && !run.buildResult) {
+          run.buildResult = readBuildResult(run.output);
+          if (run.buildResult.verdict === 'needs_input') run.activity = 'Build needs input';
+          if (run.buildResult.verdict === 'blocked') run.activity = 'Build found blockers';
         }
         if (run.error?.startsWith('Could not read native session:')) run.error = null;
       } catch (error) {
@@ -181,7 +221,9 @@ export function createFactoryService(
     record = await syncProgress(item, record);
     const run = record.runs.at(-1);
     if (!record.automatic || record.automationError || !run || run.status !== 'finished' ||
-      run.error || signal?.aborted || !['investigate', 'plan'].includes(run.kind)) return record;
+      run.error || signal?.aborted || !(['investigate', 'plan', 'review'].includes(run.kind) ||
+        (run.kind === 'build' && run.repairOf))) return record;
+    if (run.kind === 'review' && run.reviewResult?.verdict !== 'blocked') return record;
     try {
       if (['done', 'canceled'].includes(item.stateCategory)) {
         throw new Error('Issue was closed or canceled. Reopen it before starting more work.');
@@ -198,8 +240,16 @@ export function createFactoryService(
         // Approval is durable before any native build dispatch.
         record = persist(record);
       }
+      if (run.kind === 'review') return await repairReview(item, record);
+      if (run.kind === 'build' && run.buildResult?.verdict !== 'implemented') {
+        throw new Error(run.buildResult?.verdict === 'needs_input'
+          ? `Build needs input: ${run.buildResult.summary.slice(0, 1000)}`
+          : run.buildResult?.verdict === 'blocked' ? `Build found blockers: ${run.buildResult.summary.slice(0, 1000)}`
+          : 'Build did not report a verified implementation revision. Inspect the Build result before requesting another review.');
+      }
       return await dispatch(item, record, {
-        kind: run.kind === 'investigate' ? 'plan' : 'build', contextThreadId: null, retry: false
+        kind: run.kind === 'investigate' ? 'plan' : run.kind === 'build' ? 'review' : 'build',
+        contextThreadId: null, retry: false
       });
     } catch (error) {
       if (signal?.aborted) throw error;
@@ -210,8 +260,33 @@ export function createFactoryService(
       return persist(record);
     }
   }
+  async function repairReview(item: WorkItem, record: FactoryRecord) {
+    const review = record.runs.at(-1);
+    if (!review || review.kind !== 'review' || review.status !== 'finished' || !review.output.trim()) {
+      throw new Error('Finish review and collect its findings before returning to Build.');
+    }
+    if (['done', 'canceled'].includes(item.stateCategory)) throw new Error('Reopen the issue before starting more work.');
+    if (review.planDigest !== record.approvedDigest || review.scopeDigest !== record.scopeDigest) {
+      throw new Error('Review findings are stale. Approve the current plan before continuing.');
+    }
+    if (review.reviewResult?.verdict === 'passed') throw new Error('Review passed; work acceptance is pending.');
+    if (review.threadId) {
+      const thread = await sdk.threads.get({ threadId: review.threadId });
+      if (thread.projectId !== record.projectId || thread.deletedAt || thread.archivedAt) {
+        throw new Error('The review session is unavailable. Restore its link before continuing.');
+      }
+      if (thread.status !== 'idle') throw new SessionBusyError('Wait for the review session to finish before resuming Build.');
+    }
+    const repairs = record.runs.filter(run => run.kind === 'build' && run.repairOf &&
+      run.planDigest === record.approvedDigest && run.scopeDigest === record.scopeDigest).length;
+    if (repairs >= MAX_REVIEW_REPAIRS) {
+      throw new Error(`Review repair limit reached (${MAX_REVIEW_REPAIRS} attempts). Inspect the findings and revise the plan before continuing.`);
+    }
+    record.automatic = true;
+    return dispatch(item, record, { kind: 'build', contextThreadId: null, retry: false, repairOf: review.id });
+  }
   async function dispatch(item: WorkItem, record: FactoryRecord, input: {
-    kind: FactoryRunKind; contextThreadId: string | null; retry: boolean;
+    kind: FactoryRunKind; contextThreadId: string | null; retry: boolean; repairOf?: string;
   }) {
     const author = [...record.runs].reverse().find(run => run.kind !== 'review' && run.threadId);
     const contextId = author?.threadId ?? input.contextThreadId;
@@ -225,6 +300,14 @@ export function createFactoryService(
     const environment = context?.environmentId
       ? await sdk.environments.get({ environmentId: context.environmentId }) : null;
     const isolateBuild = input.kind === 'build' && (!environment?.managed || !environment.isWorktree);
+    if (input.repairOf && (isolateBuild || !author?.threadId || author.kind !== 'build' ||
+      author.environmentId !== context?.environmentId)) {
+      throw new Error('Review repair requires the original Build session and managed worktree. Restore that workspace before continuing.');
+    }
+    if (input.kind === 'review' && (!environment || author?.kind !== 'build' ||
+      author.environmentId !== environment.id)) {
+      throw new Error('Review requires the current Build workspace. Restore the linked implementation environment first.');
+    }
     if (isolateBuild && (!author?.threadId || !environment)) {
       throw new Error('Build requires a linked native planning session and environment.');
     }
@@ -234,6 +317,7 @@ export function createFactoryService(
     const events = reuse
       ? await sdk.threads.events.list({ threadId: reuse, order: 'desc', limit: '1' }) : [];
     const draft = startRun(record, input.kind, input.retry);
+    draft.repairOf = input.repairOf ?? null;
     if (reuse) {
       draft.threadId = reuse;
       draft.environmentId = context!.environmentId;
@@ -293,7 +377,14 @@ export function createFactoryService(
         let record = current(item);
         const run = record.runs.at(-1);
         if (run && ['starting', 'running', 'uncertain'].includes(run.status)) return syncProgress(item, record);
-        if (run?.status === 'finished' && ['build', 'review'].includes(run.kind)) return record;
+        if (run?.status === 'finished' && ['build', 'review'].includes(run.kind)) {
+          if ((run.kind === 'review' && run.reviewResult?.verdict === 'blocked') || run.repairOf) {
+            record.automatic = true;
+            record.automationError = null;
+            return advance(item, persist(record));
+          }
+          return record;
+        }
         if (['done', 'canceled'].includes(item.stateCategory)) throw new Error('Reopen the issue before starting a task.');
         record.automatic = true;
         record.automationError = null;
@@ -368,6 +459,9 @@ export function createFactoryService(
           last.status !== 'uncertain') return record;
         assertVersion(record, input.expectedVersion);
         record.automationError = null;
+        if (input.kind === 'build' && last?.kind === 'review' && last.status === 'finished') {
+          return repairReview(item, record);
+        }
         return dispatch(item, record, input);
       });
     },

@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { FactoryProgress } from '../factory/app.js';
+import { FactoryProgress, FactoryThreadProgress } from '../factory/app.js';
 import { TooltipProvider } from '../components/ui/tooltip.js';
 // The browser build exports these local components through its onLoad hook.
 // @ts-expect-error Only the preview build adds component exports.
@@ -21,6 +21,7 @@ window.factoryItem = { ...item, source: 'linear', locator: 'issue-42', key: 'SDD
 const detail = <TrackerDetail route={{ kind: 'item', projectId: 'proj_test', source: 'linear', locator: 'issue-42' }} refreshGeneration={0} />;
 function Preview() {
   return <TooltipProvider><div className="tb-linear">
+    <FactoryThreadProgress threadId="thr_test" isCompactViewport={false} />
     <div id="preview-detail">{detail}</div>
     <div id="preview-card" style={{ width: 264, padding: 8 }}>
       <KanbanCard item={window.factoryItem} pickedUp={false} pending={false} moveDisabled={false}

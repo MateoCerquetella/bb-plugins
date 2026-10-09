@@ -74,11 +74,16 @@ export function startRun(record: FactoryRecord, kind: FactoryRunKind, retry: boo
     latestBuild.planDigest !== record.approvedDigest)) {
     throw new Error('Finish the approved build before requesting review.');
   }
+  if (kind === 'review' && latestBuild?.buildResult &&
+    ['needs_input', 'blocked'].includes(latestBuild.buildResult.verdict)) {
+    throw new Error('Build has unresolved blockers or needs input. Resume Build before requesting review.');
+  }
   const run: FactoryRun = {
     id: randomUUID(), kind, status: 'starting' as const, threadId: null,
     environmentId: null, cursor: 0, turnId: null,
     planDigest: record.approvedDigest, scopeDigest: record.scopeDigest, activity: 'Starting native BB session',
-    error: null, output: '', checks: [], changedFiles: [], steps: [],
+    error: null, output: '', reviewResult: null, buildResult: null, repairOf: null,
+    updates: [], checks: [], changedFiles: [], steps: [],
     startedAt: new Date().toISOString(), finishedAt: null
   };
   record.runs.push(run);

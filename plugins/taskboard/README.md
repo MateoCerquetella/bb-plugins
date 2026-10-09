@@ -23,6 +23,17 @@ changes, missing plans, stopped runs and uncertain dispatches pause automatic
 work with an actionable message. Build uses a managed worktree. Review
 opens a separate linked session and remains an explicit action.
 
+For automatic tasks, a review that reports blockers resumes the original Build
+thread with the findings and asks it to verify the implementation worktree and
+revision. A repaired Build that reports implementation and a revision starts a
+fresh review in that same environment. This cycle is limited to two repairs per
+approved plan and scope. Older reviews with an explicit negative verdict also
+recover on reload. Unclear results remain inspectable and offer **Return to Build
+with findings**. A Build waiting for decisions shows **Build needs input** and
+cannot start another review; native completion alone never establishes an
+implementation. Workspace changes, uncertain dispatches and stale scope pause
+the cycle without creating a replacement worktree.
+
 After a confirmed agent dispatch, Taskboard moves the provider issue to its
 available In progress status. Providers without that transition retain their
 status with an explanation in the panel. Permission or connection failures

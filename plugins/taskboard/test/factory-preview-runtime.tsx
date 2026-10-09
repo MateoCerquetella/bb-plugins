@@ -7,13 +7,14 @@ declare global {
     factoryNavigation: string[];
     factoryItem: Record<string, unknown>;
     factoryStarts: number;
+    factoryRefresh: () => void;
   }
 }
 export function useRpc() {
   return rpc;
 }
 const rpc = {
-  async call(method: string, input: { body?: string; digest?: string }) {
+  async call(method: string, input: { body?: string; digest?: string; kind?: string }) {
     const record = window.factoryFixture;
     if (method === 'getItem') return { item: structuredClone(window.factoryItem) };
     if (method === 'factoryStartTask') {
@@ -26,11 +27,19 @@ const rpc = {
         id: 'started', kind: 'investigate', status: 'running', threadId: 'thr_started',
         environmentId: 'env_worktree', cursor: 0, turnId: null, planDigest: null,
         scopeDigest: record.scopeDigest, activity: 'Inspecting repository', error: null,
-        output: '', checks: [], steps: [], changedFiles: [], startedAt: new Date().toISOString(), finishedAt: null
+        output: '', reviewResult: null, buildResult: null, repairOf: null, updates: [], checks: [], steps: [], changedFiles: [], startedAt: new Date().toISOString(), finishedAt: null
       }];
       record.version++;
       for (const callback of listeners.get('taskboard:factory') ?? []) callback({ projectId: 'proj_test' });
       for (const callback of listeners.get('taskboard:changed') ?? []) callback({ projectId: 'proj_test' });
+    }
+    if (method === 'factoryStart' && input.kind === 'build') {
+      const review = record.runs.at(-1)!;
+      record.automatic = true; record.stage = 'Build'; record.version++;
+      record.runs.push({ ...review, id: 'repair', kind: 'build', status: 'running',
+        threadId: 'thr_build', repairOf: review.id, reviewResult: null, output: '',
+        activity: 'Addressing review findings', updates: [], checks: [], steps: [], changedFiles: [] });
+      window.factoryRefresh();
     }
     if (method === 'factorySavePlan') {
       record.plans.push({
@@ -46,6 +55,9 @@ const rpc = {
 export function useBbContext() { return { projectId: 'proj_test', threadId: 'thr_test' }; }
 export function useBbNavigate() { return { toThread: (id: string) => window.factoryNavigation.push(id) }; }
 const listeners = new Map<string, Set<(payload: unknown) => void>>();
+window.factoryRefresh = () => {
+  for (const callback of listeners.get('taskboard:factory') ?? []) callback({ projectId: 'proj_test' });
+};
 export function useRealtime(channel: string, callback: (payload: unknown) => void) {
   useEffect(() => {
     const callbacks = listeners.get(channel) ?? new Set();

@@ -41,6 +41,7 @@ const fixture = {
     id: 'run', kind: 'plan', status: 'finished', threadId: 'thr_test', environmentId: 'env_managed_worktree',
     cursor: 9, turnId: 'turn', planDigest: null, activity: 'Turn finished; work not accepted',
     error: null, output: 'Preserve filters per project. Add a regression test for switching between two projects.',
+    updates: [{ id: 'message', text: 'Found the project-switch race. Checking saved preferences.', at: new Date().toISOString() }],
     checks: [{ id: 'check', command: 'npm test', exitCode: 1, output: 'Regression failed: project preferences were reset.' }],
     steps: [{ step: 'Inspect project selection', status: 'completed' }],
     changedFiles: ['plugins/taskboard/browse-preferences.ts'],
@@ -63,7 +64,11 @@ try {
   await page.setContent(html);
   const manual = page.locator('#preview-manual');
   await manual.getByRole('heading', { name: 'Agent', exact: true }).waitFor();
-  await manual.getByRole('button', { name: 'Open session' }).click();
+  await page.getByRole('button', { name: 'Task progress', exact: true }).click();
+  await page.getByRole('dialog').getByText('Agent updates', { exact: true }).waitFor();
+  await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, 'taskboard-thread-progress.png') });
+  await page.keyboard.press('Escape');
+  await manual.getByRole('button', { name: 'Open session' }).first().click();
   assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_test']);
   await manual.getByText('Implementation plan', { exact: true }).click();
   await manual.getByRole('button', { name: 'Save revision' }).click();
@@ -87,8 +92,45 @@ try {
     await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, `taskboard-progress-${name}.png`), fullPage: true });
   }
   assert.equal(await page.getByRole('button', { name: /Generate plan|Start build|Approve revision/ }).count(), 0);
+  await page.evaluate(() => {
+    const record = window.factoryFixture;
+    record.stage = 'Review'; record.automatic = false; record.version++;
+    record.approvedDigest = record.plans.at(-1).digest;
+    record.runs = [{ ...record.runs[0], id: 'review-blocked', kind: 'review', status: 'finished',
+      output: 'The requested implementation is missing. Verify the Build worktree.',
+      reviewResult: { verdict: 'blocked', findings: 'The requested implementation is missing.' },
+      repairOf: null, planDigest: record.approvedDigest, activity: 'Review found blockers' }];
+    window.factoryRefresh();
+  });
+  await manual.getByRole('status').getByText('Review found blockers', { exact: true }).waitFor();
+  for (const width of [1280, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    assert.equal(await manual.getByRole('button', { name: 'Return to Build with findings', exact: true }).isEnabled(), true);
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+    await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, `taskboard-review-blocked-${width}.png`), fullPage: true });
+  }
+  await manual.getByRole('button', { name: 'Return to Build with findings', exact: true }).click();
+  await manual.getByText('Addressing review findings in the Build workspace. Review will run again automatically.').waitFor();
+  assert.equal(await page.evaluate(() => window.factoryNavigation.at(-1)), 'thr_build');
+  await page.evaluate(() => {
+    const record = window.factoryFixture;
+    const review = record.runs[0];
+    const repair = record.runs[1];
+    record.runs = [review, { ...repair, status: 'finished', id: 'repair-1' },
+      { ...repair, status: 'finished', id: 'repair-2' }, { ...review, id: 'review-still-blocked' }];
+    record.stage = 'Review'; record.version++;
+    record.automationError = 'Automatic work paused: Review repair limit reached (2 attempts). Inspect the findings and revise the plan before continuing.';
+    window.factoryRefresh();
+  });
+  await manual.getByText('Review still found blockers after two repair attempts. Inspect the findings and revise the plan.').waitFor();
+  assert.equal(await manual.getByRole('button', { name: 'Return to Build with findings', exact: true }).isDisabled(), true);
+  if (!await manual.getByRole('textbox', { name: 'Implementation plan' }).isVisible()) {
+    await manual.getByText('Implementation plan', { exact: true }).click();
+  }
+  await manual.getByRole('textbox', { name: 'Implementation plan' }).waitFor();
+  await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, 'taskboard-review-repair-limit.png'), fullPage: true });
   assert.deepEqual(errors, []);
-  console.log(JSON.stringify({ desktop: 'passed', panel: 'passed', mobile: 'passed', kanbanStart: 'passed', liveStatus: 'passed', navigation: 'passed', staleApproval: 'passed', automaticActions: 'passed', errors }));
+  console.log(JSON.stringify({ desktop: 'passed', panel: 'passed', mobile: 'passed', kanbanStart: 'passed', liveStatus: 'passed', navigation: 'passed', staleApproval: 'passed', automaticActions: 'passed', reviewBlockers: 'passed', returnToBuild: 'passed', repairLimit: 'passed', errors }));
 } catch (error) {
   console.error(JSON.stringify({ errors, page: await page.locator('body').innerText() }));
   throw error;
