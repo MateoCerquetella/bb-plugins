@@ -55,3 +55,28 @@ repair stays local and behaviorally identical to the header.
 ### Verification
 
 Existing project-color tests and Dockside typecheck.
+
+## D-003: Contain the external provider overlay inside Dockside families
+
+Status: Accepted; supplements D-001 and supersedes the assumption that moving
+Dockside's own provider glyph removes every duplicate.
+
+### Evidence
+
+The installed thread-provider-icons overlay inserts a span marked
+`data-thread-provider-icon` into each thread row's first direct span. In
+Dockside's grouped roots that span is the project initial badge, explaining
+the user's new screenshot despite the existing trailing provider glyph.
+
+### Chosen approach
+
+Hide only injected provider marks beneath `data-dockside-family` with a scoped
+CSS rule overriding the overlay's inline display. Preserve Dockside's own
+provider glyphs, navigation anchors, selection controls, and child layout.
+Do not disable the external plugin or mutate its observer-managed DOM.
+
+### Verification
+
+Added a focused layout regression; tests remain pending during iteration.
+Bundle build succeeded. Steel's existing BB page requires sign-in, so live
+visual verification remains pending.

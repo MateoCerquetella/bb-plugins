@@ -24,7 +24,8 @@ the two-row thread layout.
   its checkbox and omits the provider glyph without changing the two-row
   root-card layout.
 - [ ] [AC-5] Focused automated coverage guards the leading project-badge
-  placement and the single trailing provider slot.
+  placement and the single trailing provider slot, including suppression of
+  externally injected duplicate provider icons inside root and child rows.
 - [ ] [AC-UI-1] [UI] A browser screenshot shows clean root provider icons in
   Dockside with no badge/icon collision.
 

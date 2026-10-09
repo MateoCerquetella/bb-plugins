@@ -36,6 +36,7 @@ import {
   projectBadgeLetter,
   projectBadgePresentation,
 } from "@/lib/project-colors";
+import "./thread-card.css";
 
 export function ThreadCard({
   thread,

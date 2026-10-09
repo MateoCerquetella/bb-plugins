@@ -13,8 +13,23 @@ const familyStatusSource = await readFile(
   new URL("../components/inbox/family-status.tsx", import.meta.url),
   "utf8",
 );
+const threadCardStyles = await readFile(
+  new URL("../components/inbox/thread-card.css", import.meta.url),
+  "utf8",
+);
 
 describe("compact root card contract", () => {
+  it("suppresses externally injected duplicate icons only inside Dockside families", () => {
+    assert.match(threadCardSource, /import "\.\/thread-card\.css"/);
+    assert.match(rootSource, /data-dockside-family=\{thread\.id\}/);
+    assert.match(
+      threadCardStyles,
+      /\[data-dockside-family\] \[data-thread-provider-icon\]\s*\{\s*display:\s*none !important;\s*\}/,
+    );
+    assert.match(rootSource, /<ProviderGlyph/);
+    assert.match(childSource, /<ProviderGlyph/);
+  });
+
   it("keeps zero-child and no-PR roots on the same two-row skeleton", () => {
     assert.match(rootSource, /data-dockside-root-title-row/);
     assert.match(rootSource, /data-dockside-root-detail-row/);
