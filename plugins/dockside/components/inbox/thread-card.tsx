@@ -515,6 +515,7 @@ function ChildThreadRow({
           }
         />
         <div
+          data-dockside-child-row=""
           className={cn(
             "group/child relative flex items-start gap-1.5 rounded-md px-1.5",
             preferences.density === "compact"

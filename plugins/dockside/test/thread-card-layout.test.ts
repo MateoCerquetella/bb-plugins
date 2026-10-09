@@ -28,6 +28,8 @@ describe("compact root card contract", () => {
     );
     assert.match(rootSource, /<ProviderGlyph/);
     assert.match(childSource, /<ProviderGlyph/);
+    assert.match(childSource, /data-dockside-child-row/);
+    assert.doesNotMatch(childSource, /projectBadgeLetter|projectBadgePresentation/);
   });
 
   it("keeps zero-child and no-PR roots on the same two-row skeleton", () => {
