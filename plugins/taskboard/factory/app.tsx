@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Markdown, useBbContext, useBbNavigate, useRealtime, useRpc } from '@get-bb/plugin-sdk/app';
+import { Markdown, experimental_Diff as Diff, useBbContext, useBbNavigate, useRealtime, useRpc } from '@get-bb/plugin-sdk/app';
 import type { TaskboardRpcContract, WorkItem } from '../contract.js';
 import type { FactoryRecord, FactoryRun, FactoryRunKind } from './contract.js';
 import { MAX_REVIEW_REPAIRS } from './review.js';
@@ -8,45 +8,139 @@ import { Icon } from '../components/ui/icon.js';
 import { Textarea } from '../components/ui/textarea.js';
 import { Input } from '../components/ui/input.js';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '../components/ui/dialog.js';
+import { originalTicketPath, requestTaskboardOpen } from './navigation.js';
+
+function tone(run: FactoryRun) {
+  if (run.status === 'failed') return 'failed';
+  if (run.status === 'uncertain' || run.status === 'canceled' ||
+    run.buildResult?.verdict === 'blocked' || run.buildResult?.verdict === 'needs_input' ||
+    (run.kind === 'review' && run.status === 'finished' && run.reviewResult?.verdict !== 'passed')) return 'attention';
+  if (run.status === 'running' || run.status === 'starting') return 'active';
+  return run.reviewResult?.verdict === 'passed' ? 'success' : 'neutral';
+}
+
+function OriginalTicket({ record }: { record: FactoryRecord }) {
+  const navigate = useBbNavigate();
+  return <Button type="button" size="sm" variant="outline" onClick={() =>
+    navigate.toPluginPanel('tasks', { subPath: originalTicketPath(record) })
+  }><Icon name="FileText" className="size-3.5" />Original ticket</Button>;
+}
+
+function ChangedFiles({ record, run }: { record: FactoryRecord; run: FactoryRun }) {
+  const rpc = useRpc<TaskboardRpcContract>();
+  const [open, setOpen] = useState(false);
+  const [path, setPath] = useState(run.changedFiles[0] ?? '');
+  const [result, setResult] = useState<{ patch: string | null; message: string | null; truncated: boolean } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [refresh, setRefresh] = useState(0);
+  useEffect(() => {
+    if (!open || !path) return;
+    let canceled = false;
+    setResult(null); setError(null);
+    void rpc.call('factoryDiff', {
+      projectId: record.projectId, source: record.source, locator: record.locator, runId: run.id, path
+    }).then(value => { if (!canceled) setResult(value); })
+      .catch(reason => { if (!canceled) setError(reason instanceof Error ? reason.message : String(reason)); });
+    return () => { canceled = true; };
+  }, [rpc, record.projectId, record.source, record.locator, run.id, path, open, refresh]);
+  return <details className="tb-run-disclosure" onToggle={event => setOpen(event.currentTarget.open)}>
+    <summary><Icon name="FileDiff" className="size-3.5" />Changed files <span className="tb-run-caption">{run.changedFiles.length}</span></summary>
+    {open && <div className="tb-diff-workspace">
+      <div className="tb-diff-toolbar">
+        <select aria-label="Changed file" value={path} onChange={event => setPath(event.target.value)}>
+          {run.changedFiles.map(file => <option key={file} value={file}>{file}</option>)}
+        </select>
+        <span title="Refresh diff"><Button size="sm" variant="ghost" aria-label="Refresh diff" onClick={() => setRefresh(value => value + 1)}>
+          <Icon name="RotateCcw" className="size-3.5" />
+        </Button></span>
+      </div>
+      <p className="tb-run-caption">Current workspace diff</p>
+      {error ? <p role="alert">{error}</p> : !result ? <p role="status">Loading diff...</p> :
+        <>
+          {result.truncated && <p role="status">Partial diff: this file exceeds the preview limit.</p>}
+          {result.patch ? <div className="tb-diff-body"><Diff patch={result.patch} path={path} view="unified" overflow="scroll" /></div>
+            : <p role="status" className="tb-run-caption">{result.message}</p>}
+        </>}
+    </div>}
+  </details>;
+}
+
+function RunDetail({ run, record, historical = false }: { run: FactoryRun; record: FactoryRecord; historical?: boolean }) {
+  const navigate = useBbNavigate();
+  const passed = run.checks.filter(check => check.exitCode === 0).length;
+  const failed = run.checks.filter(check => check.exitCode !== null && check.exitCode !== 0).length;
+  const unknown = run.checks.length - passed - failed;
+  const live = !historical && tone(run) === 'active' && !record.automationError;
+  return <section className="tb-run" data-tone={tone(run)} data-live={live}>
+    {!historical && <div className="tb-run-heading">
+      <Icon name={live ? 'Loading' : tone(run) === 'attention' || tone(run) === 'failed' ? 'AlertCircle' : 'Circle'} className="tb-live-mark size-4" />
+      <strong>{labels[run.kind]}</strong><span className="tb-run-status">{runStatus(run)}</span>
+      {run.threadId && <span className="tb-session-action" title="Open session"><Button size="sm" variant="ghost" aria-label="Open session" onClick={() => navigate.toThread(run.threadId!)}>
+        <Icon name="MessageCirclePlus" className="size-3.5" />
+      </Button></span>}
+    </div>}
+    <div className="tb-run-now"><p key={run.activity} aria-live={live ? 'polite' : 'off'}>{run.error ?? run.activity}</p>
+      <time dateTime={run.startedAt}>{new Date(run.startedAt).toLocaleString()}</time>
+    </div>
+    {run.steps.length > 0 && <div className="tb-run-steps">
+      <p className="tb-run-caption">{run.steps.filter(step => step.status === 'completed').length} of {run.steps.length} steps completed</p>
+      <ul>{run.steps.map((step, index) => <li key={index} data-step={step.status}>
+        <Icon name={step.status === 'completed' ? 'CircleCheck' : step.status === 'active' ? 'ArrowRight' : 'Circle'} className="size-3.5 shrink-0" />
+        <span>{step.step}<span className="sr-only"> ({step.status})</span></span>
+      </li>)}</ul>
+    </div>}
+    {run.checks.length > 0 && <>
+      <details className="tb-run-disclosure tb-command-group">
+        <summary><Icon name="Terminal" className="size-3.5" />Commands <span className="tb-run-caption">{run.checks.length}</span>
+          <span className="tb-command-counts">
+            <span className="tb-check-pass" title="Passed">{passed} passed</span>
+            <span className={failed ? 'tb-check-fail' : 'tb-run-caption'}>{failed} failed</span>
+            {unknown > 0 && <span className="tb-run-caption">{unknown} unknown</span>}
+          </span>
+        </summary>
+        <div className="tb-command-list">{[...run.checks].reverse().map(check => <details key={check.id} className="tb-command">
+          <summary><Icon name={check.exitCode === 0 ? 'CircleCheck' : check.exitCode === null ? 'Clock' : 'AlertCircle'}
+            className={`size-3.5 shrink-0 ${check.exitCode === 0 ? 'tb-check-pass' : check.exitCode === null ? '' : 'tb-check-fail'}`} />
+            <code>{check.command}</code><span className="sr-only">{check.exitCode === 0 ? 'Passed' : check.exitCode === null ? 'Exit unknown' : `Failed (${check.exitCode})`}</span></summary>
+          <pre>{check.output || 'No output recorded.'}</pre>
+        </details>)}</div>
+      </details>
+    </>}
+    {(run.updates ?? []).length > 0 && <details className="tb-run-disclosure">
+      <summary><Icon name="MessageCirclePlus" className="size-3.5" />Agent updates <span className="tb-run-caption">{Math.min(3, run.updates.length)}</span></summary>
+      {[...run.updates].reverse().slice(0, 3).map(update => <div className="tb-run-update" key={update.id}>
+        <time>{new Date(update.at).toLocaleTimeString()}</time>
+        <div className="max-h-48 overflow-auto break-words"><Markdown content={update.text} /></div>
+      </div>)}
+    </details>}
+    {run.changedFiles.length > 0 && <ChangedFiles record={record} run={run} />}
+    {run.output && <details className="tb-run-disclosure"><summary>Stage result</summary>
+      <div className="max-h-96 overflow-auto break-words"><Markdown content={run.output} /></div>
+    </details>}
+    {historical && run.threadId && <Button size="sm" variant="ghost" onClick={() => navigate.toThread(run.threadId!)}>
+      <Icon name="MessageCirclePlus" className="size-3.5" />Open session
+    </Button>}
+  </section>;
+}
 
 function RunInsights({ record }: { record: FactoryRecord }) {
-  const navigate = useBbNavigate();
-  return <div className="space-y-4 text-xs min-w-0">
-    {[...record.runs].reverse().map(run => <section key={run.id} className="border-t pt-3 min-w-0">
-      <div className="flex flex-wrap items-center gap-2">
-        <strong>{labels[run.kind]}</strong><span>{runStatus(run)}</span>
-        {run.threadId && <Button size="sm" variant="ghost" onClick={() => navigate.toThread(run.threadId!)}>Open session</Button>}
-      </div>
-      <p className="mt-1 break-words">{run.error ?? run.activity}</p>
-      <p className="text-muted-foreground mt-1">Started {new Date(run.startedAt).toLocaleString()}</p>
-      {run.steps.length > 0 && <div className="mt-3">
-        <p>{run.steps.filter(step => step.status === 'completed').length} / {run.steps.length} steps completed</p>
-        <ul className="mt-2 space-y-2">{run.steps.map((step, index) => <li key={index} className="flex gap-2">
-          <span className="shrink-0">{step.status === 'completed' ? '✓' : step.status === 'active' ? '→' : '·'}</span>
-          <span className="break-words">{step.step} <span className="text-muted-foreground">({step.status})</span></span>
-        </li>)}</ul>
-      </div>}
-      {(run.updates ?? []).length > 0 && <div className="mt-3 space-y-3">
-        <strong>Agent updates</strong>
-        {[...(run.updates ?? [])].reverse().slice(0, 3).map(update => <div key={update.id}>
-          <time className="text-muted-foreground">{new Date(update.at).toLocaleTimeString()}</time>
-          <div className="max-h-48 overflow-auto break-words"><Markdown content={update.text} /></div>
-        </div>)}
-      </div>}
-      {run.checks.length > 0 && <div className="mt-3">
-        <strong>Commands ({run.checks.length})</strong>
-        {[...run.checks].reverse().map(check => <details key={check.id} className="mt-2">
-          <summary className="cursor-pointer break-all">{check.exitCode === 0 ? 'Passed' : check.exitCode === null ? 'Exit unknown' : `Failed (${check.exitCode})`}: {check.command}</summary>
-          <pre className="max-h-48 overflow-auto whitespace-pre-wrap break-all">{check.output || 'No output recorded.'}</pre>
-        </details>)}
-      </div>}
-      {run.changedFiles.length > 0 && <details className="mt-3"><summary className="cursor-pointer">{run.changedFiles.length} changed files</summary>
-        <ul>{run.changedFiles.map(path => <li key={path} className="break-all">{path}</li>)}</ul>
-      </details>}
-      {run.output && <details className="mt-3"><summary className="cursor-pointer">Stage result</summary>
-        <div className="max-h-96 overflow-auto break-words"><Markdown content={run.output} /></div>
-      </details>}
-    </section>)}
+  const run = record.runs.at(-1);
+  if (!run) return null;
+  return <div className="tb-progress-ui">
+    <ol className="tb-phase-track" aria-label="Work phases">{(Object.keys(labels) as FactoryRunKind[]).map(kind => {
+      const previous = record.runs.some(candidate => candidate.kind === kind);
+      return <li key={kind} data-current={run.kind === kind} data-observed={!!previous}
+        aria-current={run.kind === kind ? 'step' : undefined}>{labels[kind]}</li>;
+    })}</ol>
+    <RunDetail key={run.id} run={run} record={record} />
+    {record.runs.length > 1 && <details className="tb-run-disclosure"><summary>Earlier runs <span className="tb-run-caption">{record.runs.length - 1}</span></summary>
+      {[...record.runs].slice(0, -1).reverse().map(previous => <details key={previous.id} className="tb-run-disclosure tb-run-history" data-tone={tone(previous)}>
+        <summary>{labels[previous.kind]} <span className="tb-run-status">{runStatus(previous)}</span>
+          <time className="tb-run-caption">{new Date(previous.startedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</time>
+        </summary>
+        <RunDetail run={previous} record={record} historical />
+      </details>)}
+    </details>}
   </div>;
 }
 
@@ -61,7 +155,7 @@ export function FactoryThreadProgress({ threadId, isCompactViewport }: { threadI
     const load = async () => {
       try {
         const result = await rpc.call('factoryForThread', { threadId });
-        if (!canceled) { setRecord(result.record); setError(null); }
+        if (!canceled) { setRecord(current => current && result.record && current.version > result.record.version ? current : result.record); setError(null); }
       } catch { if (!canceled) setError('Progress could not be refreshed.'); }
     };
     void load();
@@ -71,18 +165,22 @@ export function FactoryThreadProgress({ threadId, isCompactViewport }: { threadI
   const run = record?.runs.at(-1);
   if (!record || !run) return null;
   const completed = run.steps.filter(step => step.status === 'completed').length;
+  const headerStatus = error ? 'Refresh failed' : record.automationError ? 'Paused' :
+    run.status === 'running' && run.steps.length ? `${completed}/${run.steps.length}` : runStatus(run);
   return <>
-    <span title={`${labels[run.kind]}: ${run.error ?? run.activity}`}><Button size="sm" variant="ghost" className="max-w-48"
-      aria-label="Task progress" onClick={() => setOpen(true)}>
-      <Icon name="AiContentGenerator01" className="size-3.5 shrink-0" />
-      {!isCompactViewport && <span className="truncate">{labels[run.kind]} · {run.status === 'running' && run.steps.length ? `${completed}/${run.steps.length}` : runStatus(run)}</span>}
+    <span title={`${labels[run.kind]}: ${error ?? record.automationError ?? run.error ?? run.activity}`}><Button size="sm" variant="ghost" className={`tb-progress-trigger ${isCompactViewport ? 'size-7 p-0' : 'max-w-48'}`}
+      data-tone={error || record.automationError ? 'attention' : tone(run)}
+      aria-label={`Task progress: ${labels[run.kind]}, ${headerStatus}`} onClick={() => setOpen(true)}>
+      <Icon name={error || record.automationError || tone(run) === 'attention' || tone(run) === 'failed' ? 'AlertCircle' : 'AiContentGenerator01'} className="size-3.5 shrink-0" />
+      {!isCompactViewport && <span className="truncate">{labels[run.kind]} · {headerStatus}</span>}
     </Button></span>
-    <Dialog open={open} onOpenChange={setOpen}><DialogContent className="max-h-[80vh] overflow-y-auto">
+    <Dialog open={open} onOpenChange={setOpen}><DialogContent className="tb-progress-ui max-h-[80vh] overflow-y-auto">
       <DialogTitle>Task progress</DialogTitle>
       <DialogDescription>{record.stage} · Updated {new Date(record.updatedAt).toLocaleTimeString()}</DialogDescription>
       {error && <p role="alert">{error}</p>}
       {record.automationError && <p role="alert">{record.automationError}</p>}
       <RunInsights record={record} />
+      <OriginalTicket record={record} />
     </DialogContent></Dialog>
   </>;
 }
@@ -104,8 +202,8 @@ function runStatus(run: FactoryRun) {
   }
   return statusLabels[run.status];
 }
-export function StartTaskButton({ item, pin, disabled = false }: {
-  item: WorkItem; pin: () => void; disabled?: boolean;
+export function StartTaskButton({ item, disabled = false }: {
+  item: WorkItem; disabled?: boolean;
 }) {
   const rpc = useRpc<TaskboardRpcContract>();
   const navigate = useBbNavigate();
@@ -122,7 +220,7 @@ export function StartTaskButton({ item, pin, disabled = false }: {
         contextThreadId: context.projectId === item.bbProjectId ? context.threadId : null
       });
       const run = record.runs.at(-1);
-      if (run?.threadId) { pin(); navigate.toThread(run.threadId); }
+      if (run?.threadId) { requestTaskboardOpen(run.threadId); navigate.toThread(run.threadId); }
       setError(record.automationError ?? run?.error ??
         (record.trackerProgress.status === 'failed' ? record.trackerProgress.message : null));
     } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
@@ -136,7 +234,7 @@ export function StartTaskButton({ item, pin, disabled = false }: {
     {error && <p role="alert" className="mt-2 text-xs text-destructive break-words">{error}</p>}
   </div>;
 }
-export function FactoryProgress({ item, pin }: { item: WorkItem; pin: () => void }) {
+export function FactoryProgress({ item }: { item: WorkItem }) {
   const rpc = useRpc<TaskboardRpcContract>();
   const navigate = useBbNavigate();
   const context = useBbContext();
@@ -185,7 +283,7 @@ export function FactoryProgress({ item, pin }: { item: WorkItem; pin: () => void
       if (ticket !== epoch.current) return;
       setRecord(result.record);
       const threadId = result.record.runs.at(-1)?.threadId;
-      if (open && threadId) { pin(); navigate.toThread(threadId); }
+      if (open && threadId) { requestTaskboardOpen(threadId); navigate.toThread(threadId); }
     } catch (e) {
       if (ticket === epoch.current) { setError(e instanceof Error ? e.message : String(e)); void load(); }
     } finally { if (ticket === epoch.current) setBusy(false); }
@@ -194,7 +292,7 @@ export function FactoryProgress({ item, pin }: { item: WorkItem; pin: () => void
     ...identity, expectedVersion: record?.version ?? 0, kind, retry,
     contextThreadId: context.projectId === item.bbProjectId ? context.threadId : null
   }), true);
-  return <section className="tb-agent-progress progress" aria-label="Agent progress">
+  return <section className="tb-agent-progress progress tb-progress-ui" data-tone={record?.automationError ? 'attention' : run ? tone(run) : 'neutral'} aria-label="Agent progress">
     <div className="sectionhead">
       <h2>Agent</h2>
       <span role="status" className="status">{run ? runStatus(run) : 'Not started'}</span>
@@ -207,14 +305,7 @@ export function FactoryProgress({ item, pin }: { item: WorkItem; pin: () => void
         rpc.call('factoryRetryStatus', identity)
       )}>Retry status update</Button>}
     </div>}
-    {!run ? <StartTaskButton item={item} pin={pin} disabled={!loaded || busy || ['done', 'canceled'].includes(item.stateCategory)} /> : <>
-      <div className="tb-agent-summary">
-        <Icon name={run.status === 'failed' || run.status === 'uncertain' ? 'AlertCircle' : 'Circle'} className="size-3.5" />
-        <div>
-          <strong>{labels[run.kind]}</strong>
-          <span>{run.error ?? run.activity}</span>
-        </div>
-      </div>
+    {!run ? <StartTaskButton item={item} disabled={!loaded || busy || ['done', 'canceled'].includes(item.stateCategory)} /> : <>
       {record && <RunInsights record={record} />}
       {run.status === 'uncertain' && <div className="my-3 space-y-2">
         <Input aria-label="Recovered native thread ID" placeholder="Native thread ID" value={recoveryId} onChange={e => setRecoveryId(e.target.value)} />
@@ -223,14 +314,12 @@ export function FactoryProgress({ item, pin }: { item: WorkItem; pin: () => void
         )}>Link recovered session</Button>
       </div>}
       <div className="mt-3 flex flex-wrap gap-2">
-        {run.threadId && <Button variant="outline" size="sm" onClick={() => {
-          pin(); navigate.toThread(run.threadId!);
-        }}><Icon name="MessageCirclePlus" className="size-3.5" />Open session</Button>}
         {!active && (run.status === 'failed' || run.status === 'canceled') &&
           <Button variant="outline" size="sm" disabled={busy} onClick={() => void start(run.kind, true)}>
             <Icon name="RotateCcw" className="size-3.5" />Retry {labels[run.kind].toLowerCase()}
           </Button>}
-        {!active && record?.automationError && run.kind !== 'review' && <StartTaskButton item={item} pin={pin} disabled={busy} />}
+        {record && <OriginalTicket record={record} />}
+        {!active && record?.automationError && run.kind !== 'review' && <StartTaskButton item={item} disabled={busy} />}
         {!active && approved && run.kind === 'review' && run.status === 'finished' && run.reviewResult?.verdict !== 'passed' &&
           <Button size="sm" disabled={busy || repairLimitReached || !run.output.trim()} onClick={() => void start('build')}>
             Return to Build with findings

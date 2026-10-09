@@ -480,6 +480,34 @@ export function createLinearAdapter(options: {
   return {
     source: 'linear',
     configured: () => configured,
+    async uploadImage(image) {
+      if (!configured) throw new Error('Linear is not configured');
+      const data = await requestLinear(apiKey, `
+        mutation TaskboardUploadImage($contentType: String!, $filename: String!, $size: Int!) {
+          fileUpload(contentType: $contentType, filename: $filename, size: $size) {
+            success uploadFile { uploadUrl assetUrl headers { key value } }
+          }
+        }`, { contentType: image.mimeType, filename: image.name, size: image.bytes.byteLength });
+      const result = z.object({ fileUpload: z.object({
+        success: z.boolean(),
+        uploadFile: z.object({
+          uploadUrl: z.string().url(), assetUrl: z.string().url(),
+          headers: z.array(z.object({ key: z.string(), value: z.string() }))
+        }).nullable()
+      }) }).parse(data).fileUpload;
+      if (!result.success || !result.uploadFile) throw new Error('Linear could not prepare the image upload.');
+      const { uploadUrl, assetUrl, headers } = result.uploadFile;
+      if (new URL(uploadUrl).protocol !== 'https:' || new URL(assetUrl).protocol !== 'https:') {
+        throw new Error('Linear returned an invalid upload destination.');
+      }
+      const response = await fetch(uploadUrl, {
+        method: 'PUT', redirect: 'error', signal: AbortSignal.timeout(60_000),
+        headers: { 'Content-Type': image.mimeType, ...Object.fromEntries(headers.map(header => [header.key, header.value])) },
+        body: new Blob([new Uint8Array(image.bytes)], { type: image.mimeType })
+      });
+      if (!response.ok) throw new Error('Linear image upload failed. Your issue has not been created.');
+      return assetUrl;
+    },
     configurationMessage: () =>
       !options.enabled
         ? 'Enable Linear for this BB project in Manage.'

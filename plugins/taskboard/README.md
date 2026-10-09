@@ -6,6 +6,19 @@
 
 ## Native Agent Progress (Development)
 
+Create new ticket accepts pasted or selected PNG/JPEG/WebP images (up to five,
+2 MB each). Images upload to Linear before issue creation; other destinations
+currently support text-only creation. Composer-assisted creation can capture
+the current clipboard image with permission; BB's pinned SDK cannot expose
+already-attached composer files, so missing images must be pasted again.
+Create only opens the new issue in Taskboard without starting an agent.
+Start now explicitly starts work after creation succeeds.
+
+Changed files opens a selectable native BB unified diff from the linked
+workspace. This is the current workspace diff, not a historical run snapshot.
+Commands and updates start collapsed; earlier runs use compact summary rows.
+Live activity motion honors reduced-motion settings.
+
 **Start task**, available on Kanban cards and issue details, starts a native investigation, opens its
 native thread and keeps Taskboard pinned on the originating ticket. The
 existing right panel shows native activity, plan steps, command exit codes,
@@ -33,6 +46,30 @@ with findings**. A Build waiting for decisions shows **Build needs input** and
 cannot start another review; native completion alone never establishes an
 implementation. Workspace changes, uncertain dispatches and stale scope pause
 the cycle without creating a replacement worktree.
+
+When Build reports blockers, **Start task** continues that Build in its original
+native session and managed worktree. The continuation carries the approved plan
+and prior blocker summary, completes every actionable part, and reports external
+tracker or optional evidence limitations separately. It never repeats
+automatically or invents product and policy decisions; repository-required
+workflow, tracker, evidence, and human gates still pause the task.
+
+Task progress uses BB theme colors for active, successful, failed and
+attention states. Commands are collapsed by default with outcome counts;
+individual output and earlier runs expand on demand. The thread-header
+progress control opens the same phase, step and activity details.
+**Original ticket** opens the provider issue inside Taskboard, including its
+existing Linear details, comments and external link. **Start task** opens
+context once without pinning the panel. Manual pinning remains a separate
+choice in the Taskboard panel.
+
+In **Create new ticket**, enter rough text in Title or Description and select
+**Improve title & description**. Taskboard uses a hidden helper with the BB
+project's current provider/model defaults to rewrite only those two fields.
+Cancel keeps the draft unchanged; Undo restores the draft after a successful
+rewrite. Invalid output and errors preserve your text, and an uncertain helper
+start blocks automatic retry. Labels, assignee, destination and other metadata
+are not rewritten. Creating the ticket still requires selecting Create.
 
 After a confirmed agent dispatch, Taskboard moves the provider issue to its
 available In progress status. Providers without that transition retain their

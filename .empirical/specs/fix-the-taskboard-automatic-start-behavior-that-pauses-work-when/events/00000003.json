@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "sequence": 3,
+  "previousDigest": "sha256:5f1c3f486f964b012ca6c29c3d92dd68cc8de01d1b6afe671d87dc73c7541d49",
+  "actor": "human",
+  "type": "transition",
+  "summary": "Resumed workflow",
+  "createdAt": "2026-10-09T01:09:31.907Z",
+  "stateBeforeDigest": "sha256:cee5240443d3dfefc657464eb8a1bee6185a735475d4c0fcf9c28512a6473355",
+  "stateAfterDigest": "sha256:d1e131ad935400eded2636c183ae46fc1bda3b7d14abcea6192ee62571496ae1",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 3,
+    "activeFeature": "fix-the-taskboard-automatic-start-behavior-that-pauses-work-when",
+    "request": "Fix the Taskboard automatic-start behavior that pauses work when a build reports recoverable blockers like the supplied Roten-App result. Improve automatic work startup so blocker summaries are handled accurately and the task does not stop prematurely when actionable implementation work can continue, while preserving genuine human-decision, tracker, evidence, and policy gates.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": null,
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:f300b2e78174bcae7ce8f444269e75a3550424d310dc5e0da613d7943a7e6a34",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": null,
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-09T01:09:31.907Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:04565bc8da048ee125613c8b4aaaffe57f9dbafaca509729b7c5625c9828bc37"
+}

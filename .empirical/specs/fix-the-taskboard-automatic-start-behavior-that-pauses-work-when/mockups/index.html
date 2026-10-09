@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Taskboard ticket improvement mockup</title>
+<style>
+:root{color-scheme:dark;--bg:#111214;--panel:#191b1f;--line:#343840;--muted:#9ba3af;--text:#f2f4f7;--accent:#8eb7ff;--danger:#ff9b9b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px system-ui,sans-serif;letter-spacing:0}
+main{max-width:620px;margin:24px auto;padding:0 16px}.modal{border:1px solid var(--line);background:var(--panel);border-radius:8px;box-shadow:0 16px 48px #0008}
+header,.body,footer{padding:16px}header{border-bottom:1px solid var(--line)}h1{font-size:16px;margin:0 0 4px}p{margin:0;color:var(--muted);font-size:12px}
+label{display:block;margin:14px 0 6px;font-size:12px;font-weight:600}input,textarea{width:100%;border:1px solid var(--line);border-radius:6px;background:#111317;color:var(--text);padding:10px;font:inherit}textarea{min-height:112px;resize:vertical}
+.draft-actions,.meta,footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.draft-actions{justify-content:space-between;margin-top:10px;min-height:32px}.status{color:var(--muted);font-size:12px;flex:1;min-width:160px}
+button{border:1px solid var(--line);border-radius:6px;background:#242830;color:var(--text);padding:7px 10px;font:600 12px system-ui;cursor:pointer}button.primary{background:#dce8ff;color:#111827;border-color:#dce8ff}button:disabled{opacity:.55;cursor:not-allowed}
+.meta{border-top:1px solid var(--line);margin-top:16px;padding-top:14px}.chip{border:1px solid var(--line);border-radius:6px;padding:6px 8px;color:var(--muted);font-size:12px}
+footer{border-top:1px solid var(--line);justify-content:flex-end}.hidden{display:none}.busy{color:var(--accent)}.error{color:var(--danger)}
+@media(max-width:480px){main{margin:8px auto;padding:0 8px}.body,header,footer{padding:12px}.draft-actions button{width:100%}.status{width:100%}}
+</style>
+</head>
+<body>
+<main>
+  <div class="modal" role="dialog" aria-labelledby="title">
+    <header><h1 id="title">Create new ticket</h1><p>GitHub in Roten App</p></header>
+    <div class="body">
+      <label for="ticket-title">Title</label>
+      <input id="ticket-title" value="fix media upload problems">
+      <label for="description">Description</label>
+      <textarea id="description">audio sometimes too long and private files can be opened. make it follow our media rules and add tests</textarea>
+      <div class="draft-actions">
+        <span id="status" class="status">Uses the project's current BB model. Review changes before creating.</span>
+        <button id="improve" type="button">Improve with AI</button>
+      </div>
+      <div class="meta" aria-label="Ticket metadata">
+        <span class="chip">Status: Todo</span><span class="chip">Assignee</span><span class="chip">Labels</span><span class="chip">Priority</span>
+      </div>
+    </div>
+    <footer><button type="button">Cancel</button><button type="button" class="primary">Create</button></footer>
+  </div>
+</main>
+<script>
+const improve=document.querySelector("#improve"),status=document.querySelector("#status"),title=document.querySelector("#ticket-title"),description=document.querySelector("#description");
+let timer=null;
+improve.addEventListener("click",()=>{
+ if(timer){clearTimeout(timer);timer=null;improve.textContent="Improve with AI";status.textContent="Improvement canceled. Your draft is unchanged.";status.className="status";return}
+ const original={title:title.value,description:description.value};
+ improve.textContent="Cancel";status.textContent="Improving title and description...";status.className="status busy";title.disabled=true;description.disabled=true;
+ timer=setTimeout(()=>{
+  timer=null;title.disabled=false;description.disabled=false;
+  title.value="Enforce media duration and private delivery rules";
+  description.value="Update media uploads to reject audio that exceeds the approved duration and ensure opaque private delivery. Preserve the existing media-policy decisions and required workflow gates. Add focused tests for duration validation, private access, and failure handling.";
+  improve.textContent="Improve again";status.textContent="Draft improved. Review both fields before creating the ticket.";status.className="status";
+ },1100);
+});
+</script>
+</body>
+</html>

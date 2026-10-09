@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "sequence": 9,
+  "previousDigest": "sha256:7cfc66ad672adde7a58c750ad02dd068d9bb68860d541200229b565384cf9f10",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Added the ticket-drafting acceptance criteria and capability delta, plus an interactive responsive Create new ticket mockup. Awaiting explicit mockup approval before design and implementation.",
+  "createdAt": "2026-10-09T01:53:23.376Z",
+  "stateBeforeDigest": "sha256:b86f0bd7b9892a992d48b09e2f50473ca40088e724e679be1248f68217c235df",
+  "stateAfterDigest": "sha256:84e8bad5d362d60d9a24ddcd22470ff5036c9c7f4b123589c2aff38b5b916332",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 9,
+    "activeFeature": "fix-the-taskboard-automatic-start-behavior-that-pauses-work-when",
+    "request": "Fix the Taskboard automatic-start behavior that pauses work when a build reports recoverable blockers like the supplied Roten-App result. Improve automatic work startup so blocker summaries are handled accurately and the task does not stop prematurely when actionable implementation work can continue, while preserving genuine human-decision, tracker, evidence, and policy gates.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "awaiting_human",
+    "repairAttempts": 0,
+    "message": "Added the ticket-drafting acceptance criteria and capability delta, plus an interactive responsive Create new ticket mockup. Awaiting explicit mockup approval before design and implementation.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:1f4a5643180dab986caa9a0d25dc3f6769e2ef259afdf94b62f217bac7cf6621",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": "fix-the-taskboard-automatic-start-behavior-that-pauses-work-when-1ecce97b7eb2",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-09T01:53:23.376Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 1,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "contractRevision": 7
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "fix-the-taskboard-automatic-start-behavior-that-pauses-work-when-1ecce97b7eb2",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "fix-the-taskboard-automatic-start-behavior-that-pauses-work-when",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_vsbcjs3cs9-1/bb-plugins",
+      "worktreeId": "sha256:39a2f85ec14f2c7290f38da564e1e9b591d6e3e8f79cc08e4c02b7e45d5a0bb5",
+      "baseCommit": "1e431a926ca0eb1411535174b41ccf2bc27e17f6",
+      "baseTree": "c6b16d52aa2a6335bf2d6f462194ab67bf2d1869",
+      "bases": {
+        "taskboard-build-resumption": {
+          "capability": "taskboard-build-resumption",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "explicit blocked build continuation": null
+          }
+        }
+      },
+      "capabilities": [
+        "taskboard-build-resumption"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-09T01:12:06.434Z",
+      "heartbeatAt": "2026-10-09T01:12:06.434Z",
+      "digest": "sha256:478bb59409ef1eaa5ee754f450617a2ae3bdab18604936b3e7cf8aa9a58e5dc8"
+    },
+    "trackerGeneration": 1,
+    "reviewFirst": true
+  },
+  "digest": "sha256:c57fcf44df4e45dcea1fd040a7397de6214a4a9b3649a05eddde92291653e7fa"
+}

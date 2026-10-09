@@ -241,6 +241,12 @@ test('supports direct and manual composer capture through one dialog', () => {
   assert.match(app, /if \(!result\.ok\)/u);
   assert.match(app, /result\.error\.safeMessage/u);
   assert.match(app, /CREATE_METADATA_NETWORK_ERROR/u);
+  assert.match(app, /onSubmit=\{event => \{ event\.preventDefault\(\); void create\(false\); \}\}/u);
+  assert.match(app, /onClick=\{\(\) => void create\(true\)\}/u);
+  assert.match(app, /creatingRef\.current = true/u);
+  assert.match(app, /event\.clipboardData\.files/u);
+  assert.match(app, /clipboardTicketImages\(\)/u);
+  assert.match(app, /originalTicketPath\(identity\)/u);
 });
 
 test('captures the original composer prompt locally exactly once per open', () => {
@@ -259,7 +265,8 @@ test('captures the original composer prompt locally exactly once per open', () =
   assert.ok(contextLoad, 'Missing provider context loading effect');
   assert.doesNotMatch(contextLoad, /setTitle|setDescription/u);
   assert.match(app, /const \[capturedPrompt, setCapturedPrompt\] = useState<string \| null>\(null\)/u);
-  assert.match(app, /setCapturedPrompt\(view\.draft\.text\)/u);
+  assert.match(app, /const prompt = view\.draft\.text;/u);
+  assert.match(app, /setCapturedPrompt\(prompt\)/u);
   assert.match(app, /initialPrompt=\{capturedPrompt\}/u);
   assert.match(app, /Prompt copied for review/u);
   assert.match(app, /copied into these editable fields/u);
@@ -268,18 +275,34 @@ test('captures the original composer prompt locally exactly once per open', () =
     [...app.matchAll(/\{assisted \? editablePromptFields : null\}/gu)].length >= 3,
     'Captured fields must remain visible while the provider loads or is unavailable'
   );
-  assert.match(app, /<form id=\{formId\}[\s\S]*?onSubmit=\{create\}/u);
+  assert.match(
+    app,
+    /<form id=\{formId\}[\s\S]*?onSubmit=\{event => \{ event\.preventDefault\(\); void create\(false\); \}\}/u
+  );
 });
 
-test('contains no frontend issue-drafting lifecycle or generation copy', () => {
+test('does not restore the retired repository-aware issue drafting flow', () => {
   assert.doesNotMatch(
     app,
-    /startIssueDraft|getIssueDraft|cancelIssueDraft|IssueDraftRecord|draftRequestId|onRegenerate|randomUUID/u
+    /startIssueDraft|getIssueDraft|cancelIssueDraft|IssueDraftRecord|draftRequestId|onRegenerate/u
   );
   assert.doesNotMatch(
     app,
     /Structuring your issue|A model|drafting model|Repository-aware draft|Drafted with repository context|Try repository draft again/u
   );
+});
+
+test('ticket improvement preserves explicit creation and guards stale responses', () => {
+  const improvement = app.match(/async function improveDraft[\s\S]*?\n  useEffect/u)?.[0];
+  assert.ok(improvement);
+  assert.match(improvement, /improvementRef\.current !== request/u);
+  assert.match(improvement, /result\.status === 'completed' && result\.draft/u);
+  assert.match(improvement, /setOriginalDraft\(before\)/u);
+  assert.doesNotMatch(improvement, /createIssue|setLabelIds|setAssigneeId|setDestinationId/u);
+  assert.match(app, /Undo improvement/u);
+  assert.match(app, /Cancel improvement/u);
+  assert.match(app, /disabled=\{creating \|\| improving\}/u);
+  assert.match(app, /improvementEpoch\.current\+\+/u);
 });
 
 test('routes detail handoff through native factory with external-content trust boundary', async () => {

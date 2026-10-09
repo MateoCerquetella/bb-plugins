@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "sequence": 32,
+  "previousDigest": "sha256:76c07042a7ce8dc4623ba42376ef2a7904305ed57beeb280f74cdd17558f4374",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Size: keep as one (User explicitly extends the same ticket and installed creation modal. Preserve the prior implemented iterations and verify this creation delta independently.)",
+  "createdAt": "2026-10-09T02:59:29.520Z",
+  "stateBeforeDigest": "sha256:8ace6bee49b89b364efe45dd3d7d7f430e18551bcdce6fb965269e7ab91300b6",
+  "stateAfterDigest": "sha256:4ea2b416f3dca11d9cf483a5bb82e2840a995a82c2feb1c932cae341801d6870",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 32,
+    "activeFeature": "fix-the-taskboard-automatic-start-behavior-that-pauses-work-when",
+    "request": "Fix the Taskboard automatic-start behavior that pauses work when a build reports recoverable blockers like the supplied Roten-App result. Improve automatic work startup so blocker summaries are handled accurately and the task does not stop prematurely when actionable implementation work can continue, while preserving genuine human-decision, tracker, evidence, and policy gates.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "design",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Specified image paste and clipboard limitations, provider-native Linear upload with explicit unsupported states, concise drafting and explicit create-only/start-now behavior.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:cd11e3a5b07c1f34e276ef15f79a0f9d7466243d35ad3d7b2397778f4d724a64",
+    "approvedSpecRevision": 31,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:9a1e5231d570e67027fc479a22bf79685f92b39496e49b322c1b8ff50554a3b1",
+    "impactDigest": "sha256:0d097c3df3587f2f6ae282bb4a5b8ae59607e22b07f4297496e320826dec40f1",
+    "capabilityClaimId": "fix-the-taskboard-automatic-start-behavior-that-pauses-work-when-1ecce97b7eb2",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-09T02:59:29.520Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 4,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "contractRevision": 29
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "fix-the-taskboard-automatic-start-behavior-that-pauses-work-when-1ecce97b7eb2",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "fix-the-taskboard-automatic-start-behavior-that-pauses-work-when",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_vsbcjs3cs9-1/bb-plugins",
+      "worktreeId": "sha256:39a2f85ec14f2c7290f38da564e1e9b591d6e3e8f79cc08e4c02b7e45d5a0bb5",
+      "baseCommit": "1e431a926ca0eb1411535174b41ccf2bc27e17f6",
+      "baseTree": "c6b16d52aa2a6335bf2d6f462194ab67bf2d1869",
+      "bases": {
+        "taskboard-agent-progress-ui": {
+          "capability": "taskboard-agent-progress-ui",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "readable native progress": null,
+            "non-sticky navigation": null
+          }
+        },
+        "taskboard-build-resumption": {
+          "capability": "taskboard-build-resumption",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "explicit blocked build continuation": null
+          }
+        },
+        "taskboard-ticket-drafting": {
+          "capability": "taskboard-ticket-drafting",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "improve an editable ticket draft with the current bb model": null
+          }
+        }
+      },
+      "capabilities": [
+        "taskboard-agent-progress-ui",
+        "taskboard-build-resumption",
+        "taskboard-ticket-drafting"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-09T01:12:06.434Z",
+      "heartbeatAt": "2026-10-09T02:21:12.373Z",
+      "digest": "sha256:45f2d8ef18c605c8fdc4ffe3079a95cdff5ebe9ff54b39bedfa835a1e25bf219"
+    },
+    "trackerGeneration": 4,
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 17,
+      "capabilities": 3,
+      "reason": "User explicitly extends the same ticket and installed creation modal. Preserve the prior implemented iterations and verify this creation delta independently.",
+      "actor": "agent",
+      "revision": 31
+    },
+    "budgetExtensionMinutes": 61,
+    "reviewFirst": true
+  },
+  "digest": "sha256:0e1b60f12801fee07684610fac248e134630cb435382ee647dac019f992a84e6"
+}
