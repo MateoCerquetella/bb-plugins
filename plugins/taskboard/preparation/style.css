@@ -1,0 +1,228 @@
+.prep {
+  font: inherit;
+  color: var(--ink);
+  background: var(--canvas);
+  padding: 16px;
+  min-width: 0;
+  overflow: auto;
+  height: 100%;
+}
+.prep h2 {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 0;
+}
+.prep h3 {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 12px 0;
+}
+.prep p {
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 8px 0;
+}
+.prep header {
+  margin-bottom: 14px;
+}
+.prep-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.prep label {
+  font-size: 12px;
+  display: block;
+  margin: 12px 0;
+  color: var(--ink);
+}
+.prep input:not([type='checkbox']),
+.prep textarea,
+.prep select {
+  display: block;
+  width: 100%;
+  border: 1px solid color-mix(in srgb, var(--ink) 18%, var(--canvas));
+  background: var(--canvas);
+  color: var(--ink);
+  border-radius: 6px;
+  padding: 8px;
+  margin-top: 5px;
+  font: inherit;
+}
+.prep textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+.prep input:focus-visible,
+.prep textarea:focus-visible,
+.prep select:focus-visible,
+.prep button:focus-visible,
+.prep summary:focus-visible {
+  outline: 2px solid var(--timeline-accent);
+  outline-offset: 2px;
+}
+.prep-box,
+.prep-prototype {
+  border: 1px solid color-mix(in srgb, var(--ink) 14%, var(--canvas));
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 12px;
+  overflow: hidden;
+}
+.prep-prototype[data-selected='true'] {
+  border-color: var(--timeline-accent);
+  box-shadow: inset 0 0 0 1px var(--timeline-accent);
+}
+.prep summary {
+  cursor: pointer;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.prep pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font:
+    12px/1.6 ui-monospace,
+    monospace;
+  max-height: 450px;
+  overflow: auto;
+  padding: 10px;
+  background: color-mix(in srgb, var(--ink) 4%, var(--canvas));
+  border-radius: 5px;
+}
+.prep-muted,
+.prep-hint {
+  color: color-mix(in srgb, var(--ink) 63%, var(--canvas));
+}
+.prep-hint {
+  font-size: 11px !important;
+  overflow-wrap: anywhere;
+}
+.prep-arm {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.prep-arm > .prep-hint {
+  max-width: 250px;
+}
+.prep-tag {
+  font-size: 11px;
+  border: 1px solid color-mix(in srgb, var(--ink) 18%, var(--canvas));
+  padding: 2px 6px;
+  border-radius: 5px;
+}
+.prep-tabs {
+  display: flex;
+  gap: 18px;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 14%, var(--canvas));
+  margin: 14px 0;
+}
+.prep-tabs button {
+  font-size: 12px;
+  padding: 8px 0;
+  border-bottom: 2px solid transparent;
+  color: color-mix(in srgb, var(--ink) 65%, var(--canvas));
+}
+.prep-tabs button[data-active='true'] {
+  color: var(--ink);
+  border-bottom-color: var(--timeline-accent);
+}
+.prep-note,
+.prep-error {
+  font-size: 12px;
+  padding: 10px;
+  border-radius: 6px;
+  margin: 10px 0;
+  overflow-wrap: anywhere;
+}
+.prep-note {
+  background: color-mix(in srgb, var(--timeline-accent) 10%, var(--canvas));
+  border: 1px solid
+    color-mix(in srgb, var(--timeline-accent) 25%, var(--canvas));
+}
+.prep-note button {
+  margin-left: 10px;
+  text-decoration: underline;
+}
+.prep-error {
+  background: color-mix(in srgb, var(--destructive-text) 8%, var(--canvas));
+  border: 1px solid
+    color-mix(in srgb, var(--destructive-text) 30%, var(--canvas));
+}
+.prep-generation {
+  display: grid;
+  grid-template-columns: 85px minmax(0, 1fr);
+  gap: 12px;
+}
+.prep-inline {
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+}
+.prep-preview {
+  display: block;
+  width: 100%;
+  height: 420px;
+  background: white;
+  border: 1px solid color-mix(in srgb, var(--ink) 14%, var(--canvas));
+  border-radius: 5px;
+  margin: 12px 0;
+}
+.prep-prototype select {
+  width: auto;
+  max-width: 180px;
+}
+.prep-alternatives.compare {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+  gap: 12px;
+}
+.prep-conversation {
+  border-top: 1px solid color-mix(in srgb, var(--ink) 14%, var(--canvas));
+  margin-top: 24px;
+  padding-top: 10px;
+}
+.prep-messages {
+  max-height: 250px;
+  overflow: auto;
+}
+.prep-messages > div {
+  padding: 10px;
+  margin: 8px 0;
+  background: color-mix(in srgb, var(--ink) 4%, var(--canvas));
+  border-radius: 6px;
+}
+.prep-messages > div[data-role='user'] {
+  background: color-mix(in srgb, var(--timeline-accent) 8%, var(--canvas));
+}
+.prep footer {
+  border-top: 1px solid color-mix(in srgb, var(--ink) 14%, var(--canvas));
+  margin-top: 18px;
+  padding-top: 14px;
+}
+.prep-list-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 0;
+  text-align: left;
+  font-size: 12px;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 12%, var(--canvas));
+}
+.prep-list-item small {
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+.prep small {
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+.prep a {
+  font-size: 12px;
+  text-decoration: underline;
+}

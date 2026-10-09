@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Taskboard agent progress proposal</title>
+<style>
+:root{color-scheme:light dark;--canvas:#fbfbfc;--ink:#25262b;--muted:#6c6e78;--surface:#f1f2f4;--line:#dedfe4;--active:#2567cb;--success:#20805a;--warning:#976419;--danger:#c13f51;--tint:#eaf1ff}
+*{box-sizing:border-box;letter-spacing:0}body{margin:0;background:var(--canvas);color:var(--ink);font:13px/1.5 system-ui,sans-serif}button,select{font:inherit;color:inherit}button,summary,select{cursor:pointer}button{border:1px solid var(--line);background:var(--canvas);border-radius:6px;padding:6px 10px;display:inline-flex;align-items:center;gap:7px}button:hover{background:var(--surface)}button:focus-visible,summary:focus-visible,select:focus-visible{outline:2px solid var(--active);outline-offset:3px}
+.preview-tools{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:10px 18px;background:var(--surface);border-bottom:1px solid var(--line);font-size:12px}.preview-tools strong{margin-right:auto}.preview-tools select{padding:4px;border:1px solid var(--line);border-radius:4px;background:var(--canvas)}
+.thread-head{display:flex;align-items:center;gap:12px;padding:15px 22px;border-bottom:1px solid var(--line)}.thread-head strong{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.muted{color:var(--muted)}.icon{width:16px;height:16px;display:inline-grid;place-items:center;flex:none}.status-button{color:var(--active);background:var(--tint);border-color:color-mix(in srgb,var(--active) 24%,var(--line));font-weight:600;white-space:nowrap}.dot{height:7px;width:7px;border-radius:50%;background:currentColor;flex:none}.status-button .dot{animation:pulse 1.8s ease-in-out infinite}
+.workspace{display:grid;grid-template-columns:minmax(220px,1fr) minmax(300px,440px);min-height:550px}.conversation{padding:32px 28px;min-width:0}.message{max-width:570px;margin:0 auto 28px}.message small{display:block;margin-bottom:9px;color:var(--muted);font-weight:600}.message p{margin:8px 0}.user-message{background:var(--surface);padding:12px 15px;border-radius:8px;margin-left:20%}.composer{margin:55px auto 0;border:1px solid var(--line);border-radius:8px;padding:14px;color:var(--muted);max-width:570px}.composer footer{display:flex;justify-content:space-between;margin-top:32px;align-items:center}
+.progress{min-width:0;border-left:1px solid var(--line);padding:22px;background:var(--canvas)}.progress-head{display:flex;align-items:center;gap:10px;margin-bottom:20px}.progress-head h1{font-size:14px;margin:0;flex:1}.close{border:0;background:transparent;font-size:18px;padding:0 5px}.ticket{font-size:11px;color:var(--muted);margin-bottom:3px}.title{font-size:16px;font-weight:600;margin:0 0 18px}
+.phases{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:22px;font-size:11px;color:var(--muted)}.phase:before{content:"";display:block;height:3px;background:var(--line);margin-bottom:8px;border-radius:2px}.phase.done{color:var(--success)}.phase.done:before{background:var(--success)}.phase.active{color:var(--active);font-weight:600}.phase.active:before{background:var(--active)}
+.now{border-left:3px solid var(--active);padding-left:12px;margin:0 0 18px}.now-head{display:flex;justify-content:space-between;gap:8px;margin-bottom:6px}.now-head strong{color:var(--active);font-size:13px}.now p{margin:0;font-size:12px}.now time{font-size:11px;color:var(--muted)}.steps{list-style:none;padding:0;margin:18px 0}.steps li{display:flex;gap:9px;align-items:start;margin:9px 0;font-size:12px}.steps .done .icon{color:var(--success)}.steps .active{color:var(--active);font-weight:600}.steps .waiting{color:var(--muted)}.steps .waiting .icon{color:var(--line)}
+details{border-top:1px solid var(--line);padding:12px 0}summary{display:flex;align-items:center;gap:7px;list-style:none;font-size:12px;font-weight:600}summary::-webkit-details-marker{display:none}summary:before{content:"›";color:var(--muted);font-size:17px;width:10px;transform-origin:center}details[open]>summary:before{transform:rotate(90deg)}.counts{margin-left:auto;display:flex;gap:9px;font-size:11px;font-weight:500}.green{color:var(--success)}.red{color:var(--danger)}.command-list{margin-top:12px;max-height:220px;overflow:auto}.command-list details{padding:9px 0}.command-list summary{font-weight:400;align-items:flex-start}.command-list code{min-width:0;overflow-wrap:anywhere;font-size:11px}pre{font-size:11px;background:var(--surface);padding:10px;border-radius:4px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:120px;overflow:auto}.latest{font-size:11px;color:var(--muted);margin:7px 0 0 17px}.update{font-size:12px;margin:12px 0 0 17px}.update time{font-size:11px;color:var(--muted)}.actions{display:flex;gap:8px;padding-top:18px}.actions button{font-size:12px}.failure{display:none;padding:10px 12px;border-left:3px solid var(--warning);background:color-mix(in srgb,var(--warning) 7%,var(--canvas));font-size:12px;margin-bottom:16px}.failure strong{color:var(--warning)}.failure p{margin:5px 0 0}
+body.blocked .failure{display:block}body.blocked .status-button{color:var(--warning);background:color-mix(in srgb,var(--warning) 9%,var(--canvas))}body.blocked .status-button .dot{animation:none}body.blocked .now{border-color:var(--warning)}body.blocked .now-head strong{color:var(--warning)}
+body.hide-progress .workspace{grid-template-columns:1fr}body.hide-progress .progress{display:none}
+@keyframes pulse{50%{opacity:.4}}@media(prefers-reduced-motion:reduce){.status-button .dot{animation:none}}
+@media(max-width:650px){.workspace{display:block}.conversation{display:none}.progress{border-left:0;max-width:100%;padding:18px}.thread-head{padding:12px 16px;gap:8px}.thread-head strong{font-size:12px}.status-button{font-size:11px;padding:5px 7px}.preview-tools{padding:10px 16px}.preview-tools strong{width:100%}body.hide-progress .conversation{display:block}}
+body.dark{--canvas:#202124;--ink:#ececf0;--muted:#a2a4ae;--surface:#292a2f;--line:#393b42;--active:#7ba8fa;--success:#69c69b;--warning:#e1b563;--danger:#f18694;--tint:#29364b}
+</style>
+<div class="preview-tools"><strong>Taskboard / interactive proposal</strong><label>State <select id="state"><option value="working">Working</option><option value="blocked">Needs input</option></select></label><label><input type="checkbox" id="dark"> Dark</label></div>
+<header class="thread-head"><span class="muted">bb /</span><strong>Fix media delivery and audio duration</strong><button class="status-button" id="toggle" aria-expanded="true" aria-controls="progress"><span class="dot"></span><span id="badge">Build · 3/5</span><span aria-hidden="true">›</span></button></header>
+<main class="workspace">
+<section class="conversation" aria-label="Thread">
+<div class="message user-message">Fix audio duration validation and preserve the opaque media delivery contract.</div>
+<div class="message"><small>Agent</small><p>I found the duration check in the upload pipeline. I’m updating the validation and keeping the existing delivery IDs unchanged.</p><p>The focused checks are passing. Next I’m covering the boundary cases and reviewing the final diff.</p></div>
+<div class="composer">Reply to the agent…<footer><span>Project defaults</span><button title="Native stop control" aria-label="Stop agent" disabled>■</button></footer></div>
+</section>
+<aside class="progress" id="progress" aria-label="Task progress">
+<div class="progress-head"><h1>Task progress</h1><span class="muted" style="font-size:11px">Updated just now</span><button class="close" id="close" aria-label="Close progress">×</button></div>
+<div class="ticket">ROT-5</div><h2 class="title">Media delivery &amp; audio duration</h2>
+<div class="phases"><div class="phase done">✓ Investigate</div><div class="phase done">✓ Plan</div><div class="phase active">Build</div><div class="phase">Review</div></div>
+<div class="failure"><strong>Needs your input</strong><p>Choose the allowed audio duration before the agent can finish validation.</p></div>
+<div class="now"><div class="now-head"><strong id="heading">Building</strong><span class="muted" style="font-size:11px">3 of 5 steps</span></div><p id="activity">Adding duration boundary tests</p><time>Latest activity · 8 seconds ago</time></div>
+<ul class="steps"><li class="done"><span class="icon">✓</span>Inspect upload and delivery flow</li><li class="done"><span class="icon">✓</span>Update duration validation</li><li class="done"><span class="icon">✓</span>Preserve opaque delivery identifiers</li><li class="active"><span class="icon">◉</span>Add boundary-case coverage</li><li class="waiting"><span class="icon">○</span>Review the implementation diff</li></ul>
+<details id="commands"><summary>Commands <span class="muted">12</span><span class="counts"><span class="green">✓ 10</span><span class="red">! 1</span><span class="muted">? 1</span></span></summary><div class="command-list">
+<details><summary><span class="red">!</span><code>pytest tests/media/test_duration.py</code></summary><pre>FAILED test_duration_limit
+Expected the configured duration boundary.
+1 failed, 12 passed.</pre></details>
+<details><summary><span class="green">✓</span><code>npm run test -- media-delivery</code></summary><pre>85 passed</pre></details>
+<details><summary><span class="green">✓</span><code>git diff --check</code></summary><pre>No whitespace errors.</pre></details>
+<details><summary><span class="muted">?</span><code>Inspect storage configuration</code></summary><pre>No exit code recorded.</pre></details>
+<p class="muted" style="font-size:11px">8 earlier commands</p></div></details>
+<p class="latest"><span class="red">1 command failed</span> · Latest: git diff --check</p>
+<details><summary>Agent updates <span class="counts muted">Latest 3</span></summary><div class="update"><time>14:32</time><p>Delivery identifiers are unchanged. I’m adding coverage for audio at the configured boundary.</p></div><div class="update"><time>14:30</time><p>The upload validation now uses the existing media policy.</p></div></details>
+<details><summary>Changed files <span class="counts muted">7</span></summary><pre>media/validation.py
+tests/media/test_duration.py
+…</pre></details>
+<details><summary>Workspace &amp; approved plan</summary><div class="update">Original managed worktree · Plan revision 1</div></details>
+<div class="actions"><button id="open-session">↗ Open session</button></div>
+</aside>
+</main>
+<script>
+const toggle=document.querySelector('#toggle');
+function show(visible){document.body.classList.toggle('hide-progress',!visible);toggle.setAttribute('aria-expanded',String(visible))}
+toggle.onclick=()=>show(document.body.classList.contains('hide-progress'));
+document.querySelector('#close').onclick=()=>show(false);
+document.querySelector('#dark').onchange=e=>document.body.classList.toggle('dark',e.target.checked);
+document.querySelector('#state').onchange=e=>{const blocked=e.target.value==='blocked';document.body.classList.toggle('blocked',blocked);document.querySelector('#badge').textContent=blocked?'Build · Needs input':'Build · 3/5';document.querySelector('#heading').textContent=blocked?'Waiting for your decision':'Building';document.querySelector('#activity').textContent=blocked?'Audio duration policy is unresolved':'Adding duration boundary tests'};
+document.querySelector('#open-session').onclick=()=>show(false);
+</script>
+</html>
