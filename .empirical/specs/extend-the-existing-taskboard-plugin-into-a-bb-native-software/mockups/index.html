@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Taskboard native thread progress proposal</title>
+<style>
+:root{font-family:Inter,ui-sans-serif,system-ui,sans-serif;font-size:13px;letter-spacing:0;color:#292b31;background:#f5f5f6;--line:#e0e1e4;--muted:#71757e;--blue:#286bd4;--green:#19714d;--amber:#986919;--red:#b13a4b}
+*{box-sizing:border-box}body{margin:0}button,input{font:inherit;letter-spacing:0}button{border:1px solid var(--line);background:#fff;color:inherit;border-radius:5px;min-height:32px;padding:6px 10px;display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer}button:hover{background:#f2f3f5}button:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-offset:2px}button.icon{width:32px;padding:6px}button.primary{background:var(--blue);border-color:var(--blue);color:#fff}button.quiet{background:transparent;border-color:transparent}svg{width:15px;height:15px;flex:none}.app{width:min(1440px,100vw);height:900px;max-height:100vh;margin:auto;display:grid;grid-template-columns:54px minmax(0,1fr) 370px;background:#fff;overflow:hidden;border-inline:1px solid var(--line)}.rail{background:#f8f8f9;border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:8px}.rail .logo{width:30px;height:30px;padding:5px;margin-bottom:6px}.rail button.active{background:#e8eef9;color:#225aa9}.rail .bottom{margin-top:auto}.thread{display:grid;grid-template-rows:49px minmax(0,1fr) auto;min-width:0}.threadbar{border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 16px;gap:9px;background:#fafafa}.title{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.muted{color:var(--muted)}.small{font-size:12px}.spacer{flex:1}.chat{overflow:auto;padding:26px max(24px,calc((100% - 760px)/2));background:#fff}.message{max-width:760px;margin:0 auto 26px}.message.user{background:#f2f3f5;border-radius:8px;padding:12px 14px;width:fit-content;max-width:min(680px,90%);margin-right:0}.avatar{width:23px;height:23px;border-radius:5px;background:#1f2228;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-right:8px}.agenthead{display:flex;align-items:center;margin-bottom:9px}.message p{line-height:1.65;margin:7px 0}.activity{border-left:2px solid #c8d5e9;padding:8px 12px;margin:12px 0;color:var(--muted);font-size:12px}.activity strong{color:#3b3e45;font-weight:550}.tool{border:1px solid var(--line);border-radius:6px;padding:9px 11px;margin:8px 0;display:flex;align-items:center;gap:8px;font-size:12px}.tool .result{margin-left:auto;color:var(--green)}.composer{padding:10px max(18px,calc((100% - 780px)/2)) 14px;background:#fff}.composerbox{border:1px solid #c8cbd1;border-radius:8px;padding:9px;box-shadow:0 1px 3px #0000000a}.composer input{width:100%;border:0;padding:5px;background:transparent}.composer input:focus{outline:0}.composeractions{display:flex;align-items:center;gap:5px;margin-top:8px}.send{margin-left:auto}.panel{border-left:1px solid var(--line);background:#fbfbfc;display:grid;grid-template-rows:49px minmax(0,1fr);min-width:0}.panelbar{height:49px;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 10px 0 15px;gap:8px}.paneltitle{font-weight:600}.panelbody{overflow:auto}.ticket{padding:17px 16px 14px;border-bottom:1px solid var(--line);background:#fff}.eyebrow{font-size:11px;color:var(--muted);display:flex;gap:7px;align-items:center}.tracker{font-size:10px;border:1px solid var(--line);border-radius:4px;padding:2px 5px}.ticket h1{font-size:15px;line-height:1.45;margin:8px 0 11px}.ticketactions{display:flex;gap:7px}.ticketactions button{font-size:12px;flex:1}.progress{padding:17px 16px;border-bottom:1px solid var(--line)}.sectionhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.sectionhead h2{font-size:12px;margin:0}.status{font-size:10px;border-radius:4px;padding:3px 6px;background:#eaf2ff;color:#235fae}.status.green{background:#e8f5ee;color:var(--green)}.status.amber{background:#fff2d7;color:var(--amber)}.status.red{background:#fbecef;color:var(--red)}.phase{display:grid;grid-template-columns:20px minmax(0,1fr);gap:8px;position:relative;min-height:51px}.phase:not(:last-child):before{content:"";position:absolute;left:8px;top:18px;bottom:-2px;border-left:1px solid #d5d8dc}.phaseicon{width:18px;height:18px;border-radius:50%;border:1px solid #c6c9ce;background:#fbfbfc;color:#8a8e96;display:flex;align-items:center;justify-content:center;font-size:9px;z-index:1}.phase.done .phaseicon{color:var(--green);border-color:#78b499;background:#edf8f2}.phase.current .phaseicon{color:#fff;border-color:var(--blue);background:var(--blue)}.phasetext strong{display:block;font-size:12px;font-weight:550;margin:1px 0 3px}.phasetext span{font-size:11px;color:var(--muted);line-height:1.45;display:block}.currentline{margin:12px 0 4px;border:1px solid #ced9e9;background:#f4f8fe;border-radius:6px;padding:10px}.currentline .label{font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:600}.currentline p{font-size:12px;line-height:1.5;margin:4px 0}.meter{height:3px;background:#dce2eb;margin-top:9px;overflow:hidden}.meter span{display:block;height:100%;width:62%;background:var(--blue);animation:pulse 1.8s ease-in-out infinite}@keyframes pulse{50%{opacity:.42}}.details{padding:17px 16px}.details h2{font-size:12px;margin:0 0 10px}.facts{display:grid;grid-template-columns:92px minmax(0,1fr);gap:8px;font-size:11px;line-height:1.45}.facts dt{color:var(--muted)}.facts dd{margin:0;overflow-wrap:anywhere}.check{display:flex;align-items:flex-start;gap:7px;padding:8px 0;border-top:1px solid var(--line);font-size:11px}.check:first-of-type{border-top:0}.check .ok{color:var(--green)}.notice{font-size:11px;line-height:1.5;border-left:2px solid #e3b24c;background:#fffaf0;padding:9px;margin-top:12px}.footeractions{padding:0 16px 18px;display:flex;gap:7px}.footeractions button{flex:1;font-size:12px}.screen-switch{position:fixed;bottom:14px;left:66px;display:flex;gap:6px;background:#fff;border:1px solid var(--line);padding:5px;border-radius:7px;box-shadow:0 6px 20px #0001;z-index:3}.screen-switch button{font-size:11px;min-height:27px}.screen-switch button.active{background:#eaf1fc;color:#225aa9}.hidden{display:none!important}.toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:#282b32;color:#fff;padding:10px 14px;border-radius:6px;font-size:12px;z-index:5}.mobile-note{display:none}
+@media(max-width:900px){.app{grid-template-columns:48px minmax(0,1fr) 330px}.screen-switch{left:58px}.chat{padding-inline:22px}}
+@media(max-width:700px){.app{display:block;height:auto;min-height:100vh}.rail{display:none}.thread{min-height:52vh}.panel{border-left:0;border-top:1px solid var(--line);min-height:48vh}.panelbar{position:sticky;top:0;background:#fbfbfc;z-index:2}.chat{max-height:46vh;padding:20px 16px}.composer{padding:8px 12px 12px}.screen-switch{display:none}.mobile-note{display:block;font-size:11px;color:var(--muted);margin-left:auto}.ticketactions button{flex:auto}.progress{padding-bottom:8px}.phase{min-height:46px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="BB navigation">
+    <img class="logo" src="../../../../../plugins/taskboard/assets/icon.svg" alt="BB">
+    <button class="icon quiet" title="New thread" aria-label="New thread"><i data-lucide="square-pen"></i></button>
+    <button class="icon active" title="Threads" aria-label="Threads"><i data-lucide="messages-square"></i></button>
+    <button class="icon quiet" title="Projects" aria-label="Projects"><i data-lucide="folder-kanban"></i></button>
+    <button class="icon quiet bottom" title="Settings" aria-label="Settings"><i data-lucide="settings"></i></button>
+  </nav>
+
+  <section class="thread" aria-label="Native BB thread">
+    <header class="threadbar">
+      <button class="icon quiet" title="Toggle sidebar" aria-label="Toggle sidebar"><i data-lucide="panel-left"></i></button>
+      <span class="title">EXAMPLE-142: Keep saved filters when switching projects</span>
+      <span class="spacer"></span>
+      <span class="small muted" id="threadState">Working</span>
+      <button class="icon quiet" title="Stop agent" aria-label="Stop agent" id="stopButton" onclick="stopAgent()"><i data-lucide="square"></i></button>
+    </header>
+
+    <div class="chat" id="chat">
+      <article class="message user">Please fix EXAMPLE-142 and keep the existing filter preset behavior.</article>
+      <article class="message">
+        <div class="agenthead"><span class="avatar">C</span><strong>Codex</strong></div>
+        <p>I found the project-switch race in the preference restoration path. I’m updating the existing project-scoped store and adding a two-project regression test.</p>
+        <div class="activity"><strong>Current step:</strong> implementing the approved scope in the BB-managed worktree.</div>
+        <div class="tool"><i data-lucide="file-pen-line"></i><span>Editing <code>browse-preferences.ts</code></span><span class="result">3 files</span></div>
+        <div class="tool"><i data-lucide="terminal"></i><span id="toolActivity">Running Taskboard tests</span><span class="result" id="toolResult">live</span></div>
+      </article>
+    </div>
+
+    <footer class="composer">
+      <div class="composerbox">
+        <input id="composerInput" aria-label="Message Codex" placeholder="Message Codex">
+        <div class="composeractions">
+          <button class="icon quiet" title="Attach context" aria-label="Attach context"><i data-lucide="paperclip"></i></button>
+          <span class="small muted" id="composerHint">Steering goes directly to this native thread</span>
+          <button class="icon primary send" title="Send message" aria-label="Send message" onclick="sendSteering()"><i data-lucide="arrow-up"></i></button>
+        </div>
+      </div>
+    </footer>
+  </section>
+
+  <aside class="panel" aria-label="Taskboard right panel">
+    <header class="panelbar">
+      <img src="../../../../../plugins/taskboard/assets/icon.svg" alt="" width="17" height="17">
+      <span class="paneltitle">Taskboard</span>
+      <span class="mobile-note">Right panel</span>
+      <span class="spacer"></span>
+      <button class="icon quiet" title="Pin panel" aria-label="Pin panel"><i data-lucide="pin"></i></button>
+      <button class="icon quiet" title="Close panel" aria-label="Close panel"><i data-lucide="x"></i></button>
+    </header>
+    <div class="panelbody">
+      <section class="ticket">
+        <div class="eyebrow"><span>EXAMPLE-142</span><span>GitHub</span><span class="tracker">Open</span></div>
+        <h1>Keep saved filters when switching projects</h1>
+        <div class="ticketactions">
+          <button onclick="toast('This is already the linked native BB thread.')"><i data-lucide="messages-square"></i>Current thread</button>
+          <button class="icon" title="Open tracker item" aria-label="Open tracker item"><i data-lucide="external-link"></i></button>
+        </div>
+      </section>
+
+      <section class="progress">
+        <div class="sectionhead"><h2>Agent progress</h2><span class="status" id="statusBadge">Working</span></div>
+        <div id="phases"></div>
+        <div class="currentline" id="currentLine">
+          <div class="label">Now</div>
+          <p id="currentText">Running Taskboard tests</p>
+          <div class="meter" id="meter"><span></span></div>
+        </div>
+        <div class="notice hidden" id="notice"></div>
+      </section>
+
+      <section class="details">
+        <h2>Execution</h2>
+        <dl class="facts">
+          <dt>Session</dt><dd>Current BB thread</dd>
+          <dt>Workspace</dt><dd>Managed worktree · <code>example-142</code></dd>
+          <dt>Plan</dt><dd>Revision 2 · approved</dd>
+          <dt>Changes</dt><dd id="changes">3 files · unverified</dd>
+          <dt>Pull request</dt><dd id="pullRequest">Not linked</dd>
+        </dl>
+        <h2 style="margin-top:18px">Checks</h2>
+        <div class="check"><i data-lucide="loader-circle" class="muted" id="testIcon"></i><span class="spacer">Taskboard tests</span><span class="muted" id="testStatus">Running</span></div>
+        <div class="check"><i data-lucide="circle" class="muted" id="typeIcon"></i><span class="spacer">Typecheck</span><span class="muted" id="typeStatus">Pending</span></div>
+      </section>
+      <div class="footeractions" id="panelActions">
+        <button onclick="openActivity()"><i data-lucide="list-tree"></i>Activity</button>
+        <button class="primary" onclick="advance()"><i data-lucide="skip-forward"></i>Simulate update</button>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<div class="screen-switch" aria-label="Preview state">
+  <button class="active" id="workingButton" onclick="setState('working')">Working</button>
+  <button id="reviewButton" onclick="setState('review')">Turn finished</button>
+  <button id="failedButton" onclick="setState('failed')">Needs input</button>
+</div>
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+<script>
+const phaseLabels=['Investigate','Plan','Build','Verify','Review'];
+let state='working',tick=2;
+function icons(){if(window.lucide)window.lucide.createIcons()}
+function toast(text){const el=document.querySelector('#toast');el.textContent=text;el.hidden=false;clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>el.hidden=true,3500)}
+function render(){
+ const current=state==='working'?tick:state==='review'?4:tick;
+ document.querySelector('#phases').innerHTML=phaseLabels.map((label,index)=>{
+   const cls=index<current?'done':index===current&&state==='working'?'current':'';
+   const detail=index<current?['Repository findings captured','Plan revision 2 approved','Implementation turn finished','Required checks passed','Review is waiting for you'][index]:index===current&&state==='working'?['Inspecting repository','Drafting implementation plan','Editing and testing','Running required checks','Reviewing changes'][index]:'Waiting';
+   return `<div class="phase ${cls}"><span class="phaseicon">${index<current?'&#10003;':index+1}</span><div class="phasetext"><strong>${label}</strong><span>${detail}</span></div></div>`;
+ }).join('');
+ const badge=document.querySelector('#statusBadge'),notice=document.querySelector('#notice'),meter=document.querySelector('#meter');
+ notice.classList.add('hidden');meter.classList.toggle('hidden',state!=='working');
+ if(state==='working'){
+   badge.textContent='Working';badge.className='status';
+   document.querySelector('#threadState').textContent='Working';
+   document.querySelector('#currentText').textContent=tick===2?'Running Taskboard tests':tick===3?'Running typecheck':'Reviewing repository context';
+   document.querySelector('#toolActivity').textContent=document.querySelector('#currentText').textContent;
+   document.querySelector('#toolResult').textContent='live';
+   document.querySelector('#stopButton').disabled=false;
+   document.querySelector('#changes').textContent='3 files · unverified';
+   document.querySelector('#pullRequest').textContent='Not linked';
+   document.querySelector('#testStatus').textContent=tick<3?'Running':'Passed';
+   document.querySelector('#typeStatus').textContent=tick<3?'Pending':'Running';
+   document.querySelector('#panelActions').innerHTML='<button onclick="openActivity()"><i data-lucide="list-tree"></i>Activity</button><button class="primary" onclick="advance()"><i data-lucide="skip-forward"></i>Simulate update</button>';
+ } else if(state==='review'){
+   badge.textContent='Ready for review';badge.className='status green';
+   document.querySelector('#threadState').textContent='Idle';
+   document.querySelector('#currentText').textContent='Agent turn finished · work is not Done';
+   document.querySelector('#toolActivity').textContent='Taskboard checks';
+   document.querySelector('#toolResult').textContent='passed';
+   document.querySelector('#stopButton').disabled=true;
+   document.querySelector('#changes').textContent='3 files · checks passed';
+   document.querySelector('#pullRequest').innerHTML='<a href=\"#\" onclick=\"event.preventDefault();toast(\\'Draft PR #148 is linked.\\')\">#148 · draft</a>';
+   document.querySelector('#testStatus').textContent='Passed';
+   document.querySelector('#typeStatus').textContent='Passed';
+   document.querySelector('#currentLine').querySelector('.label').textContent='Next';
+   notice.classList.remove('hidden');notice.innerHTML='<strong>Completion is still gated.</strong><br>A successful turn does not close the ticket or mark factory work Done.';
+   document.querySelector('#panelActions').innerHTML='<button onclick="requestChanges()"><i data-lucide=\"message-square\"></i>Request changes</button><button class=\"primary\" onclick=\"startReview()\"><i data-lucide=\"scan-search\"></i>Review changes</button>';
+ } else {
+   badge.textContent='Needs input';badge.className='status red';
+   document.querySelector('#threadState').textContent='Idle';
+   document.querySelector('#currentText').textContent='Tests failed in filter restoration';
+   document.querySelector('#toolActivity').textContent='Taskboard tests';
+   document.querySelector('#toolResult').textContent='failed';
+   document.querySelector('#stopButton').disabled=true;
+   document.querySelector('#testStatus').textContent='Failed';
+   document.querySelector('#typeStatus').textContent='Not run';
+   notice.classList.remove('hidden');notice.innerHTML='<strong>Taskboard tests failed.</strong><br>The native session and worktree are retained. Add context in the thread or retry explicitly.';
+   document.querySelector('#panelActions').innerHTML='<button onclick=\"focusComposer()\"><i data-lucide=\"message-square\"></i>Add context</button><button class=\"primary\" onclick=\"retry()\"><i data-lucide=\"rotate-ccw\"></i>Retry</button>';
+ }
+ ['working','review','failed'].forEach(name=>document.querySelector('#'+name+'Button').classList.toggle('active',name===state));
+ icons();
+}
+function setState(next){state=next;if(next==='working')tick=2;render()}
+function advance(){if(tick===2){tick=3;render();toast('Tests passed. Typecheck is running.')}else setState('review')}
+function stopAgent(){setState('failed');document.querySelector('#notice').innerHTML='<strong>Agent stopped.</strong><br>The ticket remains Open and the workspace is retained.';toast('Native BB stop requested.')}
+function sendSteering(){const input=document.querySelector('#composerInput');if(!input.value.trim())return;const message=document.createElement('article');message.className='message user';message.textContent=input.value;document.querySelector('#chat').append(message);input.value='';document.querySelector('#chat').scrollTop=document.querySelector('#chat').scrollHeight;toast('Message sent to the native thread.')}
+function focusComposer(){document.querySelector('#composerInput').focus();toast('Add context in the normal BB composer.')}
+function retry(){state='working';tick=2;render();toast('Explicit retry started in the linked native thread.')}
+function requestChanges(){focusComposer()}
+function startReview(){toast('Review starts as a linked native BB session; this ticket stays Open.')}
+function openActivity(){toast('Activity includes BB events, tool calls, checks, and Taskboard decisions.')}
+render();
+</script>
+</body>
+</html>

@@ -1,4 +1,5 @@
 import { defineRpcContract } from '@get-bb/plugin-sdk';
+import { factoryRpcMethods } from './factory/contract.js';
 import { z } from 'zod';
 import {
   bbProjectIdSchema,
@@ -336,6 +337,7 @@ const listInputSchema = z
   .strict();
 
 export const taskboardRpcContract = defineRpcContract({
+  ...factoryRpcMethods,
   listProjects: {
     input: z.null(),
     output: z.object({ projects: z.array(trackerProjectSchema) }).strict()

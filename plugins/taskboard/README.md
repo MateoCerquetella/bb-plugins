@@ -4,6 +4,66 @@
 
 <h1 align="center">Taskboard</h1>
 
+## Native Agent Progress (Development)
+
+**Start task**, available on Kanban cards and issue details, starts a native investigation, opens its
+native thread and keeps Taskboard pinned on the originating ticket. The
+existing right panel shows native activity, plan steps, command exit codes,
+reported file changes and findings. Conversation, steering, permissions and
+stop remain native BB controls. No additional credentials or workflow runtime
+are required.
+
+Investigation continues to planning and build automatically in the same thread.
+If investigation used the project's plain checkout, Build forks the planning
+session into a BB-managed worktree, preserving its conversation and ticket link.
+Starting a task authorizes that sequence: the generated plan is saved as an
+immutable revision and its exact digest is approved before build dispatch.
+Existing investigation/planning runs adopt this behavior on reload. Scope
+changes, missing plans, stopped runs and uncertain dispatches pause automatic
+work with an actionable message. Build uses a managed worktree. Review
+opens a separate linked session and remains an explicit action.
+
+For automatic tasks, a review that reports blockers resumes the original Build
+thread with the findings and asks it to verify the implementation worktree and
+revision. A repaired Build that reports implementation and a revision starts a
+fresh review in that same environment. This cycle is limited to two repairs per
+approved plan and scope. Older reviews with an explicit negative verdict also
+recover on reload. Unclear results remain inspectable and offer **Return to Build
+with findings**. A Build waiting for decisions shows **Build needs input** and
+cannot start another review; native completion alone never establishes an
+implementation. Workspace changes, uncertain dispatches and stale scope pause
+the cycle without creating a replacement worktree.
+
+After a confirmed agent dispatch, Taskboard moves the provider issue to its
+available In progress status. Providers without that transition retain their
+status with an explanation in the panel. Permission or connection failures
+are shown with a separate status-update retry; retrying never launches another
+agent. A finished turn is **not** accepted work and never closes an issue.
+
+Dispatch intent is saved before calling BB. Duplicate starts reuse the original
+dispatch. Confirmed failed/stopped attempts have bounded retries; ambiguous
+starts never retry automatically. Use **Link recovered session** after inspecting
+the matching recent native thread.
+
+This is the native progress slice, not the complete factory implementation.
+Independently executed verification bound to workspace
+revision, PR evidence capture, accepted-review and Done gates remain pending.
+Command results are observations, not proof that all required checks passed.
+No factory action merges, deploys or closes a ticket.
+
+Run `npm run check --workspace bb-plugin-taskboard` from the workspace root.
+The opt-in native harness uses isolated storage and does not install a plugin
+or contact a tracker:
+
+```sh
+FACTORY_SMOKE_DB=/absolute/path/to/smoke.sqlite \
+  node --experimental-strip-types plugins/taskboard/scripts/factory-native-smoke.ts
+```
+
+It requires BB thread/project context. The browser harness uses the dedicated
+Steel project's `STEEL_CDP_URL` and an installed `PLAYWRIGHT_MODULE`; mocked BB
+hooks exercise the real progress component, not the live panel host.
+
 <p align="center">
   GitHub, GitLab, Linear, or Jira tasks inside BB—one focused tracker for every project.
 </p>
@@ -49,8 +109,7 @@ task to an agent without rebuilding context by hand.
 - **Status changes everywhere** — use the shaped status glyph on a List row or the
   status pill inside a task to move it through the provider's real workflow.
 - **Create without context switching** — turn a composer prompt into a
-  provider-aware issue beside BB's native prompt actions in New thread or an
-  existing thread, or choose **New issue** directly from a project board. Native
+  provider-aware issue beside BB's native prompt actions in New thread, or choose **New issue** directly from a project board. Native
   assignee, status, priority, labels, due date, milestone, and issue type fields
   appear when supported. Taskboard remembers the last successfully used
   assignee for that exact project and destination. Assisted creations attach a
@@ -249,3 +308,82 @@ BB toolchain even when run from inside a live BB agent environment.
 ## License
 
 [MIT](./LICENSE) © 2026 Mateo Cerquetella.
+
+## Prepare work inside BB
+
+Prepare work turns a New thread request into a source-backed brief and interactive
+prototype alternatives before you hand anything to Empirical. It needs no tracker
+connection and never starts an Empirical workflow or creates/updates a ticket.
+
+1. Select your project, machine/workspace/branch, provider/model/reasoning and
+   permissions in BB's existing **New thread** composer.
+2. Write your request, open **Prepare work** from the New thread panel Actions
+   list, and attach the preparation there. Then use BB's normal **Send**.
+   The preparation reference preserves your request and binds to the actual
+   submitted thread settings; there is no second settings form.
+3. The preparation bootstrap tool starts an agent investigation. The linked
+   thread's **Prepare work** panel opens when the binding is available; its
+   header action can reopen it manually.
+4. Review/edit the title and description, inspect source paths/excerpts, and use
+   the panel conversation to refine the brief. Earlier revisions remain in History;
+   results generated against an older revision are proposals, not silent edits.
+5. **Generate prototypes** accepts 1–4 alternatives (default 2) and optional design
+   direction. Each job uses your configured BB agent. Successful versions remain
+   available if a sibling fails; retry the failed job or refine a chosen version.
+6. Preview/compare the alternatives, select a version, and mark the brief ready.
+   **Export for Empirical** offers Markdown, a JSON packet including the selected
+   HTML, and standalone prototype HTML. Export is preparation input, not evidence
+   that any Empirical specification, mockup, implementation or validation gate passed.
+
+**Linked task** optionally reuses this project's existing Taskboard GitHub,
+Linear or Jira connection and cached tasks. Configure it through the existing
+Taskboard settings. Linking stores the explicit task reference in the preparation
+and export; it makes no remote changes. Connection errors do not block preparation.
+
+### Isolation and persistence
+
+Taskboard resolves the submitted thread's actual environment and host. Its host
+entry reads a bounded inventory of tracked and non-ignored untracked source files,
+then selects at most 24 excerpts. Generated directories, credential-prone paths,
+symlinks, binary/oversized files and likely credential-bearing content are excluded.
+The panel shows source line ranges, hashes, repository commit, inventory limits and
+unresolved assumptions. Repository content is treated as untrusted reference data.
+
+Research and prototype jobs run as ordinary BB threads with the same resolved
+provider/model/reasoning/service tier/permissions, in separate directories under
+Taskboard's host data storage. The bootstrap agent is instructed only to invoke the
+preparation tool and stop. This instruction is not an OS read-only sandbox; the
+plugin does not alter the user's native permission setting. Plugin operations do
+not write target repository production files.
+
+Briefs, sources, conversation, jobs, HTML versions and selection persist in
+Taskboard's SQLite database. Active jobs reconcile from their BB thread IDs after
+reload. If a restart interrupts a spawn before its ID is saved, the job reports an
+ambiguous start and requires checking recent Prepare threads before retrying; it is
+never automatically duplicated. Idle jobs without output become retryable failures
+after a 15-second settling period. Worker enumeration is paginated independently
+of the recent-preparation list; old thread bindings remain directly addressable.
+Brief edits use revision checks. A preparation is
+bounded to 60 jobs and 100 brief revisions.
+
+HTML previews use nested opaque-origin `sandbox="allow-scripts"` frames. A trusted
+outer document limits child navigation to `about:`; generated content cannot relax
+that policy or navigate its own frame onto the network. The inner CSP also blocks
+resource loads, fetch, nested frames and form submission. Scripts
+cannot read BB's page or storage or navigate the parent. Do not treat browser
+iframe isolation as an OS sandbox for arbitrary downloaded code.
+
+SDK limitations: the New thread panel exposes project/draft context, not all unsent
+execution/environment selectors; native submission supplies those settings. The
+preparation tool must be available to the selected provider. Host or agent failures
+are visible in the panel and original BB job thread. A remote host must be online
+and support the plugin host entry. Current live verification covers the installed
+Codex provider; tests verify explicit remote-host routing.
+
+Agent-readable CLI (no implementation is started):
+
+```sh
+bb taskboard prepare list --project <project-id>
+bb taskboard prepare show <preparation-id> --project <project-id>
+bb taskboard prepare export <preparation-id> --project <project-id>
+```

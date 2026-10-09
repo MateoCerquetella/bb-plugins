@@ -1,3 +1,4 @@
+import { registerPreparation } from './preparation/server.js';
 import {
   PLUGIN_CLI_OUTPUT_MAX_BYTES,
   type BbPluginApi,
@@ -70,6 +71,9 @@ import {
   type WorkSourceAdapter
 } from './sources/types.js';
 import { createWorkItemStore } from './store.js';
+import { createFactoryStore } from './factory/store.js';
+import { createFactoryService } from './factory/service.js';
+import { progressStatus } from './factory/tracker.js';
 
 const SOURCES: readonly WorkSource[] = ['linear', 'github', 'jira', 'gitlab'];
 const CREDENTIAL_SOURCES: readonly CredentialSource[] = ['linear', 'jira'];
@@ -149,15 +153,13 @@ function parseMentionId(value: string): {
 function sleep(ms: number, signal: AbortSignal): Promise<void> {
   if (signal.aborted) return Promise.resolve();
   return new Promise(resolve => {
-    const timeout = setTimeout(resolve, ms);
-    signal.addEventListener(
-      'abort',
-      () => {
-        clearTimeout(timeout);
-        resolve();
-      },
-      { once: true }
-    );
+    const finish = () => {
+      clearTimeout(timeout);
+      signal.removeEventListener('abort', finish);
+      resolve();
+    };
+    const timeout = setTimeout(finish, ms);
+    signal.addEventListener('abort', finish, { once: true });
   });
 }
 
@@ -446,6 +448,36 @@ function parseGithubRepoFromRemote(
 
 export default async function plugin(bb: BbPluginApi) {
   const store = createWorkItemStore(bb);
+  const factory = createFactoryService(bb.sdk, createFactoryStore(bb.storage.database()), projectId =>
+    bb.realtime.publish('taskboard:factory', { projectId }), {
+      getItem: identity => store.get(identity.projectId, identity.source, identity.locator) ?? null,
+      async markInProgress(item) {
+        const live = await getLiveItem(item.bbProjectId, item.source, item.locator);
+        if (live.stateCategory === 'in_progress') return { status: 'synced', message: null };
+        if (['done', 'canceled'].includes(live.stateCategory)) {
+          return { status: 'unavailable', message: 'Issue is closed or canceled. Reopen it to update its status.' };
+        }
+        const option = progressStatus(await liveStatusOptions(item.bbProjectId, item.source, item.locator));
+        if (!option) return {
+          status: 'unavailable',
+          message: `${sourceName(item.source)} has no In progress transition for this issue. Agent work is tracked here.`
+        };
+        const updated = await updateItemStatus(item.bbProjectId, item.source, item.locator, option.id);
+        if (updated.stateCategory !== 'in_progress') throw new Error('The tracker did not confirm In progress.');
+        return { status: 'synced', message: null };
+      }
+    }
+  );
+  bb.background.service('taskboard-factory-progress', {
+    async start(signal) {
+      await factory.recover();
+      while (!signal.aborted) {
+        try { await factory.poll(signal); }
+        catch (error) { if (!signal.aborted) bb.log.warn(`Factory progress: ${errorMessage(error)}`); }
+        await sleep(2500, signal);
+      }
+    }
+  });
   const credentials = createProjectCredentialVault(bb);
 
   let projectRemotesForProbe: Awaited<
@@ -1755,6 +1787,48 @@ export default async function plugin(bb: BbPluginApi) {
   }
 
   const handlers: PluginRpcHandlers<typeof taskboardRpcContract> = {
+    async factoryStartTask(input) {
+      await assertProjectExists(input.projectId);
+      const item = await getLiveItem(input.projectId, input.source, input.locator);
+      return { record: await factory.startTask(item, input.contextThreadId) };
+    },
+    async factoryRetryStatus(input) {
+      await assertProjectExists(input.projectId);
+      const item = await getLiveItem(input.projectId, input.source, input.locator);
+      return { record: await factory.retryStatus(item) };
+    },
+    async factoryRecover(input) {
+      await assertProjectExists(input.projectId);
+      const item = await getLiveItem(input.projectId, input.source, input.locator);
+      return { record: await factory.linkRecovered(item, input.expectedVersion, input.threadId) };
+    },
+    async factoryGet(input) {
+      await assertProjectExists(input.projectId);
+      const item = store.get(input.projectId, input.source, input.locator);
+      return { record: item ? await factory.get(item) : null };
+    },
+    async factoryForThread(input) {
+      const thread = await bb.sdk.threads.get({ threadId: input.threadId });
+      await assertProjectExists(thread.projectId);
+      const record = factory.forThread(input.threadId);
+      if (record && record.projectId !== thread.projectId) throw new Error('Thread project mismatch.');
+      return { record };
+    },
+    async factoryStart(input) {
+      await assertProjectExists(input.projectId);
+      const item = await getLiveItem(input.projectId, input.source, input.locator);
+      return { record: await factory.start(item, input) };
+    },
+    async factorySavePlan(input) {
+      await assertProjectExists(input.projectId);
+      const item = await getLiveItem(input.projectId, input.source, input.locator);
+      return { record: await factory.savePlan(item, input.expectedVersion, input.body) };
+    },
+    async factoryApprovePlan(input) {
+      await assertProjectExists(input.projectId);
+      const item = await getLiveItem(input.projectId, input.source, input.locator);
+      return { record: await factory.approve(item, input.expectedVersion, input.digest) };
+    },
     async listProjects() {
       return { projects: await listProjects() };
     },
@@ -1902,6 +1976,15 @@ export default async function plugin(bb: BbPluginApi) {
     }
   };
   bb.rpc.register(taskboardRpcContract, handlers);
+  const preparation = registerPreparation(bb, {
+    assertProject: assertProjectExists,
+    async task(projectId, source, locator) {
+      await assertProjectExists(projectId);
+      await assertSelectedSourceAfterMutations(projectId, source);
+      const item = await getLiveItem(projectId, source, locator);
+      return { projectId, source, locator, title: item.title, key: item.key, url: item.url };
+    }
+  });
 
   bb.ui.registerMentionProvider({
     id: 'external-work-item',
@@ -1933,8 +2016,9 @@ export default async function plugin(bb: BbPluginApi) {
 
   bb.cli.register({
     name: 'taskboard',
-    summary: 'Browse project-scoped Linear, GitHub, GitLab, and Jira issues',
+    summary: 'Browse tasks and inspect durable preparation briefs',
     commands: [
+      {name: 'prepare', summary: 'List, inspect or export preparation packets without starting implementation', usage: 'bb taskboard prepare list [--project <id>] | show <id> | export <id>'},
       {
         name: 'status',
         summary: 'Show connector status for a BB project',
@@ -1998,6 +2082,20 @@ export default async function plugin(bb: BbPluginApi) {
     ],
     async run(argv, ctx) {
       try {
+        if (argv[0] === 'prepare') {
+          const verb = argv[1] ?? 'list';
+          const projectIndex = argv.indexOf('--project');
+          const projectId = projectIndex >= 0 ? argv[projectIndex + 1] : ctx.projectId;
+          if (!projectId) throw new Error('Choose a project with --project <id>.');
+          await assertProjectExists(projectId);
+          const input = {id: argv[2] ?? '', projectId};
+          let output: unknown;
+          if (verb === 'list') output = await preparation.handlers.prepareList({projectId});
+          else if (verb === 'show') output = await preparation.handlers.prepareGet(input);
+          else if (verb === 'export') output = await preparation.handlers.prepareExport(input);
+          else throw new Error('Use prepare list, show <id>, or export <id>.');
+          return {exitCode: 0, stdout: formatFilterPresetCliJson(output)};
+        }
         const firstArgument = argv[0];
         const hasExplicitCommand = Boolean(
           firstArgument && !firstArgument.startsWith('--')
