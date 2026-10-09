@@ -58,7 +58,9 @@ Existing project-color tests and Dockside typecheck.
 
 ## D-003: Contain the external provider overlay inside Dockside families
 
-Status: Accepted; supplements D-001 and supersedes the assumption that moving
+Status: Accepted
+
+Supplements D-001 and supersedes the assumption that moving
 Dockside's own provider glyph removes every duplicate.
 
 ### Evidence
@@ -68,12 +70,23 @@ The installed thread-provider-icons overlay inserts a span marked
 Dockside's grouped roots that span is the project initial badge, explaining
 the user's new screenshot despite the existing trailing provider glyph.
 
+### Options
+
+Disable the overlay globally; change Dockside navigation markers; suppress only
+the overlay's marked duplicates inside Dockside thread families.
+
 ### Chosen approach
 
 Hide only injected provider marks beneath `data-dockside-family` with a scoped
 CSS rule overriding the overlay's inline display. Preserve Dockside's own
 provider glyphs, navigation anchors, selection controls, and child layout.
 Do not disable the external plugin or mutate its observer-managed DOM.
+
+### Trade-offs and risks
+
+The compatibility selector depends on the overlay's existing data attribute.
+The scoped important declaration overrides inline display without affecting
+native sidebar rows or Dockside's own provider marks.
 
 ### Verification
 
