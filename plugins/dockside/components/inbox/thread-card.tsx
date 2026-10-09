@@ -32,6 +32,10 @@ import type { RootSelectionIntent } from "@/lib/thread-management";
 import type { DocksidePreferences } from "@/lib/preferences";
 import { relativeTimeLabel } from "@/lib/relative-time";
 import { resolveSnoozePresets } from "@/lib/lifecycle";
+import {
+  projectBadgeLetter,
+  projectBadgePresentation,
+} from "@/lib/project-colors";
 
 export function ThreadCard({
   thread,
@@ -56,7 +60,11 @@ export function ThreadCard({
   onReorderDragOver,
   onReorderDrop,
   preferences,
+  projectName,
+  projectColorOverride,
 }: {
+  projectName?: string;
+  projectColorOverride?: string;
   thread: PluginSidebarThread;
   childThreads: readonly PluginSidebarThread[];
   providerInfoById: ReadonlyMap<string, ProviderGlyphInfo>;
@@ -120,6 +128,10 @@ export function ThreadCard({
   const childDisclosureLabel = `${expanded ? "Hide" : "Show"} ${childThreads.length} child${childThreads.length === 1 ? " thread" : " threads"}${childProviderNames ? `; providers: ${childProviderNames}` : ""}`;
   const rootIsActive = thread.id === activeThreadId;
   const familyState = familyStatus([thread, ...childThreads], now);
+  const projectBadge =
+    projectName === undefined
+      ? null
+      : projectBadgePresentation(thread.projectId, projectColorOverride);
 
   return (
     <RowContextMenu thread={thread}>
@@ -245,12 +257,18 @@ export function ThreadCard({
               />
             ) : null}
 
-            {!selectionMode && preferences.showProviderIcons ? (
-              <ProviderGlyph
-                providerId={thread.providerId}
-                provider={providerInfoById.get(thread.providerId)}
-                className="col-start-1 row-start-1 size-3.5 self-center"
-              />
+            {!selectionMode && projectName && projectBadge ? (
+              <span
+                aria-label={`Project: ${projectName}`}
+                title={projectName}
+                className="relative z-10 col-start-1 row-start-1 flex size-5 shrink-0 items-center justify-center rounded-md border border-black/15 text-2xs font-semibold uppercase shadow-sm"
+                style={{
+                  backgroundColor: projectBadge.backgroundColor,
+                  color: projectBadge.foregroundColor,
+                }}
+              >
+                {projectBadgeLetter(projectName)}
+              </span>
             ) : null}
 
             <div className="pointer-events-none relative col-start-2 row-span-2 min-w-0">
@@ -384,6 +402,13 @@ export function ThreadCard({
                 ) : null}
                 {preferences.statusDisplay === "Verbose" ? (
                   <FamilyStatusBadge status={familyState} />
+                ) : null}
+                {!selectionMode && preferences.showProviderIcons ? (
+                  <ProviderGlyph
+                    providerId={thread.providerId}
+                    provider={providerInfoById.get(thread.providerId)}
+                    className="size-3.5"
+                  />
                 ) : null}
                 {!selectionMode ? (
                   <FamilyStatusIcon

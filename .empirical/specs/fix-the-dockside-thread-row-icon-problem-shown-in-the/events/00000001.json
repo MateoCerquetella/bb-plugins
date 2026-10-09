@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "sequence": 1,
+  "previousDigest": "sha256:f73fa0919ca027ae18995bdc2627bc07c12ff46ee38371540c0a0bf57fa8f3ee",
+  "actor": "empirical-start",
+  "type": "transition",
+  "summary": "Started fix-the-dockside-thread-row-icon-problem-shown-in-the",
+  "createdAt": "2026-10-09T00:22:42.623Z",
+  "stateBeforeDigest": "sha256:74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+  "stateAfterDigest": "sha256:e01fd86c14c7b56425be1075ba341466b8027d54acfa3f2883fbfc6bc4b2a045",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 1,
+    "activeFeature": "fix-the-dockside-thread-row-icon-problem-shown-in-the",
+    "request": "Fix the Dockside thread-row icon problem shown in the supplied screenshot: provider icons and adjacent project/letter marks visually overlap in the leading icon area. Preserve the existing compact layout and project badges, make the thread icon slot render cleanly at supported densities, add focused regression coverage, and verify the Dockside UI in a browser with a screenshot.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": null,
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:2286784c3c6818c518879247403fa9b00176cfdf66949cdadaf1e8bc02bc581f",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": null,
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-09T00:22:42.623Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:8f21069f30581e27dc857ab6a21d2d24aefaf571bfe6982087c8d25ab432911a"
+}

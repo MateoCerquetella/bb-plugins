@@ -83,8 +83,34 @@ describe("compact root card contract", () => {
     const metadataStart = rootSource.indexOf("data-dockside-root-metadata");
     const badgeStart = rootSource.indexOf("<FamilyStatusBadge", metadataStart);
     assert.ok(badgeStart > metadataStart);
-    assert.equal(rootSource.indexOf("<ProviderGlyph", metadataStart), -1, "provider identity stays out of the trailing metadata");
-    assert.ok(rootSource.indexOf("<ProviderGlyph") < rootSource.indexOf("data-dockside-root-title-row"));
+    const providerStart = rootSource.indexOf("<ProviderGlyph", metadataStart);
+    const statusIconStart = rootSource.indexOf("<FamilyStatusIcon", metadataStart);
+    assert.ok(providerStart > metadataStart, "provider identity sits in trailing metadata");
+    assert.ok(statusIconStart > providerStart, "provider identity is immediately before status");
+    assert.equal(
+      rootSource.indexOf("<ProviderGlyph", providerStart + 1),
+      -1,
+      "root rows render one provider identity",
+    );
+  });
+
+  it("keeps one accessible project badge in the leading root slot", () => {
+    const projectBadgeStart = rootSource.indexOf(
+      'aria-label={`Project: ${projectName}`}',
+    );
+    const titleRowStart = rootSource.indexOf("data-dockside-root-title-row");
+    const leadingSource = rootSource.slice(projectBadgeStart, titleRowStart);
+
+    assert.ok(projectBadgeStart >= 0);
+    assert.ok(titleRowStart > projectBadgeStart);
+    assert.match(leadingSource, /projectBadgeLetter\(projectName\)/);
+    assert.match(leadingSource, /projectBadge\.backgroundColor/);
+    assert.match(leadingSource, /projectBadge\.foregroundColor/);
+    assert.doesNotMatch(leadingSource, /<ProviderGlyph/);
+    assert.match(
+      rootSource,
+      /selectionMode \? \([\s\S]*data-dockside-select-root[\s\S]*\) : null\}[\s\S]*\{!selectionMode && projectName && projectBadge/,
+    );
   });
 
   it("keeps child status and disclosure-provider help keyboard-readable", () => {
