@@ -13,8 +13,25 @@ const familyStatusSource = await readFile(
   new URL("../components/inbox/family-status.tsx", import.meta.url),
   "utf8",
 );
+const threadCardStyles = await readFile(
+  new URL("../components/inbox/thread-card.css", import.meta.url),
+  "utf8",
+);
 
 describe("compact root card contract", () => {
+  it("suppresses externally injected duplicate icons only inside Dockside families", () => {
+    assert.match(threadCardSource, /import "\.\/thread-card\.css"/);
+    assert.match(rootSource, /data-dockside-family=\{thread\.id\}/);
+    assert.match(
+      threadCardStyles,
+      /\[data-dockside-family\] \[data-thread-provider-icon\]\s*\{\s*display:\s*none !important;\s*\}/,
+    );
+    assert.match(rootSource, /<ProviderGlyph/);
+    assert.match(childSource, /<ProviderGlyph/);
+    assert.match(childSource, /data-dockside-child-row/);
+    assert.doesNotMatch(childSource, /projectBadgeLetter|projectBadgePresentation/);
+  });
+
   it("keeps zero-child and no-PR roots on the same two-row skeleton", () => {
     assert.match(rootSource, /data-dockside-root-title-row/);
     assert.match(rootSource, /data-dockside-root-detail-row/);
@@ -24,7 +41,7 @@ describe("compact root card contract", () => {
       rootSource,
       /data-dockside-root-metadata=""[\s\S]*className="flex h-4 max-w-full items-center justify-end gap-1 whitespace-nowrap"/,
     );
-    assert.match(rootSource, /grid-cols-\[auto_minmax\(0,1fr\)_auto\]/);
+    assert.match(rootSource, /grid-cols-\[minmax\(0,1fr\)_auto\]/);
     assert.match(rootSource, /grid-rows-\[1rem_1rem\]/);
     assert.match(rootSource, /bg-sidebar-accent\/35 py-1/);
     assert.doesNotMatch(rootSource, /bg-sidebar-accent\/35 p-1/);
@@ -83,8 +100,23 @@ describe("compact root card contract", () => {
     const metadataStart = rootSource.indexOf("data-dockside-root-metadata");
     const badgeStart = rootSource.indexOf("<FamilyStatusBadge", metadataStart);
     assert.ok(badgeStart > metadataStart);
-    assert.equal(rootSource.indexOf("<ProviderGlyph", metadataStart), -1, "provider identity stays out of the trailing metadata");
-    assert.ok(rootSource.indexOf("<ProviderGlyph") < rootSource.indexOf("data-dockside-root-title-row"));
+    const providerStart = rootSource.indexOf("<ProviderGlyph", metadataStart);
+    const statusIconStart = rootSource.indexOf("<FamilyStatusIcon", metadataStart);
+    assert.ok(providerStart > metadataStart, "provider identity sits in trailing metadata");
+    assert.ok(statusIconStart > providerStart, "provider identity is immediately before status");
+    assert.equal(
+      rootSource.indexOf("<ProviderGlyph", providerStart + 1),
+      -1,
+      "root rows render one provider identity",
+    );
+  });
+
+  it("keeps project badges on headers while thread rows use the full title column", () => {
+    assert.doesNotMatch(rootSource, /aria-label={`Project:/);
+    assert.doesNotMatch(rootSource, /projectBadgeLetter|projectBadgePresentation/);
+    assert.match(rootSource, /data-dockside-select-root/);
+    assert.match(rootSource, /col-start-1 row-span-2 min-w-0/);
+    assert.match(rootSource, /col-start-2 row-span-2 flex/);
   });
 
   it("keeps child status and disclosure-provider help keyboard-readable", () => {

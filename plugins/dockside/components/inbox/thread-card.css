@@ -1,0 +1,6 @@
+/* Dockside owns provider placement. The optional thread-provider-icons overlay
+   injects into the first span (our project badge), duplicating that identity.
+   Override its inline display without fighting its DOM observer. */
+[data-dockside-family] [data-thread-provider-icon] {
+  display: none !important;
+}
