@@ -41,7 +41,7 @@ describe("compact root card contract", () => {
       rootSource,
       /data-dockside-root-metadata=""[\s\S]*className="flex h-4 max-w-full items-center justify-end gap-1 whitespace-nowrap"/,
     );
-    assert.match(rootSource, /grid-cols-\[auto_minmax\(0,1fr\)_auto\]/);
+    assert.match(rootSource, /grid-cols-\[minmax\(0,1fr\)_auto\]/);
     assert.match(rootSource, /grid-rows-\[1rem_1rem\]/);
     assert.match(rootSource, /bg-sidebar-accent\/35 py-1/);
     assert.doesNotMatch(rootSource, /bg-sidebar-accent\/35 p-1/);
@@ -111,23 +111,12 @@ describe("compact root card contract", () => {
     );
   });
 
-  it("keeps one accessible project badge in the leading root slot", () => {
-    const projectBadgeStart = rootSource.indexOf(
-      'aria-label={`Project: ${projectName}`}',
-    );
-    const titleRowStart = rootSource.indexOf("data-dockside-root-title-row");
-    const leadingSource = rootSource.slice(projectBadgeStart, titleRowStart);
-
-    assert.ok(projectBadgeStart >= 0);
-    assert.ok(titleRowStart > projectBadgeStart);
-    assert.match(leadingSource, /projectBadgeLetter\(projectName\)/);
-    assert.match(leadingSource, /projectBadge\.backgroundColor/);
-    assert.match(leadingSource, /projectBadge\.foregroundColor/);
-    assert.doesNotMatch(leadingSource, /<ProviderGlyph/);
-    assert.match(
-      rootSource,
-      /selectionMode \? \([\s\S]*data-dockside-select-root[\s\S]*\) : null\}[\s\S]*\{!selectionMode && projectName && projectBadge/,
-    );
+  it("keeps project badges on headers while thread rows use the full title column", () => {
+    assert.doesNotMatch(rootSource, /aria-label={`Project:/);
+    assert.doesNotMatch(rootSource, /projectBadgeLetter|projectBadgePresentation/);
+    assert.match(rootSource, /data-dockside-select-root/);
+    assert.match(rootSource, /col-start-1 row-span-2 min-w-0/);
+    assert.match(rootSource, /col-start-2 row-span-2 flex/);
   });
 
   it("keeps child status and disclosure-provider help keyboard-readable", () => {
