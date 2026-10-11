@@ -186,10 +186,31 @@ function parseJsonSafely(value: string): unknown {
 
 export function createWorkItemStore(bb: BbPluginApi) {
   const db = bb.storage.database();
+  // The reverted Work board left a durable migration in some installations.
+  const hasMigrationTable = db.prepare(
+    "SELECT name FROM sqlite_master WHERE type = 'table' AND name = '_bb_migrations'"
+  ).get();
+  const legacyWork = hasMigrationTable ? db.prepare(
+    'SELECT statement_hash FROM _bb_migrations WHERE id = 7'
+  ).get() as { statement_hash: string } | undefined : undefined;
+  const legacyWorkMigrations = legacyWork?.statement_hash ===
+    '2ed0e2eda3103f718fe67e4f50324116a3dfddcd1959b05959e083a2cc80e1ca' ? [`
+  CREATE TABLE work_board_cards (
+    id TEXT PRIMARY KEY, project_id TEXT NOT NULL, source_key TEXT,
+    revision INTEGER NOT NULL, data_json TEXT NOT NULL,
+    UNIQUE(project_id, source_key)
+  );
+  CREATE INDEX idx_work_board_project ON work_board_cards(project_id);
+  CREATE TABLE work_board_requests (
+    project_id TEXT NOT NULL, request_id TEXT NOT NULL, input_hash TEXT NOT NULL,
+    card_id TEXT NOT NULL, PRIMARY KEY(project_id, request_id)
+  );
+  CREATE TABLE work_board_settings (project_id TEXT PRIMARY KEY, data_json TEXT NOT NULL);
+`] : [];
   bb.storage.migrate(db, [
     `
       CREATE TABLE work_items (
-        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira', 'gitlab')),
+        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira')),
         locator TEXT NOT NULL,
         item_key TEXT NOT NULL,
         title TEXT NOT NULL,
@@ -208,7 +229,7 @@ export function createWorkItemStore(bb: BbPluginApi) {
       );
 
       CREATE TABLE source_sync (
-        source TEXT PRIMARY KEY CHECK (source IN ('linear', 'github', 'jira', 'gitlab')),
+        source TEXT PRIMARY KEY CHECK (source IN ('linear', 'github', 'jira')),
         last_synced_at TEXT,
         error TEXT,
         item_count INTEGER NOT NULL DEFAULT 0 CHECK (item_count >= 0)
@@ -224,7 +245,7 @@ export function createWorkItemStore(bb: BbPluginApi) {
     `
       CREATE TABLE work_items_by_project (
         bb_project_id TEXT NOT NULL,
-        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira', 'gitlab')),
+        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira')),
         locator TEXT NOT NULL,
         item_key TEXT NOT NULL,
         title TEXT NOT NULL,
@@ -244,7 +265,7 @@ export function createWorkItemStore(bb: BbPluginApi) {
 
       CREATE TABLE source_sync_by_project (
         bb_project_id TEXT NOT NULL,
-        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira', 'gitlab')),
+        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira')),
         last_synced_at TEXT,
         error TEXT,
         item_count INTEGER NOT NULL DEFAULT 0 CHECK (item_count >= 0),
@@ -276,6 +297,8 @@ export function createWorkItemStore(bb: BbPluginApi) {
         ADD COLUMN jira_enabled INTEGER NOT NULL DEFAULT 0
         CHECK (jira_enabled IN (0, 1));
 
+      CREATE INDEX idx_all_project_work_items_updated
+        ON work_items_by_project(updated_at DESC, bb_project_id, source, locator);
 
       DROP TABLE work_items;
       DROP TABLE source_sync;
@@ -294,7 +317,7 @@ export function createWorkItemStore(bb: BbPluginApi) {
     `
       CREATE TABLE project_source_config_next (
         bb_project_id TEXT PRIMARY KEY,
-        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira', 'gitlab')),
+        source TEXT NOT NULL CHECK (source IN ('linear', 'github', 'jira')),
         linear_team_key TEXT NOT NULL,
         jira_base_url TEXT NOT NULL,
         jira_email TEXT NOT NULL,
@@ -413,6 +436,7 @@ export function createWorkItemStore(bb: BbPluginApi) {
           bb_project_id, position, created_at, id
         );
     `,
+    ...legacyWorkMigrations,
     `
       CREATE TABLE work_items_by_project_next (
         bb_project_id TEXT NOT NULL,
