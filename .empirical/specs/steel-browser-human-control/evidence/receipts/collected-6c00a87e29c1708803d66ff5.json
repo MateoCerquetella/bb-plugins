@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-6c00a87e29c1708803d66ff5",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review requested changes to the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-10-08T02:47:46.825Z",
+  "completedAt": "2026-10-08T02:47:46.825Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "steel-browser-human-control",
+    "specRevision": 2,
+    "specDigest": "sha256:130771cfbea4704c6e3d110d828c366bd3728846715fad1c08ccb89de2edbe78",
+    "treeDigest": "sha256:d84a2cd1d2905dfa7b4b0546997b1dd7f3730a4d42547e0559509dcde1d00ab9",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:893c632863537a37035a546c85acc24b72803a05a29b336a3e4b7cc9518478ac",
+  "kind": "collected",
+  "collector": "empirical-review:bb-isolated-empirical-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/steel-browser-human-control/reviews/a5aad1c9400c31f69633ad63.json",
+      "mediaType": "application/json",
+      "bytes": 1934,
+      "digest": "sha256:67ba5b735bb8b5dc4b7af52a8ff32782078d4786f1f87a1241b7b7a7aafd6a0a"
+    },
+    {
+      "path": ".empirical/specs/steel-browser-human-control/reviews/a5aad1c9400c31f69633ad63.md",
+      "mediaType": "text/markdown",
+      "bytes": 1185,
+      "digest": "sha256:ffa73869a2dc1dbec51a1d690ef420c28aa3aad9431286ebee1a6ba5a9dfedab"
+    }
+  ]
+}

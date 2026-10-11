@@ -53,9 +53,8 @@ If that blocks the viewer, report the authentication limitation rather than
 opening an external browser. Session health does not prove viewer access.
 
 The Browser viewport has a **Watch browser** play control and embeds Steel's
-session player, not the Steel dashboard. **Sign in / Take control** opens a modal
-with the live player inside the thread. After signing in, select **Done** to
-reload the main viewer. Disconnecting the viewer leaves
+session player, not the Steel dashboard. **Take control** expands the existing
+player in place, keeping one stream and the same active tab. Disconnecting the viewer leaves
 the browser running; releasing a session closes it. Idle sessions remain usable.
 The play control connects the viewer; it does not start a jev-ultrafast agent.
 
@@ -72,8 +71,10 @@ the latest viewer follows the thread viewport in a compact position, capped to
 55% of the available height so the composer remains accessible. Dashboard state
 refreshes every fifteen seconds while BB is visible without reloading the iframe.
 The inline viewer can be
-minimized to its compact header and restored without stopping the session or
-reloading the browser. A manual **Steel Browser**
+minimized to its compact header and restored without stopping the browser session.
+Minimizing disconnects the player stream; restoring reconnects it. Only the
+latest inline browser message streams, and hidden browser tabs stop their
+viewers. A manual **Steel Browser**
 thread-panel action remains available from the panel launcher.
 
 ### Agent Configuration
@@ -96,6 +97,61 @@ The credentials file must have mode `0600`. It is read only during explicitly
 authorized Jev preflight; values are not returned through the plugin API.
 
 ## Project Profiles
+
+### Human Login And Clipboard
+
+Use **Sign in** beside GitHub, Linear or Google to open that service inside the
+selected project's browser. Complete credentials and MFA in the viewer. This
+opens a tab without invoking Jev or changing engine policy.
+
+All viewer surfaces provide Copy, Paste, Reconnect and Take control. Focus the
+website field first, then use Paste. The local masked field supports native
+paste even when the browser denies the Clipboard API. Select Send to forward
+the value through Steel's existing `clipboardBridge`, not BB RPC or agent tools.
+Values are cleared after sending/closing and are not persisted by this plugin.
+Use Copy after selecting text in the remote browser. It accepts only a
+short-lived response from the exact viewer window and authenticated origin.
+Unsolicited clipboard writes are ignored; remote paste shortcuts open the
+local prompt, never silently read the clipboard.
+
+Paste is capped at 4,096 characters and rejects line breaks/control characters:
+the self-hosted viewer maps them to keys which could submit a form. Steel does
+not acknowledge paste completion, so verify the target field. Clipboard API
+support varies by browser; Copy reports denied permissions rather than claiming
+success. The installed player uses WebSocket screencasting, not the WebRTC
+streaming advertised for Steel Cloud. These changes reduce duplicate streams
+and readiness requests; they do not promise a specific frame rate.
+
+### Saved Sign-ins
+
+After logging in, confirm an account name/email in **Saved sign-ins**. These
+records are per-project labels and confirmation times only. **User confirmed**
+is not automatic authentication verification: sites may expire or revoke a
+session. Update the label after switching accounts. Forget removes only the
+label, never cookies or the website login.
+
+This follows Kernel's persistent-profile approach, but is not Kernel Managed
+Auth or Steel Cloud's credential vault. BB Taskboard's GitHub/Linear API
+connections are separate from browser sessions and are not imported. The
+plugin does not inspect or export cookies to guess account identities.
+
+### Remote CLI HTTP 401
+
+If `bb plugin list` works but a plugin command returns HTTP 401, check whether
+`bb --help` and `"$BB_CLI" --help` report different server URLs. Some custom
+`~/.local/bin/bb` launchers invoke the app entrypoint and discard the injected
+authenticated host proxy. Such launchers should prefer BB's injected CLI:
+
+```sh
+if [ -n "${BB_CLI:-}" ] && [ "$BB_CLI" != "$0" ] && [ -x "$BB_CLI" ]; then
+  exec "$BB_CLI" "$@"
+fi
+```
+
+Retain the launcher's existing fallback outside BB. Do not copy machine tokens
+or replace the proxy URL with the public website. Thread terminals also need
+their owning thread context; `bb terminal show "$BB_TERMINAL_SESSION_ID" --json`
+returns its `threadId` when present. Agent sessions normally inject it already.
 
 Thread operations resolve BB's project identity server-side. Every project
 requires its own Steel container and named Chromium volume. Missing bindings
