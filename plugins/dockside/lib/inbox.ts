@@ -150,16 +150,6 @@ export function groupThreadsByProject(
     });
   }
 
-  // A project is a place work happens, not only a container for work that
-  // already exists. Emitting every project keeps a project with no threads
-  // reachable and startable from the sidebar, instead of hiding it until its
-  // first thread arrives. Its header still renders the family count and the
-  // "New thread in ..." action, so an empty group is a launcher, not a stub.
-  for (const project of projects) {
-    if (threadsByProject.has(project.id)) continue;
-    groups.push({ project, families: [] });
-  }
-
   return groups.sort((left, right) => {
     const leftOrder = projectOrder.get(left.project.id);
     const rightOrder = projectOrder.get(right.project.id);
@@ -182,7 +172,9 @@ export function searchProjectThreadGroups(
   query: string,
 ): ProjectThreadGroup[] {
   const normalized = query.trim().toLowerCase();
-  if (normalized.length === 0) return [...groups];
+  if (normalized.length === 0) {
+    return groups.filter((group) => group.families.length > 0);
+  }
 
   return groups.flatMap((group) => {
     const projectMatches = group.project.name.toLowerCase().includes(normalized);
@@ -196,7 +188,7 @@ export function searchProjectThreadGroups(
       );
       return children.length > 0 ? [{ ...family, children }] : [];
     });
-    return projectMatches || families.length > 0 ? [{ ...group, families }] : [];
+    return families.length > 0 ? [{ ...group, families }] : [];
   });
 }
 

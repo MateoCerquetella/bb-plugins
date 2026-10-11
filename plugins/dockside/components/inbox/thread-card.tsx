@@ -32,6 +32,7 @@ import type { RootSelectionIntent } from "@/lib/thread-management";
 import type { DocksidePreferences } from "@/lib/preferences";
 import { relativeTimeLabel } from "@/lib/relative-time";
 import { resolveSnoozePresets } from "@/lib/lifecycle";
+import "./thread-card.css";
 
 export function ThreadCard({
   thread,
@@ -56,7 +57,11 @@ export function ThreadCard({
   onReorderDragOver,
   onReorderDrop,
   preferences,
+  projectName,
+  projectColorOverride,
 }: {
+  projectName?: string;
+  projectColorOverride?: string;
   thread: PluginSidebarThread;
   childThreads: readonly PluginSidebarThread[];
   providerInfoById: ReadonlyMap<string, ProviderGlyphInfo>;
@@ -120,7 +125,6 @@ export function ThreadCard({
   const childDisclosureLabel = `${expanded ? "Hide" : "Show"} ${childThreads.length} child${childThreads.length === 1 ? " thread" : " threads"}${childProviderNames ? `; providers: ${childProviderNames}` : ""}`;
   const rootIsActive = thread.id === activeThreadId;
   const familyState = familyStatus([thread, ...childThreads], now);
-
   return (
     <RowContextMenu thread={thread}>
       <li
@@ -142,7 +146,7 @@ export function ThreadCard({
           <div
             data-dockside-root-card=""
             className={cn(
-              "group/root relative grid grid-cols-[auto_minmax(0,1fr)_auto] grid-rows-[1rem_1rem] items-center gap-x-2 gap-y-0.5 rounded-lg px-2",
+              "group/root relative grid grid-cols-[minmax(0,1fr)_auto] grid-rows-[1rem_1rem] items-center gap-x-2 gap-y-0.5 rounded-lg px-2",
               preferences.density === "compact"
                 ? "min-h-10 py-1"
                 : "min-h-12 py-1.5",
@@ -245,15 +249,7 @@ export function ThreadCard({
               />
             ) : null}
 
-            {!selectionMode && preferences.showProviderIcons ? (
-              <ProviderGlyph
-                providerId={thread.providerId}
-                provider={providerInfoById.get(thread.providerId)}
-                className="col-start-1 row-start-1 size-3.5 self-center"
-              />
-            ) : null}
-
-            <div className="pointer-events-none relative col-start-2 row-span-2 min-w-0">
+            <div className="pointer-events-none relative col-start-1 row-span-2 min-w-0">
               <div
                 data-dockside-root-title-row=""
                 className="flex h-4 min-w-0 items-center gap-1.5"
@@ -293,7 +289,7 @@ export function ThreadCard({
 
             <div
               className={cn(
-                "relative z-10 col-start-3 row-span-2 flex shrink-0 flex-col items-end gap-0.5",
+                "relative z-10 col-start-2 row-span-2 flex shrink-0 flex-col items-end gap-0.5",
                 selectionMode && "pointer-events-none",
               )}
             >
@@ -384,6 +380,13 @@ export function ThreadCard({
                 ) : null}
                 {preferences.statusDisplay === "Verbose" ? (
                   <FamilyStatusBadge status={familyState} />
+                ) : null}
+                {!selectionMode && preferences.showProviderIcons ? (
+                  <ProviderGlyph
+                    providerId={thread.providerId}
+                    provider={providerInfoById.get(thread.providerId)}
+                    className="size-3.5"
+                  />
                 ) : null}
                 {!selectionMode ? (
                   <FamilyStatusIcon
@@ -489,6 +492,7 @@ function ChildThreadRow({
           }
         />
         <div
+          data-dockside-child-row=""
           className={cn(
             "group/child relative flex items-start gap-1.5 rounded-md px-1.5",
             preferences.density === "compact"

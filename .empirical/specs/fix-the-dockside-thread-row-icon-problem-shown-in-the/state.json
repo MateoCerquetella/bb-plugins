@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 5,
+  "revision": 8,
+  "activeFeature": "fix-the-dockside-thread-row-icon-problem-shown-in-the",
+  "request": "Fix the Dockside thread-row icon problem shown in the supplied screenshot: provider icons and adjacent project/letter marks visually overlap in the leading icon area. Preserve the existing compact layout and project badges, make the thread icon slot render cleanly at supported densities, add focused regression coverage, and verify the Dockside UI in a browser with a screenshot.",
+  "profile": "complex",
+  "workflow": "complex",
+  "mode": "normal",
+  "phase": "implement",
+  "status": "waiting",
+  "repairAttempts": 0,
+  "message": "Planned the scoped ProjectGroup-to-ThreadCard identity flow, root badge/provider placement, regression assertions, focused verification, local plugin reload, live screenshot inspection, fresh review, and capability integration.",
+  "implementationActor": null,
+  "workStartedAt": null,
+  "specDigest": "sha256:ba2fd3182f103ee7a10bb7b717ec4a57271efefbe01d2d6d499c8994726fbdc1",
+  "approvedSpecRevision": 6,
+  "capabilityArchiveRequired": true,
+  "capabilityDeltaDigest": "sha256:9ec7f5383c88723d00547bdf5669f704f2241589ca56b85a938cf0b629008399",
+  "impactDigest": "sha256:098d8f4282d3aa8aa1199db02f8764b35ce7c00b3b450ece444b4a46892aec3f",
+  "capabilityClaimId": "fix-the-dockside-thread-row-icon-problem-shown-in-the-b7bbab6a1cb3",
+  "authorizationDigest": null,
+  "evidence": [],
+  "evidenceReceiptIds": [],
+  "legacyEvidenceCount": 0,
+  "completion": {
+    "implemented": false,
+    "verified": false,
+    "integrated": false,
+    "delivered": false,
+    "published": false,
+    "highest": "none",
+    "reasons": {
+      "implemented": "implemented has not been proven by a durable receipt.",
+      "verified": "verified has not been proven by a durable receipt.",
+      "integrated": "integrated has not been proven by a durable receipt.",
+      "delivered": "delivered has not been proven by a durable receipt.",
+      "published": "published has not been proven by a durable receipt."
+    }
+  },
+  "updatedAt": "2026-10-09T00:31:27.444Z",
+  "lifecycle": {
+    "stage": "development",
+    "iteration": 2,
+    "awaitingFeedback": false,
+    "iterative": true,
+    "contractRevision": 4
+  },
+  "capabilityBase": {
+    "schemaVersion": 1,
+    "id": "fix-the-dockside-thread-row-icon-problem-shown-in-the-b7bbab6a1cb3",
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-the-dockside-thread-row-icon-problem-shown-in-the",
+    "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_vsyberk4jn-1/bb-plugins",
+    "worktreeId": "sha256:adb8d84a31f985e826cbbd53bf4c119c1cfb550e5cf773467f062eb85d52c304",
+    "baseCommit": "fc814c22f4d26170ff0b8a5a0ac6619a438480ac",
+    "baseTree": "a75defcdb9d57f6ed091f9243f5ace4fde5ee6f3",
+    "bases": {
+      "dockside-thread-management": {
+        "capability": "dockside-thread-management",
+        "digest": "sha256:84a63707ece840ca513a80da47ef5ebd2cda40b296485692f823f24869ddd7a4",
+        "requirements": {
+          "root family cards have exactly two semantic rows": "sha256:9d6a25e76d91c5c0488bc9d66a5525808618e1ee28d5707e58d230feee59250b"
+        }
+      }
+    },
+    "capabilities": [
+      "dockside-thread-management"
+    ],
+    "status": "active",
+    "integrationReceiptDigest": null,
+    "createdAt": "2026-10-09T00:24:47.792Z",
+    "heartbeatAt": "2026-10-09T00:24:47.792Z",
+    "digest": "sha256:1da5f754982373697276ea206e31951773f226dde00da0b9cc49b956f4cf8548"
+  },
+  "trackerGeneration": 2,
+  "reviewFirst": true
+}
