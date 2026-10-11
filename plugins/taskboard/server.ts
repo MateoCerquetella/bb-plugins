@@ -1,4 +1,5 @@
 import { registerPreparation } from './preparation/server.js';
+import { createTicketImprovementService } from './ticket-improvement-service.js';
 import {
   PLUGIN_CLI_OUTPUT_MAX_BYTES,
   type BbPluginApi,
@@ -71,6 +72,7 @@ import {
   type WorkSourceAdapter
 } from './sources/types.js';
 import { createWorkItemStore } from './store.js';
+import { decodeTicketImage } from './ticket-images-server.js';
 import { createFactoryStore } from './factory/store.js';
 import { createFactoryService } from './factory/service.js';
 import { progressStatus } from './factory/tracker.js';
@@ -1742,9 +1744,20 @@ export default async function plugin(bb: BbPluginApi) {
       // Preserve the provider-native confirmation separately from display text.
       let assigneeConfirmation: ExternalWorkItemCreateResult['assigneeConfirmation'];
       try {
+        let description = input.description;
+        if (input.images?.length) {
+          if (!adapter.uploadImage) throw new Error('Image uploads are currently supported for Linear only. Remove the images or select a Linear project.');
+          const images = input.images.map(decodeTicketImage);
+          const links: string[] = [];
+          for (const image of images) {
+            const url = await adapter.uploadImage(image);
+            links.push(`![${image.name.replace(/[\\[\]\r\n]/g, '')}](<${url}>)`);
+          }
+          description = `${description}\n\n${links.join('\n\n')}`.trim();
+        }
         const result = await adapter.create({
           title: input.title,
-          description: input.description,
+          description,
           destinationId: input.destinationId,
           issueType: input.issueType,
           statusId: input.statusId,
@@ -1786,7 +1799,33 @@ export default async function plugin(bb: BbPluginApi) {
     return mutation;
   }
 
+  const ticketImprovement = createTicketImprovementService(bb);
+  bb.background.service('ticket-improvement-cleanup', {
+    async start(signal) {
+      while (!signal.aborted) {
+        try { await ticketImprovement.sweep(); }
+        catch { if (!signal.aborted) bb.log.warn('Ticket improvement cleanup will retry.'); }
+        await sleep(30_000, signal);
+      }
+    }
+  });
   const handlers: PluginRpcHandlers<typeof taskboardRpcContract> = {
+    async improveTicket(input) {
+      await assertProjectExists(input.projectId);
+      return ticketImprovement.start(input);
+    },
+    async ticketImprovement(input) {
+      await assertProjectExists(input.projectId);
+      return ticketImprovement.get(input);
+    },
+    async cancelTicketImprovement(input) {
+      await assertProjectExists(input.projectId);
+      return ticketImprovement.cancel(input);
+    },
+    async factoryDiff(input) {
+      await assertProjectExists(input.projectId);
+      return factory.diff(input, input.runId, input.path);
+    },
     async factoryStartTask(input) {
       await assertProjectExists(input.projectId);
       const item = await getLiveItem(input.projectId, input.source, input.locator);

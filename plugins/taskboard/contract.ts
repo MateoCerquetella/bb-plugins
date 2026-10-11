@@ -1,6 +1,8 @@
 import { defineRpcContract } from '@get-bb/plugin-sdk';
 import { factoryRpcMethods } from './factory/contract.js';
+import { improvementRpcMethods } from './ticket-improvement.js';
 import { z } from 'zod';
+import { ticketImageSchema } from './ticket-images.js';
 import {
   bbProjectIdSchema,
   jiraBaseUrlSchema,
@@ -310,6 +312,7 @@ export const createIssueInputSchema = z
     connectorRevision: connectorRevisionSchema,
     title: z.string().trim().min(1).max(500),
     description: z.string().max(100_000).default(''),
+    images: z.array(ticketImageSchema).max(5).default([]),
     destinationId: z.string().trim().min(1).max(500),
     issueType: z.string().trim().min(1).max(100).nullable().default(null),
     statusId: z.string().trim().min(1).max(500).nullable().default(null),
@@ -338,6 +341,7 @@ const listInputSchema = z
 
 export const taskboardRpcContract = defineRpcContract({
   ...factoryRpcMethods,
+  ...improvementRpcMethods,
   listProjects: {
     input: z.null(),
     output: z.object({ projects: z.array(trackerProjectSchema) }).strict()

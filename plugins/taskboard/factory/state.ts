@@ -83,6 +83,7 @@ export function startRun(record: FactoryRecord, kind: FactoryRunKind, retry: boo
     environmentId: null, cursor: 0, turnId: null,
     planDigest: record.approvedDigest, scopeDigest: record.scopeDigest, activity: 'Starting native BB session',
     error: null, output: '', reviewResult: null, buildResult: null, repairOf: null,
+    continuationOf: null,
     updates: [], checks: [], changedFiles: [], steps: [],
     startedAt: new Date().toISOString(), finishedAt: null
   };

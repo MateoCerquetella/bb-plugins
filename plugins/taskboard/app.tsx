@@ -1,4 +1,6 @@
 import { registerPreparationApp } from './preparation/app.js';
+import { clipboardTicketImages, readTicketImages, type TicketImage } from './ticket-images.js';
+import { originalTicketPath, requestTaskboardOpen } from './factory/navigation.js';
 import {
   useCallback,
   useEffect,
@@ -150,6 +152,7 @@ import {
   writeTaskboardComposerDrag
 } from './composer-handoff.js';
 import { FactoryProgress, FactoryThreadProgress, StartTaskButton } from './factory/app.js';
+import { consumeTaskboardOpen, TASKBOARD_OPEN_EVENT } from './factory/navigation.js';
 import './app.css';
 
 const PANEL_PATH = 'tasks';
@@ -646,6 +649,8 @@ type CreateIssueDialogProps = {
   | {
       mode: 'composer-assisted';
       initialPrompt: string;
+      initialImages?: TicketImage[];
+      attachmentWarning?: string;
     }
 );
 
@@ -655,6 +660,7 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
   const initialPrompt = assisted ? props.initialPrompt : '';
   const rpc = useRpc<TaskboardRpcContract>();
   const navigate = useBbNavigate();
+  const bbContext = useBbContext();
   const formId = useId();
   const metadataErrorId = `${formId}-metadata-error`;
   const [context, setContext] = useState<CreateIssueContext>();
@@ -680,9 +686,130 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
   const [dueDate, setDueDate] = useState('');
   const [milestoneId, setMilestoneId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
+  const creatingRef = useRef(false);
+  const [images, setImages] = useState<TicketImage[]>([]);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [readingImages, setReadingImages] = useState(false);
+  const readingImagesRef = useRef(false);
+  const imageEpoch = useRef(0);
+  const imageInput = useRef<HTMLInputElement>(null);
   const [createError, setCreateError] = useState<string | null>(null);
   const [createOutcomeUncertain, setCreateOutcomeUncertain] = useState(false);
+  const [improving, setImproving] = useState(false);
+  const [improvementError, setImprovementError] = useState<string | null>(null);
+  const [improvementUncertain, setImprovementUncertain] = useState(false);
+  const [originalDraft, setOriginalDraft] = useState<{ title: string; description: string } | null>(null);
+  const improvementRef = useRef<{ projectId: string; requestId: string } | null>(null);
+  const improvementEpoch = useRef(0);
   const initializedForOpenRef = useRef(false);
+
+  useEffect(() => {
+    imageEpoch.current++;
+    setImages(assisted ? props.initialImages ?? [] : []);
+    setImageError(assisted ? props.attachmentWarning ?? null : null);
+    setReadingImages(false);
+    readingImagesRef.current = false;
+    return () => { imageEpoch.current++; };
+  }, [open, projectId]);
+
+  async function addImages(files: File[]) {
+    if (creatingRef.current || improving || readingImagesRef.current) return;
+    const epoch = imageEpoch.current;
+    readingImagesRef.current = true;
+    setReadingImages(true); setImageError(null);
+    try {
+      if (images.length + files.length > 5) throw new Error('Attach up to five images.');
+      const added = await readTicketImages(files);
+      if (epoch === imageEpoch.current) setImages(current => [...current, ...added].slice(0, 5));
+    } catch (error) {
+      if (epoch === imageEpoch.current) setImageError(describeError(error));
+    } finally {
+      if (epoch === imageEpoch.current) { readingImagesRef.current = false; setReadingImages(false); }
+    }
+  }
+
+  useEffect(() => {
+    setImproving(false);
+    setImprovementError(null);
+    setImprovementUncertain(false);
+    setOriginalDraft(null);
+    return () => {
+      improvementEpoch.current++;
+      const pending = improvementRef.current;
+      improvementRef.current = null;
+      if (pending) void rpc.call('cancelTicketImprovement', pending).catch(() => {
+        toast.error('Could not confirm ticket improvement cancellation.');
+      });
+    };
+  }, [open, projectId, destinationId, rpc]);
+
+  async function cancelImprovement() {
+    const pending = improvementRef.current;
+    if (!pending) return;
+    const epoch = improvementEpoch.current;
+    improvementRef.current = null;
+    try {
+      const result = await rpc.call('cancelTicketImprovement', pending);
+      if (result.status === 'uncertain') throw new Error(result.error ?? 'Cancellation unconfirmed.');
+    } catch {
+      if (epoch === improvementEpoch.current) {
+        setImprovementUncertain(true);
+        setImprovementError('Cancellation could not be confirmed. Your draft is unchanged.');
+      }
+    } finally {
+      if (epoch === improvementEpoch.current) setImproving(false);
+    }
+  }
+
+  async function improveDraft() {
+    if (!projectId || improvementRef.current || improving || creating ||
+      improvementUncertain || !(title.trim() || description.trim())) return;
+    const request = { projectId, requestId: crypto.randomUUID() };
+    const before = { title, description };
+    improvementRef.current = request;
+    setImproving(true);
+    setImprovementError(null);
+    setOriginalDraft(null);
+    try {
+      let result = await rpc.call('improveTicket', { ...request, ...before });
+      const deadline = Date.now() + 5 * 60_000;
+      while (result.status === 'running' && improvementRef.current === request) {
+        if (Date.now() >= deadline) {
+          await rpc.call('cancelTicketImprovement', request);
+          throw new Error('Ticket improvement timed out. Your draft is unchanged.');
+        }
+        await new Promise(resolve => window.setTimeout(resolve, 1000));
+        if (improvementRef.current !== request) return;
+        result = await rpc.call('ticketImprovement', request);
+      }
+      if (improvementRef.current !== request) return;
+      if (result.status === 'completed' && result.draft) {
+        setTitle(result.draft.title);
+        setDescription(result.draft.description);
+        setOriginalDraft(before);
+        window.requestAnimationFrame(() => document.getElementById(`${formId}-title`)?.focus());
+      } else if (result.status !== 'canceled') {
+        setImprovementUncertain(result.status === 'uncertain');
+        setImprovementError(result.error ?? 'Could not improve this ticket draft.');
+      }
+    } catch (error) {
+      if (improvementRef.current !== request) return;
+      setImprovementError(describeError(error));
+      // A lost start/status response may leave a helper running.
+      try {
+        const canceled = await rpc.call('cancelTicketImprovement', request);
+        if (improvementRef.current === request && canceled.status === 'uncertain') {
+          setImprovementUncertain(true);
+        }
+      }
+      catch { if (improvementRef.current === request) setImprovementUncertain(true); }
+    } finally {
+      if (improvementRef.current === request) {
+        improvementRef.current = null;
+        setImproving(false);
+      }
+    }
+  }
 
   useEffect(() => {
     if (!open) {
@@ -840,12 +967,16 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
         )
       : null;
 
-  const create = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const create = async (startNow = false) => {
     if (
       !projectId ||
       !context?.available ||
       creating ||
+      creatingRef.current ||
+      readingImages ||
+      readingImagesRef.current ||
+      improving ||
+      improvementRef.current !== null ||
       createOutcomeUncertain ||
       metadataLoading ||
       loadedConnectorRevision === null ||
@@ -854,6 +985,7 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
     ) {
       return;
     }
+    creatingRef.current = true;
     setCreating(true);
     setCreateError(null);
     try {
@@ -870,6 +1002,7 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
           connectorRevision: loadedConnectorRevision,
           title,
           description,
+          images,
           destinationId,
           issueType: context.source === 'jira' ? issueType : null,
           statusId,
@@ -882,12 +1015,28 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
         submittedScope,
         assigneeId
       );
-      onCreated?.(result);
+      // Creation is final even if a callback, navigation, or agent start fails.
+      try { onCreated?.(result); } catch { /* Preserve the successful issue. */ }
       toast.success(`${result.item.key} created in ${sourceName(result.item.source)}`);
       if (result.warnings.length > 0) {
         toast.warning(result.warnings.join(' '));
       }
       onOpenChange(false);
+      const identity = { projectId: result.item.bbProjectId, source: result.item.source, locator: result.item.locator };
+      try {
+        if (startNow) {
+          const { record } = await rpc.call('factoryStartTask', {
+            ...identity, contextThreadId: bbContext.projectId === identity.projectId ? bbContext.threadId : null
+          });
+          const run = record.runs.at(-1);
+          if (record.automationError || run?.error) toast.warning(record.automationError ?? run!.error!);
+          if (run?.threadId) { requestTaskboardOpen(run.threadId); navigate.toThread(run.threadId); return; }
+        }
+        navigate.toPluginPanel(PANEL_PATH, { subPath: originalTicketPath(identity) });
+      } catch (error) {
+        toast.error(`Issue created. ${startNow ? 'Could not start work' : 'Could not open Taskboard'}: ${describeError(error)}`);
+        try { navigate.toPluginPanel(PANEL_PATH, { subPath: originalTicketPath(identity) }); } catch { /* Creation already succeeded. */ }
+      }
     } catch (error) {
       const message = describeError(error);
       const uncertain = message.includes(CREATE_OUTCOME_UNCERTAIN_MARKER);
@@ -896,12 +1045,16 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
         message.replace(CREATE_OUTCOME_UNCERTAIN_MARKER, '').trim()
       );
     } finally {
+      creatingRef.current = false;
       setCreating(false);
     }
   };
 
   const canSubmit =
     context?.available === true &&
+    !improving &&
+    !readingImages &&
+    (images.length === 0 || context.source === 'linear') &&
     !createOutcomeUncertain &&
     !metadataLoading &&
     loadedConnectorRevision !== null &&
@@ -924,7 +1077,7 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
             <p className="text-sm font-medium">Prompt copied for review</p>
             <p className="text-xs text-muted-foreground">
               Your prompt was copied into these editable fields. Nothing is
-              created until you select Create.
+              created until you select Create only or Start now.
             </p>
           </div>
         </div>
@@ -940,8 +1093,9 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
           autoFocus
           maxLength={500}
           placeholder="What needs to be done?"
-          disabled={creating}
+          disabled={creating || improving}
           onChange={event => {
+            setOriginalDraft(null);
             setTitle(event.target.value);
             setCreateError(null);
           }}
@@ -961,8 +1115,9 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
           rows={9}
           maxLength={100_000}
           placeholder="Add context, acceptance criteria, or links…"
-          disabled={creating}
+          disabled={creating || improving}
           onChange={event => {
+            setOriginalDraft(null);
             setDescription(event.target.value);
             setCreateError(null);
           }}
@@ -972,6 +1127,56 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
           text.
         </p>
       </div>
+      <div className="grid gap-2">
+        <div className="flex items-center gap-2">
+          <Button type="button" size="sm" variant="ghost" disabled={creating || improving || readingImages}
+            onClick={() => imageInput.current?.click()}>
+            <Icon name="Plus" className="size-3.5" />Add images
+          </Button>
+          <span role="status" className="text-xs text-muted-foreground">{readingImages ? 'Reading images...' : images.length ? `${images.length} attached` : ''}</span>
+          <input ref={imageInput} type="file" accept="image/png,image/jpeg,image/webp" multiple hidden
+            onChange={event => { void addImages(Array.from(event.target.files ?? [])); event.target.value = ''; }} />
+        </div>
+        {images.length > 0 && <div className="tb-ticket-images">
+          {images.map((image, index) => <figure key={`${index}-${image.name}`}>
+            <img src={image.dataUrl} alt={image.name} />
+            <figcaption title={image.name}>{image.name}</figcaption>
+            <Button type="button" variant="ghost" size="icon" aria-label={`Remove image ${index + 1}`}
+              disabled={creating || improving} onClick={() => setImages(current => current.filter((_, i) => i !== index))}>
+              <Icon name="X" className="size-3.5" />
+            </Button>
+          </figure>)}
+        </div>}
+        {images.length > 0 && context?.source !== 'linear' && <p role="alert" className="text-xs text-destructive">Image uploads are currently available for Linear only.</p>}
+        {imageError && <p role="alert" className="text-xs text-destructive">{imageError}</p>}
+      </div>
+      <div className="flex flex-wrap items-center gap-2" aria-busy={improving}>
+        <Button type="button" size="sm" variant="ghost"
+          disabled={!improving && (creating || createOutcomeUncertain || improvementUncertain ||
+            !projectId || !(title.trim() || description.trim()))}
+          onClick={() => void (improving ? cancelImprovement() : improveDraft())}>
+          <Icon name={improving ? 'X' : 'AiContentGenerator01'} className="size-4 shrink-0" />
+          {improving ? 'Cancel improvement' : 'Improve title & description'}
+        </Button>
+        {originalDraft && <Tooltip>
+          <TooltipTrigger asChild>
+            <Button type="button" variant="ghost" size="icon" aria-label="Undo improvement"
+              disabled={creating || improving}
+              onClick={() => {
+                setTitle(originalDraft.title);
+                setDescription(originalDraft.description);
+                setOriginalDraft(null);
+              }}>
+              <Icon name="RotateCcw" className="size-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Undo improvement</TooltipContent>
+        </Tooltip>}
+        <span role="status" className="text-xs text-muted-foreground">
+          {improving ? 'Improving draft...' : originalDraft ? 'Draft updated' : ''}
+        </span>
+      </div>
+      {improvementError && <p role="alert" className="text-xs text-destructive break-words">{improvementError}</p>}
     </>
   );
 
@@ -1049,7 +1254,11 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
             </Button>
           </div>
         ) : (
-          <form id={formId} className="grid gap-4" onSubmit={create}>
+          <form id={formId} className="grid gap-4" onSubmit={event => { event.preventDefault(); void create(false); }}
+            onPaste={event => {
+              const files = Array.from(event.clipboardData.files).filter(file => file.type.startsWith('image/'));
+              if (files.length) { event.preventDefault(); event.stopPropagation(); void addImages(files); }
+            }}>
             <div className="grid gap-1.5">
               <label
                 htmlFor={`${formId}-destination`}
@@ -1249,7 +1458,11 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
                 disabled={!canSubmit || creating}
                 aria-describedby={metadataError ? metadataErrorId : undefined}
               >
-                {creating ? 'Creating…' : `Create ${sourceName(context.source)} issue`}
+                {creating ? 'Creating...' : 'Create only'}
+              </Button>
+              <Button type="button" size="sm" variant="outline" disabled={!canSubmit || creating}
+                onClick={() => void create(true)}>
+                <Icon name="AiContentGenerator01" className="size-3.5" />Start now
               </Button>
             </DialogFooter>
           </form>
@@ -1322,11 +1535,16 @@ function ComposerCreateIssueAction() {
   const composer = useComposer();
   const { projectId: contextProjectId } = useBbContext();
   const [capturedPrompt, setCapturedPrompt] = useState<string | null>(null);
+  const [capturedImages, setCapturedImages] = useState<TicketImage[]>([]);
+  const [attachmentWarning, setAttachmentWarning] = useState<string | undefined>();
+  const [capturing, setCapturing] = useState(false);
   const projectId =
     view.scope.kind === 'new-thread'
       ? (view.scope.projectId ?? contextProjectId)
       : contextProjectId;
-  const hasPrompt = view.draft.text.trim().length > 0;
+  const currentProjectRef = useRef(projectId);
+  currentProjectRef.current = projectId;
+  const hasPrompt = view.draft.text.trim().length > 0 || view.draft.attachmentCount > 0;
   const guidance = !projectId
     ? 'Choose a project to create an issue'
     : !hasPrompt
@@ -1346,9 +1564,9 @@ function ComposerCreateIssueAction() {
                 className="size-7 bg-transparent text-foreground hover:bg-state-hover"
                 aria-label="Create Taskboard issue"
                 data-taskboard-create-button
-                disabled={!projectId || !hasPrompt || view.run.isSubmitting}
+                disabled={!projectId || !hasPrompt || view.run.isSubmitting || capturing}
                 onMouseDown={event => event.preventDefault()}
-                onClick={() => {
+                onClick={async () => {
                   if (!projectId) {
                     toast.error('Choose a BB project before creating an issue.');
                     return;
@@ -1360,7 +1578,19 @@ function ComposerCreateIssueAction() {
                     composer.focus();
                     return;
                   }
-                  setCapturedPrompt(view.draft.text);
+                  const prompt = view.draft.text;
+                  setCapturing(true);
+                  setCapturedImages([]); setAttachmentWarning(undefined);
+                  try {
+                    const captured = await clipboardTicketImages();
+                    setCapturedImages(captured);
+                    if (view.draft.attachmentCount > captured.length) setAttachmentWarning('BB cannot expose existing composer attachments here. Paste any missing images into this ticket.');
+                  } catch {
+                    if (view.draft.attachmentCount > 0) setAttachmentWarning('Could not read clipboard images. Paste the composer images into this ticket.');
+                  } finally {
+                    if (currentProjectRef.current === projectId) setCapturedPrompt(prompt);
+                    setCapturing(false);
+                  }
                 }}
               >
                 <Icon name="Ticket" className="size-4" aria-hidden="true" />
@@ -1378,6 +1608,8 @@ function ComposerCreateIssueAction() {
               if (!nextOpen) setCapturedPrompt(null);
             }}
             initialPrompt={capturedPrompt}
+            initialImages={capturedImages}
+            attachmentWarning={attachmentWarning}
             onCreated={result => {
               composer.insertMention(result.mention);
               composer.focus();
@@ -3658,7 +3890,7 @@ function KanbanCard({
       </span>
     </button>
     {!['done', 'canceled'].includes(item.stateCategory) && <div className="mt-2 border-t border-border-hairline pt-2">
-      <StartTaskButton item={item} pin={() => storeRightPanelPinned(true)} disabled={pending} />
+      <StartTaskButton item={item} disabled={pending} />
     </div>}
     </div>
   );
@@ -5005,7 +5237,7 @@ function TrackerDetail({
             </div>
           </div>
 
-          <FactoryProgress item={item} pin={() => storeRightPanelPinned(true)} />
+          <FactoryProgress item={item} />
 
           <DetailMetadata
             item={item}
@@ -7219,6 +7451,18 @@ function TaskboardThreadHeaderAction({
   );
 
   useEffect(() => {
+    const openOnce = () => {
+      if (consumeTaskboardOpen(threadId)) openTaskboard(false);
+    };
+    const timeout = window.setTimeout(openOnce, 0);
+    window.addEventListener(TASKBOARD_OPEN_EVENT, openOnce);
+    return () => {
+      window.clearTimeout(timeout);
+      window.removeEventListener(TASKBOARD_OPEN_EVENT, openOnce);
+    };
+  }, [openTaskboard, threadId]);
+
+  useEffect(() => {
     if (
       !loadRightPanelPinned() ||
       autoOpenedThreadRef.current === threadId
@@ -7239,16 +7483,15 @@ function TaskboardThreadHeaderAction({
             variant="ghost"
             size="icon"
             className="size-7"
-            aria-label="Pin Taskboard on the right"
+            aria-label="Open Taskboard on the right"
             onClick={() => {
-              storeRightPanelPinned(true);
               openTaskboard(true);
             }}
           >
             <Icon name="PanelRight" className="size-4" />
           </Button>
         </TooltipTrigger>
-        <TooltipContent>Pin Taskboard on the right</TooltipContent>
+        <TooltipContent>Open Taskboard on the right</TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );

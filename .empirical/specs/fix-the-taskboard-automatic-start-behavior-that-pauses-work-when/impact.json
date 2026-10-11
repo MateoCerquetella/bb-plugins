@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "taskboard-agent-progress-ui",
+    "taskboard-build-resumption",
+    "taskboard-ticket-drafting"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:0d097c3df3587f2f6ae282bb4a5b8ae59607e22b07f4297496e320826dec40f1"
+}

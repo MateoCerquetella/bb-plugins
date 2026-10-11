@@ -40,6 +40,7 @@ export const factoryRunSchema = z.object({
   reviewResult: factoryReviewResultSchema.nullable().default(null),
   buildResult: factoryBuildResultSchema.nullable().default(null),
   repairOf: z.string().nullable().default(null),
+  continuationOf: z.string().nullable().default(null),
   updates: z.array(z.object({ id: z.string(), text: z.string(), at: z.string() }).strict()).default([]),
   checks: z.array(z.object({
     id: z.string(), command: z.string(), exitCode: z.number().nullable(),
@@ -75,6 +76,15 @@ export const factoryVersionInputSchema = factoryIdentitySchema.extend({
   expectedVersion: z.number().int().nonnegative()
 }).strict();
 export const factoryRpcMethods = {
+  factoryDiff: {
+    input: factoryIdentitySchema.extend({
+      runId: z.string().min(1).max(500), path: z.string().min(1).max(4000)
+    }).strict(),
+    output: z.object({
+      patch: z.string().max(200_000).nullable(), message: z.string().nullable(),
+      truncated: z.boolean()
+    }).strict()
+  },
   factoryStartTask: {
     input: factoryIdentitySchema.extend({
       contextThreadId: z.string().min(1).nullable()

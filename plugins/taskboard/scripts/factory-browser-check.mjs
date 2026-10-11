@@ -18,7 +18,7 @@ const result = await build({
         path: resolve(plugin, 'test/factory-preview-runtime.tsx')
       }));
       build.onLoad({ filter: /\/taskboard\/app\.tsx$/ }, async ({ path }) => ({
-        contents: `${await readFile(path, 'utf8')}\nexport { KanbanCard, TrackerDetail };`,
+        contents: `${await readFile(path, 'utf8')}\nexport { KanbanCard, TrackerDetail, CreateIssueDialog };`,
         loader: 'tsx'
       }));
     }
@@ -61,12 +61,43 @@ ${hostCss}
 ${css}</style></head><body><div id="root"></div><script>window.factoryFixture=${JSON.stringify(fixture)}</script><script>${result.outputFiles[0].text.replaceAll('</script>', '<\\/script>')}</script></body></html>`;
 try {
   await page.setViewportSize({ width: 1280, height: 1000 });
-  await page.setContent(html);
+  await page.route('https://taskboard-preview.test/**', route => route.fulfill({ contentType: 'text/html', body: html }));
+  await page.goto('https://taskboard-preview.test/');
   const manual = page.locator('#preview-manual');
   await manual.getByRole('heading', { name: 'Agent', exact: true }).waitFor();
-  await page.getByRole('button', { name: 'Task progress', exact: true }).click();
-  await page.getByRole('dialog').getByText('Agent updates', { exact: true }).waitFor();
+  await page.getByRole('button', { name: /^Task progress:/ }).click();
+  await page.getByRole('dialog').locator('summary').filter({ hasText: 'Agent updates' }).waitFor();
+  assert.equal(await page.getByRole('dialog').locator('.tb-command-group').getAttribute('open'), null);
+  await page.getByRole('dialog').locator('.tb-command-group > summary').click();
+  await page.getByRole('dialog').getByText('npm test', { exact: true }).waitFor();
+  await page.getByRole('dialog').locator('.tb-command-group > summary').click();
+  await page.getByRole('dialog').locator('summary').filter({ hasText: 'Changed files' }).click();
+  await page.getByRole('dialog').locator('[data-native-diff-preview]').waitFor();
+  await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, 'taskboard-diff-preview.png') });
+  assert.match(await page.getByRole('dialog').locator('[data-native-diff-preview]').innerText(), /\+const saved/);
+  await page.getByRole('dialog').getByRole('button', { name: 'Refresh diff' }).click();
+  await page.getByRole('dialog').locator('[data-native-diff-preview]').waitFor();
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  assert.equal(await page.getByRole('dialog').locator('.tb-live-mark').evaluate(el => getComputedStyle(el).animationName), 'none');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.getByRole('dialog').getByRole('button', { name: 'Original ticket', exact: true }).click();
+  assert.equal(await page.evaluate(() => window.factoryNavigation.pop()), 'item/proj_test/github/example~2Frepo~2342');
   await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, 'taskboard-thread-progress.png') });
+  for (const width of [390, 1280]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.waitForTimeout(400);
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+    await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, `taskboard-progress-dialog-${width}.png`) });
+  }
+  await page.evaluate(() => {
+    document.documentElement.classList.add('dark');
+    document.documentElement.style.cssText = '--canvas:#202124;--ink:#ececf0;--muted-foreground:#a2a4ae;--border:#393b42;--timeline-accent:#7ba8fa;--success:#69c69b;--warning:#e1b563;--destructive-text:#f18694;--surface-recessed-soft-solid:#292a2f';
+  });
+  await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, 'taskboard-progress-dark.png') });
+  await page.evaluate(() => {
+    document.documentElement.classList.remove('dark');
+    document.documentElement.style.cssText = '';
+  });
   await page.keyboard.press('Escape');
   await manual.getByRole('button', { name: 'Open session' }).first().click();
   assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_test']);
@@ -80,7 +111,13 @@ try {
   assert.equal(await manual.getByRole('button', { name: 'Start build' }).count(), 0);
   await page.locator('#preview-card').getByRole('button', { name: 'Start task', exact: true }).click();
   assert.equal(await page.evaluate(() => window.factoryStarts), 1);
+  assert.equal(await page.evaluate(() => localStorage.getItem('bb-taskboard:right-panel-pinned')), null);
   assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_test', 'thr_started']);
+  await manual.locator('.tb-run[data-live="true"] .tb-live-mark').waitFor();
+  assert.equal(await manual.locator('.tb-live-mark').evaluate(el => getComputedStyle(el).animationName), 'tb-working');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  assert.equal(await manual.locator('.tb-live-mark').evaluate(el => getComputedStyle(el).animationName), 'none');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.locator('#preview-detail .tb-detail-meta').getByText('In progress', { exact: true }).waitFor({ state: 'attached' });
   for (const width of [1280, 800, 390]) {
     await page.setViewportSize({ width, height: 900 });
@@ -129,6 +166,31 @@ try {
   }
   await manual.getByRole('textbox', { name: 'Implementation plan' }).waitFor();
   await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, 'taskboard-review-repair-limit.png'), fullPage: true });
+  for (const start of [false, true]) {
+    await page.goto(`https://taskboard-preview.test/?creation=${start}`);
+    await page.getByLabel('Title', { exact: true }).fill('Fix screenshot layout');
+    await page.getByLabel('Description', { exact: true }).fill('Match the attached screenshot.');
+    await page.getByRole('button', { name: 'Create only', exact: true }).waitFor();
+    await page.locator('form').evaluate(form => {
+      const bytes = Uint8Array.from(atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII='), c => c.charCodeAt(0));
+      const transfer = new DataTransfer();
+      transfer.items.add(new File([bytes], 'pasted.png', { type: 'image/png' }));
+      form.dispatchEvent(new ClipboardEvent('paste', { clipboardData: transfer, bubbles: true, cancelable: true }));
+    });
+    await page.getByRole('img', { name: 'pasted.png' }).waitFor();
+    for (const width of [1280, 390]) {
+      await page.setViewportSize({ width, height: 900 });
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+      await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, `taskboard-create-images-${width}.png`) });
+    }
+    if (start) await page.getByRole('button', { name: 'Remove image 1' }).click();
+    await page.getByRole('button', { name: start ? 'Start now' : 'Create only', exact: true }).click();
+    await page.getByRole('dialog').waitFor({ state: 'hidden' });
+    assert.equal(await page.evaluate(() => window.createdInputs.length), 1);
+    assert.equal(await page.evaluate(() => window.factoryStarts), start ? 1 : 0);
+    assert.equal(await page.evaluate(() => window.createdInputs[0].images.length), start ? 0 : 1);
+    if (!start) assert.equal(await page.evaluate(() => window.factoryNavigation.at(-1)), 'item/proj_test/linear/issue-42');
+  }
   assert.deepEqual(errors, []);
   console.log(JSON.stringify({ desktop: 'passed', panel: 'passed', mobile: 'passed', kanbanStart: 'passed', liveStatus: 'passed', navigation: 'passed', staleApproval: 'passed', automaticActions: 'passed', reviewBlockers: 'passed', returnToBuild: 'passed', repairLimit: 'passed', errors }));
 } catch (error) {

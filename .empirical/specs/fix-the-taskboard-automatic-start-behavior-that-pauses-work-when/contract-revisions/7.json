@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "feature": "fix-the-taskboard-automatic-start-behavior-that-pauses-work-when",
+  "revision": 7,
+  "reason": "Extend Taskboard's Create new ticket modal with a button that uses BB's current model/provider to rewrite the user's draft into a better ticket title and description, following the installed Improve Prompt/prompt-shaper interaction pattern. Preserve user control, do not create the ticket automatically, and surface loading/error states.",
+  "spec": "# Fix The Taskboard Automatic Start Behavior That Pauses Work When\n\n## Request\n\n> Fix the Taskboard automatic-start behavior that pauses work when a build reports recoverable blockers like the supplied Roten-App result. Improve automatic work startup so blocker summaries are handled accurately and the task does not stop prematurely when actionable implementation work can continue, while preserving genuine human-decision, tracker, evidence, and policy gates.\n\n## Goal\n\nResume blocked Builds explicitly in the original session and worktree, and\nclear obsolete pauses when a new native turn resumes. Preserve required human,\npolicy, tracker, and evidence gates.\n\n## Acceptance Criteria\n\n- [ ] [AC-1] Start task on a blocked Build resumes the same managed session once.\n- [ ] [AC-2] Resume prompts include previous blockers and preserve repository gates.\n- [ ] [AC-3] Resumed Build evidence advances to review; unresolved results pause.\n- [ ] [AC-4] Concurrent requests, workspace drift and uncertain dispatch cannot duplicate work.\n- [ ] [AC-5] A new native Build turn clears only its obsolete Build-result pause.\n\n## Scope\n\nFactory service, durable continuation linkage, prompts, regression tests and README.\nUser approved fast-forward to the existing factory feature base.\n\n## Non-goals\n\nNo policy decisions, gate bypass, replacement worktrees, publication or tracker closure.\nNo layout changes or increased review repair allowance.\n\n## Risks\n\nDuplicate sends, stale approvals, moved workspaces and obsolete error messages\nmust remain guarded. Unknown dispatch outcomes cannot be automatically retried.\n\n## Verification\n\nFocused factory tests, Taskboard typecheck and check, and git diff --check.\n\n## Capability Deltas\n\ndeltas/taskboard-build-resumption.md\n",
+  "deltas": [
+    {
+      "capability": "taskboard-build-resumption",
+      "purpose": "Define safe explicit continuation and accurate pause reconciliation for native\nTaskboard Builds without bypassing required decisions or repository gates.",
+      "requirements": [
+        {
+          "operation": "added",
+          "name": "Explicit blocked Build continuation",
+          "contents": "### Requirement: Explicit blocked Build continuation\n\nTaskboard SHALL resume blocked Builds only on an explicit Start task action,\nin the same managed Build session with current scope and approval. Prompts\nSHALL carry prior findings and preserve required repository and human gates.\n\n#### Scenario: Resume a blocked Build\n- **WHEN** Start task is requested for a blocked Build\n- **THEN** one continuation is sent to its original thread and environment\n- **AND** concurrent starts cannot duplicate the dispatch.\n\n#### Scenario: Native work resumes\n- **WHEN** a newer native Build turn starts\n- **THEN** the obsolete Build-result pause is cleared\n- **AND** scope or workspace errors are preserved.\n\n#### Scenario: Completion remains gated\n- **WHEN** a continued Build reports unresolved blockers or lacks a revision\n- **THEN** automation pauses without review or tracker closure."
+        }
+      ],
+      "source": ".empirical/specs/fix-the-taskboard-automatic-start-behavior-that-pauses-work-when/deltas/taskboard-build-resumption.md"
+    }
+  ],
+  "specDigest": "sha256:b4b6228155305f6d5ab563d70d33220c0e31b533fe568716d77e5c2bdc56ff12",
+  "approvedSpecRevision": 4,
+  "capabilityClaimId": "fix-the-taskboard-automatic-start-behavior-that-pauses-work-when-1ecce97b7eb2",
+  "impactDigest": "sha256:c9e83883399b71b0755911054e2fdeee6113ac017bb5b474730ea6d555b1495f",
+  "evidenceReceiptIds": []
+}

@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "sequence": 4,
+  "previousDigest": "sha256:04565bc8da048ee125613c8b4aaaffe57f9dbafaca509729b7c5625c9828bc37",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Specified explicit same-session Build recovery and regression coverage with preserved hard gates.",
+  "createdAt": "2026-10-09T01:12:06.444Z",
+  "stateBeforeDigest": "sha256:d1e131ad935400eded2636c183ae46fc1bda3b7d14abcea6192ee62571496ae1",
+  "stateAfterDigest": "sha256:8785b946e1205d4924958a4d7684b910c874f06288960d38c2186d070bdc563d",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 4,
+    "activeFeature": "fix-the-taskboard-automatic-start-behavior-that-pauses-work-when",
+    "request": "Fix the Taskboard automatic-start behavior that pauses work when a build reports recoverable blockers like the supplied Roten-App result. Improve automatic work startup so blocker summaries are handled accurately and the task does not stop prematurely when actionable implementation work can continue, while preserving genuine human-decision, tracker, evidence, and policy gates.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "design",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Specified explicit same-session Build recovery and regression coverage with preserved hard gates.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:b4b6228155305f6d5ab563d70d33220c0e31b533fe568716d77e5c2bdc56ff12",
+    "approvedSpecRevision": 4,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:c647fffe8a580af8e57409059c78b158b972130dd4194ac2f35c997cc89601ec",
+    "impactDigest": "sha256:c9e83883399b71b0755911054e2fdeee6113ac017bb5b474730ea6d555b1495f",
+    "capabilityClaimId": "fix-the-taskboard-automatic-start-behavior-that-pauses-work-when-1ecce97b7eb2",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-09T01:12:06.444Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true
+    },
+    "reviewFirst": true,
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "fix-the-taskboard-automatic-start-behavior-that-pauses-work-when-1ecce97b7eb2",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "fix-the-taskboard-automatic-start-behavior-that-pauses-work-when",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_vsbcjs3cs9-1/bb-plugins",
+      "worktreeId": "sha256:39a2f85ec14f2c7290f38da564e1e9b591d6e3e8f79cc08e4c02b7e45d5a0bb5",
+      "baseCommit": "1e431a926ca0eb1411535174b41ccf2bc27e17f6",
+      "baseTree": "c6b16d52aa2a6335bf2d6f462194ab67bf2d1869",
+      "bases": {
+        "taskboard-build-resumption": {
+          "capability": "taskboard-build-resumption",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "explicit blocked build continuation": null
+          }
+        }
+      },
+      "capabilities": [
+        "taskboard-build-resumption"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-09T01:12:06.434Z",
+      "heartbeatAt": "2026-10-09T01:12:06.434Z",
+      "digest": "sha256:478bb59409ef1eaa5ee754f450617a2ae3bdab18604936b3e7cf8aa9a58e5dc8"
+    }
+  },
+  "digest": "sha256:0923c904f3fe396e0b214d62be6d3c10cc6b22810ad3e1469eaa8574c6f435fb"
+}

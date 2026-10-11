@@ -105,6 +105,62 @@ function fixture() {
     rejectWorktree: () => { rejectWorktree = true; }
   };
 }
+test('diff resolves only a recorded path in the linked project workspace', async () => {
+  const f = fixture();
+  const record = newRecord(item);
+  const run = startRun(record, 'investigate', false);
+  run.threadId = 'thr_native'; run.environmentId = 'env_test';
+  run.changedFiles = ['/repo/src/index.ts', '../outside.ts'];
+  f.store.save(record);
+  const requests: unknown[] = [];
+  const sdk = {
+    threads: { get: async () => ({ projectId: item.bbProjectId, environmentId: 'env_test' }) },
+    environments: {
+      get: async () => ({ projectId: item.bbProjectId, path: '/repo', mergeBaseBranch: 'main' }),
+      diffPatch: async (input: unknown) => {
+        requests.push(input);
+        return { outcome: 'available', patches: [{ path: 'src/index.ts', patch: '@@ -1 +1 @@\n-old\n+new', truncated: false }] };
+      }
+    }
+  } as unknown as Parameters<typeof createFactoryService>[0];
+  const service = createFactoryService(sdk, f.store, () => {});
+  assert.match((await service.diff(record, run.id, '/repo/src/index.ts')).patch!, /\+new/);
+  assert.deepEqual(requests, [{
+    environmentId: 'env_test', paths: ['src/index.ts'], target: { type: 'all', mergeBaseBranch: 'main' }
+  }]);
+  await assert.rejects(service.diff(record, run.id, 'unreported.ts'), /not part/);
+  await assert.rejects(service.diff(record, 'unknown', '/repo/src/index.ts'), /not part/);
+  await assert.rejects(service.diff(record, run.id, '../outside.ts'), /outside/);
+  assert.equal(requests.length, 1);
+  f.db.close();
+});
+
+test('diff reports unavailable workspaces and bounds large patches', async () => {
+  const f = fixture();
+  const record = newRecord(item);
+  const run = startRun(record, 'investigate', false);
+  run.changedFiles = ['file.ts'];
+  f.store.save(record);
+  assert.match((await f.service.diff(record, run.id, 'file.ts')).message!, /no available workspace/);
+  const stored = f.store.get(record)!;
+  stored.runs[0]!.threadId = 'thr_native'; stored.runs[0]!.environmentId = 'env_test'; f.store.save(stored);
+  let outcome: unknown = { outcome: 'unavailable', failure: { message: 'Host offline' } };
+  const sdk = {
+    threads: { get: async () => ({ projectId: item.bbProjectId, environmentId: 'env_test' }) },
+    environments: {
+      get: async () => ({ projectId: item.bbProjectId, path: '/repo', mergeBaseBranch: null }),
+      diffPatch: async () => outcome
+    }
+  } as unknown as Parameters<typeof createFactoryService>[0];
+  const service = createFactoryService(sdk, f.store, () => {});
+  assert.equal((await service.diff(record, run.id, 'file.ts')).message, 'Host offline');
+  outcome = { outcome: 'available', patches: [{ path: 'file.ts', patch: 'x'.repeat(200_001), truncated: false }] };
+  const bounded = await service.diff(record, run.id, 'file.ts');
+  assert.equal(bounded.patch?.length, 200_000);
+  assert.equal(bounded.truncated, true);
+  f.db.close();
+});
+
 test('immutable plan revisions and exact approvals gate Build', () => {
   const record = newRecord(item);
   assert.throws(() => startRun(record, 'build', false), /Approve/);
@@ -722,6 +778,99 @@ test('repair Build that needs input pauses without requesting another review', a
     await assert.rejects(f.service.start(item, {
       expectedVersion: record.version, kind: 'review', contextThreadId: null, retry: false
     }), /unresolved blockers or needs input/);
+  } finally { f.db.close(); }
+});
+
+test('Start task resumes a blocked Build in the same managed session exactly once', async () => {
+  const f = fixture();
+  try {
+    const record = newRecord(item);
+    savePlan(record, 'Implement current scope and run the relevant checks');
+    approvePlan(record, record.plans[0].digest);
+    record.automatic = true;
+    const blocked = startRun(record, 'build', false);
+    blocked.status = 'finished';
+    blocked.threadId = 'thr_native';
+    blocked.environmentId = 'env_test';
+    blocked.output = '<taskboard-build>{"verdict":"blocked","summary":"Finish the remaining media validation without bypassing required policy decisions.","revision":null}</taskboard-build>';
+    blocked.buildResult = {
+      verdict: 'blocked',
+      summary: 'Finish the remaining media validation without bypassing required policy decisions.',
+      revision: null
+    };
+    record.automationError = `Automatic work paused: Build found blockers: ${blocked.buildResult.summary}`;
+    f.store.save(record);
+
+    const [first, second] = await Promise.all([
+      f.service.startTask(item, null),
+      f.service.startTask(item, null)
+    ]);
+    const resumed = first.runs.at(-1)!;
+    assert.equal(resumed.kind, 'build');
+    assert.equal(resumed.status, 'running');
+    assert.equal(resumed.threadId, blocked.threadId);
+    assert.equal(resumed.environmentId, blocked.environmentId);
+    assert.equal(resumed.continuationOf, blocked.id);
+    assert.equal(resumed.repairOf, null);
+    assert.equal(first.automationError, null);
+    assert.equal(second.runs.at(-1)?.id, resumed.id);
+    assert.equal(f.sends(), 1);
+    assert.equal(f.spawns(), 0);
+    assert.match(f.sent[0].input[0].text, /remaining media validation/);
+    assert.match(f.sent[0].input[0].text, /Do not invent product or policy decisions/);
+    assert.match(f.sent[0].input[0].text, /do not bypass any tracker, evidence, policy, or workflow gate/);
+  } finally { f.db.close(); }
+});
+
+test('continued blocked Build starts review only after implementation evidence', async () => {
+  const f = fixture();
+  try {
+    const record = newRecord(item);
+    savePlan(record, 'Implement current scope and run the relevant checks');
+    approvePlan(record, record.plans[0].digest);
+    const blocked = startRun(record, 'build', false);
+    blocked.status = 'finished';
+    blocked.threadId = 'thr_native';
+    blocked.environmentId = 'env_test';
+    blocked.output = '<taskboard-build>{"verdict":"blocked","summary":"Recoverable build step failed.","revision":null}</taskboard-build>';
+    blocked.buildResult = { verdict: 'blocked', summary: 'Recoverable build step failed.', revision: null };
+    f.store.save(record);
+    await f.service.startTask(item, null);
+    f.complete('<taskboard-build>{"verdict":"implemented","summary":"Implemented and verified the approved scope.","revision":"def456"}</taskboard-build>');
+    const completed = await f.service.get(item);
+    assert.equal(completed.runs.at(-1)?.kind, 'review');
+    assert.equal(completed.runs.at(-1)?.environmentId, 'env_test');
+    assert.equal(f.sends(), 1);
+    assert.equal(f.spawns(), 1);
+  } finally { f.db.close(); }
+});
+
+test('a native Build restart clears only its obsolete Build pause', async () => {
+  const f = fixture();
+  try {
+    const record = newRecord(item);
+    savePlan(record, 'Implement current scope');
+    approvePlan(record, record.plans[0].digest);
+    const run = startRun(record, 'build', false);
+    run.status = 'finished';
+    run.threadId = 'thr_native';
+    run.environmentId = 'env_test';
+    run.buildResult = { verdict: 'blocked', summary: 'Old blocker', revision: null };
+    record.automationError = 'Automatic work paused: Build found blockers: Old blocker';
+    f.store.save(record);
+    f.events.push({
+      id: 'resumed', threadId: 'thr_native', seq: 1, createdAt: Date.now(),
+      scope: { kind: 'turn', turnId: 'turn_resumed' }, type: 'turn/started',
+      data: { providerThreadId: 'provider-thread-resumed' }
+    } as Parameters<typeof applyNativeEvent>[1]);
+    const resumed = await f.service.get(item);
+    assert.equal(resumed.runs.at(-1)?.status, 'running');
+    assert.equal(resumed.automationError, null);
+
+    resumed.automationError = 'Issue scope changed. Automatic work paused; inspect the session and updated plan.';
+    f.store.save(resumed);
+    const preserved = await f.service.get(item);
+    assert.match(preserved.automationError!, /Issue scope changed/);
   } finally { f.db.close(); }
 });
 
