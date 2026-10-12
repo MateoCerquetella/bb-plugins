@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 8,
+  "revision": 9,
   "activeFeature": "fix-the-dockside-thread-row-icon-problem-shown-in-the",
   "request": "Fix the Dockside thread-row icon problem shown in the supplied screenshot: provider icons and adjacent project/letter marks visually overlap in the leading icon area. Preserve the existing compact layout and project badges, make the thread icon slot render cleanly at supported densities, add focused regression coverage, and verify the Dockside UI in a browser with a screenshot.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "implement",
-  "status": "waiting",
+  "phase": "done",
+  "status": "done",
   "repairAttempts": 0,
-  "message": "Planned the scoped ProjectGroup-to-ThreadCard identity flow, root badge/provider placement, regression assertions, focused verification, local plugin reload, live screenshot inspection, fresh review, and capability integration.",
+  "message": "Closed as merged-externally: Merged in pull request #73 as 4880d65e1ff282c7f50ca94ab27cf969143e0222 into main; closed when the merge was observed.",
   "implementationActor": null,
   "workStartedAt": null,
   "specDigest": "sha256:ba2fd3182f103ee7a10bb7b717ec4a57271efefbe01d2d6d499c8994726fbdc1",
@@ -37,7 +37,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-09T00:31:27.444Z",
+  "updatedAt": "2026-10-12T03:13:11.930Z",
   "lifecycle": {
     "stage": "development",
     "iteration": 2,
@@ -73,5 +73,39 @@
     "digest": "sha256:1da5f754982373697276ea206e31951773f226dde00da0b9cc49b956f4cf8548"
   },
   "trackerGeneration": 2,
-  "reviewFirst": true
+  "reviewFirst": true,
+  "closure": {
+    "schemaVersion": 1,
+    "outcome": "merged-externally",
+    "reason": "Merged in pull request #73 as 4880d65e1ff282c7f50ca94ab27cf969143e0222 into main; closed when the merge was observed.",
+    "actor": "empirical",
+    "confirmation": "merge-observed",
+    "closedAtPhase": "implement",
+    "completionAtClosure": "none",
+    "externalMerge": {
+      "pullRequest": 73,
+      "url": "https://github.com/MateoCerquetella/bb-plugins/pull/73",
+      "state": "MERGED",
+      "mergeCommit": "4880d65e1ff282c7f50ca94ab27cf969143e0222",
+      "targetBranch": "main",
+      "ancestorOfTarget": true,
+      "observedAt": "2026-10-12T03:12:44.974Z"
+    },
+    "closedAt": "2026-10-12T03:13:11.673Z",
+    "digest": "sha256:265b0c366cc06fac378a9f175c7cb60e4943f6d5cadd69166504868037730cc9"
+  },
+  "completionRecord": {
+    "schemaVersion": 1,
+    "implementedBy": null,
+    "completedBy": "empirical",
+    "decisionBy": null,
+    "method": "merged-externally",
+    "reason": "Merged in pull request #73 as 4880d65e1ff282c7f50ca94ab27cf969143e0222 into main; closed when the merge was observed.",
+    "at": "2026-10-12T03:13:11.930Z",
+    "revision": 9,
+    "completion": "none",
+    "sourceTreeDigest": "sha256:d4f6e7aa0d6e26823a2e6a4b1c89497cadc36656fd25461819bf7583b4b408a5",
+    "artifactTreeDigest": "sha256:65ce266e68cbaa1aee15329840ee94a347fdce3283adaac65b3003815d8d78d4",
+    "digest": "sha256:d88ea489bc54fc98dae82f38a3fd4cf09c5b5547a81b6cdfd3d6c8071c6366d5"
+  }
 }

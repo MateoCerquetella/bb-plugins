@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 18,
+  "revision": 19,
   "activeFeature": "steel-browser-viewer-port-share",
   "request": "Fix Steel Browser embedded viewer displaying 'this port is not shared'. Diagnose and repair port-share recovery without changing project isolation, verify regression tests and runtime behavior. User requests finish autonomously and merge the fix PR after verification.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "integrate",
-  "status": "waiting",
-  "repairAttempts": 1,
-  "message": "Empirical-selected focused verification passed and the fresh-context review approved all criteria; proceed to integration and PR CI.",
+  "phase": "done",
+  "status": "done",
+  "repairAttempts": 0,
+  "message": "Closed as merged-externally: Merged in pull request #68 as c359938700b20695f8f4e6fd88815d93e63cd4e9 into main; closed when the merge was observed.",
   "implementationActor": "codex",
   "workStartedAt": null,
   "specDigest": "sha256:f3b1e095610e85000093bdbe3acf0281b577550f809086bd4c22b3275f7784b4",
@@ -28,17 +28,16 @@
   "completion": {
     "implemented": true,
     "verified": true,
-    "integrated": false,
+    "integrated": true,
     "delivered": false,
     "published": false,
-    "highest": "verified",
+    "highest": "integrated",
     "reasons": {
-      "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-06T13:46:46.870Z",
+  "updatedAt": "2026-10-12T03:13:22.222Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "steel-browser-viewer-port-share-9880a3911478",
@@ -73,7 +72,6 @@
     "iteration": 1,
     "awaitingFeedback": false
   },
-  "reviewFirst": true,
   "verificationCoverage": {
     "kind": "review-derived",
     "checkId": "qa-fresh-context",
@@ -81,5 +79,40 @@
     "matrixDigest": "sha256:aa936bb70043acb042de052c0897bec853e5d793bc1176dfb4766a7f30fdc161",
     "specDigest": "sha256:f3b1e095610e85000093bdbe3acf0281b577550f809086bd4c22b3275f7784b4",
     "revision": 18
+  },
+  "reviewFirst": true,
+  "closure": {
+    "schemaVersion": 1,
+    "outcome": "merged-externally",
+    "reason": "Merged in pull request #68 as c359938700b20695f8f4e6fd88815d93e63cd4e9 into main; closed when the merge was observed.",
+    "actor": "empirical",
+    "confirmation": "merge-observed",
+    "closedAtPhase": "integrate",
+    "completionAtClosure": "integrated",
+    "externalMerge": {
+      "pullRequest": 68,
+      "url": "https://github.com/MateoCerquetella/bb-plugins/pull/68",
+      "state": "MERGED",
+      "mergeCommit": "c359938700b20695f8f4e6fd88815d93e63cd4e9",
+      "targetBranch": "main",
+      "ancestorOfTarget": true,
+      "observedAt": "2026-10-12T03:12:44.974Z"
+    },
+    "closedAt": "2026-10-12T03:13:21.930Z",
+    "digest": "sha256:d7757ed9b5ea46f3842f90e56474e7e2bae5ee7a1462dce5b0e20610b9d528c4"
+  },
+  "completionRecord": {
+    "schemaVersion": 1,
+    "implementedBy": "codex",
+    "completedBy": "empirical",
+    "decisionBy": null,
+    "method": "merged-externally",
+    "reason": "Merged in pull request #68 as c359938700b20695f8f4e6fd88815d93e63cd4e9 into main; closed when the merge was observed.",
+    "at": "2026-10-12T03:13:22.222Z",
+    "revision": 19,
+    "completion": "integrated",
+    "sourceTreeDigest": "sha256:d4f6e7aa0d6e26823a2e6a4b1c89497cadc36656fd25461819bf7583b4b408a5",
+    "artifactTreeDigest": "sha256:538bb8590abeb9d944ccc3e6fa35e844a9aea145c08762ba0bdea2105e48e4cd",
+    "digest": "sha256:d6ec6b0eb5f18d1006167fcf533a4c3cb67e1864303c70631456c6344c910982"
   }
 }

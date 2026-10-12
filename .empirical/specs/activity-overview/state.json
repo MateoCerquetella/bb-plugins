@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 7,
+  "revision": 9,
   "activeFeature": "activity-overview",
   "request": "Please do it as the picture NOW. Build a new independently installable BB plugin mimicking the supplied screenshot's lower Overview dashboard: contributions, pull requests opened, pull requests merged, reviews, period/repository selectors, annual contribution heatmap, current/longest streak, most-active month/day, and needs-your-attention list. Choose sensible implementation defaults from this repository and proceed autonomously.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "review",
+  "phase": "integrate",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": null,
+  "message": "Completed activity-overview verification with the current-tree focused automated receipt, fresh-context browser receipt, and screenshot/browser evidence. Mockup gating is disabled in .empirical/config.json (mockupsBeforeCoding=false). The plugin is installed and running; focused checks pass. The broader workspace check remains blocked by an unrelated Dockside contract failure.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:8d4decddf24fcb1e85d06958c8282e2be0b29408fd565611ffc144436e25e2d6",
@@ -20,23 +20,27 @@
   "capabilityClaimId": "activity-overview-e7a0c75962ca",
   "authorizationDigest": null,
   "evidence": [],
-  "evidenceReceiptIds": [],
+  "evidenceReceiptIds": [
+    "collected-6a19b2ec00e936e987a2a391",
+    "qa-2919f801db0ccf45cbfa36e5",
+    "qa-0439cd121c33a82eb67142ae",
+    "collected-0882cd531150ad84048ddb41"
+  ],
   "legacyEvidenceCount": 0,
   "completion": {
     "implemented": true,
-    "verified": false,
+    "verified": true,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "implemented",
+    "highest": "verified",
     "reasons": {
-      "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-12T16:19:01.555Z",
+  "updatedAt": "2026-10-12T16:40:32.798Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "activity-overview-e7a0c75962ca",
