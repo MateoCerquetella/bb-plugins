@@ -19,9 +19,8 @@ test("contributes Steel discovery instructions to new agent sessions", async () 
   assert.match(server, /first run `bb steel-browser project`/u);
   assert.match(server, /Never claim Steel is unavailable/u);
   assert.match(server, /emit ::steel-browser\{\}/u);
-  assert.match(server, /same assistant message/u);
-  assert.match(server, /credentials, sign in, complete MFA/u);
-  assert.match(server, /unless that response contains the directive/u);
+  assert.match(server,
+    /Whenever you ask the user to enter credentials, sign in, complete MFA, approve consent, or perform any other manual browser action, repeat ::steel-browser\{\} on its own line in that same assistant message; never refer to an embedded browser 'above' unless that response contains the directive/u);
   assert.match(server, /Do not launch a separate browser/u);
   assert.match(server, /automatically provisions and binds/u);
   assert.match(server, /await ensureBinding\(projectId\)/u);
@@ -54,8 +53,7 @@ test("ships the required operational and responsive UI states", async () => {
   assert.match(skill, /instead of KERNEL\.SH/u);
   assert.match(skill, /Never send the user to a/u);
   assert.match(skill, /current thread is the only browser surface/u);
-  assert.match(skill, /same assistant message/u);
-  assert.match(skill, /Never tell the user to use an embedded browser "above"/u);
-  assert.match(skill, /Repeat the directive for later sign-in, MFA/u);
+  assert.match(skill,
+    /whenever you ask the\s+user to enter credentials, sign in, complete MFA, approve consent, or perform\s+another manual browser action,[\s\S]+line in that same assistant message:[\s\S]+::steel-browser\{\}[\s\S]+Never tell the user to use an embedded browser "above" unless this response\s+contains the directive\. Repeat the directive for later sign-in, MFA, consent,\s+or manual-action handoffs; an earlier viewer message is not sufficient\./u);
   assert.match(skill, /bb steel-browser release/u);
 });
