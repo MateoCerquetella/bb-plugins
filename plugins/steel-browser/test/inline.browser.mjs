@@ -6,7 +6,7 @@ import { writeFile } from "node:fs/promises";
 const result = await build({
   stdin: { contents: `import React from "react"; import {createRoot} from "react-dom/client";
     import {SteelBrowserDirective,SteelAgentSettings,SteelBrowserPage} from "./app.tsx";
-    createRoot(document.getElementById("root")).render(location.search ? <SteelBrowserPage /> : <><SteelBrowserDirective
+    window.mountSteel = () => createRoot(document.getElementById("root")).render(location.search ? <SteelBrowserPage /> : <><SteelBrowserDirective
       message={{id:"m",threadId:"t",projectId:"p",turnId:null}} source="" attributes={{}} openWorkspaceFile={null} />
       <div id="settings"><SteelAgentSettings /></div></>);`,
     resolveDir: fileURLToPath(new URL("../", import.meta.url)), loader: "tsx" },
@@ -39,30 +39,47 @@ const ws = new URL(version.webSocketDebuggerUrl);
 ws.host = cdp.host;
 const browser = await chromium.connectOverCDP(ws.toString());
 const context = browser.contexts()[0];
+const pages = [];
 try {
-  for (const width of [1280, 390]) {
+  for (const { width, touch } of [
+    { width: 1280, touch: false },
+    { width: 390, touch: true },
+    { width: 390, touch: false },
+    { width: 1280, touch: true },
+  ]) {
     const page = await context.newPage();
-    const mobile = width === 390;
+    pages.push(page);
+    await page.setViewportSize({ width, height: 900 });
+    console.log(`Checking inline viewer: width=${width}, touch=${touch}`);
+    const minimized = width <= 640 || touch;
     let loads = 0;
     await page.route("https://viewer.test/**", route => {
       loads++;
       return route.fulfill({ body: "<body style='background:#edf1f5'><h2>Project A browser</h2><input aria-label='Fixture'></body>", contentType: "text/html" });
     });
     await page.route("http://inline.test/**", route => route.fulfill({
-      body: `<meta name="viewport" content="width=device-width, initial-scale=1"><style>body{margin:16px;font-family:system-ui}#thread{height:700px;overflow:auto}#message{display:flow-root}#later{height:1600px}${css}</style><main id="thread"><article id="message"><div id="root"></div></article><div id="later">Later messages</div></main><textarea aria-label="Composer"></textarea><script>${js}</script>`,
+      body: `<meta name="viewport" content="width=device-width, initial-scale=1"><style>body{margin:16px;font-family:system-ui}#thread{height:700px;overflow:auto}#message{display:flow-root;padding-top:80px}#later{height:1600px}${css}</style><main id="thread"><article id="message"><div id="root"></div></article><div id="later">Later messages</div></main><textarea aria-label="Composer"></textarea><script>${js}</script>`,
       contentType: "text/html",
     }));
     const metrics = await context.newCDPSession(page);
-    await metrics.send("Emulation.setDeviceMetricsOverride", { width, height: 900, deviceScaleFactor: 1, mobile });
-    await metrics.send("Emulation.setTouchEmulationEnabled", { enabled: mobile, maxTouchPoints: mobile ? 5 : 0 });
     await page.goto("http://inline.test");
+    await metrics.send("Emulation.setDeviceMetricsOverride", { width, height: 900, deviceScaleFactor: 1, mobile: touch });
+    await metrics.send("Emulation.setTouchEmulationEnabled", { enabled: touch, maxTouchPoints: 5 });
     assert.equal(await page.evaluate(() => innerWidth), width, "Steel test viewport must match the requested width");
-    assert.equal(await page.evaluate(() => matchMedia("(max-width: 640px), (pointer: coarse)").matches), mobile,
+    assert.equal(await page.evaluate(() => matchMedia("(pointer: coarse)").matches), touch);
+    assert.equal(await page.evaluate(() => matchMedia("(max-width: 640px), (pointer: coarse)").matches), minimized,
       "Steel test device profile must match the requested client class");
+    await page.evaluate(() => window.mountSteel());
     await page.getByText("Project A", { exact: true }).waitFor();
-    if (mobile) {
+    if (minimized) {
+      await page.getByText("Minimized", { exact: true }).waitFor();
       assert.equal(await page.locator("iframe").count(), 0, "mobile must not mount the viewer automatically");
       assert.equal(loads, 0, "mobile must not request the viewer before explicit restore");
+      const collapsed = await page.locator(".steel-inline-browser").boundingBox();
+      assert(collapsed.height < 100 && collapsed.width <= width - 30, "collapsed viewer fits the mobile header");
+      if (process.env.BB_THREAD_STORAGE) {
+        await page.screenshot({ path: `${process.env.BB_THREAD_STORAGE}/steel-minimized-${width}-${touch}.png` });
+      }
       await page.getByRole("button", { name: "Restore inline browser" }).click();
       await page.frameLocator("iframe").getByRole("textbox").waitFor();
       assert.equal(loads, 1, "mobile restore loads the viewer once");
@@ -114,7 +131,10 @@ try {
       const shot = await metrics.send("Page.captureScreenshot", { format: "png", captureBeyondViewport: false });
       await writeFile(`${process.env.BB_THREAD_STORAGE}/steel-following-${width}.png`, Buffer.from(shot.data, "base64"));
     }
-    await page.locator("#thread").evaluate(element => { element.scrollTop = 0; });
+    await page.locator("#thread").evaluate(element => {
+      element.scrollTop = 0;
+      window.scrollTo(0, 0);
+    });
     await page.waitForFunction(() => !document.querySelector(".steel-inline-browser--following"));
     assert.equal(await page.locator('a[target="_blank"]').count(), 0);
     await page.getByRole("button", { name: "Reload inline browser" }).click();
@@ -126,6 +146,7 @@ try {
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     if (process.env.BB_THREAD_STORAGE) await page.screenshot({ path: `${process.env.BB_THREAD_STORAGE}/steel-project-inline-${width}.png` });
     await page.goto("http://inline.test/?no-project");
+    await page.evaluate(() => window.mountSteel());
     await page.getByRole("heading", { name: "All projects" }).waitFor();
     assert.equal(await page.getByRole("combobox").count(), 1);
     assert.deepEqual(await page.evaluate(() => window.rpcCalls), [{method:"allProjects",input:{}}]);
@@ -135,5 +156,24 @@ try {
     assert.equal(await page.getByRole("button", { name: "New session", exact: true }).count(), 0);
     await page.close();
   }
-} finally { await browser.close(); }
-console.log("Inline viewer: desktop/mobile, engine controls, minimize persistence passed.");
+} catch (error) {
+  const page = pages.at(-1);
+  if (page && !page.isClosed()) {
+    console.error(await page.evaluate(() => ({
+      width: innerWidth,
+      hidden: document.hidden,
+      scrollY,
+      threadScroll: document.querySelector("#thread")?.scrollTop,
+      anchor: document.querySelector(".steel-inline-anchor")?.getBoundingClientRect().toJSON(),
+      viewer: document.querySelector(".steel-inline-browser")?.outerHTML.slice(0, 3000),
+      frames: [...document.querySelectorAll("iframe")].map(frame => ({
+        src: frame.src, width: frame.clientWidth, height: frame.clientHeight,
+      })),
+    })));
+  }
+  throw error;
+} finally {
+  for (const page of pages) if (!page.isClosed()) await page.close();
+  await browser.close();
+}
+console.log("Inline viewer: desktop, mobile, narrow fine-pointer, wide coarse-pointer, explicit restore, engine controls, minimize persistence passed.");

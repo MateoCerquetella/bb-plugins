@@ -6,6 +6,10 @@
 
 Steel SHALL instruct agents to emit `::steel-browser{}` on its own line in the
 same assistant message whenever they ask the user to interact with the browser.
+This includes credential entry, sign-in, MFA, consent, or any other manual step.
+Agents SHALL NOT refer to an embedded browser "above" unless the current
+response contains the directive. This requirement SHALL be present in both the
+always-injected plugin instructions and the bundled Steel skill.
 On desktop clients the directive SHALL load the inline viewer automatically. On
 phone-width or coarse-pointer clients the directive SHALL initially render the
 viewer minimized without requesting its iframe URL, and SHALL load it only
@@ -45,3 +49,10 @@ after the user explicitly restores it.
 - **WHEN** the native directive renders but BB Connect authentication blocks it
 - **THEN** the agent reports that limitation
 - **AND** the agent does not open an external browser or expose a viewer URL
+
+#### Scenario: Website requires MFA after an earlier viewer message
+
+- **GIVEN** an earlier assistant message rendered the Steel viewer
+- **WHEN** a later response asks the user to complete MFA or another manual step
+- **THEN** the later response repeats `::steel-browser{}` on its own line
+- **AND** the user is not told to use an absent or stale browser surface

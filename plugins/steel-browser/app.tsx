@@ -193,7 +193,7 @@ function ScopedSteelBrowser({ message }: PluginMessageDirectiveProps) {
           <Monitor aria-hidden="true" />
           <span>
             <strong>Steel Browser</strong>
-            <small>{error ? "Unavailable" : active ? "Session available" : dashboard?.connected ? "No active session" : "Connecting"}</small>
+            <small>{error ? "Unavailable" : active ? "Session available" : dashboard?.connected ? "No active session" : minimized ? "Minimized" : "Connecting"}</small>
           </span>
         </div>
         <div className="steel-inline-browser__actions">
