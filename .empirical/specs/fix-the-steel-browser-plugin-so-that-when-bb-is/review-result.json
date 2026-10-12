@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "packetDigest": "sha256:f811f6f686725fcce40e1b7cf5220cafcef22e07229c27ed120289de5510e11b",
-  "resultPath": ".empirical/specs/fix-the-steel-browser-plugin-so-that-when-bb-is/reviews/b838b2d0fc295ab194651a57.json",
-  "resultDigest": "sha256:b838b2d0fc295ab194651a57b80dfd4f585f1d3989cf22a79bc3fe88ca795073",
-  "receiptId": "collected-d1d36bfec406a121b3566199"
+  "packetDigest": "sha256:28940cf987bf0a0463681ce458673a7f37452fb3bd1b5f3f4f81ab4af852b324",
+  "resultPath": ".empirical/specs/fix-the-steel-browser-plugin-so-that-when-bb-is/reviews/58d222c97091e136f3474900.json",
+  "resultDigest": "sha256:58d222c97091e136f3474900b121caa7b6fb13641a34653ca72ea88a7e2bdd4d",
+  "receiptId": "collected-aeefd1df7733d26da0a34d94"
 }
