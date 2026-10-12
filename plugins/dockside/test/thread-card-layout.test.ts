@@ -84,7 +84,7 @@ describe("compact root card contract", () => {
     assert.match(threadCardSource, /\{branch\}/);
     assert.match(
       rootSource,
-      /relative z-10 col-start-3 row-span-2 flex shrink-0 flex-col items-end gap-0\.5/,
+      /relative z-10 col-start-2 row-span-2 flex shrink-0 flex-col items-end gap-0\.5/,
     );
   });
 

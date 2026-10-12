@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:c492f6f04c8d2e1cd73a39463fba729a28d45a68b0705243e8d7dd4a2209e979",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "d544da34e76016e14cabded03ac8a355cea08acb",
+  "headCommit": "71cfcb7b9e0554dcd619cfbbb5174ac2845d777b",
+  "diffDigest": "sha256:be0c17a7a4dcfd917fe327f175143628e75620972894902dcb4167cedb90df84",
+  "verdict": "APPROVED",
+  "reviewerActor": "fresh-context-reviewer",
+  "reviewerInvocationId": "fresh-review-thr-9nh3s79zwi-1-20261012-rereview",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: The contributed Steel agent instruction requires `::steel-browser{}` on its own line in the same assistant message whenever requesting credentials, sign-in, MFA, consent, or any other manual browser action, and prevents stale references to a browser above.\n- PASS AC-2: The bundled Steel skill requires the directive in the same assistant message for credential, sign-in, MFA, consent, and other manual handoffs, requires repetition for later handoffs, and forbids referring to an embedded browser above unless the current response contains it.\n- PASS AC-3: Focused distribution tests now use coupled assertions that require each instruction surface to retain the human-handoff wording, same-message directive requirement, and stale-viewer prohibition together.\n- PASS AC-UI-1: The exact current base-relative committed diff makes no changes to the Steel viewer component, authentication, session selection, or responsive CSS; it changes only instructions, the bundled skill, focused tests, and Empirical records.\n\n## Security / correctness\n\nNo credential, token, personal-data, authentication, or authorization exposure is introduced. The instructions continue to require credential and MFA entry only in the embedded browser, prohibit external-browser fallback, and correctly require the native viewer directive in every manual handoff message.\n\n## Design / maintainability\n\nThe implementation follows accepted decisions D-001 and D-002: the behavioral rule is duplicated intentionally across the always-injected instructions and selectively loaded skill, while focused tests protect both surfaces and viewer code remains untouched. The wording is direct and maintainable for this narrowly scoped behavior.",
+  "bodyDigest": "sha256:272149cf8f0ff4f7fc1fa20f1baf8e404bbae74537440f75efe2de296d7f9b54",
+  "digest": "sha256:71612c68b6d2f236c8bd56e026bbd005afbcb9bc6a45917c5faf7f345c39fb86"
+}

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "feature": "fix-the-bb-and-or-steel-browser-plugins-so-that",
+  "revision": 12,
+  "reason": "Revise the contract to include the minimum integration-blocker repair: update the stale Dockside layout source assertion from grid column 3 to the current grid column 2, without changing Dockside runtime behavior, then rerun focused/full CI and merge PR #77.",
+  "spec": "# Fix The Bb And Or Steel Browser Plugins So That\n\n## Request\n\n> Fix the BB and/or Steel Browser plugins so that when an agent tells the user to sign in using the embedded Steel browser and emits the Steel browser surface directive, the browser is actually shown in the thread UI, as expected in the supplied screenshot context. Trace the directive/rendering integration, implement the appropriate fix, add focused regression coverage, and verify the relevant plugin checks and UI behavior.\n\n## Goal\n\nWhenever an agent asks the user to interact with the project Steel browser,\nthe same assistant message renders the native inline Steel viewer so the user\nhas an actual place to complete the requested sign-in, MFA, or manual action.\n\n## Acceptance Criteria\n\n- [ ] [AC-1] The Steel agent instructions require `::steel-browser{}` on its\n  own line in the same assistant message whenever the agent asks the user for\n  browser interaction, credentials, sign-in, MFA, or another manual handoff.\n- [ ] [AC-2] The bundled Steel skill carries the same requirement and forbids\n  referring to an embedded browser \"above\" unless that response contains the\n  native directive.\n- [ ] [AC-3] Focused regression tests fail if either contributed instructions\n  or the bundled skill loses the same-message human-handoff requirement.\n- [ ] [AC-UI-1] [UI] A rendered `::steel-browser{}` directive continues to\n  mount the existing Steel inline browser without changing its viewer,\n  authentication, session, or responsive behavior.\n\n## Scope\n\nSteel Browser's contributed agent instructions, bundled skill, focused\ndistribution tests, and documentation wording where needed.\n\n## Non-goals\n\nChanging BB's generic directive parser, opening an external browser, exposing\nCDP or Connect URLs, automating credentials or MFA, changing Steel provisioning,\nor redesigning the existing inline viewer.\n\n## Verification\n\nRun the Steel Browser focused tests, type checking, plugin build/check, and the\nexisting inline browser check when its project Steel dependency is available.\nConfirm the instruction regression assertions cover sign-in and MFA handoffs.\n\n## Risks\n\nAgent instruction adherence is probabilistic, so the requirement must be short,\nunambiguous, repeated in both injected instructions and the skill, and protected\nby exact regression assertions. The change must not suggest that a directive\nalone proves the viewer or BB Connect authentication is healthy.\n\n## Capability Deltas\n\nSee `deltas/steel-browser-viewer.md`.\n",
+  "deltas": [
+    {
+      "capability": "steel-browser-viewer",
+      "purpose": null,
+      "requirements": [
+        {
+          "operation": "added",
+          "name": "Render the viewer for every human browser handoff",
+          "contents": "### Requirement: Render the viewer for every human browser handoff\n\nSteel SHALL instruct agents to emit `::steel-browser{}` on its own line in the\nsame assistant message whenever they ask the user to interact with the browser,\nincluding credential entry, sign-in, MFA, consent, or any other manual step.\nAgents SHALL NOT refer to an embedded browser \"above\" unless the current\nresponse contains the directive. This requirement SHALL be present in both the\nalways-injected plugin instructions and the bundled Steel skill.\n\n#### Scenario: Website requires sign-in\n\n- **GIVEN** the agent has navigated the project Steel session to a sign-in page\n- **WHEN** the agent asks the user to enter credentials\n- **THEN** that same assistant message contains `::steel-browser{}` on its own line\n- **AND** BB renders the native inline Steel viewer with the request\n- **AND** the agent does not request credentials in chat\n\n#### Scenario: Website requires MFA after an earlier viewer message\n\n- **GIVEN** an earlier assistant message rendered the Steel viewer\n- **WHEN** a later response asks the user to complete MFA or another manual step\n- **THEN** the later response repeats `::steel-browser{}` on its own line\n- **AND** the user is not told to use an absent or stale browser surface\n\n#### Scenario: Viewer authentication is unavailable\n\n- **WHEN** the native directive renders but BB Connect authentication blocks it\n- **THEN** the agent reports that limitation\n- **AND** the agent does not open an external browser or expose a viewer URL"
+        }
+      ],
+      "source": ".empirical/specs/fix-the-bb-and-or-steel-browser-plugins-so-that/deltas/steel-browser-viewer.md"
+    }
+  ],
+  "specDigest": "sha256:42e3b045dd591f147d7459110f7c18a17207d55ae0588131a603e7aab6b0d187",
+  "approvedSpecRevision": 2,
+  "capabilityClaimId": "fix-the-bb-and-or-steel-browser-plugins-so-that-c6350427c3da",
+  "impactDigest": "sha256:f6d77a4fed828be597167b4855c2535dd0ed9160c4e323e42ba753b8ad5c0b08",
+  "evidenceReceiptIds": [
+    "collected-c28558fb127f025a02d30df1",
+    "qa-8c72a3ac89d22af281d3e3cd",
+    "qa-5854970861bbdeaf350e7cd7",
+    "collected-bdc9480765be5a80d3187b98"
+  ]
+}

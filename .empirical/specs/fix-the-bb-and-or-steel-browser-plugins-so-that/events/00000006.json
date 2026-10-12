@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "sequence": 6,
+  "previousDigest": "sha256:d810bbfbe1584e7d88e7ef42e7a806097c1ab7ab8b74a17b74adc34dd1fb68af",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Consolidate: User approved the implementation iteration: same-message Steel viewer handoffs are enforced in server instructions and the bundled skill, protected by focused regression assertions, committed, pushed, and ready for review and verification.",
+  "createdAt": "2026-10-12T16:52:01.910Z",
+  "stateBeforeDigest": "sha256:7de8dc7c366f436ad2b0d5169009f8961072af42544c32f5c86abe031a20dfc5",
+  "stateAfterDigest": "sha256:9cf76521868d7fa96d60fc606e87e188137ad51f88a74da035cae58a4fb79e48",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 6,
+    "activeFeature": "fix-the-bb-and-or-steel-browser-plugins-so-that",
+    "request": "Fix the BB and/or Steel Browser plugins so that when an agent tells the user to sign in using the embedded Steel browser and emits the Steel browser surface directive, the browser is actually shown in the thread UI, as expected in the supplied screenshot context. Trace the directive/rendering integration, implement the appropriate fix, add focused regression coverage, and verify the relevant plugin checks and UI behavior.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "review",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "User approved the implementation iteration: same-message Steel viewer handoffs are enforced in server instructions and the bundled skill, protected by focused regression assertions, committed, pushed, and ready for review and verification.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:42e3b045dd591f147d7459110f7c18a17207d55ae0588131a603e7aab6b0d187",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:cfdd9278f7efdc266b11edab4a0f282c3f538ae3eadb44bad77cd3111ab660fb",
+    "impactDigest": "sha256:f6d77a4fed828be597167b4855c2535dd0ed9160c4e323e42ba753b8ad5c0b08",
+    "capabilityClaimId": "fix-the-bb-and-or-steel-browser-plugins-so-that-c6350427c3da",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-12T16:52:01.910Z",
+    "lifecycle": {
+      "stage": "consolidation",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "contractBaseline": 5
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "fix-the-bb-and-or-steel-browser-plugins-so-that-c6350427c3da",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "fix-the-bb-and-or-steel-browser-plugins-so-that",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_9nh3s79zwi-1/bb-plugins",
+      "worktreeId": "sha256:12d37af9de01d828ec6d94719f83526aa976ce486f38022a1c83c6c02ed841eb",
+      "baseCommit": "4880d65e1ff282c7f50ca94ab27cf969143e0222",
+      "baseTree": "741348cd8d6cf72e02759a116a4df9636eaf2dec",
+      "bases": {
+        "steel-browser-viewer": {
+          "capability": "steel-browser-viewer",
+          "digest": "sha256:8694db00054f44ac1c8c585f2c6ff86de9f5df4d7c5a8f5ab0b910bd56960c61",
+          "requirements": {
+            "render the viewer for every human browser handoff": null
+          }
+        }
+      },
+      "capabilities": [
+        "steel-browser-viewer"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-12T16:48:23.265Z",
+      "heartbeatAt": "2026-10-12T16:48:23.265Z",
+      "digest": "sha256:284fee957fb80cf6703d709bc9af018983a4a5595d98f9135fe31b64a9242dbe"
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:fb7b1fe9a44e98c7477858f851f12526571bc3ec5989e8d0750eb2994c044cc1"
+}
