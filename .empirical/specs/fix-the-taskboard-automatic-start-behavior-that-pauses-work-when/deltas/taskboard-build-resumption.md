@@ -19,6 +19,19 @@ use Open session for navigation only. Failed/canceled Retry SHALL NOT appear
 beside a duplicate Start build action. Broken Git checkout failures SHALL
 remain blocking.
 
+Explicit Review-to-Build repair or blocked-Build continuation SHALL restore an
+archived original Build only in its ready managed worktree, after validating
+scope and approval. Polling SHALL preserve completed results without reopening
+archived sessions. Deleted sessions and unavailable, moved or busy workspaces
+SHALL remain blocking. Restoration SHALL revalidate identity and readiness
+before dispatch and SHALL NOT create a replacement checkout.
+
+#### Scenario: Return to an archived authoring session
+- **WHEN** the user explicitly resumes Build after archiving its authoring thread
+- **THEN** the original thread is unarchived only after its managed worktree is validated
+- **AND** one continuation carries review findings or prior Build blockers
+- **AND** failed restoration or changed workspace prevents dispatch.
+
 #### Scenario: Resume a blocked Build
 - **WHEN** Start task or Continue in thread is requested for a finished blocked Build
 - **THEN** one continuation is sent to its original thread and environment
