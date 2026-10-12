@@ -4,6 +4,10 @@
   "name": "mateocerquetella-bb-plugins",
   "plugins": [
     {
+      "name": "thread-glide",
+      "source": "./plugins/thread-glide"
+    },
+    {
       "name": "jev-route",
       "source": "./plugins/jev-route"
     },
