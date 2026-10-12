@@ -23,6 +23,7 @@ function dispatchRejection(value: string) {
   return null;
 }
 class SessionBusyError extends Error {}
+const unavailableSession = 'Native session is unavailable or failed. Open its thread for details.';
 
 export function applyNativeEvent(run: FactoryRun, event: Event) {
   if (event.seq <= run.cursor) return;
@@ -191,9 +192,15 @@ export function createFactoryService(
           record.automationError = null;
           dirty = true;
         }
-        if (thread.status === 'error' || thread.deletedAt || thread.archivedAt) {
+        // Archiving a completed conversation does not invalidate its result.
+        if (thread.archivedAt && !thread.deletedAt && thread.status === 'idle' &&
+          run.status === 'failed' && run.error === unavailableSession && run.finishedAt && run.output) {
+          run.status = 'finished';
+          run.error = null;
+        }
+        if (thread.status === 'error' || thread.deletedAt || (thread.archivedAt && run.status !== 'finished')) {
           run.status = 'failed';
-          run.error = 'Native session is unavailable or failed. Open its thread for details.';
+          run.error = unavailableSession;
         } else if (['active', 'starting', 'stopping'].includes(thread.status) &&
           !['finished', 'failed', 'canceled'].includes(run.status)) {
           run.status = 'running';
@@ -233,7 +240,7 @@ export function createFactoryService(
     }
     return persist(record);
   }
-  async function advance(item: WorkItem, record: FactoryRecord, signal?: AbortSignal) {
+  async function advance(item: WorkItem, record: FactoryRecord, signal?: AbortSignal, restoreArchived = false) {
     record = await syncProgress(item, record);
     const run = record.runs.at(-1);
     if (!record.automatic || record.automationError || !run || run.status !== 'finished' ||
@@ -256,7 +263,7 @@ export function createFactoryService(
         // Approval is durable before any native build dispatch.
         record = persist(record);
       }
-      if (run.kind === 'review') return await repairReview(item, record);
+      if (run.kind === 'review') return await repairReview(item, record, restoreArchived);
       if (run.kind === 'build' && run.buildResult?.verdict !== 'implemented') {
         throw new Error(run.buildResult?.verdict === 'needs_input'
           ? `Build needs input: ${run.buildResult.summary.slice(0, 1000)}`
@@ -276,7 +283,7 @@ export function createFactoryService(
       return persist(record);
     }
   }
-  async function repairReview(item: WorkItem, record: FactoryRecord) {
+  async function repairReview(item: WorkItem, record: FactoryRecord, restoreArchived = false) {
     const review = record.runs.at(-1);
     if (!review || review.kind !== 'review' || review.status !== 'finished' || !review.output.trim()) {
       throw new Error('Finish review and collect its findings before returning to Build.');
@@ -299,7 +306,9 @@ export function createFactoryService(
       throw new Error(`Review repair limit reached (${MAX_REVIEW_REPAIRS} attempts). Inspect the findings and revise the plan before continuing.`);
     }
     record.automatic = true;
-    return dispatch(item, record, { kind: 'build', contextThreadId: null, retry: false, repairOf: review.id });
+    return dispatch(item, record, {
+      kind: 'build', contextThreadId: null, retry: false, repairOf: review.id, restoreArchived
+    });
   }
   async function resumeBlockedBuild(item: WorkItem, record: FactoryRecord) {
     const blocked = record.runs.at(-1)!;
@@ -310,17 +319,22 @@ export function createFactoryService(
     record.automatic = true;
     record.automationError = null;
     return dispatch(item, record, {
-      kind: 'build', contextThreadId: null, retry: false, continuationOf: blocked.id
+      kind: 'build', contextThreadId: null, retry: false, continuationOf: blocked.id, restoreArchived: true
     });
   }
   async function dispatch(item: WorkItem, record: FactoryRecord, input: {
     kind: FactoryRunKind; contextThreadId: string | null; retry: boolean; repairOf?: string; continuationOf?: string;
+    restoreArchived?: boolean;
   }) {
     const author = [...record.runs].reverse().find(run => run.kind !== 'review' && run.threadId);
     const contextId = author?.threadId ?? input.contextThreadId;
     const context = contextId ? await sdk.threads.get({ threadId: contextId }) : null;
     if (context && context.projectId !== item.bbProjectId) throw new Error('Select a thread in this ticket project.');
-    if (context && (context.deletedAt || context.archivedAt)) throw new Error('Restore the original authoring session before continuing.');
+    if (context?.deletedAt) throw new Error('The original authoring session was deleted. Restore it before continuing.');
+    const restoreArchived = context?.archivedAt && input.restoreArchived && (input.repairOf || input.continuationOf);
+    if (context?.archivedAt && !restoreArchived) {
+      throw new Error('The original authoring session is archived. Use Return to Build with findings or Start task to resume it.');
+    }
     if (author && context?.status !== 'idle') throw new SessionBusyError('Stop or finish the authoring session first.');
     const defaults = context
       ? await sdk.threads.defaultExecutionOptions({ threadId: context.id })
@@ -340,12 +354,17 @@ export function createFactoryService(
     if (isolateBuild && (!author?.threadId || !environment)) {
       throw new Error('Build requires a linked native planning session and environment.');
     }
+    if (restoreArchived && (environment?.projectId !== record.projectId || environment.status !== 'ready')) {
+      throw new Error('The original Build worktree is unavailable. Restore that workspace before continuing.');
+    }
     // Project-default investigation can use a plain checkout. Preserve its
     // conversation by forking Build into a managed worktree in one dispatch.
     const reuse = input.kind !== 'review' && !isolateBuild && author?.threadId;
     const events = reuse
       ? await sdk.threads.events.list({ threadId: reuse, order: 'desc', limit: '1' }) : [];
-    const draft = startRun(record, input.kind, input.retry);
+    // Keep a failed restoration out of the caller's durable pause record.
+    const draftRecord = structuredClone(record);
+    const draft = startRun(draftRecord, input.kind, input.retry);
     draft.repairOf = input.repairOf ?? null;
     draft.continuationOf = input.continuationOf ?? null;
     if (reuse) {
@@ -353,8 +372,20 @@ export function createFactoryService(
       draft.environmentId = context!.environmentId;
       draft.cursor = events[0]?.seq ?? 0;
     }
+    if (restoreArchived) {
+      await sdk.threads.unarchive({ threadId: context!.id });
+      // Unarchive can race an external move, deletion or native turn.
+      const restored = await sdk.threads.get({ threadId: context!.id });
+      const workspace = await sdk.environments.get({ environmentId: environment!.id });
+      if (restored.deletedAt || restored.archivedAt || restored.projectId !== record.projectId ||
+        restored.environmentId !== environment!.id || workspace.projectId !== record.projectId ||
+        workspace.status !== 'ready' || !workspace.managed || !workspace.isWorktree) {
+        throw new Error('The original Build session or worktree changed during restoration. Inspect it before continuing.');
+      }
+      if (restored.status !== 'idle') throw new SessionBusyError('Stop or finish the authoring session first.');
+    }
     const id = draft.id;
-    record = persist(record);
+    record = persist(draftRecord);
     const run = record.runs.find(run => run.id === id)!;
     try {
       const prompt = factoryPrompt(item, record, input.kind);
@@ -448,7 +479,7 @@ export function createFactoryService(
           if ((run.kind === 'review' && run.reviewResult?.verdict === 'blocked') || run.repairOf || run.continuationOf) {
             record.automatic = true;
             record.automationError = null;
-            return advance(item, persist(record));
+            return advance(item, persist(record), undefined, true);
           }
           return record;
         }
@@ -527,7 +558,7 @@ export function createFactoryService(
         assertVersion(record, input.expectedVersion);
         record.automationError = null;
         if (input.kind === 'build' && last?.kind === 'review' && last.status === 'finished') {
-          return repairReview(item, record);
+          return repairReview(item, record, true);
         }
         return dispatch(item, record, input);
       });

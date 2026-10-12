@@ -36,6 +36,12 @@ function fixture() {
   let output = 'Observed repository findings';
   let threadStatus = 'idle';
   const threadStatuses = new Map<string, string>();
+  const archived = new Set<string>();
+  const deleted = new Set<string>();
+  let unarchives = 0;
+  let onUnarchive = () => {};
+  let environmentStatus = 'ready';
+  let buildEnvironment = 'env_test';
   let failSpawn = false;
   let failSend = false;
   let rejectSpawn = false;
@@ -58,7 +64,18 @@ function fixture() {
         currentThreadId = review ? `thr_review_${spawns}` : fork ? 'thr_build' : 'thr_native';
         return { id: currentThreadId, environmentId: fork ? 'env_build' : 'env_test', projectId: item.bbProjectId };
       },
-      get: async ({ threadId }: { threadId: string }) => ({ id: threadId, status: threadStatuses.get(threadId) ?? threadStatus, projectId: item.bbProjectId, environmentId: threadId === 'thr_build' ? 'env_build' : 'env_test', providerId: 'codex' }),
+      get: async ({ threadId }: { threadId: string }) => ({
+        id: threadId, status: threadStatuses.get(threadId) ?? threadStatus,
+        projectId: item.bbProjectId,
+        environmentId: threadId === 'thr_build' ? 'env_build' : threadId === 'thr_native' ? buildEnvironment : 'env_test',
+        providerId: 'codex', archivedAt: archived.has(threadId) ? 1 : null, deletedAt: deleted.has(threadId) ? 1 : null
+      }),
+      unarchive: async ({ threadId }: { threadId: string }) => {
+        unarchives++;
+        onUnarchive();
+        archived.delete(threadId);
+        return { ok: true };
+      },
       defaultExecutionOptions: async () => ({ model: 'test', permissionMode: 'accept-edits', reasoningLevel: 'medium', serviceTier: 'default' }),
       send: async (input: typeof sent[number]) => {
         sends++; sent.push(input); currentThreadId = input.threadId;
@@ -73,7 +90,11 @@ function fixture() {
       output: async () => ({ output })
     },
     projects: { defaultExecutionOptions: async () => ({ model: 'test', providerId: 'codex' }) },
-    environments: { get: async ({ environmentId }: { environmentId: string }) => ({ id: environmentId, managed: managed || environmentId === 'env_build', isWorktree: managed || environmentId === 'env_build', hostId: 'host_test' }) }
+    environments: { get: async ({ environmentId }: { environmentId: string }) => ({
+      id: environmentId, managed: managed || environmentId === 'env_build',
+      isWorktree: managed || environmentId === 'env_build', hostId: 'host_test',
+      projectId: item.bbProjectId, status: environmentStatus
+    }) }
   } as unknown as Parameters<typeof createFactoryService>[0];
   const service = createFactoryService(sdk, store, () => {}, {
     getItem: () => item,
@@ -85,6 +106,10 @@ function fixture() {
   });
   return {
     db, store, service, events, spawns: () => spawns, spawnInput: () => spawnInput,
+    archived, deleted, unarchives: () => unarchives,
+    onUnarchive: (callback: () => void) => { onUnarchive = callback; },
+    environmentStatus: (value: string) => { environmentStatus = value; },
+    buildEnvironment: (value: string) => { buildEnvironment = value; },
     fail: () => { failSpawn = true; },
     failSend: () => { failSend = true; },
     sends: () => sends, sent, progressWrites: () => progressWrites,
@@ -664,6 +689,156 @@ test('repair completion starts independent review of the repaired Build workspac
     assert.equal(f.sends(), 1);
     assert.equal(f.spawns(), 1);
     assert.equal(f.progressWrites(), 0);
+  } finally { f.db.close(); }
+});
+
+test('archived Build results survive polling and explicit review repair restores the same session once', async () => {
+  for (const action of ['startTask', 'returnToBuild'] as const) {
+    const f = fixture();
+    try {
+      const seeded = seedReview(f);
+      f.archived.add('thr_native');
+      const paused = await f.service.get(item);
+      assert.equal(paused.runs[0].status, 'finished');
+      assert.match(paused.automationError!, /authoring session is archived/);
+      assert.equal(f.unarchives(), 0);
+      assert.equal(f.sends(), 0);
+      const resume = () => action === 'startTask' ? f.service.startTask(item, null) : f.service.start(item, {
+        expectedVersion: paused.version, kind: 'build', contextThreadId: null, retry: false
+      });
+      await Promise.all([resume(), resume()]);
+      const repaired = f.store.all()[0];
+      assert.equal(repaired.runs.length, 3);
+      assert.equal(repaired.runs.at(-1)?.repairOf, seeded.runs[1].id);
+      assert.equal(repaired.runs.at(-1)?.threadId, 'thr_native');
+      assert.equal(repaired.runs.at(-1)?.environmentId, 'env_test');
+      assert.equal(repaired.automationError, null);
+      assert.equal(f.unarchives(), 1);
+      assert.equal(f.sends(), 1);
+      assert.equal(f.spawns(), 0);
+    } finally { f.db.close(); }
+  }
+});
+
+test('legacy archive-only failure preserves completed evidence and can return to Build', async () => {
+  const f = fixture();
+  try {
+    const record = seedReview(f);
+    Object.assign(record.runs[0], {
+      status: 'failed', finishedAt: new Date().toISOString(),
+      error: 'Native session is unavailable or failed. Open its thread for details.'
+    });
+    f.store.save(record);
+    f.archived.add('thr_native');
+    const reconciled = await f.service.get(item);
+    assert.equal(reconciled.runs[0].status, 'finished');
+    assert.equal(reconciled.runs[0].output, record.runs[0].output);
+    await f.service.startTask(item, null);
+    assert.equal(f.sends(), 1);
+  } finally { f.db.close(); }
+});
+
+test('archive recovery rejects deleted, moved, unavailable and busy Build sessions before restoration', async () => {
+  for (const failure of ['deleted', 'moved', 'destroyed', 'busy', 'unmanaged', 'scope'] as const) {
+    const f = fixture();
+    try {
+      const record = seedReview(f, blockedReview, false);
+      record.runs[1].reviewResult = readReviewResult(blockedReview);
+      const saved = f.store.save(record);
+      f.archived.add('thr_native');
+      if (failure === 'deleted') f.deleted.add('thr_native');
+      if (failure === 'moved') f.buildEnvironment('env_other');
+      if (failure === 'destroyed') f.environmentStatus('destroyed');
+      if (failure === 'busy') f.threadStatus('active', 'thr_native');
+      if (failure === 'unmanaged') f.unmanaged();
+      await assert.rejects(f.service.start(
+        failure === 'scope' ? { ...item, description: 'Changed scope' } : item,
+        { expectedVersion: saved.version, kind: 'build', contextThreadId: null, retry: false }
+      ));
+      assert.equal(f.unarchives(), 0);
+      assert.equal(f.sends(), 0);
+      assert.equal(f.spawns(), 0);
+      assert.equal(f.store.all()[0].runs.length, 2);
+    } finally { f.db.close(); }
+  }
+});
+
+test('archive recovery rechecks identity and idle state and does not dispatch after restoration failures', async () => {
+  for (const failure of ['moved', 'busy', 'destroyed', 'transport'] as const) {
+    const f = fixture();
+    try {
+      seedReview(f, blockedReview, false);
+      f.archived.add('thr_native');
+      const record = await f.service.get(item);
+      f.onUnarchive(() => {
+        if (failure === 'moved') f.buildEnvironment('env_other');
+        if (failure === 'busy') f.threadStatus('active', 'thr_native');
+        if (failure === 'destroyed') f.environmentStatus('destroyed');
+        if (failure === 'transport') throw new Error('Unarchive response lost');
+      });
+      await assert.rejects(f.service.start(item, {
+        expectedVersion: record.version, kind: 'build', contextThreadId: null, retry: false
+      }));
+      assert.equal(f.unarchives(), 1);
+      assert.equal(f.sends(), 0);
+      assert.equal(f.store.all()[0].runs.length, 2);
+    } finally { f.db.close(); }
+  }
+});
+
+test('a lost send after unarchive stays uncertain across restart without another dispatch', async () => {
+  const f = fixture();
+  try {
+    seedReview(f, blockedReview, false);
+    f.archived.add('thr_native');
+    const record = await f.service.get(item);
+    f.failSend();
+    const resumed = await f.service.start(item, {
+      expectedVersion: record.version, kind: 'build', contextThreadId: null, retry: false
+    });
+    assert.equal(resumed.runs.at(-1)?.status, 'uncertain');
+    await f.service.recover();
+    await f.service.startTask(item, null);
+    assert.equal(f.unarchives(), 1);
+    assert.equal(f.sends(), 1);
+    assert.equal(f.spawns(), 0);
+  } finally { f.db.close(); }
+});
+
+test('Start task restoration failure keeps the review actionable without a phantom Build run', async () => {
+  const f = fixture();
+  try {
+    seedReview(f);
+    f.archived.add('thr_native');
+    await f.service.get(item);
+    f.onUnarchive(() => { throw new Error('Unarchive unavailable'); });
+    const paused = await f.service.startTask(item, null);
+    assert.match(paused.automationError!, /Unarchive unavailable/);
+    assert.equal(paused.runs.length, 2);
+    assert.equal(paused.stage, 'Review');
+    assert.equal(f.sends(), 0);
+  } finally { f.db.close(); }
+});
+
+test('explicit blocked Build continuation restores its archived thread without a replacement', async () => {
+  const f = fixture();
+  try {
+    const record = seedReview(f);
+    record.runs.pop();
+    record.stage = 'Build';
+    const build = record.runs[0];
+    build.buildResult = { verdict: 'blocked', summary: 'Finish the implementation', revision: null };
+    build.output = `<taskboard-build>${JSON.stringify(build.buildResult)}</taskboard-build>`;
+    f.store.save(record);
+    f.archived.add('thr_native');
+    await f.service.get(item);
+    assert.equal(f.unarchives(), 0);
+    const resumed = await f.service.startTask(item, null);
+    assert.equal(resumed.runs.at(-1)?.continuationOf, build.id);
+    assert.equal(resumed.runs.at(-1)?.threadId, build.threadId);
+    assert.equal(f.unarchives(), 1);
+    assert.equal(f.sends(), 1);
+    assert.equal(f.spawns(), 0);
   } finally { f.db.close(); }
 });
 

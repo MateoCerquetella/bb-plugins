@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:f811f6f686725fcce40e1b7cf5220cafcef22e07229c27ed120289de5510e11b",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "d544da34e76016e14cabded03ac8a355cea08acb",
+  "headCommit": "fd0f962855c3aec6264e69ba6ad7d866e78762c7",
+  "diffDigest": "sha256:fa2d77af843766836d4a85e25ad01a2bf2f89d70e9cb2aaff5501fd622b98d9e",
+  "verdict": "APPROVED",
+  "reviewerActor": "isolated-fresh-context-reviewer",
+  "reviewerInvocationId": "reviewer-fresh-20261012-steel-mobile-01",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: Mobile/compact media query initializes the directive minimized; minimized rendering avoids iframe creation and viewer URL loading.\n- PASS AC-2: The accessible Restore inline browser control loads the viewer and existing controls; browser regression covers the transition.\n- PASS AC-3: Desktop clients do not match the compact query and retain automatic viewer loading, covered by regression.\n- PASS AC-4: Only the initial state changed; existing minimize teardown and restore reconnection behavior and assertions remain intact.\n- PASS AC-UI-1: The restore control has an explicit accessible label and the mobile browser regression checks viewport fit.\n\n## Security / correctness\n\nPASS. No credentials, tokens, sessions, CDP, Connect, authentication, or authorization behavior changes; the change only affects client-side initial presentation state.\n\n## Design / maintainability\n\nPASS. Reuses the existing minimized state and controls, scopes the behavior to the inline directive, preserves desktop/non-inline surfaces, and names the media query.",
+  "bodyDigest": "sha256:27433710cdcd948bc4d2e596be790b6a61a6952400e4ab45222dc3bc9ef9474a",
+  "findings": [],
+  "digest": "sha256:b838b2d0fc295ab194651a57b80dfd4f585f1d3989cf22a79bc3fe88ca795073"
+}

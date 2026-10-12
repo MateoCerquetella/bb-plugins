@@ -47,6 +47,12 @@ cannot start another review; native completion alone never establishes an
 implementation. Workspace changes, uncertain dispatches and stale scope pause
 the cycle without creating a replacement worktree.
 
+Archived Build sessions keep their completed results. Polling never reopens
+an archived authoring session; **Return to Build with findings** or **Start
+task** explicitly restores it when the original managed worktree is still
+ready. Deleted sessions, unavailable or changed workspaces, and busy sessions
+remain blocking. Restoration never creates a replacement checkout.
+
 When Build reports blockers, **Start task** continues that Build in its original
 native session and managed worktree. The continuation carries the approved plan
 and prior blocker summary, completes every actionable part, and reports external

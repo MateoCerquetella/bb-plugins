@@ -1,8 +1,58 @@
 # Decisions: Resume Blocked Taskboard Builds
 
+## D-009: Explicit archived-author recovery
+
+Status: Accepted
+
+### Evidence
+
+The reported Review-to-Build failure is emitted by a guard that treats archived
+and deleted authors alike. Polling also overwrote completed archived results.
+The pinned SDK exposes native thread unarchive.
+
+### Options
+
+1. Leave archived authors blocked until manually restored outside Taskboard.
+2. Automatically reopen archived authors during polling.
+3. Restore the original author only on an explicit resume action.
+
+### Chosen approach
+
+Supersedes the blanket rejection of archived authoring sessions. The reported
+Review-to-Build failure came from the same guard used for deleted sessions.
+Explicit Return to Build or Start task may unarchive the original author only
+after scope, approval, managed environment and native idle checks. Validate the
+same project, environment and readiness again after unarchive. Never restore a
+deleted thread or create a replacement checkout.
+
+### Trade-offs and risks
+
+Polling preserves completed evidence and does not undo user archive intent.
+Legacy archive-only failures with a recorded completion and output recover
+their completed status. Unarchive failures create no dispatch; lost send
+responses keep the existing uncertain-dispatch protection.
+
+### Verification
+
+Regression cases cover explicit and concurrent recovery, polling, legacy
+records, deleted/busy/moved workspaces, failed restoration and uncertain sends.
+Execution remains on demand under the iteration policy.
+
 ## D-008: Continue dispatches before navigation
 
 Status: Accepted
+
+### Evidence
+
+Continue in thread navigated to the blocked session without sending work.
+Failed/canceled runs exposed both Retry and a duplicate Start build action.
+
+### Options
+
+1. Retain navigation-only Continue in thread.
+2. Dispatch through guarded factoryStartTask before navigating.
+
+### Chosen approach
 
 The iteration 6 adjustment supersedes navigation-only Continue in thread.
 Only the current finished blocked Build offers that action. It calls the
@@ -10,7 +60,13 @@ existing guarded factoryStartTask RPC, prevents repeat clicks while pending,
 shows errors in place, and navigates after a running/starting session returns.
 Other states retain Open session as navigation only. Generic stage progression
 requires a finished run, leaving failed/canceled runs with their Retry action.
+
+### Trade-offs and risks
+
+Navigation waits for dispatch success and errors remain visible in place.
 No server workspace checks or broken Git checkout failures are bypassed.
+
+### Verification
 
 Regression scenarios cover pending feedback, checkout rejection without
 navigation, successful same-thread continuation, and failed/canceled controls.
