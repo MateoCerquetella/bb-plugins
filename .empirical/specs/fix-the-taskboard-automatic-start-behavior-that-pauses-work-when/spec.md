@@ -12,7 +12,7 @@ policy, tracker, and evidence gates.
 
 ## Acceptance Criteria
 
-- [ ] [AC-1] Start task on a blocked Build resumes the same managed session once.
+- [ ] [AC-1] Start task or Continue in thread on a finished blocked Build resumes the same managed session once through guarded factoryStartTask, with loading/error feedback before navigation. Other states use Open session; failed/canceled Retry has no duplicate Start build.
 - [ ] [AC-2] Resume prompts include previous blockers and preserve repository gates.
 - [ ] [AC-3] Resumed Build evidence advances to review; unresolved results pause.
 - [ ] [AC-4] Concurrent requests, workspace drift and uncertain dispatch cannot duplicate work.

@@ -1,5 +1,21 @@
 # Decisions: Resume Blocked Taskboard Builds
 
+## D-008: Continue dispatches before navigation
+
+Status: Accepted
+
+The iteration 6 adjustment supersedes navigation-only Continue in thread.
+Only the current finished blocked Build offers that action. It calls the
+existing guarded factoryStartTask RPC, prevents repeat clicks while pending,
+shows errors in place, and navigates after a running/starting session returns.
+Other states retain Open session as navigation only. Generic stage progression
+requires a finished run, leaving failed/canceled runs with their Retry action.
+No server workspace checks or broken Git checkout failures are bypassed.
+
+Regression scenarios cover pending feedback, checkout rejection without
+navigation, successful same-thread continuation, and failed/canceled controls.
+Execution remains pending under the iteration's on-demand verification policy.
+
 ## D-007: Explicit creation and native image delivery
 
 Status: Accepted
