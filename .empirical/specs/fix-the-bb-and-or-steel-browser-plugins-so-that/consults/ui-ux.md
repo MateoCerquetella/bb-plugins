@@ -33,3 +33,13 @@ or scrolled-away viewer.
 An external viewer link, a right-panel-only handoff, a persistent second iframe,
 and a redesigned sign-in surface are outside the fix and would weaken the
 thread-local interaction model.
+
+## Integration Repair Advisory
+
+- Severity: low
+- Category: visual-consistency
+- Location: `plugins/dockside/test/thread-card-layout.test.ts`
+- Recommendation: Update only the stale source assertion from `col-start-3` to
+  `col-start-2`. The runtime component already uses the accepted two-column
+  layout, so changing component or CSS code would introduce unnecessary visual
+  risk.

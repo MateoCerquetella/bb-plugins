@@ -57,3 +57,30 @@ and rendered whenever the directive is present.
 
 Retain the existing inline browser test as the UI regression check and run
 plugin build/type checks.
+
+## D-003: Repair the stale Dockside assertion without changing its UI
+
+Status: Accepted
+
+### Evidence
+
+`plugins/dockside/components/inbox/thread-card.tsx` uses a two-column grid and
+places the metadata cluster at `col-start-2`. The failing source-contract test
+alone still expects `col-start-3`.
+
+### Options
+
+- Change the runtime component back to a nonexistent third column.
+- Update the stale test assertion to describe the current component.
+
+### Chosen approach
+
+Update only the test regex from `col-start-3` to `col-start-2`.
+
+### Trade-offs and risks
+
+This restores CI coverage without changing the shipped Dockside interface.
+
+### Verification
+
+Run the focused Dockside test and then the full pull-request CI workflow.

@@ -9,3 +9,6 @@
    verification matrix.
 5. Perform fresh-context review, repair findings, and integrate the capability
    delta without changing the existing viewer component.
+6. Align the stale Dockside root-card source assertion with the existing
+   two-column component, run the focused Dockside test and full PR CI, then
+   merge PR #77.

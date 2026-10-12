@@ -1,6 +1,6 @@
 # Steel Browser Viewer Delta
 
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: Render the viewer for every human browser handoff
 

@@ -23,23 +23,30 @@ has an actual place to complete the requested sign-in, MFA, or manual action.
 - [ ] [AC-UI-1] [UI] A rendered `::steel-browser{}` directive continues to
   mount the existing Steel inline browser without changing its viewer,
   authentication, session, or responsive behavior.
+- [ ] [AC-4] Dockside's root-card layout regression assertion matches the
+  existing two-column grid (`col-start-2`) and the focused Dockside test passes
+  without changing Dockside runtime source or UI behavior.
 
 ## Scope
 
 Steel Browser's contributed agent instructions, bundled skill, focused
-distribution tests, and documentation wording where needed.
+distribution tests, documentation wording where needed, and the single stale
+Dockside source-contract assertion blocking repository CI.
 
 ## Non-goals
 
 Changing BB's generic directive parser, opening an external browser, exposing
 CDP or Connect URLs, automating credentials or MFA, changing Steel provisioning,
-or redesigning the existing inline viewer.
+redesigning the existing inline viewer, or changing Dockside runtime components,
+styles, layout, or behavior.
 
 ## Verification
 
 Run the Steel Browser focused tests, type checking, plugin build/check, and the
 existing inline browser check when its project Steel dependency is available.
 Confirm the instruction regression assertions cover sign-in and MFA handoffs.
+Run the focused Dockside layout test and full pull-request CI after aligning its
+stale grid-column assertion with the current component source.
 
 ## Risks
 
@@ -47,7 +54,10 @@ Agent instruction adherence is probabilistic, so the requirement must be short,
 unambiguous, repeated in both injected instructions and the skill, and protected
 by exact regression assertions. The change must not suggest that a directive
 alone proves the viewer or BB Connect authentication is healthy.
+The integration repair must remain test-only: changing Dockside runtime code
+would expand the behavioral surface and require separate UI verification.
 
 ## Capability Deltas
 
-See `deltas/steel-browser-viewer.md`.
+See `deltas/steel-browser-viewer.md` and
+`deltas/dockside-thread-management.md`.

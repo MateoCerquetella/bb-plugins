@@ -1,52 +1,50 @@
 {
   "schemaVersion": 5,
-  "revision": 12,
+  "revision": 18,
   "activeFeature": "fix-the-bb-and-or-steel-browser-plugins-so-that",
   "request": "Fix the BB and/or Steel Browser plugins so that when an agent tells the user to sign in using the embedded Steel browser and emits the Steel browser surface directive, the browser is actually shown in the thread UI, as expected in the supplied screenshot context. Trace the directive/rendering integration, implement the appropriate fix, add focused regression coverage, and verify the relevant plugin checks and UI behavior.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "integrate",
+  "phase": "review",
   "status": "waiting",
   "repairAttempts": 1,
-  "message": "Verification passed with the Empirical-selected automated check, a passing affected Steel package check (SDK pin, typecheck, 49 tests, build), fresh browser observation and screenshot of the unchanged inline viewer, plus security and fidelity records. The existing inline harness later timed out only on clearing follow mode after scrolling back, outside changed instruction surfaces.",
+  "message": "User explicitly requested completion. Consolidating the test-only Dockside CI repair for review, verification, and integration.",
   "implementationActor": "agent",
   "workStartedAt": null,
-  "specDigest": "sha256:42e3b045dd591f147d7459110f7c18a17207d55ae0588131a603e7aab6b0d187",
-  "approvedSpecRevision": 2,
+  "specDigest": "sha256:79d2a7b8e54ba3ad78a76e35c6a53b5c760805e2b6322bd8c340fba4c9283c51",
+  "approvedSpecRevision": 14,
   "capabilityArchiveRequired": true,
-  "capabilityDeltaDigest": "sha256:cfdd9278f7efdc266b11edab4a0f282c3f538ae3eadb44bad77cd3111ab660fb",
-  "impactDigest": "sha256:f6d77a4fed828be597167b4855c2535dd0ed9160c4e323e42ba753b8ad5c0b08",
+  "capabilityDeltaDigest": "sha256:5f73d5652b17c25332968d2989419cbff4318ab3504ac2e4b72bdef7ef893549",
+  "impactDigest": "sha256:1e3a8ee52d9a943026592d6fe0e470f459deb37c425b3b1fdfaa343e12b0a105",
   "capabilityClaimId": "fix-the-bb-and-or-steel-browser-plugins-so-that-c6350427c3da",
   "authorizationDigest": null,
   "evidence": [],
-  "evidenceReceiptIds": [
-    "collected-c28558fb127f025a02d30df1",
-    "qa-8c72a3ac89d22af281d3e3cd",
-    "qa-5854970861bbdeaf350e7cd7",
-    "collected-bdc9480765be5a80d3187b98"
-  ],
+  "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
     "implemented": true,
-    "verified": true,
+    "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "verified",
+    "highest": "implemented",
     "reasons": {
+      "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-12T17:08:51.700Z",
+  "updatedAt": "2026-10-12T17:43:05.534Z",
   "lifecycle": {
     "stage": "consolidation",
-    "iteration": 0,
+    "iteration": 1,
     "awaitingFeedback": false,
     "iterative": true,
-    "contractBaseline": 5
+    "contractRevision": 12,
+    "riskRequest": "Revise the contract to include the minimum integration-blocker repair: update the stale Dockside layout source assertion from grid column 3 to the current grid column 2, without changing Dockside runtime behavior, then rerun focused/full CI and merge PR #77.",
+    "contractBaseline": 17
   },
   "capabilityBase": {
     "schemaVersion": 1,
@@ -58,6 +56,13 @@
     "baseCommit": "4880d65e1ff282c7f50ca94ab27cf969143e0222",
     "baseTree": "741348cd8d6cf72e02759a116a4df9636eaf2dec",
     "bases": {
+      "dockside-thread-management": {
+        "capability": "dockside-thread-management",
+        "digest": "sha256:33108e1b95ff2b0e5fe585c8560b54da9c98ad2028789db0405340a141dcd0fa",
+        "requirements": {
+          "root family cards have exactly two semantic rows": "sha256:9d6a25e76d91c5c0488bc9d66a5525808618e1ee28d5707e58d230feee59250b"
+        }
+      },
       "steel-browser-viewer": {
         "capability": "steel-browser-viewer",
         "digest": "sha256:8694db00054f44ac1c8c585f2c6ff86de9f5df4d7c5a8f5ab0b910bd56960c61",
@@ -67,14 +72,16 @@
       }
     },
     "capabilities": [
+      "dockside-thread-management",
       "steel-browser-viewer"
     ],
     "status": "active",
     "integrationReceiptDigest": null,
     "createdAt": "2026-10-12T16:48:23.265Z",
-    "heartbeatAt": "2026-10-12T16:48:23.265Z",
-    "digest": "sha256:284fee957fb80cf6703d709bc9af018983a4a5595d98f9135fe31b64a9242dbe"
+    "heartbeatAt": "2026-10-12T17:41:48.357Z",
+    "digest": "sha256:5490e66c16a7503d7eea0efd39fb302da101cc9a4edb96e2f6139db38efb387f"
   },
   "budgetExtensionMinutes": 30,
+  "trackerGeneration": 1,
   "reviewFirst": true
 }
