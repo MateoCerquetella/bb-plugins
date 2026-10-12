@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 40,
+  "revision": 41,
   "activeFeature": "fix-the-taskboard-automatic-start-behavior-that-pauses-work-when",
   "request": "Fix the Taskboard automatic-start behavior that pauses work when a build reports recoverable blockers like the supplied Roten-App result. Improve automatic work startup so blocker summaries are handled accurately and the task does not stop prematurely when actionable implementation work can continue, while preserving genuine human-decision, tracker, evidence, and policy gates.",
   "profile": "complex",
@@ -9,13 +9,13 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Continue the same feature and fix the additional Review-to-Build failure reported in the prior thread: an archived original Build authoring session should be recoverable in place when its original managed worktree is still valid. Preserve deleted-session, project, environment drift, scope/approval, busy-session and uncertain-dispatch guards. Include the existing journal edits in this branch as explicitly authorized by the user in thr_ksv4m3qq3j.",
+  "message": "Implemented archived-author recovery in draft PR #78. Explicit Return to Build/Start task restores only the original idle Build session in its same ready managed worktree, revalidating identity/readiness before durable dispatch. Polling preserves completed results without reopening archived threads. Restoration failures preserve actionable Review; deleted/moved/busy/unavailable sessions, stale approval, repair limits and uncertain sends remain guarded. Added regression cases, README and complete decisions D-009/D-008. Committed authorized existing journal edits. Synced current origin/main without conflicts. Local tests/browser checks are unrun under on-demand iteration policy; implementation only, no verification/integration claimed.",
   "implementationActor": "agent",
   "workStartedAt": null,
-  "specDigest": "sha256:cd11e3a5b07c1f34e276ef15f79a0f9d7466243d35ad3d7b2397778f4d724a64",
+  "specDigest": "sha256:7cb15be88b598d4883f48138daec22f559e2affc4f9bcc3f2ef3ff52406c774a",
   "approvedSpecRevision": 31,
   "capabilityArchiveRequired": true,
-  "capabilityDeltaDigest": "sha256:9a1e5231d570e67027fc479a22bf79685f92b39496e49b322c1b8ff50554a3b1",
+  "capabilityDeltaDigest": "sha256:385502f29bdeac8699a2e369307f536d24ee3781f5224ddc953019d9f8d2f6ef",
   "impactDigest": "sha256:0d097c3df3587f2f6ae282bb4a5b8ae59607e22b07f4297496e320826dec40f1",
   "capabilityClaimId": "fix-the-taskboard-automatic-start-behavior-that-pauses-work-when-1ecce97b7eb2",
   "authorizationDigest": null,
@@ -23,29 +23,30 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": false,
+    "implemented": true,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "none",
+    "highest": "implemented",
     "reasons": {
-      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-12T16:52:13.117Z",
+  "updatedAt": "2026-10-12T17:01:22.946Z",
   "lifecycle": {
     "stage": "iteration",
     "iteration": 7,
-    "awaitingFeedback": false,
+    "awaitingFeedback": true,
     "iterative": true,
     "contractRevision": 29,
-    "contractBaseline": 35,
-    "amendContract": true
+    "contractBaseline": 41,
+    "amendments": [
+      40
+    ]
   },
   "capabilityBase": {
     "schemaVersion": 1,
