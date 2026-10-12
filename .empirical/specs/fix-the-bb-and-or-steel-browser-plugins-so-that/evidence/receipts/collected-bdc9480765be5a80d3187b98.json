@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-bdc9480765be5a80d3187b98",
+  "criteria": [
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Captured the existing Steel inline viewer rendering the project browser in the project-bound Steel session; the viewer controls, iframe, and desktop sizing remain intact because no viewer source or CSS changed.",
+  "passed": true,
+  "startedAt": "2026-10-12T17:08:37.846Z",
+  "completedAt": "2026-10-12T17:08:37.846Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-the-bb-and-or-steel-browser-plugins-so-that",
+    "specRevision": 2,
+    "specDigest": "sha256:42e3b045dd591f147d7459110f7c18a17207d55ae0588131a603e7aab6b0d187",
+    "treeDigest": "sha256:cafbc6ae515702cf3ed022f31496f559a684d6d5de69963f041c177278b357ed",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:ba19a2c6169c4ba88ed4aac94b09375ded4963ee7d08f35a78f7a26c4cf38678",
+  "kind": "collected",
+  "collector": "agent:steel-browser-ui-verification",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/fix-the-bb-and-or-steel-browser-plugins-so-that/evidence/artifacts/steel-browser-check.log",
+      "mediaType": "text/plain",
+      "bytes": 12002,
+      "digest": "sha256:7fb917453f5d6acf4e36f3f1c47023523b2160393b53910a8298d49e61788e3e"
+    },
+    {
+      "path": ".empirical/specs/fix-the-bb-and-or-steel-browser-plugins-so-that/evidence/artifacts/steel-following-1280.png",
+      "mediaType": "image/png",
+      "bytes": 19557,
+      "digest": "sha256:576fdaa755652425d0d97378b645ad867ce2c0585ae8cc5a449f1d681371608d"
+    }
+  ]
+}

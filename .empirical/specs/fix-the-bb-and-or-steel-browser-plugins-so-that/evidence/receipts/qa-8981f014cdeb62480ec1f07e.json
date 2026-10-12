@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-8981f014cdeb62480ec1f07e",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "Fresh-context verification confirms the same-message Steel handoff rule remains coupled across both instruction surfaces, the viewer UI source remains unchanged and matches the existing screenshot, and the Dockside repair changes only the stale test expectation to match the current two-column runtime source.",
+  "passed": true,
+  "startedAt": "2026-10-12T17:47:30.625Z",
+  "completedAt": "2026-10-12T17:47:30.625Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-the-bb-and-or-steel-browser-plugins-so-that",
+    "specRevision": 14,
+    "specDigest": "sha256:79d2a7b8e54ba3ad78a76e35c6a53b5c760805e2b6322bd8c340fba4c9283c51",
+    "treeDigest": "sha256:6bb009b40d21ab8f8483242f03183ef2bd4acb815ab7ad43ddd5c86da49bcf4a",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 19,
+    "gitCommit": "baa734294b1b40c26fc89a223ab04b5228470827",
+    "scope": [
+      "plugins/dockside/test/thread-card-layout.test.ts",
+      "plugins/steel-browser/server.ts",
+      "plugins/steel-browser/skills/steel-browser/SKILL.md",
+      "plugins/steel-browser/test/distribution.test.ts"
+    ],
+    "scopeDigest": "sha256:95753ccbcb5178199f6c32b48dc08a1472e16b878b456312773372a9b12e6ede",
+    "textTreeDigest": "sha256:6bb009b40d21ab8f8483242f03183ef2bd4acb815ab7ad43ddd5c86da49bcf4a"
+  },
+  "digest": "sha256:5adbfa2a664cd29158691400a61e4dd22af10cfee49e7042b73ea64a2d8eafe6",
+  "kind": "qa",
+  "matrixDigest": "sha256:3d074cfe32b049a4f26e0df4dc153fb20c8fa7964d46cc5349159ba2a1ef9791",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Fresh-context verification confirms the same-message Steel handoff rule remains coupled across both instruction surfaces, the viewer UI source remains unchanged and matches the existing screenshot, and the Dockside repair changes only the stale test expectation to match the current two-column runtime source.",
+      "startedAt": "2026-10-12T17:47:30.625Z",
+      "completedAt": "2026-10-12T17:47:30.625Z",
+      "durationMs": 0,
+      "collector": "agent:fresh-context-final",
+      "command": null,
+      "result": null,
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:6bb009b40d21ab8f8483242f03183ef2bd4acb815ab7ad43ddd5c86da49bcf4a",
+      "sourceTreeAfter": "sha256:6bb009b40d21ab8f8483242f03183ef2bd4acb815ab7ad43ddd5c86da49bcf4a",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/fix-the-bb-and-or-steel-browser-plugins-so-that/evidence/artifacts/steel-following-1280.png",
+          "mediaType": "image/png",
+          "bytes": 19557,
+          "digest": "sha256:576fdaa755652425d0d97378b645ad867ce2c0585ae8cc5a449f1d681371608d"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}

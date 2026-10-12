@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:0bca1b99b4c7d1d960167acf66ee74dbf98bc5aad77170f08e0025c3442a6540",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "d544da34e76016e14cabded03ac8a355cea08acb",
+  "headCommit": "baa734294b1b40c26fc89a223ab04b5228470827",
+  "diffDigest": "sha256:51150081c7af557cf3d6e8291003a40cd5bd1b2ea867ed7ed3d4afc8208e2b53",
+  "verdict": "APPROVED",
+  "reviewerActor": "fresh-context-reviewer",
+  "reviewerInvocationId": "fresh-review-thr-9nh3s79zwi-1-20261012-integration",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: The contributed agent instructions require the Steel directive in the same assistant message for credentials, sign-in, MFA, consent, and manual browser actions.\n- PASS AC-2: The bundled skill repeats the same-message directive requirement and forbids stale embedded-browser-above references.\n- PASS AC-3: Focused distribution assertions protect both instruction surfaces.\n- PASS AC-UI-1: Viewer, authentication, session lifecycle, and responsive UI files are unchanged.\n- PASS AC-4: Dockside source-contract assertion now expects the current col-start-2 two-column layout with no runtime changes.\n\n## Security / correctness\n\nApproved. No credential, authentication, session, provisioning, CDP, or transport behavior changed.\n\n## Design / maintainability\n\nApproved. The implementation is narrowly scoped to instruction surfaces, focused tests, and a stale test expectation; runtime UI is unchanged.",
+  "bodyDigest": "sha256:4c5b32ed018c21149aaf282cd4da3be18b491fe75e87e67bc0f6e84752ef9f5c",
+  "findings": [],
+  "digest": "sha256:9ed938be7b06f8a9ef7a277d6b9e5422b65d63639df63d93ee13a382d674b919"
+}
