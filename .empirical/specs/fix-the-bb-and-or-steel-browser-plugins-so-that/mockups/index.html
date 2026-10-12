@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Steel browser handoff mockup</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --background: #f8f7fb;
+      --surface: #fff;
+      --foreground: #2d293d;
+      --muted: #726d80;
+      --border: #d9d4e5;
+      --accent: #4f75b8;
+      --healthy: #398257;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--background);
+      color: var(--foreground);
+      font: 15px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main { width: min(920px, calc(100% - 32px)); margin: 24px auto; }
+    .context { color: var(--muted); margin: 0 0 16px; }
+    .message { display: grid; gap: 14px; }
+    .viewer {
+      width: min(100%, 560px);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: 0 8px 24px rgb(28 25 40 / 8%);
+    }
+    .viewer header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 44px;
+      padding: 7px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .title { display: flex; align-items: center; gap: 9px; }
+    .monitor {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--accent);
+      font-size: 17px;
+    }
+    strong, small { display: block; }
+    small { color: var(--healthy); font-size: 12px; }
+    .actions { display: flex; gap: 4px; }
+    button {
+      width: 30px;
+      height: 30px;
+      border: 1px solid transparent;
+      border-radius: 5px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 17px;
+      cursor: pointer;
+    }
+    button:hover { border-color: var(--border); background: var(--background); }
+    .viewport {
+      display: grid;
+      aspect-ratio: 1;
+      place-items: center;
+      background:
+        linear-gradient(#edf1f5 0 46px, #fff 46px);
+      color: #252936;
+    }
+    .site {
+      width: 76%;
+      padding: 20px;
+      border: 1px solid #d7dce3;
+      border-radius: 8px;
+      background: white;
+      box-shadow: 0 6px 20px rgb(36 42 52 / 10%);
+    }
+    .site h2 { margin: 0 0 14px; font-size: 18px; letter-spacing: 0; }
+    .field { height: 38px; margin-bottom: 10px; border: 1px solid #aeb6c2; border-radius: 5px; }
+    .submit { width: 100%; height: 38px; background: #202633; color: white; font-weight: 600; }
+    .handoff { max-width: 820px; margin: 0; font-size: 17px; }
+    .handoff b { font-weight: 700; }
+    .note {
+      margin-top: 18px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    @media (max-width: 600px) {
+      main { width: min(100% - 20px, 560px); margin-top: 10px; }
+      .handoff { font-size: 15px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="context">Direction 1: same-message native browser handoff</p>
+    <article class="message">
+      <section class="viewer" aria-label="Steel browser in this thread">
+        <header>
+          <div class="title">
+            <span class="monitor" aria-hidden="true">▣</span>
+            <span><strong>Steel Browser</strong><small>Session available</small></span>
+          </div>
+          <div class="actions">
+            <button type="button" title="Minimize browser" aria-label="Minimize browser">−</button>
+            <button type="button" title="Reload browser" aria-label="Reload browser">↻</button>
+          </div>
+        </header>
+        <div class="viewport">
+          <div class="site" aria-label="Example sign-in page">
+            <h2>Sign in</h2>
+            <div class="field"></div>
+            <div class="field"></div>
+            <button class="submit" type="button">Continue</button>
+          </div>
+        </div>
+      </section>
+      <p class="handoff">
+        Steel has reached the sign-in page. <b>Please sign in directly in the
+        embedded browser above</b>, then tell me when you are in so I can
+        continue.
+      </p>
+    </article>
+    <p class="note">
+      The viewer and request are emitted together. A later MFA or manual-action
+      request repeats the native viewer directive in that response.
+    </p>
+  </main>
+  <script>
+    document.querySelector('[aria-label="Minimize browser"]').addEventListener("click", (event) => {
+      const viewport = document.querySelector(".viewport");
+      viewport.hidden = !viewport.hidden;
+      event.currentTarget.textContent = viewport.hidden ? "+" : "−";
+      event.currentTarget.setAttribute("aria-label", viewport.hidden ? "Restore browser" : "Minimize browser");
+    });
+    document.querySelector('[aria-label="Reload browser"]').addEventListener("click", () => {
+      const status = document.querySelector("small");
+      status.textContent = "Reconnected";
+      setTimeout(() => { status.textContent = "Session available"; }, 900);
+    });
+  </script>
+</body>
+</html>
