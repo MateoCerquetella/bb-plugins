@@ -1,0 +1,29 @@
+{
+  "name": "bb-plugin-activity-overview",
+  "version": "0.1.0",
+  "description": "Compact local activity overview dashboard for BB.",
+  "license": "MIT",
+  "type": "module",
+  "engines": { "bb": ">=0.40", "bbPluginSdk": ">=0.4.21" },
+  "bb": {
+    "name": "Activity Overview",
+    "description": "Contributions, pull requests, reviews, streaks, and attention items.",
+    "branding": { "icon": "./assets/icon.svg" },
+    "server": "./server.ts",
+    "app": "./app.tsx",
+    "skills": []
+  },
+  "files": ["app.tsx", "app.css", "data.ts", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "env -u BB_CLI bb plugin build .",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test test/*.test.ts",
+    "check": "npm run typecheck && npm test && npm run build"
+  },
+  "devDependencies": {
+    "@get-bb/plugin-sdk": "0.4.21",
+    "@types/react": "^19.0.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}

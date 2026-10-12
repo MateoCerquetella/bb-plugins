@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "sequence": 4,
+  "previousDigest": "sha256:46e4dd3955934059a833c5ffa1e632fe6eca5c76860f69e4e747f8b32f3b0e18",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Defined the activity-overview React architecture, pure local view-model flow, responsive token-based styling, and accepted implementation decision.",
+  "createdAt": "2026-10-12T16:13:51.392Z",
+  "stateBeforeDigest": "sha256:82d6fc974d1ec61726a7606265cda5b056cc31f698909597f7ff73ae93a8301d",
+  "stateAfterDigest": "sha256:67f240793b95390aa08d61b1262ef9ad1b1c3e551db329805de60d2d357173b2",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 4,
+    "activeFeature": "activity-overview",
+    "request": "Please do it as the picture NOW. Build a new independently installable BB plugin mimicking the supplied screenshot's lower Overview dashboard: contributions, pull requests opened, pull requests merged, reviews, period/repository selectors, annual contribution heatmap, current/longest streak, most-active month/day, and needs-your-attention list. Choose sensible implementation defaults from this repository and proceed autonomously.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "yolo",
+    "phase": "plan",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Defined the activity-overview React architecture, pure local view-model flow, responsive token-based styling, and accepted implementation decision.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:8d4decddf24fcb1e85d06958c8282e2be0b29408fd565611ffc144436e25e2d6",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:78efcca36fed47b51ee34bf5126afed33b3f2abf40de3b72c8440cdf4df2d6d2",
+    "impactDigest": "sha256:3c1cff6a9a3c548605b2bc8e5d988efc3f3b3e393f4c34e1ad8aece3b6787cbb",
+    "capabilityClaimId": "activity-overview-e7a0c75962ca",
+    "authorizationDigest": "sha256:1a09c4975354d7dfb27cc60926fc2068ed36be5a81bcb794126a63724bc835a4",
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-12T16:13:51.392Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "activity-overview-e7a0c75962ca",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "activity-overview",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_hs4aspxfcg-1/bb-plugins",
+      "worktreeId": "sha256:062047b6cbc58808fbfe024f6c68649dd502a08c472f460e8ccb4371a2c5c90d",
+      "baseCommit": "4880d65e1ff282c7f50ca94ab27cf969143e0222",
+      "baseTree": "741348cd8d6cf72e02759a116a4df9636eaf2dec",
+      "bases": {
+        "activity-overview": {
+          "capability": "activity-overview",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "local activity overview dashboard": null,
+            "filtered dashboard summary": null,
+            "accessible responsive presentation": null
+          }
+        }
+      },
+      "capabilities": [
+        "activity-overview"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-12T16:12:45.403Z",
+      "heartbeatAt": "2026-10-12T16:12:45.403Z",
+      "digest": "sha256:d37cc4daa468abc0e85603fc9e2e2219ca9d5352520078e4d709d03b08f4f122"
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:d3a819dd467e5d2eb591f32f0a7d67b277862ac88616fc248e214273153feb91"
+}

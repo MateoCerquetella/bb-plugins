@@ -1,0 +1,23 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Activity Overview mockup</title>
+<style>
+  :root { color-scheme: dark; font: 14px system-ui; background:#15171a; color:#eef0f2; }
+  body { margin:0; padding:28px; max-width:1040px; margin-inline:auto; }
+  header { display:flex; justify-content:space-between; gap:16px; align-items:end; }
+  h1 { font-size:24px; margin:0 0 4px; } p { color:#9da4ad; margin:0; }
+  select { background:#22262b; color:inherit; border:1px solid #3b424b; border-radius:6px; padding:8px 28px 8px 10px; }
+  .toolbar { display:flex; gap:8px; } main { margin-top:22px; }
+  .metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .metric, .panel { background:#1d2024; border:1px solid #30363d; border-radius:8px; padding:14px; }
+  .metric small, .muted { color:#9da4ad; } .metric strong { display:block; font-size:25px; margin-top:8px; }
+  .grid { display:grid; grid-template-columns:1.5fr 1fr; gap:10px; margin-top:10px; }
+  .heat { display:grid; grid-template-columns:repeat(26, minmax(7px,1fr)); gap:3px; margin-top:14px; }
+  .heat i { aspect-ratio:1; border-radius:2px; background:#2b3138; } .heat i:nth-child(3n){background:#245b43}.heat i:nth-child(5n){background:#2f8f61}.heat i:nth-child(11n){background:#65c48a}
+  ul { list-style:none; padding:0; margin:12px 0 0; } li { display:flex; justify-content:space-between; padding:9px 0; border-top:1px solid #30363d; }
+  @media (max-width:720px) { body{padding:18px}.metrics{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr} header{align-items:start; flex-direction:column}.toolbar{width:100%}.toolbar select{flex:1} }
+</style>
+<header><div><h1>Overview</h1><p>Activity across your repositories</p></div><div class="toolbar"><select aria-label="Period"><option>Last 12 months</option><option>Last 30 days</option></select><select aria-label="Repository"><option>All repositories</option><option>bb-plugins</option></select></div></header>
+<main><section class="metrics"><div class="metric"><small>Contributions</small><strong>1,284</strong><span class="muted">+18% vs prior</span></div><div class="metric"><small>PRs opened</small><strong>86</strong><span class="muted">12 this month</span></div><div class="metric"><small>PRs merged</small><strong>72</strong><span class="muted">84% merge rate</span></div><div class="metric"><small>Reviews</small><strong>214</strong><span class="muted">+31 this month</span></div></section>
+<section class="grid"><div class="panel"><strong>Contribution activity</strong><span class="muted"> 1,284 contributions</span><div class="heat" aria-label="Annual contribution heatmap">$(printf '<i></i>%.0s' {1..364})</div></div><div class="panel"><strong>Patterns</strong><ul><li><span>Current streak</span><b>12 days</b></li><li><span>Longest streak</span><b>38 days</b></li><li><span>Most active month</span><b>October</b></li><li><span>Most active day</span><b>Tuesday</b></li></ul></div></section>
+<section class="panel" style="margin-top:10px"><strong>Needs your attention</strong><ul><li><span>Review requested in <b>bb-plugins</b></span><button>Open</button></li><li><span>PR #184 has conflicts</span><button>Open</button></li><li><span>3 stale branches</span><button>View</button></li></ul></section></main>

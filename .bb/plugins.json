@@ -46,6 +46,10 @@
     {
       "name": "conversation-space",
       "source": "./plugins/conversation-space"
+    },
+    {
+      "name": "activity-overview",
+      "source": "./plugins/activity-overview"
     }
   ]
 }
