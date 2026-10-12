@@ -33,6 +33,24 @@ export function statusFor(thread: { indicator: string; indicatorLabel: string | 
   return thread.indicatorLabel?.trim() || "Status unavailable";
 }
 
+export function statusIconFor(indicator: string | undefined) {
+  switch (indicator) {
+    case "runtime":
+    case "workflow":
+    case "background-agent":
+    case "background-command":
+    case "plan-mode":
+    case "goal": return "working";
+    case "waiting-for-input": return "waiting";
+    case "unread-error": return "error";
+    case "unread-success": return "unread";
+    case "draft":
+    case "working-draft": return "draft";
+    case "none": return "idle";
+    default: return "unknown";
+  }
+}
+
 export interface Gesture { id: number; x: number; y: number; cancelled: boolean }
 export function updateGesture(start: Gesture, x: number, y: number): Gesture {
   return { ...start, cancelled: start.cancelled || Math.abs(y - start.y) > 20 };

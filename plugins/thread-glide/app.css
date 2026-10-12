@@ -17,13 +17,19 @@
   background: transparent; color: inherit; border: 1px solid var(--border);
   border-radius: 6px; cursor: pointer;
 }
-.tg-arrow { font-size: 22px; line-height: 1; }
+.tg-arrow-icon { width: 20px; height: 20px; }
 .tg-arrow:disabled { opacity: .28; cursor: default; }
 .tg-arrow:not(:disabled):active { background: var(--muted); }
 .tg-arrow:focus-visible, .tg-swipe:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 .tg-swipe { touch-action: pan-y; user-select: none; overflow: hidden; text-align: center; padding: 4px; min-height: 44px; }
 .tg-title { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 600; }
 .tg-meta { display: flex; justify-content: center; gap: 6px; color: var(--muted-foreground); font-size: 11px; line-height: 16px; height: 16px; margin-top: 4px; }
-.tg-status { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tg-status { display: inline-flex; align-items: center; gap: 4px; min-width: 0; overflow: hidden; }
+.tg-status-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tg-status-icon { width: 14px; height: 14px; flex-shrink: 0; }
+.tg-status-working .tg-status-icon { color: var(--success-foreground, var(--primary)); }
+.tg-status-waiting .tg-status-icon { color: var(--warning-text, var(--warning, currentColor)); }
+.tg-status-error .tg-status-icon { color: var(--destructive); }
+.tg-status-unread .tg-status-icon { color: var(--primary); }
 .tg-position { flex-shrink: 0; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .tg-retry { color: var(--foreground); background: transparent; border: 0; text-decoration: underline; font-size: 12px; min-height: 44px; cursor: pointer; }

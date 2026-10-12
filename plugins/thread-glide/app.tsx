@@ -3,7 +3,8 @@ import {
   experimental_useSidebarThreads,
 } from "@get-bb/plugin-sdk/app";
 import { useEffect, useRef, useState } from "react";
-import { navigationThreads, neighbor, titleFor, statusFor, updateGesture, swipeDirection, type Gesture } from "./lib/navigation";
+import { navigationThreads, neighbor, titleFor, statusFor, statusIconFor, updateGesture, swipeDirection, type Gesture } from "./lib/navigation";
+import { Icon } from "./components/icon";
 import "./app.css";
 
 function Navigator({ threadId }: { threadId: string }) {
@@ -26,6 +27,7 @@ function Navigator({ threadId }: { threadId: string }) {
   const previous = neighbor(threads, threadId, -1);
   const next = neighbor(threads, threadId, 1);
   const status = statusFor(threads[index]);
+  const statusIcon = statusIconFor(threads[index]?.indicator);
   const label = state.status === "loading" ? "Loading threads"
     : state.status === "error" ? "Threads unavailable"
     : index < 0 ? "Thread unavailable" : titleFor(threads[index]);
@@ -43,7 +45,7 @@ function Navigator({ threadId }: { threadId: string }) {
   };
   return <nav className="tg-nav" aria-label="Thread navigation" aria-busy={state.status === "loading" || pending}>
     <button className="tg-arrow" type="button" title="Previous thread" aria-label="Previous thread"
-      disabled={!previous || pending} onClick={() => move(-1)} aria-hidden={false}>{"\u2190"}</button>
+      disabled={!previous || pending} onClick={() => move(-1)}><Icon name="previous" className="tg-arrow-icon" /></button>
     <div className="tg-swipe" role="group" tabIndex={0} aria-label="Thread position; left and right arrows change thread"
       onKeyDown={event => {
         if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
@@ -74,14 +76,17 @@ function Navigator({ threadId }: { threadId: string }) {
             onClick={() => window.location.reload()}>Reload</button>
         : <span className="tg-meta" aria-live="polite" aria-atomic="true">
             {index >= 0 ? <>
-              <span className="tg-status" title={status}>{status}</span>
+              <span className={`tg-status tg-status-${statusIcon}`} title={status}>
+                <Icon name={statusIcon} className="tg-status-icon" />
+                <span className="tg-status-text">{status}</span>
+              </span>
               <span aria-hidden="true">{"\u00b7"}</span>
               <span className="tg-position">{`${index + 1} / ${threads.length}`}</span>
             </> : "\u00a0"}
           </span>}
     </div>
     <button className="tg-arrow" type="button" title="Next thread" aria-label="Next thread"
-      disabled={!next || pending} onClick={() => move(1)} aria-hidden={false}>{"\u2192"}</button>
+      disabled={!next || pending} onClick={() => move(1)}><Icon name="next" className="tg-arrow-icon" /></button>
   </nav>;
 }
 
