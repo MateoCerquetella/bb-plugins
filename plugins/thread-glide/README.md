@@ -39,5 +39,5 @@ npm install
 npm run check --workspace bb-plugin-thread-glide
 ```
 
-BB 0.40.0 ships SDK 0.4.29. Build scripts clear `BB_CLI` to use the pinned
+BB 0.40.0 ships SDK 0.4.21. Build scripts clear `BB_CLI` to use the pinned
 workspace toolchain. No vendored SDK declarations or host patches are required.

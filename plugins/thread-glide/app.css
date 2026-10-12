@@ -17,7 +17,7 @@
   background: transparent; color: inherit; border: 1px solid var(--border);
   border-radius: 6px; cursor: pointer;
 }
-.tg-arrow svg { width: 20px; height: 20px; }
+.tg-arrow { font-size: 22px; line-height: 1; }
 .tg-arrow:disabled { opacity: .28; cursor: default; }
 .tg-arrow:not(:disabled):active { background: var(--muted); }
 .tg-arrow:focus-visible, .tg-swipe:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "license": "MIT",
-  "engines": { "bb": ">=0.40.0", "bbPluginSdk": ">=0.4.29" },
+  "engines": { "bb": ">=0.40.0", "bbPluginSdk": ">=0.4.21" },
   "bb": {
     "name": "Thread Glide",
     "description": "Mobile previous/next arrows and safe swipe navigation between project threads.",
@@ -24,7 +24,7 @@
     "check": "npm run typecheck && npm test && npm run build"
   },
   "devDependencies": {
-    "@get-bb/plugin-sdk": "0.4.29",
+    "@get-bb/plugin-sdk": "0.4.21",
     "bb-app": "0.40.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",

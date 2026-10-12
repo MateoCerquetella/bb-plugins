@@ -3,7 +3,6 @@ import {
   experimental_useSidebarThreads,
 } from "@get-bb/plugin-sdk/app";
 import { useEffect, useRef, useState } from "react";
-import { Icon } from "./components/ui/icon";
 import { navigationThreads, neighbor, titleFor, updateGesture, swipeDirection, type Gesture } from "./lib/navigation";
 import "./app.css";
 
@@ -43,7 +42,7 @@ function Navigator({ threadId }: { threadId: string }) {
   };
   return <nav className="tg-nav" aria-label="Thread navigation" aria-busy={state.status === "loading" || pending}>
     <button className="tg-arrow" type="button" title="Previous thread" aria-label="Previous thread"
-      disabled={!previous || pending} onClick={() => move(-1)}><Icon name="ArrowLeft" /></button>
+      disabled={!previous || pending} onClick={() => move(-1)} aria-hidden={false}>{"\u2190"}</button>
     <div className="tg-swipe" role="group" tabIndex={0} aria-label="Thread position; left and right arrows change thread"
       onKeyDown={event => {
         if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
@@ -75,7 +74,7 @@ function Navigator({ threadId }: { threadId: string }) {
         : <span className="tg-position" aria-live="polite">{index >= 0 ? `${index + 1} / ${threads.length}` : "\u00a0"}</span>}
     </div>
     <button className="tg-arrow" type="button" title="Next thread" aria-label="Next thread"
-      disabled={!next || pending} onClick={() => move(1)}><Icon name="ArrowRight" /></button>
+      disabled={!next || pending} onClick={() => move(1)} aria-hidden={false}>{"\u2192"}</button>
   </nav>;
 }
 
