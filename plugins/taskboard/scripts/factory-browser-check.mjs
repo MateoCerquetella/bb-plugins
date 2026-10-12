@@ -166,6 +166,42 @@ try {
   }
   await manual.getByRole('textbox', { name: 'Implementation plan' }).waitFor();
   await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, 'taskboard-review-repair-limit.png'), fullPage: true });
+  await page.evaluate(() => {
+    const record = window.factoryFixture;
+    record.automationError = null; record.stage = 'Build'; record.version++;
+    record.runs = [{ ...record.runs[1], id: 'blocked-build', kind: 'build', status: 'finished',
+      error: null, repairOf: null, reviewResult: null,
+      buildResult: { verdict: 'blocked', summary: 'Finish remaining work', revision: null } }];
+    window.factoryStartDelay = 300;
+    window.factoryStartError = 'Git checkout is unavailable';
+    window.factoryRefresh();
+  });
+  const startsBeforeContinue = await page.evaluate(() => window.factoryStarts);
+  const navigationBeforeContinue = await page.evaluate(() => window.factoryNavigation.length);
+  await manual.getByRole('button', { name: 'Continue in thread', exact: true }).click();
+  assert.equal(await manual.getByRole('button', { name: 'Continuing...', exact: true }).isDisabled(), true);
+  await manual.getByText('Git checkout is unavailable', { exact: true }).waitFor();
+  assert.equal(await page.evaluate(() => window.factoryNavigation.length), navigationBeforeContinue);
+  assert.equal(await page.evaluate(() => window.factoryStarts), startsBeforeContinue + 1);
+  await page.evaluate(() => { window.factoryStartError = null; });
+  await manual.getByRole('button', { name: 'Continue in thread', exact: true }).click();
+  await manual.getByText('Continuing Build', { exact: true }).waitFor();
+  await page.waitForFunction(count => window.factoryNavigation.length > count, navigationBeforeContinue);
+  assert.equal(await page.evaluate(() => window.factoryStarts), startsBeforeContinue + 2);
+  assert.equal(await page.evaluate(() => window.factoryNavigation.at(-1)), 'thr_build');
+  for (const status of ['failed', 'canceled']) {
+    await page.evaluate(status => {
+      const record = window.factoryFixture;
+      record.runs = [{ ...record.runs.at(-1), id: `build-${status}`, status, buildResult: null }];
+      record.version++; window.factoryRefresh();
+    }, status);
+    await manual.getByRole('button', { name: 'Retry build', exact: true }).waitFor();
+    assert.equal(await manual.getByRole('button', { name: 'Start build', exact: true }).count(), 0);
+    assert.equal(await manual.getByRole('button', { name: 'Continue in thread', exact: true }).count(), 0);
+    const startsBeforeOpen = await page.evaluate(() => window.factoryStarts);
+    await manual.getByRole('button', { name: 'Open session', exact: true }).click();
+    assert.equal(await page.evaluate(() => window.factoryStarts), startsBeforeOpen);
+  }
   for (const start of [false, true]) {
     await page.goto(`https://taskboard-preview.test/?creation=${start}`);
     await page.getByLabel('Title', { exact: true }).fill('Fix screenshot layout');

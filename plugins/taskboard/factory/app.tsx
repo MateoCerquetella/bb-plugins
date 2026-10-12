@@ -80,21 +80,64 @@ function ChangedFiles({ record, run }: { record: FactoryRecord; run: FactoryRun 
 }
 
 function RunDetail({ run, record, historical = false }: { run: FactoryRun; record: FactoryRecord; historical?: boolean }) {
+  const rpc = useRpc<TaskboardRpcContract>();
   const navigate = useBbNavigate();
+  const context = useBbContext();
+  const [continuing, setContinuing] = useState(false);
+  const [continueError, setContinueError] = useState<string | null>(null);
+  const continuePending = useRef(false);
   const passed = run.checks.filter(check => check.exitCode === 0).length;
   const failed = run.checks.filter(check => check.exitCode !== null && check.exitCode !== 0).length;
   const unknown = run.checks.length - passed - failed;
   const live = !historical && tone(run) === 'active' && !record.automationError;
   const needsAttention = tone(run) === 'attention' || tone(run) === 'failed' || !!record.automationError;
+  const canContinueBlockedBuild = !historical && run.kind === 'build' && run.status === 'finished' &&
+    run.buildResult?.verdict === 'blocked' && !!run.threadId;
+  async function continueBlockedBuild() {
+    if (continuePending.current) return;
+    continuePending.current = true;
+    setContinuing(true);
+    setContinueError(null);
+    try {
+      const result = await rpc.call('factoryStartTask', {
+        projectId: record.projectId,
+        source: record.source,
+        locator: record.locator,
+        contextThreadId: context.projectId === record.projectId ? context.threadId : null
+      });
+      const resumed = result.record.runs.at(-1);
+      const failure = result.record.automationError ?? resumed?.error;
+      if (failure) {
+        setContinueError(failure);
+        return;
+      }
+      if (!resumed?.threadId || !['starting', 'running'].includes(resumed.status)) {
+        setContinueError('The Build session did not resume. Refresh progress and try again.');
+        return;
+      }
+      navigate.toThread(resumed.threadId);
+    } catch (reason) {
+      setContinueError(reason instanceof Error ? reason.message : String(reason));
+    } finally {
+      continuePending.current = false;
+      setContinuing(false);
+    }
+  }
   return <section className="tb-run" data-tone={tone(run)} data-live={live}>
     {!historical && <div className="tb-run-heading">
       <Icon name={live ? 'Loading' : tone(run) === 'attention' || tone(run) === 'failed' ? 'AlertCircle' : 'Circle'} className="tb-live-mark size-4" />
       <strong>{labels[run.kind]}</strong><span className="tb-run-status">{runStatus(run)}</span>
-      {run.threadId && <span className="tb-session-action"><Button size="sm" variant={needsAttention ? 'outline' : 'ghost'} onClick={() => navigate.toThread(run.threadId!)}>
-        <Icon name="MessageCirclePlus" className="size-3.5" />
-        {needsAttention ? 'Continue in thread' : 'Open session'}
-      </Button></span>}
+      {run.threadId && <span className="tb-session-action">{canContinueBlockedBuild ?
+        <Button size="sm" variant="outline" disabled={continuing} aria-busy={continuing} onClick={() => void continueBlockedBuild()}>
+          <Icon name={continuing ? 'Loading' : 'MessageCirclePlus'} className="size-3.5" />
+          {continuing ? 'Continuing...' : 'Continue in thread'}
+        </Button> :
+        <Button size="sm" variant={needsAttention ? 'outline' : 'ghost'} onClick={() => navigate.toThread(run.threadId!)}>
+          <Icon name="MessageCirclePlus" className="size-3.5" />Open session
+        </Button>}
+      </span>}
     </div>}
+    {continueError && <p role="alert" className="text-xs text-destructive break-words">{continueError}</p>}
     <div className="tb-run-now"><p key={run.activity} aria-live={live ? 'polite' : 'off'}>{run.error ?? run.activity}</p>
       <time dateTime={run.startedAt}>{new Date(run.startedAt).toLocaleString()}</time>
     </div>
@@ -342,7 +385,7 @@ export function FactoryProgress({ item }: { item: WorkItem }) {
           </Button>}
         {!active && !record?.automatic && !record?.automationError && run.status === 'finished' && run.kind === 'investigate' &&
           <Button size="sm" disabled={busy} onClick={() => void start('plan')}>Generate plan</Button>}
-        {!active && approved && run.kind !== 'review' && (!record?.automatic || run.kind === 'build') &&
+        {!active && approved && run.status === 'finished' && run.kind !== 'review' && (!record?.automatic || run.kind === 'build') &&
           !['needs_input', 'blocked'].includes(run.buildResult?.verdict ?? '') &&
           <Button size="sm" disabled={busy} onClick={() => void start(run.kind === 'build' && run.status === 'finished' ? 'review' : 'build')}>
             {run.kind === 'build' && run.status === 'finished' ? 'Start review' : 'Start build'}
