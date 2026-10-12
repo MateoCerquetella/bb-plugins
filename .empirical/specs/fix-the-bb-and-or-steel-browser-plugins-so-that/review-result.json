@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "packetDigest": "sha256:c492f6f04c8d2e1cd73a39463fba729a28d45a68b0705243e8d7dd4a2209e979",
-  "resultPath": ".empirical/specs/fix-the-bb-and-or-steel-browser-plugins-so-that/reviews/71612c68b6d2f236c8bd56e0.json",
-  "resultDigest": "sha256:71612c68b6d2f236c8bd56e026bbd005afbcb9bc6a45917c5faf7f345c39fb86",
-  "receiptId": "collected-c28558fb127f025a02d30df1"
+  "packetDigest": "sha256:0bca1b99b4c7d1d960167acf66ee74dbf98bc5aad77170f08e0025c3442a6540",
+  "resultPath": ".empirical/specs/fix-the-bb-and-or-steel-browser-plugins-so-that/reviews/9ed938be7b06f8a9ef7a277d.json",
+  "resultDigest": "sha256:9ed938be7b06f8a9ef7a277d6b9e5422b65d63639df63d93ee13a382d674b919",
+  "receiptId": "collected-e0dece263d3cfd64ae826e65"
 }

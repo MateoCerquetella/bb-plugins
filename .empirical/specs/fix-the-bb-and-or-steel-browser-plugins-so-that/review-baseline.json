@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "resultPath": ".empirical/specs/fix-the-bb-and-or-steel-browser-plugins-so-that/reviews/71612c68b6d2f236c8bd56e0.json",
-  "resultDigest": "sha256:71612c68b6d2f236c8bd56e026bbd005afbcb9bc6a45917c5faf7f345c39fb86",
-  "contractDigest": "sha256:1d2faa202277685d3916d17ce932f3831d0ae2828d97c884b1bb443fa56ee454",
+  "resultPath": ".empirical/specs/fix-the-bb-and-or-steel-browser-plugins-so-that/reviews/9ed938be7b06f8a9ef7a277d.json",
+  "resultDigest": "sha256:9ed938be7b06f8a9ef7a277d6b9e5422b65d63639df63d93ee13a382d674b919",
+  "contractDigest": "sha256:844e33fd4034d916c1ae0de4b8832b340e304788842cdcce643789daa1f59bbc",
   "carriedDeferred": []
 }

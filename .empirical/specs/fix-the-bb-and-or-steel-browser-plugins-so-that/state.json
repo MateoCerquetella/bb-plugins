@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 18,
+  "revision": 20,
   "activeFeature": "fix-the-bb-and-or-steel-browser-plugins-so-that",
   "request": "Fix the BB and/or Steel Browser plugins so that when an agent tells the user to sign in using the embedded Steel browser and emits the Steel browser surface directive, the browser is actually shown in the thread UI, as expected in the supplied screenshot context. Trace the directive/rendering integration, implement the appropriate fix, add focused regression coverage, and verify the relevant plugin checks and UI behavior.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "review",
+  "phase": "integrate",
   "status": "waiting",
   "repairAttempts": 1,
-  "message": "User explicitly requested completion. Consolidating the test-only Dockside CI repair for review, verification, and integration.",
+  "message": "Final verification passed: Empirical-selected automated QA, fresh-context QA, browser/screenshot evidence, focused Dockside test, and pull-request CI all passed. Security advisory remains non-blocking and runtime UI code is unchanged.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:79d2a7b8e54ba3ad78a76e35c6a53b5c760805e2b6322bd8c340fba4c9283c51",
@@ -20,23 +20,27 @@
   "capabilityClaimId": "fix-the-bb-and-or-steel-browser-plugins-so-that-c6350427c3da",
   "authorizationDigest": null,
   "evidence": [],
-  "evidenceReceiptIds": [],
+  "evidenceReceiptIds": [
+    "collected-e0dece263d3cfd64ae826e65",
+    "qa-36ed37521109cd403ebdb716",
+    "qa-8981f014cdeb62480ec1f07e",
+    "collected-ca258443c3e66d42d086f2d5"
+  ],
   "legacyEvidenceCount": 0,
   "completion": {
     "implemented": true,
-    "verified": false,
+    "verified": true,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "implemented",
+    "highest": "verified",
     "reasons": {
-      "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-12T17:43:05.534Z",
+  "updatedAt": "2026-10-12T17:48:10.019Z",
   "lifecycle": {
     "stage": "consolidation",
     "iteration": 1,

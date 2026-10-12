@@ -20,3 +20,10 @@ implementation is therefore the current instruction-only change.
 - Recommendation: Keep the explicit prohibition on requesting credentials in
   chat and on opening external viewers; retain the existing viewer's auth
   failure behavior.
+
+- Severity: low
+- Category: correctness
+- Location: `plugins/dockside/test/thread-card-layout.test.ts`
+- Recommendation: Keep the integration repair test-only. Aligning the stale
+  grid-column assertion has no runtime attack surface and avoids changing the
+  Dockside component or its rendered UI.
