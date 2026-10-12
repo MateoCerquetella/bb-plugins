@@ -20,6 +20,9 @@ All plugins in this repository are independently installable.
 
 ## Plugins
 
+Activity Overview: [local install and usage](./plugins/activity-overview). A
+filterable contribution dashboard with deterministic sample activity.
+
 | | Plugin | Install | What it does |
 | --- | --- | --- | --- |
 | <img src="./plugins/conversation-space/assets/icon.svg" width="128" height="128" alt="" /> | [Conversation Space (WIP)](./plugins/conversation-space) | [Local development install](./plugins/conversation-space#conversation-space-wip) | **Work in progress:** compact context usage, colored token percentages, and measured Jev routing diagnostics. |

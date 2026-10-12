@@ -13,17 +13,21 @@
     "app": "./app.tsx",
     "skills": []
   },
-  "files": ["app.tsx", "app.css", "data.ts", "README.md", "LICENSE"],
+  "files": ["app.tsx", "component.tsx", "server.ts", "assets/", "app.css", "data.ts", "README.md", "LICENSE"],
   "scripts": {
     "build": "env -u BB_CLI bb plugin build .",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test test/*.test.ts",
+    "test": "tsx --test test/*.test.ts",
     "check": "npm run typecheck && npm test && npm run build"
   },
   "devDependencies": {
     "@get-bb/plugin-sdk": "0.4.21",
+    "@types/jsdom": "^21.1.7",
     "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "@types/node": "^22.0.0",
+    "jsdom": "^26.1.0",
+    "tsx": "^4.20.0",
     "typescript": "^5.7.0"
   }
 }
