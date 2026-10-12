@@ -29,6 +29,9 @@ test("period and repository selectors update the rendered summary", async () => 
   assert.equal(repository!.value, "taskboard");
   assert.match(container.textContent ?? "", /38 contributions in selected period/);
   assert.match(container.textContent ?? "", /Branch is 14 days old/);
+  const attentionAction = container.querySelector<HTMLButtonElement>(".attention button");
+  await act(async () => attentionAction!.click());
+  assert.match(container.textContent ?? "", /Selected: PR #92 needs review/);
   await act(async () => root.unmount());
   dom.window.close();
 });
