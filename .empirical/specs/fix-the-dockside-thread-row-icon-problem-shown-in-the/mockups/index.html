@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dockside root provider icon repair</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #111116;
+        --fg: #d8d5e5;
+        --muted: #918da3;
+        --line: #292733;
+        --green: #38f14b;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        padding: 24px;
+        background: #09090d;
+        color: var(--fg);
+        font: 14px/1.3 ui-sans-serif, system-ui, sans-serif;
+      }
+      main {
+        width: min(100%, 390px);
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--bg);
+      }
+      .project, .thread {
+        display: grid;
+        align-items: center;
+      }
+      .project {
+        grid-template-columns: 20px 1fr auto;
+        gap: 8px;
+        height: 32px;
+        font-weight: 650;
+      }
+      .badge {
+        display: grid;
+        width: 20px;
+        height: 20px;
+        place-items: center;
+        border: 1px solid rgb(0 0 0 / 0.2);
+        border-radius: 6px;
+        background: var(--green);
+        color: #071408;
+        font-size: 11px;
+      }
+      .thread {
+        grid-template-columns: 14px minmax(0, 1fr) auto;
+        grid-template-rows: 16px 16px;
+        column-gap: 8px;
+        min-height: 40px;
+        padding: 4px 8px;
+      }
+      .provider {
+        display: grid;
+        width: 14px;
+        height: 14px;
+        place-items: center;
+        overflow: hidden;
+        color: var(--muted);
+      }
+      .provider svg { display: block; width: 12px; height: 12px; }
+      .title, .location { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .title { grid-column: 2; grid-row: 1; font-weight: 600; }
+      .location { grid-column: 2; grid-row: 2; color: var(--muted); font-size: 12px; }
+      .time { grid-column: 3; grid-row: 1; color: var(--muted); font-size: 12px; }
+      .status { grid-column: 3; grid-row: 2; color: #d7a900; font-size: 12px; }
+      .note {
+        margin-top: 12px;
+        padding-top: 10px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <main aria-label="Corrected Dockside icon layout">
+      <div class="project">
+        <span class="badge" aria-hidden="true">B</span>
+        <span>Bandely</span>
+        <span style="color: var(--muted)">5</span>
+      </div>
+      <div class="thread">
+        <span class="badge" aria-label="Project: Bandely">B</span>
+        <span class="title">Update catalog PDF</span>
+        <span class="location">Bandely</span>
+        <span class="time">now</span>
+        <span class="status" style="display:flex;align-items:center;gap:5px">
+          <span class="provider" aria-label="OpenAI provider">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2a5 5 0 0 1 4.3 2.5A5 5 0 0 1 22 9a5 5 0 0 1-1.4 3.5A5 5 0 0 1 18 19a5 5 0 0 1-4 1.9A5 5 0 0 1 6.5 19 5 5 0 0 1 2 13a5 5 0 0 1 1.4-3.5A5 5 0 0 1 6 4a5 5 0 0 1 6-2Z"></path>
+            </svg>
+          </span>
+          <span>working</span>
+        </span>
+      </div>
+      <div class="note">One unobstructed project badge on the left. One provider glyph beside status on the right.</div>
+    </main>
+  </body>
+</html>

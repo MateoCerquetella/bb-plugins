@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "feature": "fix-the-dockside-thread-row-icon-problem-shown-in-the",
+  "revision": 4,
+  "reason": "Tighten two remaining acceptance phrases to match the revised contract: selection mode replaces the leading project badge with its checkbox, and focused coverage guards both project-badge placement and the single trailing provider slot.",
+  "spec": "# Fix The Dockside Thread Row Icon Problem Shown In The\n\n## Request\n\n> Fix the Dockside thread-row icon problem shown in the supplied screenshot: provider icons and adjacent project/letter marks visually overlap in the leading icon area. Preserve the existing compact layout and project badges, make the thread icon slot render cleanly at supported densities, add focused regression coverage, and verify the Dockside UI in a browser with a screenshot.\n\n## Goal\n\nRender each grouped Dockside root with one clean project badge in the leading\nslot and one compact provider identity beside its trailing status, eliminating\nthe duplicate provider mark that overlaps the project letter while retaining\nthe two-row thread layout.\n\n## Acceptance Criteria\n\n- [ ] [AC-1] Every grouped non-selection root thread row reserves exactly one\n  fixed leading icon slot for its project badge.\n- [ ] [AC-2] The root provider glyph appears exactly once in trailing metadata,\n  immediately before the family status icon, and never overlaps the leading\n  project letter, title, or neighboring content.\n- [ ] [AC-3] Project header and grouped-root badges share the configured project\n  color and initial.\n- [ ] [AC-4] Selection mode continues to replace the provider glyph with its\n  checkbox without changing the two-row root-card layout.\n- [ ] [AC-5] Focused automated coverage guards the root provider slot's\n  dimensions and containment.\n- [ ] [AC-UI-1] [UI] A browser screenshot shows clean root provider icons in\n  Dockside with no badge/icon collision.\n\n## Scope\n\n- Dockside grouped-root project badge and provider glyph placement.\n- Provider glyph containment in root and child thread rows.\n- Focused layout-contract tests and browser verification.\n\n## Non-goals\n\n- Changing project badge colors, initials, or project header layout.\n- Changing provider artwork or status/PR metadata.\n- Redesigning child disclosure, row density, or the two-row card structure.\n\n## Verification\n\n- Run Dockside's focused tests and typecheck.\n- Build/reload the local Dockside plugin.\n- Inspect the sidebar in the bound Steel browser and retain a screenshot\n  showing one unobstructed leading project badge and one trailing provider\n  glyph.\n\n## Capability Deltas\n\nSee `deltas/dockside-thread-management.md`.\n",
+  "deltas": [
+    {
+      "capability": "dockside-thread-management",
+      "purpose": null,
+      "requirements": [
+        {
+          "operation": "modified",
+          "name": "Root family cards have exactly two semantic rows",
+          "contents": "### Requirement: Root family cards have exactly two semantic rows\n\nEvery root MUST render exactly two compact fixed rows. Row one MUST contain the\nfamily state/activity icon, truncated title, and far-right elapsed time. Row two\nMUST contain truncated branch text and one shrink-resistant right cluster with\nthe readable state badge, root-only PR metadata, and child disclosure/count.\nOutside selection mode, a grouped root's leading column MUST reserve exactly\none fixed project badge. Provider identity MUST appear exactly once in the\ntrailing metadata immediately before family status and MUST NOT overlap the\nproject badge or adjacent content. Selection mode MUST replace the leading\nproject slot with its checkbox. Children MUST never render PR metadata.\nAmbiguous icons MUST offer hover and keyboard-focus help.\n\n#### Scenario: Provider identity stays inside the root icon slot\n\n- **Given** a project has a colored initial badge and a root thread has a known\n  provider logo\n- **When** Dockside renders the project header and root row at either supported\n  density\n- **Then** the project initial appears unobstructed in the root's leading badge\n- **And** the root row shows one provider glyph beside its trailing status\n- **And** neither graphic overlaps the title or each other\n\n#### Scenario: Selection replaces provider identity\n\n- **Given** a root thread shows its project badge and trailing provider glyph\n- **When** the user enters selection mode\n- **Then** the leading project slot contains the selection checkbox instead\n- **And** the root retains its two-row geometry"
+        }
+      ],
+      "source": ".empirical/specs/fix-the-dockside-thread-row-icon-problem-shown-in-the/deltas/dockside-thread-management.md"
+    }
+  ],
+  "specDigest": "sha256:efe9bf1bb240334addcf790cce020af1cea3ec9bbe29a1990bdb4f67f035f692",
+  "approvedSpecRevision": 4,
+  "capabilityClaimId": "fix-the-dockside-thread-row-icon-problem-shown-in-the-b7bbab6a1cb3",
+  "impactDigest": "sha256:098d8f4282d3aa8aa1199db02f8764b35ce7c00b3b450ece444b4a46892aec3f",
+  "evidenceReceiptIds": []
+}

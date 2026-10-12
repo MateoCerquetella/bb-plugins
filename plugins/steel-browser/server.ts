@@ -1,10 +1,13 @@
 import type { BbPluginApi } from "@get-bb/plugin-sdk";
-import { rpcContract, scopeSchema, type CreateOptions, type Scope, type EnginePolicy } from "./contract.ts";
+import { rpcContract, scopeSchema, type CreateOptions, type Scope, type EnginePolicy, type ServiceId } from "./contract.ts";
 import { normalizeBaseUrl, SteelClient, SteelClientError } from "./steel-client.ts";
 import { ProjectBrowsers } from "./projects.ts";
 import { runBrowser } from "./engines.ts";
 import { bindingReady, ensureViewerShare, provisionProjectInstance, verifyProjectInstance } from "./provisioning.ts";
 import { actOnProject, parseBrowserAction } from "./actions.ts";
+import { SignIns } from "./sign-ins.ts";
+import { DashboardCache } from "./dashboard-cache.ts";
+import type { Dashboard } from "./contract.ts";
 
 const DEFAULT_OPTIONS: CreateOptions = {
   blockAds: true,
@@ -28,6 +31,8 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
     "If the project CDP loopback is on another host, use bb steel-browser tabs/inspect/click/fill/press/screenshot. Routed actions default to the newest tab; use --tab <index> to target an older one. Do not enter credentials in CLI arguments.",
   ].join("\n"));
   const projects = new ProjectBrowsers(bb.storage.kv);
+  const signIns = new SignIns(bb.storage.kv);
+  const dashboards = new DashboardCache<Dashboard>();
   const settings = bb.settings.define({
     jevCheckout: {
       type: "string",
@@ -94,6 +99,21 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
   }
 
   const handlers = {
+    async signIns(scope: Scope) {
+      return signIns.list((await resolve(scope)).projectId);
+    },
+    async confirmSignIn({ scope, service, label }: { scope: Scope; service: ServiceId; label: string }) {
+      return signIns.confirm((await resolve(scope)).projectId, service, label);
+    },
+    async forgetSignIn({ scope, service }: { scope: Scope; service: ServiceId }) {
+      return signIns.forget((await resolve(scope)).projectId, service);
+    },
+    async openSignIn({ scope, service }: { scope: Scope; service: ServiceId }) {
+      const { projectId } = await resolve(scope);
+      const binding = await ensureBinding(projectId);
+      await mutate(() => actOnProject(binding, { kind: "openSignIn", service }));
+      return { opened: true };
+    },
     async allProjects() {
       const available = await bb.sdk.projects.list({ includePersonal: true });
       return Promise.all(available.map(async project => {
@@ -125,22 +145,28 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
     async dashboard(scope: Scope) {
       try {
         const { projectId } = await resolve(scope);
+        return await dashboards.read(projectId, async () => {
         const binding = await ensureBinding(projectId);
         const result = await new SteelClient(binding.apiUrl).dashboard();
         const base = normalizeBaseUrl(binding.viewerUrl).toString();
         result.uiUrl = new URL("ui", base).toString();
         result.docsUrl = new URL("documentation/", base).toString();
         return result;
+        });
       } catch (error) {
         if (error instanceof SteelClientError) throw error;
         throw new SteelClientError(message(error));
       }
     },
     async createSession({ scope, options }: { scope: Scope; options: CreateOptions }) {
-      return mutate(async () => (await client(scope, true)).createSession(options));
+      const { projectId } = await resolve(scope);
+      try { return await mutate(async () => (await client(scope, true)).createSession(options)); }
+      finally { dashboards.invalidate(projectId); }
     },
     async releaseSession({ scope, sessionId }: { scope: Scope; sessionId: string }) {
-      return mutate(async () => (await client(scope)).releaseSession(sessionId));
+      const { projectId } = await resolve(scope);
+      try { return await mutate(async () => (await client(scope)).releaseSession(sessionId)); }
+      finally { dashboards.invalidate(projectId); }
     },
   };
 

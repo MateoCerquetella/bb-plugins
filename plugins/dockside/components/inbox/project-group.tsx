@@ -226,6 +226,8 @@ export function ProjectGroup({
               <ThreadCard
                 key={family.root.id}
                 thread={family.root}
+                projectName={group.project.name}
+                projectColorOverride={projectColorOverrides.get(group.project.id)}
                 childThreads={family.children}
                 providerInfoById={providerInfoById}
                 activeThreadId={activeThreadId}

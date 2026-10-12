@@ -8,10 +8,8 @@ import {
   Monitor,
   LayoutGrid,
   List,
-  LogIn,
   Maximize2,
   Minimize2,
-  X,
 } from "lucide-react";
 import {
   definePluginApp,
@@ -26,6 +24,9 @@ import {
 import type { BrowserSession, Dashboard, Scope, ProjectState, EnginePolicy, rpcContract } from "./contract.ts";
 import { callSteelRpc } from "./rpc-timeout.ts";
 import { useFollowViewer } from "./use-follow-viewer.ts";
+import { LiveViewer, useDocumentVisible } from "./live-viewer.tsx";
+import { liveViewerUrl } from "./viewer-protocol.ts";
+import { SignInsPanel } from "./sign-ins-panel.tsx";
 import "./app.css";
 
 const CREATE_OPTIONS = { blockAds: true, width: 1440, height: 900 } as const;
@@ -66,19 +67,24 @@ function useSteelDashboard(scope: Scope, shouldPoll: () => boolean = ALWAYS_POLL
   const [error, setError] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
   const startingRef = useRef(false);
+  const refreshing = useRef(false);
+  const mounted = useRef(true);
 
   const refresh = useCallback(async () => {
+    if (refreshing.current) return;
     if (!scope.threadId && !scope.projectId) {
       setDashboard(null);
       setError("No project selected.");
       return;
     }
     setError(null);
+    refreshing.current = true;
     try {
-      setDashboard(await rpc.call("dashboard", scope));
+      const result = await rpc.call("dashboard", scope);
+      if (mounted.current) setDashboard(result);
     } catch (cause) {
-      setError(errorMessage(cause));
-    }
+      if (mounted.current) setError(errorMessage(cause));
+    } finally { refreshing.current = false; }
   }, [rpc, scope]);
 
   const start = useCallback(async () => {
@@ -97,6 +103,7 @@ function useSteelDashboard(scope: Scope, shouldPoll: () => boolean = ALWAYS_POLL
     }
   }, [rpc, scope, refresh]);
   useEffect(() => {
+    mounted.current = true;
     let stopped = false;
     let timer: ReturnType<typeof setTimeout>;
     const poll = async () => {
@@ -104,7 +111,7 @@ function useSteelDashboard(scope: Scope, shouldPoll: () => boolean = ALWAYS_POLL
       if (!stopped) timer = setTimeout(poll, 15000);
     };
     void poll();
-    return () => { stopped = true; clearTimeout(timer); };
+    return () => { mounted.current = false; stopped = true; clearTimeout(timer); };
   }, [refresh, shouldPoll]);
   return { dashboard, error, refresh, start, starting };
 }
@@ -117,9 +124,8 @@ function ScopedSteelThreadPanel({ threadId }: { threadId: string }) {
   const scope = useScope(threadId);
   const { dashboard, error, refresh, start, starting } = useSteelDashboard(scope);
   const [playerKey, setPlayerKey] = useState(0);
-  const playerUrl = dashboard
-    ? new URL("v1/sessions/debug", dashboard.uiUrl.replace(/ui\/?$/, "")).toString()
-    : null;
+  const playerUrl = liveViewerUrl(dashboard);
+  const visible = useDocumentVisible();
   const active = dashboard?.sessions.some(session => ["idle", "live"].includes(session.status));
 
   return (
@@ -135,9 +141,8 @@ function ScopedSteelThreadPanel({ threadId }: { threadId: string }) {
           <RefreshCw aria-hidden="true" />
         </button>
       </header>
-      {playerUrl && active ? (
-        <iframe key={playerKey} src={playerUrl} title={`Steel browser for ${threadId}`}
-          allow="clipboard-read; clipboard-write" />
+      {playerUrl && active && visible ? (
+        <LiveViewer key={playerKey} url={playerUrl} title={`Steel browser for ${threadId}`} />
       ) : error || dashboard?.error ? (
         <div className="steel-panel-state" role="alert">{error ?? dashboard?.error}</div>
       ) : (
@@ -159,18 +164,17 @@ export function SteelBrowserDirective(props: PluginMessageDirectiveProps) {
 }
 
 function ScopedSteelBrowser({ message }: PluginMessageDirectiveProps) {
-  const { anchor, style, anchorStyle } = useFollowViewer(message.threadId);
+  const { anchor, style, anchorStyle, latest } = useFollowViewer(message.threadId);
   const scope = useScope(message.threadId);
+  const [minimized, setMinimized] = useState(false);
   const shouldPoll = useCallback(() => {
     const viewers = document.querySelectorAll(`[data-steel-thread="${CSS.escape(message.threadId)}"]`);
-    return viewers.item(viewers.length - 1) === anchor.current;
-  }, [anchor, message.threadId]);
+    return !minimized && viewers.item(viewers.length - 1) === anchor.current;
+  }, [anchor, message.threadId, minimized]);
   const { dashboard, error, refresh, start, starting } = useSteelDashboard(scope, shouldPoll);
   const [playerKey, setPlayerKey] = useState(0);
-  const [minimized, setMinimized] = useState(false);
-  const playerUrl = dashboard
-    ? new URL("v1/sessions/debug", dashboard.uiUrl.replace(/ui\/?$/, "")).toString()
-    : null;
+  const playerUrl = liveViewerUrl(dashboard);
+  const visible = useDocumentVisible();
   const active = dashboard?.sessions.some(session => ["idle", "live"].includes(session.status));
 
   return (
@@ -206,10 +210,10 @@ function ScopedSteelBrowser({ message }: PluginMessageDirectiveProps) {
         </div>
       </header>
       <div className="steel-inline-browser__viewport" hidden={minimized}>
-        {playerUrl && active ? (
-          <iframe key={playerKey} src={playerUrl}
-            title={`Steel browser for ${message.threadId}`}
-            allow="clipboard-read; clipboard-write" />
+        {playerUrl && active && latest && visible && !minimized ? (
+          <LiveViewer key={playerKey} url={playerUrl} title={`Steel browser for ${message.threadId}`} />
+        ) : !latest ? (
+          <div className="steel-panel-state">Viewer active in the latest browser message</div>
         ) : error || dashboard?.error ? (
           <div className="steel-panel-state" role="alert">{error ?? dashboard?.error}</div>
         ) : (
@@ -414,15 +418,9 @@ function ScopedSteelBrowserPage({ scope, picker }: { scope: Scope; picker: React
   const mounted = useRef(true);
   const [watching, setWatching] = useState(true);
   const [playerKey, setPlayerKey] = useState(0);
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [loginOpen, setLoginOpen] = useState(false);
-  const loginDialog = useRef<HTMLDialogElement>(null);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("list");
+  const visible = useDocumentVisible();
   const pageRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    if (loginOpen) loginDialog.current?.showModal();
-    else loginDialog.current?.close();
-  }, [loginOpen]);
 
   const refresh = useCallback(async () => {
     setBusy("refresh");
@@ -481,7 +479,7 @@ function ScopedSteelBrowserPage({ scope, picker }: { scope: Scope; picker: React
   const sessions = dashboard?.sessions ?? [];
   const endpoint = dashboard?.endpoint ?? (error ? "Endpoint unavailable" : "Loading endpoint...");
   const activeSession = sessions.find(session => ["idle", "live"].includes(session.status));
-  const playerUrl = dashboard ? new URL("v1/sessions/debug", dashboard.uiUrl.replace(/ui\/?$/, "")).toString() : null;
+  const playerUrl = liveViewerUrl(dashboard);
 
   return (
     <main className="steel-page" ref={pageRef}>
@@ -490,7 +488,7 @@ function ScopedSteelBrowserPage({ scope, picker }: { scope: Scope; picker: React
           <span className="steel-brand" aria-hidden="true"><PanelsTopLeft /></span>
           <div>
             <h1>Steel Browser</h1>
-            <p>Browser workspace</p>
+            <p>Persistent project browser</p>
           </div>
         </div>
         <div className="steel-actions">
@@ -544,15 +542,11 @@ function ScopedSteelBrowserPage({ scope, picker }: { scope: Scope; picker: React
               aria-label="Reload viewer" onClick={() => setPlayerKey(key => key + 1)} type="button">
               <RefreshCw aria-hidden="true" />
             </button>}
-            <button className="steel-secondary" disabled={!playerUrl || !activeSession}
-              onClick={() => setLoginOpen(true)} type="button">
-              <LogIn aria-hidden="true" /> Sign in / Take control
-            </button>
           </div>
         </div>
         <div className="steel-viewport">
-          {watching && connected && activeSession && playerUrl ? (
-            <iframe key={playerKey} src={playerUrl} title="Live Steel browser" allow="clipboard-write" />
+          {watching && visible && connected && activeSession && playerUrl ? (
+            <LiveViewer key={playerKey} url={playerUrl} title="Live Steel browser" />
           ) : (
             <div className="steel-viewer-empty">
               <Monitor aria-hidden="true" />
@@ -565,11 +559,13 @@ function ScopedSteelBrowserPage({ scope, picker }: { scope: Scope; picker: React
             </div>
           )}
         </div>
-        {watching && <p className="steel-viewer-note">
-          If BB Connect blocks this embedded viewer, authentication needs repair. External navigation is disabled.
-        </p>}
       </section>
 
+      <SignInsPanel scope={scope} rpc={rpc} onOpened={() => {
+        setWatching(true);
+        void refresh();
+        pageRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+      }} />
       <section aria-labelledby="steel-sessions-heading">
         <div className="steel-toolbar">
           <div>
@@ -648,35 +644,6 @@ function ScopedSteelBrowserPage({ scope, picker }: { scope: Scope; picker: React
         <code>{activeSession?.websocketUrl || "No active connection"}</code>
       </details>
 
-      <dialog ref={loginDialog} onClose={() => setLoginOpen(false)}
-        aria-labelledby="steel-login-title" className="steel-modal">
-            <div className="steel-modal-header">
-              <div>
-                <h2 id="steel-login-title">Sign in to this browser</h2>
-                <p>Complete the website login, then select Done.</p>
-              </div>
-              <button aria-label="Close sign-in dialog" className="steel-icon-button"
-                onClick={() => setLoginOpen(false)} title="Close" type="button">
-                <X aria-hidden="true" />
-              </button>
-            </div>
-            <div className="steel-modal-notice">
-              <LogIn aria-hidden="true" />
-              <span>Enter credentials directly on the website, not in BB chat.</span>
-            </div>
-            {loginOpen && playerUrl && (
-              <iframe className="steel-login-viewer" src={playerUrl}
-                title="Sign in to the live Steel browser" allow="clipboard-write" />
-            )}
-            <div className="steel-modal-actions">
-              <button onClick={() => setLoginOpen(false)} type="button">Cancel</button>
-              <button type="button" onClick={() => {
-                setWatching(true);
-                setPlayerKey(key => key + 1);
-                setLoginOpen(false);
-              }}>Done</button>
-            </div>
-      </dialog>
     </main>
   );
 }
