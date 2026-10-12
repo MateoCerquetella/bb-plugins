@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "resultPath": ".empirical/specs/fix-the-steel-browser-plugin-so-that-when-bb-is/reviews/58d222c97091e136f3474900.json",
+  "resultDigest": "sha256:58d222c97091e136f3474900b121caa7b6fb13641a34653ca72ea88a7e2bdd4d",
+  "contractDigest": "sha256:a45aeed90592866e3aa11f952cb31a6f7ff26a67a8004d36f0219cedf2c7b946",
+  "carriedDeferred": []
+}
