@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 8,
+  "revision": 9,
   "activeFeature": "fix-the-action-topbar-plugin-regression-where-the-action-menu",
   "request": "Fix the Action Topbar plugin regression where the action menu opens with “Search open tabs or actions…” but actions cannot be dragged and instead show “Reload BB to load Action dragging support.” Restore working action dragging from the topbar menu, add regression coverage, and verify the plugin UI and relevant checks.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "implement",
-  "status": "waiting",
+  "phase": "done",
+  "status": "done",
   "repairAttempts": 0,
-  "message": null,
+  "message": "Closed as merged-externally: Merged in pull request #63 as c00002a477d40bdce07ccdc87a0ce9d4a73342d4 into main; closed when the merge was observed.",
   "implementationActor": null,
   "workStartedAt": null,
   "specDigest": "sha256:d1b015081c57fec5505f01038621eda0b25b1d49da20fb997f8c7df8a8372e3d",
@@ -37,7 +37,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-03T01:38:11.733Z",
+  "updatedAt": "2026-10-09T00:38:51.745Z",
   "lifecycle": {
     "stage": "development",
     "iteration": 0,
@@ -71,5 +71,39 @@
     "heartbeatAt": "2026-10-03T01:08:54.566Z",
     "digest": "sha256:2c77c2b0f972f161695e2846aeb8767b9d1e0cf6df76228e2ae1fcfd7f2ada6c"
   },
-  "reviewFirst": true
+  "reviewFirst": true,
+  "closure": {
+    "schemaVersion": 1,
+    "outcome": "merged-externally",
+    "reason": "Merged in pull request #63 as c00002a477d40bdce07ccdc87a0ce9d4a73342d4 into main; closed when the merge was observed.",
+    "actor": "empirical",
+    "confirmation": "merge-observed",
+    "closedAtPhase": "implement",
+    "completionAtClosure": "none",
+    "externalMerge": {
+      "pullRequest": 63,
+      "url": "https://github.com/MateoCerquetella/bb-plugins/pull/63",
+      "state": "MERGED",
+      "mergeCommit": "c00002a477d40bdce07ccdc87a0ce9d4a73342d4",
+      "targetBranch": "main",
+      "ancestorOfTarget": true,
+      "observedAt": "2026-10-09T00:38:36.613Z"
+    },
+    "closedAt": "2026-10-09T00:38:51.230Z",
+    "digest": "sha256:036b4270b4ba81360fcc8704679d3c9e32d35aa5ceee35b9c4b912d18751e92f"
+  },
+  "completionRecord": {
+    "schemaVersion": 1,
+    "implementedBy": null,
+    "completedBy": "empirical",
+    "decisionBy": null,
+    "method": "merged-externally",
+    "reason": "Merged in pull request #63 as c00002a477d40bdce07ccdc87a0ce9d4a73342d4 into main; closed when the merge was observed.",
+    "at": "2026-10-09T00:38:51.745Z",
+    "revision": 9,
+    "completion": "none",
+    "sourceTreeDigest": "sha256:891c1f325f62d9b66e26d8aa3f21125885032117f56d532b394f62061e82c106",
+    "artifactTreeDigest": "sha256:a7b0881df34de35f5d410cb3e1f36bcc2d4c4689b9868248514d852d6817ab1e",
+    "digest": "sha256:a3c9d884d2f9b4ea17f55ddefd1c7b1c40c6557a7b533891a0b6be16f955c337"
+  }
 }

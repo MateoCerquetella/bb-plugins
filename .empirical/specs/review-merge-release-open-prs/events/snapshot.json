@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "feature": "review-merge-release-open-prs",
+  "lastSequence": 17,
+  "lastEventDigest": "sha256:4f784ca606a0485ac5e182d33015d65d4997dc85ed19642c221e90d3dbd5b226",
+  "stateDigest": "sha256:bfe24c2b2c8c96111ecd6552600f7001b9cf39fc6389f699558259d408fad36b",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 17,
+    "activeFeature": "review-merge-release-open-prs",
+    "request": "Review all open pull requests in MateoCerquetella/bb-plugins, merge those that are correct and verified, then create and publish new patch releases for affected BB plugins so the BB Community marketplace ranges resolve them.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "done",
+    "status": "done",
+    "repairAttempts": 0,
+    "message": "Closed as merged-externally: Merged in pull request #46 as d38e2d003f470a1df5edb2b11b2484d4eedba3da into main; closed when the merge was observed.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:70424b72bef5bfbb582b8dab86f13d1f879c24d458b579216f97934697cf6165",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:198eb35b899059ed9045f2ed90a9cca1c047e28f6d2cefd91cef4a1d7e0e45d9",
+    "impactDigest": "sha256:0ef2490ec0f0e93898cd2a2844c877df03835199d8011d5476417ab6fdbda821",
+    "capabilityClaimId": "review-merge-release-open-prs-7d601272d2cd",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-09T00:38:59.950Z",
+    "closure": {
+      "schemaVersion": 1,
+      "outcome": "merged-externally",
+      "reason": "Merged in pull request #46 as d38e2d003f470a1df5edb2b11b2484d4eedba3da into main; closed when the merge was observed.",
+      "actor": "empirical",
+      "confirmation": "merge-observed",
+      "closedAtPhase": "implement",
+      "completionAtClosure": "implemented",
+      "externalMerge": {
+        "pullRequest": 46,
+        "url": "https://github.com/MateoCerquetella/bb-plugins/pull/46",
+        "state": "MERGED",
+        "mergeCommit": "d38e2d003f470a1df5edb2b11b2484d4eedba3da",
+        "targetBranch": "main",
+        "ancestorOfTarget": true,
+        "observedAt": "2026-10-09T00:38:36.613Z"
+      },
+      "closedAt": "2026-10-09T00:38:59.491Z",
+      "digest": "sha256:52b85ce877914d20d888d94378d3bed3ffafc2918c342528d2f231fe0a815ef8"
+    },
+    "completionRecord": {
+      "schemaVersion": 1,
+      "implementedBy": "agent",
+      "completedBy": "empirical",
+      "decisionBy": null,
+      "method": "merged-externally",
+      "reason": "Merged in pull request #46 as d38e2d003f470a1df5edb2b11b2484d4eedba3da into main; closed when the merge was observed.",
+      "at": "2026-10-09T00:38:59.950Z",
+      "revision": 17,
+      "completion": "implemented",
+      "sourceTreeDigest": "sha256:891c1f325f62d9b66e26d8aa3f21125885032117f56d532b394f62061e82c106",
+      "artifactTreeDigest": "sha256:1494232d5295862c52a6c62b841b7f9123c3fe1d46a79ec1d4224ade549752a5",
+      "digest": "sha256:c2e41dfe771ac4bc74f73904ead026772b415d6c130c72ec393b5b55737d0319"
+    }
+  },
+  "compactedAt": "2026-10-09T00:39:02.936Z",
+  "digest": "sha256:94131b6b8aee8afb5c36340fa40d2a6b9744c298e749d170690abe862afd4d0e"
+}

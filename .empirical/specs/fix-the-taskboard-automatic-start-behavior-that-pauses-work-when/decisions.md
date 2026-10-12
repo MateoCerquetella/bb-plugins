@@ -1,5 +1,25 @@
 # Decisions: Resume Blocked Taskboard Builds
 
+## D-009: Explicit archived-author recovery
+
+Status: Accepted
+
+Supersedes the blanket rejection of archived authoring sessions. The reported
+Review-to-Build failure came from the same guard used for deleted sessions.
+Explicit Return to Build or Start task may unarchive the original author only
+after scope, approval, managed environment and native idle checks. Validate the
+same project, environment and readiness again after unarchive. Never restore a
+deleted thread or create a replacement checkout.
+
+Polling preserves completed evidence and does not undo user archive intent.
+Legacy archive-only failures with a recorded completion and output recover
+their completed status. Unarchive failures create no dispatch; lost send
+responses keep the existing uncertain-dispatch protection.
+
+Regression cases cover explicit and concurrent recovery, polling, legacy
+records, deleted/busy/moved workspaces, failed restoration and uncertain sends.
+Execution remains on demand under the iteration policy.
+
 ## D-008: Continue dispatches before navigation
 
 Status: Accepted
