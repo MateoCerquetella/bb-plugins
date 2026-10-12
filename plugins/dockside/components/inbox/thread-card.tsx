@@ -241,7 +241,7 @@ export function ThreadCard({
                   });
                 }}
                 className={cn(
-                  "relative z-10 col-start-1 row-span-2 min-w-0 size-4 shrink-0 cursor-pointer rounded border accent-primary transition-colors",
+                  "relative z-10 col-start-1 row-start-1 size-4 shrink-0 cursor-pointer rounded border accent-primary transition-colors",
                   "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
                   selectionDisabledReason !== null &&
                     "cursor-not-allowed opacity-35",
@@ -249,7 +249,7 @@ export function ThreadCard({
               />
             ) : null}
 
-            <div className="pointer-events-none relative col-start-2 row-span-2 flex min-w-0">
+            <div className="pointer-events-none relative col-start-1 row-span-2 min-w-0">
               <div
                 data-dockside-root-title-row=""
                 className="flex h-4 min-w-0 items-center gap-1.5"
@@ -289,7 +289,7 @@ export function ThreadCard({
 
             <div
               className={cn(
-                "relative z-10 col-start-3 row-span-2 flex shrink-0 flex-col items-end gap-0.5",
+                "relative z-10 col-start-2 row-span-2 flex shrink-0 flex-col items-end gap-0.5",
                 selectionMode && "pointer-events-none",
               )}
             >

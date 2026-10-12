@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 42,
+  "revision": 43,
   "activeFeature": "fix-the-taskboard-automatic-start-behavior-that-pauses-work-when",
   "request": "Fix the Taskboard automatic-start behavior that pauses work when a build reports recoverable blockers like the supplied Roten-App result. Improve automatic work startup so blocker summaries are handled accurately and the task does not stop prematurely when actionable implementation work can continue, while preserving genuine human-decision, tracker, evidence, and policy gates.",
   "profile": "complex",
@@ -37,7 +37,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-12T17:40:32.486Z",
+  "updatedAt": "2026-10-12T18:33:01.421Z",
   "lifecycle": {
     "stage": "iteration",
     "iteration": 8,
@@ -103,6 +103,6 @@
     "actor": "agent",
     "revision": 31
   },
-  "budgetExtensionMinutes": 156,
+  "budgetExtensionMinutes": 225,
   "reviewFirst": true
 }
