@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { navigationThreads, neighbor, titleFor, swipeDirection, updateGesture, type Thread } from "../lib/navigation.ts";
+import { navigationThreads, neighbor, titleFor, statusFor, swipeDirection, updateGesture, type Thread } from "../lib/navigation.ts";
 
 const thread = (id: string, createdAt: number, extra: Partial<Thread> = {}): Thread =>
   ({ id, createdAt, projectId: "p", title: id, titleFallback: null, parentThreadId: null, isArchived: false, ...extra });
@@ -24,6 +24,15 @@ test("boundaries and unknown identities never wrap", () => {
 test("titles use fallback for blank names", () => {
   assert.equal(titleFor(thread("a", 1, { title: " ", titleFallback: "Fallback" })), "Fallback");
   assert.equal(titleFor(undefined), "Untitled thread");
+});
+test("status preserves live host semantics without inferring completion", () => {
+  assert.equal(statusFor({ indicator: "runtime", indicatorLabel: "Thread is working" }), "Thread is working");
+  assert.equal(statusFor({ indicator: "waiting-for-input", indicatorLabel: "Thread needs user input" }), "Thread needs user input");
+  assert.equal(statusFor({ indicator: "unread-success", indicatorLabel: "Unread response" }), "Unread response");
+  assert.equal(statusFor({ indicator: "none", indicatorLabel: null }), "Idle");
+  assert.equal(statusFor({ indicator: "future-state", indicatorLabel: "New host status" }), "New host status");
+  assert.equal(statusFor({ indicator: "future-state", indicatorLabel: " " }), "Status unavailable");
+  assert.equal(statusFor(undefined), "Status unavailable");
 });
 test("swipes require horizontal threshold and matching pointer", () => {
   const start = { id: 1, x: 100, y: 100, cancelled: false };

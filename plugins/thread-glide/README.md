@@ -10,6 +10,11 @@ Navigation stays in the current project, newest-created first, without wrapping.
 Archived and hidden threads are excluded. Child threads are skipped except for
 the currently open child. Live sidebar updates keep the list current.
 
+The secondary line shows the current thread's live BB status alongside its
+position. Status uses BB's own indicator label (including working or needing
+input); no indicator is shown as "Idle", not as a claim that work is complete.
+Unknown states without a host label display "Status unavailable".
+
 Swipes only start on the title strip. Vertical scrolling, short gestures,
 cancelled pointers and secondary touches do not navigate. The plugin never
 archives, deletes or modifies messages, and uses BB navigation to preserve

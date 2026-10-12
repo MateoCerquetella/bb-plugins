@@ -3,7 +3,7 @@ import {
   experimental_useSidebarThreads,
 } from "@get-bb/plugin-sdk/app";
 import { useEffect, useRef, useState } from "react";
-import { navigationThreads, neighbor, titleFor, updateGesture, swipeDirection, type Gesture } from "./lib/navigation";
+import { navigationThreads, neighbor, titleFor, statusFor, updateGesture, swipeDirection, type Gesture } from "./lib/navigation";
 import "./app.css";
 
 function Navigator({ threadId }: { threadId: string }) {
@@ -25,6 +25,7 @@ function Navigator({ threadId }: { threadId: string }) {
   const index = threads.findIndex(thread => thread.id === threadId);
   const previous = neighbor(threads, threadId, -1);
   const next = neighbor(threads, threadId, 1);
+  const status = statusFor(threads[index]);
   const label = state.status === "loading" ? "Loading threads"
     : state.status === "error" ? "Threads unavailable"
     : index < 0 ? "Thread unavailable" : titleFor(threads[index]);
@@ -71,7 +72,13 @@ function Navigator({ threadId }: { threadId: string }) {
             onPointerDown={event => event.stopPropagation()}
             onKeyDown={event => event.stopPropagation()}
             onClick={() => window.location.reload()}>Reload</button>
-        : <span className="tg-position" aria-live="polite">{index >= 0 ? `${index + 1} / ${threads.length}` : "\u00a0"}</span>}
+        : <span className="tg-meta" aria-live="polite" aria-atomic="true">
+            {index >= 0 ? <>
+              <span className="tg-status" title={status}>{status}</span>
+              <span aria-hidden="true">{"\u00b7"}</span>
+              <span className="tg-position">{`${index + 1} / ${threads.length}`}</span>
+            </> : "\u00a0"}
+          </span>}
     </div>
     <button className="tg-arrow" type="button" title="Next thread" aria-label="Next thread"
       disabled={!next || pending} onClick={() => move(1)} aria-hidden={false}>{"\u2192"}</button>

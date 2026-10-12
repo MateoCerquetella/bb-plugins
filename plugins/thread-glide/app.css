@@ -23,5 +23,7 @@
 .tg-arrow:focus-visible, .tg-swipe:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 .tg-swipe { touch-action: pan-y; user-select: none; overflow: hidden; text-align: center; padding: 4px; min-height: 44px; }
 .tg-title { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 600; }
-.tg-position { display: block; color: var(--muted-foreground); font-size: 11px; line-height: 16px; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.tg-meta { display: flex; justify-content: center; gap: 6px; color: var(--muted-foreground); font-size: 11px; line-height: 16px; height: 16px; margin-top: 4px; }
+.tg-status { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tg-position { flex-shrink: 0; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .tg-retry { color: var(--foreground); background: transparent; border: 0; text-decoration: underline; font-size: 12px; min-height: 44px; cursor: pointer; }

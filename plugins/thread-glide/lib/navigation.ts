@@ -27,6 +27,12 @@ export function titleFor(thread: Thread | undefined): string {
   return thread?.title?.trim() || thread?.titleFallback?.trim() || "Untitled thread";
 }
 
+export function statusFor(thread: { indicator: string; indicatorLabel: string | null } | undefined): string {
+  if (!thread) return "Status unavailable";
+  if (thread.indicator === "none") return "Idle";
+  return thread.indicatorLabel?.trim() || "Status unavailable";
+}
+
 export interface Gesture { id: number; x: number; y: number; cancelled: boolean }
 export function updateGesture(start: Gesture, x: number, y: number): Gesture {
   return { ...start, cancelled: start.cancelled || Math.abs(y - start.y) > 20 };
