@@ -240,7 +240,7 @@ export function createFactoryService(
     }
     return persist(record);
   }
-  async function advance(item: WorkItem, record: FactoryRecord, signal?: AbortSignal) {
+  async function advance(item: WorkItem, record: FactoryRecord, signal?: AbortSignal, restoreArchived = false) {
     record = await syncProgress(item, record);
     const run = record.runs.at(-1);
     if (!record.automatic || record.automationError || !run || run.status !== 'finished' ||
@@ -263,7 +263,7 @@ export function createFactoryService(
         // Approval is durable before any native build dispatch.
         record = persist(record);
       }
-      if (run.kind === 'review') return await repairReview(item, record);
+      if (run.kind === 'review') return await repairReview(item, record, restoreArchived);
       if (run.kind === 'build' && run.buildResult?.verdict !== 'implemented') {
         throw new Error(run.buildResult?.verdict === 'needs_input'
           ? `Build needs input: ${run.buildResult.summary.slice(0, 1000)}`
@@ -362,7 +362,9 @@ export function createFactoryService(
     const reuse = input.kind !== 'review' && !isolateBuild && author?.threadId;
     const events = reuse
       ? await sdk.threads.events.list({ threadId: reuse, order: 'desc', limit: '1' }) : [];
-    const draft = startRun(record, input.kind, input.retry);
+    // Keep a failed restoration out of the caller's durable pause record.
+    const draftRecord = structuredClone(record);
+    const draft = startRun(draftRecord, input.kind, input.retry);
     draft.repairOf = input.repairOf ?? null;
     draft.continuationOf = input.continuationOf ?? null;
     if (reuse) {
@@ -383,7 +385,7 @@ export function createFactoryService(
       if (restored.status !== 'idle') throw new SessionBusyError('Stop or finish the authoring session first.');
     }
     const id = draft.id;
-    record = persist(record);
+    record = persist(draftRecord);
     const run = record.runs.find(run => run.id === id)!;
     try {
       const prompt = factoryPrompt(item, record, input.kind);
@@ -477,8 +479,7 @@ export function createFactoryService(
           if ((run.kind === 'review' && run.reviewResult?.verdict === 'blocked') || run.repairOf || run.continuationOf) {
             record.automatic = true;
             record.automationError = null;
-            if (run.kind === 'review') return repairReview(item, record, true);
-            return advance(item, persist(record));
+            return advance(item, persist(record), undefined, true);
           }
           return record;
         }

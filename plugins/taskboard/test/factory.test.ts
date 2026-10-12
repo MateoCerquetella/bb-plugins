@@ -744,15 +744,16 @@ test('archive recovery rejects deleted, moved, unavailable and busy Build sessio
     try {
       const record = seedReview(f, blockedReview, false);
       record.runs[1].reviewResult = readReviewResult(blockedReview);
-      f.store.save(record);
+      const saved = f.store.save(record);
       f.archived.add('thr_native');
       if (failure === 'deleted') f.deleted.add('thr_native');
       if (failure === 'moved') f.buildEnvironment('env_other');
       if (failure === 'destroyed') f.environmentStatus('destroyed');
       if (failure === 'busy') f.threadStatus('active', 'thr_native');
       if (failure === 'unmanaged') f.unmanaged();
-      await assert.rejects(f.service.startTask(
-        failure === 'scope' ? { ...item, description: 'Changed scope' } : item, null
+      await assert.rejects(f.service.start(
+        failure === 'scope' ? { ...item, description: 'Changed scope' } : item,
+        { expectedVersion: saved.version, kind: 'build', contextThreadId: null, retry: false }
       ));
       assert.equal(f.unarchives(), 0);
       assert.equal(f.sends(), 0);
@@ -798,6 +799,43 @@ test('a lost send after unarchive stays uncertain across restart without another
     assert.equal(resumed.runs.at(-1)?.status, 'uncertain');
     await f.service.recover();
     await f.service.startTask(item, null);
+    assert.equal(f.unarchives(), 1);
+    assert.equal(f.sends(), 1);
+    assert.equal(f.spawns(), 0);
+  } finally { f.db.close(); }
+});
+
+test('Start task restoration failure keeps the review actionable without a phantom Build run', async () => {
+  const f = fixture();
+  try {
+    seedReview(f);
+    f.archived.add('thr_native');
+    await f.service.get(item);
+    f.onUnarchive(() => { throw new Error('Unarchive unavailable'); });
+    const paused = await f.service.startTask(item, null);
+    assert.match(paused.automationError!, /Unarchive unavailable/);
+    assert.equal(paused.runs.length, 2);
+    assert.equal(paused.stage, 'Review');
+    assert.equal(f.sends(), 0);
+  } finally { f.db.close(); }
+});
+
+test('explicit blocked Build continuation restores its archived thread without a replacement', async () => {
+  const f = fixture();
+  try {
+    const record = seedReview(f);
+    record.runs.pop();
+    record.stage = 'Build';
+    const build = record.runs[0];
+    build.buildResult = { verdict: 'blocked', summary: 'Finish the implementation', revision: null };
+    build.output = `<taskboard-build>${JSON.stringify(build.buildResult)}</taskboard-build>`;
+    f.store.save(record);
+    f.archived.add('thr_native');
+    await f.service.get(item);
+    assert.equal(f.unarchives(), 0);
+    const resumed = await f.service.startTask(item, null);
+    assert.equal(resumed.runs.at(-1)?.continuationOf, build.id);
+    assert.equal(resumed.runs.at(-1)?.threadId, build.threadId);
     assert.equal(f.unarchives(), 1);
     assert.equal(f.sends(), 1);
     assert.equal(f.spawns(), 0);
