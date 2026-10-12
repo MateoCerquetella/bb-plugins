@@ -70,11 +70,13 @@ right panel or navigating away from the thread. When its message scrolls away,
 the latest viewer follows the thread viewport in a compact position, capped to
 55% of the available height so the composer remains accessible. Dashboard state
 refreshes every fifteen seconds while BB is visible without reloading the iframe.
-The inline viewer can be
-minimized to its compact header and restored without stopping the browser session.
-Minimizing disconnects the player stream; restoring reconnects it. Only the
-latest inline browser message streams, and hidden browser tabs stop their
-viewers. A manual **Steel Browser**
+The inline viewer can be minimized to its compact header and restored without
+stopping the browser session. On phone-width or coarse-pointer clients, a new
+inline viewer starts minimized and does not load until the user explicitly
+restores it. Desktop clients keep the automatic viewer connection. Minimizing
+disconnects the player stream; restoring reconnects it. Only the latest inline
+browser message streams, and hidden browser tabs stop their viewers. A manual
+**Steel Browser**
 thread-panel action remains available from the panel launcher.
 
 ### Agent Configuration

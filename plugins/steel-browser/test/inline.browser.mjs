@@ -42,7 +42,7 @@ const context = browser.contexts()[0];
 try {
   for (const width of [1280, 390]) {
     const page = await context.newPage();
-    await page.setViewportSize({ width, height: 900 });
+    const mobile = width === 390;
     let loads = 0;
     await page.route("https://viewer.test/**", route => {
       loads++;
@@ -52,11 +52,24 @@ try {
       body: `<meta name="viewport" content="width=device-width, initial-scale=1"><style>body{margin:16px;font-family:system-ui}#thread{height:700px;overflow:auto}#message{display:flow-root}#later{height:1600px}${css}</style><main id="thread"><article id="message"><div id="root"></div></article><div id="later">Later messages</div></main><textarea aria-label="Composer"></textarea><script>${js}</script>`,
       contentType: "text/html",
     }));
-    await page.goto("http://inline.test");
-    await page.getByText("Project A", { exact: true }).waitFor();
     const metrics = await context.newCDPSession(page);
-    await metrics.send("Emulation.setDeviceMetricsOverride", { width, height: 900, deviceScaleFactor: 1, mobile: false });
+    await metrics.send("Emulation.setDeviceMetricsOverride", { width, height: 900, deviceScaleFactor: 1, mobile });
+    await metrics.send("Emulation.setTouchEmulationEnabled", { enabled: mobile, maxTouchPoints: mobile ? 5 : 0 });
+    await page.goto("http://inline.test");
     assert.equal(await page.evaluate(() => innerWidth), width, "Steel test viewport must match the requested width");
+    assert.equal(await page.evaluate(() => matchMedia("(max-width: 640px), (pointer: coarse)").matches), mobile,
+      "Steel test device profile must match the requested client class");
+    await page.getByText("Project A", { exact: true }).waitFor();
+    if (mobile) {
+      assert.equal(await page.locator("iframe").count(), 0, "mobile must not mount the viewer automatically");
+      assert.equal(loads, 0, "mobile must not request the viewer before explicit restore");
+      await page.getByRole("button", { name: "Restore inline browser" }).click();
+      await page.frameLocator("iframe").getByRole("textbox").waitFor();
+      assert.equal(loads, 1, "mobile restore loads the viewer once");
+    } else {
+      await page.frameLocator("iframe").getByRole("textbox").waitFor();
+      assert.equal(loads, 1, "desktop loads the viewer automatically");
+    }
     await page.frameLocator("iframe").getByRole("textbox").fill("Retained");
     const box = await page.locator(".steel-inline-browser").boundingBox();
     assert(box.width <= 562 && box.width <= width - 30, JSON.stringify({width, box}));

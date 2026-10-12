@@ -32,6 +32,11 @@ import "./app.css";
 const CREATE_OPTIONS = { blockAds: true, width: 1440, height: 900 } as const;
 const THREAD_PANEL_ACTION_ID = "steel-live-browser";
 const ALWAYS_POLL = () => true;
+const COMPACT_VIEWER_QUERY = "(max-width: 640px), (pointer: coarse)";
+
+function startsInlineViewerMinimized(): boolean {
+  return window.matchMedia(COMPACT_VIEWER_QUERY).matches;
+}
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
@@ -166,7 +171,7 @@ export function SteelBrowserDirective(props: PluginMessageDirectiveProps) {
 function ScopedSteelBrowser({ message }: PluginMessageDirectiveProps) {
   const { anchor, style, anchorStyle, latest } = useFollowViewer(message.threadId);
   const scope = useScope(message.threadId);
-  const [minimized, setMinimized] = useState(false);
+  const [minimized, setMinimized] = useState(startsInlineViewerMinimized);
   const shouldPoll = useCallback(() => {
     const viewers = document.querySelectorAll(`[data-steel-thread="${CSS.escape(message.threadId)}"]`);
     return !minimized && viewers.item(viewers.length - 1) === anchor.current;
