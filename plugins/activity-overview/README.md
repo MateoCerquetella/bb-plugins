@@ -5,7 +5,8 @@ requests, reviews, streak patterns, and follow-up items. It uses deterministic
 local sample data so the surface works without credentials; period and
 repository filters update the summary immediately.
 
-Open **Settings > Activity Overview** or **Actions > Activity Overview** in a
+Open **New Thread** to see the dashboard below the composer. It is also available
+in **Settings > Activity Overview** and **Actions > Activity Overview** in a
 thread panel. This version is a sample-data dashboard, not live GitHub analytics.
 
 Install from the workspace root:

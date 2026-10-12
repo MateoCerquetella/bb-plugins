@@ -2,6 +2,10 @@
 
 ## Approach
 
+Register the existing component with `app.slots.homepageSection` so the host
+places it below the New Thread composer. Retain Settings and thread actions.
+Test the actual app entry registration as well as the component.
+
 Implement a standalone React plugin using the existing BB SDK app entry pattern.
 Keep the data model in a pure module so selector changes are deterministic and
 unit-testable. Render a dense overview surface with host theme tokens, semantic

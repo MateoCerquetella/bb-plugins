@@ -23,6 +23,10 @@ Status: Accepted
 
 ### Chosen approach
 
+Use the SDK homepageSection registration for New Thread placement. A
+newThreadPanelAction alone would still hide the dashboard behind an action;
+DOM injection would duplicate supported host behavior and introduce fragility.
+
 Use the self-contained React plugin and pure local view-model so interactions
 are deterministic, testable, and independently installable.
 

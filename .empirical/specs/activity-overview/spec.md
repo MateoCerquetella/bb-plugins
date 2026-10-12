@@ -16,7 +16,8 @@ external account.
 
 - [ ] [AC-1] The plugin has its own manifest, app entry, styles, README, package
   scripts, and workspace catalog entry under `plugins/activity-overview`.
-- [ ] [AC-UI-1] [UI] Opening the plugin shows an Overview dashboard with four
+- [ ] [AC-UI-1] [UI] Opening New Thread shows the Overview dashboard below the
+  composer without opening Settings or an action panel, with four
   headline metrics: contributions, pull requests opened, pull requests
   merged, and reviews.
 - [ ] [AC-UI-2] [UI] Period and repository selectors are visible controls;

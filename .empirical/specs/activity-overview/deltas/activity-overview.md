@@ -13,7 +13,9 @@ The plugin MUST render a self-contained Overview dashboard with headline
 activity metrics, trend details, a contribution calendar, and attention items.
 
 #### Scenario: Dashboard opens with overview content
-- **WHEN** a user opens the Activity Overview plugin
+- **WHEN** a user opens New Thread
+- **THEN** the dashboard appears below the composer through the homepage section
+  without requiring a Settings or action-panel visit.
 - **THEN** the Overview heading, four headline metrics, contribution heatmap,
   streak callouts, and needs-your-attention list are visible together.
 

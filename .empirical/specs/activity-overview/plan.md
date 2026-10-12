@@ -1,5 +1,11 @@
 # Activity Overview Plan
 
+## Placement Correction
+
+1. Add the homepage section to the existing app entry and document its location.
+2. Test the built app's collected homepage registration.
+3. Run the plugin checks, install/reload, and inspect the live New Thread screen.
+
 1. Inspect the plugin catalog and copy the smallest existing React plugin
    manifest pattern into `plugins/activity-overview`.
 2. Add a pure `data.ts` view model with periods, repositories, metrics, heatmap

@@ -2,6 +2,13 @@
 
 - Specialist: UI/UX
 - Verdict: advisory
+- Finding: Settings and thread actions do not satisfy the requested New Thread
+  placement.
+  - Severity: high
+  - Category: usability
+  - Location: `spec.md#acceptance-criteria`
+  - Recommendation: Render the existing dashboard through the homepage section
+    below the composer; preserve other entry points and test slot registration.
 - Finding: The single dense dashboard direction makes the four metrics,
   heatmap, patterns, and attention queue scannable while preserving BB's
   compact operational tone.
