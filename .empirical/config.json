@@ -25,5 +25,10 @@
     "reviewerTokenEnv": "EMPIRICAL_REVIEWER_TOKEN"
   },
   "setupComplete": true,
-  "legacySource": null
+  "legacySource": null,
+  "budget": {
+    "fast": 10080,
+    "quick": 10080,
+    "complex": 10080
+  }
 }
