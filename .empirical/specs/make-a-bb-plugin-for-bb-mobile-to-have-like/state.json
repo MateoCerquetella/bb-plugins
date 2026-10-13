@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 53,
+  "revision": 54,
   "activeFeature": "make-a-bb-plugin-for-bb-mobile-to-have-like",
   "request": "Make a bb plugin for bb mobile to have like arrows or tinder stylrer to go strong it the threads more easily. You teasesrch and do it don’t ask me",
   "profile": "complex",
@@ -9,7 +9,7 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "The pointer-event isolation did not stop BB's sidebar from opening on mobile. Also contain the touch event stream within Dockside's swipe strip so BB's separate touch recognizer cannot see it, while preserving native vertical scrolling and all gestures outside the strip.",
+  "message": "Added touchstart, touchmove, touchend, and touchcancel propagation containment to Dockside's mobile swipe strip in addition to pointer containment, without preventDefault and with touch-action pan-y preserved. Extended the UI contract test, passed 8 focused tests plus typecheck/build, reinstalled and reloaded Dockside 0.1.7 as running, committed and pushed the fix, and confirmed the branch is current with main.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:97e9c76bc176347484978a922dae03d3eec90d19404ed05d299aad693d94fed8",
@@ -23,21 +23,20 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": false,
+    "implemented": true,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "none",
+    "highest": "implemented",
     "reasons": {
-      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-13T15:40:19.586Z",
+  "updatedAt": "2026-10-13T15:42:04.931Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "make-a-bb-plugin-for-bb-mobile-to-have-like-07aee46cf0cd",
@@ -72,11 +71,11 @@
   },
   "trackerGeneration": 8,
   "lifecycle": {
-    "riskRequest": "Replace the currently installed Dockside v0.1.5 with this updated Dockside build, verify it is running, then create and push the new Dockside v0.1.6 release.",
     "stage": "iteration",
     "iteration": 8,
-    "awaitingFeedback": false,
-    "contractRevision": 43
+    "awaitingFeedback": true,
+    "contractRevision": 43,
+    "riskRequest": "Replace the currently installed Dockside v0.1.5 with this updated Dockside build, verify it is running, then create and push the new Dockside v0.1.6 release."
   },
   "budgetExtensionMinutes": 99,
   "sizeDecision": {
