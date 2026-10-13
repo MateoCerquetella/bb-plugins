@@ -127,11 +127,12 @@ try {
     if(shots) await page.screenshot({path:`${shots}/cerq-panel-compact-${width}-${touch}-${theme}.png`});
     await panel.getByRole("button",{name:"Expand browser panel"}).click();
     await page.getByRole("button",{name:"Switch thread"}).evaluate(button=>button.click());
+    await page.mouse.move(5,5);
     await page.waitForFunction(()=>!document.querySelector(".steel-thread-panel--expanded"));
     await panel.locator("iframe").waitFor();
     assert((await page.evaluate(()=>window.calls)).some(call=>call.input.threadId==="next"),"thread switch uses new scope");
     await page.waitForTimeout(2100);
-    assert.equal(await page.locator(".steel-thread-panel--expanded").count(),0,"old timer cannot expand new thread");
+    assert.equal(await page.locator(".steel-thread-panel--expanded").count(),0,"thread switch resets expansion without a stale timer");
     console.log(`Panel passed: width=${width}, touch=${touch}, theme=${theme}`);
     await page.close();
   }

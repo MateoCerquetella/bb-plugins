@@ -73,7 +73,7 @@ export function usePanelExpansion() {
       if (!inside) {
         cancel();
         if (event.type === "pointermove") hoverSuppressed.current = false;
-        if (mode === "hover") setMode("compact");
+        setMode(value => value === "hover" ? "compact" : value);
       }
     };
     document.addEventListener("pointermove", track, true);
@@ -83,7 +83,7 @@ export function usePanelExpansion() {
       const hovered = (pointerInside.current || panel.current?.matches(":hover")) && canHover();
       if (!hovered) {
         cancel();
-        if (mode === "hover") setMode("compact");
+        setMode(value => value === "hover" ? "compact" : value);
       } else if (mode === "compact" && !hoverSuppressed.current && timer.current === undefined) {
         timer.current = setTimeout(() => {
           timer.current = undefined;
