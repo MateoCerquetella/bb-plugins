@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "dockside-thread-management",
+    "steel-browser-viewer"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:1e3a8ee52d9a943026592d6fe0e470f459deb37c425b3b1fdfaa343e12b0a105"
+}

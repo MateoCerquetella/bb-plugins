@@ -12,10 +12,10 @@ policy, tracker, and evidence gates.
 
 ## Acceptance Criteria
 
-- [ ] [AC-1] Start task on a blocked Build resumes the same managed session once.
+- [ ] [AC-1] Start task or Continue in thread on a finished blocked Build resumes the same managed session once through guarded factoryStartTask, with loading/error feedback before navigation. Other states use Open session; failed/canceled Retry has no duplicate Start build.
 - [ ] [AC-2] Resume prompts include previous blockers and preserve repository gates.
 - [ ] [AC-3] Resumed Build evidence advances to review; unresolved results pause.
-- [ ] [AC-4] Concurrent requests, workspace drift and uncertain dispatch cannot duplicate work.
+- [ ] [AC-4] Explicit resumption can restore an archived original Build in its ready managed worktree; polling preserves completed results without reopening archives. Deleted or busy sessions, workspace drift, stale approval and uncertain dispatch remain blocking and cannot duplicate work.
 - [ ] [AC-5] A new native Build turn clears only its obsolete Build-result pause.
 - [ ] [AC-6] Create new ticket offers Improve with AI when title or description
   contains draft text and a BB project is selected.

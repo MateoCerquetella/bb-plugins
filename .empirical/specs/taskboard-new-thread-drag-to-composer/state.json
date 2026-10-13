@@ -42,7 +42,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-12T03:13:23.830Z",
+  "updatedAt": "2026-10-09T00:39:09.280Z",
   "closure": {
     "schemaVersion": 1,
     "outcome": "merged-externally",
@@ -58,10 +58,10 @@
       "mergeCommit": "a6391be14058735b3aebe1769edb313f20100014",
       "targetBranch": "main",
       "ancestorOfTarget": true,
-      "observedAt": "2026-10-12T03:12:44.974Z"
+      "observedAt": "2026-10-09T00:38:36.613Z"
     },
-    "closedAt": "2026-10-12T03:13:23.562Z",
-    "digest": "sha256:de489a655dd5bb462698cb27e8710e0d378dd407bdb3eb6f493fb348504f0b41"
+    "closedAt": "2026-10-09T00:39:08.884Z",
+    "digest": "sha256:f037d7bddf6e0a832461d89d2373abfebea526a228d558707e1596600ac7d0d4"
   },
   "capabilityBase": {
     "schemaVersion": 1,
@@ -106,11 +106,11 @@
     "decisionBy": null,
     "method": "merged-externally",
     "reason": "Merged in pull request #32 as a6391be14058735b3aebe1769edb313f20100014 into main; closed when the merge was observed.",
-    "at": "2026-10-12T03:13:23.830Z",
+    "at": "2026-10-09T00:39:09.280Z",
     "revision": 15,
     "completion": "verified",
-    "sourceTreeDigest": "sha256:d4f6e7aa0d6e26823a2e6a4b1c89497cadc36656fd25461819bf7583b4b408a5",
-    "artifactTreeDigest": "sha256:42d88a1778ff143e23406d6b862d98b686393ab0416c51ccd61654bb0683ebb6",
-    "digest": "sha256:785b10deaf62ab9bf70e63df503bd57b77bf33cce9be043345c27b8b0d361c61"
+    "sourceTreeDigest": "sha256:891c1f325f62d9b66e26d8aa3f21125885032117f56d532b394f62061e82c106",
+    "artifactTreeDigest": "sha256:3810368f6a1001fcf96128865e89d0ba29ac38157e838833fa773c2eebbe4d9c",
+    "digest": "sha256:8d83d31005f5211b0c467b057d268c355ef7ef205126ff74d742b604b0cc6a3c"
   }
 }

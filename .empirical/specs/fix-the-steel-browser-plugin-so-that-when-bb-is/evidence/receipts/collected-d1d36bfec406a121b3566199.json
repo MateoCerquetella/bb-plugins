@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-d1d36bfec406a121b3566199",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-10-12T19:24:25.450Z",
+  "completedAt": "2026-10-12T19:24:25.450Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-the-steel-browser-plugin-so-that-when-bb-is",
+    "specRevision": 2,
+    "specDigest": "sha256:aca9f3255ce916f421ac20c7d6d52e4c9ebceebea91a6e3f3cc7bec30f386c7c",
+    "treeDigest": "sha256:c30560af14cfb232a44c5cc142b8bbae8730884a2fbd04ad467968126bedee29",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:fc89d10da9a7c279597630449be60b4ca10e5de24736e03d036a77dee7162a0f",
+  "kind": "collected",
+  "collector": "empirical-review:isolated-fresh-context-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/fix-the-steel-browser-plugin-so-that-when-bb-is/reviews/b838b2d0fc295ab194651a57.json",
+      "mediaType": "application/json",
+      "bytes": 1853,
+      "digest": "sha256:e9514712d521db149919679a47c57d48dfd1b2efdb91531c905129839030848a"
+    },
+    {
+      "path": ".empirical/specs/fix-the-steel-browser-plugin-so-that-when-bb-is/reviews/b838b2d0fc295ab194651a57.md",
+      "mediaType": "text/markdown",
+      "bytes": 1080,
+      "digest": "sha256:3cdff6ab27aae0d6acf3062220588f65c71e1dea018d8f59790226f4ba82da8a"
+    }
+  ]
+}

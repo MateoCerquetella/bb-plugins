@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
   "sequence": 10,
-  "previousDigest": "sha256:af951cbaa1dc6417a5bbb6c11a1bc5628e1989a011f7d42bc4b0dee07955926e",
+  "previousDigest": "sha256:29fd5287e7753bb7e07e8537bf590c607b6670acbab9d80a121c809096baf014",
   "actor": "empirical-merge-observed",
   "type": "compaction-boundary",
   "summary": "Compacted through journal event 9",
-  "createdAt": "2026-10-12T03:13:09.913Z",
-  "stateBeforeDigest": "sha256:bbdfc04ea0fdd0c01ac607bbc817c90f828146cdee72a7f3057cd965ced58d4c",
-  "stateAfterDigest": "sha256:bbdfc04ea0fdd0c01ac607bbc817c90f828146cdee72a7f3057cd965ced58d4c",
+  "createdAt": "2026-10-09T00:38:53.732Z",
+  "stateBeforeDigest": "sha256:79116f7a9bc98a7c5a7556976e5ead7421b287c4e655f45fadb36db301741db2",
+  "stateAfterDigest": "sha256:79116f7a9bc98a7c5a7556976e5ead7421b287c4e655f45fadb36db301741db2",
   "state": {
     "schemaVersion": 5,
     "revision": 9,
@@ -47,7 +47,7 @@
         "published": "published has not been proven by a durable receipt."
       }
     },
-    "updatedAt": "2026-10-12T03:13:08.640Z",
+    "updatedAt": "2026-10-09T00:38:51.745Z",
     "lifecycle": {
       "stage": "development",
       "iteration": 0,
@@ -97,10 +97,10 @@
         "mergeCommit": "c00002a477d40bdce07ccdc87a0ce9d4a73342d4",
         "targetBranch": "main",
         "ancestorOfTarget": true,
-        "observedAt": "2026-10-12T03:12:44.974Z"
+        "observedAt": "2026-10-09T00:38:36.613Z"
       },
-      "closedAt": "2026-10-12T03:13:08.338Z",
-      "digest": "sha256:1d51939f5c276181db3156783a4e37e278aabca86e4c2e473d2706632208010f"
+      "closedAt": "2026-10-09T00:38:51.230Z",
+      "digest": "sha256:036b4270b4ba81360fcc8704679d3c9e32d35aa5ceee35b9c4b912d18751e92f"
     },
     "completionRecord": {
       "schemaVersion": 1,
@@ -109,13 +109,13 @@
       "decisionBy": null,
       "method": "merged-externally",
       "reason": "Merged in pull request #63 as c00002a477d40bdce07ccdc87a0ce9d4a73342d4 into main; closed when the merge was observed.",
-      "at": "2026-10-12T03:13:08.640Z",
+      "at": "2026-10-09T00:38:51.745Z",
       "revision": 9,
       "completion": "none",
-      "sourceTreeDigest": "sha256:d4f6e7aa0d6e26823a2e6a4b1c89497cadc36656fd25461819bf7583b4b408a5",
-      "artifactTreeDigest": "sha256:a9302b69fa22b9073af8459e0ead09f9f5f28556970f68b173d0085b00114900",
-      "digest": "sha256:c2b965b3e1f732683f343690c3f176f2c0dc7e2815be3cb5ad2e9b0bb21c837f"
+      "sourceTreeDigest": "sha256:891c1f325f62d9b66e26d8aa3f21125885032117f56d532b394f62061e82c106",
+      "artifactTreeDigest": "sha256:a7b0881df34de35f5d410cb3e1f36bcc2d4c4689b9868248514d852d6817ab1e",
+      "digest": "sha256:a3c9d884d2f9b4ea17f55ddefd1c7b1c40c6557a7b533891a0b6be16f955c337"
     }
   },
-  "digest": "sha256:9147d3ffaa86f2a50cbf616e7c7c50e39e4214ad53e1b92889b289b75acdf1d8"
+  "digest": "sha256:119b763bd612870756d40bbdee1ca50a6b0962839e10283d64ba2ccf8c59b125"
 }

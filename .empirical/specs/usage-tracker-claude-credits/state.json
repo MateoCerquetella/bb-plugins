@@ -36,7 +36,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-12T03:13:25.577Z",
+  "updatedAt": "2026-10-09T00:39:14.504Z",
   "route": "formal-sdd",
   "publicState": "working",
   "closure": {
@@ -54,10 +54,10 @@
       "mergeCommit": "c3d4c5f71c2cc6204dc92c6677ed1dbeceba2307",
       "targetBranch": "main",
       "ancestorOfTarget": true,
-      "observedAt": "2026-10-12T03:12:44.974Z"
+      "observedAt": "2026-10-09T00:38:36.613Z"
     },
-    "closedAt": "2026-10-12T03:13:25.294Z",
-    "digest": "sha256:cdbbf9a8566aa699e8c16c9ad837e73ba06f35e7d270fade87782880ee4aae81"
+    "closedAt": "2026-10-09T00:39:13.801Z",
+    "digest": "sha256:e6ddcdbfc42a0a7fd9e5b1a7e958e0c69fd5b565a56253f7f43ef2ec34415958"
   },
   "completionRecord": {
     "schemaVersion": 1,
@@ -66,11 +66,11 @@
     "decisionBy": null,
     "method": "merged-externally",
     "reason": "Merged in pull request #47 as c3d4c5f71c2cc6204dc92c6677ed1dbeceba2307 into main; closed when the merge was observed.",
-    "at": "2026-10-12T03:13:25.577Z",
+    "at": "2026-10-09T00:39:14.504Z",
     "revision": 6,
     "completion": "implemented",
-    "sourceTreeDigest": "sha256:d4f6e7aa0d6e26823a2e6a4b1c89497cadc36656fd25461819bf7583b4b408a5",
-    "artifactTreeDigest": "sha256:8bd3cee07c93700e38ac9c6b2277c0d1ac8e899520d9e87061d09e958d22eacf",
-    "digest": "sha256:4278dcff29b0acac5fc2e880d434f496aec84048ee6fd4cbbe548f19f6449980"
+    "sourceTreeDigest": "sha256:891c1f325f62d9b66e26d8aa3f21125885032117f56d532b394f62061e82c106",
+    "artifactTreeDigest": "sha256:dc0717bc94291ddff580905bc62f34252ccc4b72b21d0656229b821b79afd81d",
+    "digest": "sha256:704b8c748c74b04dab73fdbe6fc7b2e69a00ffdb0c736084b36f3e1d6b6fede9"
   }
 }

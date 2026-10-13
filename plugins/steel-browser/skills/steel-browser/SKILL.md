@@ -18,8 +18,10 @@ If Docker, BB Connect, or startup fails, report the actual command error.
 
 ## Show the live browser in the current thread
 
-When the user asks to see the Steel browser in BB, emit this complete message
-directive on its own line:
+When the user asks to see the Steel browser in BB, or whenever you ask the
+user to enter credentials, sign in, complete MFA, approve consent, or perform
+another manual browser action, emit this complete message directive on its own
+line in that same assistant message:
 
 ```text
 ::steel-browser{}
@@ -29,6 +31,9 @@ The directive renders the live Steel player directly inside the assistant
 message. The latest viewer follows the thread viewport when its message scrolls
 away; minimize it with the header control to stop its viewer stream without
 stopping the browser session. Restore reconnects the viewer.
+Never tell the user to use an embedded browser "above" unless this response
+contains the directive. Repeat the directive for later sign-in, MFA, consent,
+or manual-action handoffs; an earlier viewer message is not sufficient.
 It does not open the right panel. Never send the user to a
 BB Connect URL, Safari, Chrome, or another external browser window.
 

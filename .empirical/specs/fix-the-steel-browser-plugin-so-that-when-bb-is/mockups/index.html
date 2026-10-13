@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Steel mobile opt-in viewer</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --background: #f7f7f8;
+      --surface: #fff;
+      --foreground: #25252a;
+      --muted: #6d6d76;
+      --border: #d9d9df;
+      --accent: #3777b8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--background);
+      color: var(--foreground);
+      font: 15px/1.45 system-ui, sans-serif;
+    }
+    main {
+      display: grid;
+      grid-template-columns: minmax(280px, 390px) minmax(420px, 600px);
+      gap: 28px;
+      width: min(1060px, calc(100% - 32px));
+      margin: 28px auto;
+    }
+    h2 { margin: 0 0 10px; font-size: 16px; letter-spacing: 0; }
+    .device { min-width: 0; }
+    .viewer {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+    }
+    header {
+      display: flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 7px 10px;
+    }
+    .title { display: flex; min-width: 0; align-items: center; gap: 9px; }
+    .icon { color: var(--accent); font-size: 18px; }
+    strong, small { display: block; }
+    small { color: var(--muted); font-size: 12px; }
+    .actions { display: flex; gap: 4px; }
+    button {
+      width: 30px;
+      height: 30px;
+      border: 1px solid transparent;
+      border-radius: 5px;
+      background: transparent;
+      color: inherit;
+      font-size: 17px;
+      cursor: pointer;
+    }
+    button:hover { border-color: var(--border); background: var(--background); }
+    .viewport {
+      display: grid;
+      aspect-ratio: 1;
+      place-items: center;
+      border-top: 1px solid var(--border);
+      background: #edf1f5;
+      color: #252936;
+    }
+    .site {
+      width: 70%;
+      padding: 20px;
+      border: 1px solid #d4d8de;
+      border-radius: 6px;
+      background: white;
+    }
+    .field { height: 34px; margin-top: 10px; border: 1px solid #aeb6c2; border-radius: 4px; }
+    .note { margin: 10px 0 0; color: var(--muted); font-size: 13px; }
+    @media (max-width: 760px) {
+      main { grid-template-columns: 1fr; width: min(100% - 20px, 560px); margin-top: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="device">
+      <h2>Mobile initial state</h2>
+      <div class="viewer">
+        <header>
+          <div class="title">
+            <span class="icon" aria-hidden="true">▣</span>
+            <span><strong>Steel Browser</strong><small>Session available</small></span>
+          </div>
+          <div class="actions">
+            <button type="button" title="Restore browser" aria-label="Restore inline browser">+</button>
+            <button type="button" title="Reload browser" aria-label="Reload inline browser">↻</button>
+          </div>
+        </header>
+      </div>
+      <p class="note">No iframe or viewer request occurs until Restore is activated.</p>
+    </section>
+    <section class="device">
+      <h2>Desktop initial state</h2>
+      <div class="viewer">
+        <header>
+          <div class="title">
+            <span class="icon" aria-hidden="true">▣</span>
+            <span><strong>Steel Browser</strong><small>Session available</small></span>
+          </div>
+          <div class="actions">
+            <button type="button" title="Minimize browser" aria-label="Minimize inline browser">−</button>
+            <button type="button" title="Reload browser" aria-label="Reload inline browser">↻</button>
+          </div>
+        </header>
+        <div class="viewport">
+          <div class="site"><strong>Sign in</strong><div class="field"></div><div class="field"></div></div>
+        </div>
+      </div>
+      <p class="note">Desktop retains the existing automatic viewer connection.</p>
+    </section>
+  </main>
+  <script>
+    document.querySelector('[aria-label="Restore inline browser"]').addEventListener("click", (event) => {
+      const viewer = event.currentTarget.closest(".viewer");
+      const viewport = document.querySelector(".viewport").cloneNode(true);
+      viewer.append(viewport);
+      event.currentTarget.textContent = "−";
+      event.currentTarget.setAttribute("aria-label", "Minimize inline browser");
+    }, { once: true });
+  </script>
+</body>
+</html>

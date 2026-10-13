@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "feature": "retire-the-unused-save-my-model-plugin-from-the-mateocerquetella",
   "lastSequence": 8,
-  "lastEventDigest": "sha256:d6fb59eebfdaed6d132e04f875deed152a02d331c6f5f4742465872f07b35381",
-  "stateDigest": "sha256:ea5e2569eaead479bd2e8b172a7e376b441431cb7850a04553be01f8c6af2dc6",
+  "lastEventDigest": "sha256:3e024cf09bacd29873c0c46b74b544c92e5db97c56d9eb568dea0e993c1ef8bc",
+  "stateDigest": "sha256:acd7d481a8e8b8e2eddde4bb3a7b7360eeb6b53e32a409b5de4d9f896cba5bdc",
   "state": {
     "schemaVersion": 5,
     "revision": 8,
@@ -42,7 +42,7 @@
         "published": "published has not been proven by a durable receipt."
       }
     },
-    "updatedAt": "2026-10-12T03:13:14.079Z",
+    "updatedAt": "2026-10-09T00:38:56.815Z",
     "capabilityBase": {
       "schemaVersion": 1,
       "id": "retire-the-unused-save-my-model-plugin-from-the-mateocerquetella-05a8ee8dda3b",
@@ -86,10 +86,10 @@
         "mergeCommit": "ff4dec1308f8ae69d040eebdf77863182c7a45ca",
         "targetBranch": "main",
         "ancestorOfTarget": true,
-        "observedAt": "2026-10-12T03:12:44.974Z"
+        "observedAt": "2026-10-09T00:38:36.613Z"
       },
-      "closedAt": "2026-10-12T03:13:13.691Z",
-      "digest": "sha256:6faed24def30c9c9ad59bac238782424beca03c2521a770e66ff0ba06385e316"
+      "closedAt": "2026-10-09T00:38:56.511Z",
+      "digest": "sha256:65e5955b15a1595782ea7038ad663f65b363787853c8f8017ff269680fd60c6e"
     },
     "completionRecord": {
       "schemaVersion": 1,
@@ -98,14 +98,14 @@
       "decisionBy": null,
       "method": "merged-externally",
       "reason": "Merged in pull request #67 as ff4dec1308f8ae69d040eebdf77863182c7a45ca into main; closed when the merge was observed.",
-      "at": "2026-10-12T03:13:14.079Z",
+      "at": "2026-10-09T00:38:56.815Z",
       "revision": 8,
       "completion": "implemented",
-      "sourceTreeDigest": "sha256:d4f6e7aa0d6e26823a2e6a4b1c89497cadc36656fd25461819bf7583b4b408a5",
-      "artifactTreeDigest": "sha256:5968fdf93eec9520381eacacd06b35634848182d39e6561745bde42ec79b71b3",
-      "digest": "sha256:9f1791308a91176a7a299a42ee256886163c427acef81ab7eb448f9c37f4c548"
+      "sourceTreeDigest": "sha256:891c1f325f62d9b66e26d8aa3f21125885032117f56d532b394f62061e82c106",
+      "artifactTreeDigest": "sha256:b71fc6e3cd34c20f1fa40ffcee0eea4a3fcaa8da9cbd2fc98d2e32bc7f7ee819",
+      "digest": "sha256:349de2b582e8f06355135da78dc9d86c27c2d3adad056597f5a62a3fd210f0bc"
     }
   },
-  "compactedAt": "2026-10-12T03:13:16.839Z",
-  "digest": "sha256:e87470094007dab207bd8588e76465a296ff517e08eefe63c71aa605b49ea6f5"
+  "compactedAt": "2026-10-09T00:38:59.303Z",
+  "digest": "sha256:a0abd494790e660f8fa19b306952287bfe4f6808317dde3b95d4487cda57cc3a"
 }

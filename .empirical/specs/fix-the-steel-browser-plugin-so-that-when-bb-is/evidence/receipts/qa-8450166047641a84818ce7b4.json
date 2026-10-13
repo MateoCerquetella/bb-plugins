@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-8450166047641a84818ce7b4",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "Real Steel/Playwright browser QA passed across desktop, mobile, narrow fine-pointer, and wide coarse-pointer profiles. Mobile created zero viewer requests until explicit Restore; screenshots confirm the compact mobile header and preserved desktop viewer.",
+  "passed": true,
+  "startedAt": "2026-10-12T19:42:10.710Z",
+  "completedAt": "2026-10-12T19:42:10.710Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-the-steel-browser-plugin-so-that-when-bb-is",
+    "specRevision": 2,
+    "specDigest": "sha256:aca9f3255ce916f421ac20c7d6d52e4c9ebceebea91a6e3f3cc7bec30f386c7c",
+    "treeDigest": "sha256:054d20d58799824ef4c63a567390cd6aaf5813b68636bb0331e2162de6e27adf",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 11,
+    "gitCommit": "597e95555d1d5f84826d0ad8869bc77886013adb",
+    "scope": [
+      "plugins/steel-browser/app.css",
+      "plugins/steel-browser/app.tsx",
+      "plugins/steel-browser/test/inline.browser.mjs"
+    ],
+    "scopeDigest": "sha256:85b28005f24704191254f182ece4e6ff6e6ec64bfdfad3c3c5a9c046c6e50a64",
+    "textTreeDigest": "sha256:054d20d58799824ef4c63a567390cd6aaf5813b68636bb0331e2162de6e27adf"
+  },
+  "digest": "sha256:866b0c25f02d40b2ceb9a9acbce6f10818c6f23808f99ee3990c98364e52f862",
+  "kind": "qa",
+  "matrixDigest": "sha256:26283dced88e4467bd3e08b1496712ce47132c3d69f5a0d785b2a46e75e530e7",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Real Steel/Playwright browser QA passed across desktop, mobile, narrow fine-pointer, and wide coarse-pointer profiles. Mobile created zero viewer requests until explicit Restore; screenshots confirm the compact mobile header and preserved desktop viewer.",
+      "startedAt": "2026-10-12T19:42:10.710Z",
+      "completedAt": "2026-10-12T19:42:10.710Z",
+      "durationMs": 0,
+      "collector": "codex-browser-qa",
+      "command": null,
+      "result": null,
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:054d20d58799824ef4c63a567390cd6aaf5813b68636bb0331e2162de6e27adf",
+      "sourceTreeAfter": "sha256:054d20d58799824ef4c63a567390cd6aaf5813b68636bb0331e2162de6e27adf",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/fix-the-steel-browser-plugin-so-that-when-bb-is/qa/desktop-expanded.png",
+          "mediaType": "image/png",
+          "bytes": 17638,
+          "digest": "sha256:11ebc46a4c099321ad842c69f9f41f1e3baaac78821f4f4a7e3587ebe3775380"
+        },
+        {
+          "path": ".empirical/specs/fix-the-steel-browser-plugin-so-that-when-bb-is/qa/mobile-minimized.png",
+          "mediaType": "image/png",
+          "bytes": 32970,
+          "digest": "sha256:c080f06080002f866a23b09d3ce9c3e37db162b0c0b5b674a6b2bcd62a11b5ef"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}

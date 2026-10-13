@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-ad582565aa156ba8a3f870c5",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Run the matrix-selected repository unit check for final verification.",
+  "passed": false,
+  "startedAt": "2026-10-12T19:25:13.887Z",
+  "completedAt": "2026-10-12T19:25:14.538Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-the-steel-browser-plugin-so-that-when-bb-is",
+    "specRevision": 2,
+    "specDigest": "sha256:aca9f3255ce916f421ac20c7d6d52e4c9ebceebea91a6e3f3cc7bec30f386c7c",
+    "treeDigest": "sha256:c30560af14cfb232a44c5cc142b8bbae8730884a2fbd04ad467968126bedee29",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 7,
+    "gitCommit": "fd0f962855c3aec6264e69ba6ad7d866e78762c7",
+    "textTreeDigest": "sha256:c30560af14cfb232a44c5cc142b8bbae8730884a2fbd04ad467968126bedee29"
+  },
+  "digest": "sha256:5884c7989943ae771bca4d0c65b6b0dec233731b07f00863275ae595c0fa53c9",
+  "kind": "qa",
+  "matrixDigest": "sha256:26283dced88e4467bd3e08b1496712ce47132c3d69f5a0d785b2a46e75e530e7",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "failed",
+      "summary": "Run the matrix-selected repository unit check for final verification.",
+      "startedAt": "2026-10-12T19:25:13.887Z",
+      "completedAt": "2026-10-12T19:25:14.538Z",
+      "durationMs": 651,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:3102e0660c5a28fb09072a92af73601c0704a8badb5519082e7545d1f876aa50",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-taskboard"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 1,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:de528cb9c22e0caecfb8b517d778a4e3e21b6fefb4e0c8b5c264d42c4142c569",
+        "stderrDigest": "sha256:0bd9eb7b9a74fa8b93440b3c5b09ea0e9e75d3b6df213ebda7700fbe068ac409",
+        "stdoutTail": "\n> bb-plugin-taskboard@0.3.3 check\n> npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build\n\n\n> bb-plugin-taskboard@0.3.3 types:check\n> env -u BB_CLI bb plugin types --check .\n\nThis plugin uses the npm package @get-bb/plugin-sdk; pin is 0.4.21, host is 0.6.15.\n",
+        "stderrTail": "Set \"@get-bb/plugin-sdk\" to 0.6.15 in devDependencies and re-run npm install (`bb plugin types` does it for you).\nnpm error Lifecycle script `types:check` failed with error:\nnpm error code 1\nnpm error path /home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_ph4zesju56-1/bb-plugins/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.3\nnpm error location /home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_ph4zesju56-1/bb-plugins/plugins/taskboard\nnpm error command failed\nnpm error command sh -c env -u BB_CLI bb plugin types --check .\nnpm error Lifecycle script `check` failed with error:\nnpm error code 1\nnpm error path /home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_ph4zesju56-1/bb-plugins/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.3\nnpm error location /home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_ph4zesju56-1/bb-plugins/plugins/taskboard\nnpm error command failed\nnpm error command sh -c npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build\n",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:c30560af14cfb232a44c5cc142b8bbae8730884a2fbd04ad467968126bedee29",
+      "sourceTreeAfter": "sha256:c30560af14cfb232a44c5cc142b8bbae8730884a2fbd04ad467968126bedee29",
+      "artifacts": []
+    }
+  ],
+  "anomalies": [
+    "outcome-failed"
+  ]
+}

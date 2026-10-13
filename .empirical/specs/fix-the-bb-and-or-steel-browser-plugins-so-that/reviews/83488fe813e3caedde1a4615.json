@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:1d3490d58f74aab0f62f8428564dcdcea170d38533987e5c6826852ae0450474",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "c359938700b20695f8f4e6fd88815d93e63cd4e9",
+  "headCommit": "59a7a618adcf3d70c279a23f23ca91381f58d0c9",
+  "diffDigest": "sha256:37f069b9b128e2ca5b6c4e06b924b3ef59966a6872eefd1955accfa1043edc85",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "fresh-context-reviewer",
+  "reviewerInvocationId": "fresh-review-thr-9nh3s79zwi-1-20261012",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- PASS AC-1: The contributed Steel agent instruction explicitly requires `::steel-browser{}` on its own line in the same assistant message for credentials, sign-in, MFA, consent, and other manual browser actions.\n- PASS AC-2: The bundled Steel skill repeats the same-message requirement, requires later handoffs to repeat the directive, and forbids referring to an embedded browser above unless the current response contains it.\n- FAIL AC-3: The server regression assertions match `emit ::steel-browser{}`, `same assistant message`, and handoff keywords independently, so a mutation can remove the requirement to repeat the directive for a human handoff while all assertions still pass.\n- FAIL AC-UI-1: The packet does not preserve the existing viewer unchanged: it replaces iframe usage with a new LiveViewer, changes viewer URL/session selection behavior, adds clipboard/control behavior, and materially changes responsive CSS, contrary to D-002.\n\n## Security / correctness\n\nThe instruction-only changes do not introduce a credential, authentication, or authorization exposure. Correctness is not acceptable overall because the focused test does not guarantee the contributed instruction's semantic coupling and the packet materially changes the viewer despite the accepted no-viewer-change decision.\n\n## Design / maintainability\n\nThe instruction wording is clear and duplicated consistently between the contributed instructions and bundled skill. However, the packet mixes substantial viewer/component/CSS work into an instruction-emission fix whose accepted design explicitly excludes those changes, greatly widening the review surface and obscuring whether the existing viewer remains preserved.",
+  "bodyDigest": "sha256:a95428076618a58e501e5e561c0da8e28128db7b9ff18f2fa6bdec8163ca01c0",
+  "findings": [
+    {
+      "id": "F-1",
+      "severity": "medium",
+      "category": "tests",
+      "summary": "Independent phrase assertions can pass after the server instruction stops requiring the directive in the same human-handoff message, so AC-3 is not regression-protected.",
+      "path": "plugins/steel-browser/test/distribution.test.ts"
+    },
+    {
+      "id": "F-2",
+      "severity": "medium",
+      "category": "acceptance",
+      "summary": "The committed packet replaces and extends the Steel viewer and its CSS despite D-002 requiring no component or CSS changes, so AC-UI-1 is not met.",
+      "path": "plugins/steel-browser/app.tsx"
+    }
+  ],
+  "digest": "sha256:83488fe813e3caedde1a46159a328f00c3e8adfc395381a0bfadcfe857402136"
+}

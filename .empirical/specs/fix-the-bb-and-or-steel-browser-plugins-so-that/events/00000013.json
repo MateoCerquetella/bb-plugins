@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "sequence": 13,
+  "previousDigest": "sha256:e5826dd5394b484cf972b1bccf77c99a4219a8472e7431b34b4fb464461eb258",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Revise contract: Revise the contract to include the minimum integration-blocker repair: update the stale Dockside layout source assertion from grid column 3 to the current grid column 2, without changing Dockside runtime behavior, then rerun focused/full CI and merge PR #77.",
+  "createdAt": "2026-10-12T17:40:26.364Z",
+  "stateBeforeDigest": "sha256:2dafd770048fcdfffca6ed7e5e177619db0f1b9dacb5bb41bbac64d0a6116172",
+  "stateAfterDigest": "sha256:a752906eee4f0a857cdc805ad880ed373ac624d22c48120eac5bccb4ffebe769",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 13,
+    "activeFeature": "fix-the-bb-and-or-steel-browser-plugins-so-that",
+    "request": "Fix the BB and/or Steel Browser plugins so that when an agent tells the user to sign in using the embedded Steel browser and emits the Steel browser surface directive, the browser is actually shown in the thread UI, as expected in the supplied screenshot context. Trace the directive/rendering integration, implement the appropriate fix, add focused regression coverage, and verify the relevant plugin checks and UI behavior.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 1,
+    "message": "Revise the contract to include the minimum integration-blocker repair: update the stale Dockside layout source assertion from grid column 3 to the current grid column 2, without changing Dockside runtime behavior, then rerun focused/full CI and merge PR #77.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:42e3b045dd591f147d7459110f7c18a17207d55ae0588131a603e7aab6b0d187",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": "fix-the-bb-and-or-steel-browser-plugins-so-that-c6350427c3da",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-12T17:40:26.364Z",
+    "lifecycle": {
+      "riskRequest": "Revise the contract to include the minimum integration-blocker repair: update the stale Dockside layout source assertion from grid column 3 to the current grid column 2, without changing Dockside runtime behavior, then rerun focused/full CI and merge PR #77.",
+      "stage": "development",
+      "iteration": 1,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "contractRevision": 12
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "fix-the-bb-and-or-steel-browser-plugins-so-that-c6350427c3da",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "fix-the-bb-and-or-steel-browser-plugins-so-that",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_9nh3s79zwi-1/bb-plugins",
+      "worktreeId": "sha256:12d37af9de01d828ec6d94719f83526aa976ce486f38022a1c83c6c02ed841eb",
+      "baseCommit": "4880d65e1ff282c7f50ca94ab27cf969143e0222",
+      "baseTree": "741348cd8d6cf72e02759a116a4df9636eaf2dec",
+      "bases": {
+        "steel-browser-viewer": {
+          "capability": "steel-browser-viewer",
+          "digest": "sha256:8694db00054f44ac1c8c585f2c6ff86de9f5df4d7c5a8f5ab0b910bd56960c61",
+          "requirements": {
+            "render the viewer for every human browser handoff": null
+          }
+        }
+      },
+      "capabilities": [
+        "steel-browser-viewer"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-12T16:48:23.265Z",
+      "heartbeatAt": "2026-10-12T16:48:23.265Z",
+      "digest": "sha256:284fee957fb80cf6703d709bc9af018983a4a5595d98f9135fe31b64a9242dbe"
+    },
+    "budgetExtensionMinutes": 30,
+    "reviewFirst": true,
+    "trackerGeneration": 1
+  },
+  "digest": "sha256:a0b07d7c4c012fdf24c72f8ea73763dfb0e7c42a0cff51402cfb5aa80bb36706"
+}

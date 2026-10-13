@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:28940cf987bf0a0463681ce458673a7f37452fb3bd1b5f3f4f81ab4af852b324",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "d544da34e76016e14cabded03ac8a355cea08acb",
+  "headCommit": "597e95555d1d5f84826d0ad8869bc77886013adb",
+  "diffDigest": "sha256:50e88be3aefdae6e661d96b84bea95ca3efe1d2995d5b20f74aa91cc0cc21835",
+  "verdict": "APPROVED",
+  "reviewerActor": "independent-fresh-context-reviewer",
+  "reviewerInvocationId": "reviewer-fresh-20261012-steel-mobile-rereview-02",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: PASS (carried forward and strengthened): the runtime still initializes the inline directive from the phone-width/coarse-pointer media query, while the repaired browser test now verifies both narrow fine-pointer and wide coarse-pointer profiles create no iframe or viewer request before restore.\n- PASS AC-2: PASS (carried forward and strengthened): explicit restore still mounts the existing iframe and controls, and the repaired inline and human-control regressions now restore mobile directives before continuing their interaction assertions.\n- PASS AC-3: PASS (carried forward): the latest delta does not change desktop runtime behavior, and the desktop fine-pointer profile continues to assert one automatic viewer load.\n- PASS AC-4: PASS (carried forward): the latest delta leaves the minimize/restore lifecycle unchanged and continues through the existing teardown, reconnect, and session-preservation assertions after profile-specific initialization.\n- PASS AC-UI-1: PASS (carried forward and strengthened): the accessible Restore inline browser control remains unchanged; the repaired test checks collapsed dimensions at all minimized profiles and the new Minimized status makes the deferred state explicit.\n\n## Security / correctness\n\nPASS. The latest changes are limited to test emulation sequencing/profile coverage and a presentation-only minimized label. They introduce no credential, token, authentication, authorization, cross-project, CDP, Connect, navigation, or remote-session behavior changes. No open findings were carried from the prior review.\n\n## Design / maintainability\n\nPASS. The implementation continues to reuse the existing minimized state, remains scoped to ScopedSteelBrowser, and preserves the accepted desktop and non-inline boundaries. The test harness now mounts only after media emulation is configured and covers the two query clauses independently, which makes the regression intent materially clearer.",
+  "bodyDigest": "sha256:512ac1a82a119cb2b5bc72b6892efb6338be1b1207407f144761e929c068f510",
+  "findings": [],
+  "digest": "sha256:58d222c97091e136f3474900b121caa7b6fb13641a34653ca72ea88a7e2bdd4d"
+}

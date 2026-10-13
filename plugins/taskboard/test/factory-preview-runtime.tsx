@@ -7,6 +7,8 @@ declare global {
     factoryNavigation: string[];
     factoryItem: Record<string, unknown>;
     factoryStarts: number;
+    factoryStartError?: string | null;
+    factoryStartDelay?: number;
     factoryRefresh: () => void;
     createdInputs: Record<string, unknown>[];
   }
@@ -38,6 +40,17 @@ const rpc = {
     if (method === 'getItem') return { item: structuredClone(window.factoryItem) };
     if (method === 'factoryStartTask') {
       window.factoryStarts++;
+      if (window.factoryStartDelay) await new Promise(resolve => setTimeout(resolve, window.factoryStartDelay));
+      if (window.factoryStartError) throw new Error(window.factoryStartError);
+      const previous = record.runs.at(-1);
+      if (previous?.kind === 'build' && previous.status === 'finished' && previous.buildResult?.verdict === 'blocked') {
+        record.automationError = null;
+        record.version++;
+        record.runs.push({ ...previous, id: 'continued', status: 'running', error: null,
+          buildResult: null, continuationOf: previous.id, output: '', activity: 'Continuing Build' });
+        window.factoryRefresh();
+        return { record: structuredClone(record) };
+      }
       record.automatic = true;
       record.stage = 'Triage';
       record.trackerProgress = { status: 'synced', message: null };

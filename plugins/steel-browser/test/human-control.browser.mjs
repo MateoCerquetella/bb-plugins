@@ -14,7 +14,7 @@ const result = await build({
         <SteelBrowserDirective key={i} message={{id:"m"+i,threadId:"thread",projectId:"test-project",turnId:null}}
           source="" attributes={{}} openWorkspaceFile={null} />)}</>
       : <SteelBrowserPage/>;}
-    createRoot(document.getElementById("root")).render(<App/>);`,
+    window.mountSteel = () => createRoot(document.getElementById("root")).render(<App/>);`,
     resolveDir: fileURLToPath(new URL("../", import.meta.url)), loader: "tsx" },
   bundle: true, write: false, outdir: "/tmp/steel-human-check", jsx: "automatic",
   plugins: [{ name: "sdk", setup(b) {
@@ -54,7 +54,6 @@ try {
   for (const width of [1280, 390]) {
     const page = await context.newPage(); pages.push(page);
     const metrics = await context.newCDPSession(page);
-    await metrics.send("Emulation.setDeviceMetricsOverride", { width, height: 900, deviceScaleFactor: 1, mobile: false });
     let loads = 0;
     await page.route("https://steel.test/**", route => {
       loads++;
@@ -79,6 +78,8 @@ try {
         <div id="root"></div><script>${js}</script>`,
     }));
     await page.goto("https://steel-ui.test");
+    await metrics.send("Emulation.setDeviceMetricsOverride", { width, height: 900, deviceScaleFactor: 1, mobile: false });
+    await page.evaluate(() => window.mountSteel());
     await page.waitForFunction(() => document.querySelector('[aria-label="Paste into browser"]')?.disabled === false);
     await page.evaluate(() => {
       window.clipboardWrites=[];
@@ -108,7 +109,7 @@ try {
     assert.deepEqual(await page.evaluate(() => window.clipboardWrites), ["dummy-selection"]);
     await page.getByRole("button", { name: "Exit expanded control" }).click();
     assert.equal(loads, initialLoads);
-    await page.getByRole("button", { name: "Confirm GitHub account" }).click();
+    await page.getByRole("button", { name: "Confirm GitHub account" }).press("Enter");
     await page.getByLabel("GitHub account label").fill("dummy-account");
     await page.getByRole("button", { name: "Confirm signed in" }).click();
     await page.getByText("dummy-account", { exact:true }).waitFor();
@@ -121,8 +122,18 @@ try {
       await writeFile(`${process.env.BB_THREAD_STORAGE}/steel-human-${width}.png`, Buffer.from(shot.data,"base64"));
     }
     await page.goto("https://steel-ui.test/?inline");
+    await metrics.send("Emulation.setDeviceMetricsOverride", { width, height: 900, deviceScaleFactor: 1, mobile: false });
+    await page.evaluate(() => window.mountSteel());
+    if (width === 390) {
+      await page.getByRole("button", {name:"Restore inline browser"}).click();
+    }
     await page.waitForFunction(() => document.querySelectorAll("iframe").length===1);
     await page.getByRole("button", {name:"Add viewer"}).click();
+    if (width === 390) {
+      await page.waitForFunction(() => document.querySelectorAll(".steel-inline-anchor").length===2
+        && document.querySelectorAll("iframe").length===0);
+      await page.getByRole("button", {name:"Restore inline browser"}).last().click();
+    }
     await page.waitForFunction(() => document.querySelectorAll(".steel-inline-anchor").length===2
       && document.querySelectorAll("iframe").length===1 && document.querySelectorAll(".steel-inline-anchor")[1].querySelector("iframe"));
     await page.getByRole("button", { name:"Minimize inline browser" }).last().click();
@@ -134,6 +145,18 @@ try {
     await metrics.detach();
     await page.close();
   }
+} catch (error) {
+  const page = pages.at(-1);
+  if (page && !page.isClosed()) {
+    console.error(await page.locator(".steel-signins").innerText());
+    console.error(await page.evaluate(() => ({
+      width: innerWidth,
+      forms: document.querySelectorAll(".steel-signin-form").length,
+      expanded: document.querySelectorAll(".steel-live--expanded").length,
+      calls: window.rpcCalls,
+    })));
+  }
+  throw error;
 } finally {
   for (const page of pages) if (!page.isClosed()) await page.close();
   await browser.close();

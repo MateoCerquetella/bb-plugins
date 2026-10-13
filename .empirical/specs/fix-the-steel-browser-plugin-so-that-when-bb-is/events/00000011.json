@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "sequence": 11,
+  "previousDigest": "sha256:f7e8bd7970752e135967eba0d8dd667817fe5e8ce8d677afad080595566a7812",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Fresh-context re-review approved the latest committed changes across all acceptance criteria with no findings.",
+  "createdAt": "2026-10-12T19:40:36.835Z",
+  "stateBeforeDigest": "sha256:0780cf81fd033946b5f4e412eb30dc330e3aac95486e5168cf3190cb15087d93",
+  "stateAfterDigest": "sha256:a6bdf6925ad258c48f044f01368a5adf2a3f7517d364b9ae222e078d2b4197d3",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 11,
+    "activeFeature": "fix-the-steel-browser-plugin-so-that-when-bb-is",
+    "request": "Fix the steel-browser plugin so that when BB is being used on mobile it does not automatically open the browser link/viewer, while preserving appropriate desktop behavior; add or update tests, run required verification, create a pull request, and merge it.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "verify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Fresh-context re-review approved the latest committed changes across all acceptance criteria with no findings.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:aca9f3255ce916f421ac20c7d6d52e4c9ebceebea91a6e3f3cc7bec30f386c7c",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:5a9b8b916898bd56113d50009b2eba2c1eed55e226a96b6fe02472ec08ffb07d",
+    "impactDigest": "sha256:f6d77a4fed828be597167b4855c2535dd0ed9160c4e323e42ba753b8ad5c0b08",
+    "capabilityClaimId": "fix-the-steel-browser-plugin-so-that-when-bb-is-21c37e987a71",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "collected-aeefd1df7733d26da0a34d94"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-12T19:40:36.835Z",
+    "lifecycle": {
+      "stage": "consolidation",
+      "iteration": 1,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "contractBaseline": 9,
+      "amendments": [
+        8
+      ]
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "fix-the-steel-browser-plugin-so-that-when-bb-is-21c37e987a71",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "fix-the-steel-browser-plugin-so-that-when-bb-is",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_ph4zesju56-1/bb-plugins",
+      "worktreeId": "sha256:0102a4c59797342e14b314b77d5b2867b0e4e40e906f86dc6c1bef5b8c78a6c3",
+      "baseCommit": "9b1e4867641bbf8685eb5b363d96571a26da44c5",
+      "baseTree": "e5b5f754077d2f2af4f8e2f869d3d7e126ee99be",
+      "bases": {
+        "steel-browser-viewer": {
+          "capability": "steel-browser-viewer",
+          "digest": "sha256:1b6f3b4ba00080925b9363deaffa6552844dd72b1368b93935449488737bbac0",
+          "requirements": {
+            "render the viewer for every human browser handoff": "sha256:c2be62e0a43b4d2a2107f95aa572f7709d879df18d402253c5cfe0e26333ca13"
+          }
+        }
+      },
+      "capabilities": [
+        "steel-browser-viewer"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-12T19:19:11.182Z",
+      "heartbeatAt": "2026-10-12T19:19:11.182Z",
+      "digest": "sha256:d78ba15558fffbbab12b09754c02ae224caa5b1a8cf5c9664c2016757d47db95"
+    },
+    "trackerGeneration": 1,
+    "reviewFirst": true
+  },
+  "digest": "sha256:4bce7ac0bd4a44a2ed45502f92a6b7253d91f1381a8e095c84bc212b539170f9"
+}
