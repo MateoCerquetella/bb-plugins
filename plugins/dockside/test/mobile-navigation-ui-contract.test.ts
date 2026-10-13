@@ -11,6 +11,20 @@ const stylesUrl = new URL(
   import.meta.url,
 );
 
+test("mobile navigation mounts Dockside's live semantic palette", async () => {
+  const component = await readFile(componentUrl, "utf8");
+  assert.match(component, /useSettings\(\)/);
+  assert.match(component, /resolveDocksidePreferences\(settings.values\)/);
+  assert.match(component, /style=\{docksidePreferenceStyle\(preferences\)/);
+});
+
+test("mobile and family glyphs retain the action's distinct artwork", async () => {
+  const glyph = await readFile(new URL("../components/inbox/status-glyph.tsx", import.meta.url), "utf8");
+  const family = await readFile(new URL("../components/inbox/family-status.tsx", import.meta.url), "utf8");
+  assert.match(glyph, /workingActivityPresentation\(role\)\.icon/);
+  assert.match(family, /name=\{status.icon\}/);
+});
+
 test("the mobile navigation strip owns its pointer gesture without blocking vertical scroll", async () => {
   const [component, styles] = await Promise.all([
     readFile(componentUrl, "utf8"),

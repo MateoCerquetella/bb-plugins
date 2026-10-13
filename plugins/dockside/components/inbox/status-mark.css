@@ -26,6 +26,7 @@
     animation: dockside-status-loader 1s linear infinite;
   }
 
+  .dockside-status-mark-activity,
   .dockside-status-mark-needs-you,
   .dockside-status-mark-failed {
     animation: dockside-status-attention 2.4s ease-in-out infinite;

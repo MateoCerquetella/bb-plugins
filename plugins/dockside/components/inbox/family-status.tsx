@@ -1,4 +1,5 @@
 import { StatusMark } from "@/components/inbox/status-mark";
+import { Icon } from "@/components/ui/icon";
 import type { DragEventHandler, KeyboardEventHandler } from "react";
 import type { FamilyStatusPresentation } from "@/lib/family-status";
 import { cn } from "@/lib/utils";
@@ -48,7 +49,9 @@ export function FamilyStatusIcon({
       )}
       style={{ color: familyStatusColor(status) }}
     >
-      <StatusMark kind={status.kind} />
+      {status.kind === "working" && status.icon !== "Loading" ? (
+        <Icon name={status.icon} aria-hidden className="size-3.5 dockside-status-mark-activity" />
+      ) : <StatusMark kind={status.kind} />}
       {interactive ? (
         <span
           role="tooltip"

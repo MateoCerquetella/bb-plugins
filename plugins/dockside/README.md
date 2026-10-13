@@ -54,6 +54,9 @@ arrows disabled.
 Project initials use Dockside's effective project colors, including custom
 overrides that update through its live color subscription. Status uses the
 same animated glyphs as the sidebar and respects reduced-motion preferences.
+Workflow, agent, command, plan, and goal each retain their distinct action
+icon. The strip subscribes to Dockside's semantic palette, including custom
+and accessibility settings; defaults use yellow for runtime and red for goals.
 Vertical, short, cancelled, and secondary-touch gestures do not navigate.
 Pointer gestures that begin on the navigation title stay inside the strip, so
 they do not also open BB's mobile sidebar; vertical scrolling remains native.

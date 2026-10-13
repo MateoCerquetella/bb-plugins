@@ -1,18 +1,21 @@
 import {
-  useComposer, useBbNavigate,
+  useComposer, useBbNavigate, useSettings,
   experimental_useSidebarThreads,
 } from "@get-bb/plugin-sdk/app";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { navigationThreads, neighbor, titleFor, statusFor, updateGesture, swipeDirection, type Gesture } from "../../lib/mobile-navigation";
 import { Icon } from "../ui/icon";
 import { StatusGlyph } from "../inbox/status-glyph";
 import { useProjectColors } from "../../hooks/use-project-colors";
 import { projectBadgeLetter, projectBadgePresentation } from "../../lib/project-colors";
+import { docksidePreferenceStyle, resolveDocksidePreferences } from "../../lib/preferences";
 import "./navigation.css";
 
 function Navigator({ threadId }: { threadId: string }) {
   const state = experimental_useSidebarThreads();
   const colors = useProjectColors();
+  const settings = useSettings();
+  const preferences = resolveDocksidePreferences(settings.values);
   const navigate = useBbNavigate();
   const [pending, setPending] = useState(false);
   const pendingRef = useRef(false);
@@ -51,7 +54,8 @@ function Navigator({ threadId }: { threadId: string }) {
     try { navigate.toThread(target); }
     catch { pendingRef.current = false; setPending(false); }
   };
-  return <nav className="tg-nav" aria-label="Thread navigation" aria-busy={state.status === "loading" || pending}>
+  return <nav className="tg-nav" style={docksidePreferenceStyle(preferences) as CSSProperties}
+    aria-label="Thread navigation" aria-busy={state.status === "loading" || pending}>
     <button className="tg-arrow" type="button" title="Previous thread" aria-label="Previous thread"
       disabled={!previous || pending} onClick={() => move(-1)}><Icon name="ChevronLeft" aria-hidden className="tg-arrow-icon" /></button>
     <div className="tg-swipe" role="group" tabIndex={0} aria-label="Thread position; left and right arrows change thread"
