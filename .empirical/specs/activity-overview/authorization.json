@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "mode": "yolo",
+  "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+  "feature": "activity-overview",
+  "requestDigest": "sha256:84b01b4d2db10e8669ca8ddda048989385a4a6a9bd76ba2685437a38f866fb8c",
+  "ceiling": "implemented",
+  "targetBranch": null,
+  "allowExternalAgent": false,
+  "createdAt": "2026-10-12T15:15:43.710Z",
+  "expiresAt": null,
+  "digest": "sha256:1a09c4975354d7dfb27cc60926fc2068ed36be5a81bcb794126a63724bc835a4"
+}

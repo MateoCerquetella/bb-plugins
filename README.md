@@ -20,6 +20,9 @@ All plugins in this repository are independently installable.
 
 ## Plugins
 
+Activity Overview: [local install and usage](./plugins/activity-overview). A
+filterable contribution dashboard with deterministic sample activity.
+
 | | Plugin | Install | What it does |
 | --- | --- | --- | --- |
 | | [Agent Canvas (WIP)](./plugins/agent-canvas) | [Local install](./plugins/agent-canvas#cli-and-development) | A spatial workbench for live BB agents, persistent notes, drawings, ensembles and scoped team context. Requires BB 0.44+. |

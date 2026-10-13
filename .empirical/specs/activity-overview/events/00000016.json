@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "sequence": 16,
+  "previousDigest": "sha256:714159e7e0684f4aa39540aa03fb1d3a999b541411ea41a771eb4aa48a287589",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Shipped the current implementation as draft PR #80. Committed New Thread homepage registration and regression coverage as 87348ca7b, pushed branch mimic-bottom-as-plugin-thr_hs4aspxfcg, and opened https://github.com/MateoCerquetella/bb-plugins/pull/80. Focused plugin check previously passed. Target sync was not forced because origin/main has predicted conflicts in Empirical journal files across multiple completed features; the PR documents this and the authenticated browser-verification limitation.",
+  "createdAt": "2026-10-12T20:08:01.122Z",
+  "stateBeforeDigest": "sha256:ff63e116b386d980f80d531257e6560841320597ae1e4a00bdc20df50c65b1c9",
+  "stateAfterDigest": "sha256:7c88e55089c06bb2538c08528f28d03199b2b58e4814a8bbd2b2bd9806edbd42",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 16,
+    "activeFeature": "activity-overview",
+    "request": "Please do it as the picture NOW. Build a new independently installable BB plugin mimicking the supplied screenshot's lower Overview dashboard: contributions, pull requests opened, pull requests merged, reviews, period/repository selectors, annual contribution heatmap, current/longest streak, most-active month/day, and needs-your-attention list. Choose sensible implementation defaults from this repository and proceed autonomously.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Shipped the current implementation as draft PR #80. Committed New Thread homepage registration and regression coverage as 87348ca7b, pushed branch mimic-bottom-as-plugin-thr_hs4aspxfcg, and opened https://github.com/MateoCerquetella/bb-plugins/pull/80. Focused plugin check previously passed. Target sync was not forced because origin/main has predicted conflicts in Empirical journal files across multiple completed features; the PR documents this and the authenticated browser-verification limitation.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:570ecae833fa9e76834303e00136e428610ebb5d9de72035612492cb85a12b27",
+    "approvedSpecRevision": 11,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:4e45c0b699cabafc4ce539420994f316f3ac3d525470fa74421b3735feca8516",
+    "impactDigest": "sha256:3c1cff6a9a3c548605b2bc8e5d988efc3f3b3e393f4c34e1ad8aece3b6787cbb",
+    "capabilityClaimId": "activity-overview-e7a0c75962ca",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-12T20:08:01.122Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "activity-overview-e7a0c75962ca",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "activity-overview",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_hs4aspxfcg-1/bb-plugins",
+      "worktreeId": "sha256:062047b6cbc58808fbfe024f6c68649dd502a08c472f460e8ccb4371a2c5c90d",
+      "baseCommit": "4880d65e1ff282c7f50ca94ab27cf969143e0222",
+      "baseTree": "741348cd8d6cf72e02759a116a4df9636eaf2dec",
+      "bases": {
+        "activity-overview": {
+          "capability": "activity-overview",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "local activity overview dashboard": null,
+            "filtered dashboard summary": null,
+            "accessible responsive presentation": null
+          }
+        }
+      },
+      "capabilities": [
+        "activity-overview"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-12T16:12:45.403Z",
+      "heartbeatAt": "2026-10-12T16:12:45.403Z",
+      "digest": "sha256:d37cc4daa468abc0e85603fc9e2e2219ca9d5352520078e4d709d03b08f4f122"
+    },
+    "trackerGeneration": 1,
+    "lifecycle": {
+      "stage": "iteration",
+      "iteration": 1,
+      "awaitingFeedback": true,
+      "contractRevision": 9
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:04675cbf53d1f57847e3aaa33bb6bbfa9a8de99d6a921d87965ccd5f9a7cf660"
+}

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:37170ef746afa90a5c9118cff35653c08e0b7d460f73454e30801220947fe599",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "c359938700b20695f8f4e6fd88815d93e63cd4e9",
+  "headCommit": "f8e14786585f1b7b1daec6c2ad2689fba8f934b9",
+  "diffDigest": "sha256:d0563c0d594d31858be952ae1505ce84e04d962c128847f2919813101aec73f0",
+  "verdict": "APPROVED",
+  "reviewerActor": "fresh-context-agent",
+  "reviewerInvocationId": "rereview-activity-overview-1",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: Independent package manifest, app/server entries, styles, assets, README, scripts, tests, and catalog entry are present.\n- PASS AC-UI-1: The dashboard renders all four required headline metrics.\n- PASS AC-UI-2: Both labelled controlled selectors recompute and render the summary; focused tests cover the combined change.\n- PASS AC-UI-3: Annual heatmap, streaks, active month/day, and attention list are implemented.\n- PASS AC-UI-4: Responsive breakpoints, labelled controls, actionable attention buttons, and visible focus styling are present.\n- PASS AC-2: Focused coverage addresses deterministic data, selector state, rendered updates, and attention action; execution evidence is supplied separately.\n\n## Security / correctness\n\nPass: local-only React-rendered data with no credential, network, persistence, or unsafe HTML surface.\n\n## Design / maintainability\n\nThe pure view-model boundary is simple and testable, and interaction remains scoped to the component.",
+  "bodyDigest": "sha256:12c12ceed0e897c1b646bab8c6aeb52ca16fced68f00b8991dddabdf02992e70",
+  "findings": [
+    {
+      "id": "F-1",
+      "severity": "low",
+      "category": "correctness",
+      "summary": "Selected attention feedback can remain visible after a repository filter change removes that item.",
+      "path": "plugins/activity-overview/component.tsx"
+    }
+  ],
+  "digest": "sha256:c10cd8561758200ccdb9268b3cc220ed87251ea9aa2ed1986b5c3adb7b8c0fc7"
+}
