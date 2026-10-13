@@ -22,7 +22,12 @@
 .tg-arrow:not(:disabled):active { background: var(--muted); }
 .tg-arrow:focus-visible, .tg-swipe:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 .tg-swipe { touch-action: pan-y; user-select: none; overflow: hidden; text-align: center; padding: 4px; min-height: 44px; }
-.tg-title { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 600; }
+.tg-heading { display: flex; align-items: center; justify-content: center; gap: 6px; min-width: 0; }
+.tg-title { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 600; }
+.tg-project {
+  display: grid; place-items: center; width: 18px; height: 18px; flex: 0 0 18px;
+  border-radius: 4px; font-size: 10px; font-weight: 700; line-height: 1;
+}
 .tg-meta { display: flex; justify-content: center; gap: 6px; color: var(--muted-foreground); font-size: 11px; line-height: 16px; height: 16px; margin-top: 4px; }
 .tg-status { display: inline-flex; align-items: center; gap: 4px; min-width: 0; overflow: hidden; }
 .tg-status-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -33,3 +38,15 @@
 .tg-status-unread .tg-status-icon { color: var(--primary); }
 .tg-position { flex-shrink: 0; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .tg-retry { color: var(--foreground); background: transparent; border: 0; text-decoration: underline; font-size: 12px; min-height: 44px; cursor: pointer; }
+@keyframes tg-status-spin { to { transform: rotate(360deg); } }
+@keyframes tg-status-attention { 0%, 100% { opacity: 1; } 50% { opacity: .6; } }
+@keyframes tg-status-arrive {
+  from { transform: scale(.75); opacity: .4; }
+  65% { transform: scale(1.12); opacity: 1; }
+  to { transform: scale(1); opacity: 1; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .tg-status-working .tg-status-icon { transform-origin: center; animation: tg-status-spin 1s linear infinite; }
+  .tg-status-waiting .tg-status-icon, .tg-status-error .tg-status-icon { animation: tg-status-attention 2.4s ease-in-out infinite; }
+  .tg-status-unread .tg-status-icon { transform-origin: center; animation: tg-status-arrive 350ms ease-out; }
+}

@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 28,
+  "revision": 30,
   "activeFeature": "make-a-bb-plugin-for-bb-mobile-to-have-like",
   "request": "Make a bb plugin for bb mobile to have like arrows or tinder stylrer to go strong it the threads more easily. You teasesrch and do it don’t ask me",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "design",
+  "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": null,
+  "message": "Planned a focused Thread Mobile update covering cross-project active/unread selection, Dockside-compatible project badges, animated live status, tests, docs, local reload, and mobile verification.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:18f0beb4f2aea224211be62bbc662787269f0a9ea7a9cd00e1f2e2ce1901dee6",
@@ -37,7 +37,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-13T14:15:41.796Z",
+  "updatedAt": "2026-10-13T14:19:01.118Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "make-a-bb-plugin-for-bb-mobile-to-have-like-07aee46cf0cd",
@@ -75,6 +75,6 @@
     "awaitingFeedback": false,
     "contractRevision": 23
   },
-  "reviewFirst": true,
-  "budgetExtensionMinutes": 77
+  "budgetExtensionMinutes": 77,
+  "reviewFirst": true
 }

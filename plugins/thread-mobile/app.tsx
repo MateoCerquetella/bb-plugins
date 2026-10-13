@@ -3,7 +3,7 @@ import {
   experimental_useSidebarThreads,
 } from "@get-bb/plugin-sdk/app";
 import { useEffect, useRef, useState } from "react";
-import { navigationThreads, neighbor, titleFor, statusFor, statusIconFor, updateGesture, swipeDirection, type Gesture } from "./lib/navigation";
+import { navigationThreads, neighbor, projectBadge, titleFor, statusFor, statusIconFor, updateGesture, swipeDirection, type Gesture } from "./lib/navigation";
 import { Icon } from "./components/icon";
 import "./app.css";
 
@@ -28,6 +28,10 @@ function Navigator({ threadId }: { threadId: string }) {
   const next = neighbor(threads, threadId, 1);
   const status = statusFor(threads[index]);
   const statusIcon = statusIconFor(threads[index]?.indicator);
+  const project = state.status === "ready"
+    ? state.projects.find(item => item.id === threads[index]?.projectId)
+    : undefined;
+  const badge = projectBadge(threads[index]?.projectId ?? "", project?.name);
   const label = state.status === "loading" ? "Loading threads"
     : state.status === "error" ? "Threads unavailable"
     : index < 0 ? "Thread unavailable" : titleFor(threads[index]);
@@ -68,7 +72,11 @@ function Navigator({ threadId }: { threadId: string }) {
       }}
       onPointerCancel={() => { gesture.current = null; }}
       onLostPointerCapture={() => { gesture.current = null; }}>
-      <strong className="tg-title" title={label}>{label}</strong>
+      <span className="tg-heading">
+        {index >= 0 && <span className="tg-project" style={{ backgroundColor: badge.color, color: badge.foreground }}
+          title={badge.name} aria-label={`Project: ${badge.name}`}>{badge.letter}</span>}
+        <strong className="tg-title" title={label}>{label}</strong>
+      </span>
       {state.status === "error"
         ? <button className="tg-retry" type="button" title="Reload BB to retry loading threads"
             onPointerDown={event => event.stopPropagation()}

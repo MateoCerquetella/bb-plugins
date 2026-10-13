@@ -3,7 +3,7 @@ import type { BbPluginApi } from "@get-bb/plugin-sdk";
 export default function plugin(bb: BbPluginApi) {
   bb.cli.register({
     name: "thread-mobile",
-    summary: "Inspect mobile thread navigation",
+    summary: "Inspect Thread Mobile navigation",
     commands: [{ name: "list", summary: "List visible project root threads", usage: "bb thread-mobile list <project-id>" }],
     async run(argv) {
       if (argv.length !== 2 || argv[0] !== "list" || !argv[1]) {

@@ -6,16 +6,23 @@ On screens up to 767px wide, Thread Mobile places previous/next arrows and a
 swipeable title above the thread composer. Swipe left for the next thread or
 right for the previous one. Keyboard arrows work when the title is focused.
 
-Navigation stays in the current project, newest-created first, without wrapping.
-Archived and hidden threads are excluded. Child threads are skipped except for
-the currently open child. Live sidebar updates keep the list current.
+Navigation includes the current thread plus active and unread threads from
+every project, ordered by their latest attention. Archived and hidden threads
+are excluded; active or unread child threads are included. Live sidebar updates
+keep the queue current, and boundaries do not wrap.
+
+A compact project badge sits beside the title using the same deterministic
+initial and color palette as Dockside, so project context remains visible
+without adding another text row.
 
 The secondary line shows the current thread's live BB status alongside its
 position. Status uses BB's own indicator label (including working or needing
 input); no indicator is shown as "Idle", not as a claim that work is complete.
 Unknown states without a host label display "Status unavailable".
-The status line includes a small Dockside-style state icon, and the navigation
-controls use matching chevron icons with accessible labels.
+The status line includes a small Dockside-style state icon. Working icons spin,
+waiting and error icons gently pulse, and newly unread icons arrive with a
+short scale animation. Motion is disabled when the device requests reduced
+motion. Navigation controls use matching chevron icons with accessible labels.
 
 Swipes only start on the title strip. Vertical scrolling, short gestures,
 cancelled pointers and secondary touches do not navigate. The plugin never

@@ -26,7 +26,7 @@ filterable contribution dashboard with deterministic sample activity.
 | | Plugin | Install | What it does |
 | --- | --- | --- | --- |
 <<<<<<< HEAD
-| | [Thread Mobile](./plugins/thread-mobile) | [Local install](./plugins/thread-mobile#install) | Mobile arrows and safe horizontal swipes between threads in the current project. Requires BB 0.40+. |
+| | [Thread Mobile](./plugins/thread-mobile) | [Local install](./plugins/thread-mobile#install) | Mobile arrows and safe swipes across active and unread threads in every project. Requires BB 0.40+. |
 =======
 | | [Agent Canvas (WIP)](./plugins/agent-canvas) | [Local install](./plugins/agent-canvas#cli-and-development) | A spatial workbench for live BB agents, persistent notes, drawings, ensembles and scoped team context. Requires BB 0.44+. |
 >>>>>>> origin/main

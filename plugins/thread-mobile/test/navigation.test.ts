@@ -1,15 +1,23 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { navigationThreads, neighbor, titleFor, statusFor, statusIconFor, swipeDirection, updateGesture, type Thread } from "../lib/navigation.ts";
+import { navigationThreads, neighbor, projectBadge, titleFor, statusFor, statusIconFor, swipeDirection, updateGesture, type Thread } from "../lib/navigation.ts";
 
 const thread = (id: string, createdAt: number, extra: Partial<Thread> = {}): Thread =>
-  ({ id, createdAt, projectId: "p", title: id, titleFallback: null, parentThreadId: null, isArchived: false, ...extra });
+  ({ id, createdAt, updatedAt: createdAt, latestAttentionAt: createdAt, projectId: "p",
+    title: id, titleFallback: null, parentThreadId: null, isArchived: false,
+    isUnread: false, indicator: "none", ...extra });
 
-test("project roots sort by creation and deterministic id without mutating input", () => {
-  const rows = [thread("b", 1), thread("z", 9), thread("a", 1), thread("other", 20, { projectId: "q" }), thread("archived", 30, { isArchived: true }), thread("child", 10, { parentThreadId: "b" })];
-  assert.deepEqual(navigationThreads(rows, "b").map(t => t.id), ["z", "a", "b"]);
-  assert.equal(rows[0].id, "b");
-  assert.deepEqual(navigationThreads(rows, "child").map(t => t.id), ["child", "z", "a", "b"]);
+test("current, active and unread threads span projects and sort by attention", () => {
+  const rows = [
+    thread("current", 1),
+    thread("working", 9, { projectId: "q", indicator: "runtime", latestAttentionAt: 30 }),
+    thread("unread", 4, { projectId: "r", isUnread: true, latestAttentionAt: 20 }),
+    thread("child", 10, { parentThreadId: "working", indicator: "goal", latestAttentionAt: 10 }),
+    thread("quiet", 40),
+    thread("archived", 50, { isArchived: true, isUnread: true }),
+  ];
+  assert.deepEqual(navigationThreads(rows, "current").map(t => t.id), ["working", "unread", "child", "current"]);
+  assert.equal(rows[0].id, "current");
   assert.deepEqual(navigationThreads(rows, "missing"), []);
   assert.deepEqual(navigationThreads(rows, "archived"), []);
 });
@@ -46,6 +54,13 @@ test("status icons follow Dockside categories and unknown states stay neutral", 
   assert.equal(statusIconFor("none"), "idle");
   assert.equal(statusIconFor("future"), "unknown");
   assert.equal(statusIconFor(undefined), "unknown");
+});
+test("project badges are stable and provide a useful fallback", () => {
+  assert.deepEqual(projectBadge("project-1", " bb plugins "), projectBadge("project-1", " bb plugins "));
+  assert.equal(projectBadge("project-1", " bb plugins ").letter, "B");
+  assert.equal(projectBadge("project-1", undefined).name, "Unknown project");
+  assert.match(projectBadge("project-1", "BB").color, /^#[0-9A-F]{6}$/);
+  assert.match(projectBadge("project-1", "BB").foreground, /^#(?:000000|FFFFFF)$/);
 });
 test("swipes require horizontal threshold and matching pointer", () => {
   const start = { id: 1, x: 100, y: 100, cancelled: false };
