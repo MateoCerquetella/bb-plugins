@@ -105,7 +105,6 @@ try {
     await page.waitForTimeout(80);
     assert.equal(await page.locator(".steel-inline-browser--following").count(), 0,
       "viewer remains in normal thread flow while scrolling");
-    const inFlowTop = await page.locator(".steel-inline-browser").boundingBox();
     const anchorHeight = await page.locator(".steel-inline-anchor").evaluate(element => element.getBoundingClientRect().height);
     await page.locator("#message").evaluate(element => {
       const stream = document.createElement("div");
@@ -115,8 +114,10 @@ try {
     });
     await page.waitForTimeout(80);
     assert.equal(await page.locator(".steel-inline-browser--following").count(), 0, "streaming layout stays in normal flow");
-    assert((await page.locator(".steel-inline-browser").boundingBox()).y >= inFlowTop.y,
+    assert.equal(await page.locator(".steel-inline-browser").evaluate(element => getComputedStyle(element).position), "static",
       "streaming content does not pin the viewer to the viewport");
+    assert.equal(await page.locator(".steel-inline-anchor > .steel-inline-browser").count(), 1,
+      "viewer remains inside its message anchor");
     assert(await page.locator(".steel-inline-anchor").evaluate(element => element.getBoundingClientRect().height) >= anchorHeight,
       "streaming content keeps the viewer in its message");
     assert.equal(await page.frameLocator("iframe").getByRole("textbox").inputValue(), "Retained");
