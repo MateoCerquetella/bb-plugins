@@ -1,25 +1,25 @@
 {
   "schemaVersion": 1,
-  "sequence": 8,
-  "previousDigest": "sha256:b219c68eac1c29d3706cbc12ce4ea5f222d16f26597f497383e6781554cb3e0b",
-  "actor": "agent",
-  "type": "transition",
-  "summary": "Planned the scoped ProjectGroup-to-ThreadCard identity flow, root badge/provider placement, regression assertions, focused verification, local plugin reload, live screenshot inspection, fresh review, and capability integration.",
-  "createdAt": "2026-10-09T00:31:27.444Z",
-  "stateBeforeDigest": "sha256:904d892abc95873b4466f6bc43c12c20d25712596ea74561920616b6e3dd20cc",
-  "stateAfterDigest": "sha256:52d115c6066111173c0f12bcdd37518b9f6005aec92211f96ac8458e64de4ce3",
+  "sequence": 10,
+  "previousDigest": "sha256:79cdeab4b181c211ea75aabf65d26d7f7aeed3e1430b216b26f0c2f8f23c31ee",
+  "actor": "empirical-merge-observed",
+  "type": "compaction-boundary",
+  "summary": "Compacted through journal event 9",
+  "createdAt": "2026-10-12T19:15:55.471Z",
+  "stateBeforeDigest": "sha256:7c0a5a0e9f6b50641c8f2b74a5c37f76c68f5300a939ba584f2f7a8f20062bd9",
+  "stateAfterDigest": "sha256:7c0a5a0e9f6b50641c8f2b74a5c37f76c68f5300a939ba584f2f7a8f20062bd9",
   "state": {
     "schemaVersion": 5,
-    "revision": 8,
+    "revision": 9,
     "activeFeature": "fix-the-dockside-thread-row-icon-problem-shown-in-the",
     "request": "Fix the Dockside thread-row icon problem shown in the supplied screenshot: provider icons and adjacent project/letter marks visually overlap in the leading icon area. Preserve the existing compact layout and project badges, make the thread icon slot render cleanly at supported densities, add focused regression coverage, and verify the Dockside UI in a browser with a screenshot.",
     "profile": "complex",
     "workflow": "complex",
     "mode": "normal",
-    "phase": "implement",
-    "status": "waiting",
+    "phase": "done",
+    "status": "done",
     "repairAttempts": 0,
-    "message": "Planned the scoped ProjectGroup-to-ThreadCard identity flow, root badge/provider placement, regression assertions, focused verification, local plugin reload, live screenshot inspection, fresh review, and capability integration.",
+    "message": "Closed as merged-externally: Merged in pull request #73 as 4880d65e1ff282c7f50ca94ab27cf969143e0222 into main; closed when the merge was observed.",
     "implementationActor": null,
     "workStartedAt": null,
     "specDigest": "sha256:ba2fd3182f103ee7a10bb7b717ec4a57271efefbe01d2d6d499c8994726fbdc1",
@@ -47,7 +47,7 @@
         "published": "published has not been proven by a durable receipt."
       }
     },
-    "updatedAt": "2026-10-09T00:31:27.444Z",
+    "updatedAt": "2026-10-12T19:15:54.522Z",
     "lifecycle": {
       "stage": "development",
       "iteration": 2,
@@ -83,7 +83,41 @@
       "digest": "sha256:1da5f754982373697276ea206e31951773f226dde00da0b9cc49b956f4cf8548"
     },
     "trackerGeneration": 2,
-    "reviewFirst": true
+    "reviewFirst": true,
+    "closure": {
+      "schemaVersion": 1,
+      "outcome": "merged-externally",
+      "reason": "Merged in pull request #73 as 4880d65e1ff282c7f50ca94ab27cf969143e0222 into main; closed when the merge was observed.",
+      "actor": "empirical",
+      "confirmation": "merge-observed",
+      "closedAtPhase": "implement",
+      "completionAtClosure": "none",
+      "externalMerge": {
+        "pullRequest": 73,
+        "url": "https://github.com/MateoCerquetella/bb-plugins/pull/73",
+        "state": "MERGED",
+        "mergeCommit": "4880d65e1ff282c7f50ca94ab27cf969143e0222",
+        "targetBranch": "main",
+        "ancestorOfTarget": true,
+        "observedAt": "2026-10-12T19:15:47.777Z"
+      },
+      "closedAt": "2026-10-12T19:15:54.154Z",
+      "digest": "sha256:b44f1c050c7cf3b5910b85a670c425d757727edd9ec69de5c3d7a5016f042936"
+    },
+    "completionRecord": {
+      "schemaVersion": 1,
+      "implementedBy": null,
+      "completedBy": "empirical",
+      "decisionBy": null,
+      "method": "merged-externally",
+      "reason": "Merged in pull request #73 as 4880d65e1ff282c7f50ca94ab27cf969143e0222 into main; closed when the merge was observed.",
+      "at": "2026-10-12T19:15:54.522Z",
+      "revision": 9,
+      "completion": "none",
+      "sourceTreeDigest": "sha256:a62b462ed3de16e6835a68f52c850d1c7ccb49c50cf25f30a1f87efd8c8ba98c",
+      "artifactTreeDigest": "sha256:9e354f4d99a194ebfaaa8e369778f0cc7c5eb0492495692f54090526c1febd65",
+      "digest": "sha256:13b7c8e7f1f21ac188ae1727230c4b4aae2a0c03f51f1d216bce4a86209f2541"
+    }
   },
-  "digest": "sha256:f6555485b4fb303d653f14ce7f91c5a38e94b9c08d15514ae2fda746546cca99"
+  "digest": "sha256:87465dc6fa6c8e39a4725efdb4dff426e0cf714f2695d785b9d9f6989ba5dacf"
 }

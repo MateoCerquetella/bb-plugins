@@ -1,25 +1,21 @@
 {
   "schemaVersion": 1,
-  "sequence": 5,
-  "previousDigest": "sha256:300497c53fc8c0e30b9e50079bd8c41ee3c8306114305d32d519f422d7b62b0b",
-  "actor": "agent",
-  "type": "transition",
-  "summary": "Implemented one-stream Steel viewer lifecycle, guarded user-only clipboard controls with native fallback, project-scoped GitHub/Linear/Google sign-in labels, allowlisted login navigation, responsive UI, and dashboard request coalescing. Plugin build/typecheck, 49 plugin tests, desktop/mobile browser checks, and full workspace npm run check passed; committed as 5d66e66e.",
-  "createdAt": "2026-10-08T02:42:56.253Z",
-  "stateBeforeDigest": "sha256:bf77f08010f39adabab3685402482e13fc80f5006c999ed4883a19ff4e64c286",
-  "stateAfterDigest": "sha256:dc303e9e466dc3ab5bdba8045b17fba2806629bd7d8fa41a8a14efd5e5f73c71",
+  "feature": "steel-browser-human-control",
+  "lastSequence": 7,
+  "lastEventDigest": "sha256:253a416f0de9d70432f8a966e9c83addbee939f81eab5a7a170f2ab4508ef7c4",
+  "stateDigest": "sha256:1c3b0efa530ec9f76a49680a14bb2cbbfd574f9654d6e8c85f4d7c10db90e210",
   "state": {
     "schemaVersion": 5,
-    "revision": 5,
+    "revision": 7,
     "activeFeature": "steel-browser-human-control",
     "request": "Improve plugins/steel-browser thread and plugin-page responsiveness, reduce duplicate streams and requests, provide secure user-only copy/paste and human login controls, expose project-scoped saved service/account labels with honest verification status, research existing BB and Kernel patterns, test and visually verify, then commit and push the working branch. Preserve existing browser profiles, auth boundaries and paid-engine opt-in. Include a portable documented fix for the remote BB launcher issue if appropriate.",
     "profile": "complex",
     "workflow": "complex",
     "mode": "normal",
-    "phase": "context",
-    "status": "waiting",
+    "phase": "done",
+    "status": "done",
     "repairAttempts": 0,
-    "message": "Implemented one-stream Steel viewer lifecycle, guarded user-only clipboard controls with native fallback, project-scoped GitHub/Linear/Google sign-in labels, allowlisted login navigation, responsive UI, and dashboard request coalescing. Plugin build/typecheck, 49 plugin tests, desktop/mobile browser checks, and full workspace npm run check passed; committed as 5d66e66e.",
+    "message": "Closed as merged-externally: Merged in pull request #71 as ae557ce0a686054738472f6aa0106fbe48465bb5 into main; closed when the merge was observed.",
     "implementationActor": "agent",
     "workStartedAt": null,
     "specDigest": "sha256:130771cfbea4704c6e3d110d828c366bd3728846715fad1c08ccb89de2edbe78",
@@ -46,7 +42,7 @@
         "published": "published has not been proven by a durable receipt."
       }
     },
-    "updatedAt": "2026-10-08T02:42:56.253Z",
+    "updatedAt": "2026-10-12T19:15:55.800Z",
     "capabilityBase": {
       "schemaVersion": 1,
       "id": "steel-browser-human-control-4665f320dc00",
@@ -77,7 +73,42 @@
       "heartbeatAt": "2026-10-08T02:26:07.098Z",
       "digest": "sha256:f1eb3d8aa13f24a13d360f078788322c175de98b60bbdfd58eba87de5505348f"
     },
-    "reviewFirst": true
+    "reviewFirst": true,
+    "closure": {
+      "schemaVersion": 1,
+      "outcome": "merged-externally",
+      "reason": "Merged in pull request #71 as ae557ce0a686054738472f6aa0106fbe48465bb5 into main; closed when the merge was observed.",
+      "actor": "empirical",
+      "confirmation": "merge-observed",
+      "closedAtPhase": "review",
+      "completionAtClosure": "implemented",
+      "externalMerge": {
+        "pullRequest": 71,
+        "url": "https://github.com/MateoCerquetella/bb-plugins/pull/71",
+        "state": "MERGED",
+        "mergeCommit": "ae557ce0a686054738472f6aa0106fbe48465bb5",
+        "targetBranch": "main",
+        "ancestorOfTarget": true,
+        "observedAt": "2026-10-12T19:15:47.777Z"
+      },
+      "closedAt": "2026-10-12T19:15:55.569Z",
+      "digest": "sha256:e7f09392b7e79ee10f911c8c3a6b72f000a05ef1a8500356478e0134baff7d7e"
+    },
+    "completionRecord": {
+      "schemaVersion": 1,
+      "implementedBy": "agent",
+      "completedBy": "empirical",
+      "decisionBy": null,
+      "method": "merged-externally",
+      "reason": "Merged in pull request #71 as ae557ce0a686054738472f6aa0106fbe48465bb5 into main; closed when the merge was observed.",
+      "at": "2026-10-12T19:15:55.800Z",
+      "revision": 7,
+      "completion": "implemented",
+      "sourceTreeDigest": "sha256:a62b462ed3de16e6835a68f52c850d1c7ccb49c50cf25f30a1f87efd8c8ba98c",
+      "artifactTreeDigest": "sha256:e943c3d1d853e0f833ba4c2f358a3c601fd4d092a1ae7414f32250a17bf36a2a",
+      "digest": "sha256:e2fac2041868cc4baee8a767a0841b37b27a31544e79cf6b844eb5c52d637481"
+    }
   },
-  "digest": "sha256:32c05342b4642187952e99b7ded2539a830e790971aae8ed1ff89c4f3fffafa1"
+  "compactedAt": "2026-10-12T19:15:56.748Z",
+  "digest": "sha256:a75d5bcd5861f8c46898533ad65f3f75daa3170e1c73274b62144fd49d936c47"
 }

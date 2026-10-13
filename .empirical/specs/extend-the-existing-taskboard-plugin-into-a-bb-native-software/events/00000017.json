@@ -1,25 +1,25 @@
 {
   "schemaVersion": 1,
-  "sequence": 9,
-  "previousDigest": "sha256:946baef36a3ce25403f70dae38c91fdec611a71a293eec46f66afbedf3f3d82c",
-  "actor": "codex",
-  "type": "transition",
-  "summary": "Resumed workflow",
-  "createdAt": "2026-10-08T14:48:27.946Z",
-  "stateBeforeDigest": "sha256:54296297e1df524b36d335eff5fab84e697f1d406880e2785af99c77f24ef5ce",
-  "stateAfterDigest": "sha256:98d0ccfe2ccb02a800ea7dce45e420be9e472d331bb779dcb1950a4cb38ddc40",
+  "sequence": 17,
+  "previousDigest": "sha256:d9b14410e9ae3b39019cf84becbf709e8ef1fbdfec8edac09028ce2ef0972b95",
+  "actor": "empirical-merge-observed",
+  "type": "compaction-boundary",
+  "summary": "Compacted through journal event 16",
+  "createdAt": "2026-10-12T19:15:54.120Z",
+  "stateBeforeDigest": "sha256:139fa54df56a7a6e7eb7d1e50212cdedb7a549a4a62f02cac553aa293c124130",
+  "stateAfterDigest": "sha256:139fa54df56a7a6e7eb7d1e50212cdedb7a549a4a62f02cac553aa293c124130",
   "state": {
     "schemaVersion": 5,
-    "revision": 9,
+    "revision": 16,
     "activeFeature": "extend-the-existing-taskboard-plugin-into-a-bb-native-software",
     "request": "Extend the EXISTING Taskboard plugin into a BB-native software factory, using Mastra Factory as the product and workflow reference. Inspect current Taskboard main, the installed plugin source, and PR #57 first; identify reusable code and regressions; preserve existing tracker credentials, data, integrations, and user edits; do not merge #57 wholesale or replace the live installation. Taskboard owns Intake -> Triage -> Planning -> Build -> Review -> Done with configurable manual-by-default stage policies and explicit opt-in automation, while factory stage, agent-run status, and external tracker status remain separate. Retain original tracker identity and link native BB sessions, investigation, versioned plans, approvals, workspace, verification, and PRs. Reuse authoring context across stages and allow a separate linked review session. Use BB provider/account/model/environment/worktree/thread/permission systems and exact SDK contracts. Empirical, Symphony, Mastra, and LangGraph are not required runtimes and Taskboard must not inject Empirical policy globally. Reuse suitable #57 lifecycle and verification code, but a successful turn or completed event must never by itself mark a ticket Done. Deliver a working vertical slice: existing ticket -> Investigate -> inspect findings -> generate/revise plan -> approve exact plan revision -> Build in a BB-managed workspace -> inspect tests and changes -> Review with linked PR/evidence. Expose native sessions and actionable failures; support steering, cancellation, bounded retries, restart recovery, duplicate-dispatch prevention, and stale-approval invalidation. Keep merge, deployment, and tracker closure explicitly gated. Test transitions, stale approvals, duplicate starts, crash recovery, cancellation, and the regression where an agent turn finishes without the task finishing. Verify an actual native BB execution path. Implement in this clean branch. Do not merge, deploy, close real tickets, or replace the live Taskboard installation. Report reuse from #57, checks, demonstrated workflow, and limitations.",
     "profile": "complex",
     "workflow": "complex",
     "mode": "normal",
-    "phase": "implement",
-    "status": "waiting",
+    "phase": "done",
+    "status": "done",
     "repairAttempts": 0,
-    "message": null,
+    "message": "Closed as merged-externally: Merged in pull request #72 as 2daf96f4de78bf9ef65b690001db78b9904d4bf0 into main; closed when the merge was observed.",
     "implementationActor": null,
     "workStartedAt": null,
     "specDigest": "sha256:6eb6d50c9ea5308eea8eb2bf73c6adde304911bf4c699f269d88b142cb7c805e",
@@ -47,7 +47,7 @@
         "published": "published has not been proven by a durable receipt."
       }
     },
-    "updatedAt": "2026-10-08T14:48:27.946Z",
+    "updatedAt": "2026-10-12T19:15:53.387Z",
     "capabilityBase": {
       "schemaVersion": 1,
       "id": "extend-the-existing-taskboard-plugin-into-a-bb-native-software-23c140730dcf",
@@ -91,7 +91,42 @@
       "actor": "agent",
       "revision": 4
     },
-    "reviewFirst": true
+    "budgetExtensionMinutes": 176,
+    "reviewFirst": true,
+    "closure": {
+      "schemaVersion": 1,
+      "outcome": "merged-externally",
+      "reason": "Merged in pull request #72 as 2daf96f4de78bf9ef65b690001db78b9904d4bf0 into main; closed when the merge was observed.",
+      "actor": "empirical",
+      "confirmation": "merge-observed",
+      "closedAtPhase": "implement",
+      "completionAtClosure": "none",
+      "externalMerge": {
+        "pullRequest": 72,
+        "url": "https://github.com/MateoCerquetella/bb-plugins/pull/72",
+        "state": "MERGED",
+        "mergeCommit": "2daf96f4de78bf9ef65b690001db78b9904d4bf0",
+        "targetBranch": "main",
+        "ancestorOfTarget": true,
+        "observedAt": "2026-10-12T19:15:47.777Z"
+      },
+      "closedAt": "2026-10-12T19:15:53.228Z",
+      "digest": "sha256:987b19ebf93a4eee26d5f62d2d7019f015880cae13218ead4739fb9cfdedcdad"
+    },
+    "completionRecord": {
+      "schemaVersion": 1,
+      "implementedBy": null,
+      "completedBy": "empirical",
+      "decisionBy": null,
+      "method": "merged-externally",
+      "reason": "Merged in pull request #72 as 2daf96f4de78bf9ef65b690001db78b9904d4bf0 into main; closed when the merge was observed.",
+      "at": "2026-10-12T19:15:53.387Z",
+      "revision": 16,
+      "completion": "none",
+      "sourceTreeDigest": "sha256:a62b462ed3de16e6835a68f52c850d1c7ccb49c50cf25f30a1f87efd8c8ba98c",
+      "artifactTreeDigest": "sha256:6c55ea713bddf5e82e7ef74519f5f493ce91e4a6cd75500e7179165540327fc6",
+      "digest": "sha256:dd450933713781c925e659ce277583df178066ecb1b5d16d0b17d67a5a123587"
+    }
   },
-  "digest": "sha256:2924f9b5b099af0e7379a7a90116b61463cdf9fca89ca238479f5722158f7e75"
+  "digest": "sha256:6daea9398f850760c0050de6e370f48b2a593453abb2236a1a1607afdb86775f"
 }

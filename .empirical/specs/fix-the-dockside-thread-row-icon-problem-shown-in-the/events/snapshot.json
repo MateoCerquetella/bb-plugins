@@ -1,29 +1,25 @@
 {
   "schemaVersion": 1,
-  "sequence": 4,
-  "previousDigest": "sha256:729d7a23754e90d3d4cb0e6941f2bfa30e0a172d2f97d7b696652d5e73b2d4bf",
-  "actor": "agent",
-  "type": "transition",
-  "summary": "Revised the contract from runtime and repository-history evidence: grouped roots keep one leading project badge and render provider identity exactly once before trailing status. Updated the capability delta and mockup, and recorded the required UI/UX advisory with no blocking findings.",
-  "createdAt": "2026-10-09T00:29:34.810Z",
-  "stateBeforeDigest": "sha256:3b91ef0d24439432eca2ced0284bcd18cefc4ddd368b13c4931c929a6c14ca8a",
-  "stateAfterDigest": "sha256:24580354f0748bd7dc2eea0e6bd72cb326b59710dbe738ff44029605540340e4",
+  "feature": "fix-the-dockside-thread-row-icon-problem-shown-in-the",
+  "lastSequence": 9,
+  "lastEventDigest": "sha256:79cdeab4b181c211ea75aabf65d26d7f7aeed3e1430b216b26f0c2f8f23c31ee",
+  "stateDigest": "sha256:7c0a5a0e9f6b50641c8f2b74a5c37f76c68f5300a939ba584f2f7a8f20062bd9",
   "state": {
     "schemaVersion": 5,
-    "revision": 4,
+    "revision": 9,
     "activeFeature": "fix-the-dockside-thread-row-icon-problem-shown-in-the",
     "request": "Fix the Dockside thread-row icon problem shown in the supplied screenshot: provider icons and adjacent project/letter marks visually overlap in the leading icon area. Preserve the existing compact layout and project badges, make the thread icon slot render cleanly at supported densities, add focused regression coverage, and verify the Dockside UI in a browser with a screenshot.",
     "profile": "complex",
     "workflow": "complex",
     "mode": "normal",
-    "phase": "design",
-    "status": "waiting",
+    "phase": "done",
+    "status": "done",
     "repairAttempts": 0,
-    "message": "Revised the contract from runtime and repository-history evidence: grouped roots keep one leading project badge and render provider identity exactly once before trailing status. Updated the capability delta and mockup, and recorded the required UI/UX advisory with no blocking findings.",
+    "message": "Closed as merged-externally: Merged in pull request #73 as 4880d65e1ff282c7f50ca94ab27cf969143e0222 into main; closed when the merge was observed.",
     "implementationActor": null,
     "workStartedAt": null,
-    "specDigest": "sha256:efe9bf1bb240334addcf790cce020af1cea3ec9bbe29a1990bdb4f67f035f692",
-    "approvedSpecRevision": 4,
+    "specDigest": "sha256:ba2fd3182f103ee7a10bb7b717ec4a57271efefbe01d2d6d499c8994726fbdc1",
+    "approvedSpecRevision": 6,
     "capabilityArchiveRequired": true,
     "capabilityDeltaDigest": "sha256:9ec7f5383c88723d00547bdf5669f704f2241589ca56b85a938cf0b629008399",
     "impactDigest": "sha256:098d8f4282d3aa8aa1199db02f8764b35ce7c00b3b450ece444b4a46892aec3f",
@@ -47,13 +43,13 @@
         "published": "published has not been proven by a durable receipt."
       }
     },
-    "updatedAt": "2026-10-09T00:29:34.810Z",
+    "updatedAt": "2026-10-12T19:15:54.522Z",
     "lifecycle": {
       "stage": "development",
-      "iteration": 1,
+      "iteration": 2,
       "awaitingFeedback": false,
       "iterative": true,
-      "contractRevision": 2
+      "contractRevision": 4
     },
     "capabilityBase": {
       "schemaVersion": 1,
@@ -82,8 +78,43 @@
       "heartbeatAt": "2026-10-09T00:24:47.792Z",
       "digest": "sha256:1da5f754982373697276ea206e31951773f226dde00da0b9cc49b956f4cf8548"
     },
-    "trackerGeneration": 1,
-    "reviewFirst": true
+    "trackerGeneration": 2,
+    "reviewFirst": true,
+    "closure": {
+      "schemaVersion": 1,
+      "outcome": "merged-externally",
+      "reason": "Merged in pull request #73 as 4880d65e1ff282c7f50ca94ab27cf969143e0222 into main; closed when the merge was observed.",
+      "actor": "empirical",
+      "confirmation": "merge-observed",
+      "closedAtPhase": "implement",
+      "completionAtClosure": "none",
+      "externalMerge": {
+        "pullRequest": 73,
+        "url": "https://github.com/MateoCerquetella/bb-plugins/pull/73",
+        "state": "MERGED",
+        "mergeCommit": "4880d65e1ff282c7f50ca94ab27cf969143e0222",
+        "targetBranch": "main",
+        "ancestorOfTarget": true,
+        "observedAt": "2026-10-12T19:15:47.777Z"
+      },
+      "closedAt": "2026-10-12T19:15:54.154Z",
+      "digest": "sha256:b44f1c050c7cf3b5910b85a670c425d757727edd9ec69de5c3d7a5016f042936"
+    },
+    "completionRecord": {
+      "schemaVersion": 1,
+      "implementedBy": null,
+      "completedBy": "empirical",
+      "decisionBy": null,
+      "method": "merged-externally",
+      "reason": "Merged in pull request #73 as 4880d65e1ff282c7f50ca94ab27cf969143e0222 into main; closed when the merge was observed.",
+      "at": "2026-10-12T19:15:54.522Z",
+      "revision": 9,
+      "completion": "none",
+      "sourceTreeDigest": "sha256:a62b462ed3de16e6835a68f52c850d1c7ccb49c50cf25f30a1f87efd8c8ba98c",
+      "artifactTreeDigest": "sha256:9e354f4d99a194ebfaaa8e369778f0cc7c5eb0492495692f54090526c1febd65",
+      "digest": "sha256:13b7c8e7f1f21ac188ae1727230c4b4aae2a0c03f51f1d216bce4a86209f2541"
+    }
   },
-  "digest": "sha256:f072407fb43e4134da54446c94c269dbd3c726665c166a5a47165c88ca908ed4"
+  "compactedAt": "2026-10-12T19:15:55.471Z",
+  "digest": "sha256:2cdc758c262aa7bce007c9263e465ff5c3f0e31aca2db41f741b5d345ca24fff"
 }
