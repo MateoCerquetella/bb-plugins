@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 51,
+  "revision": 52,
   "activeFeature": "make-a-bb-plugin-for-bb-mobile-to-have-like",
   "request": "Make a bb plugin for bb mobile to have like arrows or tinder stylrer to go strong it the threads more easily. You teasesrch and do it don’t ask me",
   "profile": "complex",
@@ -9,7 +9,7 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Prevent BB's sidebar-opening horizontal gesture from firing when the user swipes inside Dockside's mobile thread-navigation strip. The strip's deliberate horizontal swipe must navigate exactly one thread and consume propagation/default behavior only once the gesture is recognized; vertical scrolling and gestures outside the strip must remain unchanged.",
+  "message": "Isolated Dockside's mobile navigation pointer sequence with stopPropagation on the swipe strip while retaining touch-action pan-y and avoiding preventDefault, so thread swipes no longer also reach BB's sidebar recognizer and vertical scrolling remains native. Added a UI contract regression test, updated docs/reference markup, passed 8 focused tests plus typecheck and build, reinstalled and reloaded running Dockside 0.1.7, committed and pushed the fix, and confirmed the branch is current with main.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:97e9c76bc176347484978a922dae03d3eec90d19404ed05d299aad693d94fed8",
@@ -23,21 +23,20 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": false,
+    "implemented": true,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "none",
+    "highest": "implemented",
     "reasons": {
-      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-13T15:32:53.705Z",
+  "updatedAt": "2026-10-13T15:35:20.355Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "make-a-bb-plugin-for-bb-mobile-to-have-like-07aee46cf0cd",
@@ -74,7 +73,7 @@
   "lifecycle": {
     "stage": "iteration",
     "iteration": 7,
-    "awaitingFeedback": false,
+    "awaitingFeedback": true,
     "contractRevision": 43,
     "riskRequest": "Replace the currently installed Dockside v0.1.5 with this updated Dockside build, verify it is running, then create and push the new Dockside v0.1.6 release."
   },
