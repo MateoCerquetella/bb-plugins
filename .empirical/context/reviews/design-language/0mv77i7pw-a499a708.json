@@ -1,10 +1,9 @@
 {
   "schemaVersion": 1,
   "page": ".empirical/context/design-language.md",
-  "head": "bd64b26a458cdb23a56008f93f74ae483d83f30f",
+  "head": "c9d46a87e343e337dc2c4090436d2631e53db9c9",
   "units": [
-    "plugins/dockside",
-    "plugins/thread-mobile"
+    "plugins/dockside"
   ],
   "pending": {}
 }

@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-933bd0ca08a5bf0b79c74f34",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3",
+    "AC-UI-4"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-10-13T21:44:03.606Z",
+  "completedAt": "2026-10-13T21:44:03.606Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "make-a-bb-plugin-for-bb-mobile-to-have-like",
+    "specRevision": 45,
+    "specDigest": "sha256:97e9c76bc176347484978a922dae03d3eec90d19404ed05d299aad693d94fed8",
+    "treeDigest": "sha256:f0d11c4c47a8f20139b7d0dfa7a32198ef8e81fd504c2ed071428f0e65d50102",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:df6ee0aae8d517838aeab383847e7c997f91e893d76f8bef5334e2a66480397c",
+  "kind": "collected",
+  "collector": "empirical-review:/root/independent_review",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/make-a-bb-plugin-for-bb-mobile-to-have-like/reviews/1cf9105ebb23441d94179d28.json",
+      "mediaType": "application/json",
+      "bytes": 2469,
+      "digest": "sha256:ff39d1b81354aa03db8aae071c7b069ee7e8d7c2b8ab4ee632e3c57fc959688e"
+    },
+    {
+      "path": ".empirical/specs/make-a-bb-plugin-for-bb-mobile-to-have-like/reviews/1cf9105ebb23441d94179d28.md",
+      "mediaType": "text/markdown",
+      "bytes": 1680,
+      "digest": "sha256:098794a4aba2043279b77ae6945c802ce1c2868eff1acca40f288c8433d0646b"
+    }
+  ]
+}

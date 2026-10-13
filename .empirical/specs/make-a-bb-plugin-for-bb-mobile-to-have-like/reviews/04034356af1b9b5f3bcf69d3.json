@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:a0c44ac7c96c8c1c24885f29ee8621ef23ea0b5ce34495bb04410e9a9371649a",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "d544da34e76016e14cabded03ac8a355cea08acb",
+  "headCommit": "7d451488e2c3cf7ee94600e5cd597015feefac84",
+  "diffDigest": "sha256:29a9e8672978846158c6d1e3af3a01d13aeda84248c2e28097740dacaae2cf94",
+  "verdict": "APPROVED",
+  "reviewerActor": "codex-fresh-context-reviewer",
+  "reviewerInvocationId": "fresh-review-20261013-archive-recovery-01",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: The committed diff preserves the native cross-project queue ordering implementation and its deterministic fallback behavior; no contrary change is present in the reviewed patch.\n- PASS AC-UI-1: The reviewed implementation keeps the mobile-only compact strip and accessible 44px navigation controls while leaving desktop layout unchanged.\n- PASS AC-UI-3: The reviewed patch does not regress the live host indicator-label/Idle status behavior or derive status from message content.\n- PASS AC-UI-2: The reviewed patch does not alter the strip gesture guards; the existing deliberate-horizontal-only behavior remains intact.\n- PASS AC-2: The reviewed patch adds archive recovery while retaining safe loading/error/singleton behavior and stale-request protections.\n- PASS AC-UI-4: The reviewed patch does not alter project-initial effective color synchronization.\n- PASS AC-3: The diff registers the intended independently installable plugins and retains Dockside ownership; the standalone Thread Mobile package/catalog removal is consistent with the accepted implementation decision.\n- PASS AC-4: The packet's accepted release criterion is not contradicted by the reviewed committed changes; release artifacts are outside this source diff and no source regression is visible.\n\n## Security / correctness\n\nNo credential, token, personal-data exposure, or authentication/authorization bypass is introduced by the reviewed diff. Archive restoration performs project, environment, managed-worktree, status, identity, and idle-state checks before dispatch; failures avoid creating phantom runs.\n\n## Design / maintainability\n\nThe archive restoration logic is narrowly scoped, uses a named sentinel error, clones durable state before potentially failing restoration, and adds focused regression coverage. No material design or maintainability defect found.",
+  "bodyDigest": "sha256:41801d3589915fc828d90ef681d0346c96ab2ae194dc41ccec7bdf6abef13ec0",
+  "findings": [],
+  "digest": "sha256:04034356af1b9b5f3bcf69d3356b3ad08d331261e307c27f2d1b819e6fe2dbdf"
+}

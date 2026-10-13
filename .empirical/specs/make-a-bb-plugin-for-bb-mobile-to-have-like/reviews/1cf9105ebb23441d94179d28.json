@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:ff1bc74e817be2a1fa238eaeb477e8d983ff956cbd4f89f2fd3092370b6e449c",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "d544da34e76016e14cabded03ac8a355cea08acb",
+  "headCommit": "c9d46a87e343e337dc2c4090436d2631e53db9c9",
+  "diffDigest": "sha256:6838a7cf1f500dd7298fdd63b05e6c2e5e358ac8335c2fac26ff2d216552f50e",
+  "verdict": "APPROVED",
+  "reviewerActor": "/root/independent_review",
+  "reviewerInvocationId": "independent_review:c9d46a87e343e337dc2c4090436d2631e53db9c9",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: Carried forward. Queue eligibility, cross-project inclusion, and deterministic ordering are unchanged.\n- PASS AC-UI-1: Carried forward. The strip remains hidden above 767px, with fixed 44px arrows and constrained title/position layout.\n- PASS AC-UI-3: Host-provided status labels and the none-to-Idle fallback remain intact. Semantic palette subscription and distinct activity icons do not replace host status semantics.\n- PASS AC-UI-2: Carried forward. Gesture thresholds, cancellation, secondary-pointer rejection, and strip-local gesture handling are unchanged.\n- PASS AC-2: Carried forward. Wrapping, disabled loading/error/singleton controls, navigation debounce, and thread-keyed state remain unchanged.\n- PASS AC-UI-4: Carried forward. Project initials still use useProjectColors and projectBadgePresentation; semantic status colors do not interfere with project colors.\n- PASS AC-3: Carried forward. Implementation, tests, and documentation remain owned by Dockside.\n- PASS AC-4: Carried forward from the previous approved review. Source review does not independently verify the installed package or remote release tag.\n\n## Security / correctness\n\nNo new material finding in the committed Dockside delta since 7d451488e. Activity roles map to existing typed icon presentations; settings resolve through the existing preference layer. No new network, credential, or authorization behavior is introduced.\n\n## Design / maintainability\n\nThe changes reuse established Dockside palette and activity-presentation helpers. Focused tests cover distinct role mapping and palette attachment. Runtime rendering remains a verification responsibility.",
+  "bodyDigest": "sha256:e2cdf4d132f1194cc274de118fb662c9d19c89f7c2496e6ba1fc805f394d8b54",
+  "findings": [],
+  "digest": "sha256:1cf9105ebb23441d94179d288035b0490c8eb3e03d13ec37b61fbd7495c2dd9c"
+}
