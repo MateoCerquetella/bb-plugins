@@ -1,0 +1,25 @@
+{
+  "threadId": "thr_q9v9mzmunp",
+  "nativeRunId": "arun_xktzmcaemsm",
+  "steps": [
+    {
+      "step": 1,
+      "requestSeq": 18,
+      "acceptedSeq": 20,
+      "completedSeq": 28,
+      "requestId": "creq_93z3srq27z",
+      "turnId": "daf7fe10c1-t6",
+      "status": "completed"
+    },
+    {
+      "step": 2,
+      "requestSeq": 29,
+      "acceptedSeq": 31,
+      "completedSeq": 39,
+      "requestId": "creq_uc6vavyk2f",
+      "turnId": "daf7fe10c1-t7",
+      "status": "completed"
+    }
+  ],
+  "nativeStatus": "succeeded"
+}

@@ -1,0 +1,14 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import {emptyDocument,createNode,connect,groupNodes,extractEnsemble,documentSchema} from "./document.ts";
+import {exportLibrary,importLibrary,placeCollection} from "./library.ts";
+
+test("library transfers preserve roles and structure with fresh IDs and no live sessions",()=>{
+ let d=emptyDocument();const a=createNode("note","source",{x:20,y:40,w:200,h:200}),b=createNode("agent","source",{x:260,y:40,w:400,h:300});const role={id:"role",name:"Engineer",color:"#578af3",instructions:"Implement",maestro:false};b.roleId=role.id;b.threadId="live-thread";d={...d,nodes:[a,b],roles:[role]};d=groupNodes(connect(d,a.id,b.id),[a.id,b.id]);const item=extractEnsemble(d,[a.id,b.id],new Map(d.nodes.map(n=>[n.id,n.box])));const result=importLibrary(emptyDocument(),exportLibrary(d,"ensembles",[item]));assert.equal(result.ensembles.length,1);const imported=result.ensembles[0];assert.notEqual(imported.id,item.id);assert.ok(imported.nodes.every(n=>n.threadId===null));assert.equal(imported.nodes[1].roleId,result.roles[0].id);assert.notEqual(result.roles[0].id,role.id);assert.ok(imported.edges.every(e=>imported.nodes.some(n=>n.id===e.source)&&imported.nodes.some(n=>n.id===e.target)));assert.equal(imported.groups[0].members.length,2);assert.ok(documentSchema.safeParse(result).success);
+});
+test("note collections transfer to another floor as new notes with remapped cables",()=>{
+ let d=emptyDocument();const a=createNode("note","source",{x:20,y:40,w:200,h:200}),b=createNode("note","source",{x:260,y:40,w:200,h:200});a.content="Keep this context";d=connect({...d,nodes:[a,b]},a.id,b.id);const item=extractEnsemble(d,[a.id,b.id],new Map(d.nodes.map(n=>[n.id,n.box])));const imported=importLibrary(emptyDocument(),exportLibrary(d,"collections",[item]));assert.equal(imported.nodes.length,0);const placed=placeCollection(imported,imported.collectionTemplates[0],"destination","floor",100,200);assert.equal(placed.document.collections[0].members.length,2);assert.ok(placed.document.nodes.every(n=>n.workspaceId==="destination"&&n.environmentId==="floor"));assert.equal(placed.document.nodes[0].content,a.content);assert.deepEqual(placed.document.collections[0].members,placed.ids);assert.equal(placed.document.edges.length,1);
+});
+test("library imports reject malformed structure and active agents in note collections",()=>{
+ const d=emptyDocument(),a=createNode("agent","source",{x:0,y:0,w:200,h:200});const item=extractEnsemble({...d,nodes:[a]},[a.id],new Map([[a.id,a.box]]));assert.throws(()=>importLibrary(d,exportLibrary(d,"collections",[item])));const valid=JSON.parse(exportLibrary(d,"ensembles",[item]));valid.items[0].edges.push({id:"bad",source:a.id,target:"missing"});assert.throws(()=>importLibrary(d,JSON.stringify(valid)));assert.throws(()=>importLibrary(d," ".repeat(2000001)));
+});
