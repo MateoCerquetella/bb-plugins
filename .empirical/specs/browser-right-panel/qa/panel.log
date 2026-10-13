@@ -1,0 +1,4 @@
+Panel passed: width=1440, touch=false, theme=dark
+Panel passed: width=1440, touch=false, theme=light
+Panel passed: width=390, touch=true, theme=light
+Panel passed: width=1440, touch=true, theme=dark

@@ -1,16 +1,16 @@
 {
   "schemaVersion": 5,
-  "revision": 4,
+  "revision": 7,
   "activeFeature": "browser-right-panel",
   "request": "Improve the existing Steel Browser plugin: put the live agent browser viewer on the right side opened/closed by clicking a browser icon; dwelling the pointer over the browser panel for about two seconds expands it toward nearly full screen without a blocking modal, with a reversible return to compact view; mimic BB native UI styling, and replace Steel Browser user-facing branding with a personalized name (user preference pending; use configurable display name if needed). Preserve same project-bound browser session and ability to watch the agent work. Implement and verify the human UI and CLI.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "implement",
-  "status": "waiting",
+  "phase": "verify",
+  "status": "awaiting_human",
   "repairAttempts": 0,
-  "message": "Planned native panel wiring, stable hover expansion, compatible branding, browser interaction evidence and fresh-context review.",
-  "implementationActor": null,
+  "message": "Implemented and independently approved Cerq Browser; final workspace QA and browser interaction fixtures passed. Awaiting the user's sign-in in the embedded project browser to complete the fresh host UI outcome check before integration.",
+  "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:fbc6ec7bb81874a98ed84b1d1e6e95960f9b459ccfee4cb85d00c800a13a7c46",
   "approvedSpecRevision": 2,
@@ -20,24 +20,25 @@
   "capabilityClaimId": "browser-right-panel-1a47658651f8",
   "authorizationDigest": null,
   "evidence": [],
-  "evidenceReceiptIds": [],
+  "evidenceReceiptIds": [
+    "collected-660d0ec62ddeec9987d79737"
+  ],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": false,
+    "implemented": true,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "none",
+    "highest": "implemented",
     "reasons": {
-      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-13T21:50:25.650Z",
+  "updatedAt": "2026-10-13T22:14:07.204Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "browser-right-panel-1a47658651f8",

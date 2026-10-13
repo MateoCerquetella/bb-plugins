@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:79f9a38673ffbbb42b6004f97e3f8f4ea2f98921fe9cb725700d17648af253ec",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "e18c3aadb34d54673e144d7a309697a795e65ad1",
+  "headCommit": "aa82bb1282adba29c0ab0e58820498f744c5fab3",
+  "diffDigest": "sha256:339dc69672e688bbc1f1d472c0bc67a9adc72c95d149a8733db0e2fd786d0cac",
+  "verdict": "APPROVED",
+  "reviewerActor": "isolated-browser-reviewer",
+  "reviewerInvocationId": "browser-review-isolated-20261013-2209",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-UI-1: Existing Monitor threadPanelAction remains registered; handoffs gain a labeled SDK openThreadPanel control and retain inline viewing when the host declines opening.\n- PASS AC-UI-2: The hook implements a 2000ms fine mouse dwell, hover collapse on leaving, pinned explicit expansion, Shrink and Escape, and timer cleanup on leave, blur, hidden document and unmount. Fixed geometry has no backdrop, dialog semantics or focus trap. The interaction suite covers short hover, leave/blur cancellation and continued chat input.\n- PASS AC-UI-3: Expansion alters section style without relocating or keying the LiveViewer; thread-keyed scope remount cleans expansion effects and timers. Coarse pointers and narrow viewports disable automatic dwell, and explicit geometry is bounded by viewport dimensions. The suite checks iframe identity, stream load count, retained iframe state, touch widths and thread switching.\n- PASS AC-UI-4: Changed panel and viewer controls use BB semantic foreground/background/border/accent/primary/ring tokens, compact icons and visible focus outlines. Manifest, navigation, page and handoff headings consistently adopt Cerq Browser; test scenarios include light and dark themes.\n- PASS AC-5: The committed changes retain steel-browser technical identifiers, commands, directive registration and scoped dashboard/viewer paths. Authentication and browser provisioning/automation code are unchanged; existing inline and human-control harnesses are adapted for the added navigation hook.\n\n## Security / correctness\n\nNo material security or correctness defect found in the exact committed diff. Session scope and authenticated transport are retained; no credentials or authorization paths are changed. Timer/listener/observer cleanup is explicit and iframe resizing retains its identity. This assessment uses only the review packet and does not claim independently executed tests or host UI inspection.\n\n## Design / maintainability\n\nThe dedicated expansion hook keeps interaction state and lifecycle cleanup separate from panel presentation. A stationary anchor and in-place geometry honor the accepted no-portal design; display branding is separated from persistent compatibility identifiers. The targeted cross-origin browser harness exercises the key interaction risks. No material design or maintainability finding.",
+  "bodyDigest": "sha256:748fc951031cc75d172b73692e46452c59aafc0da5ccf131a05f288c166b75a6",
+  "findings": [],
+  "digest": "sha256:13edb11632db7e962abd8520a0b2ad83557541c98e3d4578cb9baf2657a94ae1"
+}
