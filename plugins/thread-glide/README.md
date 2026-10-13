@@ -14,6 +14,8 @@ The secondary line shows the current thread's live BB status alongside its
 position. Status uses BB's own indicator label (including working or needing
 input); no indicator is shown as "Idle", not as a claim that work is complete.
 Unknown states without a host label display "Status unavailable".
+The status line includes a small Dockside-style state icon, and the navigation
+controls use matching chevron icons with accessible labels.
 
 Swipes only start on the title strip. Vertical scrolling, short gestures,
 cancelled pointers and secondary touches do not navigate. The plugin never
