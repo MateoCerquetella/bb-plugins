@@ -25,15 +25,11 @@ filterable contribution dashboard with deterministic sample activity.
 
 | | Plugin | Install | What it does |
 | --- | --- | --- | --- |
-<<<<<<< HEAD
-| | [Thread Mobile](./plugins/thread-mobile) | [Local install](./plugins/thread-mobile#install) | Mobile arrows and safe swipes across active and unread threads in every project. Requires BB 0.40+. |
-=======
 | | [Agent Canvas (WIP)](./plugins/agent-canvas) | [Local install](./plugins/agent-canvas#cli-and-development) | A spatial workbench for live BB agents, persistent notes, drawings, ensembles and scoped team context. Requires BB 0.44+. |
->>>>>>> origin/main
 | <img src="./plugins/conversation-space/assets/icon.svg" width="128" height="128" alt="" /> | [Conversation Space (WIP)](./plugins/conversation-space) | [Local development install](./plugins/conversation-space#conversation-space-wip) | **Work in progress:** compact context usage, colored token percentages, and measured Jev routing diagnostics. |
 | <img src="./plugins/jev-route/assets/icon.svg" width="128" height="128" alt="" /> | [Jev Routing](./plugins/jev-route) | [Git install](./plugins/jev-route#install) | Jev-only model history, custom model colors, and Codex-only automatic routing without cross-provider quota fallback. |
 | <img src="./plugins/action-topbar/assets/icon.svg" width="128" height="128" alt="" /> | [Action Topbar](./plugins/action-topbar) | [Git install](#action-topbar-install) | Adds a compact main-thread topbar with draggable BB Actions and persistent, per-thread workspace panes. |
-| <img src="./plugins/dockside/assets/icon.svg" width="128" height="128" alt="" /> | [Dockside](./plugins/dockside) | [Git release](#dockside-quick-start) | Replaces BB's thread list with a compact project-first sidebar, semantic status colors, filters, safe multi-select deletion, and child-agent families. |
+| <img src="./plugins/dockside/assets/icon.svg" width="128" height="128" alt="" /> | [Dockside](./plugins/dockside) | [Git release](#dockside-quick-start) | Adds a project-first sidebar plus mobile navigation across active and unread threads, with synchronized project colors and animated status icons. |
 | <img src="./plugins/host-monitor/assets/icon.svg" width="128" height="128" alt="" /> | [Host Monitor](./plugins/host-monitor) | [Git release](#host-monitor-quick-start) | Monitors CPU, RAM, disk, network, host details, and guarded process actions across every machine enrolled in BB. Requires BB 0.40+. |
 | <img src="./plugins/steel-browser/assets/icon.svg" width="128" height="128" alt="" /> | [Steel Browser](./plugins/steel-browser) | [Local install](#steel-browser-quick-start) | Operates self-hosted Steel browser sessions from BB with health, session lifecycle, CLI, and agent guidance. Requires BB 0.40+. |
 | <img src="./plugins/taskboard/assets/icon.svg" width="128" height="128" alt="" /> | [Taskboard](./plugins/taskboard) | [Git release](#taskboard-quick-start) | Brings each BB project's GitHub, GitLab, Linear, or Jira tasks into one focused List or Kanban board. |

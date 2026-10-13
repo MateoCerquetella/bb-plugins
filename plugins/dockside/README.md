@@ -41,6 +41,23 @@ You clear the list with two email verbs: **snooze** a thread until a wake time, 
 
 ## Dockside in action
 
+### Mobile Navigation
+
+On screens up to 767px wide, Dockside shows 44px previous/next arrows and a
+swipeable title above the thread composer. The queue includes the current
+thread plus active and unread threads across every project, including child
+threads, ordered by latest attention. Hidden and archived threads are excluded.
+Boundaries do not wrap.
+
+Project initials use Dockside's effective project colors, including custom
+overrides that update through its live color subscription. Status uses the
+same animated glyphs as the sidebar and respects reduced-motion preferences.
+Vertical, short, cancelled, and secondary-touch gestures do not navigate.
+BB owns navigation and drafts; the strip never modifies thread contents.
+
+This replaces the former standalone Thread Mobile plugin. Remove that old
+installation when updating to avoid showing two strips.
+
 | Light | Dark |
 |:--:|:--:|
 | <img src="docs/media/dockside-light.png" alt="Compact Dockside sidebar in light mode showing project groups, Working, Unread, Needs you, Failed, Inactive, pull requests, and expanded child agents" width="317" /> | <img src="docs/media/dockside-dark.png" alt="Compact Dockside sidebar in dark mode with accessible semantic colors, project groups, pull requests, and expanded child agents" width="317" /> |

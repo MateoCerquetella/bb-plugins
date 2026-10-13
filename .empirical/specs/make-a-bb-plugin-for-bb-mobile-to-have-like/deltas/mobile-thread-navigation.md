@@ -6,17 +6,26 @@ Give mobile BB users a fast, safe way to move between eligible threads without
 leaving the conversation surface.
 
 ### Requirement: Mobile threads support bounded one-thumb navigation
-Thread Glide MUST show mobile previous/next controls and a swipeable title
-above the current thread composer. It MUST use native thread navigation,
-stay within the current project, exclude hidden/archived threads and order
-roots deterministically by creation time descending with ID tie-breaking.
-The current child MAY be included so a child view is not stranded.
+Dockside MUST show mobile previous/next controls and a swipeable title above
+the current thread composer. It MUST use native thread navigation, include the
+current thread plus visible non-archived active and unread threads from every
+project, and order them by latest attention with deterministic fallbacks.
 
-#### Scenario: User browses the current project
-- **Given** three eligible threads and the middle thread open on mobile
+#### Scenario: User browses active work across projects
+- **Given** three eligible threads from multiple projects and the middle thread open on mobile
 - **When** the user taps next or deliberately swipes left on the strip
 - **Then** the next thread opens exactly once through host navigation
 - **And** the final thread disables next instead of wrapping
+
+### Requirement: Project context uses Dockside's effective color
+Each eligible thread MUST show a compact project initial beside its title.
+The badge MUST use the same automatic or custom effective project color as
+Dockside and update when Dockside's synchronized color setting changes.
+
+#### Scenario: User customizes a project color
+- **Given** a project has a custom color in Dockside settings
+- **When** one of its threads appears in the mobile navigation queue
+- **Then** its project badge uses that custom color and a readable foreground
 
 ### Requirement: Gestures preserve ordinary conversation interaction
 Only horizontal gestures beginning on the strip title MUST navigate.

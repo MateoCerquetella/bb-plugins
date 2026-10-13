@@ -1,4 +1,4 @@
-import type { PluginSidebarThreadIndicator } from "@bb/plugin-sdk";
+import type { PluginSidebarThreadIndicator } from "@get-bb/plugin-sdk";
 import { StatusMark, type StatusMarkKind } from "@/components/inbox/status-mark";
 import { cn } from "@/lib/utils";
 import {

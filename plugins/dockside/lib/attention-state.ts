@@ -1,4 +1,4 @@
-import type { PluginSidebarThread } from "@bb/plugin-sdk";
+import type { PluginSidebarThread } from "@get-bb/plugin-sdk";
 import { threadIsWorking } from "./inbox.ts";
 
 export type SemanticStateTone =

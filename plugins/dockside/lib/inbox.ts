@@ -1,7 +1,7 @@
 import type {
   PluginSidebarProject,
   PluginSidebarThread,
-} from "@bb/plugin-sdk";
+} from "@get-bb/plugin-sdk";
 
 export interface ThreadFamily {
   root: PluginSidebarThread;

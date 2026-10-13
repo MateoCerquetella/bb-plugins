@@ -1,11 +1,4 @@
 import { spawnSync } from "node:child_process";
-import { readFile, writeFile } from "node:fs/promises";
-
-const generatedTypes = [
-  "plugins/dockside/types/bb-plugin-sdk.d.ts",
-  "plugins/dockside/types/bb-plugin-sdk-app.d.ts",
-];
-const originals = await Promise.all(generatedTypes.map((path) => readFile(path)));
 
 function run(args) {
   const env = { ...process.env };
@@ -16,12 +9,6 @@ function run(args) {
   }
 }
 
-try {
-  run(["run", "typecheck", "--workspace", "bb-plugin-dockside"]);
-  run(["test", "--workspace", "bb-plugin-dockside"]);
-  run(["run", "build", "--workspace", "bb-plugin-dockside"]);
-} finally {
-  await Promise.all(
-    generatedTypes.map((path, index) => writeFile(path, originals[index])),
-  );
-}
+run(["run", "typecheck", "--workspace", "bb-plugin-dockside"]);
+run(["test", "--workspace", "bb-plugin-dockside"]);
+run(["run", "build", "--workspace", "bb-plugin-dockside"]);

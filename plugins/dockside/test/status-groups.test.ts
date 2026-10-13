@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import type { PluginSidebarProject, PluginSidebarThread } from "@bb/plugin-sdk";
+import type { PluginSidebarProject, PluginSidebarThread } from "@get-bb/plugin-sdk";
 import { groupThreadsByProject } from "../lib/inbox.ts";
 import { DAY_MS } from "../lib/thread-management.ts";
 import { groupFamiliesByStatus } from "../lib/status-groups.ts";

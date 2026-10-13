@@ -1,14 +1,18 @@
 import {
-  definePluginApp, useComposer, useBbNavigate,
+  useComposer, useBbNavigate,
   experimental_useSidebarThreads,
 } from "@get-bb/plugin-sdk/app";
 import { useEffect, useRef, useState } from "react";
-import { navigationThreads, neighbor, projectBadge, titleFor, statusFor, statusIconFor, updateGesture, swipeDirection, type Gesture } from "./lib/navigation";
-import { Icon } from "./components/icon";
-import "./app.css";
+import { navigationThreads, neighbor, titleFor, statusFor, updateGesture, swipeDirection, type Gesture } from "../../lib/mobile-navigation";
+import { Icon } from "../ui/icon";
+import { StatusGlyph } from "../inbox/status-glyph";
+import { useProjectColors } from "../../hooks/use-project-colors";
+import { projectBadgeLetter, projectBadgePresentation } from "../../lib/project-colors";
+import "./navigation.css";
 
 function Navigator({ threadId }: { threadId: string }) {
   const state = experimental_useSidebarThreads();
+  const colors = useProjectColors();
   const navigate = useBbNavigate();
   const [pending, setPending] = useState(false);
   const pendingRef = useRef(false);
@@ -27,11 +31,11 @@ function Navigator({ threadId }: { threadId: string }) {
   const previous = neighbor(threads, threadId, -1);
   const next = neighbor(threads, threadId, 1);
   const status = statusFor(threads[index]);
-  const statusIcon = statusIconFor(threads[index]?.indicator);
   const project = state.status === "ready"
     ? state.projects.find(item => item.id === threads[index]?.projectId)
     : undefined;
-  const badge = projectBadge(threads[index]?.projectId ?? "", project?.name);
+  const projectId = threads[index]?.projectId ?? "";
+  const badge = projectBadgePresentation(projectId, colors.overrides.get(projectId));
   const label = state.status === "loading" ? "Loading threads"
     : state.status === "error" ? "Threads unavailable"
     : index < 0 ? "Thread unavailable" : titleFor(threads[index]);
@@ -49,7 +53,7 @@ function Navigator({ threadId }: { threadId: string }) {
   };
   return <nav className="tg-nav" aria-label="Thread navigation" aria-busy={state.status === "loading" || pending}>
     <button className="tg-arrow" type="button" title="Previous thread" aria-label="Previous thread"
-      disabled={!previous || pending} onClick={() => move(-1)}><Icon name="previous" className="tg-arrow-icon" /></button>
+      disabled={!previous || pending} onClick={() => move(-1)}><Icon name="ChevronLeft" aria-hidden className="tg-arrow-icon" /></button>
     <div className="tg-swipe" role="group" tabIndex={0} aria-label="Thread position; left and right arrows change thread"
       onKeyDown={event => {
         if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
@@ -73,8 +77,8 @@ function Navigator({ threadId }: { threadId: string }) {
       onPointerCancel={() => { gesture.current = null; }}
       onLostPointerCapture={() => { gesture.current = null; }}>
       <span className="tg-heading">
-        {index >= 0 && <span className="tg-project" style={{ backgroundColor: badge.color, color: badge.foreground }}
-          title={badge.name} aria-label={`Project: ${badge.name}`}>{badge.letter}</span>}
+        {index >= 0 && <span className="tg-project" style={{ backgroundColor: badge.backgroundColor, color: badge.foregroundColor }}
+          title={project?.name ?? "Unknown project"} aria-label={`Project: ${project?.name ?? "Unknown project"}`}>{projectBadgeLetter(project?.name ?? "")}</span>}
         <strong className="tg-title" title={label}>{label}</strong>
       </span>
       {state.status === "error"
@@ -84,8 +88,8 @@ function Navigator({ threadId }: { threadId: string }) {
             onClick={() => window.location.reload()}>Reload</button>
         : <span className="tg-meta" aria-live="polite" aria-atomic="true">
             {index >= 0 ? <>
-              <span className={`tg-status tg-status-${statusIcon}`} title={status}>
-                <Icon name={statusIcon} className="tg-status-icon" />
+              <span className="tg-status" title={status}>
+                <StatusGlyph indicator={threads[index].indicator} label={null} className="tg-status-icon" />
                 <span className="tg-status-text">{status}</span>
               </span>
               <span aria-hidden="true">{"\u00b7"}</span>
@@ -94,18 +98,11 @@ function Navigator({ threadId }: { threadId: string }) {
           </span>}
     </div>
     <button className="tg-arrow" type="button" title="Next thread" aria-label="Next thread"
-      disabled={!next || pending} onClick={() => move(1)}><Icon name="next" className="tg-arrow-icon" /></button>
+      disabled={!next || pending} onClick={() => move(1)}><Icon name="ChevronRight" aria-hidden className="tg-arrow-icon" /></button>
   </nav>;
 }
 
-function ThreadGlide() {
+export function MobileNavigation() {
   const { scope } = useComposer();
   return scope.kind === "thread" ? <Navigator key={scope.threadId} threadId={scope.threadId} /> : null;
 }
-
-export default definePluginApp(app => {
-  app.composer.customize({
-    id: "thread-mobile", scopes: ["thread"],
-    banners: [{ id: "navigation", chrome: "bare", component: ThreadGlide }],
-  });
-});

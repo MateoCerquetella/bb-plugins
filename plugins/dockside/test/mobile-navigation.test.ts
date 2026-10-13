@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { navigationThreads, neighbor, projectBadge, titleFor, statusFor, statusIconFor, swipeDirection, updateGesture, type Thread } from "../lib/navigation.ts";
+import { navigationThreads, neighbor, titleFor, statusFor, statusIconFor, swipeDirection, updateGesture, type Thread } from "../lib/mobile-navigation.ts";
 
 const thread = (id: string, createdAt: number, extra: Partial<Thread> = {}): Thread =>
   ({ id, createdAt, updatedAt: createdAt, latestAttentionAt: createdAt, projectId: "p",
@@ -54,13 +54,6 @@ test("status icons follow Dockside categories and unknown states stay neutral", 
   assert.equal(statusIconFor("none"), "idle");
   assert.equal(statusIconFor("future"), "unknown");
   assert.equal(statusIconFor(undefined), "unknown");
-});
-test("project badges are stable and provide a useful fallback", () => {
-  assert.deepEqual(projectBadge("project-1", " bb plugins "), projectBadge("project-1", " bb plugins "));
-  assert.equal(projectBadge("project-1", " bb plugins ").letter, "B");
-  assert.equal(projectBadge("project-1", undefined).name, "Unknown project");
-  assert.match(projectBadge("project-1", "BB").color, /^#[0-9A-F]{6}$/);
-  assert.match(projectBadge("project-1", "BB").foreground, /^#(?:000000|FFFFFF)$/);
 });
 test("swipes require horizontal threshold and matching pointer", () => {
   const start = { id: 1, x: 100, y: 100, cancelled: false };

@@ -39,6 +39,12 @@ Typecheck/build, pure helper tests, local install/reload, and mobile/desktop
 Steel checks for arrows, swipe thresholds, boundaries and draft preservation.
 ## Accepted Decisions
 
+- **2026-10-13 — Dockside owns mobile navigation:** Move the banner,
+  navigation helpers, styles and tests into Dockside. Use Dockside's live
+  project color overrides and badge presentation directly, and remove the
+  standalone Thread Mobile package and registry entry to avoid duplicate
+  surfaces and drifting colors.
+
 - **2026-10-12 — Live host status:** Reuse the sidebar indicator label instead
   of inferring completion. Missing unknown labels fail to "Status unavailable";
   the known none indicator displays Idle. Keep Thread Glide branding.

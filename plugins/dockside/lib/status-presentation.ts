@@ -1,4 +1,4 @@
-import type { PluginSidebarThreadIndicator } from "@bb/plugin-sdk";
+import type { PluginSidebarThreadIndicator } from "@get-bb/plugin-sdk";
 
 export type ThreadStatusColorRole =
   | "error"

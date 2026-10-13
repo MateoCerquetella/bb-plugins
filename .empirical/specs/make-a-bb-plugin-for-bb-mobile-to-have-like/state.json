@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 30,
+  "revision": 36,
   "activeFeature": "make-a-bb-plugin-for-bb-mobile-to-have-like",
   "request": "Make a bb plugin for bb mobile to have like arrows or tinder stylrer to go strong it the threads more easily. You teasesrch and do it don’t ask me",
   "profile": "complex",
@@ -9,13 +9,13 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Planned a focused Thread Mobile update covering cross-project active/unread selection, Dockside-compatible project badges, animated live status, tests, docs, local reload, and mobile verification.",
+  "message": "Planned the atomic move of mobile navigation into Dockside, direct synchronized color usage, focused test relocation, standalone package/catalog/lockfile removal, documentation, verification, sync, and push.",
   "implementationActor": "agent",
   "workStartedAt": null,
-  "specDigest": "sha256:18f0beb4f2aea224211be62bbc662787269f0a9ea7a9cd00e1f2e2ce1901dee6",
-  "approvedSpecRevision": 25,
+  "specDigest": "sha256:7c895b81727f0f2118a4280c9740e045b9607c588280117dd539a987890dca26",
+  "approvedSpecRevision": 33,
   "capabilityArchiveRequired": true,
-  "capabilityDeltaDigest": "sha256:c8de4f638abd2b709f204a7ea41da837a81487d814963c70cba2d1da201c3dbd",
+  "capabilityDeltaDigest": "sha256:48aee6aee72aa441fc8598d98f32895c5fdc06afa1180f7a7feae3570c958606",
   "impactDigest": "sha256:59fe412620416a2f2caf357fa5cead797c072e679dc0be4cf8b87add6cd691d2",
   "capabilityClaimId": "make-a-bb-plugin-for-bb-mobile-to-have-like-07aee46cf0cd",
   "authorizationDigest": null,
@@ -37,7 +37,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-13T14:19:01.118Z",
+  "updatedAt": "2026-10-13T14:26:31.061Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "make-a-bb-plugin-for-bb-mobile-to-have-like-07aee46cf0cd",
@@ -53,6 +53,7 @@
         "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "requirements": {
           "mobile threads support bounded one-thumb navigation": null,
+          "project context uses dockside's effective color": null,
           "gestures preserve ordinary conversation interaction": null,
           "unavailable lists fail safely": null,
           "current thread status uses live host semantics": null
@@ -65,16 +66,25 @@
     "status": "active",
     "integrationReceiptDigest": null,
     "createdAt": "2026-10-12T19:17:24.549Z",
-    "heartbeatAt": "2026-10-12T21:04:44.390Z",
-    "digest": "sha256:a5c5a37228c3717f8882c3a6046a16ab19f515ffd06d192aa3d0cd98caa8cc04"
+    "heartbeatAt": "2026-10-13T14:25:10.106Z",
+    "digest": "sha256:5ea553c88d0b20192f55bc9c4868a0bd4372aed8cb86ffd98ff669bf32648aff"
   },
-  "trackerGeneration": 3,
+  "trackerGeneration": 4,
   "lifecycle": {
     "stage": "development",
-    "iteration": 3,
+    "iteration": 4,
     "awaitingFeedback": false,
-    "contractRevision": 23
+    "contractRevision": 31,
+    "riskRequest": "Fold Thread Mobile into the existing Dockside plugin so project badges use Dockside's synchronized project color settings directly. Remove the standalone thread-mobile plugin and its root catalog/registry entry, preserve the mobile active/unread cross-project navigation inside Dockside, update Dockside documentation and tests, and push the revised code."
   },
   "budgetExtensionMinutes": 77,
+  "sizeDecision": {
+    "choice": "keep",
+    "criteria": 7,
+    "capabilities": 1,
+    "reason": "The seven criteria describe one atomic ownership migration: moving an already coherent mobile navigator into Dockside and deleting its standalone package. Splitting would temporarily duplicate registrations or break synchronized color ownership.",
+    "actor": "agent",
+    "revision": 33
+  },
   "reviewFirst": true
 }
