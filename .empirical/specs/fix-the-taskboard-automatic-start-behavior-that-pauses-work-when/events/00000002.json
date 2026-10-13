@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "sequence": 2,
+  "previousDigest": "sha256:ddc1a60b03ac9df55eed40eef594ede7f7882c3804abfa62f23cfde70906dd3f",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Read-only investigation found the reported automatic-work engine absent from this checkout's main base. It exists on taskboard-with-mastra-factory-thr_suvnn4i6np at 1e431a926, eight commits / about 8,000 added lines ahead. Asked user whether to fast-forward this isolated fix branch to that existing feature base before implementing. No plugin source changes or tests performed. Identified blocked repaired Build Start task re-evaluating the same old result instead of resuming, and persistent automationError needing careful reconciliation after native resumed turns. Real product-policy decisions and required repository tracker gates must not be bypassed.",
+  "createdAt": "2026-10-09T00:42:00.253Z",
+  "stateBeforeDigest": "sha256:1bdf5f69227796d1bf49dd80c483ec526ba34863519f871a65335ccbc3ae2a77",
+  "stateAfterDigest": "sha256:cee5240443d3dfefc657464eb8a1bee6185a735475d4c0fcf9c28512a6473355",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 2,
+    "activeFeature": "fix-the-taskboard-automatic-start-behavior-that-pauses-work-when",
+    "request": "Fix the Taskboard automatic-start behavior that pauses work when a build reports recoverable blockers like the supplied Roten-App result. Improve automatic work startup so blocker summaries are handled accurately and the task does not stop prematurely when actionable implementation work can continue, while preserving genuine human-decision, tracker, evidence, and policy gates.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "awaiting_human",
+    "repairAttempts": 0,
+    "message": "Read-only investigation found the reported automatic-work engine absent from this checkout's main base. It exists on taskboard-with-mastra-factory-thr_suvnn4i6np at 1e431a926, eight commits / about 8,000 added lines ahead. Asked user whether to fast-forward this isolated fix branch to that existing feature base before implementing. No plugin source changes or tests performed. Identified blocked repaired Build Start task re-evaluating the same old result instead of resuming, and persistent automationError needing careful reconciliation after native resumed turns. Real product-policy decisions and required repository tracker gates must not be bypassed.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:f300b2e78174bcae7ce8f444269e75a3550424d310dc5e0da613d7943a7e6a34",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": null,
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-09T00:42:00.253Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:5f1c3f486f964b012ca6c29c3d92dd68cc8de01d1b6afe671d87dc73c7541d49"
+}

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "approvalId": "full-suite-approval-26509f240202670fd469bfc9",
+  "approvalDigest": "sha256:20b4f130babc007625a7b4d0f6c45202001592604bcfc0be0fa0b51c6afb1a02",
+  "feature": "fix-https-github-com-mateocerquetella-bb-plugins-issues-64-review",
+  "workflowRevision": 9,
+  "commandId": "repo-full-ci",
+  "digest": "sha256:545dd0bcf3203e59748730648ac17dd4e3e07554b99bb37f09a1ed0fa5a03bc5"
+}

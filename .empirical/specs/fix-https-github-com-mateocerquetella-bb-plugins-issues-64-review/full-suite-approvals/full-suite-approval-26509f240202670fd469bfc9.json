@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "full-suite-approval-26509f240202670fd469bfc9",
+  "feature": "fix-https-github-com-mateocerquetella-bb-plugins-issues-64-review",
+  "workflowRevision": 9,
+  "gitCommit": "a59583e46c97f51454c485b96dbd9b1980368ea0",
+  "treeDigest": "sha256:293a27edaec2bdcc5506e71540df2d22fde06b3a18e0a796db760ff8c65a5646",
+  "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+  "commandId": "repo-full-ci",
+  "argvDigest": "sha256:aaa5d72d3c7fd1c5a17276ccc7f471554fda2c186552f4621f1a637b0a4447f1",
+  "estimateMs": null,
+  "route": {
+    "mode": "auto",
+    "route": "local",
+    "reasons": [
+      {
+        "code": "REMOTE_CHECKS_NOT_CONFIGURED"
+      },
+      {
+        "code": "REMOTE_CONFIGURATION_CHANGED",
+        "paths": [
+          "package-lock.json"
+        ]
+      },
+      {
+        "code": "REMOTE_MUTABLE_WORKFLOW_REF",
+        "paths": [
+          ".github/workflows/ci.yml: actions/cache@v4",
+          ".github/workflows/ci.yml: actions/checkout@v4",
+          ".github/workflows/ci.yml: actions/setup-node@v4"
+        ]
+      }
+    ]
+  },
+  "confirmation": "cli-unattended",
+  "authorizationDigest": null,
+  "createdAt": "2026-10-07T21:41:01.607Z",
+  "digest": "sha256:20b4f130babc007625a7b4d0f6c45202001592604bcfc0be0fa0b51c6afb1a02"
+}

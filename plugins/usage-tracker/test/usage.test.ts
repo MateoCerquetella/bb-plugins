@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   loadUsageSnapshot,
+  markProvidersInUse,
   resolveThreadHostId,
   type UsageSdk,
 } from "../lib/load-usage.ts";
@@ -1026,6 +1027,8 @@ test("leaves provider activity unknown when thread counts are unavailable", asyn
   );
 
   assert.ok(snapshot.providers.every((provider) => provider.inUse === undefined));
+  assert.ok(snapshot.providers.every((provider) => !Object.hasOwn(provider, "inUse")));
+  assert.deepEqual(JSON.parse(JSON.stringify(snapshot)), snapshot);
 });
 
 test("marks inactive providers only when every thread count succeeds", async () => {
@@ -1084,6 +1087,64 @@ test("keeps activity unknown when thread counts omit provider groups", async () 
   );
 
   assert.ok(snapshot.providers.every((provider) => provider.inUse === undefined));
+  assert.ok(snapshot.providers.every((provider) => !Object.hasOwn(provider, "inUse")));
+  assert.deepEqual(JSON.parse(JSON.stringify(snapshot)), snapshot);
+});
+
+test("omits activity when the thread count API is absent", async () => {
+  const snapshot = await loadUsageSnapshot(
+    makeSdk({ threads: { async get() { return { environmentId: null }; } } }),
+    null,
+    new Date(),
+    Promise.resolve({}),
+    Promise.resolve([]),
+  );
+
+  assert.ok(snapshot.providers.every((provider) => !Object.hasOwn(provider, "inUse")));
+  assert.deepEqual(JSON.parse(JSON.stringify(snapshot)), snapshot);
+});
+
+test("keeps known activity while omitting unknown activity for unmapped providers", async () => {
+  const snapshot = await loadUsageSnapshot(
+    makeSdk({
+      threads: {
+        async get() { return { environmentId: null }; },
+        async count({ status }) {
+          return status === "active"
+            ? { total: 2, groups: [{ key: "codex", count: 1 }, { key: "pi", count: 1 }] }
+            : { total: 0, groups: [] };
+        },
+      },
+    }),
+    null,
+    new Date(),
+    Promise.resolve({}),
+    Promise.resolve([]),
+  );
+
+  assert.equal(snapshot.providers.find((provider) => provider.id === "codex")?.inUse, true);
+  assert.ok(snapshot.providers
+    .filter((provider) => provider.id !== "codex")
+    .every((provider) => !Object.hasOwn(provider, "inUse")));
+  assert.deepEqual(JSON.parse(JSON.stringify(snapshot)), snapshot);
+});
+
+test("removes stale activity without mutating the input snapshot", () => {
+  for (const staleActivity of [true, false]) {
+    const snapshot = normalizeUsage(healthyResponse(), { id: null, name: null });
+    snapshot.providers = snapshot.providers.map((provider) => ({
+      ...provider,
+      inUse: staleActivity,
+    }));
+    const result = markProvidersInUse(snapshot, new Set(["codex"]), false);
+
+    assert.equal(result.providers.find((provider) => provider.id === "codex")?.inUse, true);
+    assert.ok(result.providers
+      .filter((provider) => provider.id !== "codex")
+      .every((provider) => !Object.hasOwn(provider, "inUse")));
+    assert.ok(snapshot.providers.every((provider) => provider.inUse === staleActivity));
+    assert.deepEqual(JSON.parse(JSON.stringify(result)), result);
+  }
 });
 
 test("propagates thread and request-level usage failures", async () => {

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "mode": "yolo",
+  "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+  "feature": "steel-browser-viewer-port-share",
+  "requestDigest": "sha256:68d61092f7e0a9f109ed3862e5d37c33eded3b6c9ccff33ae84ffbe89ad4ce6e",
+  "ceiling": "verified",
+  "targetBranch": null,
+  "allowExternalAgent": false,
+  "createdAt": "2026-10-06T02:38:34.428Z",
+  "expiresAt": null,
+  "digest": "sha256:0dd541634ab9a6a3910fc3bfa071b0ba70a4076832c8c002d247a5f39861ef98"
+}

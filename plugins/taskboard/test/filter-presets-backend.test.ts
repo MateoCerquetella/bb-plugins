@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { registerHooks } from 'node:module';
 import { test } from 'node:test';
@@ -52,6 +53,54 @@ function createStore(): { db: Database.Database; store: WorkItemStore } {
   } as unknown as StoreBb;
   return { db, store: createWorkItemStore(bb) };
 }
+
+test('upgrades a retained Work-board migration without rewriting history or losing data', () => {
+  const db = new Database(':memory:');
+  const hash = (sql: string) => createHash('sha256').update(sql).digest('hex');
+  let statements: readonly string[] = [];
+  const bb = { storage: {
+    database: () => db,
+    migrate(database: Database.Database, migrations: readonly string[]) {
+      statements = migrations;
+      database.exec('CREATE TABLE IF NOT EXISTS _bb_migrations (id INTEGER PRIMARY KEY, statement_hash TEXT)');
+      database.transaction(() => migrations.forEach((sql, index) => {
+        const existing = database.prepare('SELECT statement_hash FROM _bb_migrations WHERE id=?').get(index) as { statement_hash: string } | undefined;
+        if (existing) assert.equal(hash(sql), existing.statement_hash, `migration ${index}`);
+        else {
+          database.exec(sql);
+          database.prepare('INSERT INTO _bb_migrations VALUES (?,?)').run(index, hash(sql));
+        }
+      }))();
+    }
+  }} as unknown as StoreBb;
+  try {
+    // Capture the canonical migrations without using an external checkout.
+    createWorkItemStore({ storage: {
+      database: () => db,
+      migrate(database: Database.Database, migrations: readonly string[]) {
+        statements = migrations;
+        migrations.slice(0, 7).forEach(sql => database.exec(sql));
+        throw new Error('legacy schema prepared');
+      }
+    }} as unknown as StoreBb);
+  } catch (error) {
+    assert.equal((error as Error).message, 'legacy schema prepared');
+  }
+  try {
+    db.exec('CREATE TABLE _bb_migrations (id INTEGER PRIMARY KEY, statement_hash TEXT)');
+    statements.slice(0, 7).forEach((sql, index) => db.prepare('INSERT INTO _bb_migrations VALUES (?,?)').run(index, hash(sql)));
+    db.prepare('INSERT INTO _bb_migrations VALUES (7,?)').run('2ed0e2eda3103f718fe67e4f50324116a3dfddcd1959b05959e083a2cc80e1ca');
+    db.exec("CREATE TABLE work_board_settings (project_id TEXT PRIMARY KEY, data_json TEXT); INSERT INTO work_board_settings VALUES ('proj_legacy','preserved')");
+    db.exec("CREATE TABLE preparations (document TEXT); INSERT INTO preparations VALUES ('preserved')");
+    createWorkItemStore(bb);
+    assert.equal(db.prepare('SELECT data_json FROM work_board_settings').pluck().get(), 'preserved');
+    assert.equal(db.prepare('SELECT document FROM preparations').pluck().get(), 'preserved');
+    assert.equal(db.prepare('SELECT count(*) FROM _bb_migrations').pluck().get(), 12);
+    createWorkItemStore(bb);
+  } finally {
+    db.close();
+  }
+});
 
 function state(provider: 'github' | 'linear' = 'github'): BrowsePreferences {
   return {

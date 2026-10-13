@@ -257,6 +257,37 @@ describe("project thread groups", () => {
     assert.equal(groups[0]?.families[0]?.root.id, "child");
   });
 
+  it("omits projects with no visible threads", () => {
+    const groups = groupThreadsByProject(
+      [thread({ id: "root", projectId: "p1" })],
+      [project("p1", "First"), project("p2", "Second")],
+    );
+    assert.deepEqual(
+      groups.map((group) => group.project.id),
+      ["p1"],
+    );
+  });
+
+  it("returns no project groups when no thread exists", () => {
+    const groups = groupThreadsByProject(
+      [],
+      [project("p1", "First"), project("p2", "Second")],
+    );
+    assert.deepEqual(groups, []);
+  });
+
+  it("keeps a thread's unknown project without adding known empty ones", () => {
+    const groups = groupThreadsByProject(
+      [thread({ id: "root", projectId: "gone" })],
+      [project("p1", "First")],
+    );
+    assert.deepEqual(
+      groups.map((group) => group.project.id),
+      ["gone"],
+    );
+    assert.equal(groups[0]?.project.name, "Other project");
+  });
+
   it("keeps a parent as context when only its child matches search", () => {
     const groups = groupThreadsByProject(
       [
@@ -288,6 +319,16 @@ describe("project thread groups", () => {
       [project("proj_1", "Storefront")],
     );
     assert.equal(searchProjectThreadGroups(groups, "store").length, 1);
+  });
+
+  it("never reintroduces empty projects during search", () => {
+    const groups = [
+      { project: project("empty", "Empty Storefront"), families: [] },
+      { project: project("other", "Other"), families: [] },
+    ];
+    assert.deepEqual(searchProjectThreadGroups(groups, " STORE "), []);
+    assert.deepEqual(searchProjectThreadGroups(groups, "missing"), []);
+    assert.deepEqual(searchProjectThreadGroups(groups, "   "), []);
   });
 });
 

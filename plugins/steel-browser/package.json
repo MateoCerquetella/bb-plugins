@@ -60,6 +60,12 @@
     "engines.ts",
     "actions.ts",
     "navigation.ts",
+    "viewer-protocol.ts",
+    "live-viewer.tsx",
+    "service-catalog.ts",
+    "sign-ins.ts",
+    "sign-ins-panel.tsx",
+    "dashboard-cache.ts",
     "provisioning.ts",
     "scripts/"
   ],

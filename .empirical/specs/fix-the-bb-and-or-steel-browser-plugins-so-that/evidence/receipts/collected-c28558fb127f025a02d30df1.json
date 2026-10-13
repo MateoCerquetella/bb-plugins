@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-c28558fb127f025a02d30df1",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-10-12T17:02:03.180Z",
+  "completedAt": "2026-10-12T17:02:03.180Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-the-bb-and-or-steel-browser-plugins-so-that",
+    "specRevision": 2,
+    "specDigest": "sha256:42e3b045dd591f147d7459110f7c18a17207d55ae0588131a603e7aab6b0d187",
+    "treeDigest": "sha256:cafbc6ae515702cf3ed022f31496f559a684d6d5de69963f041c177278b357ed",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:9cd6200f0dc6798eddb49a89d08a9104c5b6283f8893a7107698f131cf2b4646",
+  "kind": "collected",
+  "collector": "empirical-review:fresh-context-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/fix-the-bb-and-or-steel-browser-plugins-so-that/reviews/71612c68b6d2f236c8bd56e0.json",
+      "mediaType": "application/json",
+      "bytes": 2496,
+      "digest": "sha256:307f7375b50881fe2bc8df362f8f2ee500440b0771a1951006130394fc0f9edb"
+    },
+    {
+      "path": ".empirical/specs/fix-the-bb-and-or-steel-browser-plugins-so-that/reviews/71612c68b6d2f236c8bd56e0.md",
+      "mediaType": "text/markdown",
+      "bytes": 1743,
+      "digest": "sha256:c65af8bce1e7e583cbddbbe0dc24ebb7498656850720da490012b61816d2529a"
+    }
+  ]
+}

@@ -43,6 +43,7 @@ export function withoutComments(
 }
 
 export interface WorkSourceAdapter {
+  uploadImage?(image: { name: string; bytes: Uint8Array; mimeType: string }): Promise<string>;
   readonly source: WorkSource;
   configured(): boolean;
   configurationMessage(): string | null;

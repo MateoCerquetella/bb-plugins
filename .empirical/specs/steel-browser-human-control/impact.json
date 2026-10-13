@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "steel-browser"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:700c0a284127ffe7e57f86a02a5c9d2476981e7a39228f4675c0efdb9cd0b94b"
+}

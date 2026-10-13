@@ -170,20 +170,21 @@ Dockside's verified sidebar behavior or persisted settings.
 
 ### Requirement: Root family cards have exactly two semantic rows
 
-Every root MUST render exactly two compact fixed rows. Row one MUST contain the
-family state/activity icon, truncated title, and far-right elapsed time. Row two
-MUST contain truncated branch text and one shrink-resistant right cluster with
-the readable state badge, root-only PR metadata, and child disclosure/count plus
-provider identity. Children MUST never render PR metadata. Ambiguous icons MUST
-offer hover and keyboard-focus help.
+Every root MUST render exactly two compact fixed rows using the existing
+two-column grid. Row one MUST contain the family state/activity icon, truncated
+title, and far-right elapsed time. Row two MUST contain truncated branch text
+and one shrink-resistant right cluster with the readable state badge, root-only
+PR metadata, and child disclosure/count plus provider identity. Children MUST
+never render PR metadata. Ambiguous icons MUST offer hover and keyboard-focus
+help. Source-contract tests MUST describe the current two-column placement and
+MUST NOT require an obsolete third grid column.
 
-#### Scenario: Narrow multi-child PR family
+#### Scenario: Repository CI validates the current root-card grid
 
-- **Given** a root has a long title, long branch, a PR, and multiple children
-- **When** the sidebar is narrow
-- **Then** title and branch truncate before metadata
-- **And** PR appears only on the root
-- **And** the card remains exactly two rows without clipping
+- **Given** the runtime root card places its metadata cluster in grid column 2
+- **When** the Dockside source-contract test runs
+- **Then** the assertion expects `col-start-2`
+- **And** no Dockside runtime component, styling, layout, or behavior changes
 
 ### Requirement: Root family order is durable and project-local
 
@@ -209,3 +210,22 @@ order incomplete. Cross-project and stale/incomplete requests MUST fail closed.
 - **When** the user attempts drag or keyboard reorder
 - **Then** no order is stored or changed
 - **And** accessible help explains that search must be cleared
+
+### Requirement: Projects remain reachable before their first thread
+
+Dockside MUST list known projects even when they contain no threads, and MUST
+preserve an empty project's launcher when its project name matches search.
+
+#### Scenario: A project has no threads
+
+- **GIVEN** BB reports a project with no visible threads
+- **WHEN** Dockside groups the inbox by project
+- **THEN** the project appears with an empty family list
+- **AND** its new-thread action remains available
+
+#### Scenario: Search matches an empty project
+
+- **GIVEN** an empty project appears in Dockside
+- **WHEN** the user searches for part of the project name
+- **THEN** Dockside keeps the project group in the results
+- **AND** its family list remains empty

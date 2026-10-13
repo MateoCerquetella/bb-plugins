@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "sequence": 17,
+  "previousDigest": "sha256:c431c8405616eab7edf1f33a938f915242afede21d8f352f123f1535b92c63fa",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Approved native progress redesign, collapsed commands, non-sticky navigation and original ticket access specified.",
+  "createdAt": "2026-10-09T02:21:12.395Z",
+  "stateBeforeDigest": "sha256:d8b2cff4694cf8b077c22f2f80d9088f5a5a2e3ae0d10b89905cab752be7111e",
+  "stateAfterDigest": "sha256:381d60d1c5d1a213e1ee1f3cfabb5150e427f98cc12ef764595a55e96135cc92",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 17,
+    "activeFeature": "fix-the-taskboard-automatic-start-behavior-that-pauses-work-when",
+    "request": "Fix the Taskboard automatic-start behavior that pauses work when a build reports recoverable blockers like the supplied Roten-App result. Improve automatic work startup so blocker summaries are handled accurately and the task does not stop prematurely when actionable implementation work can continue, while preserving genuine human-decision, tracker, evidence, and policy gates.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "design",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Approved native progress redesign, collapsed commands, non-sticky navigation and original ticket access specified.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:da4b21607ee306eb24d7c5617aac225eb4a740b4c4c19055aebf52393ecc458f",
+    "approvedSpecRevision": 17,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:ab177de8000822f62071911e450eff0c93bc4510aafcf1574c83211e074974c6",
+    "impactDigest": "sha256:0d097c3df3587f2f6ae282bb4a5b8ae59607e22b07f4297496e320826dec40f1",
+    "capabilityClaimId": "fix-the-taskboard-automatic-start-behavior-that-pauses-work-when-1ecce97b7eb2",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-09T02:21:12.395Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 2,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "contractRevision": 15
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "fix-the-taskboard-automatic-start-behavior-that-pauses-work-when-1ecce97b7eb2",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "fix-the-taskboard-automatic-start-behavior-that-pauses-work-when",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_vsbcjs3cs9-1/bb-plugins",
+      "worktreeId": "sha256:39a2f85ec14f2c7290f38da564e1e9b591d6e3e8f79cc08e4c02b7e45d5a0bb5",
+      "baseCommit": "1e431a926ca0eb1411535174b41ccf2bc27e17f6",
+      "baseTree": "c6b16d52aa2a6335bf2d6f462194ab67bf2d1869",
+      "bases": {
+        "taskboard-agent-progress-ui": {
+          "capability": "taskboard-agent-progress-ui",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "readable native progress": null,
+            "non-sticky navigation": null
+          }
+        },
+        "taskboard-build-resumption": {
+          "capability": "taskboard-build-resumption",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "explicit blocked build continuation": null
+          }
+        },
+        "taskboard-ticket-drafting": {
+          "capability": "taskboard-ticket-drafting",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "improve an editable ticket draft with the current bb model": null
+          }
+        }
+      },
+      "capabilities": [
+        "taskboard-agent-progress-ui",
+        "taskboard-build-resumption",
+        "taskboard-ticket-drafting"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-09T01:12:06.434Z",
+      "heartbeatAt": "2026-10-09T02:21:12.373Z",
+      "digest": "sha256:45f2d8ef18c605c8fdc4ffe3079a95cdff5ebe9ff54b39bedfa835a1e25bf219"
+    },
+    "trackerGeneration": 2,
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 9,
+      "capabilities": 2,
+      "reason": "The user explicitly requested immediate implementation. The two capabilities are isolated in code and tests but share one Taskboard branch, verification pass, and delivery boundary; splitting now would duplicate the same plugin integration and installation work.",
+      "actor": "agent",
+      "revision": 10
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:915ed4d8b2b368d1f82fe7b3ad6de3a59b225272441f43c2f6f2811a37ea9eb6"
+}

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "mode": "yolo",
+  "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+  "feature": "fix-https-github-com-mateocerquetella-bb-plugins-issues-64-review",
+  "requestDigest": "sha256:96ed61f8fdf5cc74ba6f1d1b7f4ac6f1b9d8fb78478e62e5a7e66b659271c2a1",
+  "ceiling": "integrated",
+  "targetBranch": "main",
+  "allowExternalAgent": false,
+  "createdAt": "2026-10-07T19:28:09.289Z",
+  "expiresAt": null,
+  "digest": "sha256:e284d00f4cb354705f315655c1441dce5717eb40e521c8ea14ca8a9c675f98c5"
+}

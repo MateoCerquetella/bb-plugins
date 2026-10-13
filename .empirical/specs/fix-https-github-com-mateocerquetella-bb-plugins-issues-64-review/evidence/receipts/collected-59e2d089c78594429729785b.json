@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-59e2d089c78594429729785b",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8",
+    "AC-9"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-10-07T19:44:46.121Z",
+  "completedAt": "2026-10-07T19:44:46.121Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-https-github-com-mateocerquetella-bb-plugins-issues-64-review",
+    "specRevision": 3,
+    "specDigest": "sha256:1977cdfd64b5571a0f91a673410b117488411693cec06a888153d0d40c2f47cb",
+    "treeDigest": "sha256:293a27edaec2bdcc5506e71540df2d22fde06b3a18e0a796db760ff8c65a5646",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:e3aade9f484425e42ac012e4818c540472229e7a6d3e66998d12b2f6605f10bc",
+  "kind": "collected",
+  "collector": "empirical-review:independent-review",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/fix-https-github-com-mateocerquetella-bb-plugins-issues-64-review/reviews/b6385592c27e07203f19d9f6.json",
+      "mediaType": "application/json",
+      "bytes": 2204,
+      "digest": "sha256:39d488ebe1f9a6e7e2fcdf62ce5f7be5ae7def0037a40a366a9336623527cd10"
+    },
+    {
+      "path": ".empirical/specs/fix-https-github-com-mateocerquetella-bb-plugins-issues-64-review/reviews/b6385592c27e07203f19d9f6.md",
+      "mediaType": "text/markdown",
+      "bytes": 1446,
+      "digest": "sha256:fe8eee60a05ed74694ff5e5c8306a15dadcc350de4f50b6806a4f58192bcb6c0"
+    }
+  ]
+}

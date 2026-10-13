@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "sequence": 5,
+  "previousDigest": "sha256:f072407fb43e4134da54446c94c269dbd3c726665c166a5a47165c88ca908ed4",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Revise contract: Tighten two remaining acceptance phrases to match the revised contract: selection mode replaces the leading project badge with its checkbox, and focused coverage guards both project-badge placement and the single trailing provider slot.",
+  "createdAt": "2026-10-09T00:29:49.771Z",
+  "stateBeforeDigest": "sha256:24580354f0748bd7dc2eea0e6bd72cb326b59710dbe738ff44029605540340e4",
+  "stateAfterDigest": "sha256:7a0c4fecaae4fe82f9f664dbd4dbcb23e347adc531fe72fc6d96b7aeaf902a0a",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 5,
+    "activeFeature": "fix-the-dockside-thread-row-icon-problem-shown-in-the",
+    "request": "Fix the Dockside thread-row icon problem shown in the supplied screenshot: provider icons and adjacent project/letter marks visually overlap in the leading icon area. Preserve the existing compact layout and project badges, make the thread icon slot render cleanly at supported densities, add focused regression coverage, and verify the Dockside UI in a browser with a screenshot.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Tighten two remaining acceptance phrases to match the revised contract: selection mode replaces the leading project badge with its checkbox, and focused coverage guards both project-badge placement and the single trailing provider slot.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:efe9bf1bb240334addcf790cce020af1cea3ec9bbe29a1990bdb4f67f035f692",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": "fix-the-dockside-thread-row-icon-problem-shown-in-the-b7bbab6a1cb3",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-09T00:29:49.771Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 2,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "contractRevision": 4
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "fix-the-dockside-thread-row-icon-problem-shown-in-the-b7bbab6a1cb3",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "fix-the-dockside-thread-row-icon-problem-shown-in-the",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_vsyberk4jn-1/bb-plugins",
+      "worktreeId": "sha256:adb8d84a31f985e826cbbd53bf4c119c1cfb550e5cf773467f062eb85d52c304",
+      "baseCommit": "fc814c22f4d26170ff0b8a5a0ac6619a438480ac",
+      "baseTree": "a75defcdb9d57f6ed091f9243f5ace4fde5ee6f3",
+      "bases": {
+        "dockside-thread-management": {
+          "capability": "dockside-thread-management",
+          "digest": "sha256:84a63707ece840ca513a80da47ef5ebd2cda40b296485692f823f24869ddd7a4",
+          "requirements": {
+            "root family cards have exactly two semantic rows": "sha256:9d6a25e76d91c5c0488bc9d66a5525808618e1ee28d5707e58d230feee59250b"
+          }
+        }
+      },
+      "capabilities": [
+        "dockside-thread-management"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-09T00:24:47.792Z",
+      "heartbeatAt": "2026-10-09T00:24:47.792Z",
+      "digest": "sha256:1da5f754982373697276ea206e31951773f226dde00da0b9cc49b956f4cf8548"
+    },
+    "trackerGeneration": 2,
+    "reviewFirst": true
+  },
+  "digest": "sha256:bd2a98fb8e422e6c6612b67d266ae9d085afe5e92dfcc4562b52eb9714f3a429"
+}

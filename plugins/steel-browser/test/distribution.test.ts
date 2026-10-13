@@ -19,11 +19,16 @@ test("contributes Steel discovery instructions to new agent sessions", async () 
   assert.match(server, /first run `bb steel-browser project`/u);
   assert.match(server, /Never claim Steel is unavailable/u);
   assert.match(server, /emit ::steel-browser\{\}/u);
+  assert.match(server,
+    /Whenever you ask the user to enter credentials, sign in, complete MFA, approve consent, or perform any other manual browser action, repeat ::steel-browser\{\} on its own line in that same assistant message; never refer to an embedded browser 'above' unless that response contains the directive/u);
   assert.match(server, /Do not launch a separate browser/u);
   assert.match(server, /automatically provisions and binds/u);
   assert.match(server, /await ensureBinding\(projectId\)/u);
   assert.match(server, /const binding = await ensureBinding\(projectId\);/u);
-  assert.match(server, /\}, bindingReady\)/u);
+  assert.match(server, /async binding => \{/u);
+  assert.match(server, /if \(!await bindingReady\(binding\)\) return false;/u);
+  assert.match(server, /await ensureViewerShare\(projectId, binding\);/u);
+  assert.match(server, /return true;/u);
   assert.match(server, /client\(scope, true\)/u);
   const allProjects = server.slice(server.indexOf("async allProjects()"), server.indexOf("async project(scope"));
   assert.match(allProjects, /projects\.binding\(project\.id\)/u);
@@ -48,5 +53,7 @@ test("ships the required operational and responsive UI states", async () => {
   assert.match(skill, /instead of KERNEL\.SH/u);
   assert.match(skill, /Never send the user to a/u);
   assert.match(skill, /current thread is the only browser surface/u);
+  assert.match(skill,
+    /whenever you ask the\s+user to enter credentials, sign in, complete MFA, approve consent, or perform\s+another manual browser action,[\s\S]+line in that same assistant message:[\s\S]+::steel-browser\{\}[\s\S]+Never tell the user to use an embedded browser "above" unless this response\s+contains the directive\. Repeat the directive for later sign-in, MFA, consent,\s+or manual-action handoffs; an earlier viewer message is not sufficient\./u);
   assert.match(skill, /bb steel-browser release/u);
 });

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "dockside-thread-management",
+    "usage-tracker-provider-usage"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:714d7a2ef81feebbdbe4eb543d80bf2915873a718bb452b7ca70c5b5d16ecf96"
+}

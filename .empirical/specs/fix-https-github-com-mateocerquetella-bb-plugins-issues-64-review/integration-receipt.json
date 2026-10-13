@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "feature": "fix-https-github-com-mateocerquetella-bb-plugins-issues-64-review",
+  "claimId": "fix-https-github-com-mateocerquetella-bb-plugins-issues-64-review-e28b574c8119",
+  "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+  "baseCommit": "c359938700b20695f8f4e6fd88815d93e63cd4e9",
+  "baseTree": "e1cb005857ceef70e6d3f52f6a19afcade7069c6",
+  "featureTree": "sha256:293a27edaec2bdcc5506e71540df2d22fde06b3a18e0a796db760ff8c65a5646",
+  "targetCommit": "c359938700b20695f8f4e6fd88815d93e63cd4e9",
+  "targetTree": "e1cb005857ceef70e6d3f52f6a19afcade7069c6",
+  "capabilityBaseDigests": {
+    "dockside-thread-management": "sha256:eb6aadc29d0c246fc4a2b9865ff4993c44f31ea935df97eb7fa3866147e18398",
+    "usage-tracker-provider-usage": "sha256:b7d93dc3f6c18265ec2f97a4754d672ad29c54a16f5c4d9d474f876825d35123"
+  },
+  "deltaDigest": "sha256:189e0455989835b0568fed816f1b83147814e2c7f49557bcbccc551b5b319c77",
+  "resultDigests": {
+    "dockside-thread-management": "sha256:84a63707ece840ca513a80da47ef5ebd2cda40b296485692f823f24869ddd7a4",
+    "usage-tracker-provider-usage": "sha256:51a4b6675fbf710cd8551d3659934cd887dbc325d4bc47140de4fb4fd0e1eb13"
+  },
+  "verificationReceiptDigests": [
+    "sha256:37e7b91b4c3cfe6ceb5284517cbd59017cb7ce0bbe3fe529fc70abe3e456f01e"
+  ],
+  "promotionRoute": {
+    "mode": "auto",
+    "route": "local",
+    "reasons": [
+      {
+        "code": "REMOTE_CHECKS_NOT_CONFIGURED"
+      },
+      {
+        "code": "REMOTE_CONFIGURATION_CHANGED",
+        "paths": [
+          "package-lock.json"
+        ]
+      },
+      {
+        "code": "REMOTE_MUTABLE_WORKFLOW_REF",
+        "paths": [
+          ".github/workflows/ci.yml: actions/cache@v4",
+          ".github/workflows/ci.yml: actions/checkout@v4",
+          ".github/workflows/ci.yml: actions/setup-node@v4"
+        ]
+      }
+    ]
+  },
+  "integratedAt": "2026-10-07T21:44:10.018Z",
+  "digest": "sha256:877903b631752e109d287c0f465e43dd3f5e5589acf4310993e9f2023a590c5b"
+}

@@ -18,8 +18,10 @@ If Docker, BB Connect, or startup fails, report the actual command error.
 
 ## Show the live browser in the current thread
 
-When the user asks to see the Steel browser in BB, emit this complete message
-directive on its own line:
+When the user asks to see the Steel browser in BB, or whenever you ask the
+user to enter credentials, sign in, complete MFA, approve consent, or perform
+another manual browser action, emit this complete message directive on its own
+line in that same assistant message:
 
 ```text
 ::steel-browser{}
@@ -27,7 +29,11 @@ directive on its own line:
 
 The directive renders the live Steel player directly inside the assistant
 message. The latest viewer follows the thread viewport when its message scrolls
-away; minimize it with the header control without disconnecting the session.
+away; minimize it with the header control to stop its viewer stream without
+stopping the browser session. Restore reconnects the viewer.
+Never tell the user to use an embedded browser "above" unless this response
+contains the directive. Repeat the directive for later sign-in, MFA, consent,
+or manual-action handoffs; an earlier viewer message is not sufficient.
 It does not open the right panel. Never send the user to a
 BB Connect URL, Safari, Chrome, or another external browser window.
 
@@ -53,6 +59,20 @@ binding is automatically provisioned by this command with dedicated ports and
 a persistent project profile. Repeated calls validate readiness and reuse the
 same binding; an unready validated container gets one bounded recovery attempt.
 Never copy cookies from another project's profile.
+
+## Human Login And Saved Accounts
+
+The inline and plugin-page viewers have Copy, Paste and Take control buttons.
+Ask the user to focus the website field, then use Paste (including native paste
+into its masked local field). Never ask for passwords, MFA or clipboard values
+in chat or pass them as CLI arguments. The clipboard bridge stays between the
+user's frontend and the project viewer; it does not use an agent tool.
+
+The plugin page has Sign in actions for GitHub, Linear and Google and
+project-scoped saved account labels. These are explicitly user-confirmed, not
+proof of a currently valid website session. Do not tell an agent that an account
+is authenticated solely because a label exists. Forgetting a label does not log
+out the website. BB API connector connections are separate from browser logins.
 
 The inline engine select and fallback checkbox persist per project. CLI:
 `bb steel-browser engine <playwright|jev|auto> <fallback-on|fallback-off>`.

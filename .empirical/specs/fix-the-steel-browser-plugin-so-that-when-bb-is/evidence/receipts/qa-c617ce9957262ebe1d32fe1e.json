@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-c617ce9957262ebe1d32fe1e",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Retry final selected check after installing pinned workspace dependencies.",
+  "passed": false,
+  "startedAt": "2026-10-12T19:25:13.887Z",
+  "completedAt": "2026-10-12T19:26:46.266Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-the-steel-browser-plugin-so-that-when-bb-is",
+    "specRevision": 2,
+    "specDigest": "sha256:aca9f3255ce916f421ac20c7d6d52e4c9ebceebea91a6e3f3cc7bec30f386c7c",
+    "treeDigest": "sha256:c30560af14cfb232a44c5cc142b8bbae8730884a2fbd04ad467968126bedee29",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 7,
+    "gitCommit": "fd0f962855c3aec6264e69ba6ad7d866e78762c7",
+    "textTreeDigest": "sha256:c30560af14cfb232a44c5cc142b8bbae8730884a2fbd04ad467968126bedee29"
+  },
+  "digest": "sha256:376d496d4e6d1ade41401a6407a39e1b78b4fd10bba24cd519f51205aadfdeff",
+  "kind": "qa",
+  "matrixDigest": "sha256:26283dced88e4467bd3e08b1496712ce47132c3d69f5a0d785b2a46e75e530e7",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "failed",
+      "summary": "Run the matrix-selected repository unit check for final verification.",
+      "startedAt": "2026-10-12T19:25:13.887Z",
+      "completedAt": "2026-10-12T19:25:14.538Z",
+      "durationMs": 651,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:3102e0660c5a28fb09072a92af73601c0704a8badb5519082e7545d1f876aa50",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-taskboard"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 1,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:de528cb9c22e0caecfb8b517d778a4e3e21b6fefb4e0c8b5c264d42c4142c569",
+        "stderrDigest": "sha256:0bd9eb7b9a74fa8b93440b3c5b09ea0e9e75d3b6df213ebda7700fbe068ac409",
+        "stdoutTail": "\n> bb-plugin-taskboard@0.3.3 check\n> npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build\n\n\n> bb-plugin-taskboard@0.3.3 types:check\n> env -u BB_CLI bb plugin types --check .\n\nThis plugin uses the npm package @get-bb/plugin-sdk; pin is 0.4.21, host is 0.6.15.\n",
+        "stderrTail": "Set \"@get-bb/plugin-sdk\" to 0.6.15 in devDependencies and re-run npm install (`bb plugin types` does it for you).\nnpm error Lifecycle script `types:check` failed with error:\nnpm error code 1\nnpm error path /home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_ph4zesju56-1/bb-plugins/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.3\nnpm error location /home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_ph4zesju56-1/bb-plugins/plugins/taskboard\nnpm error command failed\nnpm error command sh -c env -u BB_CLI bb plugin types --check .\nnpm error Lifecycle script `check` failed with error:\nnpm error code 1\nnpm error path /home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_ph4zesju56-1/bb-plugins/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.3\nnpm error location /home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_ph4zesju56-1/bb-plugins/plugins/taskboard\nnpm error command failed\nnpm error command sh -c npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build\n",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:c30560af14cfb232a44c5cc142b8bbae8730884a2fbd04ad467968126bedee29",
+      "sourceTreeAfter": "sha256:c30560af14cfb232a44c5cc142b8bbae8730884a2fbd04ad467968126bedee29",
+      "artifacts": []
+    },
+    {
+      "number": 2,
+      "outcome": "passed",
+      "summary": "Retry final selected check after installing pinned workspace dependencies.",
+      "startedAt": "2026-10-12T19:26:23.707Z",
+      "completedAt": "2026-10-12T19:26:46.266Z",
+      "durationMs": 22559,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:3102e0660c5a28fb09072a92af73601c0704a8badb5519082e7545d1f876aa50",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-taskboard"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:da667c4e22f52def9e7d52449799e3e4c1583ae297904ac75f7bb235c8d44645",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "eparation responses cannot cross selection identity or undo a mutation\nok 166 - deferred preparation responses cannot cross selection identity or undo a mutation\n  ---\n  duration_ms: 1.596667\n  type: 'test'\n  ...\n# Subtest: selects the active thread project only when it still exists\nok 167 - selects the active thread project only when it still exists\n  ---\n  duration_ms: 28.094262\n  type: 'test'\n  ...\n# Subtest: treats a different thread in the same project as new context\nok 168 - treats a different thread in the same project as new context\n  ---\n  duration_ms: 0.23107\n  type: 'test'\n  ...\n# Subtest: reads the project and thread from a BB project route\nok 169 - reads the project and thread from a BB project route\n  ---\n  duration_ms: 1.189786\n  type: 'test'\n  ...\n# Subtest: uses only the immediately previous navigation entry as source context\nok 170 - uses only the immediately previous navigation entry as source context\n  ---\n  duration_ms: 0.275141\n  type: 'test'\n  ...\n# Subtest: never replaces an explicit Taskboard project selection with route context\nok 171 - never replaces an explicit Taskboard project selection with route context\n  ---\n  duration_ms: 0.18616\n  type: 'test'\n  ...\n# Subtest: writes project credentials atomically with owner-only permissions\nok 172 - writes project credentials atomically with owner-only permissions\n  ---\n  duration_ms: 20.38883\n  type: 'test'\n  ...\n# Subtest: deleting a missing credential is harmless\nok 173 - deleting a missing credential is harmless\n  ---\n  duration_ms: 2.689428\n  type: 'test'\n  ...\n# Subtest: cached summaries never retain provider comments\nok 174 - cached summaries never retain provider comments\n  ---\n  duration_ms: 2.790831\n  type: 'test'\n  ...\n# Subtest: provider creation results carry strict native assignee confirmation\nok 175 - provider creation results carry strict native assignee confirmation\n  ---\n  duration_ms: 0.253342\n  type: 'test'\n  ...\n# Subtest: metadata failures expose only a fixed server-safe message\nok 176 - metadata failures expose only a fixed server-safe message\n  ---\n  duration_ms: 0.473633\n  type: 'test'\n  ...\n# Subtest: finds Jira project keys from common configured JQL scopes\nok 177 - finds Jira project keys from common configured JQL scopes\n  ---\n  duration_ms: 1.286944\n  type: 'test'\n  ...\n# Subtest: binds issue creation to the tracker reviewed in the modal\nok 178 - binds issue creation to the tracker reviewed in the modal\n  ---\n  duration_ms: 0.652899\n  type: 'test'\n  ...\n# Subtest: refreshes authoritative provider data after successful issue creation\nok 179 - refreshes authoritative provider data after successful issue creation\n  ---\n  duration_ms: 0.394037\n  type: 'test'\n  ...\n# Subtest: refreshes authoritative provider data after ambiguous issue creation failure\nok 180 - refreshes authoritative provider data after ambiguous issue creation failure\n  ---\n  duration_ms: 0.377317\n  type: 'test'\n  ...\n# Subtest: gitlab is a registered taskboard source\nok 181 - gitlab is a registered taskboard source\n  ---\n  duration_ms: 1.339279\n  type: 'test'\n  ...\n# Subtest: refs must be host-qualified paths\nok 182 - refs must be host-qualified paths\n  ---\n  duration_ms: 1.127794\n  type: 'test'\n  ...\n# Subtest: locators round-trip with ref and iid\nok 183 - locators round-trip with ref and iid\n  ---\n  duration_ms: 0.416579\n  type: 'test'\n  ...\n# Subtest: status label categories cover the five states\nok 184 - status label categories cover the five states\n  ---\n  duration_ms: 0.206176\n  type: 'test'\n  ...\n# Subtest: status labels filter out unrelated labels\nok 185 - status labels filter out unrelated labels\n  ---\n  duration_ms: 0.671874\n  type: 'test'\n  ...\n# Subtest: state category prefers workflow labels over native state\nok 186 - state category prefers workflow labels over native state\n  ---\n  duration_ms: 0.206696\n  type: 'test'\n  ...\n# Subtest: status name shows the workflow column name or the native state\nok 187 - status name shows the workflow column name or the native state\n  ---\n  duration_ms: 0.250816\n  type: 'test'\n  ...\n# Subtest: cached summaries never retain provider comments\nok 188 - cached summaries never retain provider comments\n  ---\n  duration_ms: 0.200525\n  type: 'test'\n  ...\n# Subtest: untriaged issues keep native open/closed choices current-flagged\nok 189 - untriaged issues keep native open/closed choices current-flagged\n  ---\n  duration_ms: 0.386594\n  type: 'test'\n  ...\n# Subtest: stripped status names keep facet and dropdown consistent\nok 190 - stripped status names keep facet and dropdown consistent\n  ---\n  duration_ms: 0.464455\n  type: 'test'\n  ...\n# Subtest: token line is parsed from glab stderr output\nok 191 - token line is parsed from glab stderr output\n  ---\n  duration_ms: 0.473352\n  type: 'test'\n  ...\n# Subtest: keeps structural headers on neutral host theme surfaces\nok 192 - keeps structural headers on neutral host theme surfaces\n  ---\n  duration_ms: 1.560432\n  type: 'test'\n  ...\n# Subtest: uses restrained state glyph, focus, and conversation treatments\nok 193 - uses restrained state glyph, focus, and conversation treatments\n  ---\n  duration_ms: 0.574366\n  type: 'test'\n  ...\n# Subtest: keeps constrained filter values inside the vertical menu measure\nok 194 - keeps constrained filter values inside the vertical menu measure\n  ---\n  duration_ms: 0.309654\n  type: 'test'\n  ...\n# Subtest: keeps assignee avatars compact with six theme-safe identity tones\nok 195 - keeps assignee avatars compact with six theme-safe identity tones\n  ---\n  duration_ms: 0.597678\n  type: 'test'\n  ...\n# Subtest: shows restrained composer drop feedback and discoverable drag grips\nok 196 - shows restrained composer drop feedback and discoverable drag grips\n  ---\n  duration_ms: 0.571751\n  type: 'test'\n  ...\n# Subtest: ticket images reject spoofed formats, active content and oversized bytes\nok 197 - ticket images reject spoofed formats, active content and oversized bytes\n  ---\n  duration_ms: 14.23877\n  type: 'test'\n  ...\n# Subtest: Linear uploads use signed storage headers and return the asset URL\nok 198 - Linear uploads use signed storage headers and return the asset URL\n  ---\n  duration_ms: 74.890972\n  type: 'test'\n  ...\n# Subtest: improvement asks for concrete concise scope without invented implementation\nok 199 - improvement asks for concrete concise scope without invented implementation\n  ---\n  duration_ms: 0.286972\n  type: 'test'\n  ...\n# Subtest: draft parser accepts JSON or a single fence and rejects missing, extra or oversized fields\nok 200 - draft parser accepts JSON or a single fence and rejects missing, extra or oversized fields\n  ---\n  duration_ms: 3.594606\n  type: 'test'\n  ...\n# Subtest: concurrent starts spawn once with project defaults and only validated text is returned\nok 201 - concurrent starts spawn once with project defaults and only validated text is returned\n  ---\n  duration_ms: 2.023164\n  type: 'test'\n  ...\n# Subtest: cancellation before start prevents dispatch, including after service reload\nok 202 - cancellation before start prevents dispatch, including after service reload\n  ---\n  duration_ms: 0.454337\n  type: 'test'\n  ...\n# Subtest: uncertain spawn cannot become a confirmed cancellation or be dispatched twice\nok 203 - uncertain spawn cannot become a confirmed cancellation or be dispatched twice\n  ---\n  duration_ms: 0.633374\n  type: 'test'\n  ...\n# Subtest: stop failures stay uncertain and cleanup is retried by the sweep\nok 204 - stop failures stay uncertain and cleanup is retried by the sweep\n  ---\n  duration_ms: 0.748003\n  type: 'test'\n  ...\n# Subtest: invalid model output never returns a replacement draft\nok 205 - invalid model output never returns a replacement draft\n  ---\n  duration_ms: 0.640036\n  type: 'test'\n  ...\n1..205\n# tests 205\n# suites 0\n# pass 205\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 11002.651617\n\n> bb-plugin-taskboard@0.3.3 build\n> env -u BB_CLI bb plugin build .\n\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\ndist/host.js\ndist/host.js.map\ndist/host.meta.json\n\n> bb-plugin-taskboard@0.3.3 verify:build\n> node scripts/verify-build.mjs\n\nTaskboard build metadata is valid.\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:c30560af14cfb232a44c5cc142b8bbae8730884a2fbd04ad467968126bedee29",
+      "sourceTreeAfter": "sha256:c30560af14cfb232a44c5cc142b8bbae8730884a2fbd04ad467968126bedee29",
+      "artifacts": []
+    }
+  ],
+  "anomalies": [
+    "prior-nonpassing-attempt",
+    "retry-history-present"
+  ]
+}

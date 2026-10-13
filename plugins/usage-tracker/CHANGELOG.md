@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.15 - 2026-10-07
+
+- Omit unknown provider activity from RPC responses instead of returning an
+  explicit undefined value, keeping the sidebar visible when thread counts are
+  unavailable or include unmapped providers such as Pi.
+
 ## 0.1.14 - 2026-09-28
 
 - Disable process-default Codex reset actions when displaying pooled accounts.
