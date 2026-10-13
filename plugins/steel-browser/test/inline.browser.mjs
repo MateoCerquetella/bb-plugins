@@ -102,14 +102,10 @@ try {
     await page.frameLocator("iframe").getByRole("textbox").fill("Retained");
     assert.equal(loads, 2, "restoring reconnects the stream, not the remote browser");
     await page.locator("#thread").evaluate(element => { element.scrollTop = 1100; });
-    await page.waitForFunction(() => document.querySelector(".steel-inline-browser--following"));
-    const floating = await page.locator(".steel-inline-browser").boundingBox();
-    const placeholderHeight = await page.locator(".steel-inline-anchor").evaluate(element => element.getBoundingClientRect().height);
-    const composer = await page.getByRole("textbox", { name: "Composer" }).boundingBox();
-    assert(floating.y >= 0 && floating.y + floating.height < composer.y, "viewer leaves composer accessible");
-    assert(floating.height <= 400 && floating.x + floating.width <= width, "floating viewer fits viewport");
-    assert(placeholderHeight > floating.height, "floating viewer reserves its original message height");
-    const floatingTop = floating.y;
+    await page.waitForTimeout(80);
+    assert.equal(await page.locator(".steel-inline-browser--following").count(), 0,
+      "viewer remains in normal thread flow while scrolling");
+    const anchorHeight = await page.locator(".steel-inline-anchor").evaluate(element => element.getBoundingClientRect().height);
     await page.locator("#message").evaluate(element => {
       const stream = document.createElement("div");
       stream.style.height = "900px";
@@ -117,10 +113,13 @@ try {
       element.append(stream);
     });
     await page.waitForTimeout(80);
-    assert.equal(await page.locator(".steel-inline-browser--following").count(), 1, "streaming layout must not drop follow mode");
-    assert.equal((await page.locator(".steel-inline-browser").boundingBox()).y, floatingTop, "streaming layout must not bounce the floating viewer");
-    assert.equal(await page.locator(".steel-inline-anchor").evaluate(element => element.getBoundingClientRect().height), placeholderHeight,
-      "streaming layout must not resize the message placeholder");
+    assert.equal(await page.locator(".steel-inline-browser--following").count(), 0, "streaming layout stays in normal flow");
+    assert.equal(await page.locator(".steel-inline-browser").evaluate(element => getComputedStyle(element).position), "static",
+      "streaming content does not pin the viewer to the viewport");
+    assert.equal(await page.locator(".steel-inline-anchor > .steel-inline-browser").count(), 1,
+      "viewer remains inside its message anchor");
+    assert(await page.locator(".steel-inline-anchor").evaluate(element => element.getBoundingClientRect().height) >= anchorHeight,
+      "streaming content keeps the viewer in its message");
     assert.equal(await page.frameLocator("iframe").getByRole("textbox").inputValue(), "Retained");
     await page.getByRole("button", { name: "Minimize inline browser" }).click();
     assert.equal(await page.locator("iframe").count(), 0);
@@ -135,7 +134,8 @@ try {
       element.scrollTop = 0;
       window.scrollTo(0, 0);
     });
-    await page.waitForFunction(() => !document.querySelector(".steel-inline-browser--following"));
+    await page.waitForTimeout(80);
+    assert.equal(await page.locator(".steel-inline-browser--following").count(), 0);
     assert.equal(await page.locator('a[target="_blank"]').count(), 0);
     await page.getByRole("button", { name: "Reload inline browser" }).click();
     await page.frameLocator("iframe").getByRole("textbox").waitFor();
