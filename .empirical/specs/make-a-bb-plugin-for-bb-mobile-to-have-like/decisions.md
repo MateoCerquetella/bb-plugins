@@ -45,6 +45,11 @@ Steel checks for arrows, swipe thresholds, boundaries and draft preservation.
   standalone Thread Mobile package and registry entry to avoid duplicate
   surfaces and drifting colors.
 
+- **2026-10-13 — Publish Dockside v0.1.6:** Replace the installed v0.1.5 only
+  after the new package builds, verify the local v0.1.6 runtime before
+  publication, then create an immutable `dockside/v0.1.6` tag and matching
+  GitHub release from the exact verified commit. Never move an existing tag.
+
 - **2026-10-12 — Live host status:** Reuse the sidebar indicator label instead
   of inferring completion. Missing unknown labels fail to "Status unavailable";
   the known none indicator displays Idle. Keep Thread Glide branding.

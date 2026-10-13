@@ -25,3 +25,7 @@
 The approved 44px-arrow strip remains the clearest mobile layout. The revised
 criteria now cover the previously missing cross-project project context,
 effective custom color synchronization, and ownership by Dockside.
+
+Publication adds no new visual treatment. The installed v0.1.6 bundle must
+retain the approved strip and synchronized color behavior without duplicate
+navigation from the removed standalone plugin.

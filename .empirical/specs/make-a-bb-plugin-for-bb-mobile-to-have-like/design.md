@@ -48,3 +48,11 @@ Project-color persistence remains exclusively in Dockside.
 Pure navigation, badge and gesture helpers receive unit tests inside Dockside.
 Dockside typecheck/build, workspace checks, local reload, and Steel
 mobile/desktop checks cover runtime integration.
+
+## Installation and release
+
+Remove the existing Git-managed v0.1.5 installation only after the v0.1.6
+package is built. Install the local package path with explicit approval, verify
+BB reports Dockside v0.1.6 running and inspect its app bundle metadata. Commit
+all durable workflow state, tag that exact commit `dockside/v0.1.6`, push the
+branch and tag without force, and create the matching GitHub release.

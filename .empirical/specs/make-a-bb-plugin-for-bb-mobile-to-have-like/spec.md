@@ -18,11 +18,15 @@ threads in every project through previous/next controls and horizontal swipes.
 - [ ] [AC-2] Boundaries disable navigation without wrapping. Loading, errors and singleton lists are safe; stale requests cannot change the current thread.
 - [ ] [AC-UI-4] [UI] Every queued thread shows its project initial using Dockside's effective project color, including custom colors synchronized through Dockside settings.
 - [ ] [AC-3] Dockside owns the implementation, tests and documentation. The standalone Thread Mobile package and root catalog entry are removed.
+- [ ] [AC-4] The existing Dockside v0.1.5 installation is removed, the local
+  v0.1.6 build is installed and running, and the immutable `dockside/v0.1.6`
+  Git release is created from the verified commit and pushed.
 
 ## Scope
 Dockside app registration, mobile navigation components and helpers, Dockside
 project color hook, focused tests and documentation, root catalog/lockfile
-cleanup, local reload, and live mobile browser verification.
+cleanup, local replacement install, immutable v0.1.6 tag/release, and live
+mobile browser verification.
 
 ## Non-goals
 No archive/delete/vote gesture, no native BB patch, no desktop UI replacement,
@@ -37,7 +41,8 @@ must use native navigation so drafts remain host-owned.
 ## Verification
 Pure tests for ordering/boundaries and gesture classification, SDK typecheck,
 plugin build, root checks subject to full-suite approval rules, local install
-and reload, Steel mobile/desktop screenshot and interaction checks.
+and reload, installed-source/status inspection, exact release-tag commit
+inspection, and Steel mobile/desktop screenshot and interaction checks.
 
 ## Capability Deltas
 

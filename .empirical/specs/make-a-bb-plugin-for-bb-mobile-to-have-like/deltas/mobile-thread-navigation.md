@@ -57,3 +57,13 @@ infer status from message text, timestamps, or thread titles.
 - **When** BB changes its indicator or accessible indicator label
 - **Then** Thread Glide updates the compact status without navigating
 - **And** the status remains distinguishable from the numeric thread position
+
+### Requirement: Dockside mobile navigation is released immutably
+The verified Dockside package MUST be installable as version 0.1.6 and the
+`dockside/v0.1.6` tag MUST identify the exact reviewed release commit.
+
+#### Scenario: User installs the new Dockside release
+- **Given** Dockside v0.1.5 is currently installed
+- **When** it is replaced with the verified v0.1.6 package
+- **Then** Dockside v0.1.6 is running with the mobile navigation bundle
+- **And** the pushed release tag identifies that exact source commit

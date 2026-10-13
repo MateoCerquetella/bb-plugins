@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 37,
+  "revision": 42,
   "activeFeature": "make-a-bb-plugin-for-bb-mobile-to-have-like",
   "request": "Make a bb plugin for bb mobile to have like arrows or tinder stylrer to go strong it the threads more easily. You teasesrch and do it don’t ask me",
   "profile": "complex",
@@ -9,13 +9,13 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Moved mobile active/unread cross-project navigation into Dockside, wired badges to Dockside's live custom color overrides and shared presentation helper, reused Dockside animated status glyphs, removed the standalone Thread Mobile package and registry/lock entries, migrated Dockside to the pinned SDK package, updated docs/version, passed 218 tests plus typecheck/build, removed the old installed plugin, and pushed the branch.",
+  "message": "Planned the build-first replacement install, exact runtime verification, final durable commit, immutable tag push, and matching GitHub release.",
   "implementationActor": "agent",
   "workStartedAt": null,
-  "specDigest": "sha256:7c895b81727f0f2118a4280c9740e045b9607c588280117dd539a987890dca26",
-  "approvedSpecRevision": 33,
+  "specDigest": "sha256:89f68b1e22bff3458aab926857ba80d4b667ac6e1efe12428368d6adcffc9c2a",
+  "approvedSpecRevision": 39,
   "capabilityArchiveRequired": true,
-  "capabilityDeltaDigest": "sha256:48aee6aee72aa441fc8598d98f32895c5fdc06afa1180f7a7feae3570c958606",
+  "capabilityDeltaDigest": "sha256:8f1b8775522e8d54c7d480cb374e81a8561f67d913379448d940207a49043804",
   "impactDigest": "sha256:59fe412620416a2f2caf357fa5cead797c072e679dc0be4cf8b87add6cd691d2",
   "capabilityClaimId": "make-a-bb-plugin-for-bb-mobile-to-have-like-07aee46cf0cd",
   "authorizationDigest": null,
@@ -23,20 +23,21 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": true,
+    "implemented": false,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "implemented",
+    "highest": "none",
     "reasons": {
+      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-13T14:35:15.054Z",
+  "updatedAt": "2026-10-13T15:17:00.257Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "make-a-bb-plugin-for-bb-mobile-to-have-like-07aee46cf0cd",
@@ -55,7 +56,8 @@
           "project context uses dockside's effective color": null,
           "gestures preserve ordinary conversation interaction": null,
           "unavailable lists fail safely": null,
-          "current thread status uses live host semantics": null
+          "current thread status uses live host semantics": null,
+          "dockside mobile navigation is released immutably": null
         }
       }
     },
@@ -65,25 +67,25 @@
     "status": "active",
     "integrationReceiptDigest": null,
     "createdAt": "2026-10-12T19:17:24.549Z",
-    "heartbeatAt": "2026-10-13T14:25:10.106Z",
-    "digest": "sha256:5ea553c88d0b20192f55bc9c4868a0bd4372aed8cb86ffd98ff669bf32648aff"
+    "heartbeatAt": "2026-10-13T15:16:01.417Z",
+    "digest": "sha256:b84120666cadf7244ec93d3275713ffa93e38a867469c2987e7c6bfe7c61c44d"
   },
-  "trackerGeneration": 4,
+  "trackerGeneration": 5,
   "lifecycle": {
-    "stage": "iteration",
-    "iteration": 4,
-    "awaitingFeedback": true,
-    "contractRevision": 31,
-    "riskRequest": "Fold Thread Mobile into the existing Dockside plugin so project badges use Dockside's synchronized project color settings directly. Remove the standalone thread-mobile plugin and its root catalog/registry entry, preserve the mobile active/unread cross-project navigation inside Dockside, update Dockside documentation and tests, and push the revised code."
+    "stage": "development",
+    "iteration": 5,
+    "awaitingFeedback": false,
+    "contractRevision": 37,
+    "riskRequest": "Replace the currently installed Dockside v0.1.5 with this updated Dockside build, verify it is running, then create and push the new Dockside v0.1.6 release."
   },
   "budgetExtensionMinutes": 77,
   "sizeDecision": {
     "choice": "keep",
-    "criteria": 7,
+    "criteria": 8,
     "capabilities": 1,
-    "reason": "The seven criteria describe one atomic ownership migration: moving an already coherent mobile navigator into Dockside and deleting its standalone package. Splitting would temporarily duplicate registrations or break synchronized color ownership.",
+    "reason": "Installation replacement and immutable release are the final delivery of the already atomic Dockside ownership migration; splitting would create a release without proving the installed artifact or an installation without the requested release.",
     "actor": "agent",
-    "revision": 33
+    "revision": 39
   },
   "reviewFirst": true
 }
