@@ -61,20 +61,23 @@ function Navigator({ threadId }: { threadId: string }) {
         }
       }}
       onPointerDown={event => {
+        event.stopPropagation();
         if (!event.isPrimary || event.button !== 0 || pendingRef.current) { gesture.current = null; return; }
         gesture.current = { id: event.pointerId, x: event.clientX, y: event.clientY, cancelled: false };
         event.currentTarget.setPointerCapture(event.pointerId);
       }}
       onPointerMove={event => {
+        event.stopPropagation();
         if (gesture.current?.id === event.pointerId) gesture.current = updateGesture(gesture.current, event.clientX, event.clientY);
       }}
       onPointerUp={event => {
+        event.stopPropagation();
         const start = gesture.current; gesture.current = null;
         if (!start) return;
         const direction = swipeDirection(start, event.pointerId, event.clientX, event.clientY);
         if (direction !== null) move(direction);
       }}
-      onPointerCancel={() => { gesture.current = null; }}
+      onPointerCancel={event => { event.stopPropagation(); gesture.current = null; }}
       onLostPointerCapture={() => { gesture.current = null; }}>
       <span className="tg-heading">
         {index >= 0 && <span className="tg-project" style={{ backgroundColor: badge.backgroundColor, color: badge.foregroundColor }}

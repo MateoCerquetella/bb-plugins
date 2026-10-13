@@ -55,6 +55,8 @@ Project initials use Dockside's effective project colors, including custom
 overrides that update through its live color subscription. Status uses the
 same animated glyphs as the sidebar and respects reduced-motion preferences.
 Vertical, short, cancelled, and secondary-touch gestures do not navigate.
+Pointer gestures that begin on the navigation title stay inside the strip, so
+they do not also open BB's mobile sidebar; vertical scrolling remains native.
 BB owns navigation and drafts; the strip never modifies thread contents.
 
 This replaces the former standalone Thread Mobile plugin. Remove that old

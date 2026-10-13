@@ -62,21 +62,25 @@ function render(){
 function move(direction){index=(index+direction+threads.length)%threads.length;render()}
 previous.onclick=()=>move(-1);next.onclick=()=>move(1);
 swipe.onpointerdown=event=>{
+  event.stopPropagation();
   if(!event.isPrimary||event.button!==0){gesture=null;return}
   gesture={id:event.pointerId,x:event.clientX,y:event.clientY,cancelled:false};
   swipe.setPointerCapture(event.pointerId);
 };
 swipe.onpointermove=event=>{
+  event.stopPropagation();
   if(!gesture||event.pointerId!==gesture.id)return;
   if(Math.abs(event.clientY-gesture.y)>20)gesture.cancelled=true;
 };
 swipe.onpointerup=event=>{
+  event.stopPropagation();
   const start=gesture;gesture=null;
   if(!start||start.cancelled||event.pointerId!==start.id)return;
   const dx=event.clientX-start.x,dy=event.clientY-start.y;
   if(Math.abs(dx)>=56&&Math.abs(dx)>Math.abs(dy)*2)move(dx<0?1:-1);
 };
-swipe.onpointercancel=swipe.onlostpointercapture=()=>{gesture=null};
+swipe.onpointercancel=event=>{event.stopPropagation();gesture=null};
+swipe.onlostpointercapture=()=>{gesture=null};
 swipe.onkeydown=event=>{
   if(event.key==="ArrowLeft"||event.key==="ArrowRight"){
     event.preventDefault();move(event.key==="ArrowLeft"?-1:1)
