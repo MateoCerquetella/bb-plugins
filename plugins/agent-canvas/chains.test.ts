@@ -1,0 +1,22 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import vm from "node:vm";
+import {createFakePluginHost,makeThreadResponse} from "@get-bb/plugin-sdk/testing";
+import {chainScript,splitPrompts,createChainEngine} from "./chains.ts";
+const sleep=(ms:number)=>new Promise(r=>setTimeout(r,ms));
+async function until(check:()=>boolean){const deadline=Date.now()+2500;while(!check()){if(Date.now()>deadline)throw Error("Expected chain transition did not occur");await sleep(10);}}
+async function fixture(){
+ const rows:any[]=[{seq:1,type:"turn/completed",scope:{kind:"turn",turnId:"old"},data:{status:"completed"}}];const sent:any[]=[];let enabled=true,status="idle",validRun=true;
+ const controller=new AbortController();
+ const {bb,harness}=createFakePluginHost({pluginId:"agent-canvas",sdk:{plugins:{callRpc:async(args:any)=>{if(args.method==="automations_get")return {id:"auto",projectId:"project",enabled,execution:{mode:"script"}};if(args.method==="automations_runs")return {runs:validRun?[{id:"run",automationId:"auto",status:"running",runMode:"script"}]:[],nextCursor:null};if(args.method==="automations_pause"){enabled=false;return {ok:true};}throw Error("Unexpected native operation");}},threads:{get:async()=>makeThreadResponse({id:"target",projectId:"project",environmentId:"floor",status:status as any}),send:async(args:any)=>{sent.push(args);status="active";const requestId=`request-${sent.length}`,turnId=`turn-${sent.length}`,seq=rows.at(-1).seq;rows.push({seq:seq+1,type:"client/turn/requested",scope:{kind:"thread"},data:{requestId,input:args.input}},{seq:seq+2,type:"turn/input/accepted",scope:{kind:"turn",turnId},data:{clientRequestId:requestId}},{seq:seq+3,type:"turn/completed",scope:{kind:"turn",turnId:"unrelated"},data:{status:"completed"}});return {delivery:"sent",ok:true};},events:{list:async(args:any)=>args.afterSeq?rows.filter(r=>r.seq>Number(args.afterSeq)):rows.slice(-1)}}}});
+ const engine=await createChainEngine(bb,controller.signal);await engine.setDefinition({automationId:"auto",projectId:"project",threadId:"target",prompt:"First prompt\n&&\nSecond prompt",version:"version"});
+ const finish=(outcome="completed")=>{status=outcome==="completed"?"idle":"error";rows.push({seq:rows.at(-1).seq+1,type:"turn/completed",scope:{kind:"turn",turnId:`turn-${sent.length}`},data:{status:outcome}});};
+ return {engine,sent,finish,rows,controller,harness,setEnabled:(v:boolean)=>{enabled=v;},setValidRun:(v:boolean)=>{validRun=v;}};
+}
+test("chains split only standalone separators and generated scripts never interpolate user prompts",()=>{assert.deepEqual(splitPrompts("Explain && as syntax\n&&\nReview"),["Explain && as syntax","Review"]);assert.throws(()=>splitPrompts("One\n&&\n"));assert.throws(()=>splitPrompts(Array.from({length:21},()=>"Task").join("\n&&\n")));new vm.Script(chainScript());assert.ok(chainScript().includes("BB_AUTOMATION_RUN_ID"));});
+test("each chain step waits for its own accepted turn completion, ignoring other turns",async()=>{
+ const f=await fixture();try{await f.engine.begin({automationId:"auto",runId:"run"});await until(()=>f.sent.length===1);await sleep(350);assert.equal(f.sent.length,1);assert.equal(f.sent[0].input[0].text,"First prompt");assert.equal(f.sent[0].mode,"queue-if-active");assert.equal(f.sent[0].permissionMode,undefined);f.finish();await until(()=>f.sent.length===2);assert.equal(f.sent[1].input[0].text,"Second prompt");f.finish();await until(()=>f.engine.status({automationId:"auto",runId:"run"}).status==="completed");assert.equal(f.engine.status({automationId:"auto",runId:"run"}).step,2);await f.engine.begin({automationId:"auto",runId:"run"});assert.equal(f.sent.length,2);}finally{f.controller.abort();await f.harness.lifecycle.dispose();}
+});
+test("failed turns stop remaining steps, while paused/non-native runs cannot start",async()=>{
+ const f=await fixture();try{f.setValidRun(false);await assert.rejects(f.engine.begin({automationId:"auto",runId:"run"}));assert.equal(f.sent.length,0);f.setValidRun(true);f.setEnabled(false);await assert.rejects(f.engine.begin({automationId:"auto",runId:"run"}));f.setEnabled(true);await f.engine.begin({automationId:"auto",runId:"run"});await until(()=>f.sent.length===1);f.finish("failed");await until(()=>f.engine.status({automationId:"auto",runId:"run"}).status==="failed");assert.equal(f.sent.length,1);}finally{f.controller.abort();await f.harness.lifecycle.dispose();}
+});
