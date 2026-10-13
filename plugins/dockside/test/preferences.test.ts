@@ -17,6 +17,7 @@ describe("resolveDocksidePreferences", () => {
     assert.equal(loading.showPullRequestMetadata, true);
     assert.equal(loading.showRelativeTime, true);
     assert.equal(loading.colors.working, "#D99B00");
+    assert.equal(loading.colors.goal, "#D94B4B");
     assert.equal(loading.colors.waiting, "#F58220");
     assert.equal(loading.colors.unread, "#34A853");
     assert.equal(loading.colors.prReady, "#34A853");

@@ -1,6 +1,15 @@
 {
   "schemaVersion": 1,
   "sequence": 10,
+<<<<<<< HEAD
+  "previousDigest": "sha256:72fec643f59efd43c1d1ebe7a714654f3ab4108d09bded0f1d40c21f91001ddd",
+  "actor": "empirical-merge-observed",
+  "type": "compaction-boundary",
+  "summary": "Compacted through journal event 9",
+  "createdAt": "2026-10-12T19:07:40.505Z",
+  "stateBeforeDigest": "sha256:030e30afda0c27076a5fe54bd59bd50b19e5817e57d2ed207f6b5bcb27525962",
+  "stateAfterDigest": "sha256:030e30afda0c27076a5fe54bd59bd50b19e5817e57d2ed207f6b5bcb27525962",
+=======
   "previousDigest": "sha256:7b63a54d06df7a403ec9bea916637a395407244aef27090d6d6f661b717c6640",
   "actor": "empirical-merge-observed",
   "type": "compaction-boundary",
@@ -8,6 +17,7 @@
   "createdAt": "2026-10-12T03:13:13.576Z",
   "stateBeforeDigest": "sha256:6c0152c84453efaab1ef69df864b9414fb954853d126b7dfec8f733955bf0dc5",
   "stateAfterDigest": "sha256:6c0152c84453efaab1ef69df864b9414fb954853d126b7dfec8f733955bf0dc5",
+>>>>>>> origin/main
   "state": {
     "schemaVersion": 5,
     "revision": 9,
@@ -47,7 +57,11 @@
         "published": "published has not been proven by a durable receipt."
       }
     },
+<<<<<<< HEAD
+    "updatedAt": "2026-10-12T19:07:39.874Z",
+=======
     "updatedAt": "2026-10-12T03:13:11.930Z",
+>>>>>>> origin/main
     "lifecycle": {
       "stage": "development",
       "iteration": 2,
@@ -99,10 +113,17 @@
         "mergeCommit": "4880d65e1ff282c7f50ca94ab27cf969143e0222",
         "targetBranch": "main",
         "ancestorOfTarget": true,
+<<<<<<< HEAD
+        "observedAt": "2026-10-12T19:07:21.023Z"
+      },
+      "closedAt": "2026-10-12T19:07:39.694Z",
+      "digest": "sha256:12e978cfd7666d77dfed21bf25f0a750131101102334956cace3b11be763e57e"
+=======
         "observedAt": "2026-10-12T03:12:44.974Z"
       },
       "closedAt": "2026-10-12T03:13:11.673Z",
       "digest": "sha256:265b0c366cc06fac378a9f175c7cb60e4943f6d5cadd69166504868037730cc9"
+>>>>>>> origin/main
     },
     "completionRecord": {
       "schemaVersion": 1,
@@ -111,6 +132,17 @@
       "decisionBy": null,
       "method": "merged-externally",
       "reason": "Merged in pull request #73 as 4880d65e1ff282c7f50ca94ab27cf969143e0222 into main; closed when the merge was observed.",
+<<<<<<< HEAD
+      "at": "2026-10-12T19:07:39.874Z",
+      "revision": 9,
+      "completion": "none",
+      "sourceTreeDigest": "sha256:cdde1d5250efb1080dca5c434aa7d56a8a608e18193cb54c553736eb60645b5d",
+      "artifactTreeDigest": "sha256:9e354f4d99a194ebfaaa8e369778f0cc7c5eb0492495692f54090526c1febd65",
+      "digest": "sha256:30282c89c3416d3b338725cea010edb166960ef5ecdd90278b8f51d851d782fb"
+    }
+  },
+  "digest": "sha256:8627561e4de1b1714d7f17ab9159e95a4439e7a0c5f9a4aca7b6dd2b8f250704"
+=======
       "at": "2026-10-12T03:13:11.930Z",
       "revision": 9,
       "completion": "none",
@@ -120,4 +152,5 @@
     }
   },
   "digest": "sha256:54fa69eb69b29fdbf0652755e52ed59f67836f2fd0d061d7f84f16f9d7cfba29"
+>>>>>>> origin/main
 }

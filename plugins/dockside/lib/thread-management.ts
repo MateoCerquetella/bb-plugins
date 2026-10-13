@@ -1,4 +1,4 @@
-import type { PluginSidebarThread } from "@bb/plugin-sdk";
+import type { PluginSidebarThread } from "@get-bb/plugin-sdk";
 import { threadIsWorking, type ProjectThreadGroup, type ThreadFamily } from "./inbox.ts";
 
 export const DAY_MS = 24 * 60 * 60 * 1_000;

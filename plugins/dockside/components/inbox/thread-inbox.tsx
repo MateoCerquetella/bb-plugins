@@ -13,7 +13,7 @@ import {
   useSettings,
   type PluginSidebarThread,
   type PluginThreadListProps,
-} from "@bb/plugin-sdk/app";
+} from "@get-bb/plugin-sdk/app";
 import type { docksideRpcContract } from "@/server";
 import { Icon } from "@/components/ui/icon";
 import { cn } from "@/lib/utils";

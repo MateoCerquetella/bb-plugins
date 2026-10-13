@@ -3,7 +3,7 @@ import {
   useRealtime,
   useRealtimeConnectionState,
   useRpc,
-} from "@bb/plugin-sdk/app";
+} from "@get-bb/plugin-sdk/app";
 import type { docksideRpcContract } from "@/server";
 import { useRetryingRead } from "@/hooks/use-retrying-read";
 

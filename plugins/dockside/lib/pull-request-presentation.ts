@@ -1,4 +1,4 @@
-import type { PluginSidebarPullRequest } from "@bb/plugin-sdk";
+import type { PluginSidebarPullRequest } from "@get-bb/plugin-sdk";
 import type { SemanticStateTone } from "./attention-state.ts";
 
 export interface PullRequestPresentation {

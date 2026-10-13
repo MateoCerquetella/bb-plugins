@@ -1,12 +1,18 @@
 // bb-plugin-dockside — a project-first replacement for bb's sidebar thread
 // list. Root threads keep a stable position and expand their child agents in
 // place, so activity changes state without moving the user's navigation.
-import { definePluginApp } from "@bb/plugin-sdk/app";
+import { definePluginApp } from "@get-bb/plugin-sdk/app";
 import { ThreadInbox } from "@/components/inbox/thread-inbox";
 import { ParentChip } from "@/components/inbox/parent-chip";
 import { DocksideSettingsSection } from "@/components/settings/dockside-settings";
+import { MobileNavigation } from "@/components/mobile/navigation";
 
 export default definePluginApp((app) => {
+  app.composer.customize({
+    id: "mobile-navigation",
+    scopes: ["thread"],
+    banners: [{ id: "navigation", chrome: "bare", component: MobileNavigation }],
+  });
   app.slots.settingsSection({
     id: "appearance",
     title: "Appearance & behavior",

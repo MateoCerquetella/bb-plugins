@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "20261012T190817124Z-create-a-bb-plugin-that-improves-mobile",
+  "problem": "Create a BB plugin that improves mobile thread navigation, using obvious previous/next arrow controls and/or Tinder-style horizontal swipe gestures so users can move through threads more easily.",
+  "status": "draft",
+  "answers": [],
+  "refinedRequest": null,
+  "approvedAt": null,
+  "workflow": null,
+  "handoff": null,
+  "createdAt": "2026-10-12T19:08:17.124Z",
+  "updatedAt": "2026-10-12T19:08:17.125Z"
+}

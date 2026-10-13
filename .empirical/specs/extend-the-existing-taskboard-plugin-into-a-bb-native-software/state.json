@@ -37,7 +37,11 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
+<<<<<<< HEAD
+  "updatedAt": "2026-10-12T19:07:37.165Z",
+=======
   "updatedAt": "2026-10-12T03:13:06.919Z",
+>>>>>>> origin/main
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "extend-the-existing-taskboard-plugin-into-a-bb-native-software-23c140730dcf",
@@ -98,10 +102,17 @@
       "mergeCommit": "2daf96f4de78bf9ef65b690001db78b9904d4bf0",
       "targetBranch": "main",
       "ancestorOfTarget": true,
+<<<<<<< HEAD
+      "observedAt": "2026-10-12T19:07:21.023Z"
+    },
+    "closedAt": "2026-10-12T19:07:36.994Z",
+    "digest": "sha256:248d6679bd11bdde4af4a765d3d8ddbf0ff58f54eb0ad73eb7bc028220525a76"
+=======
       "observedAt": "2026-10-12T03:12:44.974Z"
     },
     "closedAt": "2026-10-12T03:13:06.571Z",
     "digest": "sha256:14ddd8cb4a798b2105a4f49c86ffbb9aede7880c79a377848c0587599f1eb23c"
+>>>>>>> origin/main
   },
   "completionRecord": {
     "schemaVersion": 1,
@@ -110,11 +121,20 @@
     "decisionBy": null,
     "method": "merged-externally",
     "reason": "Merged in pull request #72 as 2daf96f4de78bf9ef65b690001db78b9904d4bf0 into main; closed when the merge was observed.",
+<<<<<<< HEAD
+    "at": "2026-10-12T19:07:37.165Z",
+    "revision": 16,
+    "completion": "none",
+    "sourceTreeDigest": "sha256:cdde1d5250efb1080dca5c434aa7d56a8a608e18193cb54c553736eb60645b5d",
+    "artifactTreeDigest": "sha256:6c55ea713bddf5e82e7ef74519f5f493ce91e4a6cd75500e7179165540327fc6",
+    "digest": "sha256:1cf19661f668914e9ffb77fa5d1ef077d0ba61ee0282b3e90ab1c61ee9d28f02"
+=======
     "at": "2026-10-12T03:13:06.919Z",
     "revision": 16,
     "completion": "none",
     "sourceTreeDigest": "sha256:d4f6e7aa0d6e26823a2e6a4b1c89497cadc36656fd25461819bf7583b4b408a5",
     "artifactTreeDigest": "sha256:f7e493c5107d5607252725ff054089490e00e26c0f297bb40d97782760538e8e",
     "digest": "sha256:67155512a88f13c0ca6c9c85652b7ba64bae7eaf1e6ea9be6c786765ef61520c"
+>>>>>>> origin/main
   }
 }

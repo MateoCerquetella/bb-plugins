@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "mobile-thread-navigation"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:59fe412620416a2f2caf357fa5cead797c072e679dc0be4cf8b87add6cd691d2"
+}

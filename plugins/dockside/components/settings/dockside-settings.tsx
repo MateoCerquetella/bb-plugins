@@ -1,7 +1,7 @@
 import {
   experimental_useSidebarThreads as useSidebarThreads,
   useSettings,
-} from "@bb/plugin-sdk/app";
+} from "@get-bb/plugin-sdk/app";
 import { useEffect, useId, useMemo, useRef, useState, type CSSProperties } from "react";
 import {
   FamilyStatusBadge,

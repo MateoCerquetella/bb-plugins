@@ -37,7 +37,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-09T00:39:03.899Z",
+  "updatedAt": "2026-10-12T19:07:43.367Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "steel-browser-viewer-port-share-9880a3911478",
@@ -96,10 +96,10 @@
       "mergeCommit": "c359938700b20695f8f4e6fd88815d93e63cd4e9",
       "targetBranch": "main",
       "ancestorOfTarget": true,
-      "observedAt": "2026-10-09T00:38:36.613Z"
+      "observedAt": "2026-10-12T19:07:21.023Z"
     },
-    "closedAt": "2026-10-09T00:39:03.347Z",
-    "digest": "sha256:d0a08fa8dfe68a2d5bc818982cdbedfb0e12d27e946b80c5d3871423abc47420"
+    "closedAt": "2026-10-12T19:07:43.177Z",
+    "digest": "sha256:f0de4c0bf00e453bf4a530dd7b512209e3d51da5a52f9f1668663b1601637c2c"
   },
   "completionRecord": {
     "schemaVersion": 1,
@@ -108,11 +108,11 @@
     "decisionBy": null,
     "method": "merged-externally",
     "reason": "Merged in pull request #68 as c359938700b20695f8f4e6fd88815d93e63cd4e9 into main; closed when the merge was observed.",
-    "at": "2026-10-09T00:39:03.899Z",
+    "at": "2026-10-12T19:07:43.367Z",
     "revision": 19,
     "completion": "integrated",
-    "sourceTreeDigest": "sha256:891c1f325f62d9b66e26d8aa3f21125885032117f56d532b394f62061e82c106",
-    "artifactTreeDigest": "sha256:482bee5c30175a1279ffc14164e58780a9de74007850b93e5792d308832e1e97",
-    "digest": "sha256:8ff386686be0418277e5cd40c60258c0003abfd3112a742abcfcabfd660e2661"
+    "sourceTreeDigest": "sha256:cdde1d5250efb1080dca5c434aa7d56a8a608e18193cb54c553736eb60645b5d",
+    "artifactTreeDigest": "sha256:75d8f574e60e8a620fbd60127aa5b258c6ca537713171480f893e156a668a229",
+    "digest": "sha256:f4373757e20c3a0512507a3c830f3b46e2268f357465113087c8e0df420878a4"
   }
 }
