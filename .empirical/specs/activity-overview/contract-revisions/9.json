@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "feature": "activity-overview",
+  "revision": 9,
+  "reason": "Finish the user's requested installation and visibility fix: Activity Overview must appear below the New Thread composer, not only Settings or an existing-thread panel. Use the supported homepage slot, add regression coverage, rebuild and install/reload the local plugin, and verify the actual New Thread surface.",
+  "spec": "# Activity Overview\n\n## Request\n\n> Please do it as the picture NOW. Build a new independently installable BB plugin mimicking the supplied screenshot's lower Overview dashboard: contributions, pull requests opened, pull requests merged, reviews, period/repository selectors, annual contribution heatmap, current/longest streak, most-active month/day, and needs-your-attention list. Choose sensible implementation defaults from this repository and proceed autonomously.\n\n## Goal\n\nShip an independently installable `activity-overview` BB plugin that opens a\npolished activity dashboard modeled on the supplied reference. It presents\ncontribution metrics and attention items using deterministic local data, with\nperiod and repository controls that update the visible summary without an\nexternal account.\n\n## Acceptance Criteria\n\n- [ ] [AC-1] The plugin has its own manifest, app entry, styles, README, package\n  scripts, and workspace catalog entry under `plugins/activity-overview`.\n- [ ] [AC-UI-1] [UI] Opening the plugin shows an Overview dashboard with four\n  headline metrics: contributions, pull requests opened, pull requests\n  merged, and reviews.\n- [ ] [AC-UI-2] [UI] Period and repository selectors are visible controls;\n  changing either updates metric values and selected state without a reload.\n- [ ] [AC-UI-3] [UI] The dashboard includes an annual contribution heatmap,\n  current and longest streak values, most-active month and day callouts, and a\n  needs-your-attention list.\n- [ ] [AC-UI-4] [UI] The layout remains readable at narrow and wide viewport\n  widths, uses labelled controls, and exposes visible keyboard focus states.\n- [ ] [AC-2] Typecheck, focused tests, and build pass with the pinned BB SDK;\n  tests cover selector state changes and deterministic summary data.\n\n## Scope\n\nImplement the dashboard UI, local view-model data, selector interactions,\nresponsive styling, plugin metadata, and focused tests. Follow existing plugin\nconventions and avoid a backend or external credentials.\n\n## Non-goals\n\nNo live GitHub/API integration, authentication, persistence, routing, editing\nof repositories, or changes to existing plugins.\n\n## Verification\n\nRun the plugin typecheck, focused test, and build scripts, then workspace\nchecks. Capture browser evidence for the rendered dashboard and selector\ninteractions during UI verification.\n\n## Capability Deltas\n\nCreate one or more files under deltas/<capability>.md using ADDED, MODIFIED, or\nREMOVED Requirements sections, named Requirement blocks, and concrete Scenario\nexamples. These merge into living specifications\nafter verification and review.\n",
+  "deltas": [
+    {
+      "capability": "activity-overview",
+      "purpose": "Provide a compact, local-first activity summary so BB users can scan their\ncontributions, review workload, and follow-up items from one native plugin\nsurface.",
+      "requirements": [
+        {
+          "operation": "added",
+          "name": "Local activity overview dashboard",
+          "contents": "### Requirement: Local activity overview dashboard\nThe plugin MUST render a self-contained Overview dashboard with headline\nactivity metrics, trend details, a contribution calendar, and attention items.\n\n#### Scenario: Dashboard opens with overview content\n- **WHEN** a user opens the Activity Overview plugin\n- **THEN** the Overview heading, four headline metrics, contribution heatmap,\n  streak callouts, and needs-your-attention list are visible together."
+        },
+        {
+          "operation": "added",
+          "name": "Filtered dashboard summary",
+          "contents": "### Requirement: Filtered dashboard summary\nThe plugin MUST expose period and repository selectors whose selected values\ndrive the displayed summary data.\n\n#### Scenario: User changes the period\n- **WHEN** a user selects a different period\n- **THEN** the selected control updates and headline metric values and activity\n  annotations refresh to the corresponding local dataset.\n\n#### Scenario: User changes the repository\n- **WHEN** a user selects a repository\n- **THEN** the selected repository is reflected in the control and the visible\n  summary is recalculated for that repository."
+        },
+        {
+          "operation": "added",
+          "name": "Accessible responsive presentation",
+          "contents": "### Requirement: Accessible responsive presentation\nThe plugin MUST use labelled semantic controls, keyboard-visible focus states,\nand a responsive layout that remains usable on narrow viewports.\n\n#### Scenario: Keyboard navigation\n- **WHEN** a user tabs through the dashboard\n- **THEN** selectors and actionable attention items receive a visible focus\n  indicator in a logical order."
+        }
+      ],
+      "source": ".empirical/specs/activity-overview/deltas/activity-overview.md"
+    }
+  ],
+  "specDigest": "sha256:8d4decddf24fcb1e85d06958c8282e2be0b29408fd565611ffc144436e25e2d6",
+  "approvedSpecRevision": 3,
+  "capabilityClaimId": "activity-overview-e7a0c75962ca",
+  "impactDigest": "sha256:3c1cff6a9a3c548605b2bc8e5d988efc3f3b3e393f4c34e1ad8aece3b6787cbb",
+  "evidenceReceiptIds": [
+    "collected-6a19b2ec00e936e987a2a391",
+    "qa-2919f801db0ccf45cbfa36e5",
+    "qa-0439cd121c33a82eb67142ae",
+    "collected-0882cd531150ad84048ddb41"
+  ]
+}

@@ -2,8 +2,13 @@
   "schemaVersion": 1,
   "feature": "steel-browser-human-control",
   "lastSequence": 7,
+<<<<<<< HEAD
   "lastEventDigest": "sha256:0d6f75a30f0e726aa9cf36c7be36545070c46c90a57c27684f5a4783d6015780",
   "stateDigest": "sha256:2cb3d91b60ffae6a22ed4d2e180115d49bf7b66c11eef2724ccb824c0cc68918",
+=======
+  "lastEventDigest": "sha256:99ee259c6a746ad1fefa56f2141b55a5f747d892b369335f818d22ef78ab08c8",
+  "stateDigest": "sha256:92083bf9ea768cf69f0c6a7cd4f30d0a8e0f39d754d1b7616dba47d032fb006e",
+>>>>>>> origin/main
   "state": {
     "schemaVersion": 5,
     "revision": 7,
@@ -42,7 +47,11 @@
         "published": "published has not been proven by a durable receipt."
       }
     },
+<<<<<<< HEAD
     "updatedAt": "2026-10-12T19:07:42.436Z",
+=======
+    "updatedAt": "2026-10-12T03:13:20.001Z",
+>>>>>>> origin/main
     "capabilityBase": {
       "schemaVersion": 1,
       "id": "steel-browser-human-control-4665f320dc00",
@@ -89,10 +98,17 @@
         "mergeCommit": "ae557ce0a686054738472f6aa0106fbe48465bb5",
         "targetBranch": "main",
         "ancestorOfTarget": true,
+<<<<<<< HEAD
         "observedAt": "2026-10-12T19:07:21.023Z"
       },
       "closedAt": "2026-10-12T19:07:42.257Z",
       "digest": "sha256:201346d01d40c4c03e78ed59c203e65fea603683a7a2f2caceed53bf1383cb5e"
+=======
+        "observedAt": "2026-10-12T03:12:44.974Z"
+      },
+      "closedAt": "2026-10-12T03:13:19.658Z",
+      "digest": "sha256:72c91b1d89b138c464800f8a434ff642429bcb348a07d89ac87b7f23df5a96de"
+>>>>>>> origin/main
     },
     "completionRecord": {
       "schemaVersion": 1,
@@ -101,6 +117,7 @@
       "decisionBy": null,
       "method": "merged-externally",
       "reason": "Merged in pull request #71 as ae557ce0a686054738472f6aa0106fbe48465bb5 into main; closed when the merge was observed.",
+<<<<<<< HEAD
       "at": "2026-10-12T19:07:42.436Z",
       "revision": 7,
       "completion": "implemented",
@@ -111,4 +128,16 @@
   },
   "compactedAt": "2026-10-12T19:07:43.139Z",
   "digest": "sha256:53aaa057314da7f814f25f1eda792827f358061ecb3dff95781a7db01031257c"
+=======
+      "at": "2026-10-12T03:13:20.001Z",
+      "revision": 7,
+      "completion": "implemented",
+      "sourceTreeDigest": "sha256:d4f6e7aa0d6e26823a2e6a4b1c89497cadc36656fd25461819bf7583b4b408a5",
+      "artifactTreeDigest": "sha256:3da097772e5aaecf5522cf041de6f7c166b65fe99d2ccdea2abd4a56619d7ecf",
+      "digest": "sha256:1d2bc8bd60a66a08402390a16ccd14d49ade5288947d2cb5c7be00f66158cc0c"
+    }
+  },
+  "compactedAt": "2026-10-12T03:13:21.849Z",
+  "digest": "sha256:e6325d2bfb87b53a2846d4e2e3e010ed45ab4d9bc6e999d442556219d6027aab"
+>>>>>>> origin/main
 }

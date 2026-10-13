@@ -50,6 +50,14 @@
     {
       "name": "conversation-space",
       "source": "./plugins/conversation-space"
+    },
+    {
+      "name": "activity-overview",
+      "source": "./plugins/activity-overview"
+    },
+    {
+      "name": "agent-canvas",
+      "source": "./plugins/agent-canvas"
     }
   ]
 }
