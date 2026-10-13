@@ -33,8 +33,9 @@ The title row includes an 18px colored project initial with readable foreground
 and accessible project name. The strip has 44px icon buttons and a centered
 title/position region. Pointer
 tracking starts only on the title region, rejects vertical travel over 20px,
-requires a 56px horizontal threshold, and never wraps. Keyboard arrows on the
-title provide an equivalent accessible action.
+requires a 56px horizontal threshold, and wraps through queues with at least
+two threads. Keyboard arrows on the title provide an equivalent accessible
+action. A singleton queue returns no neighbor in either direction.
 
 ## Styling
 

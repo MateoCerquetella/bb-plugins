@@ -1,19 +1,19 @@
 # Implementation Plan
 
-1. Move the mobile navigation component, icons, styles, and pure helpers into
-   Dockside and register its bare composer banner from Dockside's app entry.
-2. Replace the copied automatic badge logic with Dockside's
-   `projectBadgePresentation()` plus live overrides from `useProjectColors()`.
-3. Move and extend focused navigation tests under Dockside, including
-   cross-project selection, custom project color presentation, status mapping,
-   boundaries, and gesture rejection.
-4. Delete the standalone `plugins/thread-mobile` package, remove its root
-   plugin catalog and lockfile workspace entries, and update Dockside/root docs.
-5. Run Dockside tests/typecheck/build, install and reload Dockside, perform the
-   available mobile UI check, sync with main, commit, and push.
-6. Remove the installed v0.1.5 only after the v0.1.6 build is ready, install
-   the local Dockside path, and verify version, running status, source, and app
-   bundle compatibility.
-7. Commit and push the final workflow state, ensure `dockside/v0.1.6` does not
-   already exist, create the immutable tag on the verified commit, push it, and
-   create the matching GitHub release with concise notes.
+1. Change Dockside's pure neighbor helper to wrap in either direction when the
+   eligible queue contains at least two threads, while retaining `null` for an
+   empty queue, a missing current thread, or a singleton queue.
+2. Extend focused helper tests for last-to-first, first-to-last, ordinary
+   neighbors, missing-current safety, and singleton safety. Confirm buttons,
+   keyboard arrows, and swipes still delegate through the same helper.
+3. Update Dockside documentation and package version for the continuous
+   navigation behavior without changing the existing mobile layout or queue
+   ordering.
+4. Run Dockside's focused tests, typecheck, build, and the configured workspace
+   verification. Install and reload the local Dockside package and verify the
+   plugin is running with the new version and a compatible app bundle.
+5. Perform the required UI evidence and fresh-context review, integrate the
+   capability update, sync with `main`, commit, and push the exact verified
+   source.
+6. Create a new immutable Dockside patch tag and GitHub release from that exact
+   commit. Never move or replace the published `dockside/v0.1.6` tag.

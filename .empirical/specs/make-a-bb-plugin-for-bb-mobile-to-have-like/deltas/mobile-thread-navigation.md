@@ -5,7 +5,7 @@
 Give mobile BB users a fast, safe way to move between eligible threads without
 leaving the conversation surface.
 
-### Requirement: Mobile threads support bounded one-thumb navigation
+### Requirement: Mobile threads support continuous one-thumb navigation
 Dockside MUST show mobile previous/next controls and a swipeable title above
 the current thread composer. It MUST use native thread navigation, include the
 current thread plus visible non-archived active and unread threads from every
@@ -15,7 +15,17 @@ project, and order them by latest attention with deterministic fallbacks.
 - **Given** three eligible threads from multiple projects and the middle thread open on mobile
 - **When** the user taps next or deliberately swipes left on the strip
 - **Then** the next thread opens exactly once through host navigation
-- **And** the final thread disables next instead of wrapping
+- **And** the final thread's next action opens the first thread
+
+#### Scenario: User moves backward from the first thread
+- **Given** the first thread is open in a queue with more than one thread
+- **When** the user taps previous or swipes right
+- **Then** the final thread opens
+
+#### Scenario: User has only one eligible thread
+- **Given** a singleton queue
+- **When** the strip renders
+- **Then** both controls remain disabled
 
 ### Requirement: Project context uses Dockside's effective color
 Each eligible thread MUST show a compact project initial beside its title.

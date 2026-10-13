@@ -15,7 +15,9 @@ threads in every project through previous/next controls and horizontal swipes.
 - [ ] [AC-UI-1] [UI] At widths up to 767px, a compact strip above the composer offers accessible 44px previous/next arrows, title and position. Desktop is unchanged.
 - [ ] [AC-UI-3] [UI] The strip shows the current thread's live BB status using the host-provided accessible indicator label, with "Idle" when the host reports no indicator. Status changes update without navigation or message inspection.
 - [ ] [AC-UI-2] [UI] A deliberate horizontal swipe on the strip changes one thread; vertical movement, cancellation, short gestures and gestures outside the strip never navigate.
-- [ ] [AC-2] Boundaries disable navigation without wrapping. Loading, errors and singleton lists are safe; stale requests cannot change the current thread.
+- [ ] [AC-2] Navigation wraps from the last queue item to the first and from
+  the first to the last. Loading, errors, and singleton lists remain safe;
+  stale requests cannot change the current thread.
 - [ ] [AC-UI-4] [UI] Every queued thread shows its project initial using Dockside's effective project color, including custom colors synchronized through Dockside settings.
 - [ ] [AC-3] Dockside owns the implementation, tests and documentation. The standalone Thread Mobile package and root catalog entry are removed.
 - [ ] [AC-4] The existing Dockside v0.1.5 installation is removed, the local

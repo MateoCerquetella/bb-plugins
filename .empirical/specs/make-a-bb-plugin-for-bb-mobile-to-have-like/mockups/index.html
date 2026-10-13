@@ -57,9 +57,9 @@ function render(){
   title.textContent=heading.textContent=threads[index].title;
   message.textContent=threads[index].message;
   position.textContent=`${index+1} / ${threads.length}`;
-  previous.disabled=index===0;next.disabled=index===threads.length-1;
+  previous.disabled=next.disabled=threads.length<2;
 }
-function move(direction){index=Math.max(0,Math.min(threads.length-1,index+direction));render()}
+function move(direction){index=(index+direction+threads.length)%threads.length;render()}
 previous.onclick=()=>move(-1);next.onclick=()=>move(1);
 swipe.onpointerdown=event=>{
   if(!event.isPrimary||event.button!==0){gesture=null;return}

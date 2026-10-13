@@ -32,8 +32,10 @@ export function navigationThreads<T extends Thread>(threads: readonly T[], curre
 }
 
 export function neighbor(threads: readonly Thread[], currentId: string, direction: -1 | 1): string | null {
+  if (threads.length < 2) return null;
   const index = threads.findIndex(thread => thread.id === currentId);
-  return index < 0 ? null : threads[index + direction]?.id ?? null;
+  if (index < 0) return null;
+  return threads[(index + direction + threads.length) % threads.length]?.id ?? null;
 }
 
 export function titleFor(thread: Thread | undefined): string {

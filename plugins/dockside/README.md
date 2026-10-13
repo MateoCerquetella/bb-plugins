@@ -47,7 +47,9 @@ On screens up to 767px wide, Dockside shows 44px previous/next arrows and a
 swipeable title above the thread composer. The queue includes the current
 thread plus active and unread threads across every project, including child
 threads, ordered by latest attention. Hidden and archived threads are excluded.
-Boundaries do not wrap.
+Navigation wraps continuously: next from the final thread opens the first, and
+previous from the first opens the final. A queue with only one thread keeps both
+arrows disabled.
 
 Project initials use Dockside's effective project colors, including custom
 overrides that update through its live color subscription. Status uses the

@@ -29,3 +29,7 @@ effective custom color synchronization, and ownership by Dockside.
 Publication adds no new visual treatment. The installed v0.1.6 bundle must
 retain the approved strip and synchronized color behavior without duplicate
 navigation from the removed standalone plugin.
+
+Continuous navigation keeps both arrows actionable at queue boundaries, which
+matches the requested unbounded reading flow. Singleton queues remain disabled
+so a tap cannot navigate to itself.

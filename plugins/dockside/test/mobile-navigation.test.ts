@@ -21,12 +21,20 @@ test("current, active and unread threads span projects and sort by attention", (
   assert.deepEqual(navigationThreads(rows, "missing"), []);
   assert.deepEqual(navigationThreads(rows, "archived"), []);
 });
-test("boundaries and unknown identities never wrap", () => {
-  const rows = [thread("a", 2), thread("b", 1)];
-  assert.equal(neighbor(rows, "a", -1), null);
+test("neighbors wrap continuously in both directions", () => {
+  const rows = [thread("a", 3), thread("b", 2), thread("c", 1)];
+  assert.equal(neighbor(rows, "a", -1), "c");
   assert.equal(neighbor(rows, "a", 1), "b");
-  assert.equal(neighbor(rows, "b", 1), null);
+  assert.equal(neighbor(rows, "b", -1), "a");
+  assert.equal(neighbor(rows, "b", 1), "c");
+  assert.equal(neighbor(rows, "c", -1), "b");
+  assert.equal(neighbor(rows, "c", 1), "a");
+});
+test("unknown, empty, and singleton queues have no neighbor", () => {
+  const rows = [thread("a", 2), thread("b", 1)];
   assert.equal(neighbor(rows, "unknown", 1), null);
+  assert.equal(neighbor([], "a", 1), null);
+  assert.equal(neighbor([rows[0]], "a", -1), null);
   assert.equal(neighbor([rows[0]], "a", 1), null);
 });
 test("titles use fallback for blank names", () => {

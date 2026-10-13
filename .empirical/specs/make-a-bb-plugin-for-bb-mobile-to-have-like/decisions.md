@@ -50,6 +50,10 @@ Steel checks for arrows, swipe thresholds, boundaries and draft preservation.
   publication, then create an immutable `dockside/v0.1.6` tag and matching
   GitHub release from the exact verified commit. Never move an existing tag.
 
+- **2026-10-13 — Continuous queue navigation:** Previous from the first thread
+  wraps to the last and next from the last wraps to the first. Apply the same
+  rule to arrow keys and swipes; keep singleton queues disabled.
+
 - **2026-10-12 — Live host status:** Reuse the sidebar indicator label instead
   of inferring completion. Missing unknown labels fail to "Status unavailable";
   the known none indicator displays Idle. Keep Thread Glide branding.
