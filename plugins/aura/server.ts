@@ -3,17 +3,22 @@ import { defineRpcContract, type BbPluginApi } from "@get-bb/plugin-sdk";
 import { z } from "zod";
 import { CHANGED, defaults, settingsSchema, snapshotSchema, applySchema, slotNumberSchema, type Snapshot, type ApplyInput } from "./lib/model.ts";
 import { decodeImage } from "./lib/image.ts";
+import { activityInputSchema, activityResultSchema } from "./lib/activity.ts";
+import { createActivityService } from "./lib/github.ts";
 
 export const rpcContract = defineRpcContract({
   get: { input: z.null(), output: snapshotSchema },
   apply: { input: applySchema, output: snapshotSchema },
   setDimmer: { input: z.object({ enabled: z.boolean() }).strict(), output: snapshotSchema },
+  setActivityOverview: { input: z.object({ enabled: z.boolean() }).strict(), output: snapshotSchema },
+  activity: { input: activityInputSchema, output: activityResultSchema },
   activateSlot: { input: z.object({ slot: slotNumberSchema }).strict(), output: snapshotSchema },
   deleteSlot: { input: z.object({ slot: slotNumberSchema }).strict(), output: snapshotSchema },
   reset: { input: z.null(), output: snapshotSchema },
 });
 type Stored = { settings: string; image_info: string | null; image_bytes: Buffer | null };
 export default function aura(bb: BbPluginApi): void {
+  const activity = createActivityService();
   const db = bb.storage.database();
   bb.storage.migrate(db, [
     "CREATE TABLE background (id INTEGER PRIMARY KEY CHECK (id = 1), settings TEXT NOT NULL, image_info TEXT, image_bytes BLOB)",
@@ -42,7 +47,7 @@ export default function aura(bb: BbPluginApi): void {
         info = JSON.stringify({ version: randomBytes(12).toString("hex"), name: value.image.name, mime: decoded.mime, bytes: bytes.length });
       }
       const settings = JSON.stringify(value.settings);
-      const appearance = ({ enabled, newThreadOnly, dimmerEnabled, ...rest }: Snapshot["settings"]) => JSON.stringify(rest);
+      const appearance = ({ enabled, newThreadOnly, dimmerEnabled, activityOverview, ...rest }: Snapshot["settings"]) => JSON.stringify(rest);
       const sameAppearance = value.image.action === "keep" && appearance(settingsSchema.parse(JSON.parse(previous.settings))) === appearance(value.settings);
       const activeSlot = value.saveSlot?.slot ?? (sameAppearance ? previous.active_slot : null);
       db.prepare("UPDATE background SET settings = ?, image_info = ?, image_bytes = ?, active_slot = ? WHERE id = 1")
@@ -57,7 +62,7 @@ export default function aura(bb: BbPluginApi): void {
       const saved = db.prepare("SELECT settings, image_info, image_bytes FROM aura_slots WHERE slot = ?").get(slot) as Stored | undefined;
       if (!saved) throw new Error(`Slot ${slot} is empty.`);
       const current = read().settings;
-      const settings = settingsSchema.parse({ ...JSON.parse(saved.settings), enabled: current.enabled, newThreadOnly: current.newThreadOnly, dimmerEnabled: current.dimmerEnabled });
+      const settings = settingsSchema.parse({ ...JSON.parse(saved.settings), enabled: current.enabled, newThreadOnly: current.newThreadOnly, dimmerEnabled: current.dimmerEnabled, activityOverview: current.activityOverview });
       db.prepare("UPDATE background SET settings = ?, image_info = ?, image_bytes = ?, active_slot = ? WHERE id = 1")
         .run(JSON.stringify(settings), saved.image_info, saved.image_bytes, slot);
     })();
@@ -72,12 +77,14 @@ export default function aura(bb: BbPluginApi): void {
   }
   function reset(): Snapshot {
     const current = read().settings;
-    return apply({ settings: { ...defaults, enabled: current.enabled, newThreadOnly: current.newThreadOnly, dimmerEnabled: current.dimmerEnabled }, image: { action: "remove" } });
+    return apply({ settings: { ...defaults, enabled: current.enabled, newThreadOnly: current.newThreadOnly, dimmerEnabled: current.dimmerEnabled, activityOverview: current.activityOverview }, image: { action: "remove" } });
   }
   bb.rpc.register(rpcContract, { get: read, apply, setDimmer: ({ enabled }) => {
     const current = read().settings;
     return apply({ settings: { ...current, dimmerEnabled: enabled, fade: enabled && current.fade === 0 ? 1 : current.fade }, image: { action: "keep" } });
-  }, activateSlot: ({slot}) => activate(slot), deleteSlot: ({slot}) => deleteSlot(slot), reset });
+  }, setActivityOverview: ({ enabled }) => apply({ settings: { ...read().settings, activityOverview: enabled }, image: { action: "keep" } }),
+  activity: input => read().settings.activityOverview ? activity(input) : Promise.resolve({ status: "unavailable" as const, message: "Enable Activity overview in Settings → Aura.", data: null }),
+  activateSlot: ({slot}) => activate(slot), deleteSlot: ({slot}) => deleteSlot(slot), reset });
   bb.http.route("GET", "/image", c => {
     const version = c.req.query("v");
     if (!version || !/^[a-f0-9]{24}$/.test(version)) return c.notFound();
@@ -89,10 +96,10 @@ export default function aura(bb: BbPluginApi): void {
       "Content-Security-Policy": "default-src 'none'",
     } });
   });
-  const usage = "bb aura status [--json]\nbb aura enable|disable|reset\nbb aura slots\nbb aura use <1-6>\nbb aura new-thread-only on|off\nOpen Settings → Aura to upload images and save slots.";
+  const usage = "bb aura status [--json]\nbb aura enable|disable|reset\nbb aura slots\nbb aura use <1-6>\nbb aura new-thread-only on|off\nbb aura overview on|off\nOpen Settings → Aura to upload images, save slots and toggle Activity overview.";
   bb.cli.register({
     name: "aura", summary: "Manage Aura backgrounds and saved slots",
-    commands: ["status", "enable", "disable", "reset", "slots", "use", "new-thread-only"].map(name => ({ name, summary: `Aura ${name}`, usage: `bb aura ${name}` })),
+    commands: ["status", "enable", "disable", "reset", "slots", "use", "new-thread-only", "overview"].map(name => ({ name, summary: `Aura ${name}`, usage: `bb aura ${name}` })),
     async run(argv) {
       const [command, ...args] = argv.filter(arg => arg !== "--json");
       if (!command || command === "help" || command === "--help") return { exitCode: 0, stdout: usage };
@@ -104,6 +111,7 @@ export default function aura(bb: BbPluginApi): void {
           else result = command === "slots" ? read().slots : read();
         } else if (command === "use" && args.length === 1 && /^[1-6]$/.test(args[0]!)) result = activate(Number(args[0]));
         else if (command === "new-thread-only" && args.length === 1 && ["on", "off"].includes(args[0]!)) result = apply({ settings: { ...read().settings, newThreadOnly: args[0] === "on" }, image: { action: "keep" } });
+        else if (command === "overview" && args.length === 1 && ["on", "off"].includes(args[0]!)) result = apply({ settings: { ...read().settings, activityOverview: args[0] === "on" }, image: { action: "keep" } });
         else return { exitCode: 1, stderr: usage };
         return { exitCode: 0, stdout: JSON.stringify(result, null, 2) };
       } catch (error) { return { exitCode: 1, stderr: error instanceof Error ? error.message : String(error) }; }

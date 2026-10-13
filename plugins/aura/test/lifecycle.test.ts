@@ -3,6 +3,28 @@ import test from "node:test";
 import { JSDOM } from "jsdom";
 import { mountBackground, notifyChange, TARGETS } from "../lib/background.ts";
 import { defaults } from "../lib/model.ts";
+import { canvasSize, frameIsDue, MAX_IMAGE_FRAMEBUFFER_PIXELS, QUALITY_SCALE } from "../lib/capy-effect.ts";
+
+test("render-quality tiers increase drawing-buffer density", () => {
+  assert.equal(QUALITY_SCALE.performance, 1 / 4);
+  assert.equal(QUALITY_SCALE.balanced, 1 / 3);
+  assert.equal(QUALITY_SCALE.sharp, 1 / 2);
+  assert.deepEqual(canvasSize(1200, 900, "performance", false), { width: 300, height: 225 });
+  assert.deepEqual(canvasSize(1200, 900, "balanced", false), { width: 400, height: 300 });
+  assert.deepEqual(canvasSize(1200, 900, "sharp", false), { width: 600, height: 450 });
+
+  const capped = canvasSize(12000, 8000, "sharp", true);
+  assert.ok(capped.width * capped.height <= MAX_IMAGE_FRAMEBUFFER_PIXELS);
+});
+
+test("selected FPS limits the next draw after an immediate frame", () => {
+  for (const fps of [15, 30, 60] as const) {
+    const interval = 1000 / fps;
+    assert.equal(frameIsDue(null, 100, fps), true);
+    assert.equal(frameIsDue(100, 100 + interval - 0.01, fps), false);
+    assert.equal(frameIsDue(100, 100 + interval, fps), true);
+  }
+});
 
 test("applies scoped backgrounds, disables cleanly and ignores a late fetch after disposal", async () => {
   const dom = new JSDOM('<html><head></head><body><div id="thread-detail-timeline-panel"></div><div id="root-compose-main-panel"></div><aside>Sidebar</aside></body></html>', { pretendToBeVisual: true });
@@ -46,7 +68,9 @@ test("applies scoped backgrounds, disables cleanly and ignores a late fetch afte
 
 
     notifyChange({ settings: { ...defaults, enabled: false }, image: null, slots: [], activeSlot: null });
-    assert.equal(document.head.textContent, "");
+    assert.match(document.head.textContent!, /root-compose-main-panel/);
+    assert.ok(!document.head.textContent!.includes("aura-capy-layer"));
+    assert.equal(document.querySelectorAll('.aura-capy-layer').length, 0);
     controller.abort();
     dispose();
     assert.equal(document.querySelectorAll('style[data-aura]').length, 0);

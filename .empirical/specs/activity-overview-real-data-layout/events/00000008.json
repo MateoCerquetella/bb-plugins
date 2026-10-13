@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "sequence": 8,
+  "previousDigest": "sha256:3cd9e877e27334a7e9d4a6fe62b566838d324f5d6f190b0dba3cee897d229100",
+  "actor": "codex-aura-implementation",
+  "type": "transition",
+  "summary": "Implemented the approved optional AURA overview, native SDK slot and compact responsive CSS, immediate persisted global preference, real bounded authenticated GitHub adapter, precise scope availability, date/streak logic, sanitized source states and client race/disposal guards. Preserved installed fps/quality features and all existing wallpaper/slot metadata during local install. Updated README/catalog/CHANGELOG; 22 focused tests/typecheck/build and root npm run check pass; installed RPC verifies all periods and scoped counts. empirical_sync_target(fetch:true) was attempted and safely refused because unrelated pre-existing journal changes remain uncommitted; no stash or force. Installed-host browser verification/new screenshots remain pending BB Connect sign-in and will not be claimed as passed.",
+  "createdAt": "2026-10-13T19:23:34.503Z",
+  "stateBeforeDigest": "sha256:bd8c5b6cc2fc70f579498ef8160054386db6b136babb6a3ce86e6c36a5969d25",
+  "stateAfterDigest": "sha256:ac5d16ce592533baf72f81d149253849cc8ed3fb671a165903316052b7883356",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 8,
+    "activeFeature": "activity-overview-real-data-layout",
+    "request": "Finish the original Center thread mimic UI request recovered from thread thr_rr4st4gmwp: fix Activity Overview to match the user's reference screenshot, center the native New Thread composer above a compact aligned overview, remove overflow and card-heavy misplaced UI, and use real contribution, PR, review and pattern numbers with no mock data. Preserve native composer and host UI behavior. Inspect the installed Activity Overview and newly merged origin/main implementation first; this checkout predates that merge. Preserve existing uncommitted Empirical closure changes. Update README with accurate behavior and real UI screenshots; test real-data calculations and unavailable/empty/error states, verify desktop/mobile rendered UI and focused checks. Work in the existing BB-managed checkout. User says Finish it; do not publish releases or change credentials.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "review",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Implemented the approved optional AURA overview, native SDK slot and compact responsive CSS, immediate persisted global preference, real bounded authenticated GitHub adapter, precise scope availability, date/streak logic, sanitized source states and client race/disposal guards. Preserved installed fps/quality features and all existing wallpaper/slot metadata during local install. Updated README/catalog/CHANGELOG; 22 focused tests/typecheck/build and root npm run check pass; installed RPC verifies all periods and scoped counts. empirical_sync_target(fetch:true) was attempted and safely refused because unrelated pre-existing journal changes remain uncommitted; no stash or force. Installed-host browser verification/new screenshots remain pending BB Connect sign-in and will not be claimed as passed.",
+    "implementationActor": "codex-aura-implementation",
+    "workStartedAt": null,
+    "specDigest": "sha256:5b7fdf29cf577694c5df7a31a96114b43fe92cb216f0578936206bc04442e0fe",
+    "approvedSpecRevision": 5,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:72e4083a725dd5451e2f5e035873930f9e6e862cd30cc53e616c159065db1a8f",
+    "impactDigest": "sha256:a6f584d7071149c058c875e6dbd8bf471b88b77d2dbde00d37ef9c21345f595c",
+    "capabilityClaimId": "activity-overview-real-data-layout-880e163de475",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-13T19:23:34.503Z",
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 8,
+      "capabilities": 1,
+      "reason": "One user-approved optional AURA surface; the criteria jointly verify its authenticated adapter, settings and native composer layout. The obsolete standalone-plugin delta has been consolidated into AURA. Splitting would duplicate contracts without an independently usable slice.",
+      "actor": "agent",
+      "revision": 3
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "activity-overview-real-data-layout-880e163de475",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "activity-overview-real-data-layout",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_rr4st4gmwp-1/bb-plugins",
+      "worktreeId": "sha256:173b24302d06a803bc6d7b539e70a0c1fcb8bfc0ae0425c6438d8c797ed22ce0",
+      "baseCommit": "a2170ef63d19ea466306d2dc2ece0a33a86887a9",
+      "baseTree": "1df089c8983364963aaa33be71b5edf5bca9301a",
+      "bases": {
+        "aura-activity-overview": {
+          "capability": "aura-activity-overview",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "optional activity within aura": null,
+            "authenticated, scoped activity": null,
+            "responsive native presentation": null
+          }
+        }
+      },
+      "capabilities": [
+        "aura-activity-overview"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-13T15:33:58.989Z",
+      "heartbeatAt": "2026-10-13T15:33:58.989Z",
+      "digest": "sha256:0905b3a66b81e00bd7ff0802468bd81bf1fa26addcc362b17d26b0299d882fdf"
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:5b63e8960035096963ac0a9afd159fb2be9ae0373a3d60dc2597f4cf5272e5d0"
+}
