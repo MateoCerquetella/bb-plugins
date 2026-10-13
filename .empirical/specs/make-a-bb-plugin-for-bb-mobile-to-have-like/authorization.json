@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "mode": "yolo",
+  "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+  "feature": "make-a-bb-plugin-for-bb-mobile-to-have-like",
+  "requestDigest": "sha256:cdacceccc83eda34e8e0b2381b04d01a67a63f2b07bead0ef155ec24f11f95f9",
+  "ceiling": "integrated",
+  "targetBranch": null,
+  "allowExternalAgent": false,
+  "createdAt": "2026-10-12T19:09:30.232Z",
+  "expiresAt": null,
+  "digest": "sha256:f7e9bfd4e1b4243f479b3853505baeb1c8721ed0dfd3ecf10041d9bf434c3f56"
+}

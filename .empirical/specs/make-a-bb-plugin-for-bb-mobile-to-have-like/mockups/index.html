@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Thread Glide - mobile layout reference</title>
+<style>
+*{box-sizing:border-box;letter-spacing:0}
+:root{color-scheme:dark;font:14px system-ui,sans-serif;color:#eee;background:#18181b}
+body{margin:0}
+main{max-width:560px;margin:auto;min-height:100dvh;display:flex;flex-direction:column}
+header{padding:16px;border-bottom:1px solid #38383d;display:flex;align-items:center;gap:12px}
+header span{color:#a1a1aa;font-size:12px}
+h1{font-size:16px;margin:0;flex:1}
+article{flex:1;padding:24px 16px;min-height:220px}
+h2{font-size:18px;margin:0 0 20px}
+article p{line-height:1.65;max-width:48ch}
+.status{color:#75c9a0;font-size:12px}
+footer{padding:8px 12px max(12px,env(safe-area-inset-bottom))}
+nav{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;gap:8px;align-items:center;border-top:1px solid #38383d;padding:8px 0}
+button{width:44px;height:44px;background:transparent;color:inherit;border:1px solid #52525b;border-radius:6px;font-size:24px;cursor:pointer}
+button:disabled{opacity:.28;cursor:default}
+button:focus-visible,#swipe:focus-visible{outline:2px solid #73b4ed;outline-offset:2px}
+#swipe{touch-action:pan-y;user-select:none;overflow:hidden;text-align:center;padding:4px;min-height:44px}
+#title{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+#meta{display:flex;justify-content:center;gap:6px;color:#a1a1aa;font-size:11px;margin-top:4px}
+#state{color:#75c9a0}
+textarea{display:block;width:100%;height:82px;resize:none;background:#242428;border:1px solid #45454b;border-radius:6px;color:inherit;font:inherit;padding:12px}
+@media(min-width:768px){nav{display:none}}
+</style>
+<main>
+  <header><h1>bb-plugins</h1><span>Layout reference</span></header>
+  <article><div class="status">Completed</div><h2 id="heading"></h2><p id="message"></p></article>
+  <footer>
+    <nav aria-label="Thread navigation">
+      <button id="previous" type="button" title="Previous thread" aria-label="Previous thread">&#8592;</button>
+      <div id="swipe" tabindex="0" role="group" aria-label="Swipe to change thread">
+        <strong id="title"></strong>
+        <span id="meta"><span id="state">Working</span><span aria-hidden="true">&middot;</span><span id="position" aria-live="polite"></span></span>
+      </div>
+      <button id="next" type="button" title="Next thread" aria-label="Next thread">&#8594;</button>
+    </nav>
+    <textarea aria-label="Message draft" placeholder="Message"></textarea>
+  </footer>
+</main>
+<script>
+const threads=[
+  {title:"Mobile thread navigation",message:"The mobile navigation controls are ready for review."},
+  {title:"Fix sidebar ordering",message:"Pinned threads now remain at the top of their project. The ordering tests pass."},
+  {title:"Review usage tracker",message:"The usage display keeps its compact layout on narrow screens."}
+];
+let index=1,gesture=null;
+const title=document.querySelector("#title"),heading=document.querySelector("#heading"),
+  message=document.querySelector("#message"),position=document.querySelector("#position"),
+  previous=document.querySelector("#previous"),next=document.querySelector("#next"),
+  swipe=document.querySelector("#swipe");
+function render(){
+  title.textContent=heading.textContent=threads[index].title;
+  message.textContent=threads[index].message;
+  position.textContent=`${index+1} / ${threads.length}`;
+  previous.disabled=index===0;next.disabled=index===threads.length-1;
+}
+function move(direction){index=Math.max(0,Math.min(threads.length-1,index+direction));render()}
+previous.onclick=()=>move(-1);next.onclick=()=>move(1);
+swipe.onpointerdown=event=>{
+  if(!event.isPrimary||event.button!==0){gesture=null;return}
+  gesture={id:event.pointerId,x:event.clientX,y:event.clientY,cancelled:false};
+  swipe.setPointerCapture(event.pointerId);
+};
+swipe.onpointermove=event=>{
+  if(!gesture||event.pointerId!==gesture.id)return;
+  if(Math.abs(event.clientY-gesture.y)>20)gesture.cancelled=true;
+};
+swipe.onpointerup=event=>{
+  const start=gesture;gesture=null;
+  if(!start||start.cancelled||event.pointerId!==start.id)return;
+  const dx=event.clientX-start.x,dy=event.clientY-start.y;
+  if(Math.abs(dx)>=56&&Math.abs(dx)>Math.abs(dy)*2)move(dx<0?1:-1);
+};
+swipe.onpointercancel=swipe.onlostpointercapture=()=>{gesture=null};
+swipe.onkeydown=event=>{
+  if(event.key==="ArrowLeft"||event.key==="ArrowRight"){
+    event.preventDefault();move(event.key==="ArrowLeft"?-1:1)
+  }
+};
+render();
+</script>
+</html>

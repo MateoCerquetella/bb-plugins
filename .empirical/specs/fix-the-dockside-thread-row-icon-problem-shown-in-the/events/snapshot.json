@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "feature": "fix-the-dockside-thread-row-icon-problem-shown-in-the",
+  "lastSequence": 9,
+  "lastEventDigest": "sha256:72fec643f59efd43c1d1ebe7a714654f3ab4108d09bded0f1d40c21f91001ddd",
+  "stateDigest": "sha256:030e30afda0c27076a5fe54bd59bd50b19e5817e57d2ed207f6b5bcb27525962",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 9,
+    "activeFeature": "fix-the-dockside-thread-row-icon-problem-shown-in-the",
+    "request": "Fix the Dockside thread-row icon problem shown in the supplied screenshot: provider icons and adjacent project/letter marks visually overlap in the leading icon area. Preserve the existing compact layout and project badges, make the thread icon slot render cleanly at supported densities, add focused regression coverage, and verify the Dockside UI in a browser with a screenshot.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "done",
+    "status": "done",
+    "repairAttempts": 0,
+    "message": "Closed as merged-externally: Merged in pull request #73 as 4880d65e1ff282c7f50ca94ab27cf969143e0222 into main; closed when the merge was observed.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:ba2fd3182f103ee7a10bb7b717ec4a57271efefbe01d2d6d499c8994726fbdc1",
+    "approvedSpecRevision": 6,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:9ec7f5383c88723d00547bdf5669f704f2241589ca56b85a938cf0b629008399",
+    "impactDigest": "sha256:098d8f4282d3aa8aa1199db02f8764b35ce7c00b3b450ece444b4a46892aec3f",
+    "capabilityClaimId": "fix-the-dockside-thread-row-icon-problem-shown-in-the-b7bbab6a1cb3",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-12T19:07:39.874Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 2,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "contractRevision": 4
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "fix-the-dockside-thread-row-icon-problem-shown-in-the-b7bbab6a1cb3",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "fix-the-dockside-thread-row-icon-problem-shown-in-the",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_vsyberk4jn-1/bb-plugins",
+      "worktreeId": "sha256:adb8d84a31f985e826cbbd53bf4c119c1cfb550e5cf773467f062eb85d52c304",
+      "baseCommit": "fc814c22f4d26170ff0b8a5a0ac6619a438480ac",
+      "baseTree": "a75defcdb9d57f6ed091f9243f5ace4fde5ee6f3",
+      "bases": {
+        "dockside-thread-management": {
+          "capability": "dockside-thread-management",
+          "digest": "sha256:84a63707ece840ca513a80da47ef5ebd2cda40b296485692f823f24869ddd7a4",
+          "requirements": {
+            "root family cards have exactly two semantic rows": "sha256:9d6a25e76d91c5c0488bc9d66a5525808618e1ee28d5707e58d230feee59250b"
+          }
+        }
+      },
+      "capabilities": [
+        "dockside-thread-management"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-09T00:24:47.792Z",
+      "heartbeatAt": "2026-10-09T00:24:47.792Z",
+      "digest": "sha256:1da5f754982373697276ea206e31951773f226dde00da0b9cc49b956f4cf8548"
+    },
+    "trackerGeneration": 2,
+    "reviewFirst": true,
+    "closure": {
+      "schemaVersion": 1,
+      "outcome": "merged-externally",
+      "reason": "Merged in pull request #73 as 4880d65e1ff282c7f50ca94ab27cf969143e0222 into main; closed when the merge was observed.",
+      "actor": "empirical",
+      "confirmation": "merge-observed",
+      "closedAtPhase": "implement",
+      "completionAtClosure": "none",
+      "externalMerge": {
+        "pullRequest": 73,
+        "url": "https://github.com/MateoCerquetella/bb-plugins/pull/73",
+        "state": "MERGED",
+        "mergeCommit": "4880d65e1ff282c7f50ca94ab27cf969143e0222",
+        "targetBranch": "main",
+        "ancestorOfTarget": true,
+        "observedAt": "2026-10-12T19:07:21.023Z"
+      },
+      "closedAt": "2026-10-12T19:07:39.694Z",
+      "digest": "sha256:12e978cfd7666d77dfed21bf25f0a750131101102334956cace3b11be763e57e"
+    },
+    "completionRecord": {
+      "schemaVersion": 1,
+      "implementedBy": null,
+      "completedBy": "empirical",
+      "decisionBy": null,
+      "method": "merged-externally",
+      "reason": "Merged in pull request #73 as 4880d65e1ff282c7f50ca94ab27cf969143e0222 into main; closed when the merge was observed.",
+      "at": "2026-10-12T19:07:39.874Z",
+      "revision": 9,
+      "completion": "none",
+      "sourceTreeDigest": "sha256:cdde1d5250efb1080dca5c434aa7d56a8a608e18193cb54c553736eb60645b5d",
+      "artifactTreeDigest": "sha256:9e354f4d99a194ebfaaa8e369778f0cc7c5eb0492495692f54090526c1febd65",
+      "digest": "sha256:30282c89c3416d3b338725cea010edb166960ef5ecdd90278b8f51d851d782fb"
+    }
+  },
+  "compactedAt": "2026-10-12T19:07:40.505Z",
+  "digest": "sha256:f27c36f1e87666f093515cae7608825c22d96ddfb72f0116a9dd9ffbf6f676dc"
+}

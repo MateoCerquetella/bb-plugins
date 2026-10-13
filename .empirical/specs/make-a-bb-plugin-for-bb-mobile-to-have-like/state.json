@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 5,
+  "revision": 28,
+  "activeFeature": "make-a-bb-plugin-for-bb-mobile-to-have-like",
+  "request": "Make a bb plugin for bb mobile to have like arrows or tinder stylrer to go strong it the threads more easily. You teasesrch and do it don’t ask me",
+  "profile": "complex",
+  "workflow": "complex",
+  "mode": "normal",
+  "phase": "design",
+  "status": "waiting",
+  "repairAttempts": 0,
+  "message": null,
+  "implementationActor": "agent",
+  "workStartedAt": null,
+  "specDigest": "sha256:18f0beb4f2aea224211be62bbc662787269f0a9ea7a9cd00e1f2e2ce1901dee6",
+  "approvedSpecRevision": 25,
+  "capabilityArchiveRequired": true,
+  "capabilityDeltaDigest": "sha256:c8de4f638abd2b709f204a7ea41da837a81487d814963c70cba2d1da201c3dbd",
+  "impactDigest": "sha256:59fe412620416a2f2caf357fa5cead797c072e679dc0be4cf8b87add6cd691d2",
+  "capabilityClaimId": "make-a-bb-plugin-for-bb-mobile-to-have-like-07aee46cf0cd",
+  "authorizationDigest": null,
+  "evidence": [],
+  "evidenceReceiptIds": [],
+  "legacyEvidenceCount": 0,
+  "completion": {
+    "implemented": false,
+    "verified": false,
+    "integrated": false,
+    "delivered": false,
+    "published": false,
+    "highest": "none",
+    "reasons": {
+      "implemented": "implemented has not been proven by a durable receipt.",
+      "verified": "verified has not been proven by a durable receipt.",
+      "integrated": "integrated has not been proven by a durable receipt.",
+      "delivered": "delivered has not been proven by a durable receipt.",
+      "published": "published has not been proven by a durable receipt."
+    }
+  },
+  "updatedAt": "2026-10-13T14:15:41.796Z",
+  "capabilityBase": {
+    "schemaVersion": 1,
+    "id": "make-a-bb-plugin-for-bb-mobile-to-have-like-07aee46cf0cd",
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "make-a-bb-plugin-for-bb-mobile-to-have-like",
+    "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_ty3rbbybde-1/bb-plugins",
+    "worktreeId": "sha256:af5fb25e529005d46159f2f14ce9445c21fc05a1dbfa4174e61fc42bd09a6051",
+    "baseCommit": "40a9e575a3002a3229be1c9ec43494c60561ffc5",
+    "baseTree": "4ea3ba71a1d6f06e0946a81cb3b6e936bf93495a",
+    "bases": {
+      "mobile-thread-navigation": {
+        "capability": "mobile-thread-navigation",
+        "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "requirements": {
+          "mobile threads support bounded one-thumb navigation": null,
+          "gestures preserve ordinary conversation interaction": null,
+          "unavailable lists fail safely": null,
+          "current thread status uses live host semantics": null
+        }
+      }
+    },
+    "capabilities": [
+      "mobile-thread-navigation"
+    ],
+    "status": "active",
+    "integrationReceiptDigest": null,
+    "createdAt": "2026-10-12T19:17:24.549Z",
+    "heartbeatAt": "2026-10-12T21:04:44.390Z",
+    "digest": "sha256:a5c5a37228c3717f8882c3a6046a16ab19f515ffd06d192aa3d0cd98caa8cc04"
+  },
+  "trackerGeneration": 3,
+  "lifecycle": {
+    "stage": "development",
+    "iteration": 3,
+    "awaitingFeedback": false,
+    "contractRevision": 23
+  },
+  "reviewFirst": true,
+  "budgetExtensionMinutes": 77
+}

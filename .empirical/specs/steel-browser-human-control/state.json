@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 6,
+  "revision": 7,
   "activeFeature": "steel-browser-human-control",
   "request": "Improve plugins/steel-browser thread and plugin-page responsiveness, reduce duplicate streams and requests, provide secure user-only copy/paste and human login controls, expose project-scoped saved service/account labels with honest verification status, research existing BB and Kernel patterns, test and visually verify, then commit and push the working branch. Preserve existing browser profiles, auth boundaries and paid-engine opt-in. Include a portable documented fix for the remote BB launcher issue if appropriate.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "review",
-  "status": "waiting",
+  "phase": "done",
+  "status": "done",
   "repairAttempts": 0,
-  "message": "Refreshed repository knowledge and confirmed the existing design-language context is evidence-backed and current.",
+  "message": "Closed as merged-externally: Merged in pull request #71 as ae557ce0a686054738472f6aa0106fbe48465bb5 into main; closed when the merge was observed.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:130771cfbea4704c6e3d110d828c366bd3728846715fad1c08ccb89de2edbe78",
@@ -36,7 +36,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-08T02:44:08.214Z",
+  "updatedAt": "2026-10-12T19:07:42.436Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "steel-browser-human-control-4665f320dc00",
@@ -67,5 +67,39 @@
     "heartbeatAt": "2026-10-08T02:26:07.098Z",
     "digest": "sha256:f1eb3d8aa13f24a13d360f078788322c175de98b60bbdfd58eba87de5505348f"
   },
-  "reviewFirst": true
+  "reviewFirst": true,
+  "closure": {
+    "schemaVersion": 1,
+    "outcome": "merged-externally",
+    "reason": "Merged in pull request #71 as ae557ce0a686054738472f6aa0106fbe48465bb5 into main; closed when the merge was observed.",
+    "actor": "empirical",
+    "confirmation": "merge-observed",
+    "closedAtPhase": "review",
+    "completionAtClosure": "implemented",
+    "externalMerge": {
+      "pullRequest": 71,
+      "url": "https://github.com/MateoCerquetella/bb-plugins/pull/71",
+      "state": "MERGED",
+      "mergeCommit": "ae557ce0a686054738472f6aa0106fbe48465bb5",
+      "targetBranch": "main",
+      "ancestorOfTarget": true,
+      "observedAt": "2026-10-12T19:07:21.023Z"
+    },
+    "closedAt": "2026-10-12T19:07:42.257Z",
+    "digest": "sha256:201346d01d40c4c03e78ed59c203e65fea603683a7a2f2caceed53bf1383cb5e"
+  },
+  "completionRecord": {
+    "schemaVersion": 1,
+    "implementedBy": "agent",
+    "completedBy": "empirical",
+    "decisionBy": null,
+    "method": "merged-externally",
+    "reason": "Merged in pull request #71 as ae557ce0a686054738472f6aa0106fbe48465bb5 into main; closed when the merge was observed.",
+    "at": "2026-10-12T19:07:42.436Z",
+    "revision": 7,
+    "completion": "implemented",
+    "sourceTreeDigest": "sha256:cdde1d5250efb1080dca5c434aa7d56a8a608e18193cb54c553736eb60645b5d",
+    "artifactTreeDigest": "sha256:e943c3d1d853e0f833ba4c2f358a3c601fd4d092a1ae7414f32250a17bf36a2a",
+    "digest": "sha256:59bde0775c5a4bf7d9d7138f1d013436c468750f713d018e17b347492dd91d54"
+  }
 }
