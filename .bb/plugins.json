@@ -4,8 +4,8 @@
   "name": "mateocerquetella-bb-plugins",
   "plugins": [
     {
-      "name": "thread-glide",
-      "source": "./plugins/thread-glide"
+      "name": "thread-mobile",
+      "source": "./plugins/thread-mobile"
     },
     {
       "name": "jev-route",

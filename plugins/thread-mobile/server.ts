@@ -2,12 +2,12 @@ import type { BbPluginApi } from "@get-bb/plugin-sdk";
 
 export default function plugin(bb: BbPluginApi) {
   bb.cli.register({
-    name: "thread-glide",
+    name: "thread-mobile",
     summary: "Inspect mobile thread navigation",
-    commands: [{ name: "list", summary: "List visible project root threads", usage: "bb thread-glide list <project-id>" }],
+    commands: [{ name: "list", summary: "List visible project root threads", usage: "bb thread-mobile list <project-id>" }],
     async run(argv) {
       if (argv.length !== 2 || argv[0] !== "list" || !argv[1]) {
-        return { exitCode: argv.length === 0 || argv[0] === "--help" ? 0 : 1, stdout: "Usage: bb thread-glide list <project-id>" };
+        return { exitCode: argv.length === 0 || argv[0] === "--help" ? 0 : 1, stdout: "Usage: bb thread-mobile list <project-id>" };
       }
       const threads = [];
       for (let offset = 0; offset < 10000; offset += 200) {

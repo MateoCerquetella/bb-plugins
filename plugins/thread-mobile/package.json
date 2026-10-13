@@ -1,12 +1,12 @@
 {
-  "name": "bb-plugin-thread-glide",
+  "name": "bb-plugin-thread-mobile",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "license": "MIT",
   "engines": { "bb": ">=0.40.0", "bbPluginSdk": ">=0.4.21" },
   "bb": {
-    "name": "Thread Glide",
+    "name": "Thread Mobile",
     "description": "Mobile previous/next arrows and safe swipe navigation between project threads.",
     "branding": { "icon": "ArrowLeftRight" },
     "server": "./server.ts",
@@ -15,7 +15,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MateoCerquetella/bb-plugins.git",
-    "directory": "plugins/thread-glide"
+    "directory": "plugins/thread-mobile"
   },
   "scripts": {
     "build": "env -u BB_CLI bb plugin build .",

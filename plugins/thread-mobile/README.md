@@ -1,8 +1,8 @@
-# Thread Glide
+# Thread Mobile
 
 One-thumb thread navigation for BB mobile. Requires BB 0.40.0 or newer.
 
-On screens up to 767px wide, Thread Glide places previous/next arrows and a
+On screens up to 767px wide, Thread Mobile places previous/next arrows and a
 swipeable title above the thread composer. Swipe left for the next thread or
 right for the previous one. Keyboard arrows work when the title is focused.
 
@@ -27,14 +27,14 @@ host-managed drafts. The strip is hidden on desktop.
 From the workspace root:
 
 ```sh
-bb plugin install ./plugins/thread-glide
-bb plugin reload thread-glide
+bb plugin install ./plugins/thread-mobile
+bb plugin reload thread-mobile
 ```
 
 ## CLI
 
 ```sh
-bb thread-glide list <project-id>
+bb thread-mobile list <project-id>
 ```
 
 Returns visible non-archived project roots as JSON in navigation order.
@@ -43,7 +43,7 @@ Returns visible non-archived project roots as JSON in navigation order.
 
 ```sh
 npm install
-npm run check --workspace bb-plugin-thread-glide
+npm run check --workspace bb-plugin-thread-mobile
 ```
 
 BB 0.40.0 ships SDK 0.4.21. Build scripts clear `BB_CLI` to use the pinned

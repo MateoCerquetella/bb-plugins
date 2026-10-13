@@ -97,7 +97,7 @@ function ThreadGlide() {
 
 export default definePluginApp(app => {
   app.composer.customize({
-    id: "thread-glide", scopes: ["thread"],
+    id: "thread-mobile", scopes: ["thread"],
     banners: [{ id: "navigation", chrome: "bare", component: ThreadGlide }],
   });
 });
