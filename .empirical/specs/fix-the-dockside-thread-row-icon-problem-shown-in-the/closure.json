@@ -13,8 +13,8 @@
     "mergeCommit": "4880d65e1ff282c7f50ca94ab27cf969143e0222",
     "targetBranch": "main",
     "ancestorOfTarget": true,
-    "observedAt": "2026-10-12T19:15:47.777Z"
+    "observedAt": "2026-10-12T03:12:44.974Z"
   },
-  "closedAt": "2026-10-12T19:15:54.154Z",
-  "digest": "sha256:b44f1c050c7cf3b5910b85a670c425d757727edd9ec69de5c3d7a5016f042936"
+  "closedAt": "2026-10-12T03:13:11.673Z",
+  "digest": "sha256:265b0c366cc06fac378a9f175c7cb60e4943f6d5cadd69166504868037730cc9"
 }

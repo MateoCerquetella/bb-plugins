@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-0882cd531150ad84048ddb41",
+  "criteria": [
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3",
+    "AC-UI-4"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Steel browser rendering at 1280x900 with selectors changed to month/taskboard, focus on an attention action, four metrics, 364 heatmap cells, and no horizontal overflow.",
+  "passed": true,
+  "startedAt": "2026-10-12T16:39:01.287Z",
+  "completedAt": "2026-10-12T16:39:01.287Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "activity-overview",
+    "specRevision": 3,
+    "specDigest": "sha256:8d4decddf24fcb1e85d06958c8282e2be0b29408fd565611ffc144436e25e2d6",
+    "treeDigest": "sha256:71e2f54e276be932c2b4b6734bdb70ec6899e5c873e318521677b923d3aecb1f",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:7d164ac95bcd28dc77513416f5b13ee1d8c46f2811e9924c813d317c817f2a44",
+  "kind": "collected",
+  "collector": "steel-browser-cdp",
+  "artifacts": [
+    {
+      "path": "docs/media/activity-overview/verification.png",
+      "mediaType": "image/png",
+      "bytes": 49961,
+      "digest": "sha256:cf92d60a772f49443594199a64a48703f82f3186212fda7ab77f234a1b12a0aa"
+    }
+  ]
+}

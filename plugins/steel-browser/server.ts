@@ -4,6 +4,7 @@ import { normalizeBaseUrl, SteelClient, SteelClientError } from "./steel-client.
 import { ProjectBrowsers } from "./projects.ts";
 import { runBrowser } from "./engines.ts";
 import { bindingReady, ensureViewerShare, provisionProjectInstance, verifyProjectInstance } from "./provisioning.ts";
+import { navigateProject } from "./navigation.ts";
 import { actOnProject, parseBrowserAction } from "./actions.ts";
 import { SignIns } from "./sign-ins.ts";
 import { DashboardCache } from "./dashboard-cache.ts";
@@ -99,6 +100,11 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
   }
 
   const handlers = {
+    async navigate({ scope, url }: { scope: Scope; url: string }) {
+      const { projectId } = await resolve(scope);
+      const binding = await ensureBinding(projectId);
+      return mutate(() => navigateProject(binding, url));
+    },
     async signIns(scope: Scope) {
       return signIns.list((await resolve(scope)).projectId);
     },

@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
   "sequence": 8,
-  "previousDigest": "sha256:253a416f0de9d70432f8a966e9c83addbee939f81eab5a7a170f2ab4508ef7c4",
+  "previousDigest": "sha256:99ee259c6a746ad1fefa56f2141b55a5f747d892b369335f818d22ef78ab08c8",
   "actor": "empirical-merge-observed",
   "type": "compaction-boundary",
   "summary": "Compacted through journal event 7",
-  "createdAt": "2026-10-12T19:15:56.748Z",
-  "stateBeforeDigest": "sha256:1c3b0efa530ec9f76a49680a14bb2cbbfd574f9654d6e8c85f4d7c10db90e210",
-  "stateAfterDigest": "sha256:1c3b0efa530ec9f76a49680a14bb2cbbfd574f9654d6e8c85f4d7c10db90e210",
+  "createdAt": "2026-10-12T03:13:21.849Z",
+  "stateBeforeDigest": "sha256:92083bf9ea768cf69f0c6a7cd4f30d0a8e0f39d754d1b7616dba47d032fb006e",
+  "stateAfterDigest": "sha256:92083bf9ea768cf69f0c6a7cd4f30d0a8e0f39d754d1b7616dba47d032fb006e",
   "state": {
     "schemaVersion": 5,
     "revision": 7,
@@ -46,7 +46,7 @@
         "published": "published has not been proven by a durable receipt."
       }
     },
-    "updatedAt": "2026-10-12T19:15:55.800Z",
+    "updatedAt": "2026-10-12T03:13:20.001Z",
     "capabilityBase": {
       "schemaVersion": 1,
       "id": "steel-browser-human-control-4665f320dc00",
@@ -93,10 +93,10 @@
         "mergeCommit": "ae557ce0a686054738472f6aa0106fbe48465bb5",
         "targetBranch": "main",
         "ancestorOfTarget": true,
-        "observedAt": "2026-10-12T19:15:47.777Z"
+        "observedAt": "2026-10-12T03:12:44.974Z"
       },
-      "closedAt": "2026-10-12T19:15:55.569Z",
-      "digest": "sha256:e7f09392b7e79ee10f911c8c3a6b72f000a05ef1a8500356478e0134baff7d7e"
+      "closedAt": "2026-10-12T03:13:19.658Z",
+      "digest": "sha256:72c91b1d89b138c464800f8a434ff642429bcb348a07d89ac87b7f23df5a96de"
     },
     "completionRecord": {
       "schemaVersion": 1,
@@ -105,13 +105,13 @@
       "decisionBy": null,
       "method": "merged-externally",
       "reason": "Merged in pull request #71 as ae557ce0a686054738472f6aa0106fbe48465bb5 into main; closed when the merge was observed.",
-      "at": "2026-10-12T19:15:55.800Z",
+      "at": "2026-10-12T03:13:20.001Z",
       "revision": 7,
       "completion": "implemented",
-      "sourceTreeDigest": "sha256:a62b462ed3de16e6835a68f52c850d1c7ccb49c50cf25f30a1f87efd8c8ba98c",
-      "artifactTreeDigest": "sha256:e943c3d1d853e0f833ba4c2f358a3c601fd4d092a1ae7414f32250a17bf36a2a",
-      "digest": "sha256:e2fac2041868cc4baee8a767a0841b37b27a31544e79cf6b844eb5c52d637481"
+      "sourceTreeDigest": "sha256:d4f6e7aa0d6e26823a2e6a4b1c89497cadc36656fd25461819bf7583b4b408a5",
+      "artifactTreeDigest": "sha256:3da097772e5aaecf5522cf041de6f7c166b65fe99d2ccdea2abd4a56619d7ecf",
+      "digest": "sha256:1d2bc8bd60a66a08402390a16ccd14d49ade5288947d2cb5c7be00f66158cc0c"
     }
   },
-  "digest": "sha256:26dd99f8ccbeeab252090a7abf0e6a0016728217354779fc56f7e803d80dc183"
+  "digest": "sha256:c09cb326816917b0db3e475a1c2f3248eb795c5a25f63e4cb00e7fd71181762c"
 }

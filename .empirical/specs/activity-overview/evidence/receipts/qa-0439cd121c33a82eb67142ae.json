@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-0439cd121c33a82eb67142ae",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3",
+    "AC-UI-4"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "Rendered the committed ActivityOverview component in the thread's bound Steel browser at 1280x900; verified four metrics, 364 heatmap cells, month/taskboard selector updates, actionable focus, no horizontal overflow, and captured screenshot evidence.",
+  "passed": true,
+  "startedAt": "2026-10-12T16:38:37.923Z",
+  "completedAt": "2026-10-12T16:38:37.923Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "activity-overview",
+    "specRevision": 3,
+    "specDigest": "sha256:8d4decddf24fcb1e85d06958c8282e2be0b29408fd565611ffc144436e25e2d6",
+    "treeDigest": "sha256:71e2f54e276be932c2b4b6734bdb70ec6899e5c873e318521677b923d3aecb1f",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 8,
+    "gitCommit": "f8e14786585f1b7b1daec6c2ad2689fba8f934b9",
+    "scope": [
+      "plugins/activity-overview/app.css",
+      "plugins/activity-overview/app.tsx",
+      "plugins/activity-overview/component.tsx",
+      "plugins/activity-overview/data.ts"
+    ],
+    "scopeDigest": "sha256:4133b9e3d91f6f582a729d9d97548148f9d0041a977f9607fad50a36aecc7c1b",
+    "textTreeDigest": "sha256:71e2f54e276be932c2b4b6734bdb70ec6899e5c873e318521677b923d3aecb1f"
+  },
+  "digest": "sha256:f797cce063d361829b37035683cb7252ce0977971f43f71e9e3fbe42e847e0ac",
+  "kind": "qa",
+  "matrixDigest": "sha256:2511384cdd3aad89ce0d8f6e66adbeca333e7b5f3eecff442f03cae97908b513",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Rendered the committed ActivityOverview component in the thread's bound Steel browser at 1280x900; verified four metrics, 364 heatmap cells, month/taskboard selector updates, actionable focus, no horizontal overflow, and captured screenshot evidence.",
+      "startedAt": "2026-10-12T16:38:37.923Z",
+      "completedAt": "2026-10-12T16:38:37.923Z",
+      "durationMs": 0,
+      "collector": "steel-browser-cdp",
+      "command": null,
+      "result": null,
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:71e2f54e276be932c2b4b6734bdb70ec6899e5c873e318521677b923d3aecb1f",
+      "sourceTreeAfter": "sha256:71e2f54e276be932c2b4b6734bdb70ec6899e5c873e318521677b923d3aecb1f",
+      "artifacts": [
+        {
+          "path": "docs/media/activity-overview/verification.png",
+          "mediaType": "image/png",
+          "bytes": 49961,
+          "digest": "sha256:cf92d60a772f49443594199a64a48703f82f3186212fda7ab77f234a1b12a0aa"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}

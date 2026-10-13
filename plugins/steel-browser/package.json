@@ -59,6 +59,7 @@
     "use-follow-viewer.ts",
     "engines.ts",
     "actions.ts",
+    "navigation.ts",
     "viewer-protocol.ts",
     "live-viewer.tsx",
     "service-catalog.ts",

@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
   "sequence": 17,
-  "previousDigest": "sha256:d9b14410e9ae3b39019cf84becbf709e8ef1fbdfec8edac09028ce2ef0972b95",
+  "previousDigest": "sha256:38239b6e8d6a8b5f3b0fd8ba5a0ab8f09f34de0d431e947a98bb7bf437a8d844",
   "actor": "empirical-merge-observed",
   "type": "compaction-boundary",
   "summary": "Compacted through journal event 16",
-  "createdAt": "2026-10-12T19:15:54.120Z",
-  "stateBeforeDigest": "sha256:139fa54df56a7a6e7eb7d1e50212cdedb7a549a4a62f02cac553aa293c124130",
-  "stateAfterDigest": "sha256:139fa54df56a7a6e7eb7d1e50212cdedb7a549a4a62f02cac553aa293c124130",
+  "createdAt": "2026-10-12T03:13:08.186Z",
+  "stateBeforeDigest": "sha256:4e67f91d59672d7fae0c54aba06df7e63d6c2b422015fd2c7b752d7dbf5502a4",
+  "stateAfterDigest": "sha256:4e67f91d59672d7fae0c54aba06df7e63d6c2b422015fd2c7b752d7dbf5502a4",
   "state": {
     "schemaVersion": 5,
     "revision": 16,
@@ -47,7 +47,7 @@
         "published": "published has not been proven by a durable receipt."
       }
     },
-    "updatedAt": "2026-10-12T19:15:53.387Z",
+    "updatedAt": "2026-10-12T03:13:06.919Z",
     "capabilityBase": {
       "schemaVersion": 1,
       "id": "extend-the-existing-taskboard-plugin-into-a-bb-native-software-23c140730dcf",
@@ -108,10 +108,10 @@
         "mergeCommit": "2daf96f4de78bf9ef65b690001db78b9904d4bf0",
         "targetBranch": "main",
         "ancestorOfTarget": true,
-        "observedAt": "2026-10-12T19:15:47.777Z"
+        "observedAt": "2026-10-12T03:12:44.974Z"
       },
-      "closedAt": "2026-10-12T19:15:53.228Z",
-      "digest": "sha256:987b19ebf93a4eee26d5f62d2d7019f015880cae13218ead4739fb9cfdedcdad"
+      "closedAt": "2026-10-12T03:13:06.571Z",
+      "digest": "sha256:14ddd8cb4a798b2105a4f49c86ffbb9aede7880c79a377848c0587599f1eb23c"
     },
     "completionRecord": {
       "schemaVersion": 1,
@@ -120,13 +120,13 @@
       "decisionBy": null,
       "method": "merged-externally",
       "reason": "Merged in pull request #72 as 2daf96f4de78bf9ef65b690001db78b9904d4bf0 into main; closed when the merge was observed.",
-      "at": "2026-10-12T19:15:53.387Z",
+      "at": "2026-10-12T03:13:06.919Z",
       "revision": 16,
       "completion": "none",
-      "sourceTreeDigest": "sha256:a62b462ed3de16e6835a68f52c850d1c7ccb49c50cf25f30a1f87efd8c8ba98c",
-      "artifactTreeDigest": "sha256:6c55ea713bddf5e82e7ef74519f5f493ce91e4a6cd75500e7179165540327fc6",
-      "digest": "sha256:dd450933713781c925e659ce277583df178066ecb1b5d16d0b17d67a5a123587"
+      "sourceTreeDigest": "sha256:d4f6e7aa0d6e26823a2e6a4b1c89497cadc36656fd25461819bf7583b4b408a5",
+      "artifactTreeDigest": "sha256:f7e493c5107d5607252725ff054089490e00e26c0f297bb40d97782760538e8e",
+      "digest": "sha256:67155512a88f13c0ca6c9c85652b7ba64bae7eaf1e6ea9be6c786765ef61520c"
     }
   },
-  "digest": "sha256:6daea9398f850760c0050de6e370f48b2a593453abb2236a1a1607afdb86775f"
+  "digest": "sha256:849457b6b15fd2760f2a09e900613251d30397c8b5a584e8b2750e0aea40f7a1"
 }

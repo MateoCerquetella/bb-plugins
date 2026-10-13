@@ -27,5 +27,5 @@
     "reviewerTokenEnv": "EMPIRICAL_REVIEWER_TOKEN"
   },
   "activationMode": "explicit",
-  "mockupsBeforeCoding": true
+  "mockupsBeforeCoding": false
 }
