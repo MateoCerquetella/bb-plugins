@@ -26,5 +26,10 @@
     "mode": "fresh-context",
     "reviewerTokenEnv": "EMPIRICAL_REVIEWER_TOKEN"
   },
-  "mockupsBeforeCoding": false
+  "mockupsBeforeCoding": false,
+  "budget": {
+    "fast": 10080,
+    "quick": 10080,
+    "complex": 10080
+  }
 }
