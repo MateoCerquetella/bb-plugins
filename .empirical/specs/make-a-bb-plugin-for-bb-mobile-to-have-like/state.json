@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 36,
+  "revision": 37,
   "activeFeature": "make-a-bb-plugin-for-bb-mobile-to-have-like",
   "request": "Make a bb plugin for bb mobile to have like arrows or tinder stylrer to go strong it the threads more easily. You teasesrch and do it don’t ask me",
   "profile": "complex",
@@ -9,7 +9,7 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Planned the atomic move of mobile navigation into Dockside, direct synchronized color usage, focused test relocation, standalone package/catalog/lockfile removal, documentation, verification, sync, and push.",
+  "message": "Moved mobile active/unread cross-project navigation into Dockside, wired badges to Dockside's live custom color overrides and shared presentation helper, reused Dockside animated status glyphs, removed the standalone Thread Mobile package and registry/lock entries, migrated Dockside to the pinned SDK package, updated docs/version, passed 218 tests plus typecheck/build, removed the old installed plugin, and pushed the branch.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:7c895b81727f0f2118a4280c9740e045b9607c588280117dd539a987890dca26",
@@ -23,21 +23,20 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": false,
+    "implemented": true,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "none",
+    "highest": "implemented",
     "reasons": {
-      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-13T14:26:31.061Z",
+  "updatedAt": "2026-10-13T14:35:15.054Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "make-a-bb-plugin-for-bb-mobile-to-have-like-07aee46cf0cd",
@@ -71,9 +70,9 @@
   },
   "trackerGeneration": 4,
   "lifecycle": {
-    "stage": "development",
+    "stage": "iteration",
     "iteration": 4,
-    "awaitingFeedback": false,
+    "awaitingFeedback": true,
     "contractRevision": 31,
     "riskRequest": "Fold Thread Mobile into the existing Dockside plugin so project badges use Dockside's synchronized project color settings directly. Remove the standalone thread-mobile plugin and its root catalog/registry entry, preserve the mobile active/unread cross-project navigation inside Dockside, update Dockside documentation and tests, and push the revised code."
   },
