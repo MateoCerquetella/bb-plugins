@@ -22,6 +22,10 @@ test("the mobile navigation strip owns its pointer gesture without blocking vert
     "onPointerMove",
     "onPointerUp",
     "onPointerCancel",
+    "onTouchStart",
+    "onTouchMove",
+    "onTouchEnd",
+    "onTouchCancel",
   ]) {
     const start = component.indexOf(`${handler}={`);
     assert.notEqual(start, -1, `${handler} must remain registered`);

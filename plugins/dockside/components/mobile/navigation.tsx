@@ -78,6 +78,10 @@ function Navigator({ threadId }: { threadId: string }) {
         if (direction !== null) move(direction);
       }}
       onPointerCancel={event => { event.stopPropagation(); gesture.current = null; }}
+      onTouchStart={event => event.stopPropagation()}
+      onTouchMove={event => event.stopPropagation()}
+      onTouchEnd={event => event.stopPropagation()}
+      onTouchCancel={event => event.stopPropagation()}
       onLostPointerCapture={() => { gesture.current = null; }}>
       <span className="tg-heading">
         {index >= 0 && <span className="tg-project" style={{ backgroundColor: badge.backgroundColor, color: badge.foregroundColor }}

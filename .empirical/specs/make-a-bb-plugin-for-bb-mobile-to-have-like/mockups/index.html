@@ -81,6 +81,9 @@ swipe.onpointerup=event=>{
 };
 swipe.onpointercancel=event=>{event.stopPropagation();gesture=null};
 swipe.onlostpointercapture=()=>{gesture=null};
+swipe.ontouchstart=swipe.ontouchmove=swipe.ontouchend=swipe.ontouchcancel=event=>{
+  event.stopPropagation();
+};
 swipe.onkeydown=event=>{
   if(event.key==="ArrowLeft"||event.key==="ArrowRight"){
     event.preventDefault();move(event.key==="ArrowLeft"?-1:1)
