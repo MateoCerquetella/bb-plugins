@@ -7,7 +7,7 @@ import { readEmpiricalStatus } from './empirical/status.js';
 export default experimental_defineHostEntry({
   contract: hostContract,
   handlers: {
-    observeEmpirical: input => readEmpiricalStatus(input.root),
+    observeEmpirical: input => readEmpiricalStatus(input.root, input.environmentId),
     collect: (input) => collectContext(input.root, input.request),
     async workspace(input, ctx) {
       const path = join(

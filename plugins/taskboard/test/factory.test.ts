@@ -71,6 +71,7 @@ function fixture() {
   let unarchives = 0;
   let onUnarchive = () => {};
   let environmentStatus = 'ready';
+  let failEnvironmentGet = false;
   let buildEnvironment = 'env_test';
   let failSpawn = false;
   let failSend = false;
@@ -130,11 +131,14 @@ function fixture() {
       output: async () => ({ output })
     },
     projects: { defaultExecutionOptions: async () => ({ model: 'test', providerId: 'codex' }) },
-    environments: { get: async ({ environmentId }: { environmentId: string }) => ({
-      id: environmentId, managed: managed || environmentId === 'env_build',
-      isWorktree: managed || environmentId === 'env_build', hostId: 'host_test',
-      projectId: item.bbProjectId, status: environmentStatus
-    }) }
+    environments: { get: async ({ environmentId }: { environmentId: string }) => {
+      if (failEnvironmentGet) throw new Error('Workspace lookup temporarily unavailable');
+      return {
+        id: environmentId, managed: managed || environmentId === 'env_build',
+        isWorktree: managed || environmentId === 'env_build', hostId: 'host_test',
+        projectId: item.bbProjectId, status: environmentStatus, path: '/repo/worktree'
+      };
+    } }
   } as unknown as Parameters<typeof createFactoryService>[0];
   const service = createFactoryService(sdk, store, () => {}, {
     getItem: () => item,
@@ -149,6 +153,7 @@ function fixture() {
     archived, deleted, unarchives: () => unarchives,
     onUnarchive: (callback: () => void) => { onUnarchive = callback; },
     environmentStatus: (value: string) => { environmentStatus = value; },
+    failEnvironmentGet: (value = true) => { failEnvironmentGet = value; },
     buildEnvironment: (value: string) => { buildEnvironment = value; },
     fail: () => { failSpawn = true; },
     failSend: () => { failSend = true; },
@@ -346,6 +351,27 @@ test('crash recovery preserves an ambiguous intent and refuses duplicate dispatc
       expectedVersion: recovered.version, kind: 'investigate', contextThreadId: null, retry: true
     }), /uncertain/);
     assert.equal(f.spawns(), 0);
+  } finally { f.db.close(); }
+});
+test('recovered native dispatch persists even when workspace lookup fails', async () => {
+  const f = fixture();
+  try {
+    const record = newRecord(item);
+    const run = startRun(record, 'investigate', false);
+    run.status = 'uncertain';
+    run.threadId = 'thr_native';
+    run.error = 'Native dispatch outcome uncertain';
+    const saved = f.store.save(record);
+    f.failEnvironmentGet();
+    const recovered = await f.service.linkRecovered(item, saved.version, 'thr_native');
+    assert.equal(recovered.runs[0]?.threadId, 'thr_native');
+    assert.equal(recovered.runs[0]?.status, 'running');
+    assert.equal(f.store.get(saved)?.runs[0]?.status, 'running');
+    assert.equal(f.spawns(), 0);
+    f.failEnvironmentGet(false);
+    await f.service.get(item);
+    assert.equal(f.store.get(saved)?.runs[0]?.hostId, 'host_test');
+    assert.equal(f.store.get(saved)?.runs[0]?.checkoutRoot, '/repo/worktree');
   } finally { f.db.close(); }
 });
 test('lost spawn response is uncertain, not a retryable failure', async () => {

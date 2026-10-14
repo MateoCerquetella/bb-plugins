@@ -16,10 +16,17 @@ export const empiricalStatusSchema = z.discriminatedUnion('kind', [
     completionLevel: z.string().max(100),
     completionMethod: z.string().max(200).nullable(),
     ownership: z.enum(['selected', 'unclaimed', 'conflict', 'unknown']).optional(),
+    owners: z.array(z.string().max(4096)).max(128).optional(),
     mergedButUnclosed: z.boolean().optional()
   }).strict()
 ]);
 export type EmpiricalStatus = z.infer<typeof empiricalStatusSchema>;
+
+export const empiricalHostObservationSchema = z.object({
+  environmentId: z.string().min(1),
+  root: z.string().min(1).max(4096),
+  status: empiricalStatusSchema
+}).strict();
 
 export const empiricalSnapshotSchema = z.object({
   hostId: z.string(),

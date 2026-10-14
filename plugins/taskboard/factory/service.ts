@@ -224,6 +224,17 @@ export function createFactoryService(
         if (active && started && !run.pendingCompletion) {
           resumedBuild ||= run === record.runs.at(-1) && run.kind === 'build';
         }
+        if (run.environmentId && (!run.hostId || !run.checkoutRoot)) {
+          try {
+            const workspace = await sdk.environments.get({ environmentId: run.environmentId });
+            if (workspace.projectId === record.projectId && workspace.hostId && workspace.path) {
+              run.hostId = workspace.hostId;
+              run.checkoutRoot = workspace.path;
+            }
+          } catch {
+            // Keep the native session linked while its environment is temporarily unavailable.
+          }
+        }
         if (resumedBuild && record.automationError?.startsWith('Automatic work paused: Build ') &&
           run.planDigest === record.approvedDigest && run.scopeDigest === record.scopeDigest) {
           record.automationError = null;
@@ -605,11 +616,15 @@ export function createFactoryService(
         }
         run.threadId = thread.id;
         run.environmentId = thread.environmentId;
-        const workspace = thread.environmentId
-          ? await sdk.environments.get({ environmentId: thread.environmentId }) : null;
-        if (workspace?.projectId === record.projectId) {
-          run.hostId = workspace.hostId;
-          run.checkoutRoot = workspace.path ?? null;
+        try {
+          const workspace = thread.environmentId
+            ? await sdk.environments.get({ environmentId: thread.environmentId }) : null;
+          if (workspace?.projectId === record.projectId) {
+            run.hostId = workspace.hostId;
+            run.checkoutRoot = workspace.path ?? null;
+          }
+        } catch {
+          // The recovered thread is authoritative; its workspace can resolve on the next observation.
         }
         run.status = 'running';
         run.error = null;

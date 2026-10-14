@@ -1,126 +1,90 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { parseEmpiricalStatus, readEmpiricalStatus } from '../empirical/status.ts';
+import { EmpiricalError } from 'empirical-sdd';
+import { readEmpiricalStatus } from '../empirical/status.ts';
+import type { EmpiricalOverview } from '../empirical/observation.ts';
 
-const document = {
-  schemaVersion: 5,
-  activeFeature: 'task-1',
-  revision: 7,
-  phase: 'verify',
-  status: 'waiting',
-  roadmap: {
-    nextAction: 'Run selected checks',
-    checks: [{ gate: 'verify', state: 'unrun' }]
-  },
-  completion: { highest: 'implemented', verified: false }
-};
-
-test('projects durable completion separately from phase and provider activity', () => {
-  assert.deepEqual(parseEmpiricalStatus(document), {
-    kind: 'feature', feature: 'task-1', revision: 7,
-    phase: 'verify', status: 'waiting', nextAction: 'Run selected checks',
-    verification: 'pending', completionLevel: 'implemented',
-    completionMethod: null
-  });
-  assert.equal(parseEmpiricalStatus({ ...document, activeFeature: null }).kind, 'empty');
-  assert.equal(parseEmpiricalStatus({ ...document, revision: Number.MAX_SAFE_INTEGER + 1 }).kind, 'unavailable');
-  assert.equal(parseEmpiricalStatus({ ...document, completion: { highest: 'verified', verified: 'yes' } }).kind, 'unavailable');
-  assert.equal(parseEmpiricalStatus({ ...document, revision: '7' }).kind, 'unavailable');
-  const legacy = parseEmpiricalStatus({ ...document, roadmap: undefined });
-  if (legacy.kind === 'feature') {
-    assert.match(legacy.nextAction, /Unavailable/);
-    assert.equal(legacy.verification, 'pending');
-  }
-  assert.equal(parseEmpiricalStatus({
-    ...document, completion: { highest: 'verified', verified: true }
-  }).kind, 'feature');
-  const skipped = parseEmpiricalStatus({
-    ...document, roadmap: {
-      ...document.roadmap, checks: [{ gate: 'verify', state: 'skipped' }]
-    }
-  });
-  if (skipped.kind === 'feature') assert.equal(skipped.verification, 'skipped');
-});
-
-const overview = {
-  schemaVersion: 1, root: '/repo/worktrees/a', truncated: false, issues: [],
-  worktrees: [{ root: '/repo/worktrees/a', selectedFeature: 'task-1', selection: 'valid' }],
-  specs: [{ feature: 'task-1', owners: ['/repo/worktrees/a'], ownership: 'selected',
-    copies: [{ root: '/repo/worktrees/a', phase: 'verify', status: 'waiting', revision: 7,
+const root = '/repo/worktrees/a';
+const feature = 'task-1';
+const overview = (): EmpiricalOverview => ({
+  schemaVersion: 1, root, truncated: false, issues: [],
+  worktrees: [{ root, selectedFeature: feature, selection: 'valid' }],
+  specs: [{ feature, owners: [root], ownership: 'selected',
+    copies: [{ root, phase: 'verify', status: 'waiting', revision: 7,
       completionLevel: 'implemented', verification: 'pending', nextAction: 'Run selected checks',
       merged: false, valid: true }] }]
-};
-
-test('reads only the supplied checkout with bounded read-only commands', async () => {
-  const result = await readEmpiricalStatus('/repo/worktrees/a', async (file, args, options) => {
-    assert.equal(file, 'empirical');
-    assert.deepEqual(args.slice(2), ['--root', '/repo/worktrees/a', '--json']);
-    assert.ok(['status', 'overview'].includes(args[1]!));
-    assert.equal(options.timeout, args[1] === 'status' ? 15_000 : 120_000);
-    return { stdout: JSON.stringify(args[1] === 'status' ? document : overview) };
-  });
-  assert.equal(result.kind, 'feature');
-  assert.equal((await readEmpiricalStatus('/repo/worktrees/a', async (_file, args) =>
-    ({ stdout: JSON.stringify(args[1] === 'status' ? document : overview) }))).kind, 'feature');
+});
+const completion = async () => ({
+  activeFeature: feature, revision: 7, phase: 'verify', status: 'waiting',
+  completion: { highest: 'implemented', verified: false }
 });
 
-test('distinguishes uninitialized from transient failure', async () => {
-  const missing = await readEmpiricalStatus('/repo', async () => {
-    throw new Error('PROJECT_NOT_INITIALIZED');
+test('reads a checkout-consistent Empirical feature and its completion method', async () => {
+  const input = overview();
+  input.specs[0]!.ownership = 'conflict';
+  input.specs[0]!.owners.push('/repo/worktrees/b');
+  const result = await readEmpiricalStatus(root, 'env-a', async requested => {
+    assert.equal(requested, root);
+    return input;
+  }, async requested => {
+    assert.equal(requested, root);
+    return { ...await completion(), completionRecord: { method: 'workflow' } };
   });
-  assert.equal(missing.kind, 'uninitialized');
-  const failed = await readEmpiricalStatus('/repo', async () => {
-    throw new Error('ETIMEDOUT');
+  assert.deepEqual(result, {
+    environmentId: 'env-a', root,
+    status: {
+      kind: 'feature', feature, revision: 7, phase: 'verify', status: 'waiting',
+      nextAction: 'Run selected checks', verification: 'pending',
+      completionLevel: 'implemented', completionMethod: 'workflow',
+      ownership: 'conflict', owners: [root, '/repo/worktrees/b'],
+      mergedButUnclosed: false
+    }
   });
-  assert.equal(failed.kind, 'unavailable');
 });
 
-test('gets the next action and completion projection from an older status', async () => {
-  const result = await readEmpiricalStatus('/repo/worktrees/legacy', async (_file, args) =>
-    ({ stdout: JSON.stringify(args[1] === 'status' ? { ...document, roadmap: undefined }
-      : args[1] === 'next' ? { rationale: { nextAction: 'Continue verification' } }
-        : overview) }));
-  assert.equal(result.kind, 'feature');
-  if (result.kind === 'feature') {
-    assert.equal(result.nextAction, 'Continue verification');
-    assert.equal(result.completionLevel, 'implemented');
-    assert.equal(result.verification, 'pending');
+test('rejects a changed checkout or feature before showing completion', async () => {
+  const wrongRoot = await readEmpiricalStatus(root, 'env-a',
+    async () => ({ ...overview(), root: '/another' }), completion);
+  assert.equal(wrongRoot.status.kind, 'invalid');
+  const changed = await readEmpiricalStatus(root, 'env-a',
+    async () => overview(),
+    async () => ({ ...await completion(), revision: 8 }));
+  assert.equal(changed.status.kind, 'invalid');
+});
+
+test('does not reuse stale ownership or merged state', async () => {
+  const first = overview();
+  first.specs[0]!.copies[0]!.merged = true;
+  const second = overview();
+  second.specs[0]!.ownership = 'conflict';
+  second.specs[0]!.owners.push('/repo/worktrees/b');
+  const read = (source: EmpiricalOverview) =>
+    readEmpiricalStatus(root, 'env-a', async () => source, completion);
+  const merged = await read(first);
+  const conflict = await read(second);
+  assert.equal(merged.status.kind, 'feature');
+  assert.equal(conflict.status.kind, 'feature');
+  if (merged.status.kind === 'feature' && conflict.status.kind === 'feature') {
+    assert.equal(merged.status.mergedButUnclosed, true);
+    assert.equal(conflict.status.mergedButUnclosed, false);
+    assert.deepEqual(conflict.status.owners, [root, '/repo/worktrees/b']);
   }
 });
 
-test('reports duplicate ownership and rejects invalid selected copies', async () => {
-  const root = '/repo/worktrees/conflict';
-  const read = (source: typeof overview) => readEmpiricalStatus(root,
-    async (_file, args) => ({ stdout: JSON.stringify(args[1] === 'status' ? document : {
-      ...source, root, worktrees: [{ ...source.worktrees[0], root }],
-      specs: [{ ...source.specs[0], copies: [{ ...source.specs[0]!.copies[0], root }] }]
-    }) }));
-  const conflict = structuredClone(overview);
-  conflict.specs[0]!.ownership = 'conflict';
-  conflict.specs[0]!.owners.push('/repo/worktrees/b');
-  await read(conflict);
-  const result = await read(conflict);
-  assert.equal(result.kind, 'feature');
-  if (result.kind === 'feature') assert.equal(result.ownership, 'conflict');
-  const invalidRoot = '/repo/worktrees/invalid';
-  const invalid = structuredClone(overview);
-  invalid.specs[0]!.copies[0]!.valid = false;
-  await readEmpiricalStatus(invalidRoot, async (_file, args) =>
-    ({ stdout: JSON.stringify(args[1] === 'status' ? document : {
-      ...invalid, root: invalidRoot,
-      worktrees: [{ ...invalid.worktrees[0], root: invalidRoot }],
-      specs: [{ ...invalid.specs[0], copies: [{ ...invalid.specs[0]!.copies[0], root: invalidRoot }] }]
-    }) }));
-  assert.equal((await readEmpiricalStatus(invalidRoot, async () =>
-    ({ stdout: JSON.stringify(document) }))).kind, 'invalid');
-});
-
-test('rejects malformed overview JSON instead of trusting a cast', async () => {
-  const root = '/repo/worktrees/malformed';
-  const read = () => readEmpiricalStatus(root, async (_file, args) => ({
-    stdout: JSON.stringify(args[1] === 'status' ? document : { ...overview, specs: 'not-an-array' })
-  }));
-  await read();
-  await new Promise(resolve => setTimeout(resolve, 0));
-  assert.equal((await read()).kind, 'invalid');
+test('distinguishes empty, invalid, uninitialized and unavailable', async () => {
+  const empty = overview();
+  empty.worktrees[0]!.selectedFeature = null;
+  assert.equal((await readEmpiricalStatus(root, 'env-a', async () => empty,
+    async () => ({ ...await completion(), activeFeature: null }))).status.kind, 'empty');
+  const invalid = overview();
+  invalid.truncated = true;
+  assert.equal((await readEmpiricalStatus(root, 'env-a', async () => invalid, completion)).status.kind, 'invalid');
+  const uninitialized = await readEmpiricalStatus(root, 'env-a', async () => {
+    throw new EmpiricalError('PROJECT_NOT_INITIALIZED', 'missing project');
+  }, completion);
+  assert.equal(uninitialized.status.kind, 'uninitialized');
+  const unavailable = await readEmpiricalStatus(root, 'env-a', async () => {
+    throw new Error('transient failure');
+  }, completion);
+  assert.equal(unavailable.status.kind, 'unavailable');
 });

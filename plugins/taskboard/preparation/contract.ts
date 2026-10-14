@@ -1,7 +1,7 @@
 import type { PluginRpcContract } from '@get-bb/plugin-sdk';
 import { z } from 'zod';
 import { workSourceSchema } from '../contract.js';
-import { empiricalStatusSchema } from '../empirical/contract.js';
+import { empiricalHostObservationSchema } from '../empirical/contract.js';
 
 export const id = z.string().regex(/^[a-zA-Z0-9_-]{1,100}$/);
 const text = z.string().max(24_000);
@@ -200,8 +200,8 @@ export const preparationRpc = {
 } as const satisfies PluginRpcContract;
 export const hostContract = {
   observeEmpirical: {
-    input: z.object({ root: z.string().min(1).max(4096) }).strict(),
-    output: empiricalStatusSchema
+    input: z.object({ root: z.string().min(1).max(4096), environmentId: z.string().min(1) }).strict(),
+    output: empiricalHostObservationSchema
   },
   collect: {
     input: z.object({ root: z.string().min(1), request: text }),

@@ -280,11 +280,19 @@ function EmpiricalProgress({ record }: { record: FactoryRecord }) {
       void load();
     };
     window.addEventListener('taskboard:empirical-refresh', refresh);
+    window.addEventListener('online', refresh);
+    window.addEventListener('focus', refresh);
+    const visible = () => { if (document.visibilityState === 'visible') refresh(); };
+    document.addEventListener('visibilitychange', visible);
     return () => {
       canceled = true; window.clearTimeout(refreshTimer); window.clearInterval(clockInterval);
       window.removeEventListener('taskboard:empirical-refresh', refresh);
+      window.removeEventListener('online', refresh);
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', visible);
     };
   }, [rpc, record.projectId, record.source, record.locator, record.runs.at(-1)?.environmentId]);
+  useRealtime('taskboard:factory', () => window.dispatchEvent(new Event('taskboard:empirical-refresh')));
   const current = observation?.kind === 'observation' ? observation : null;
   const sameWorkspace = current && lastGood &&
     current.hostId === lastGood.hostId &&
@@ -297,14 +305,17 @@ function EmpiricalProgress({ record }: { record: FactoryRecord }) {
     saved.checkoutRoot === current.checkoutRoot
     ? { ...current, observedAt: saved.observedAt, status: saved.status }
     : sameWorkspace || !current ? lastGood : null;
-  const displayed = failure ? retained : current;
-  const stale = !!failure || !!displayed && clock - displayed.observedAt > 20_000;
+  const offline = !!failure || current?.status.kind === 'unavailable';
+  const displayed = offline ? retained ?? current : current;
+  const stale = offline || !!displayed && clock - displayed.observedAt > 20_000;
   const state = displayed?.status;
-  const title = !observation && !failure ? 'Connecting' : stale ? 'Stale' :
+  const title = !observation && !failure ? 'Connecting' :
+    state?.kind === 'invalid' ? 'Invalid source' :
+    state?.kind === 'uninitialized' ? 'Not initialized' :
+    stale ? 'Stale' :
     state?.kind === 'feature' ? `${state.phase} · r${state.revision}` :
     state?.kind === 'empty' ? 'No active feature' :
-    state?.kind === 'uninitialized' ? 'Not initialized' :
-    state?.kind === 'invalid' ? 'Invalid source' : 'Unavailable';
+    'Unavailable';
   return <section className="tb-empirical-progress" aria-label="Empirical workflow" data-stale={stale}>
     <div className="tb-empirical-heading">
       <strong>Empirical</strong><span role="status">{title}</span>
@@ -316,7 +327,10 @@ function EmpiricalProgress({ record }: { record: FactoryRecord }) {
     {failure && <p role="status" className="tb-run-caption">{failure}{retained ? ' Last observation retained.' : ''}</p>}
     {state?.kind === 'feature' && <>
       <p className="tb-empirical-feature">{state.feature}</p>
-      {state.ownership === 'conflict' && <p role="alert" className="tb-run-caption">Multiple worktrees claim this feature.</p>}
+      {state.ownership === 'conflict' && <div role="alert" className="tb-run-caption">
+        Multiple worktrees claim this feature.
+        <ul>{state.owners?.map(owner => <li key={owner}><code>{owner}</code></li>)}</ul>
+      </div>}
       {state.mergedButUnclosed && <p role="status" className="tb-run-caption">Merged, but Empirical has not closed this feature.</p>}
       <dl className="tb-empirical-facts">
         <div><dt>Phase</dt><dd>{state.phase} · {state.status}</dd></div>
@@ -328,6 +342,7 @@ function EmpiricalProgress({ record }: { record: FactoryRecord }) {
     {state?.kind === 'empty' && <p className="tb-run-caption">No Empirical feature is selected in this checkout.</p>}
     {state?.kind === 'uninitialized' && <p className="tb-run-caption">This checkout has no Empirical project.</p>}
     {state?.kind === 'invalid' && <p role="alert" className="tb-run-caption">{state.reason}</p>}
+    {state?.kind === 'unavailable' && <p role="status" className="tb-run-caption">{state.reason}</p>}
     {displayed && <p className="tb-empirical-source" title={displayed.checkoutRoot}>
       {displayed.hostId} · {displayed.checkoutRoot} · observed {new Date(displayed.observedAt).toLocaleTimeString()}
     </p>}
