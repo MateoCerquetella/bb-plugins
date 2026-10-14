@@ -123,6 +123,23 @@ keeps the last good observation marked stale, and the native thread remains
 available from **Open session**. Empty, uninitialized, invalid and unavailable
 Empirical states are distinct.
 
+To run the isolated progress demo, build Taskboard and start the fixture server
+from the workspace root:
+
+```sh
+npm run build -w bb-plugin-taskboard
+TASKBOARD_DEMO_PORT=8421 node plugins/taskboard/scripts/factory-browser-check.mjs
+```
+
+The page uses Taskboard's real progress components with in-memory BB responses.
+Click **Start task** on the example card, then use the demo controls to switch
+between awaiting input, blocked, offline, implemented-only and verified states.
+The fixture creates no native agents or external tickets. The panel polls every
+eight seconds while open and marks an observation older than 20 seconds stale;
+it also refreshes immediately on a fixture event. The host-wide ownership
+inventory is slower and cached separately. The demo does not prove host-routed
+delivery; verify that with a locally installed plugin in a connected BB host.
+
 In **Create new ticket**, enter rough text in Title or Description and select
 **Improve title & description**. Taskboard uses a hidden helper with the BB
 project's current provider/model defaults to rewrite only those two fields.

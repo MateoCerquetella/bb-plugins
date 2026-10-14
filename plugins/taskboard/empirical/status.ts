@@ -1,6 +1,7 @@
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { projectEmpiricalCheckout, type EmpiricalCheckoutState, type EmpiricalOverview } from './observation.ts';
+import { z } from 'zod';
+import { empiricalOverviewSchema, projectEmpiricalCheckout, type EmpiricalCheckoutState } from './observation.ts';
 
 const execFileAsync = promisify(execFile);
 
@@ -23,27 +24,35 @@ export type EmpiricalStatusResult =
       mergedButUnclosed?: boolean;
     };
 
-interface StatusDocument {
-  schemaVersion?: unknown;
-  activeFeature?: unknown;
-  revision?: unknown;
-  phase?: unknown;
-  status?: unknown;
-  completion?: { highest?: unknown; verified?: unknown };
-  completionRecord?: { method?: unknown };
-  roadmap?: { nextAction?: unknown; checks?: Array<{ gate?: unknown; state?: unknown }> };
-}
+const statusDocumentSchema = z.object({
+  schemaVersion: z.number().optional(),
+  activeFeature: z.union([z.string(), z.null()]).optional(),
+  revision: z.number().int().safe().optional(),
+  phase: z.string().optional(),
+  status: z.string().optional(),
+  completion: z.object({
+    highest: z.string().optional(),
+    verified: z.boolean().optional()
+  }).optional(),
+  completionRecord: z.object({ method: z.string().optional() }).optional(),
+  roadmap: z.object({
+    nextAction: z.string().optional(),
+    checks: z.array(z.object({ gate: z.unknown(), state: z.unknown() })).optional()
+  }).optional()
+}).passthrough();
 
 export function parseEmpiricalStatus(value: unknown): EmpiricalStatusResult {
-  if (typeof value !== 'object' || value === null) {
+  const parsed = statusDocumentSchema.safeParse(value);
+  if (!parsed.success) {
     return { kind: 'unavailable', reason: 'Empirical returned an invalid status.' };
   }
-  const document = value as StatusDocument;
+  const document = parsed.data;
   if (document.schemaVersion !== 5) {
     return { kind: 'unavailable', reason: 'Unsupported Empirical status schema.' };
   }
   if (document.activeFeature === null) return { kind: 'empty' };
   if (typeof document.activeFeature !== 'string' ||
+    typeof document.revision !== 'number' ||
     !Number.isSafeInteger(document.revision) ||
     typeof document.phase !== 'string' ||
     typeof document.status !== 'string' ||
@@ -54,7 +63,7 @@ export function parseEmpiricalStatus(value: unknown): EmpiricalStatusResult {
   return {
     kind: 'feature',
     feature: document.activeFeature,
-    revision: document.revision as number,
+    revision: document.revision,
     phase: document.phase,
     status: document.status,
     nextAction: typeof document.roadmap?.nextAction === 'string'
@@ -85,7 +94,7 @@ function refreshOwnership(root: string, execute: Execute): void {
     .then(({ stdout }) => {
       let state: EmpiricalCheckoutState;
       try {
-        state = projectEmpiricalCheckout(JSON.parse(stdout) as EmpiricalOverview, root);
+        state = projectEmpiricalCheckout(empiricalOverviewSchema.parse(JSON.parse(stdout) as unknown), root);
       } catch {
         state = { kind: 'invalid', root, issues: ['Empirical overview did not match this checkout.'] };
       }
@@ -112,7 +121,9 @@ export async function readEmpiricalStatus(
         const next = await execute('empirical',
           ['__internal', 'next', '--root', checkoutRoot, '--json'],
           { timeout: 15_000, maxBuffer: 512 * 1024 });
-        const packet = JSON.parse(next.stdout) as { roadmap?: { nextAction?: unknown } };
+        const packet = z.object({
+          roadmap: z.object({ nextAction: z.string().optional() }).optional()
+        }).passthrough().parse(JSON.parse(next.stdout) as unknown);
         if (typeof packet.roadmap?.nextAction === 'string') nextAction = packet.roadmap.nextAction;
       } catch {
         // The status remains useful when the action query is unavailable.

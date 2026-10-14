@@ -11,6 +11,7 @@ declare global {
     factoryStartDelay?: number;
     empiricalStatus: Record<string, unknown>;
     empiricalOffline: boolean;
+    empiricalLastKnown: Record<string, unknown> | null;
     empiricalRefresh: () => void;
     factoryRefresh: () => void;
     createdInputs: Record<string, unknown>[];
@@ -47,12 +48,23 @@ const rpc = {
     if (method === 'factoryEmpirical') {
       const run = record.runs.at(-1);
       if (!run?.threadId || !run.environmentId) return { kind: 'unbound', reason: 'Start task to link an agent workspace.' };
+      const identity = {
+        hostId: 'host_demo', environmentId: run.environmentId,
+        checkoutRoot: '/demo/empirical'
+      };
+      const snapshot = window.empiricalLastKnown;
+      const lastKnown = snapshot && snapshot.hostId === identity.hostId &&
+        snapshot.environmentId === identity.environmentId &&
+        snapshot.checkoutRoot === identity.checkoutRoot ? snapshot : null;
+      if (!window.empiricalOffline) window.empiricalLastKnown = {
+        ...identity, observedAt: Date.now(), status: structuredClone(window.empiricalStatus)
+      };
       return {
-        kind: 'observation', hostId: 'host_demo', environmentId: run.environmentId,
-        checkoutRoot: '/demo/empirical', threadId: run.threadId, observedAt: Date.now(),
+        kind: 'observation', ...identity, threadId: run.threadId, observedAt: Date.now(),
         status: window.empiricalOffline
           ? { kind: 'unavailable', reason: 'The host is offline or Empirical did not respond.' }
-          : structuredClone(window.empiricalStatus)
+          : structuredClone(window.empiricalStatus),
+        lastKnown: window.empiricalOffline ? lastKnown : null
       };
     }
     if (method === 'factoryStartTask') {

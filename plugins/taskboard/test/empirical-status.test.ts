@@ -23,6 +23,8 @@ test('projects durable completion separately from phase and provider activity', 
     completionMethod: null
   });
   assert.equal(parseEmpiricalStatus({ ...document, activeFeature: null }).kind, 'empty');
+  assert.equal(parseEmpiricalStatus({ ...document, revision: Number.MAX_SAFE_INTEGER + 1 }).kind, 'unavailable');
+  assert.equal(parseEmpiricalStatus({ ...document, completion: { highest: 'verified', verified: 'yes' } }).kind, 'unavailable');
   assert.equal(parseEmpiricalStatus({ ...document, revision: '7' }).kind, 'unavailable');
   const legacy = parseEmpiricalStatus({ ...document, roadmap: undefined });
   if (legacy.kind === 'feature') {
@@ -111,4 +113,14 @@ test('reports duplicate ownership and rejects invalid selected copies', async ()
     }) }));
   assert.equal((await readEmpiricalStatus(invalidRoot, async () =>
     ({ stdout: JSON.stringify(document) }))).kind, 'invalid');
+});
+
+test('rejects malformed overview JSON instead of trusting a cast', async () => {
+  const root = '/repo/worktrees/malformed';
+  const read = () => readEmpiricalStatus(root, async (_file, args) => ({
+    stdout: JSON.stringify(args[1] === 'status' ? document : { ...overview, specs: 'not-an-array' })
+  }));
+  await read();
+  await new Promise(resolve => setTimeout(resolve, 0));
+  assert.equal((await read()).kind, 'invalid');
 });

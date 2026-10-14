@@ -1882,6 +1882,10 @@ export default async function plugin(bb: BbPluginApi) {
       if (!run?.threadId || !run.environmentId) {
         return { kind: 'unbound', reason: 'Start task to link an agent workspace.' };
       }
+      const prior = factoryStore.getEmpirical(input);
+      const lastKnown = prior && prior.hostId === run.hostId &&
+        prior.environmentId === run.environmentId &&
+        prior.checkoutRoot === run.checkoutRoot ? prior : null;
       try {
         const [thread, environment] = await Promise.all([
           bb.sdk.threads.get({ threadId: run.threadId }),
@@ -1896,14 +1900,22 @@ export default async function plugin(bb: BbPluginApi) {
         const status = await empiricalHost.call('observeEmpirical',
           { root: environment.path },
           { hostId: environment.hostId, signal: AbortSignal.timeout(55_000) });
+        const observedAt = Date.now();
+        if (status.kind !== 'unavailable') {
+          factoryStore.saveEmpirical(input, {
+            hostId: environment.hostId, environmentId: environment.id,
+            checkoutRoot: environment.path, observedAt, status
+          });
+        }
         return {
           kind: 'observation',
           hostId: environment.hostId,
           environmentId: environment.id,
           checkoutRoot: environment.path,
           threadId: run.threadId,
-          observedAt: Date.now(),
-          status
+          observedAt,
+          status,
+          lastKnown: status.kind === 'unavailable' ? lastKnown : null
         };
       } catch {
         if (!run.hostId || !run.checkoutRoot) {
@@ -1916,7 +1928,8 @@ export default async function plugin(bb: BbPluginApi) {
           checkoutRoot: run.checkoutRoot,
           threadId: run.threadId,
           observedAt: Date.now(),
-          status: { kind: 'unavailable', reason: 'The host is offline or Empirical did not respond.' }
+          status: { kind: 'unavailable', reason: 'The host is offline or Empirical did not respond.' },
+          lastKnown
         };
       }
     },

@@ -396,6 +396,24 @@ test('additive storage preserves unrelated preparation data across reopen', () =
     assert.equal(f.db.prepare('SELECT body FROM preparation_user_data').pluck().get(), 'preserve');
   } finally { f.db.close(); }
 });
+test('Empirical observations survive reopen and older responses cannot replace them', () => {
+  const f = fixture();
+  try {
+    const identity = newRecord(item);
+    const snapshot = {
+      hostId: 'host_a', environmentId: 'env_a', checkoutRoot: '/repo/worktree',
+      observedAt: 200,
+      status: { kind: 'feature', feature: 'task-1', revision: 4, phase: 'verify',
+        status: 'waiting', nextAction: 'Run checks', verification: 'pending',
+        completionLevel: 'implemented', completionMethod: null }
+    } as const;
+    f.store.saveEmpirical(identity, snapshot);
+    f.store.saveEmpirical(identity, { ...snapshot, observedAt: 100,
+      status: { ...snapshot.status, revision: 3 } });
+    const reopened = createFactoryStore(f.db);
+    assert.deepEqual(reopened.getEmpirical(identity), snapshot);
+  } finally { f.db.close(); }
+});
 test('prompts keep tracker data untrusted and impose no Empirical runtime', () => {
   const prompt = factoryPrompt(item, newRecord(item), 'investigate');
   assert.match(prompt, /UNTRUSTED EXTERNAL TRACKER DATA/);

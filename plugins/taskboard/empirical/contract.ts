@@ -21,6 +21,15 @@ export const empiricalStatusSchema = z.discriminatedUnion('kind', [
 ]);
 export type EmpiricalStatus = z.infer<typeof empiricalStatusSchema>;
 
+export const empiricalSnapshotSchema = z.object({
+  hostId: z.string(),
+  environmentId: z.string(),
+  checkoutRoot: z.string(),
+  observedAt: z.number().int().nonnegative(),
+  status: empiricalStatusSchema
+}).strict();
+export type EmpiricalSnapshot = z.infer<typeof empiricalSnapshotSchema>;
+
 export const empiricalObservationSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('unbound'), reason: z.string().max(500) }).strict(),
   z.object({
@@ -30,7 +39,8 @@ export const empiricalObservationSchema = z.discriminatedUnion('kind', [
     checkoutRoot: z.string(),
     threadId: z.string(),
     observedAt: z.number().int().nonnegative(),
-    status: empiricalStatusSchema
+    status: empiricalStatusSchema,
+    lastKnown: empiricalSnapshotSchema.nullable()
   }).strict()
 ]);
 export type EmpiricalObservation = z.infer<typeof empiricalObservationSchema>;

@@ -78,11 +78,11 @@
     "vaul": "^1.1.2"
   },
   "scripts": {
-    "build": "env -u BB_CLI bb plugin build .",
+    "build": "node scripts/run-isolated-bb-cli.mjs plugin build .",
     "dev": "bb plugin dev .",
     "typecheck": "tsc --noEmit",
-    "types:check": "env -u BB_CLI bb plugin types --check .",
-    "types:refresh": "env -u BB_CLI bb plugin types .",
+    "types:check": "node scripts/run-isolated-bb-cli.mjs plugin types --check .",
+    "types:refresh": "node scripts/run-isolated-bb-cli.mjs plugin types .",
     "test": "node --test --experimental-strip-types test/*.test.ts",
     "verify:build": "node scripts/verify-build.mjs",
     "check": "npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build"

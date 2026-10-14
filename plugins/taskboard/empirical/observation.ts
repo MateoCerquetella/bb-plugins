@@ -1,32 +1,40 @@
+import { z } from 'zod';
+
 // A structural subset of empirical-sdd's RepositoryOverview. Keep the
 // projection independent of the host transport and persisted factory record.
-export interface EmpiricalOverview {
-  schemaVersion: number;
-  root: string;
-  truncated: boolean;
-  worktrees: Array<{
-    root: string;
-    selectedFeature: string | null;
-    selection: 'valid' | 'unavailable';
-  }>;
-  specs: Array<{
-    feature: string;
-    owners: string[];
-    ownership: 'selected' | 'unclaimed' | 'conflict' | 'unknown';
-    copies: Array<{
-      root: string;
-      phase: string | null;
-      status: string | null;
-      revision: number | null;
-      completionLevel: string;
-      verification: 'verified' | 'skipped' | 'pending' | 'unknown';
-      nextAction: string;
-      merged: boolean;
-      valid: boolean;
-    }>;
-  }>;
-  issues: Array<{ root: string; feature?: string; code: string; message: string }>;
-}
+export const empiricalOverviewSchema = z.object({
+  schemaVersion: z.number().int(),
+  root: z.string(),
+  truncated: z.boolean(),
+  worktrees: z.array(z.object({
+    root: z.string(),
+    selectedFeature: z.string().nullable(),
+    selection: z.enum(['valid', 'unavailable'])
+  }).passthrough()),
+  specs: z.array(z.object({
+    feature: z.string(),
+    owners: z.array(z.string()),
+    ownership: z.enum(['selected', 'unclaimed', 'conflict', 'unknown']),
+    copies: z.array(z.object({
+      root: z.string(),
+      phase: z.string().nullable(),
+      status: z.string().nullable(),
+      revision: z.number().int().nullable(),
+      completionLevel: z.string(),
+      verification: z.enum(['verified', 'skipped', 'pending', 'unknown']),
+      nextAction: z.string(),
+      merged: z.boolean(),
+      valid: z.boolean()
+    }).passthrough())
+  }).passthrough()),
+  issues: z.array(z.object({
+    root: z.string(),
+    feature: z.string().optional(),
+    code: z.string(),
+    message: z.string()
+  }).passthrough())
+}).passthrough();
+export type EmpiricalOverview = z.infer<typeof empiricalOverviewSchema>;
 
 export type EmpiricalCheckoutState =
   | { kind: 'none'; root: string; issues: string[] }

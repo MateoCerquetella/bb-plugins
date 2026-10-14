@@ -290,7 +290,14 @@ function EmpiricalProgress({ record }: { record: FactoryRecord }) {
     current.hostId === lastGood.hostId &&
     current.environmentId === lastGood.environmentId &&
     current.checkoutRoot === lastGood.checkoutRoot;
-  const displayed = failure ? (sameWorkspace || !current ? lastGood : null) : current;
+  const saved = current?.lastKnown;
+  const retained = saved && current &&
+    saved.hostId === current.hostId &&
+    saved.environmentId === current.environmentId &&
+    saved.checkoutRoot === current.checkoutRoot
+    ? { ...current, observedAt: saved.observedAt, status: saved.status }
+    : sameWorkspace || !current ? lastGood : null;
+  const displayed = failure ? retained : current;
   const stale = !!failure || !!displayed && clock - displayed.observedAt > 20_000;
   const state = displayed?.status;
   const title = !observation && !failure ? 'Connecting' : stale ? 'Stale' :
@@ -306,7 +313,7 @@ function EmpiricalProgress({ record }: { record: FactoryRecord }) {
         <Icon name="MessageCirclePlus" className="size-3.5" />Open session
       </Button>}
     </div>
-    {failure && <p role="status" className="tb-run-caption">{failure}{lastGood ? ' Last observation retained.' : ''}</p>}
+    {failure && <p role="status" className="tb-run-caption">{failure}{retained ? ' Last observation retained.' : ''}</p>}
     {state?.kind === 'feature' && <>
       <p className="tb-empirical-feature">{state.feature}</p>
       {state.ownership === 'conflict' && <p role="alert" className="tb-run-caption">Multiple worktrees claim this feature.</p>}
