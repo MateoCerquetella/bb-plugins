@@ -39,6 +39,7 @@ const fixture = {
   stage: 'Planning', updatedAt: new Date().toISOString(),
   runs: [{
     id: 'run', kind: 'plan', status: 'finished', threadId: 'thr_test', environmentId: 'env_managed_worktree',
+    hostId: 'host_demo', checkoutRoot: '/demo/empirical',
     cursor: 9, turnId: 'turn', planDigest: null, activity: 'Turn finished; work not accepted',
     error: null, output: 'Preserve filters per project. Add a regression test for switching between two projects.',
     updates: [{ id: 'message', text: 'Found the project-switch race. Checking saved preferences.', at: new Date().toISOString() }],
@@ -58,7 +59,7 @@ const html = `<html><head><meta name="viewport" content="width=device-width,init
 ${hostCss}
 :root{font:16px system-ui;--border:#ddd;--muted:#f2f3f5;--primary:#286bd4;--muted-foreground:#71757e;--canvas:#fff;--ink:#292b31;--timeline-accent:#286bd4;--success:#19714d;--destructive-text:#b13a4b}
 *{box-sizing:border-box}body{margin:0;color:var(--ink);background:var(--canvas);font-size:13px}#preview-detail{width:100%;min-width:0}#preview-manual{padding:20px}pre{font-size:11px}
-${css}</style></head><body><div id="root"></div><script>window.factoryFixture=${JSON.stringify(fixture)}</script><script>${result.outputFiles[0].text.replaceAll('</script>', '<\\/script>')}</script></body></html>`;
+${css}</style></head><body><div id="root"></div><script>window.factoryFixture=${JSON.stringify(fixture)};window.empiricalOffline=false;window.empiricalStatus={kind:'feature',feature:'demo-live-work',revision:1,phase:'implement',status:'waiting',nextAction:'Implement the current acceptance criteria',verification:'pending',completionLevel:'none',completionMethod:null};</script><script>${result.outputFiles[0].text.replaceAll('</script>', '<\\/script>')}</script></body></html>`;
 try {
   await page.setViewportSize({ width: 1280, height: 1000 });
   await page.route('https://taskboard-preview.test/**', route => route.fulfill({ contentType: 'text/html', body: html }));
@@ -169,6 +170,29 @@ try {
   assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_investigate', 'thr_build', 'thr_started']);
   await manual.locator('.tb-run[data-live="true"] .tb-live-mark').waitFor();
   assert.equal(await manual.locator('.tb-run[data-live="true"] .tb-live-mark').evaluate(el => getComputedStyle(el).animationName), 'tb-working');
+  const empirical = manual.locator('.tb-empirical-progress');
+  await empirical.getByText('demo-live-work').waitFor();
+  await empirical.getByText('implement · r1').waitFor();
+  await page.evaluate(() => {
+    window.empiricalStatus = { ...window.empiricalStatus, revision: 2, phase: 'review',
+      status: 'blocked', nextAction: 'Resolve review findings' };
+    window.empiricalRefresh();
+  });
+  await empirical.getByText('review · r2').waitFor();
+  await empirical.getByText('Resolve review findings').waitFor();
+  await page.evaluate(() => { window.empiricalOffline = true; window.empiricalRefresh(); });
+  await empirical.getByText('Stale').waitFor();
+  await empirical.getByText('The host is offline or Empirical did not respond.', { exact: false }).waitFor();
+  await page.evaluate(() => {
+    window.empiricalOffline = false;
+    window.empiricalStatus = { ...window.empiricalStatus, revision: 3, phase: 'done',
+      status: 'done', nextAction: 'Completed at verified', verification: 'verified',
+      completionLevel: 'verified', completionMethod: 'reviewed' };
+    window.empiricalRefresh();
+  });
+  await empirical.getByText('done · r3').waitFor();
+  await empirical.getByText('verified · reviewed').waitFor();
+  await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, 'taskboard-empirical-demo.png') });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   assert.equal(await manual.locator('.tb-run[data-live="true"] .tb-live-mark').evaluate(el => getComputedStyle(el).animationName), 'none');
   await page.emulateMedia({ reducedMotion: 'no-preference' });

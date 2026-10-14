@@ -112,6 +112,17 @@ existing Linear details, comments and external link. **Start task** opens
 context once without pinning the panel. Manual pinning remains a separate
 choice in the Taskboard panel.
 
+For tickets started from an initialized Empirical checkout, the progress view
+also shows the selected feature, revision, phase, next action, verification
+and durable completion level. Empirical is read on the native run's exact BB
+host and checkout; this does not start, complete or otherwise change an
+Empirical workflow. Status refreshes serially while the progress view is open.
+The slower repository-wide ownership check runs in the background and fills in
+duplicate-owner or invalid-copy warnings when available. A disconnected host
+keeps the last good observation marked stale, and the native thread remains
+available from **Open session**. Empty, uninitialized, invalid and unavailable
+Empirical states are distinct.
+
 In **Create new ticket**, enter rough text in Title or Description and select
 **Improve title & description**. Taskboard uses a hidden helper with the BB
 project's current provider/model defaults to rewrite only those two fields.

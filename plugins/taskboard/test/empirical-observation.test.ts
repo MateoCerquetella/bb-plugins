@@ -124,13 +124,11 @@ test('retains last good state as stale on timeout or disconnect, then recovers',
   assert.equal(stale.kind, 'stale');
   const disconnected = empiricalObservationAt(received, identity, 120, 50, 'Host offline');
   assert.equal(disconnected.kind, 'stale');
-  if (disconnected.kind === 'unobserved') return;
   assert.equal(disconnected.reason, 'Host offline');
   assert.equal(disconnected.state.kind, 'feature');
   const recovered = receiveEmpiricalObservation(disconnected, identity,
     overview({ phase: 'verify', revision: 4 }), 200);
   assert.equal(recovered.kind, 'observed');
-  if (recovered.kind === 'unobserved') return;
   assert.equal(recovered.state.kind, 'feature');
   if (recovered.state.kind === 'feature') assert.equal(recovered.state.revision, 4);
 });

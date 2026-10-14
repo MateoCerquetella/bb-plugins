@@ -76,6 +76,7 @@ import { createWorkItemStore } from './store.js';
 import { decodeTicketImage } from './ticket-images-server.js';
 import { createFactoryStore } from './factory/store.js';
 import { createFactoryService } from './factory/service.js';
+import { hostContract } from './preparation/contract.js';
 import { progressStatus } from './factory/tracker.js';
 
 const SOURCES: readonly WorkSource[] = ['linear', 'github', 'jira', 'gitlab', 'gitea'];
@@ -481,7 +482,9 @@ export default async function plugin(bb: BbPluginApi) {
     }
   });
   const store = createWorkItemStore(bb);
-  const factory = createFactoryService(bb.sdk, createFactoryStore(bb.storage.database()), projectId =>
+  const factoryStore = createFactoryStore(bb.storage.database());
+  const empiricalHost = bb.hosts.experimental_client({ contract: hostContract });
+  const factory = createFactoryService(bb.sdk, factoryStore, projectId =>
     bb.realtime.publish('taskboard:factory', { projectId }), {
       getItem: identity => store.get(identity.projectId, identity.source, identity.locator) ?? null,
       async markInProgress(item) {
@@ -1870,6 +1873,52 @@ export default async function plugin(bb: BbPluginApi) {
     async factoryDiff(input) {
       await assertProjectExists(input.projectId);
       return factory.diff(input, input.runId, input.path);
+    },
+    async factoryEmpirical(input) {
+      await assertProjectExists(input.projectId);
+      const record = factoryStore.get(input);
+      const run = [...(record?.runs ?? [])].reverse().find(candidate =>
+        candidate.threadId && candidate.environmentId);
+      if (!run?.threadId || !run.environmentId) {
+        return { kind: 'unbound', reason: 'Start task to link an agent workspace.' };
+      }
+      try {
+        const [thread, environment] = await Promise.all([
+          bb.sdk.threads.get({ threadId: run.threadId }),
+          bb.sdk.environments.get({ environmentId: run.environmentId })
+        ]);
+        if (thread.projectId !== input.projectId || thread.environmentId !== run.environmentId ||
+          environment.projectId !== input.projectId || !environment.hostId || !environment.path ||
+          (run.hostId && run.hostId !== environment.hostId) ||
+          (run.checkoutRoot && run.checkoutRoot !== environment.path)) {
+          return { kind: 'unbound', reason: 'The linked session workspace changed or is unavailable.' };
+        }
+        const status = await empiricalHost.call('observeEmpirical',
+          { root: environment.path },
+          { hostId: environment.hostId, signal: AbortSignal.timeout(55_000) });
+        return {
+          kind: 'observation',
+          hostId: environment.hostId,
+          environmentId: environment.id,
+          checkoutRoot: environment.path,
+          threadId: run.threadId,
+          observedAt: Date.now(),
+          status
+        };
+      } catch {
+        if (!run.hostId || !run.checkoutRoot) {
+          return { kind: 'unbound', reason: 'The linked session workspace is offline or unavailable.' };
+        }
+        return {
+          kind: 'observation',
+          hostId: run.hostId,
+          environmentId: run.environmentId,
+          checkoutRoot: run.checkoutRoot,
+          threadId: run.threadId,
+          observedAt: Date.now(),
+          status: { kind: 'unavailable', reason: 'The host is offline or Empirical did not respond.' }
+        };
+      }
     },
     async factoryStartTask(input) {
       await assertProjectExists(input.projectId);

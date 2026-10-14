@@ -437,6 +437,8 @@ export function createFactoryService(
     if (reuse) {
       draft.threadId = reuse;
       draft.environmentId = context!.environmentId;
+      draft.hostId = environment?.hostId ?? null;
+      draft.checkoutRoot = environment?.path ?? null;
       draft.cursor = events[0]?.seq ?? 0;
     }
     if (restoreArchived) {
@@ -476,6 +478,16 @@ export function createFactoryService(
         });
         run.threadId = thread.id;
         run.environmentId = thread.environmentId;
+        try {
+          const workspace = thread.environmentId
+            ? await sdk.environments.get({ environmentId: thread.environmentId }) : null;
+          if (workspace?.projectId === record.projectId) {
+            run.hostId = workspace.hostId;
+            run.checkoutRoot = workspace.path ?? null;
+          }
+        } catch {
+          // The session was dispatched; a later observation can resolve its workspace.
+        }
       }
       run.status = 'running';
       run.activity = 'Waiting for native agent events';
@@ -593,6 +605,12 @@ export function createFactoryService(
         }
         run.threadId = thread.id;
         run.environmentId = thread.environmentId;
+        const workspace = thread.environmentId
+          ? await sdk.environments.get({ environmentId: thread.environmentId }) : null;
+        if (workspace?.projectId === record.projectId) {
+          run.hostId = workspace.hostId;
+          run.checkoutRoot = workspace.path ?? null;
+        }
         run.status = 'running';
         run.error = null;
         return reconcile(persist(record));

@@ -3,9 +3,11 @@ import { mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { hostContract } from './preparation/contract.js';
 import { collectContext } from './preparation/context.js';
+import { readEmpiricalStatus } from './empirical/status.js';
 export default experimental_defineHostEntry({
   contract: hostContract,
   handlers: {
+    observeEmpirical: input => readEmpiricalStatus(input.root),
     collect: (input) => collectContext(input.root, input.request),
     async workspace(input, ctx) {
       const path = join(

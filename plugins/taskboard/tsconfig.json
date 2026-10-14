@@ -33,6 +33,7 @@
     "lib",
     "hooks",
     "host.ts",
-    "preparation"
+    "preparation",
+    "empirical"
   ]
 }
