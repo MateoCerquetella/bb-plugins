@@ -122,9 +122,10 @@ export async function readEmpiricalStatus(
           ['__internal', 'next', '--root', checkoutRoot, '--json'],
           { timeout: 15_000, maxBuffer: 512 * 1024 });
         const packet = z.object({
-          roadmap: z.object({ nextAction: z.string().optional() }).optional()
+          roadmap: z.object({ nextAction: z.string().optional() }).optional(),
+          rationale: z.object({ nextAction: z.string().optional() }).optional()
         }).passthrough().parse(JSON.parse(next.stdout) as unknown);
-        if (typeof packet.roadmap?.nextAction === 'string') nextAction = packet.roadmap.nextAction;
+        nextAction = packet.roadmap?.nextAction ?? packet.rationale?.nextAction ?? nextAction;
       } catch {
         // The status remains useful when the action query is unavailable.
       }

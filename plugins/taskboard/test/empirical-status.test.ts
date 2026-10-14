@@ -78,7 +78,7 @@ test('distinguishes uninitialized from transient failure', async () => {
 test('gets the next action and completion projection from an older status', async () => {
   const result = await readEmpiricalStatus('/repo/worktrees/legacy', async (_file, args) =>
     ({ stdout: JSON.stringify(args[1] === 'status' ? { ...document, roadmap: undefined }
-      : args[1] === 'next' ? { roadmap: { nextAction: 'Continue verification' } }
+      : args[1] === 'next' ? { rationale: { nextAction: 'Continue verification' } }
         : overview) }));
   assert.equal(result.kind, 'feature');
   if (result.kind === 'feature') {
