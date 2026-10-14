@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 10,
+  "revision": 11,
   "activeFeature": "browser-right-panel",
   "request": "Improve the existing Steel Browser plugin: put the live agent browser viewer on the right side opened/closed by clicking a browser icon; dwelling the pointer over the browser panel for about two seconds expands it toward nearly full screen without a blocking modal, with a reversible return to compact view; mimic BB native UI styling, and replace Steel Browser user-facing branding with a personalized name (user preference pending; use configurable display name if needed). Preserve same project-bound browser session and ability to watch the agent work. Implement and verify the human UI and CLI.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
   "phase": "specify",
-  "status": "awaiting_human",
+  "status": "waiting",
   "repairAttempts": 0,
-  "message": "Kernel's primary BB plugin source confirms user-clicked new-tab live-view/login links. The revised login handoff contract and UI/UX advisory are prepared. Reapproval failed because the original capability baseline cannot prove newly touched requirements; no plugin source changed. Awaiting approval of the exact separate-worktree proposal based on fdc3ac94 to preserve the existing Cerq Browser implementation and add the requested client handoff safely.",
+  "message": null,
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:e65ff9ffd69abfe5f81dc39b16f26368d7280da3e02985d2bb6dc87ff45890c0",
@@ -37,7 +37,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-13T23:55:39.814Z",
+  "updatedAt": "2026-10-14T16:38:49.501Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "browser-right-panel-1a47658651f8",
