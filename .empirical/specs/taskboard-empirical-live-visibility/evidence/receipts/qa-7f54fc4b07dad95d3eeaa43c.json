@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-7f54fc4b07dad95d3eeaa43c",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Run the Taskboard-focused type, test, build, and build-metadata checks for live Empirical progress.",
+  "passed": false,
+  "startedAt": "2026-10-14T15:37:06.918Z",
+  "completedAt": "2026-10-14T15:37:49.836Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "taskboard-empirical-live-visibility",
+    "specRevision": 2,
+    "specDigest": "sha256:23291153874870cc75cc38a787e5cee61cce6d731a247b8f8fd75da66c0b00ce",
+    "treeDigest": "sha256:7257cbaf55b8a0e59c88c0fa315d51ea0426824b6705525e01f434639f1c892f",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 6,
+    "gitCommit": "9c48c8a473b3f53e512d0ca5b72d13f979c1ebe1",
+    "textTreeDigest": "sha256:7257cbaf55b8a0e59c88c0fa315d51ea0426824b6705525e01f434639f1c892f"
+  },
+  "digest": "sha256:5f8392427613075296efc61a83077b7244e7adf0b4399e917f7795c165da0232",
+  "kind": "qa",
+  "matrixDigest": "sha256:dc803ff91bcfda63e56273b11396209410b8dd81ed133b03c3cb178b2f1690cb",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "x64",
+    "node": "24.21.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "failed",
+      "summary": "Run the Taskboard-focused type, test, build, and build-metadata checks for live Empirical progress.",
+      "startedAt": "2026-10-14T15:37:06.918Z",
+      "completedAt": "2026-10-14T15:37:49.836Z",
+      "durationMs": 42918,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:f9b129d8080d6ae249324764ab9bf53ce8ebc569462bb37a19a9d1056d966f66",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-taskboard"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH",
+          "TMPDIR"
+        ]
+      },
+      "result": {
+        "exitCode": 1,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:6a99146d81a1d813dc5f95216fb74febd676495e85b9c1acbaaad1830904f98c",
+        "stderrDigest": "sha256:ed6889d0ea25c289afcf26abec6d9c6e09881ca99a804cb4d371b436bfd3da6b",
+        "stdoutTail": "transfer/plugins/taskboard/test/filter-presets-backend.test.ts:374:25) {\n    code: 'ERR_DLOPEN_FAILED'\n  }\n\ntest at test/filter-presets-backend.test.ts:513:1\n✖ enforces a transactional aggregate state-byte limit per project (6.981281ms)\n  Error: The module '/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/better-sqlite3/build/Release/better_sqlite3.node'\n  was compiled against a different Node.js version using\n  NODE_MODULE_VERSION 127. This version of Node.js requires\n  NODE_MODULE_VERSION 137. Please try re-compiling or re-installing\n  the module (for instance, using `npm rebuild` or `npm install`).\n      at Object..node (node:internal/modules/cjs/loader:2087:18)\n      at Module.load (node:internal/modules/cjs/loader:1651:32)\n      at Module._load (node:internal/modules/cjs/loader:1443:12)\n      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n      at Module.require (node:internal/modules/cjs/loader:1674:12)\n      at require (node:internal/modules/helpers:157:16)\n      at bindings (/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/bindings/bindings.js:112:48)\n      at new Database (/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/better-sqlite3/lib/database.js:48:64)\n      at createStore (file:///Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/plugins/taskboard/test/filter-presets-backend.test.ts:45:14)\n      at TestContext.<anonymous> (file:///Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/plugins/taskboard/test/filter-presets-backend.test.ts:514:25) {\n    code: 'ERR_DLOPEN_FAILED'\n  }\n\ntest at test/linear-finished-window.test.ts:112:1\n✖ store defaults existing projects to no finished window and persists it (11.500856ms)\n  Error: The module '/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/better-sqlite3/build/Release/better_sqlite3.node'\n  was compiled against a different Node.js version using\n  NODE_MODULE_VERSION 127. This version of Node.js requires\n  NODE_MODULE_VERSION 137. Please try re-compiling or re-installing\n  the module (for instance, using `npm rebuild` or `npm install`).\n      at Object..node (node:internal/modules/cjs/loader:2087:18)\n      at Module.load (node:internal/modules/cjs/loader:1651:32)\n      at Module._load (node:internal/modules/cjs/loader:1443:12)\n      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n      at Module.require (node:internal/modules/cjs/loader:1674:12)\n      at require (node:internal/modules/helpers:157:16)\n      at bindings (/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/bindings/bindings.js:112:48)\n      at new Database (/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/better-sqlite3/lib/database.js:48:64)\n      at TestContext.<anonymous> (file:///Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/plugins/taskboard/test/linear-finished-window.test.ts:113:14)\n      at Test.runInAsyncScope (node:async_hooks:227:14) {\n    code: 'ERR_DLOPEN_FAILED'\n  }\n\ntest at test/preparation.test.ts:134:1\n✖ real SQLite preparation retains direct edits, project isolation, jobs and settings after reload (28.924747ms)\n  Error: The module '/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/better-sqlite3/build/Release/better_sqlite3.node'\n  was compiled against a different Node.js version using\n  NODE_MODULE_VERSION 127. This version of Node.js requires\n  NODE_MODULE_VERSION 137. Please try re-compiling or re-installing\n  the module (for instance, using `npm rebuild` or `npm install`).\n      at Object..node (node:internal/modules/cjs/loader:2087:18)\n      at Module.load (node:internal/modules/cjs/loader:1651:32)\n      at Module._load (node:internal/modules/cjs/loader:1443:12)\n      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n      at Module.require (node:internal/modules/cjs/loader:1674:12)\n      at require (node:internal/modules/helpers:157:16)\n      at bindings (/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/bindings/bindings.js:112:48)\n      at new Database (/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/better-sqlite3/lib/database.js:48:64)\n      at TestContext.<anonymous> (file:///Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/plugins/taskboard/test/preparation.test.ts:135:14)\n      at Test.runInAsyncScope (node:async_hooks:227:14) {\n    code: 'ERR_DLOPEN_FAILED'\n  }\n\ntest at test/preparation.test.ts:259:1\n✖ job service routes context to the remote host and preserves partial success and immutable retries (5.762768ms)\n  Error: The module '/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/better-sqlite3/build/Release/better_sqlite3.node'\n  was compiled against a different Node.js version using\n  NODE_MODULE_VERSION 127. This version of Node.js requires\n  NODE_MODULE_VERSION 137. Please try re-compiling or re-installing\n  the module (for instance, using `npm rebuild` or `npm install`).\n      at Object..node (node:internal/modules/cjs/loader:2087:18)\n      at Module.load (node:internal/modules/cjs/loader:1651:32)\n      at Module._load (node:internal/modules/cjs/loader:1443:12)\n      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n      at Module.require (node:internal/modules/cjs/loader:1674:12)\n      at require (node:internal/modules/helpers:157:16)\n      at bindings (/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/bindings/bindings.js:112:48)\n      at new Database (/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/better-sqlite3/lib/database.js:48:64)\n      at TestContext.<anonymous> (file:///Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/plugins/taskboard/test/preparation.test.ts:260:14)\n      at Test.runInAsyncScope (node:async_hooks:227:14) {\n    code: 'ERR_DLOPEN_FAILED'\n  }\n\ntest at test/preparation.test.ts:441:1\n✖ old preparations remain discoverable and every pending record is reconciled beyond presentation limits (5.431375ms)\n  Error: The module '/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/better-sqlite3/build/Release/better_sqlite3.node'\n  was compiled against a different Node.js version using\n  NODE_MODULE_VERSION 127. This version of Node.js requires\n  NODE_MODULE_VERSION 137. Please try re-compiling or re-installing\n  the module (for instance, using `npm rebuild` or `npm install`).\n      at Object..node (node:internal/modules/cjs/loader:2087:18)\n      at Module.load (node:internal/modules/cjs/loader:1651:32)\n      at Module._load (node:internal/modules/cjs/loader:1443:12)\n      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n      at Module.require (node:internal/modules/cjs/loader:1674:12)\n      at require (node:internal/modules/helpers:157:16)\n      at bindings (/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/bindings/bindings.js:112:48)\n      at new Database (/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/better-sqlite3/lib/database.js:48:64)\n      at TestContext.<anonymous> (file:///Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/plugins/taskboard/test/preparation.test.ts:443:14)\n      at async Test.run (node:internal/test_runner/test:1409:7) {\n    code: 'ERR_DLOPEN_FAILED'\n  }\n",
+        "stderrTail": "npm error Lifecycle script `test` failed with error:\nnpm error code 1\nnpm error path /Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.3\nnpm error location /Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/plugins/taskboard\nnpm error command failed\nnpm error command sh -c node --test --experimental-strip-types test/*.test.ts\nnpm error Lifecycle script `check` failed with error:\nnpm error code 1\nnpm error path /Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.3\nnpm error location /Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/plugins/taskboard\nnpm error command failed\nnpm error command sh -c npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build\n",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:7257cbaf55b8a0e59c88c0fa315d51ea0426824b6705525e01f434639f1c892f",
+      "sourceTreeAfter": "sha256:7257cbaf55b8a0e59c88c0fa315d51ea0426824b6705525e01f434639f1c892f",
+      "artifacts": []
+    }
+  ],
+  "anomalies": [
+    "outcome-failed"
+  ]
+}
