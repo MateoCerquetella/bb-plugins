@@ -7800,7 +7800,7 @@ export default definePluginApp(app => {
   app.slots.experimental_newThreadPanelAction({
     id: 'taskboard-new-thread-panel',
     title: 'Taskboard',
-    icon: 'Target',
+    icon: 'Ticket',
     component: TaskboardNewThreadPanel,
     layout: 'flush'
   });
