@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "sequence": 11,
+  "previousDigest": "sha256:150e83d2971defa44292eb74ea57eb1771207fbdcd64b96e7125eca8c34d9972",
+  "actor": "root",
+  "type": "transition",
+  "summary": "Independent fresh-context re-review approved the complete BB Surf display rename and pinned hover-sampler change with all six criteria passing and no findings.",
+  "createdAt": "2026-10-15T14:59:30.271Z",
+  "stateBeforeDigest": "sha256:9aff2822fe98737446fba40ed158ff3e15f4e7673dd29db3842e7c04995a37e1",
+  "stateAfterDigest": "sha256:6a766b6e9a5ad8fd82fdd1e12b3827058e13b4e06fd447a60e63cfc0ec8941d5",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 11,
+    "activeFeature": "bb-surf-branding-clean",
+    "request": "Rebuild the already implemented BB Surf branding and responsiveness follow-up from current main so review contains only this feature. Preserve compatibility identifiers and upstream Steel attribution. Update the root and plugin READMEs and icon accessibility title to BB Surf, suspend automatic hover sampling while panel expansion is pinned, preserve compact and hover behavior, add the browser behavior assertion, then run independent review and focused plugin/browser verification. Do not publish or rename the compatibility protocol.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "verify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Independent fresh-context re-review approved the complete BB Surf display rename and pinned hover-sampler change with all six criteria passing and no findings.",
+    "implementationActor": "root",
+    "workStartedAt": "2026-10-15T14:52:21.877Z",
+    "specDigest": "sha256:0223d0f9df88d4c7e80fe501f02c9e90c1f09e418f3841a6c9a4a8a1459aed72",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:a01e6ad4f07055bca4251e44ddf68c913c2d1edbeee843d8154c1ba997248527",
+    "impactDigest": "sha256:f6d77a4fed828be597167b4855c2535dd0ed9160c4e323e42ba753b8ad5c0b08",
+    "capabilityClaimId": "bb-surf-branding-clean-126e96e64c00",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "collected-62027799fc733bb70c05d3c0"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-15T14:59:30.271Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "bb-surf-branding-clean-126e96e64c00",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "bb-surf-branding-clean",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_3bq8hj3659-1/bb-plugins-bb-surf-branding-clean",
+      "worktreeId": "sha256:8954c8cafc08b2e1950518c88729a9bd1b3101f5824c06cb9c5aa901a4b786cc",
+      "baseCommit": "02d3f6731d3eee570c4f242932f338d60e9117b3",
+      "baseTree": "e9c3da95ad04dbcb227b87ef10ef4f3cabb59049",
+      "bases": {
+        "steel-browser-viewer": {
+          "capability": "steel-browser-viewer",
+          "digest": "sha256:34a60c662993a3239e1f26a994ed59f7c034488fc4bb9aab48b7b1eabbcf82ac",
+          "requirements": {
+            "bounded panel hover work": null
+          }
+        }
+      },
+      "capabilities": [
+        "steel-browser-viewer"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-15T14:53:09.824Z",
+      "heartbeatAt": "2026-10-15T14:53:09.824Z",
+      "digest": "sha256:d552038ba876b75d220d52e7722649f26f36df4d1ca8ac6a38eb8d081f4fc126"
+    },
+    "trackerGeneration": 1,
+    "lifecycle": {
+      "stage": "consolidation",
+      "iteration": 1,
+      "awaitingFeedback": false
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:0c20bbfe7c1d6c755fe5fae35f478471c84320b1180154f33ca066e3e5b1be42"
+}

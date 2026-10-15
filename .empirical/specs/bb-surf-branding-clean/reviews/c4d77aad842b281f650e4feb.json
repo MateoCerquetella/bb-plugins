@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:4c1d011c91d28990e5d71d00ee9ccb51ebbbee6f04c9ad5c1e0cf62ed7804484",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "02d3f6731d3eee570c4f242932f338d60e9117b3",
+  "headCommit": "70f7b05809540e5c6492fa01b0180fba8d40cf39",
+  "diffDigest": "sha256:98373f957d5a1a198d0092aea3d72601ae68e0297c643760e0899fb1e47d5183",
+  "verdict": "APPROVED",
+  "reviewerActor": "surf_clean_review",
+  "reviewerInvocationId": "surf-clean-review-20261015T151200Z-4c1d011c",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: The committed display-copy changes rename the current user-facing documentation and icon title to BB Surf while preserving the scoped structure; no contrary current-facing label is introduced by the packet.\n- PASS AC-2: The diff leaves steel-browser paths, commands, directives, fixture domain, and other technical identifiers intact, and the README explicitly preserves upstream Steel Browser attribution.\n- PASS AC-3: The plugin README describes hover and pinned behavior, compatibility identifiers, project-scoped operation, and retains its verification/development guidance.\n- PASS AC-UI-4: The packet updates the remaining scoped accessibility/display surface and preserves theme-driven UI behavior; no theme-specific branding branch is added.\n- PASS AC-5: The hook exits its hover-sampling effect while mode is pinned, allowing normal effect lifecycle cleanup and restart when compact mode resumes; the browser fixture adds an observable interval-lifecycle assertion and preserves compact/hover paths.\n- PASS AC-6: The diff supplies focused browser interaction assertions for the changed behavior and presents no static type/build defect; command execution is intentionally outside this review and must be established by the separate verification receipts.\n\n## Security / correctness\n\nNo material security or correctness issue found in the packet. The changes expose no credentials or personal data, alter no authentication/authorization boundary, and preserve stable protocol identifiers. Correctness of the new polling lifecycle follows the existing React effect cleanup/restart model. No tests were run as part of this review.\n\n## Design / maintainability\n\nAPPROVED. The change keeps branding edits at display surfaces, preserves compatibility boundaries, and implements the behavioral adjustment in the existing usePanelExpansion owner without adding a new abstraction or scattering state checks. The named viewport ratio makes the new geometry legible, and the focused fixture observes the relevant lifecycle without coupling production code to test hooks.",
+  "bodyDigest": "sha256:a492a49b04200f36273ba5b8e33cdad418067b2b95dbf2be52de426ef4d7c218",
+  "findings": [],
+  "digest": "sha256:c4d77aad842b281f650e4feb03076157369f85985d6750d34cbfec4d3af43917"
+}

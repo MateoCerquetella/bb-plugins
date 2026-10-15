@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 
 const HOVER_DELAY = 2000;
+const EXPANDED_VIEWPORT_RATIO = 2 / 3;
 
 // Resize the existing section in place: moving an iframe through a portal
 // would reconnect its authenticated viewer and discard human control state.
@@ -25,7 +26,10 @@ export function usePanelExpansion() {
       const top = Math.max(8, Math.min(box.top, innerHeight - 80));
       const right = Math.max(8, innerWidth - box.right);
       setGeometry({ top, right, height: Math.max(0, Math.min(box.bottom, innerHeight - 8) - top),
-        width: Math.min(innerWidth - right - 8, Math.max(box.width, innerWidth * .9)) });
+        width: Math.min(
+          innerWidth - right - 8,
+          Math.max(box.width, innerWidth * EXPANDED_VIEWPORT_RATIO),
+        ) });
     };
     update();
     const observer = new ResizeObserver(update);
@@ -61,6 +65,7 @@ export function usePanelExpansion() {
   }, [cancel, shrink]);
 
   useEffect(() => {
+    if (mode === "pinned") return;
     // Browsers do not deliver ancestor pointerenter/leave consistently when
     // the pointer crosses straight into a cross-origin iframe. CSS :hover
     // still tracks that hit area, without intercepting input with an overlay.

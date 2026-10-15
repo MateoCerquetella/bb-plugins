@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
-import { Markdown, experimental_Diff as Diff, useBbContext, useBbNavigate, useRealtime, useRpc } from '@get-bb/plugin-sdk/app';
+import { Markdown, experimental_Diff as Diff, useBbContext, useBbNavigate, useRealtime, useRpc, useSettings } from '@get-bb/plugin-sdk/app';
 import type { TaskboardRpcContract, WorkItem } from '../contract.js';
 import type { FactoryRecord, FactoryRun, FactoryRunKind } from './contract.js';
 import { MAX_REVIEW_REPAIRS, readableResultOutput } from './review.js';
@@ -230,7 +230,7 @@ function RunInsights({ record }: { record: FactoryRecord }) {
   </div>;
 }
 
-export function FactoryThreadProgress({ threadId, isCompactViewport }: { threadId: string; isCompactViewport: boolean }) {
+function FactoryThreadProgressContent({ threadId, isCompactViewport }: { threadId: string; isCompactViewport: boolean }) {
   const rpc = useRpc<TaskboardRpcContract>();
   const [record, setRecord] = useState<FactoryRecord | null>(null);
   const [open, setOpen] = useState(false);
@@ -269,6 +269,13 @@ export function FactoryThreadProgress({ threadId, isCompactViewport }: { threadI
       <OriginalTicket record={record} />
     </DialogContent></Dialog>
   </>;
+}
+
+export function FactoryThreadProgress(props: { threadId: string; isCompactViewport: boolean }) {
+  const { values } = useSettings();
+  return values?.showThreadHeaderProgress === false
+    ? null
+    : <FactoryThreadProgressContent {...props} />;
 }
 
 const labels = { investigate: 'Investigate', plan: 'Plan', build: 'Build', review: 'Review' };

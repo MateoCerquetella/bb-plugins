@@ -61,7 +61,13 @@ try {
       :root{--background:${theme==="dark"?"#19191c":"#fafafa"};--foreground:${theme==="dark"?"#e4e4e7":"#242427"};--border:${theme==="dark"?"#333338":"#e4e4e7"};--muted-foreground:#93939e;--accent:#8882;--ring:#888;}
       body{margin:0;color:var(--foreground);background:var(--background);font:13px system-ui}#root{height:100vh;display:flex;padding-top:48px;box-sizing:border-box}
       #conversation{flex:1;min-width:0;padding:16px;overflow:auto}#panel{width:min(440px,70vw);height:100%;border-left:1px solid var(--border)}textarea{display:block;width:80%;height:70px}
-      ${css}</style><div id="root"></div><script>${js}</script>`}));
+      ${css}</style><div id="root"></div><script>
+      window.liveIntervals=new Set();
+      const nativeSetInterval=window.setInterval;
+      const nativeClearInterval=window.clearInterval;
+      window.setInterval=(callback,delay,...args)=>{const id=nativeSetInterval(callback,delay,...args);window.liveIntervals.add(id);return id};
+      window.clearInterval=id=>{window.liveIntervals.delete(id);return nativeClearInterval(id)};
+      </script><script>${js}</script>`}));
     await page.goto("https://cerq-panel.test");
     await metrics.send("Emulation.setDeviceMetricsOverride", {width,height:900,deviceScaleFactor:1,mobile:touch});
     await metrics.send("Emulation.setTouchEmulationEnabled", {enabled:touch,maxTouchPoints:5});
@@ -82,16 +88,16 @@ try {
     // Move out before beginning dwell; focus inside the iframe must not break it.
     await page.mouse.move(5,5);
     const box = await panel.boundingBox();
-    // CDP teleporting directly into an OOPIF skips outer-page hover updates.
-    // Enter through the panel chrome, then dwell over the cross-origin viewer.
+    // Dwell over the panel chrome so the outer page owns the hover timer.
     await page.mouse.move(box.x+80,box.y+20);
-    await page.mouse.move(box.x+80,box.y+120);
     await page.waitForTimeout(1100);
     assert.equal(await page.locator(".steel-thread-panel--expanded").count(),0,"a short hover never expands");
     if (!touch) {
       await page.waitForFunction(()=>document.querySelector(".steel-thread-panel--expanded"));
       const wide = await panel.boundingBox();
-      assert(wide.width>width*.85 && wide.x>=0 && wide.x+wide.width<=width);
+      assert(wide.width>=width*.62 && wide.width<=width*.7 && wide.x>=0 && wide.x+wide.width<=width);
+      const conversation=await page.locator("#conversation").boundingBox();
+      assert(conversation && conversation.width>=width*.28,"expanded browser leaves the thread readable");
       assert.equal(loads,baseline,"dwell does not reconnect viewer");
       assert(await panel.locator("iframe").evaluate(frame=>frame===window.originalFrame));
       assert.equal(await frame.getByRole("textbox").inputValue(),"Preserved while expanding");
@@ -113,8 +119,11 @@ try {
     await panel.getByRole("button", {name:"Expand browser panel"}).click();
     await page.mouse.move(5,5);
     assert.equal(await page.locator(".steel-thread-panel--expanded").count(),1,"explicit expansion stays pinned");
+    await page.waitForFunction(()=>window.liveIntervals.size===0);
+    assert.equal(await page.evaluate(()=>window.liveIntervals.size),0,"pinned expansion suspends hover sampling");
     const wide = await panel.boundingBox();
     assert(wide.x>=0 && wide.x+wide.width<=width && wide.y+wide.height<=900,"expanded view fits viewport");
+    if(!touch) assert(wide.width<=width*.7,"explicit expansion keeps a third of the thread visible");
     assert.equal(await page.getByRole("dialog").count(),0,"no focus trap or modal");
     await page.getByRole("textbox",{name:"Message",exact:true}).fill("Chat remains available");
     await page.keyboard.press("Escape");

@@ -23,6 +23,7 @@ import {
   useRealtime,
   useRealtimeConnectionState,
   useRpc,
+  useSettings,
   type PluginNavPanelProps,
   type PluginNewThreadPanelProps,
   type PluginPendingInteractionProps,
@@ -7146,6 +7147,7 @@ function TaskboardRightPanel({
   projectId: string | null | undefined;
   threadId?: string;
 }) {
+  const { values } = useSettings();
   const rpc = useRpc<TaskboardRpcContract>();
   const navigate = useBbNavigate();
   const composer = useComposer();
@@ -7280,7 +7282,7 @@ function TaskboardRightPanel({
               variant="icon"
             />
           ) : null}
-          <Tooltip>
+          {values?.showThreadHeaderPin !== false && <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 type="button"
@@ -7304,7 +7306,7 @@ function TaskboardRightPanel({
             <TooltipContent>
               {pinned ? 'Stop reopening across chats' : 'Keep open across chats'}
             </TooltipContent>
-          </Tooltip>
+          </Tooltip>}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -7435,6 +7437,7 @@ function TaskboardNewThreadPanel({ projectId }: PluginNewThreadPanelProps) {
 function TaskboardThreadHeaderAction({
   threadId
 }: PluginThreadHeaderActionProps) {
+  const { values } = useSettings();
   const { openThreadPanel } = useBbNavigate();
   const autoOpenedThreadRef = useRef<string | null>(null);
   const openTaskboard = useCallback(
@@ -7474,6 +7477,8 @@ function TaskboardThreadHeaderAction({
     const timeout = window.setTimeout(() => openTaskboard(false), 0);
     return () => window.clearTimeout(timeout);
   }, [openTaskboard, threadId]);
+
+  if (values?.showThreadHeaderPin === false) return null;
 
   return (
     <TooltipProvider delayDuration={250}>
