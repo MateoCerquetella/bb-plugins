@@ -225,6 +225,11 @@ function RunInsights({ record }: { record: FactoryRecord }) {
         <Icon name="MessageCirclePlus" className="size-3.5" />Open session
       </Button>
     </div>}
+    {selected && selected.id !== run.id && run.error && <ErrorNotice
+      title={`${labels[run.kind]} ${run.status === 'uncertain' ? 'needs recovery' : run.status === 'failed' ? 'could not finish' : 'progress is unavailable'}`}
+      nextStep={run.status === 'uncertain' ? 'Confirm the native session before linking it. Do not start duplicate work.'
+        : 'Inspect the latest run and its available recovery action.'}
+      detail={run.error} />}
     {selected && <RunDetail key={selected.id} run={selected} record={record} historical={selected.id !== run.id} />}
     {canContinueBlockedBuild && <ContinueBuild key={run.id} run={run} record={record} />}
   </div>;
