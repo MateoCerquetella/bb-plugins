@@ -38,6 +38,7 @@ function resetTurn(run: FactoryRun, turnId: string | null) {
   run.changedFiles = [];
   run.steps = [];
   run.finishedAt = null;
+  run.pendingCompletion = null;
   run.turnId = turnId;
   run.activity = 'Agent working';
   run.error = null;
@@ -82,10 +83,12 @@ export function applyNativeEvent(run: FactoryRun, event: Event) {
     run.activity = run.status === 'finished' ? 'Turn finished; work not accepted'
       : run.status === 'canceled' ? 'Agent stopped' : 'Agent turn failed';
     run.finishedAt = new Date(event.createdAt).toISOString();
+    run.pendingCompletion = { status: run.status, activity: run.activity };
   } else if (event.type === 'system/thread/interrupted') {
     run.status = 'canceled';
     run.activity = `Interrupted: ${event.data.reason}`;
     run.finishedAt = new Date(event.createdAt).toISOString();
+    run.pendingCompletion = { status: run.status, activity: run.activity };
   }
 }
 
@@ -192,7 +195,6 @@ export function createFactoryService(
       try {
         let resumedBuild = false;
         let started = false;
-        let completed = false;
         for (;;) {
           const cursor = run.cursor;
           const events = await sdk.threads.events.list({
@@ -204,9 +206,7 @@ export function createFactoryService(
             applyNativeEvent(run, event);
             if (event.type === 'turn/started') {
               started = true;
-              completed = false;
             }
-            if (event.type === 'turn/completed' && run.status === 'finished') completed = true;
           }
           if (events.length < 100 || run.cursor <= cursor) break;
         }
@@ -217,11 +217,11 @@ export function createFactoryService(
         }
         run.environmentId = thread.environmentId;
         const active = ['active', 'starting', 'stopping'].includes(thread.status);
-        if (active && !completed && ['finished', 'failed', 'canceled'].includes(run.status)) {
+        if (active && !run.pendingCompletion && ['finished', 'failed', 'canceled'].includes(run.status)) {
           resetTurn(run, null);
           started = true;
         }
-        if (active && started && !completed) {
+        if (active && started && !run.pendingCompletion) {
           resumedBuild ||= run === record.runs.at(-1) && run.kind === 'build';
         }
         if (resumedBuild && record.automationError?.startsWith('Automatic work paused: Build ') &&
@@ -240,7 +240,13 @@ export function createFactoryService(
           run.error = unavailableSession;
         } else if (active) {
           run.status = 'running';
-          run.activity = thread.status === 'stopping' ? 'Stopping agent' : 'Agent working';
+          if (thread.status === 'stopping') run.activity = 'Stopping agent';
+          else if (run.pendingCompletion) run.activity = run.pendingCompletion.activity;
+          else if (!run.activity) run.activity = 'Agent working';
+        } else if (run.pendingCompletion) {
+          run.status = run.pendingCompletion.status;
+          run.activity = run.pendingCompletion.activity;
+          run.pendingCompletion = null;
         } else if (run.status === 'running' && run.finishedAt) {
           run.status = 'finished';
           run.activity = 'Turn finished; work not accepted';

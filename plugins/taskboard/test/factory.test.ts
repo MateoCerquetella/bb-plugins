@@ -579,6 +579,90 @@ test('completion before native idle continues automatically on the next poll', a
   } finally { f.db.close(); }
 });
 
+for (const outcome of ['failed', 'interrupted', 'system-interrupted'] as const) {
+  test(`${outcome} survives active and stopping polls until native idle`, async () => {
+    const f = fixture();
+    try {
+      await f.service.startTask(item, null);
+      const createdAt = Date.now();
+      const scope = { kind: 'turn' as const, turnId: 'terminal-turn' };
+      f.events.push(outcome === 'system-interrupted' ? {
+        id: 'terminal', threadId: 'thr_native', seq: 1, createdAt,
+        scope: { kind: 'thread' }, type: 'system/thread/interrupted', data: { reason: 'manual-stop' }
+      } : {
+        id: 'terminal', threadId: 'thr_native', seq: 1, createdAt, scope, type: 'turn/completed',
+        data: { status: outcome, providerThreadId: null,
+          ...(outcome === 'failed' ? { error: { message: 'Provider request failed' } } : {}) }
+      });
+      const expectedError = outcome === 'failed' ? 'Provider request failed' : null;
+      for (const status of ['active', 'active', 'stopping', 'stopping', 'idle', 'idle']) {
+        f.threadStatus(status, 'thr_native');
+        const record = await f.service.get(item);
+        const run = record.runs[0];
+        assert.equal(run.status, status === 'idle' ? outcome === 'failed' ? 'failed' : 'canceled' : 'running');
+        assert.equal(run.error, expectedError);
+        assert.equal(run.finishedAt, new Date(createdAt).toISOString());
+        assert.equal(run.cursor, 1);
+        if (status === 'idle') assert.equal(run.activity, outcome === 'failed' ? 'Agent turn failed'
+          : outcome === 'interrupted' ? 'Agent stopped' : 'Interrupted: manual-stop');
+        assert.equal(record.runs.length, 1);
+        assert.equal(f.spawns(), 1);
+      }
+      f.threadStatus('active', 'thr_native');
+      const resumed = await f.service.get(item);
+      assert.equal(resumed.runs[0].status, 'running');
+      assert.equal(resumed.runs[0].finishedAt, null);
+      assert.equal(resumed.runs[0].error, null);
+      assert.equal(resumed.runs[0].activity, 'Agent working');
+    } finally { f.db.close(); }
+  });
+}
+
+test('polls preserve event-derived live activity until stopping', async () => {
+  const f = fixture();
+  try {
+    await f.service.startTask(item, null);
+    f.threadStatus('active', 'thr_native');
+    const activities: [Parameters<typeof applyNativeEvent>[1], string][] = [
+      [{
+        id: 'plan', threadId: 'thr_native', seq: 1, createdAt: Date.now(),
+        scope: { kind: 'turn', turnId: 'turn_1' }, type: 'turn/plan/updated',
+        data: { plan: [{ step: 'Inspect project selection', status: 'active' }],
+          providerThreadId: 'provider_1' }
+      }, 'Inspect project selection'],
+      ...([
+        [{ type: 'commandExecution', id: 'command', command: 'npm test' }, 'Running: npm test'],
+        [{ type: 'fileChange', id: 'files', changes: [] }, 'Editing files'],
+        [{ type: 'agentMessage', id: 'message', text: '' }, 'Writing response']
+      ] as const).map(([item, activity], index) => [{
+        id: item.id, threadId: 'thr_native', seq: index + 2, createdAt: Date.now(),
+        scope: { kind: 'turn', turnId: 'turn_1' }, type: 'item/started', data: { item }
+      } as Parameters<typeof applyNativeEvent>[1], activity] satisfies [Parameters<typeof applyNativeEvent>[1], string])
+    ];
+    for (const [event, activity] of activities) {
+      f.events.push(event);
+      assert.equal((await f.service.get(item)).runs[0].activity, activity);
+      await f.service.poll(new AbortController().signal);
+      assert.equal(f.store.all()[0].runs[0].activity, activity);
+    }
+    f.threadStatus('stopping', 'thr_native');
+    assert.equal((await f.service.get(item)).runs[0].activity, 'Stopping agent');
+  } finally { f.db.close(); }
+});
+
+test('legacy successful completion waiting for idle still advances', async () => {
+  const f = fixture();
+  try {
+    let record = await f.service.startTask(item, null);
+    record.runs[0].finishedAt = new Date().toISOString();
+    f.store.save(record);
+    record = await f.service.get(item);
+    assert.equal(record.runs[0].status, 'finished');
+    assert.equal(record.runs[0].output, 'Observed repository findings');
+    assert.equal(record.runs[1].kind, 'plan');
+  } finally { f.db.close(); }
+});
+
 test('planning in a project checkout starts a fresh Build in a managed worktree exactly once', async () => {
   const f = fixture();
   try {

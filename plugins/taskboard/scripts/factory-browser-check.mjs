@@ -106,6 +106,20 @@ try {
     record.version++; window.factoryRefresh();
   });
   const sessionSelect = manual.locator('.tb-session-picker select');
+  assert.equal(await sessionSelect.inputValue(), 'run');
+  await page.evaluate(() => {
+    const record = window.factoryFixture;
+    record.runs.push({ ...record.runs.at(-1), id: 'follow-latest', threadId: 'thr_latest' });
+    record.version++; window.factoryRefresh();
+  });
+  await page.waitForFunction(() =>
+    document.querySelector('#preview-manual .tb-session-picker select')?.value === 'follow-latest');
+  assert.equal(await sessionSelect.inputValue(), 'follow-latest');
+  await page.evaluate(() => {
+    window.factoryFixture.runs.pop();
+    window.factoryFixture.version++;
+    window.factoryRefresh();
+  });
   await sessionSelect.selectOption('investigate-run');
   await page.evaluate(() => window.factoryRefresh());
   assert.equal(await sessionSelect.inputValue(), 'investigate-run');
@@ -114,19 +128,32 @@ try {
   assert.equal(await manual.getByText('Preserve filters per project.', { exact: true }).count(), 0);
   await page.evaluate(() => {
     const record = window.factoryFixture;
-    record.runs.push({ ...record.runs.at(-1), id: 'new-review', kind: 'review', threadId: 'thr_review',
-      output: 'New review details.', reviewResult: { verdict: 'passed', findings: 'New review details.' } });
+    record.runs.push({ ...record.runs.at(-1), id: 'new-build', kind: 'build', threadId: 'thr_build',
+      status: 'finished', output: 'Build needs more work.', reviewResult: null,
+      buildResult: { verdict: 'blocked', summary: 'Build needs more work.', revision: null } });
     record.version++; window.factoryRefresh();
   });
   assert.equal(await sessionSelect.inputValue(), 'investigate-run');
-  await page.evaluate(() => {
-    window.factoryFixture.runs.pop();
-    window.factoryFixture.version++;
-    window.factoryRefresh();
-  });
-  assert.equal(await manual.getByRole('button', { name: 'Open session', exact: true }).count(), 1);
+  assert.equal(await manual.getByRole('button', { name: 'Continue in thread', exact: true }).count(), 1);
   await manual.getByRole('button', { name: 'Open session', exact: true }).click();
   assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_investigate']);
+  await page.evaluate(() => {
+    const record = window.factoryFixture;
+    record.runs = record.runs.filter(run => run.id !== 'investigate-run');
+    record.version++;
+    window.factoryRefresh();
+  });
+  assert.equal(await sessionSelect.inputValue(), 'new-build');
+  assert.equal(await manual.getByRole('button', { name: 'Open session', exact: true }).count(), 1);
+  await manual.getByRole('button', { name: 'Open session', exact: true }).click();
+  assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_investigate', 'thr_build']);
+  await page.evaluate(() => {
+    const record = window.factoryFixture;
+    record.runs.pop();
+    record.version++;
+    window.factoryRefresh();
+  });
+  assert.equal(await sessionSelect.inputValue(), 'run');
   await sessionSelect.selectOption('run');
   await manual.getByText('Implementation plan', { exact: true }).click();
   await manual.getByRole('button', { name: 'Save revision' }).click();
@@ -139,11 +166,11 @@ try {
   await page.locator('#preview-card').getByRole('button', { name: 'Start task', exact: true }).click();
   assert.equal(await page.evaluate(() => window.factoryStarts), 1);
   assert.equal(await page.evaluate(() => localStorage.getItem('bb-taskboard:right-panel-pinned')), null);
-  assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_investigate', 'thr_started']);
+  assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_investigate', 'thr_build', 'thr_started']);
   await manual.locator('.tb-run[data-live="true"] .tb-live-mark').waitFor();
-  assert.equal(await manual.locator('.tb-live-mark').evaluate(el => getComputedStyle(el).animationName), 'tb-working');
+  assert.equal(await manual.locator('.tb-run[data-live="true"] .tb-live-mark').evaluate(el => getComputedStyle(el).animationName), 'tb-working');
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  assert.equal(await manual.locator('.tb-live-mark').evaluate(el => getComputedStyle(el).animationName), 'none');
+  assert.equal(await manual.locator('.tb-run[data-live="true"] .tb-live-mark').evaluate(el => getComputedStyle(el).animationName), 'none');
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.locator('#preview-detail .tb-detail-meta').getByText('In progress', { exact: true }).waitFor({ state: 'attached' });
   for (const width of [1280, 800, 390]) {

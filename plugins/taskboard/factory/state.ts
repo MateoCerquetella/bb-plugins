@@ -81,7 +81,7 @@ export function startRun(record: FactoryRecord, kind: FactoryRunKind, retry: boo
   }
   const run: FactoryRun = {
     id: randomUUID(), kind, status: 'starting' as const, threadId: null,
-    environmentId: null, cursor: 0, turnId: null,
+    environmentId: null, cursor: 0, turnId: null, pendingCompletion: null,
     planDigest: record.approvedDigest, scopeDigest: record.scopeDigest, activity: 'Starting native BB session',
     error: null, output: '', reviewResult: null, buildResult: null, repairOf: null,
     continuationOf: null,

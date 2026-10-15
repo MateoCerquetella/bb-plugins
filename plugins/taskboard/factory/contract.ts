@@ -32,6 +32,10 @@ export const factoryRunSchema = z.object({
   environmentId: z.string().nullable(),
   cursor: z.number().int().nonnegative(),
   turnId: z.string().nullable(),
+  pendingCompletion: z.object({
+    status: z.enum(['finished', 'failed', 'canceled']),
+    activity: z.string()
+  }).strict().nullable().default(null),
   planDigest: z.string().nullable(),
   scopeDigest: z.string().nullable().default(null),
   activity: z.string(),

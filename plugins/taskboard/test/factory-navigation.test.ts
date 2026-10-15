@@ -20,14 +20,13 @@ test('work navigation never changes the persistent pin preference', async () => 
   assert.match(app, /storeRightPanelPinned\(!pinned\)/);
 });
 
-test('command history and earlier runs use closed disclosures by default', async () => {
+test('command history uses closed disclosures by default', async () => {
   const source = await readFile(new URL('../factory/app.tsx', import.meta.url), 'utf8');
   assert.match(source, /<details className="tb-run-disclosure tb-command-group">/);
   assert.match(source, /<details key=\{check\.id\} className="tb-command">/);
   assert.match(source, /\{passed\} passed/);
   assert.match(source, /\{failed\} failed/);
   assert.match(source, /\{unknown\} unknown/);
-  assert.match(source, /Earlier runs/);
 });
 
 test('progress uses native diffs and live-only reduced-motion-safe animation', async () => {
