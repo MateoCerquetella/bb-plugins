@@ -77,6 +77,8 @@ import { decodeTicketImage } from './ticket-images-server.js';
 import { createFactoryStore } from './factory/store.js';
 import { createFactoryService } from './factory/service.js';
 import type { FactoryIdentity } from './factory/contract.js';
+import { factoryKey } from './factory/state.js';
+import { createEmpiricalObservationQueue } from './empirical/serial.js';
 import { hostContract } from './preparation/contract.js';
 import { progressStatus } from './factory/tracker.js';
 
@@ -505,7 +507,11 @@ export default async function plugin(bb: BbPluginApi) {
       }
     }
   );
-  async function observeFactoryEmpirical(input: FactoryIdentity) {
+  const queueEmpiricalObservation = createEmpiricalObservationQueue();
+  function observeFactoryEmpirical(input: FactoryIdentity) {
+    return queueEmpiricalObservation(factoryKey(input), () => readFactoryEmpirical(input));
+  }
+  async function readFactoryEmpirical(input: FactoryIdentity) {
     const record = factoryStore.get(input);
     const run = [...(record?.runs ?? [])].reverse().find(candidate =>
       candidate.threadId && candidate.environmentId);
