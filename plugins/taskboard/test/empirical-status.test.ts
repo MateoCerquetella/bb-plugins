@@ -79,6 +79,14 @@ test('distinguishes empty, invalid, uninitialized and unavailable', async () => 
   const invalid = overview();
   invalid.truncated = true;
   assert.equal((await readEmpiricalStatus(root, 'env-a', async () => invalid, completion)).status.kind, 'invalid');
+  for (const source of [
+    { ...overview(), specs: [{ feature }] },
+    { ...overview(), schemaVersion: 2 },
+    { ...overview(), worktrees: [] }
+  ]) {
+    const observation = await readEmpiricalStatus(root, 'env-a', async () => source, completion);
+    assert.equal(observation.status.kind, 'invalid');
+  }
   const uninitialized = await readEmpiricalStatus(root, 'env-a', async () => {
     throw new EmpiricalError('PROJECT_NOT_INITIALIZED', 'missing project');
   }, completion);

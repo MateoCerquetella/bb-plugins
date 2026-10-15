@@ -1,9 +1,9 @@
 import { resolve } from 'node:path';
 import { EmpiricalError, EmpiricalProject, repositoryOverview } from 'empirical-sdd';
-import { empiricalOverviewSchema, projectEmpiricalCheckout, type EmpiricalOverview } from './observation.ts';
+import { empiricalOverviewSchema, projectEmpiricalCheckout } from './observation.ts';
 import type { EmpiricalStatus } from './contract.ts';
 
-type ReadOverview = (root: string) => Promise<EmpiricalOverview>;
+type ReadOverview = (root: string) => Promise<unknown>;
 type ReadCompletion = (root: string) => Promise<{
   activeFeature: string | null;
   revision: number;
@@ -13,8 +13,7 @@ type ReadCompletion = (root: string) => Promise<{
   completionRecord?: { method: string };
 }>;
 
-const readOverview: ReadOverview = async root =>
-  empiricalOverviewSchema.parse(await repositoryOverview(root));
+const readOverview: ReadOverview = root => repositoryOverview(root);
 
 const readCompletion: ReadCompletion = async root =>
   (await EmpiricalProject.openReadOnly(root, { selection: 'selected' })).status();
@@ -29,9 +28,19 @@ export async function readEmpiricalStatus(
   const result = (status: EmpiricalStatus) => ({ environmentId, root, status });
   try {
     const current = await completion(root);
-    const inventory = await overview(root);
+    const parsed = empiricalOverviewSchema.safeParse(await overview(root));
+    if (!parsed.success) {
+      return result({ kind: 'invalid', reason: 'Empirical overview has an unsupported format.' });
+    }
+    const inventory = parsed.data;
+    if (inventory.schemaVersion !== 1) {
+      return result({ kind: 'invalid', reason: 'Empirical overview has an unsupported version.' });
+    }
     if (inventory.root !== root) {
       return result({ kind: 'invalid', reason: 'Empirical returned another checkout.' });
+    }
+    if (!inventory.worktrees.some(entry => entry.root === root)) {
+      return result({ kind: 'invalid', reason: 'Empirical overview omitted the requested checkout.' });
     }
     const state = projectEmpiricalCheckout(inventory, root);
     if (state.kind === 'none') {
