@@ -449,6 +449,18 @@ function parseGithubRepoFromRemote(
 }
 
 export default async function plugin(bb: BbPluginApi) {
+  bb.settings.define({
+    showThreadHeaderProgress: {
+      type: 'boolean',
+      label: 'Show task progress in thread headers',
+      default: true
+    },
+    showThreadHeaderPin: {
+      type: 'boolean',
+      label: 'Show Taskboard pin and open button',
+      default: true
+    }
+  });
   const store = createWorkItemStore(bb);
   const factory = createFactoryService(bb.sdk, createFactoryStore(bb.storage.database()), projectId =>
     bb.realtime.publish('taskboard:factory', { projectId }), {
