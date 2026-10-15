@@ -1,5 +1,5 @@
 .steel-page {
-  --steel-accent: #cbd0d6;
+  --steel-accent: var(--primary, #cbd0d6);
   --steel-ok: #34885a;
   --steel-down: #ef8c8c;
   height: 100dvh;
@@ -25,6 +25,8 @@
 .steel-project-card:hover { border-color: var(--steel-accent); }
 .steel-project-card__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .steel-project-card__meta { grid-column: 2; color: var(--muted-foreground, #a4a5af); font-size: 12px; }
+.steel-thread-panel-anchor { width: 100%; height: 100%; min-height: 0; }
+.steel-thread-panel, .steel-inline-browser, .steel-agent-settings { --steel-accent: var(--primary, #cbd0d6); }
 .steel-thread-panel {
   display: flex;
   flex-direction: column;
@@ -33,7 +35,34 @@
   min-height: 0;
   color: var(--foreground, #ececef);
   background: var(--background, #18191c);
+  box-sizing: border-box;
+  font: inherit;
+  overflow: hidden;
 }
+.steel-thread-panel--expanded {
+  position: fixed;
+  z-index: 180;
+  max-width: calc(100vw - 16px);
+  border: 1px solid var(--border, #36373d);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px #0003;
+}
+.steel-panel-actions { display: flex; align-items: center; gap: 4px; }
+.steel-thread-panel .steel-icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 6px;
+  border: 0;
+  border-radius: 5px;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+.steel-thread-panel .steel-icon-button svg { width: 16px; height: 16px; }
+.steel-thread-panel .steel-icon-button:hover { background: var(--accent, #292a30); }
+.steel-thread-panel button:focus-visible { outline: 2px solid var(--ring, currentColor); outline-offset: 2px; }
 .steel-thread-panel__bar {
   display: flex;
   align-items: center;
@@ -173,7 +202,7 @@
   justify-content: center;
   gap: 7px;
   padding: 8px 11px;
-  color: #23231e !important;
+  color: var(--primary-foreground, #23231e) !important;
   border-color: var(--steel-accent) !important;
   background: var(--steel-accent) !important;
   font-weight: 600 !important;
@@ -218,7 +247,7 @@
 .steel-updated { display: block; margin-top: 4px; color: var(--muted-foreground, #a4a5af); font-size: 12px; }
 .steel-view-switch { display: grid; grid-template-columns: 34px 34px; gap: 4px; }
 .steel-view-switch button { display: grid; place-items: center; width: 34px; padding: 7px; }
-.steel-view-switch button[aria-pressed="true"] { border-color: var(--steel-accent); color: #23231e; background: var(--steel-accent); }
+.steel-view-switch button[aria-pressed="true"] { border-color: var(--steel-accent); color: var(--primary-foreground, #23231e); background: var(--steel-accent); }
 .steel-view-switch svg { width: 17px; height: 17px; }
 .steel-browser-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr)); gap: 12px; }
 .steel-browser-tile { min-width: 0; border: 1px solid var(--border, #36373d); background: color-mix(in srgb, var(--foreground, #ececef) 2%, transparent); }
@@ -343,13 +372,13 @@
 }
 
 .steel-live { display: flex; flex-direction: column; width: 100%; height: 100%; min-height: 0; flex: 1; color: var(--foreground, #ececef); background: var(--background, #18191c); }
-.steel-live--expanded { position: fixed; inset: 12px; width: auto; height: auto; z-index: 200; border: 1px solid var(--border, #464750); box-shadow: 0 0 0 100vmax #000b; }
+.steel-live--expanded { position: fixed; inset: 12px; width: auto; height: auto; z-index: 200; border: 1px solid var(--border, #464750); border-radius: 8px; box-shadow: 0 8px 32px #0003; }
 .steel-live__bar { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 5px 8px; border-bottom: 1px solid var(--border, #36373d); }
 .steel-live__bar > span { font-size: 11px; color: var(--muted-foreground, #a4a5af); }
 .steel-live__tools { display: flex; gap: 4px; }
 .steel-live button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 32px; border: 1px solid var(--border, #464750); border-radius: 4px; color: inherit; background: var(--secondary, #292a30); cursor: pointer; font: inherit; }
 .steel-live button:disabled { opacity: .45; cursor: not-allowed; }
-.steel-live button:focus-visible { outline: 2px solid #94b5d1; outline-offset: 2px; }
+.steel-live button:focus-visible { outline: 2px solid var(--ring, currentColor); outline-offset: 2px; }
 .steel-live__tools button, .steel-paste-dialog header button { width: 32px; height: 32px; padding: 6px; }
 .steel-live svg { width: 16px; height: 16px; }
 .steel-live iframe { display: block; flex: 1; min-height: 0; width: 100%; height: 0; border: 0; background: #171717; }

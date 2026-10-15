@@ -3,7 +3,7 @@ name: steel-browser
 description: Use for every browser task in BB, including AWS Console, website sign-in, app navigation, screenshots, scraping, and CDP automation. Check bb steel-browser project before claiming browser access is unavailable. Use Steel instead of KERNEL.SH or an external browser.
 ---
 
-# Steel Browser
+# Cerq Browser
 
 ## Availability In New Threads
 
@@ -27,10 +27,12 @@ line in that same assistant message:
 ::steel-browser{}
 ```
 
-The directive renders the live Steel player directly inside the assistant
-message. The latest viewer follows the thread viewport when its message scrolls
-away; minimize it with the header control to stop its viewer stream without
-stopping the browser session. Restore reconnects the viewer.
+The directive renders Cerq Browser inside the assistant message. Choose
+Open browser panel to watch the same project session on the right; the Monitor
+icon in the thread header also opens that panel. Hover there for two seconds
+to expand without a modal; leaving restores the compact view. Explicit Expand
+pins the wide view until Shrink or Escape in BB. Minimize stops only the viewer
+stream; Restore reconnects it without stopping the browser session.
 Never tell the user to use an embedded browser "above" unless this response
 contains the directive. Repeat the directive for later sign-in, MFA, consent,
 or manual-action handoffs; an earlier viewer message is not sufficient.

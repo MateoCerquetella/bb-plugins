@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "sequence": 8,
+  "previousDigest": "sha256:2c059639438a384cb73261cf7cd12e00bd54af9a4c46951e7efd2a0adfee45d7",
+  "actor": "user-requested-login-handoff",
+  "type": "transition",
+  "summary": "Resumed workflow",
+  "createdAt": "2026-10-13T23:48:48.284Z",
+  "stateBeforeDigest": "sha256:04bec3f90eab1ae2eb22a9f46879c7abe6c851d61e16600e5af4e30a1ee095f1",
+  "stateAfterDigest": "sha256:97c5209089a89f7f0ff55e17374a8eb51a8b2f4dc6f62431661ff739c6e332a0",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 8,
+    "activeFeature": "browser-right-panel",
+    "request": "Improve the existing Steel Browser plugin: put the live agent browser viewer on the right side opened/closed by clicking a browser icon; dwelling the pointer over the browser panel for about two seconds expands it toward nearly full screen without a blocking modal, with a reversible return to compact view; mimic BB native UI styling, and replace Steel Browser user-facing branding with a personalized name (user preference pending; use configurable display name if needed). Preserve same project-bound browser session and ability to watch the agent work. Implement and verify the human UI and CLI.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "verify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": null,
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:fbc6ec7bb81874a98ed84b1d1e6e95960f9b459ccfee4cb85d00c800a13a7c46",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:f266397b20093c83bb8151d9933009819d788ab78150a806073bfeb6640b991e",
+    "impactDigest": "sha256:f6d77a4fed828be597167b4855c2535dd0ed9160c4e323e42ba753b8ad5c0b08",
+    "capabilityClaimId": "browser-right-panel-1a47658651f8",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "collected-660d0ec62ddeec9987d79737"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-13T23:48:48.284Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "browser-right-panel-1a47658651f8",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "browser-right-panel",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_3bq8hj3659-1/bb-plugins",
+      "worktreeId": "sha256:f851d2d20e9e598a6653b1376a649315e5e4e5583dc439b20520d19a30b731d1",
+      "baseCommit": "e18c3aadb34d54673e144d7a309697a795e65ad1",
+      "baseTree": "626746b9da79baa76193482188beaf9ef9707b59",
+      "bases": {
+        "steel-browser-viewer": {
+          "capability": "steel-browser-viewer",
+          "digest": "sha256:28b7fb1494b5bd937cabcf1ca485bdc0e70adb1ccee1f0d701e566d442f3b04f",
+          "requirements": {
+            "expand the live right panel without a modal": null,
+            "personalized browser presentation": null
+          }
+        }
+      },
+      "capabilities": [
+        "steel-browser-viewer"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-13T21:48:52.453Z",
+      "heartbeatAt": "2026-10-13T21:48:52.453Z",
+      "digest": "sha256:fdd05bc6904611d467673f522ef2e1f56f445e61e1683aafe42d9eb0a5535398"
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:64acf772f6fca3762849da1134166190ddc991169dbb70d26d9a80eb467994b5"
+}

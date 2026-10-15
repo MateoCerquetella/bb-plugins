@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-6927ec17941eedb92b2aae92",
+  "criteria": [
+    "AC-5",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3",
+    "AC-UI-4"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot",
+    "test"
+  ],
+  "summary": "Workspace and focused plugin checks plus inline, human-control and panel browser fixtures passed. Panel fixtures verify SDK accepted/declined handoff, 2s dwell over cross-origin viewer after chrome entry, cancellation, manual pin/shrink/Escape, iframe retention, thread switching and light/dark desktop/touch bounds. Direct CDP teleport into an OOPIF bypasses outer hover events, so enter panel chrome before dwelling inside it. Authenticated BB host inspection is pending sign-in.",
+  "passed": true,
+  "startedAt": "2026-10-13T22:09:43.928Z",
+  "completedAt": "2026-10-13T22:09:43.928Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "browser-right-panel",
+    "specRevision": 2,
+    "specDigest": "sha256:fbc6ec7bb81874a98ed84b1d1e6e95960f9b459ccfee4cb85d00c800a13a7c46",
+    "treeDigest": "sha256:1e3b97f616e0eb5ff7dfe2bf20dc929f1a0b68b5e983740e4bea448e10adb054",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:703faeef2a581aef8bfa6d68d00afffb6aa61e116bbdf8e7cadb7d69481031e8",
+  "kind": "collected",
+  "collector": "codex-steel-project-cdp",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/browser-right-panel/qa/focused.log",
+      "mediaType": "text/plain",
+      "bytes": 12684,
+      "digest": "sha256:b3f0835663554515a46f4d59fbb96e66cd8534500f2d8bf48d2806fdf5a3866b"
+    },
+    {
+      "path": ".empirical/specs/browser-right-panel/qa/human-control.log",
+      "mediaType": "text/plain",
+      "bytes": 265,
+      "digest": "sha256:669beec895141f58723030fce02725c4126e019e0708158e9ff438ec0adf7eb3"
+    },
+    {
+      "path": ".empirical/specs/browser-right-panel/qa/inline.log",
+      "mediaType": "text/plain",
+      "bytes": 326,
+      "digest": "sha256:dff8d4d3e5fb26c4af0f62621fd3d7f1dba3e11572a8e95fa74e8389b5e484f1"
+    },
+    {
+      "path": ".empirical/specs/browser-right-panel/qa/panel.log",
+      "mediaType": "text/plain",
+      "bytes": 199,
+      "digest": "sha256:f1126d34ec94c5e06b5c36dc7399254f97d2fa8868a8de088ec8798c175882d4"
+    },
+    {
+      "path": ".empirical/specs/browser-right-panel/qa/workspace.log",
+      "mediaType": "text/plain",
+      "bytes": 181768,
+      "digest": "sha256:0c2b178a4c84a2e14c6a8f799a1f824a1782504fc042fd78e86b0c194cca43ba"
+    },
+    {
+      "path": "docs/media/cerq-browser/expanded-dark.png",
+      "mediaType": "image/png",
+      "bytes": 31707,
+      "digest": "sha256:9540097ea43171c36cc5f4b09901d9507b1a064ca4870dd9d5298537e79518b8"
+    },
+    {
+      "path": "docs/media/cerq-browser/expanded-light.png",
+      "mediaType": "image/png",
+      "bytes": 31816,
+      "digest": "sha256:a951673aaf60b709a679817d304bd838605e255f9668c8316d7e6fac2b988667"
+    },
+    {
+      "path": "docs/media/cerq-browser/mobile-light.png",
+      "mediaType": "image/png",
+      "bytes": 30338,
+      "digest": "sha256:7d93e1533b9756b46a13c363bd2bfb68ebef2d9ff121ff7a707aff651f9bd186"
+    }
+  ]
+}

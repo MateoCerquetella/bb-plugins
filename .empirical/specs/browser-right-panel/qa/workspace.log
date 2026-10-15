@@ -1,0 +1,5925 @@
+
+> bb-plugins@0.0.0 check
+> npm run check --workspaces --if-present && npm run check:dockside
+
+
+> bb-plugin-action-topbar@0.1.2 check
+> npm run typecheck && npm test && npm run build
+
+
+> bb-plugin-action-topbar@0.1.2 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-action-topbar@0.1.2 test
+> node --test --experimental-strip-types test/*.test.ts
+
+TAP version 13
+# Subtest: starts with the action set shown in the BB right-panel launcher
+ok 1 - starts with the action set shown in the BB right-panel launcher
+  ---
+  duration_ms: 1.529491
+  type: 'test'
+  ...
+# Subtest: normalizes, bounds, and deduplicates a discovered action catalog
+ok 2 - normalizes, bounds, and deduplicates a discovered action catalog
+  ---
+  duration_ms: 0.413565
+  type: 'test'
+  ...
+# Subtest: round-trips valid storage and rejects unknown storage versions
+ok 3 - round-trips valid storage and rejects unknown storage versions
+  ---
+  duration_ms: 0.447697
+  type: 'test'
+  ...
+# Subtest: a visible launcher replaces the seed while an absent launcher preserves it
+ok 4 - a visible launcher replaces the seed while an absent launcher preserves it
+  ---
+  duration_ms: 0.238195
+  type: 'test'
+  ...
+# Subtest: classifies known and third-party action labels for compact glyphs
+ok 5 - classifies known and third-party action labels for compact glyphs
+  ---
+  duration_ms: 0.390833
+  type: 'test'
+  ...
+# Subtest: mounts the owned strip in the thread-header center and leaves native plus alone
+ok 6 - mounts the owned strip in the thread-header center and leaves native plus alone
+  ---
+  duration_ms: 1.140901
+  type: 'test'
+  ...
+# Subtest: keeps Action lookup scoped to BB's native launcher
+ok 7 - keeps Action lookup scoped to BB's native launcher
+  ---
+  duration_ms: 0.338318
+  type: 'test'
+  ...
+# Subtest: keeps lifecycle and drag work event-driven and reversible
+ok 8 - keeps lifecycle and drag work event-driven and reversible
+  ---
+  duration_ms: 0.32873
+  type: 'test'
+  ...
+# Subtest: retains and releases the initiating pointer for topbar tab drags
+ok 9 - retains and releases the initiating pointer for topbar tab drags
+  ---
+  duration_ms: 0.362411
+  type: 'test'
+  ...
+# Subtest: keeps every Action Topbar surface above host application chrome
+ok 10 - keeps every Action Topbar surface above host application chrome
+  ---
+  duration_ms: 1.122608
+  type: 'test'
+  ...
+# Subtest: preserves keyboard focus and the bounded cross-pane relaunch path
+ok 11 - preserves keyboard focus and the bounded cross-pane relaunch path
+  ---
+  duration_ms: 0.231803
+  type: 'test'
+  ...
+# Subtest: focuses main Action panes without opening the right panel
+ok 12 - focuses main Action panes without opening the right panel
+  ---
+  duration_ms: 0.316568
+  type: 'test'
+  ...
+# Subtest: places close controls on the left and closes through persisted tab state
+ok 13 - places close controls on the left and closes through persisted tab state
+  ---
+  duration_ms: 0.369555
+  type: 'test'
+  ...
+# Subtest: makes Actions drag-only instead of opening them from click or Enter
+ok 14 - makes Actions drag-only instead of opening them from click or Enter
+  ---
+  duration_ms: 1.068701
+  type: 'test'
+  ...
+# Subtest: projects BB tab state into the compact frontend RPC model
+ok 15 - projects BB tab state into the compact frontend RPC model
+  ---
+  duration_ms: 5.703306
+  type: 'test'
+  ...
+# Subtest: persists a topbar drag reorder through BB's tab revision API
+ok 16 - persists a topbar drag reorder through BB's tab revision API
+  ---
+  duration_ms: 1.475954
+  type: 'test'
+  ...
+# Subtest: closes a topbar tab through BB's tab revision API
+ok 17 - closes a topbar tab through BB's tab revision API
+  ---
+  duration_ms: 1.410503
+  type: 'test'
+  ...
+# Subtest: closes a main-pane terminal without a persisted panel tab
+ok 18 - closes a main-pane terminal without a persisted panel tab
+  ---
+  duration_ms: 0.717429
+  type: 'test'
+  ...
+# Subtest: does not close a main-pane terminal owned by another thread
+ok 19 - does not close a main-pane terminal owned by another thread
+  ---
+  duration_ms: 0.924006
+  type: 'test'
+  ...
+# Subtest: bounds host-provided tab labels before returning the RPC projection
+ok 20 - bounds host-provided tab labels before returning the RPC projection
+  ---
+  duration_ms: 0.868525
+  type: 'test'
+  ...
+# Subtest: shows only real content tabs in the mirrored strip
+ok 21 - shows only real content tabs in the mirrored strip
+  ---
+  duration_ms: 1.096631
+  type: 'test'
+  ...
+# Subtest: keeps the empty combobox action-only and ranks open tabs while searching
+ok 22 - keeps the empty combobox action-only and ranks open tabs while searching
+  ---
+  duration_ms: 0.720875
+  type: 'test'
+  ...
+# Subtest: ranks an equivalent open tab before its Action even when titles differ
+ok 23 - ranks an equivalent open tab before its Action even when titles differ
+  ---
+  duration_ms: 0.326646
+  type: 'test'
+  ...
+# Subtest: never positionally pairs a stale New Tab snapshot with a new Action tab
+ok 24 - never positionally pairs a stale New Tab snapshot with a new Action tab
+  ---
+  duration_ms: 0.236843
+  type: 'test'
+  ...
+# Subtest: uses one bounded normalization for server and native tab identities
+ok 25 - uses one bounded normalization for server and native tab identities
+  ---
+  duration_ms: 0.210454
+  type: 'test'
+  ...
+# Subtest: validates RPC snapshots before the content script renders them
+ok 26 - validates RPC snapshots before the content script renders them
+  ---
+  duration_ms: 0.445183
+  type: 'test'
+  ...
+1..26
+# tests 26
+# suites 0
+# pass 26
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 257.821718
+
+> bb-plugin-action-topbar@0.1.2 build
+> env -u BB_CLI bb plugin build .
+
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+dist/app.js
+dist/app.css
+dist/app.meta.json
+
+> bb-plugin-activity-overview@0.1.0 check
+> npm run typecheck && npm test && npm run build
+
+
+> bb-plugin-activity-overview@0.1.0 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-activity-overview@0.1.0 test
+> tsx --test test/*.test.ts
+
+TAP version 13
+# Subtest: period and repository selectors update the rendered summary
+ok 1 - period and repository selectors update the rendered summary
+  ---
+  duration_ms: 127.312736
+  type: 'test'
+  ...
+# Subtest: repository and period filters produce deterministic summaries
+ok 2 - repository and period filters produce deterministic summaries
+  ---
+  duration_ms: 0.796063
+  type: 'test'
+  ...
+# Subtest: the app registers the dashboard on New Thread and preserves existing entry points
+ok 3 - the app registers the dashboard on New Thread and preserves existing entry points
+  ---
+  duration_ms: 39.678635
+  type: 'test'
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 3
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1002.993017
+
+> bb-plugin-activity-overview@0.1.0 build
+> env -u BB_CLI bb plugin build .
+
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+dist/app.js
+dist/app.css
+dist/app.meta.json
+
+> bb-plugin-agent-canvas@0.1.0 check
+> npm run typecheck && npm run test && npm run types:check && npm run build
+
+
+> bb-plugin-agent-canvas@0.1.0 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-agent-canvas@0.1.0 test
+> node --experimental-strip-types --test *.test.ts
+
+TAP version 13
+# Subtest: chains split only standalone separators and generated scripts never interpolate user prompts
+ok 1 - chains split only standalone separators and generated scripts never interpolate user prompts
+  ---
+  duration_ms: 1.492432
+  type: 'test'
+  ...
+# Subtest: each chain step waits for its own accepted turn completion, ignoring other turns
+ok 2 - each chain step waits for its own accepted turn completion, ignoring other turns
+  ---
+  duration_ms: 909.199483
+  type: 'test'
+  ...
+# Subtest: failed turns stop remaining steps, while paused/non-native runs cannot start
+ok 3 - failed turns stop remaining steps, while paused/non-native runs cannot start
+  ---
+  duration_ms: 311.845348
+  type: 'test'
+  ...
+# Subtest: ensemble placement remaps groups and cables without copying a live session
+ok 4 - ensemble placement remaps groups and cables without copying a live session
+  ---
+  duration_ms: 6.834169
+  type: 'test'
+  ...
+# Subtest: locks survive move and alignment; deletion removes graph and collection references
+ok 5 - locks survive move and alignment; deletion removes graph and collection references
+  ---
+  duration_ms: 0.841836
+  type: 'test'
+  ...
+# Subtest: imports reject duplicate cables, ambiguous ensemble groups and unknown live roles
+ok 6 - imports reject duplicate cables, ambiguous ensemble groups and unknown live roles
+  ---
+  duration_ms: 3.254317
+  type: 'test'
+  ...
+# Subtest: undo and redo restore complete document transactions and new edits discard redo
+ok 7 - undo and redo restore complete document transactions and new edits discard redo
+  ---
+  duration_ms: 0.957217
+  type: 'test'
+  ...
+# Subtest: a filtered child retains parents and siblings across project/worktree boundaries
+ok 8 - a filtered child retains parents and siblings across project/worktree boundaries
+  ---
+  duration_ms: 3.482694
+  type: 'test'
+  ...
+# Subtest: cycles terminate and every thread has a finite box
+ok 9 - cycles terminate and every thread has a finite box
+  ---
+  duration_ms: 5.674453
+  type: 'test'
+  ...
+# Subtest: automatic positions are stable across refresh order and children follow parents
+ok 10 - automatic positions are stable across refresh order and children follow parents
+  ---
+  duration_ms: 0.266636
+  type: 'test'
+  ...
+# Subtest: independent agent families tile across the canvas instead of forming one long column
+ok 11 - independent agent families tile across the canvas instead of forming one long column
+  ---
+  duration_ms: 0.204112
+  type: 'test'
+  ...
+# Subtest: browser identity includes the owner and edges follow moved geometry
+ok 12 - browser identity includes the owner and edges follow moved geometry
+  ---
+  duration_ms: 0.173176
+  type: 'test'
+  ...
+# Subtest: workspace squares enclose every agent and browser without overlapping groups
+ok 13 - workspace squares enclose every agent and browser without overlapping groups
+  ---
+  duration_ms: 1.198527
+  type: 'test'
+  ...
+# Subtest: workspace colors remain stable and panes can move beyond workspace boundaries
+ok 14 - workspace colors remain stable and panes can move beyond workspace boundaries
+  ---
+  duration_ms: 0.145385
+  type: 'test'
+  ...
+# Subtest: zoom keeps the world point under the cursor stationary
+ok 15 - zoom keeps the world point under the cursor stationary
+  ---
+  duration_ms: 0.102387
+  type: 'test'
+  ...
+# Subtest: UI control accepts only bounded visual commands
+ok 16 - UI control accepts only bounded visual commands
+  ---
+  duration_ms: 1.629783
+  type: 'test'
+  ...
+# Subtest: library transfers preserve roles and structure with fresh IDs and no live sessions
+ok 17 - library transfers preserve roles and structure with fresh IDs and no live sessions
+  ---
+  duration_ms: 9.244026
+  type: 'test'
+  ...
+# Subtest: note collections transfer to another floor as new notes with remapped cables
+ok 18 - note collections transfer to another floor as new notes with remapped cables
+  ---
+  duration_ms: 2.078442
+  type: 'test'
+  ...
+# Subtest: library imports reject malformed structure and active agents in note collections
+ok 19 - library imports reject malformed structure and active agents in note collections
+  ---
+  duration_ms: 1.157752
+  type: 'test'
+  ...
+# Subtest: existing canvases gain usable presets without overwriting custom roles
+ok 20 - existing canvases gain usable presets without overwriting custom roles
+  ---
+  duration_ms: 3.714497
+  type: 'test'
+  ...
+# Subtest: deleted presets stay deleted after reload and full role libraries stay bounded
+ok 21 - deleted presets stay deleted after reload and full role libraries stay bounded
+  ---
+  duration_ms: 1.054884
+  type: 'test'
+  ...
+# Subtest: native routines inherit target execution and stay paused until activation
+ok 22 - native routines inherit target execution and stay paused until activation
+  ---
+  duration_ms: 2.268399
+  type: 'test'
+  ...
+# Subtest: a cross-project routine is rejected before any native automation mutation
+ok 23 - a cross-project routine is rejected before any native automation mutation
+  ---
+  duration_ms: 0.528204
+  type: 'test'
+  ...
+# Subtest: search matches accents, note bodies and multiword workspace/provider metadata
+ok 24 - search matches accents, note bodies and multiword workspace/provider metadata
+  ---
+  duration_ms: 10.005365
+  type: 'test'
+  ...
+# Subtest: name matches lead body matches, workspace boosts ties, and empty search lists actions first
+ok 25 - name matches lead body matches, workspace boosts ties, and empty search lists actions first
+  ---
+  duration_ms: 0.604743
+  type: 'test'
+  ...
+# Subtest: only the selected universal Control thread can send bounded UI commands
+ok 26 - only the selected universal Control thread can send bounded UI commands
+  ---
+  duration_ms: 14.956599
+  type: 'test'
+  ...
+# Subtest: capture rejects browser ownership from a different host
+ok 27 - capture rejects browser ownership from a different host
+  ---
+  duration_ms: 4.243632
+  type: 'test'
+  ...
+# Subtest: shared document writes serialize revisions and reject stale views
+ok 28 - shared document writes serialize revisions and reject stale views
+  ---
+  duration_ms: 5.982776
+  type: 'test'
+  ...
+# Subtest: stored role presets migrate once and invalidate previously loaded revisions
+ok 29 - stored role presets migrate once and invalidate previously loaded revisions
+  ---
+  duration_ms: 5.19601
+  type: 'test'
+  ...
+# Subtest: connected-note tools enforce the calling project and explicit current links
+ok 30 - connected-note tools enforce the calling project and explicit current links
+  ---
+  duration_ms: 4.237862
+  type: 'test'
+  ...
+# Subtest: Maestro tools require an assigned role and direct teammates; recruitment inherits execution
+ok 31 - Maestro tools require an assigned role and direct teammates; recruitment inherits execution
+  ---
+  duration_ms: 4.053696
+  type: 'test'
+  ...
+# Subtest: native connected-note mentions are minted only for live connections and resolve fresh content
+ok 32 - native connected-note mentions are minted only for live connections and resolve fresh content
+  ---
+  duration_ms: 4.32975
+  type: 'test'
+  ...
+1..32
+# tests 32
+# suites 0
+# pass 32
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1423.852738
+
+> bb-plugin-agent-canvas@0.1.0 types:check
+> env -u BB_CLI bb plugin types --check .
+
+This plugin uses the npm package @get-bb/plugin-sdk; pin is 0.5.29, host is 0.5.29.
+The declarations are in node_modules/@get-bb/plugin-sdk/bundled-types/ — read them for exact signatures.
+
+> bb-plugin-agent-canvas@0.1.0 build
+> env -u BB_CLI bb plugin build .
+
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+dist/app.js
+dist/app.css
+dist/app.meta.json
+
+> bb-plugin-aura@0.2.2 check
+> npm run typecheck && npm test && npm run build
+
+
+> bb-plugin-aura@0.2.2 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-aura@0.2.2 test
+> node --experimental-strip-types --test test/*.test.ts
+
+TAP version 13
+# Subtest: applies scoped backgrounds, disables cleanly and ignores a late fetch after disposal
+ok 1 - applies scoped backgrounds, disables cleanly and ignores a late fetch after disposal
+  ---
+  duration_ms: 86.016647
+  type: 'test'
+  ...
+# Subtest: six independent slots retain images and appearance across switches and reload
+ok 2 - six independent slots retain images and appearance across switches and reload
+  ---
+  duration_ms: 25.916796
+  type: 'test'
+  ...
+# Subtest: invalid image or slot rejects the entire apply without partially changing settings
+ok 3 - invalid image or slot rejects the entire apply without partially changing settings
+  ---
+  duration_ms: 19.518952
+  type: 'test'
+  ...
+# Subtest: scope stays global across slots; clearing/resetting preserves saved work
+ok 4 - scope stays global across slots; clearing/resetting preserves saved work
+  ---
+  duration_ms: 5.610227
+  type: 'test'
+  ...
+# Subtest: image type must match bytes; legacy settings get the new scope default
+ok 5 - image type must match bytes; legacy settings get the new scope default
+  ---
+  duration_ms: 1.395807
+  type: 'test'
+  ...
+# Subtest: versioned images use an immutable private browser cache
+ok 6 - versioned images use an immutable private browser cache
+  ---
+  duration_ms: 17.645734
+  type: 'test'
+  ...
+# Subtest: New thread dimmer toggles without replacing images or saved slots
+ok 7 - New thread dimmer toggles without replacing images or saved slots
+  ---
+  duration_ms: 3.39279
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 474.371744
+
+> bb-plugin-aura@0.2.2 build
+> env -u BB_CLI bb plugin build .
+
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+dist/app.js
+dist/app.css
+dist/app.meta.json
+
+> bb-plugin-conversation-space@0.1.0 check
+> npm run typecheck && npm test && npm run build
+
+
+> bb-plugin-conversation-space@0.1.0 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-conversation-space@0.1.0 test
+> node --test --experimental-strip-types test/*.test.ts
+
+TAP version 13
+# Subtest: Jev diagnostics isolate sessions and ignore partial records
+ok 1 - Jev diagnostics isolate sessions and ignore partial records
+  ---
+  duration_ms: 1.059022
+  type: 'test'
+  ...
+# Subtest: recent diagnostics are bounded, unknown usage is not zero
+ok 2 - recent diagnostics are bounded, unknown usage is not zero
+  ---
+  duration_ms: 1.800045
+  type: 'test'
+  ...
+# Subtest: manual model selection does not claim Jev activity
+ok 3 - manual model selection does not claim Jev activity
+  ---
+  duration_ms: 0.227044
+  type: 'test'
+  ...
+# Subtest: category percentages use disjoint input/cache/output denominator
+ok 4 - category percentages use disjoint input/cache/output denominator
+  ---
+  duration_ms: 0.199274
+  type: 'test'
+  ...
+# Subtest: records roles without duplicating user input and repeated completed items
+ok 5 - records roles without duplicating user input and repeated completed items
+  ---
+  duration_ms: 1.209998
+  type: 'test'
+  ...
+# Subtest: truncation is explicit and tools/system input retain distinct roles
+ok 6 - truncation is explicit and tools/system input retain distinct roles
+  ---
+  duration_ms: 0.306128
+  type: 'test'
+  ...
+# Subtest: text estimates exclude metadata, include full content before display truncation, and separate roles
+ok 7 - text estimates exclude metadata, include full content before display truncation, and separate roles
+  ---
+  duration_ms: 0.298595
+  type: 'test'
+  ...
+# Subtest: loaded content shares use only loaded estimates and handle empty history
+ok 8 - loaded content shares use only loaded estimates and handle empty history
+  ---
+  duration_ms: 0.264773
+  type: 'test'
+  ...
+# Subtest: latest call excludes cached input and does not use cumulative totals
+ok 9 - latest call excludes cached input and does not use cumulative totals
+  ---
+  duration_ms: 0.723099
+  type: 'test'
+  ...
+# Subtest: explicit context measurement takes precedence
+ok 10 - explicit context measurement takes precedence
+  ---
+  duration_ms: 0.134235
+  type: 'test'
+  ...
+# Subtest: reset and unavailable measurements do not show old context
+ok 11 - reset and unavailable measurements do not show old context
+  ---
+  duration_ms: 0.163648
+  type: 'test'
+  ...
+# Subtest: unknown cache does not imply zero cached tokens or known uncached input
+ok 12 - unknown cache does not imply zero cached tokens or known uncached input
+  ---
+  duration_ms: 0.107236
+  type: 'test'
+  ...
+# Subtest: cumulative provider usage remains separate from current context
+ok 13 - cumulative provider usage remains separate from current context
+  ---
+  duration_ms: 0.180129
+  type: 'test'
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 126.584203
+
+> bb-plugin-conversation-space@0.1.0 build
+> env -u BB_CLI bb plugin build .
+
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+dist/app.js
+dist/app.css
+dist/app.meta.json
+
+> bb-plugin-host-monitor@0.1.5 check
+> npm run types:check && npm run typecheck && npm test && npm run build
+
+
+> bb-plugin-host-monitor@0.1.5 types:check
+> env -u BB_CLI bb plugin types --check .
+
+This plugin uses the npm package @get-bb/plugin-sdk; pin is 0.4.21, host is 0.4.21.
+The declarations are in node_modules/@get-bb/plugin-sdk/bundled-types/ — read them for exact signatures.
+
+> bb-plugin-host-monitor@0.1.5 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-host-monitor@0.1.5 test
+> node --import tsx --import ./test/register-css.mjs --test test/*.test.ts
+
+TAP version 13
+# Subtest: keeps the installed plugin identity while presenting Host Monitor
+ok 1 - keeps the installed plugin identity while presenting Host Monitor
+  ---
+  duration_ms: 1.509554
+  type: 'test'
+  ...
+# Subtest: keeps the retired compound identity out of active plugin text
+ok 2 - keeps the retired compound identity out of active plugin text
+  ---
+  duration_ms: 10.20553
+  type: 'test'
+  ...
+# Subtest: keeps threshold color hooks on percentages without rendering a legend or coloring counts
+ok 3 - keeps threshold color hooks on percentages without rendering a legend or coloring counts
+  ---
+  duration_ms: 0.654575
+  type: 'test'
+  ...
+# Subtest: marks download red and upload blue across network readings
+ok 4 - marks download red and upload blue across network readings
+  ---
+  duration_ms: 0.574288
+  type: 'test'
+  ...
+# Subtest: keeps the redesigned host cards flat, private, and keyboard-native
+ok 5 - keeps the redesigned host cards flat, private, and keyboard-native
+  ---
+  duration_ms: 0.639437
+  type: 'test'
+  ...
+# Subtest: registers the Host Monitor sidebar surfaces and targeted inspector
+ok 6 - registers the Host Monitor sidebar surfaces and targeted inspector
+  ---
+  duration_ms: 335.341997
+  type: 'test'
+  ...
+# Subtest: keeps process inspection on demand, target-bound, and privacy-safe
+ok 7 - keeps process inspection on demand, target-bound, and privacy-safe
+  ---
+  duration_ms: 1.922357
+  type: 'test'
+  ...
+# Subtest: keeps process sorting responsive and accessible
+ok 8 - keeps process sorting responsive and accessible
+  ---
+  duration_ms: 1.130102
+  type: 'test'
+  ...
+# Subtest: stamps portaled process confirmations with the plugin overlay scope
+ok 9 - stamps portaled process confirmations with the plugin overlay scope
+  ---
+  duration_ms: 1.117399
+  type: 'test'
+  ...
+# Subtest: network snapshot accepts only a canonical primary IP or null
+ok 10 - network snapshot accepts only a canonical primary IP or null
+  ---
+  duration_ms: 4.302981
+  type: 'test'
+  ...
+# Subtest: network snapshot rejects malformed addresses and extra interface data
+ok 11 - network snapshot rejects malformed addresses and extra interface data
+  ---
+  duration_ms: 1.645222
+  type: 'test'
+  ...
+# Subtest: process rows expose only the bounded privacy-safe projection
+ok 12 - process rows expose only the bounded privacy-safe projection
+  ---
+  duration_ms: 3.363056
+  type: 'test'
+  ...
+# Subtest: process row protection fields cannot contradict each other
+ok 13 - process row protection fields cannot contradict each other
+  ---
+  duration_ms: 0.64699
+  type: 'test'
+  ...
+# Subtest: process list result is strict and bounded
+ok 14 - process list result is strict and bounded
+  ---
+  duration_ms: 1.503914
+  type: 'test'
+  ...
+# Subtest: extra volume fields stay optional for existing hosts and servers
+ok 15 - extra volume fields stay optional for existing hosts and servers
+  ---
+  duration_ms: 1.376231
+  type: 'test'
+  ...
+# Subtest: resource health
+    # Subtest: applies memory thresholds immediately at 85 and 95 percent
+    ok 1 - applies memory thresholds immediately at 85 and 95 percent
+      ---
+      duration_ms: 1.437112
+      type: 'test'
+      ...
+    # Subtest: applies disk thresholds immediately and tolerates a missing disk
+    ok 2 - applies disk thresholds immediately and tolerates a missing disk
+      ---
+      duration_ms: 0.18603
+      type: 'test'
+      ...
+    # Subtest: applies disk thresholds to extra volumes and skips unavailable ones
+    ok 3 - applies disk thresholds to extra volumes and skips unavailable ones
+      ---
+      duration_ms: 0.297203
+      type: 'test'
+      ...
+    # Subtest: requires a sustained CPU streak and never alerts on swap alone
+    ok 4 - requires a sustained CPU streak and never alerts on swap alone
+      ---
+      duration_ms: 0.338768
+      type: 'test'
+      ...
+    # Subtest: selects the most severe alert with a stable resource tie-break
+    ok 5 - selects the most severe alert with a stable resource tie-break
+      ---
+      duration_ms: 0.177483
+      type: 'test'
+      ...
+    # Subtest: uses a supplied ordered threshold pair for health classification
+    ok 6 - uses a supplied ordered threshold pair for health classification
+      ---
+      duration_ms: 0.112365
+      type: 'test'
+      ...
+    1..6
+ok 16 - resource health
+  ---
+  duration_ms: 3.353678
+  type: 'suite'
+  ...
+# Subtest: sample state
+    # Subtest: prioritizes connectivity, active sampling, and errors
+    ok 1 - prioritizes connectivity, active sampling, and errors
+      ---
+      duration_ms: 0.287525
+      type: 'test'
+      ...
+    # Subtest: marks a reading stale only after two complete refresh intervals
+    ok 2 - marks a reading stale only after two complete refresh intervals
+      ---
+      duration_ms: 0.239097
+      type: 'test'
+      ...
+    1..2
+ok 17 - sample state
+  ---
+  duration_ms: 1.964204
+  type: 'suite'
+  ...
+# Subtest: last-good record merging
+    # Subtest: keeps useful snapshots through sampling, errors, and disconnection
+    ok 1 - keeps useful snapshots through sampling, errors, and disconnection
+      ---
+      duration_ms: 0.405991
+      type: 'test'
+      ...
+    # Subtest: rejects duplicate enrolled host ids
+    ok 2 - rejects duplicate enrolled host ids
+      ---
+      duration_ms: 0.490445
+      type: 'test'
+      ...
+    1..2
+ok 18 - last-good record merging
+  ---
+  duration_ms: 0.995346
+  type: 'suite'
+  ...
+# Subtest: dashboard construction
+    # Subtest: sorts by health then case-insensitive name and keeps stale health
+    ok 1 - sorts by health then case-insensitive name and keeps stale health
+      ---
+      duration_ms: 0.516192
+      type: 'test'
+      ...
+    # Subtest: exposes custom thresholds and classifies every machine with them
+    ok 2 - exposes custom thresholds and classifies every machine with them
+      ---
+      duration_ms: 0.132141
+      type: 'test'
+      ...
+    # Subtest: represents a connected machine without a sample as sampling/unavailable
+    ok 3 - represents a connected machine without a sample as sampling/unavailable
+      ---
+      duration_ms: 0.096236
+      type: 'test'
+      ...
+    1..3
+ok 19 - dashboard construction
+  ---
+  duration_ms: 0.845042
+  type: 'suite'
+  ...
+# Subtest: an empty or missing setting yields no extra paths
+ok 20 - an empty or missing setting yields no extra paths
+  ---
+  duration_ms: 1.087845
+  type: 'test'
+  ...
+# Subtest: keeps trimmed absolute paths once and drops relative entries
+ok 21 - keeps trimmed absolute paths once and drops relative entries
+  ---
+  duration_ms: 0.219581
+  type: 'test'
+  ...
+# Subtest: bounds the number of extra paths
+ok 22 - bounds the number of extra paths
+  ---
+  duration_ms: 0.228076
+  type: 'test'
+  ...
+# Subtest: compares parsed path lists by order and content
+ok 23 - compares parsed path lists by order and content
+  ---
+  duration_ms: 0.185268
+  type: 'test'
+  ...
+# Subtest: Host Monitor fleet presentation
+    # Subtest: counts stale and failed samples as attention exactly once
+    ok 1 - counts stale and failed samples as attention exactly once
+      ---
+      duration_ms: 1.445427
+      type: 'test'
+      ...
+    # Subtest: includes stale and failed samples in the Attention filter
+    ok 2 - includes stale and failed samples in the Attention filter
+      ---
+      duration_ms: 0.178245
+      type: 'test'
+      ...
+    # Subtest: keeps a connected host waiting for its first sample neutral
+    ok 3 - keeps a connected host waiting for its first sample neutral
+      ---
+      duration_ms: 0.227274
+      type: 'test'
+      ...
+    # Subtest: uses freshness-aware badge copy and attention styling
+    ok 4 - uses freshness-aware badge copy and attention styling
+      ---
+      duration_ms: 0.196679
+      type: 'test'
+      ...
+    1..4
+ok 24 - Host Monitor fleet presentation
+  ---
+  duration_ms: 3.076392
+  type: 'suite'
+  ...
+# Subtest: Host Monitor fleet view preference
+    # Subtest: uses cards by default for missing or unrecognized values
+    ok 1 - uses cards by default for missing or unrecognized values
+      ---
+      duration_ms: 1.786439
+      type: 'test'
+      ...
+    # Subtest: round-trips both supported layouts
+    ok 2 - round-trips both supported layouts
+      ---
+      duration_ms: 0.215684
+      type: 'test'
+      ...
+    # Subtest: falls back safely when browser storage is unavailable
+    ok 3 - falls back safely when browser storage is unavailable
+      ---
+      duration_ms: 0.194044
+      type: 'test'
+      ...
+    1..3
+ok 25 - Host Monitor fleet view preference
+  ---
+  duration_ms: 3.315358
+  type: 'suite'
+  ...
+# Subtest: Host Monitor IP address presentation
+    # Subtest: does not expose a masked address in any presentation field
+    ok 1 - does not expose a masked address in any presentation field
+      ---
+      duration_ms: 1.263486
+      type: 'test'
+      ...
+    # Subtest: reveals the exact address only after an explicit request
+    ok 2 - reveals the exact address only after an explicit request
+      ---
+      duration_ms: 0.183144
+      type: 'test'
+      ...
+    # Subtest: reports unavailable without inventing or revealing an address
+    ok 3 - reports unavailable without inventing or revealing an address
+      ---
+      duration_ms: 0.141308
+      type: 'test'
+      ...
+    1..3
+ok 26 - Host Monitor IP address presentation
+  ---
+  duration_ms: 3.658375
+  type: 'suite'
+  ...
+# Subtest: calculates aggregate machine-wide CPU utilization
+ok 27 - calculates aggregate machine-wide CPU utilization
+  ---
+  duration_ms: 0.945245
+  type: 'test'
+  ...
+# Subtest: selects one useful non-loopback IPv4 address without interface metadata
+ok 28 - selects one useful non-loopback IPv4 address without interface metadata
+  ---
+  duration_ms: 4.640626
+  type: 'test'
+  ...
+# Subtest: canonicalizes IPv6 while dropping its interface zone identifier
+ok 29 - canonicalizes IPv6 while dropping its interface zone identifier
+  ---
+  duration_ms: 0.377749
+  type: 'test'
+  ...
+# Subtest: returns null when interfaces expose no useful unicast address
+ok 30 - returns null when interfaces expose no useful unicast address
+  ---
+  duration_ms: 0.184717
+  type: 'test'
+  ...
+# Subtest: selects only address-owning interfaces for throughput aggregation
+ok 31 - selects only address-owning interfaces for throughput aggregation
+  ---
+  duration_ms: 0.661857
+  type: 'test'
+  ...
+# Subtest: rejects missing, changed, and regressing CPU counters
+ok 32 - rejects missing, changed, and regressing CPU counters
+  ---
+  duration_ms: 0.402064
+  type: 'test'
+  ...
+# Subtest: calculates capacities and validates byte relationships
+ok 33 - calculates capacities and validates byte relationships
+  ---
+  duration_ms: 0.215423
+  type: 'test'
+  ...
+# Subtest: parses Linux MemAvailable and swap in kibibytes
+ok 34 - parses Linux MemAvailable and swap in kibibytes
+  ---
+  duration_ms: 0.447236
+  type: 'test'
+  ...
+# Subtest: estimates Linux available memory when MemAvailable is absent
+ok 35 - estimates Linux available memory when MemAvailable is absent
+  ---
+  duration_ms: 0.267538
+  type: 'test'
+  ...
+# Subtest: rejects incomplete or inconsistent Linux counters independently
+ok 36 - rejects incomplete or inconsistent Linux counters independently
+  ---
+  duration_ms: 0.387648
+  type: 'test'
+  ...
+# Subtest: parses os-release as data without evaluating it
+ok 37 - parses os-release as data without evaluating it
+  ---
+  duration_ms: 0.269061
+  type: 'test'
+  ...
+# Subtest: parses macOS vm_stat using the reported 16 KiB page size
+ok 38 - parses macOS vm_stat using the reported 16 KiB page size
+  ---
+  duration_ms: 0.401002
+  type: 'test'
+  ...
+# Subtest: rejects malformed vm_stat output and clamps racing page totals
+ok 39 - rejects malformed vm_stat output and clamps racing page totals
+  ---
+  duration_ms: 0.21352
+  type: 'test'
+  ...
+# Subtest: parses decimal macOS swap counters and optional encryption suffix
+ok 40 - parses decimal macOS swap counters and optional encryption suffix
+  ---
+  duration_ms: 0.430506
+  type: 'test'
+  ...
+# Subtest: parses sw_vers labels without depending on field order
+ok 41 - parses sw_vers labels without depending on field order
+  ---
+  duration_ms: 0.133403
+  type: 'test'
+  ...
+# Subtest: calculates df-style system-volume usage from statfs counters
+ok 42 - calculates df-style system-volume usage from statfs counters
+  ---
+  duration_ms: 0.200165
+  type: 'test'
+  ...
+# Subtest: clamps negative statfs bavail and rejects unsafe byte totals
+ok 43 - clamps negative statfs bavail and rejects unsafe byte totals
+  ---
+  duration_ms: 0.175089
+  type: 'test'
+  ...
+# Subtest: collects a schema-valid strict-JSON snapshot on the current machine
+ok 44 - collects a schema-valid strict-JSON snapshot on the current machine
+  ---
+  duration_ms: 134.847928
+  type: 'test'
+  ...
+# Subtest: propagates an already-aborted snapshot request
+ok 45 - propagates an already-aborted snapshot request
+  ---
+  duration_ms: 0.321808
+  type: 'test'
+  ...
+# Subtest: rejects out-of-contract CPU sample windows
+ok 46 - rejects out-of-contract CPU sample windows
+  ---
+  duration_ms: 0.118125
+  type: 'test'
+  ...
+# Subtest: omits extra volumes when none are configured
+ok 47 - omits extra volumes when none are configured
+  ---
+  duration_ms: 110.331619
+  type: 'test'
+  ...
+# Subtest: measures a configured extra volume like the system volume
+ok 48 - measures a configured extra volume like the system volume
+  ---
+  duration_ms: 109.931468
+  type: 'test'
+  ...
+# Subtest: marks missing, unmounted, and relative extra paths unavailable
+ok 49 - marks missing, unmounted, and relative extra paths unavailable
+  ---
+  duration_ms: 1.850747
+  type: 'test'
+  ...
+# Subtest: keeps sampling when one extra volume is missing
+ok 50 - keeps sampling when one extra volume is missing
+  ---
+  duration_ms: 110.082143
+  type: 'test'
+  ...
+# Subtest: Host Monitor network presentation
+    # Subtest: formats rates compactly using binary units
+    ok 1 - formats rates compactly using binary units
+      ---
+      duration_ms: 13.766788
+      type: 'test'
+      ...
+    # Subtest: uses an unavailable marker for absent or invalid rates
+    ok 2 - uses an unavailable marker for absent or invalid rates
+      ---
+      duration_ms: 0.192081
+      type: 'test'
+      ...
+    # Subtest: builds a shared receive and send summary
+    ok 3 - builds a shared receive and send summary
+      ---
+      duration_ms: 1.050917
+      type: 'test'
+      ...
+    1..3
+ok 51 - Host Monitor network presentation
+  ---
+  duration_ms: 16.260798
+  type: 'suite'
+  ...
+# Subtest: parses Linux counters, excludes loopback, and handles alias colons
+ok 52 - parses Linux counters, excludes loopback, and handles alias colons
+  ---
+  duration_ms: 2.336083
+  type: 'test'
+  ...
+# Subtest: parses macOS counters once per interface and excludes loopback
+ok 53 - parses macOS counters once per interface and excludes loopback
+  ---
+  duration_ms: 0.6248
+  type: 'test'
+  ...
+# Subtest: parses Windows UInt64 strings without leaking adapter details
+ok 54 - parses Windows UInt64 strings without leaking adapter details
+  ---
+  duration_ms: 0.45474
+  type: 'test'
+  ...
+# Subtest: selects only interfaces that own useful addresses
+ok 55 - selects only interfaces that own useful addresses
+  ---
+  duration_ms: 0.259543
+  type: 'test'
+  ...
+# Subtest: derives rounded bytes-per-second from one bounded sample window
+ok 56 - derives rounded bytes-per-second from one bounded sample window
+  ---
+  duration_ms: 0.227645
+  type: 'test'
+  ...
+# Subtest: reports a stable zero delta as zero bytes per second
+ok 57 - reports a stable zero delta as zero bytes per second
+  ---
+  duration_ms: 0.122994
+  type: 'test'
+  ...
+# Subtest: uses stable interfaces only when topology or one counter changes
+ok 58 - uses stable interfaces only when topology or one counter changes
+  ---
+  duration_ms: 0.218329
+  type: 'test'
+  ...
+# Subtest: fails closed when no stable safe rate can be calculated
+ok 59 - fails closed when no stable safe rate can be calculated
+  ---
+  duration_ms: 0.275131
+  type: 'test'
+  ...
+# Subtest: process confirmations are one-use and consumed before remote work
+ok 60 - process confirmations are one-use and consumed before remote work
+  ---
+  duration_ms: 1.480451
+  type: 'test'
+  ...
+# Subtest: process confirmations expire at the deadline and stay one-use
+ok 61 - process confirmations expire at the deadline and stay one-use
+  ---
+  duration_ms: 0.261787
+  type: 'test'
+  ...
+# Subtest: a new challenge invalidates every prior mode for the same process identity
+ok 62 - a new challenge invalidates every prior mode for the same process identity
+  ---
+  duration_ms: 0.293505
+  type: 'test'
+  ...
+# Subtest: process confirmation storage is bounded and prunes expired entries
+ok 63 - process confirmation storage is bounded and prunes expired entries
+  ---
+  duration_ms: 0.777278
+  type: 'test'
+  ...
+# Subtest: process confirmation options reject unbounded configurations
+ok 64 - process confirmation options reject unbounded configurations
+  ---
+  duration_ms: 0.257039
+  type: 'test'
+  ...
+# Subtest: process operations serialize per host while different hosts stay independent
+ok 65 - process operations serialize per host while different hosts stay independent
+  ---
+  duration_ms: 1.180665
+  type: 'test'
+  ...
+# Subtest: process operation waiting is strictly bounded
+ok 66 - process operation waiting is strictly bounded
+  ---
+  duration_ms: 0.437317
+  type: 'test'
+  ...
+# Subtest: a synchronous operation throw cannot wedge the host queue
+ok 67 - a synchronous operation throw cannot wedge the host queue
+  ---
+  duration_ms: 0.256198
+  type: 'test'
+  ...
+# Subtest: closing the gate rejects queued destructive work without starting it
+ok 68 - closing the gate rejects queued destructive work without starting it
+  ---
+  duration_ms: 0.294236
+  type: 'test'
+  ...
+# Subtest: sorts processes deterministically without mutating the RPC rows
+ok 69 - sorts processes deterministically without mutating the RPC rows
+  ---
+  duration_ms: 13.76802
+  type: 'test'
+  ...
+# Subtest: filters processes by safe name or PID fields
+ok 70 - filters processes by safe name or PID fields
+  ---
+  duration_ms: 0.420287
+  type: 'test'
+  ...
+# Subtest: summarizes top resource consumers and protected processes
+ok 71 - summarizes top resource consumers and protected processes
+  ---
+  duration_ms: 0.260815
+  type: 'test'
+  ...
+# Subtest: prefers a graceful end and only labels force-only platforms honestly
+ok 72 - prefers a graceful end and only labels force-only platforms honestly
+  ---
+  duration_ms: 0.156305
+  type: 'test'
+  ...
+# Subtest: keeps blocked processes non-actionable with an accessible reason
+ok 73 - keeps blocked processes non-actionable with an accessible reason
+  ---
+  duration_ms: 0.223328
+  type: 'test'
+  ...
+# Subtest: shows only safe ownership categories
+ok 74 - shows only safe ownership categories
+  ---
+  duration_ms: 0.091487
+  type: 'test'
+  ...
+# Subtest: termination timeout has clear headroom over bounded Windows commands
+ok 75 - termination timeout has clear headroom over bounded Windows commands
+  ---
+  duration_ms: 2.807803
+  type: 'test'
+  ...
+# Subtest: listProcesses routes only to the explicit enrolled connected host
+ok 76 - listProcesses routes only to the explicit enrolled connected host
+  ---
+  duration_ms: 13.963926
+  type: 'test'
+  ...
+# Subtest: identical overlapping process polls are coalesced
+ok 77 - identical overlapping process polls are coalesced
+  ---
+  duration_ms: 5.880349
+  type: 'test'
+  ...
+# Subtest: termination preparation waits behind one active poll on the same host
+ok 78 - termination preparation waits behind one active poll on the same host
+  ---
+  duration_ms: 4.42333
+  type: 'test'
+  ...
+# Subtest: offline and unknown hosts never start a host worker
+ok 79 - offline and unknown hosts never start a host worker
+  ---
+  duration_ms: 1.440578
+  type: 'test'
+  ...
+# Subtest: prepare issues a one-use challenge and execute consumes it before dispatch
+ok 80 - prepare issues a one-use challenge and execute consumes it before dispatch
+  ---
+  duration_ms: 3.664326
+  type: 'test'
+  ...
+# Subtest: execute reports known preflight failure before dispatch and unknown transport outcome after dispatch
+ok 81 - execute reports known preflight failure before dispatch and unknown transport outcome after dispatch
+  ---
+  duration_ms: 1.931314
+  type: 'test'
+  ...
+# Subtest: process names are reduced to safe basenames without Unicode controls
+ok 82 - process names are reduced to safe basenames without Unicode controls
+  ---
+  duration_ms: 1.621809
+  type: 'test'
+  ...
+# Subtest: opaque process identities bind platform, PID, and lifetime without leaking it
+ok 83 - opaque process identities bind platform, PID, and lifetime without leaking it
+  ---
+  duration_ms: 0.666275
+  type: 'test'
+  ...
+# Subtest: Linux proc parsers handle parenthesized names and bounded RSS
+ok 84 - Linux proc parsers handle parenthesized names and bounded RSS
+  ---
+  duration_ms: 1.133498
+  type: 'test'
+  ...
+# Subtest: macOS parser never returns path or UID and normalizes machine CPU
+ok 85 - macOS parser never returns path or UID and normalizes machine CPU
+  ---
+  duration_ms: 0.638305
+  type: 'test'
+  ...
+# Subtest: Windows parser ignores injected credentials and executable details
+ok 86 - Windows parser ignores injected credentials and executable details
+  ---
+  duration_ms: 0.653824
+  type: 'test'
+  ...
+# Subtest: Windows collection proves ownership without requiring elevated Get-Process
+ok 87 - Windows collection proves ownership without requiring elevated Get-Process
+  ---
+  duration_ms: 0.609833
+  type: 'test'
+  ...
+# Subtest: process protection blocks system, monitor, ancestor, owner, identity, and elevation
+ok 88 - process protection blocks system, monitor, ancestor, owner, identity, and elevation
+  ---
+  duration_ms: 0.329902
+  type: 'test'
+  ...
+# Subtest: monitor ancestry is bounded and cycle safe
+ok 89 - monitor ancestry is bounded and cycle safe
+  ---
+  duration_ms: 0.284148
+  type: 'test'
+  ...
+# Subtest: POSIX modes map only to SIGTERM and explicit SIGKILL
+ok 90 - POSIX modes map only to SIGTERM and explicit SIGKILL
+  ---
+  duration_ms: 0.220081
+  type: 'test'
+  ...
+# Subtest: Windows force script rechecks StartTime and kills the validated object
+ok 91 - Windows force script rechecks StartTime and kills the validated object
+  ---
+  duration_ms: 0.705177
+  type: 'test'
+  ...
+# Subtest: live process collection is schema-valid and exposes only safe fields
+ok 92 - live process collection is schema-valid and exposes only safe fields
+  ---
+  duration_ms: 426.870127
+  type: 'test'
+  ...
+# Subtest: host process RPC validates its bounded strict result
+ok 93 - host process RPC validates its bounded strict result
+  ---
+  duration_ms: 455.017121
+  type: 'test'
+  ...
+# Subtest: refresh fans out only to connected hosts and isolates one failure
+ok 94 - refresh fans out only to connected hosts and isolates one failure
+  ---
+  duration_ms: 14.472425
+  type: 'test'
+  ...
+# Subtest: CLI exposes the bounded cached dashboard used by Touch Bar
+ok 95 - CLI exposes the bounded cached dashboard used by Touch Bar
+  ---
+  duration_ms: 2.331574
+  type: 'test'
+  ...
+# Subtest: CLI open request is claimed exactly once by the desktop app
+ok 96 - CLI open request is claimed exactly once by the desktop app
+  ---
+  duration_ms: 1.521235
+  type: 'test'
+  ...
+# Subtest: CLI opens one validated enrolled host and rejects unknown ids
+ok 97 - CLI opens one validated enrolled host and rejects unknown ids
+  ---
+  duration_ms: 0.984106
+  type: 'test'
+  ...
+# Subtest: a failed refresh preserves the last good reading
+ok 98 - a failed refresh preserves the last good reading
+  ---
+  duration_ms: 2.910681
+  type: 'test'
+  ...
+# Subtest: CPU health uses configurable thresholds after three high samples
+ok 99 - CPU health uses configurable thresholds after three high samples
+  ---
+  duration_ms: 3.330266
+  type: 'test'
+  ...
+# Subtest: threshold settings keep the toggle key and expose effective percentages
+ok 100 - threshold settings keep the toggle key and expose effective percentages
+  ---
+  duration_ms: 1.143967
+  type: 'test'
+  ...
+# Subtest: settings changes immediately recompute dashboard health
+ok 101 - settings changes immediately recompute dashboard health
+  ---
+  duration_ms: 1.69402
+  type: 'test'
+  ...
+# Subtest: sends no extra volume paths by default
+ok 102 - sends no extra volume paths by default
+  ---
+  duration_ms: 1.579071
+  type: 'test'
+  ...
+# Subtest: samples configured extra volumes and alerts on their threshold
+ok 103 - samples configured extra volumes and alerts on their threshold
+  ---
+  duration_ms: 1.952843
+  type: 'test'
+  ...
+# Subtest: Host Monitor sidebar summary
+    # Subtest: distinguishes null loading, error, and idle-empty states
+    ok 1 - distinguishes null loading, error, and idle-empty states
+      ---
+      duration_ms: 1.257064
+      type: 'test'
+      ...
+    # Subtest: reports an all-healthy connected fleet
+    ok 2 - reports an all-healthy connected fleet
+      ---
+      duration_ms: 0.284769
+      type: 'test'
+      ...
+    # Subtest: surfaces an offline host when no connected host needs attention
+    ok 3 - surfaces an offline host when no connected host needs attention
+      ---
+      duration_ms: 0.203692
+      type: 'test'
+      ...
+    # Subtest: counts each attention host once and gives critical health precedence
+    ok 4 - counts each attention host once and gives critical health precedence
+      ---
+      duration_ms: 0.369244
+      type: 'test'
+      ...
+    # Subtest: uses the attention tone when freshness needs attention without a critical host
+    ok 5 - uses the attention tone when freshness needs attention without a critical host
+      ---
+      duration_ms: 0.130758
+      type: 'test'
+      ...
+    # Subtest: keeps a connected host waiting for its first sample neutral
+    ok 6 - keeps a connected host waiting for its first sample neutral
+      ---
+      duration_ms: 0.170581
+      type: 'test'
+      ...
+    # Subtest: degrades cached data when a later refresh is unavailable
+    ok 7 - degrades cached data when a later refresh is unavailable
+      ---
+      duration_ms: 0.160102
+      type: 'test'
+      ...
+    1..7
+ok 104 - Host Monitor sidebar summary
+  ---
+  duration_ms: 3.48591
+  type: 'suite'
+  ...
+# Subtest: Host Monitor sidebar requests
+    # Subtest: claims native open requests only from BB desktop windows
+    ok 1 - claims native open requests only from BB desktop windows
+      ---
+      duration_ms: 0.387587
+      type: 'test'
+      ...
+    # Subtest: loads the declarative sidebar color preference
+    ok 2 - loads the declarative sidebar color preference
+      ---
+      duration_ms: 0.196268
+      type: 'test'
+      ...
+    # Subtest: uses the dashboard RPC for passive reads
+    ok 3 - uses the dashboard RPC for passive reads
+      ---
+      duration_ms: 0.228036
+      type: 'test'
+      ...
+    # Subtest: uses refresh-all semantics for an explicit refresh
+    ok 4 - uses refresh-all semantics for an explicit refresh
+      ---
+      duration_ms: 0.119398
+      type: 'test'
+      ...
+    1..4
+ok 105 - Host Monitor sidebar requests
+  ---
+  duration_ms: 1.194269
+  type: 'suite'
+  ...
+# Subtest: Host Monitor sidebar threshold colors
+    # Subtest: accepts enabled and disabled preference values
+    ok 1 - accepts enabled and disabled preference values
+      ---
+      duration_ms: 0.162907
+      type: 'test'
+      ...
+    # Subtest: preserves the last-known value for malformed responses
+    ok 2 - preserves the last-known value for malformed responses
+      ---
+      duration_ms: 0.076359
+      type: 'test'
+      ...
+    # Subtest: parses only explicit boolean cache values
+    ok 3 - parses only explicit boolean cache values
+      ---
+      duration_ms: 0.073885
+      type: 'test'
+      ...
+    # Subtest: accepts effective cutoffs and falls back field by field
+    ok 4 - accepts effective cutoffs and falls back field by field
+      ---
+      duration_ms: 0.141549
+      type: 'test'
+      ...
+    # Subtest: round-trips only complete valid sidebar preference caches
+    ok 5 - round-trips only complete valid sidebar preference caches
+      ---
+      duration_ms: 0.182193
+      type: 'test'
+      ...
+    # Subtest: computes shared threshold tones for CPU and RAM only
+    ok 6 - computes shared threshold tones for CPU and RAM only
+      ---
+      duration_ms: 0.163618
+      type: 'test'
+      ...
+    # Subtest: gates sidebar tones behind the default-on preference attribute
+    ok 7 - gates sidebar tones behind the default-on preference attribute
+      ---
+      duration_ms: 0.430014
+      type: 'test'
+      ...
+    # Subtest: colors download red and upload blue independently of threshold colors
+    ok 8 - colors download red and upload blue independently of threshold colors
+      ---
+      duration_ms: 0.303483
+      type: 'test'
+      ...
+    # Subtest: uses bb's traffic-light semantic tokens instead of the accent color
+    ok 9 - uses bb's traffic-light semantic tokens instead of the accent color
+      ---
+      duration_ms: 0.239246
+      type: 'test'
+      ...
+    1..9
+ok 106 - Host Monitor sidebar threshold colors
+  ---
+  duration_ms: 1.979342
+  type: 'suite'
+  ...
+# Subtest: Host Monitor trigger visibility
+    # Subtest: accepts a trigger that intersects the viewport
+    ok 1 - accepts a trigger that intersects the viewport
+      ---
+      duration_ms: 0.102207
+      type: 'test'
+      ...
+    # Subtest: rejects collapsed, zero-area, and fully offscreen triggers
+    ok 2 - rejects collapsed, zero-area, and fully offscreen triggers
+      ---
+      duration_ms: 0.078985
+      type: 'test'
+      ...
+    1..2
+ok 107 - Host Monitor trigger visibility
+  ---
+  duration_ms: 0.240619
+  type: 'suite'
+  ...
+# Subtest: Host Monitor drag threshold
+    # Subtest: keeps sub-threshold movement as an ordinary click
+    ok 1 - keeps sub-threshold movement as an ordinary click
+      ---
+      duration_ms: 0.110612
+      type: 'test'
+      ...
+    # Subtest: engages at the inclusive eight-pixel boundary
+    ok 2 - engages at the inclusive eight-pixel boundary
+      ---
+      duration_ms: 0.057986
+      type: 'test'
+      ...
+    1..2
+ok 108 - Host Monitor drag threshold
+  ---
+  duration_ms: 0.230801
+  type: 'suite'
+  ...
+# Subtest: Host Monitor sidebar refresh cadence
+    # Subtest: polls cheaply while closed and follows a bounded visible cadence
+    ok 1 - polls cheaply while closed and follows a bounded visible cadence
+      ---
+      duration_ms: 0.086358
+      type: 'test'
+      ...
+    1..1
+ok 109 - Host Monitor sidebar refresh cadence
+  ---
+  duration_ms: 0.127132
+  type: 'suite'
+  ...
+# Subtest: Host Monitor floating metric privacy
+    # Subtest: colors only CPU/RAM percentages by threshold and marks network direction
+    ok 1 - colors only CPU/RAM percentages by threshold and marks network direction
+      ---
+      duration_ms: 0.596929
+      type: 'test'
+      ...
+    1..1
+ok 110 - Host Monitor floating metric privacy
+  ---
+  duration_ms: 0.929937
+  type: 'suite'
+  ...
+# Subtest: Host Monitor floating position
+    # Subtest: preserves an in-bounds position
+    ok 1 - preserves an in-bounds position
+      ---
+      duration_ms: 0.167696
+      type: 'test'
+      ...
+    # Subtest: clamps every edge with an eight-pixel gutter
+    ok 2 - clamps every edge with an eight-pixel gutter
+      ---
+      duration_ms: 0.10985
+      type: 'test'
+      ...
+    # Subtest: pins an oversized panel to the viewport gutter
+    ok 3 - pins an oversized panel to the viewport gutter
+      ---
+      duration_ms: 0.073824
+      type: 'test'
+      ...
+    # Subtest: places the dropped titlebar under the pointer and then clamps
+    ok 4 - places the dropped titlebar under the pointer and then clamps
+      ---
+      duration_ms: 0.122624
+      type: 'test'
+      ...
+    # Subtest: parses only finite coordinate cache objects
+    ok 5 - parses only finite coordinate cache objects
+      ---
+      duration_ms: 0.228086
+      type: 'test'
+      ...
+    1..5
+ok 111 - Host Monitor floating position
+  ---
+  duration_ms: 0.833721
+  type: 'suite'
+  ...
+# Subtest: Host Monitor threshold presentation
+    # Subtest: uses the dashboard's effective attention and critical boundaries
+    ok 1 - uses the dashboard's effective attention and critical boundaries
+      ---
+      duration_ms: 1.810654
+      type: 'test'
+      ...
+    # Subtest: treats missing and non-finite readings as unavailable
+    ok 2 - treats missing and non-finite readings as unavailable
+      ---
+      duration_ms: 0.106314
+      type: 'test'
+      ...
+    # Subtest: keeps stale and in-flight readings neutral
+    ok 3 - keeps stale and in-flight readings neutral
+      ---
+      duration_ms: 0.090135
+      type: 'test'
+      ...
+    # Subtest: provides non-color threshold wording for accessible meter copy
+    ok 4 - provides non-color threshold wording for accessible meter copy
+      ---
+      duration_ms: 0.113848
+      type: 'test'
+      ...
+    # Subtest: defaults colors on until an explicit false setting arrives
+    ok 5 - defaults colors on until an explicit false setting arrives
+      ---
+      duration_ms: 0.10462
+      type: 'test'
+      ...
+    1..5
+ok 112 - Host Monitor threshold presentation
+  ---
+  duration_ms: 3.061096
+  type: 'suite'
+  ...
+# Subtest: health threshold settings
+    # Subtest: uses the established 85/95 defaults when values are absent
+    ok 1 - uses the established 85/95 defaults when values are absent
+      ---
+      duration_ms: 0.883882
+      type: 'test'
+      ...
+    # Subtest: accepts ordered numeric strings, decimals, and inclusive outer bounds
+    ok 2 - accepts ordered numeric strings, decimals, and inclusive outer bounds
+      ---
+      duration_ms: 0.135557
+      type: 'test'
+      ...
+    # Subtest: falls back as one pair for empty, non-finite, out-of-range, or reversed values
+    ok 3 - falls back as one pair for empty, non-finite, out-of-range, or reversed values
+      ---
+      duration_ms: 0.227816
+      type: 'test'
+      ...
+    # Subtest: compares effective pairs without relying on object identity
+    ok 4 - compares effective pairs without relying on object identity
+      ---
+      duration_ms: 0.112435
+      type: 'test'
+      ...
+    1..4
+ok 113 - health threshold settings
+  ---
+  duration_ms: 2.747913
+  type: 'suite'
+  ...
+1..113
+# tests 161
+# suites 18
+# pass 161
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1905.050446
+
+> bb-plugin-host-monitor@0.1.5 build
+> env -u BB_CLI bb plugin build .
+
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+dist/app.js
+dist/app.css
+dist/app.meta.json
+dist/host.js
+dist/host.js.map
+dist/host.meta.json
+
+> bb-plugin-jev-route@0.1.1 check
+> npm run typecheck && npm test && npm run build
+
+
+> bb-plugin-jev-route@0.1.1 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-jev-route@0.1.1 test
+> node --test --experimental-strip-types test/*.test.ts
+
+TAP version 13
+# Subtest: Python and native fingerprints agree without exposing content
+ok 1 - Python and native fingerprints agree without exposing content
+  ---
+  duration_ms: 62.964999
+  type: 'test'
+  ...
+# Subtest: trace patch refuses partial/ambiguous states and is idempotent
+ok 2 - trace patch refuses partial/ambiguous states and is idempotent
+  ---
+  duration_ms: 0.401121
+  type: 'test'
+  ...
+# Subtest: repair skips generic reasoning carry only for the native Jev Responses path
+ok 3 - repair skips generic reasoning carry only for the native Jev Responses path
+  ---
+  duration_ms: 4.49462
+  type: 'test'
+  ...
+# Subtest: patch is idempotent and refuses an unknown or ambiguous upstream boundary
+ok 4 - patch is idempotent and refuses an unknown or ambiguous upstream boundary
+  ---
+  duration_ms: 1.436832
+  type: 'test'
+  ...
+# Subtest: installed repair backs up source, is repeatable and validates target identity
+ok 5 - installed repair backs up source, is repeatable and validates target identity
+  ---
+  duration_ms: 11.935496
+  type: 'test'
+  ...
+# Subtest: custom colors persist independently for arbitrary model IDs
+ok 6 - custom colors persist independently for arbitrary model IDs
+  ---
+  duration_ms: 1.944478
+  type: 'test'
+  ...
+# Subtest: invalid colors and blank model IDs are rejected at the RPC boundary
+ok 7 - invalid colors and blank model IDs are rejected at the RPC boundary
+  ---
+  duration_ms: 1.914493
+  type: 'test'
+  ...
+# Subtest: manual model changes have no Jev switch history; polling never writes chat events
+ok 8 - manual model changes have no Jev switch history; polling never writes chat events
+  ---
+  duration_ms: 0.662469
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 143.923605
+
+> bb-plugin-jev-route@0.1.1 build
+> env -u BB_CLI bb plugin build .
+
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+dist/app.js
+dist/app.css
+dist/app.meta.json
+
+> bb-plugin-lavender@0.1.0 check
+> npm run typecheck && npm test && npm run build
+
+
+> bb-plugin-lavender@0.1.0 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-lavender@0.1.0 test
+> node --test test/*.test.mjs
+
+TAP version 13
+# Subtest: light text remains readable across content, panels, composer and selection
+ok 1 - light text remains readable across content, panels, composer and selection
+  ---
+  duration_ms: 1.563081
+  type: 'test'
+  ...
+# Subtest: dark text remains readable across content, panels, composer and selection
+ok 2 - dark text remains readable across content, panels, composer and selection
+  ---
+  duration_ms: 0.311308
+  type: 'test'
+  ...
+# Subtest: the distributable exposes one paired palette with local readable syntax assets
+ok 3 - the distributable exposes one paired palette with local readable syntax assets
+  ---
+  duration_ms: 1.009151
+  type: 'test'
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 3
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 49.874605
+
+> bb-plugin-lavender@0.1.0 build
+> env -u BB_CLI bb plugin build .
+
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+
+> bb-plugin-steel-browser@0.1.0 check
+> npm run types:check && npm run typecheck && npm test && npm run build
+
+
+> bb-plugin-steel-browser@0.1.0 types:check
+> env -u BB_CLI bb plugin types --check .
+
+This plugin uses the npm package @get-bb/plugin-sdk; pin is 0.4.21, host is 0.4.21.
+The declarations are in node_modules/@get-bb/plugin-sdk/bundled-types/ — read them for exact signatures.
+
+> bb-plugin-steel-browser@0.1.0 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-steel-browser@0.1.0 test
+> node --test --experimental-transform-types test/*.test.ts
+
+TAP version 13
+# (node:3805849) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: browser commands accept bounded actions and reject ambiguous input
+ok 1 - browser commands accept bounded actions and reject ambiguous input
+  ---
+  duration_ms: 2.578004
+  type: 'test'
+  ...
+# Subtest: newest open tab is the default and earlier tabs remain addressable
+ok 2 - newest open tab is the default and earlier tabs remain addressable
+  ---
+  duration_ms: 0.48768
+  type: 'test'
+  ...
+# Subtest: remote actions select exactly one accessible target and return the current page
+ok 3 - remote actions select exactly one accessible target and return the current page
+  ---
+  duration_ms: 2.06606
+  type: 'test'
+  ...
+# Subtest: ambiguous targets fail without clicking
+ok 4 - ambiguous targets fail without clicking
+  ---
+  duration_ms: 0.377689
+  type: 'test'
+  ...
+# (node:3805850) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: declares an independent BB app, server, CLI skill, and pinned SDK
+ok 5 - declares an independent BB app, server, CLI skill, and pinned SDK
+  ---
+  duration_ms: 8.114244
+  type: 'test'
+  ...
+# Subtest: contributes Steel discovery instructions to new agent sessions
+ok 6 - contributes Steel discovery instructions to new agent sessions
+  ---
+  duration_ms: 18.366108
+  type: 'test'
+  ...
+# Subtest: ships the required operational and responsive UI states
+ok 7 - ships the required operational and responsive UI states
+  ---
+  duration_ms: 7.545316
+  type: 'test'
+  ...
+# (node:3805856) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: viewer URL pins the authenticated origin and enables the native bridge
+ok 8 - viewer URL pins the authenticated origin and enables the native bridge
+  ---
+  duration_ms: 1.922668
+  type: 'test'
+  ...
+# Subtest: clipboard bridge requires exact source and origin; login paste rejects control keys
+ok 9 - clipboard bridge requires exact source and origin; login paste rejects control keys
+  ---
+  duration_ms: 0.393849
+  type: 'test'
+  ...
+# Subtest: sign-in labels are scoped, validated and explicitly forgettable without profile access
+ok 10 - sign-in labels are scoped, validated and explicitly forgettable without profile access
+  ---
+  duration_ms: 6.576077
+  type: 'test'
+  ...
+# Subtest: service login navigates only to the service catalog and never runs a model
+ok 11 - service login navigates only to the service catalog and never runs a model
+  ---
+  duration_ms: 0.616514
+  type: 'test'
+  ...
+# Subtest: dashboard coalesces concurrent reads, expires and invalidates after mutation
+ok 12 - dashboard coalesces concurrent reads, expires and invalidates after mutation
+  ---
+  duration_ms: 0.602349
+  type: 'test'
+  ...
+# (node:3805857) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: page targets remain bound to the current project endpoint, excluding browser UI targets
+ok 13 - page targets remain bound to the current project endpoint, excluding browser UI targets
+  ---
+  duration_ms: 0.846023
+  type: 'test'
+  ...
+# Subtest: navigation rejects credential-bearing and non-web destinations before opening a connection
+ok 14 - navigation rejects credential-bearing and non-web destinations before opening a connection
+  ---
+  duration_ms: 1.602073
+  type: 'test'
+  ...
+# (node:3805863) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: project bindings are isolated, immutable and fail closed
+ok 15 - project bindings are isolated, immutable and fail closed
+  ---
+  duration_ms: 3.24475
+  type: 'test'
+  ...
+# Subtest: engine preferences do not leak between projects
+ok 16 - engine preferences do not leak between projects
+  ---
+  duration_ms: 1.087454
+  type: 'test'
+  ...
+# Subtest: automatic setup serializes projects, coalesces duplicates, and revalidates bindings
+ok 17 - automatic setup serializes projects, coalesces duplicates, and revalidates bindings
+  ---
+  duration_ms: 16.0045
+  type: 'test'
+  ...
+# Subtest: failed provisioning persists nothing and a later request can retry
+ok 18 - failed provisioning persists nothing and a later request can retry
+  ---
+  duration_ms: 0.742565
+  type: 'test'
+  ...
+# Subtest: healthy stored bindings coalesce probes and bypass provisioning
+ok 19 - healthy stored bindings coalesce probes and bypass provisioning
+  ---
+  duration_ms: 0.334611
+  type: 'test'
+  ...
+# Subtest: recent healthy bindings avoid repeated probes but expire for recovery
+ok 20 - recent healthy bindings avoid repeated probes but expire for recovery
+  ---
+  duration_ms: 0.485856
+  type: 'test'
+  ...
+# Subtest: failed readiness repairs only the stored project and preserves its binding
+ok 21 - failed readiness repairs only the stored project and preserves its binding
+  ---
+  duration_ms: 0.336434
+  type: 'test'
+  ...
+# Subtest: viewer readiness errors are not cached and never enter container provisioning
+ok 22 - viewer readiness errors are not cached and never enter container provisioning
+  ---
+  duration_ms: 0.402534
+  type: 'test'
+  ...
+# Subtest: healthy projects do not wait for another project's slow setup
+ok 23 - healthy projects do not wait for another project's slow setup
+  ---
+  duration_ms: 0.598943
+  type: 'test'
+  ...
+# Subtest: existing bindings are passed into recovery and retained after a failed check
+ok 24 - existing bindings are passed into recovery and retained after a failed check
+  ---
+  duration_ms: 0.722939
+  type: 'test'
+  ...
+# Subtest: fallback is opt-in and only selects an engine during preflight
+ok 25 - fallback is opt-in and only selects an engine during preflight
+  ---
+  duration_ms: 0.318802
+  type: 'test'
+  ...
+# Subtest: cancellation during preflight never dispatches fallback
+ok 26 - cancellation during preflight never dispatches fallback
+  ---
+  duration_ms: 0.311037
+  type: 'test'
+  ...
+# (node:3805869) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: missing viewer share validates the container then exposes only API on the Steel host
+ok 27 - missing viewer share validates the container then exposes only API on the Steel host
+  ---
+  duration_ms: 1.936814
+  type: 'test'
+  ...
+# Subtest: matching viewer share validates ownership and is reused without share mutations
+ok 28 - matching viewer share validates ownership and is reused without share mutations
+  ---
+  duration_ms: 0.309224
+  type: 'test'
+  ...
+# Subtest: matching viewer share rejects container mismatch without calling Connect
+ok 29 - matching viewer share rejects container mismatch without calling Connect
+  ---
+  duration_ms: 0.472953
+  type: 'test'
+  ...
+# Subtest: viewer share validation and Connect errors propagate without repair
+ok 30 - viewer share validation and Connect errors propagate without repair
+  ---
+  duration_ms: 0.659053
+  type: 'test'
+  ...
+# Subtest: viewer recovery refuses nonlocal and CDP ports before calling Connect
+ok 31 - viewer recovery refuses nonlocal and CDP ports before calling Connect
+  ---
+  duration_ms: 0.397284
+  type: 'test'
+  ...
+# Subtest: readiness probes API and CDP concurrently and rejects unhealthy responses
+ok 32 - readiness probes API and CDP concurrently and rejects unhealthy responses
+  ---
+  duration_ms: 59.023015
+  type: 'test'
+  ...
+# Subtest: new setup skips occupied/shared ports and exposes only API on the server host
+ok 33 - new setup skips occupied/shared ports and exposes only API on the server host
+  ---
+  duration_ms: 0.976552
+  type: 'test'
+  ...
+# Subtest: existing project with inherited DNS is recreated with the same profile
+ok 34 - existing project with inherited DNS is recreated with the same profile
+  ---
+  duration_ms: 0.601347
+  type: 'test'
+  ...
+# Subtest: dead CDP on a validated project triggers one scoped repair
+ok 35 - dead CDP on a validated project triggers one scoped repair
+  ---
+  duration_ms: 0.58139
+  type: 'test'
+  ...
+# Subtest: persistent CDP failure is bounded to one recovery attempt
+ok 36 - persistent CDP failure is bounded to one recovery attempt
+  ---
+  duration_ms: 0.595015
+  type: 'test'
+  ...
+# Subtest: shared profile or changed saved binding cannot trigger destructive repair
+ok 37 - shared profile or changed saved binding cannot trigger destructive repair
+  ---
+  duration_ms: 0.581391
+  type: 'test'
+  ...
+# Subtest: existing stopped project is validated and resumed without replacing its profile
+ok 38 - existing stopped project is validated and resumed without replacing its profile
+  ---
+  duration_ms: 1.099155
+  type: 'test'
+  ...
+# Subtest: foreign profile and Connect errors fail closed
+ok 39 - foreign profile and Connect errors fail closed
+  ---
+  duration_ms: 0.543561
+  type: 'test'
+  ...
+# Subtest: viewer origins reject credentials, non-HTTPS and paths
+ok 40 - viewer origins reject credentials, non-HTTPS and paths
+  ---
+  duration_ms: 0.182733
+  type: 'test'
+  ...
+# Subtest: Docker port inspection requests only bounded port metadata
+ok 41 - Docker port inspection requests only bounded port metadata
+  ---
+  duration_ms: 0.297723
+  type: 'test'
+  ...
+# (node:3805875) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: RPC returns successful results and preserves actionable errors
+ok 42 - RPC returns successful results and preserves actionable errors
+  ---
+  duration_ms: 1.687178
+  type: 'test'
+  ...
+# Subtest: stalled RPC expires without replaying the operation or accepting a late result
+ok 43 - stalled RPC expires without replaying the operation or accepting a late result
+  ---
+  duration_ms: 10.71547
+  type: 'test'
+  ...
+# Subtest: late RPC rejection after timeout is handled
+ok 44 - late RPC rejection after timeout is handled
+  ---
+  duration_ms: 12.720658
+  type: 'test'
+  ...
+# Subtest: stalled reads retry once and recover, while permanent hangs are bounded
+ok 45 - stalled reads retry once and recover, while permanent hangs are bounded
+  ---
+  duration_ms: 30.38718
+  type: 'test'
+  ...
+# Subtest: mutations and explicit server failures are never replayed
+ok 46 - mutations and explicit server failures are never replayed
+  ---
+  duration_ms: 46.08519
+  type: 'test'
+  ...
+# (node:3805923) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: normalizes a safe endpoint and rejects unsupported URL forms
+ok 47 - normalizes a safe endpoint and rejects unsupported URL forms
+  ---
+  duration_ms: 1.118881
+  type: 'test'
+  ...
+# Subtest: loads a normalized dashboard
+ok 48 - loads a normalized dashboard
+  ---
+  duration_ms: 26.716934
+  type: 'test'
+  ...
+# Subtest: creates and releases an exact session
+ok 49 - creates and releases an exact session
+  ---
+  duration_ms: 24.76895
+  type: 'test'
+  ...
+# Subtest: idle bootstrap sessions allow new session creation; live sessions do not
+ok 50 - idle bootstrap sessions allow new session creation; live sessions do not
+  ---
+  duration_ms: 11.604742
+  type: 'test'
+  ...
+# Subtest: returns a stable unavailable dashboard
+ok 51 - returns a stable unavailable dashboard
+  ---
+  duration_ms: 1.123911
+  type: 'test'
+  ...
+1..51
+# tests 51
+# suites 0
+# pass 51
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 419.208758
+
+> bb-plugin-steel-browser@0.1.0 build
+> env -u BB_CLI bb plugin build .
+
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+dist/app.js
+dist/app.css
+dist/app.meta.json
+
+> bb-plugin-taskboard@0.3.3 check
+> npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build
+
+
+> bb-plugin-taskboard@0.3.3 types:check
+> env -u BB_CLI bb plugin types --check .
+
+This plugin uses the npm package @get-bb/plugin-sdk; pin is 0.4.21, host is 0.4.21.
+The declarations are in node_modules/@get-bb/plugin-sdk/bundled-types/ — read them for exact signatures.
+
+> bb-plugin-taskboard@0.3.3 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-taskboard@0.3.3 test
+> node --test --experimental-strip-types test/*.test.ts
+
+TAP version 13
+# Subtest: registers Taskboard for existing-thread and New Thread right panels
+ok 1 - registers Taskboard for existing-thread and New Thread right panels
+  ---
+  duration_ms: 1.525112
+  type: 'test'
+  ...
+# Subtest: accepts bounded Taskboard drops only on the visible composer textbox
+ok 2 - accepts bounded Taskboard drops only on the visible composer textbox
+  ---
+  duration_ms: 0.588304
+  type: 'test'
+  ...
+# Subtest: makes constrained List and Kanban tickets composer drag sources
+ok 3 - makes constrained List and Kanban tickets composer drag sources
+  ---
+  duration_ms: 0.464958
+  type: 'test'
+  ...
+# Subtest: offers an accessible non-drag Add to chat detail action
+ok 4 - offers an accessible non-drag Add to chat detail action
+  ---
+  duration_ms: 3.514162
+  type: 'test'
+  ...
+# Subtest: shares durable project preferences between full and constrained surfaces
+ok 5 - shares durable project preferences between full and constrained surfaces
+  ---
+  duration_ms: 0.582212
+  type: 'test'
+  ...
+# Subtest: canonicalizes provider facet casing before rendering and persistence
+ok 6 - canonicalizes provider facet casing before rendering and persistence
+  ---
+  duration_ms: 0.132972
+  type: 'test'
+  ...
+# Subtest: applies project presets through the released preference store
+ok 7 - applies project presets through the released preference store
+  ---
+  duration_ms: 0.637463
+  type: 'test'
+  ...
+# Subtest: keeps preset refreshes, drafts, and focus non-disruptive
+ok 8 - keeps preset refreshes, drafts, and focus non-disruptive
+  ---
+  duration_ms: 0.543762
+  type: 'test'
+  ...
+# Subtest: announces preset apply and keeps save errors with the draft
+ok 9 - announces preset apply and keeps save errors with the draft
+  ---
+  duration_ms: 0.529416
+  type: 'test'
+  ...
+# Subtest: keeps List measured and Kanban unconstrained
+ok 10 - keeps List measured and Kanban unconstrained
+  ---
+  duration_ms: 2.0717
+  type: 'test'
+  ...
+# Subtest: renders assignees as deterministic accessible avatars
+ok 11 - renders assignees as deterministic accessible avatars
+  ---
+  duration_ms: 0.384852
+  type: 'test'
+  ...
+# Subtest: uses an explicit constrained filter composition
+ok 12 - uses an explicit constrained filter composition
+  ---
+  duration_ms: 0.465269
+  type: 'test'
+  ...
+# Subtest: centralizes and reuses decorative filter icons across surfaces
+ok 13 - centralizes and reuses decorative filter icons across surfaces
+  ---
+  duration_ms: 6.079822
+  type: 'test'
+  ...
+# Subtest: supports direct and manual composer capture through one dialog
+ok 14 - supports direct and manual composer capture through one dialog
+  ---
+  duration_ms: 6.302098
+  type: 'test'
+  ...
+# Subtest: captures the original composer prompt locally exactly once per open
+ok 15 - captures the original composer prompt locally exactly once per open
+  ---
+  duration_ms: 0.71799
+  type: 'test'
+  ...
+# Subtest: does not restore the retired repository-aware issue drafting flow
+ok 16 - does not restore the retired repository-aware issue drafting flow
+  ---
+  duration_ms: 1.283592
+  type: 'test'
+  ...
+# Subtest: ticket improvement preserves explicit creation and guards stale responses
+ok 17 - ticket improvement preserves explicit creation and guards stale responses
+  ---
+  duration_ms: 0.317749
+  type: 'test'
+  ...
+# Subtest: routes detail handoff through native factory with external-content trust boundary
+ok 18 - routes detail handoff through native factory with external-content trust boundary
+  ---
+  duration_ms: 9.909519
+  type: 'test'
+  ...
+# Subtest: renders comments as one conversation rail
+ok 19 - renders comments as one conversation rail
+  ---
+  duration_ms: 0.400671
+  type: 'test'
+  ...
+# Subtest: reconciles provider identity from the cached-list response
+ok 20 - reconciles provider identity from the cached-list response
+  ---
+  duration_ms: 0.207349
+  type: 'test'
+  ...
+# Subtest: parses only strict version-1 browse records and normalizes values
+ok 21 - parses only strict version-1 browse records and normalizes values
+  ---
+  duration_ms: 6.069023
+  type: 'test'
+  ...
+# Subtest: restores project and Across-project preferences without scope leakage
+ok 22 - restores project and Across-project preferences without scope leakage
+  ---
+  duration_ms: 1.105908
+  type: 'test'
+  ...
+# Subtest: restores collapsed groups from storage with the rest of a project view
+ok 23 - restores collapsed groups from storage with the rest of a project view
+  ---
+  duration_ms: 0.336183
+  type: 'test'
+  ...
+# Subtest: board-setting seeds initialize only untouched preference scopes
+ok 24 - board-setting seeds initialize only untouched preference scopes
+  ---
+  duration_ms: 0.417381
+  type: 'test'
+  ...
+# Subtest: storage failures fall back safely while in-window updates remain usable
+ok 25 - storage failures fall back safely while in-window updates remain usable
+  ---
+  duration_ms: 0.499772
+  type: 'test'
+  ...
+# Subtest: one observable store notifies every surface and reloads external writes
+ok 26 - one observable store notifies every surface and reloads external writes
+  ---
+  duration_ms: 0.481849
+  type: 'test'
+  ...
+# Subtest: structurally equal writes keep a stable snapshot and do not notify
+ok 27 - structurally equal writes keep a stable snapshot and do not notify
+  ---
+  duration_ms: 0.25765
+  type: 'test'
+  ...
+# Subtest: clearing filters changes only the active scope and preserves its view and collapse state
+ok 28 - clearing filters changes only the active scope and preserves its view and collapse state
+  ---
+  duration_ms: 0.500153
+  type: 'test'
+  ...
+# Subtest: provider reconciliation preserves view but drops provider-derived state
+ok 29 - provider reconciliation preserves view but drops provider-derived state
+  ---
+  duration_ms: 0.527593
+  type: 'test'
+  ...
+# Subtest: terminal collapse defaults use sparse overrides and search opens matches temporarily
+ok 30 - terminal collapse defaults use sparse overrides and search opens matches temporarily
+  ---
+  duration_ms: 0.500784
+  type: 'test'
+  ...
+# Subtest: create assignee defaults are versioned, fully scoped, and restored only from fresh options
+ok 31 - create assignee defaults are versioned, fully scoped, and restored only from fresh options
+  ---
+  duration_ms: 1.53487
+  type: 'test'
+  ...
+# Subtest: create assignee scope canonicalizes Jira project keys
+ok 32 - create assignee scope canonicalizes Jira project keys
+  ---
+  duration_ms: 0.160813
+  type: 'test'
+  ...
+# Subtest: remembers only provider-confirmed create assignees and clears confirmed unassigned scopes
+ok 33 - remembers only provider-confirmed create assignees and clears confirmed unassigned scopes
+  ---
+  duration_ms: 0.744578
+  type: 'test'
+  ...
+# Subtest: keeps the prior assignee when a successful create omits the requested assignment
+ok 34 - keeps the prior assignee when a successful create omits the requested assignment
+  ---
+  duration_ms: 0.153991
+  type: 'test'
+  ...
+# Subtest: scope helpers reject empty identities
+ok 35 - scope helpers reject empty identities
+  ---
+  duration_ms: 0.722959
+  type: 'test'
+  ...
+# Subtest: storage keys remain collision-free for delimiter and Unicode identities
+ok 36 - storage keys remain collision-free for delimiter and Unicode identities
+  ---
+  duration_ms: 0.248874
+  type: 'test'
+  ...
+# Subtest: derives stable Unicode-safe assignee avatar identities
+ok 37 - derives stable Unicode-safe assignee avatar identities
+  ---
+  duration_ms: 2.70758
+  type: 'test'
+  ...
+# Subtest: uses the backlog-first default before provider-specific states
+ok 38 - uses the backlog-first default before provider-specific states
+  ---
+  duration_ms: 1.028256
+  type: 'test'
+  ...
+# Subtest: defines the complete backlog-first default status order
+ok 39 - defines the complete backlog-first default status order
+  ---
+  duration_ms: 0.128545
+  type: 'test'
+  ...
+# Subtest: builds case-insensitive assignee choices including Unassigned
+ok 40 - builds case-insensitive assignee choices including Unassigned
+  ---
+  duration_ms: 6.499629
+  type: 'test'
+  ...
+# Subtest: keeps selected assignees available when other filters return no items
+ok 41 - keeps selected assignees available when other filters return no items
+  ---
+  duration_ms: 0.210554
+  type: 'test'
+  ...
+# Subtest: canonicalizes facet selections and toggles every case variant
+ok 42 - canonicalizes facet selections and toggles every case variant
+  ---
+  duration_ms: 0.212468
+  type: 'test'
+  ...
+# Subtest: uses a configurable exact workflow order
+ok 43 - uses a configurable exact workflow order
+  ---
+  duration_ms: 0.190428
+  type: 'test'
+  ...
+# Subtest: keeps the complete provider workflow ordered before and after a move
+ok 44 - keeps the complete provider workflow ordered before and after a move
+  ---
+  duration_ms: 0.75634
+  type: 'test'
+  ...
+# Subtest: assigns distinct stable tones to the active workflow statuses
+ok 45 - assigns distinct stable tones to the active workflow statuses
+  ---
+  duration_ms: 0.347715
+  type: 'test'
+  ...
+# Subtest: builds Linear-style field options including empty values
+ok 46 - builds Linear-style field options including empty values
+  ---
+  duration_ms: 4.355015
+  type: 'test'
+  ...
+# Subtest: combines different filter fields with AND and values within a field with OR
+ok 47 - combines different filter fields with AND and values within a field with OR
+  ---
+  duration_ms: 0.327758
+  type: 'test'
+  ...
+# Subtest: builds and round-trips the bounded live Taskboard mention
+ok 48 - builds and round-trips the bounded live Taskboard mention
+  ---
+  duration_ms: 1.904124
+  type: 'test'
+  ...
+# Subtest: writes only the private mention payload with the requested drag effect
+ok 49 - writes only the private mention payload with the requested drag effect
+  ---
+  duration_ms: 0.353024
+  type: 'test'
+  ...
+# Subtest: rejects malformed, oversized, unsafe, and expanded drag payloads
+ok 50 - rejects malformed, oversized, unsafe, and expanded drag payloads
+  ---
+  duration_ms: 0.319944
+  type: 'test'
+  ...
+# Subtest: fails closed when an item cannot form a safe mention or DataTransfer rejects it
+ok 51 - fails closed when an item cannot form a safe mention or DataTransfer rejects it
+  ---
+  duration_ms: 0.226604
+  type: 'test'
+  ...
+# Subtest: delimits useful issue facts as untrusted external tracker data
+ok 52 - delimits useful issue facts as untrusted external tracker data
+  ---
+  duration_ms: 1.462008
+  type: 'test'
+  ...
+# Subtest: keeps instruction-like issue text inside the untrusted boundary
+ok 53 - keeps instruction-like issue text inside the untrusted boundary
+  ---
+  duration_ms: 0.807022
+  type: 'test'
+  ...
+# Subtest: prefixes control-character line separators inside external data
+ok 54 - prefixes control-character line separators inside external data
+  ---
+  duration_ms: 0.269612
+  type: 'test'
+  ...
+# Subtest: visibly escapes every C1 and bidirectional control inside ordered boundaries
+ok 55 - visibly escapes every C1 and bidirectional control inside ordered boundaries
+  ---
+  duration_ms: 3.384805
+  type: 'test'
+  ...
+# Subtest: visibly escapes every C0 control in inline CLI fields
+ok 56 - visibly escapes every C0 control in inline CLI fields
+  ---
+  duration_ms: 0.41062
+  type: 'test'
+  ...
+# Subtest: keeps JSON CLI output readable around external controls
+ok 57 - keeps JSON CLI output readable around external controls
+  ---
+  duration_ms: 0.298204
+  type: 'test'
+  ...
+# Subtest: keeps detail handoff intent trusted while issue text stays inside the boundary
+ok 58 - keeps detail handoff intent trusted while issue text stays inside the boundary
+  ---
+  duration_ms: 0.297933
+  type: 'test'
+  ...
+# Subtest: defaults optional provider-native issue creation properties
+ok 59 - defaults optional provider-native issue creation properties
+  ---
+  duration_ms: 3.09123
+  type: 'test'
+  ...
+# Subtest: validates expanded provider-native issue creation properties
+ok 60 - validates expanded provider-native issue creation properties
+  ---
+  duration_ms: 2.256606
+  type: 'test'
+  ...
+# Subtest: validates creation metadata and warning-bearing RPC results
+ok 61 - validates creation metadata and warning-bearing RPC results
+  ---
+  duration_ms: 20.100452
+  type: 'test'
+  ...
+# Subtest: returns authoritative provider identity with cached list results
+ok 62 - returns authoritative provider identity with cached list results
+  ---
+  duration_ms: 2.872861
+  type: 'test'
+  ...
+# Subtest: Linear maps native metadata and sends it in IssueCreateInput
+ok 63 - Linear maps native metadata and sends it in IssueCreateInput
+  ---
+  duration_ms: 43.385965
+  type: 'test'
+  ...
+# Subtest: Linear paginates create options independently and preserves the native default state
+ok 64 - Linear paginates create options independently and preserves the native default state
+  ---
+  duration_ms: 5.115052
+  type: 'test'
+  ...
+# Subtest: Linear rejects invalid creation metadata cursors
+ok 65 - Linear rejects invalid creation metadata cursors
+  ---
+  duration_ms: 1.727712
+  type: 'test'
+  ...
+# Subtest: Linear keeps explicit create rejection retryable without the uncertain marker
+ok 66 - Linear keeps explicit create rejection retryable without the uncertain marker
+  ---
+  duration_ms: 5.320918
+  type: 'test'
+  ...
+# Subtest: Linear marks malformed or lost post-dispatch create responses uncertain
+ok 67 - Linear marks malformed or lost post-dispatch create responses uncertain
+  ---
+  duration_ms: 7.216455
+  type: 'test'
+  ...
+# Subtest: Jira derives native fields from createmeta and forwards selections
+ok 68 - Jira derives native fields from createmeta and forwards selections
+  ---
+  duration_ms: 7.69576
+  type: 'test'
+  ...
+# Subtest: Jira marks ambiguous create acknowledgement and detail failures uncertain
+ok 69 - Jira marks ambiguous create acknowledgement and detail failures uncertain
+  ---
+  duration_ms: 6.757278
+  type: 'test'
+  ...
+# Subtest: Jira paginates create metadata and canonicalizes issue types to native IDs
+ok 70 - Jira paginates create metadata and canonicalizes issue types to native IDs
+  ---
+  duration_ms: 2.162075
+  type: 'test'
+  ...
+# Subtest: Jira exposes only priorities allowed for the selected project and issue type
+ok 71 - Jira exposes only priorities allowed for the selected project and issue type
+  ---
+  duration_ms: 0.938202
+  type: 'test'
+  ...
+# Subtest: GitHub loads native metadata and reports partially applied fields
+ok 72 - GitHub loads native metadata and reports partially applied fields
+  ---
+  duration_ms: 2.340581
+  type: 'test'
+  ...
+# Subtest: GitHub confirms the submitted assignee from native response membership
+ok 73 - GitHub confirms the submitted assignee from native response membership
+  ---
+  duration_ms: 0.639837
+  type: 'test'
+  ...
+# Subtest: GitHub paginates and deduplicates every create metadata collection
+ok 74 - GitHub paginates and deduplicates every create metadata collection
+  ---
+  duration_ms: 2.041054
+  type: 'test'
+  ...
+# Subtest: GitHub queues a fresh reconciliation after an overlapping pre-create refresh
+ok 75 - GitHub queues a fresh reconciliation after an overlapping pre-create refresh
+  ---
+  duration_ms: 0.944623
+  type: 'test'
+  ...
+# Subtest: GitHub queues a post-write refresh when issue confirmation is ambiguous
+ok 76 - GitHub queues a post-write refresh when issue confirmation is ambiguous
+  ---
+  duration_ms: 0.469777
+  type: 'test'
+  ...
+# Subtest: GitHub forced reconciliation refreshes before listing only project-scoped repos
+ok 77 - GitHub forced reconciliation refreshes before listing only project-scoped repos
+  ---
+  duration_ms: 0.233185
+  type: 'test'
+  ...
+# Subtest: keeps Taskboard private and Git-buildable without npm publication hooks
+ok 78 - keeps Taskboard private and Git-buildable without npm publication hooks
+  ---
+  duration_ms: 0.869687
+  type: 'test'
+  ...
+# Subtest: documents only BB Community and direct Git installation for Taskboard
+ok 79 - documents only BB Community and direct Git installation for Taskboard
+  ---
+  duration_ms: 0.888811
+  type: 'test'
+  ...
+# Subtest: keeps Usage Tracker private and documents its Git release too
+ok 80 - keeps Usage Tracker private and documents its Git release too
+  ---
+  duration_ms: 4.448246
+  type: 'test'
+  ...
+# Subtest: has no active registry publication automation or credential path
+ok 81 - has no active registry publication automation or credential path
+  ---
+  duration_ms: 0.435174
+  type: 'test'
+  ...
+# Subtest: credits merged contributors without reviving superseded filter storage
+ok 82 - credits merged contributors without reviving superseded filter storage
+  ---
+  duration_ms: 2.933272
+  type: 'test'
+  ...
+# Subtest: original provider ticket route round-trips reserved locator characters
+ok 83 - original provider ticket route round-trips reserved locator characters
+  ---
+  duration_ms: 0.770485
+  type: 'test'
+  ...
+# Subtest: work navigation never changes the persistent pin preference
+ok 84 - work navigation never changes the persistent pin preference
+  ---
+  duration_ms: 4.39021
+  type: 'test'
+  ...
+# Subtest: command history and earlier runs use closed disclosures by default
+ok 85 - command history and earlier runs use closed disclosures by default
+  ---
+  duration_ms: 2.696981
+  type: 'test'
+  ...
+# Subtest: progress uses native diffs and live-only reduced-motion-safe animation
+ok 86 - progress uses native diffs and live-only reduced-motion-safe animation
+  ---
+  duration_ms: 8.563063
+  type: 'test'
+  ...
+# Subtest: diff resolves only a recorded path in the linked project workspace
+ok 87 - diff resolves only a recorded path in the linked project workspace
+  ---
+  duration_ms: 28.0364
+  type: 'test'
+  ...
+# Subtest: diff reports unavailable workspaces and bounds large patches
+ok 88 - diff reports unavailable workspaces and bounds large patches
+  ---
+  duration_ms: 2.050862
+  type: 'test'
+  ...
+# Subtest: immutable plan revisions and exact approvals gate Build
+ok 89 - immutable plan revisions and exact approvals gate Build
+  ---
+  duration_ms: 0.341704
+  type: 'test'
+  ...
+# Subtest: agent progress messages are bounded and survive store reload
+ok 90 - agent progress messages are bounded and survive store reload
+  ---
+  duration_ms: 1.42008
+  type: 'test'
+  ...
+# Subtest: successful turn never completes work or updates tracker status
+ok 91 - successful turn never completes work or updates tracker status
+  ---
+  duration_ms: 0.225702
+  type: 'test'
+  ...
+# Subtest: concurrent and stale duplicate starts spawn exactly once
+ok 92 - concurrent and stale duplicate starts spawn exactly once
+  ---
+  duration_ms: 2.40645
+  type: 'test'
+  ...
+# Subtest: a start without thread context uses the project default environment
+ok 93 - a start without thread context uses the project default environment
+  ---
+  duration_ms: 1.175284
+  type: 'test'
+  ...
+# Subtest: a confirmed environment rejection is retryable and legacy records are repaired
+ok 94 - a confirmed environment rejection is retryable and legacy records are repaired
+  ---
+  duration_ms: 2.763743
+  type: 'test'
+  ...
+# Subtest: missing host source recovers as retryable without automatic dispatch
+ok 95 - missing host source recovers as retryable without automatic dispatch
+  ---
+  duration_ms: 2.190626
+  type: 'test'
+  ...
+# Subtest: crash recovery preserves an ambiguous intent and refuses duplicate dispatch
+ok 96 - crash recovery preserves an ambiguous intent and refuses duplicate dispatch
+  ---
+  duration_ms: 1.47976
+  type: 'test'
+  ...
+# Subtest: lost spawn response is uncertain, not a retryable failure
+ok 97 - lost spawn response is uncertain, not a retryable failure
+  ---
+  duration_ms: 1.456638
+  type: 'test'
+  ...
+# Subtest: native cancellation stays separate and retries are bounded
+ok 98 - native cancellation stays separate and retries are bounded
+  ---
+  duration_ms: 0.322819
+  type: 'test'
+  ...
+# Subtest: scope change invalidates approval and optimistic revisions reject stale edits
+ok 99 - scope change invalidates approval and optimistic revisions reject stale edits
+  ---
+  duration_ms: 1.586024
+  type: 'test'
+  ...
+# Subtest: additive storage preserves unrelated preparation data across reopen
+ok 100 - additive storage preserves unrelated preparation data across reopen
+  ---
+  duration_ms: 0.498109
+  type: 'test'
+  ...
+# Subtest: prompts keep tracker data untrusted and impose no Empirical runtime
+ok 101 - prompts keep tracker data untrusted and impose no Empirical runtime
+  ---
+  duration_ms: 0.243293
+  type: 'test'
+  ...
+# Subtest: old terminal events cannot complete a different native turn
+ok 102 - old terminal events cannot complete a different native turn
+  ---
+  duration_ms: 0.134605
+  type: 'test'
+  ...
+# Subtest: native polling observes completion and persists the result
+ok 103 - native polling observes completion and persists the result
+  ---
+  duration_ms: 1.638088
+  type: 'test'
+  ...
+# Subtest: Review requires approved, completed Build and never implies acceptance
+ok 104 - Review requires approved, completed Build and never implies acceptance
+  ---
+  duration_ms: 0.275763
+  type: 'test'
+  ...
+# Subtest: recovery rejects a different project thread
+ok 105 - recovery rejects a different project thread
+  ---
+  duration_ms: 0.87158
+  type: 'test'
+  ...
+# Subtest: Start task moves status once and automatically reuses the session through planning and build
+ok 106 - Start task moves status once and automatically reuses the session through planning and build
+  ---
+  duration_ms: 34.654785
+  type: 'test'
+  ...
+# Subtest: completion before native idle continues automatically on the next poll
+ok 107 - completion before native idle continues automatically on the next poll
+  ---
+  duration_ms: 3.837602
+  type: 'test'
+  ...
+# Subtest: planning in a project checkout forks Build into a managed worktree exactly once
+ok 108 - planning in a project checkout forks Build into a managed worktree exactly once
+  ---
+  duration_ms: 2.989474
+  type: 'test'
+  ...
+# Subtest: a lost Build fork response pauses without creating another worktree or changing status again
+ok 109 - a lost Build fork response pauses without creating another worktree or changing status again
+  ---
+  duration_ms: 3.614175
+  type: 'test'
+  ...
+# Subtest: a broken checkout is a confirmed retryable Build failure, including legacy records
+ok 110 - a broken checkout is a confirmed retryable Build failure, including legacy records
+  ---
+  duration_ms: 3.211319
+  type: 'test'
+  ...
+# Subtest: closing an issue during investigation pauses automatic dispatch
+ok 111 - closing an issue during investigation pauses automatic dispatch
+  ---
+  duration_ms: 1.289764
+  type: 'test'
+  ...
+# Subtest: tracker failures are visible and retry independently without another agent dispatch
+ok 112 - tracker failures are visible and retry independently without another agent dispatch
+  ---
+  duration_ms: 1.468429
+  type: 'test'
+  ...
+# Subtest: uncertain and rejected dispatches never change provider status
+ok 113 - uncertain and rejected dispatches never change provider status
+  ---
+  duration_ms: 1.752548
+  type: 'test'
+  ...
+# Subtest: legacy completed planning resumes automatically after restart without another planning turn
+ok 114 - legacy completed planning resumes automatically after restart without another planning turn
+  ---
+  duration_ms: 1.856648
+  type: 'test'
+  ...
+# Subtest: review outcomes require a valid result; legacy negative verdicts are recoverable
+ok 115 - review outcomes require a valid result; legacy negative verdicts are recoverable
+  ---
+  duration_ms: 1.615137
+  type: 'test'
+  ...
+# Subtest: blocked review automatically resumes the same Build with findings exactly once
+ok 116 - blocked review automatically resumes the same Build with findings exactly once
+  ---
+  duration_ms: 3.878847
+  type: 'test'
+  ...
+# Subtest: repair completion starts independent review of the repaired Build workspace
+ok 117 - repair completion starts independent review of the repaired Build workspace
+  ---
+  duration_ms: 3.520973
+  type: 'test'
+  ...
+# Subtest: archived Build results survive polling and explicit review repair restores the same session once
+ok 118 - archived Build results survive polling and explicit review repair restores the same session once
+  ---
+  duration_ms: 6.49508
+  type: 'test'
+  ...
+# Subtest: legacy archive-only failure preserves completed evidence and can return to Build
+ok 119 - legacy archive-only failure preserves completed evidence and can return to Build
+  ---
+  duration_ms: 4.903486
+  type: 'test'
+  ...
+# Subtest: archive recovery rejects deleted, moved, unavailable and busy Build sessions before restoration
+ok 120 - archive recovery rejects deleted, moved, unavailable and busy Build sessions before restoration
+  ---
+  duration_ms: 6.840961
+  type: 'test'
+  ...
+# Subtest: archive recovery rechecks identity and idle state and does not dispatch after restoration failures
+ok 121 - archive recovery rechecks identity and idle state and does not dispatch after restoration failures
+  ---
+  duration_ms: 10.014441
+  type: 'test'
+  ...
+# Subtest: a lost send after unarchive stays uncertain across restart without another dispatch
+ok 122 - a lost send after unarchive stays uncertain across restart without another dispatch
+  ---
+  duration_ms: 2.635729
+  type: 'test'
+  ...
+# Subtest: Start task restoration failure keeps the review actionable without a phantom Build run
+ok 123 - Start task restoration failure keeps the review actionable without a phantom Build run
+  ---
+  duration_ms: 1.604548
+  type: 'test'
+  ...
+# Subtest: explicit blocked Build continuation restores its archived thread without a replacement
+ok 124 - explicit blocked Build continuation restores its archived thread without a replacement
+  ---
+  duration_ms: 1.824568
+  type: 'test'
+  ...
+# Subtest: review repair loop stops after two attempts without closing the tracker
+ok 125 - review repair loop stops after two attempts without closing the tracker
+  ---
+  duration_ms: 7.576042
+  type: 'test'
+  ...
+# Subtest: manual and unknown reviews remain actionable without an automatic dispatch
+ok 126 - manual and unknown reviews remain actionable without an automatic dispatch
+  ---
+  duration_ms: 2.799708
+  type: 'test'
+  ...
+# Subtest: busy review completion waits for native idle without consuming a repair attempt
+ok 127 - busy review completion waits for native idle without consuming a repair attempt
+  ---
+  duration_ms: 1.512829
+  type: 'test'
+  ...
+# Subtest: lost repair response is uncertain and cannot dispatch again after restart
+ok 128 - lost repair response is uncertain and cannot dispatch again after restart
+  ---
+  duration_ms: 18.969799
+  type: 'test'
+  ...
+# Subtest: review repairs reject scope changes and replacement workspaces
+ok 129 - review repairs reject scope changes and replacement workspaces
+  ---
+  duration_ms: 2.769393
+  type: 'test'
+  ...
+# Subtest: resumed review turns invalidate the previous verdict
+ok 130 - resumed review turns invalidate the previous verdict
+  ---
+  duration_ms: 0.212638
+  type: 'test'
+  ...
+# Subtest: repair Build that needs input pauses without requesting another review
+ok 131 - repair Build that needs input pauses without requesting another review
+  ---
+  duration_ms: 2.966031
+  type: 'test'
+  ...
+# Subtest: Start task resumes a blocked Build in the same managed session exactly once
+ok 132 - Start task resumes a blocked Build in the same managed session exactly once
+  ---
+  duration_ms: 1.771662
+  type: 'test'
+  ...
+# Subtest: continued blocked Build starts review only after implementation evidence
+ok 133 - continued blocked Build starts review only after implementation evidence
+  ---
+  duration_ms: 2.320453
+  type: 'test'
+  ...
+# Subtest: a native Build restart clears only its obsolete Build pause
+ok 134 - a native Build restart clears only its obsolete Build pause
+  ---
+  duration_ms: 1.418919
+  type: 'test'
+  ...
+# Subtest: legacy waiting Build and repaired turns without a revision cannot imply implementation
+ok 135 - legacy waiting Build and repaired turns without a revision cannot imply implementation
+  ---
+  duration_ms: 3.018708
+  type: 'test'
+  ...
+# Subtest: scope changes and an empty plan pause automatic build
+ok 136 - scope changes and an empty plan pause automatic build
+  ---
+  duration_ms: 3.545809
+  type: 'test'
+  ...
+# Subtest: only provider-supported In progress transitions are selected
+ok 137 - only provider-supported In progress transitions are selected
+  ---
+  duration_ms: 0.310347
+  type: 'test'
+  ...
+# Subtest: upgrades a retained Work-board migration without rewriting history or losing data
+ok 138 - upgrades a retained Work-board migration without rewriting history or losing data
+  ---
+  duration_ms: 37.680204
+  type: 'test'
+  ...
+# Subtest: appends only the preset migration and round-trips complete state
+ok 139 - appends only the preset migration and round-trips complete state
+  ---
+  duration_ms: 13.810366
+  type: 'test'
+  ...
+# Subtest: isolates names and ids between projects
+ok 140 - isolates names and ids between projects
+  ---
+  duration_ms: 5.435286
+  type: 'test'
+  ...
+# Subtest: contains corrupt rows and makes reorder exact and atomic
+ok 141 - contains corrupt rows and makes reorder exact and atomic
+  ---
+  duration_ms: 9.50439
+  type: 'test'
+  ...
+# Subtest: enforces the per-project preset limit without blocking updates
+ok 142 - enforces the per-project preset limit without blocking updates
+  ---
+  duration_ms: 29.725462
+  type: 'test'
+  ...
+# Subtest: bounds reads and fails closed when raw rows exceed the preset limit
+ok 143 - bounds reads and fails closed when raw rows exceed the preset limit
+  ---
+  duration_ms: 49.264159
+  type: 'test'
+  ...
+# Subtest: rejects --from-state on wrong verbs and preserves explicit precedence
+ok 144 - rejects --from-state on wrong verbs and preserves explicit precedence
+  ---
+  duration_ms: 0.94326
+  type: 'test'
+  ...
+# Subtest: keeps maximum aggregate preset JSON compact and under the CLI cap
+ok 145 - keeps maximum aggregate preset JSON compact and under the CLI cap
+  ---
+  duration_ms: 32.848229
+  type: 'test'
+  ...
+# Subtest: enforces a transactional aggregate state-byte limit per project
+ok 146 - enforces a transactional aggregate state-byte limit per project
+  ---
+  duration_ms: 57.527856
+  type: 'test'
+  ...
+# Subtest: accepts a complete strict project browse preference snapshot
+ok 147 - accepts a complete strict project browse preference snapshot
+  ---
+  duration_ms: 24.127268
+  type: 'test'
+  ...
+# Subtest: requires a project provider and matching source
+ok 148 - requires a project provider and matching source
+  ---
+  duration_ms: 1.14557
+  type: 'test'
+  ...
+# Subtest: bounds names, ids, positions, order size, and state fields
+ok 149 - bounds names, ids, positions, order size, and state fields
+  ---
+  duration_ms: 2.222254
+  type: 'test'
+  ...
+# Subtest: rejects control characters in preset identity and state
+ok 150 - rejects control characters in preset identity and state
+  ---
+  duration_ms: 0.900573
+  type: 'test'
+  ...
+# Subtest: rejects oversized adversarial containers before inspecting elements
+ok 151 - rejects oversized adversarial containers before inspecting elements
+  ---
+  duration_ms: 0.436757
+  type: 'test'
+  ...
+# Subtest: accepts the maximum valid browse state inside the UTF-8 envelope
+ok 152 - accepts the maximum valid browse state inside the UTF-8 envelope
+  ---
+  duration_ms: 7.042639
+  type: 'test'
+  ...
+# Subtest: normalizes unique names without depending on locale
+ok 153 - normalizes unique names without depending on locale
+  ---
+  duration_ms: 0.969969
+  type: 'test'
+  ...
+# Subtest: resolves only exact preset order permutations
+ok 154 - resolves only exact preset order permutations
+  ---
+  duration_ms: 0.525138
+  type: 'test'
+  ...
+# Subtest: Linear sync excludes finished issues when the window is off
+ok 155 - Linear sync excludes finished issues when the window is off
+  ---
+  duration_ms: 28.195871
+  type: 'test'
+  ...
+# Subtest: Linear sync includes issues finished within the window
+ok 156 - Linear sync includes issues finished within the window
+  ---
+  duration_ms: 1.548646
+  type: 'test'
+  ...
+# Subtest: finished window is a bounded whole number of days
+ok 157 - finished window is a bounded whole number of days
+  ---
+  duration_ms: 2.286401
+  type: 'test'
+  ...
+# Subtest: CLI parses --linear-finished-days as days
+ok 158 - CLI parses --linear-finished-days as days
+  ---
+  duration_ms: 0.648763
+  type: 'test'
+  ...
+# Subtest: store defaults existing projects to no finished window and persists it
+ok 159 - store defaults existing projects to no finished window and persists it
+  ---
+  duration_ms: 7.84355
+  type: 'test'
+  ...
+# Subtest: preparation references retain support for every Taskboard tracker
+ok 160 - preparation references retain support for every Taskboard tracker
+  ---
+  duration_ms: 6.14961
+  type: 'test'
+  ...
+# Subtest: repository context excludes credentials, generated content and symlink escapes
+ok 161 - repository context excludes credentials, generated content and symlink escapes
+  ---
+  duration_ms: 100.322361
+  type: 'test'
+  ...
+# Subtest: context and generation boundaries reject dangerous and malformed input
+ok 162 - context and generation boundaries reject dangerous and malformed input
+  ---
+  duration_ms: 3.834696
+  type: 'test'
+  ...
+# Subtest: real SQLite preparation retains direct edits, project isolation, jobs and settings after reload
+ok 163 - real SQLite preparation retains direct edits, project isolation, jobs and settings after reload
+  ---
+  duration_ms: 12.383934
+  type: 'test'
+  ...
+# Subtest: job service routes context to the remote host and preserves partial success and immutable retries
+ok 164 - job service routes context to the remote host and preserves partial success and immutable retries
+  ---
+  duration_ms: 10027.941294
+  type: 'test'
+  ...
+# Subtest: old preparations remain discoverable and every pending record is reconciled beyond presentation limits
+ok 165 - old preparations remain discoverable and every pending record is reconciled beyond presentation limits
+  ---
+  duration_ms: 85.707094
+  type: 'test'
+  ...
+# Subtest: deferred preparation responses cannot cross selection identity or undo a mutation
+ok 166 - deferred preparation responses cannot cross selection identity or undo a mutation
+  ---
+  duration_ms: 2.008485
+  type: 'test'
+  ...
+# Subtest: selects the active thread project only when it still exists
+ok 167 - selects the active thread project only when it still exists
+  ---
+  duration_ms: 0.905582
+  type: 'test'
+  ...
+# Subtest: treats a different thread in the same project as new context
+ok 168 - treats a different thread in the same project as new context
+  ---
+  duration_ms: 0.170842
+  type: 'test'
+  ...
+# Subtest: reads the project and thread from a BB project route
+ok 169 - reads the project and thread from a BB project route
+  ---
+  duration_ms: 0.677095
+  type: 'test'
+  ...
+# Subtest: uses only the immediately previous navigation entry as source context
+ok 170 - uses only the immediately previous navigation entry as source context
+  ---
+  duration_ms: 0.190067
+  type: 'test'
+  ...
+# Subtest: never replaces an explicit Taskboard project selection with route context
+ok 171 - never replaces an explicit Taskboard project selection with route context
+  ---
+  duration_ms: 0.190137
+  type: 'test'
+  ...
+# Subtest: writes project credentials atomically with owner-only permissions
+ok 172 - writes project credentials atomically with owner-only permissions
+  ---
+  duration_ms: 7.182804
+  type: 'test'
+  ...
+# Subtest: deleting a missing credential is harmless
+ok 173 - deleting a missing credential is harmless
+  ---
+  duration_ms: 1.294753
+  type: 'test'
+  ...
+# Subtest: cached summaries never retain provider comments
+ok 174 - cached summaries never retain provider comments
+  ---
+  duration_ms: 1.756865
+  type: 'test'
+  ...
+# Subtest: provider creation results carry strict native assignee confirmation
+ok 175 - provider creation results carry strict native assignee confirmation
+  ---
+  duration_ms: 0.178366
+  type: 'test'
+  ...
+# Subtest: metadata failures expose only a fixed server-safe message
+ok 176 - metadata failures expose only a fixed server-safe message
+  ---
+  duration_ms: 0.404718
+  type: 'test'
+  ...
+# Subtest: finds Jira project keys from common configured JQL scopes
+ok 177 - finds Jira project keys from common configured JQL scopes
+  ---
+  duration_ms: 0.934515
+  type: 'test'
+  ...
+# Subtest: binds issue creation to the tracker reviewed in the modal
+ok 178 - binds issue creation to the tracker reviewed in the modal
+  ---
+  duration_ms: 0.596087
+  type: 'test'
+  ...
+# Subtest: refreshes authoritative provider data after successful issue creation
+ok 179 - refreshes authoritative provider data after successful issue creation
+  ---
+  duration_ms: 0.325494
+  type: 'test'
+  ...
+# Subtest: refreshes authoritative provider data after ambiguous issue creation failure
+ok 180 - refreshes authoritative provider data after ambiguous issue creation failure
+  ---
+  duration_ms: 0.27403
+  type: 'test'
+  ...
+# Subtest: gitlab is a registered taskboard source
+ok 181 - gitlab is a registered taskboard source
+  ---
+  duration_ms: 1.43088
+  type: 'test'
+  ...
+# Subtest: refs must be host-qualified paths
+ok 182 - refs must be host-qualified paths
+  ---
+  duration_ms: 0.994734
+  type: 'test'
+  ...
+# Subtest: locators round-trip with ref and iid
+ok 183 - locators round-trip with ref and iid
+  ---
+  duration_ms: 0.366529
+  type: 'test'
+  ...
+# Subtest: status label categories cover the five states
+ok 184 - status label categories cover the five states
+  ---
+  duration_ms: 0.177484
+  type: 'test'
+  ...
+# Subtest: status labels filter out unrelated labels
+ok 185 - status labels filter out unrelated labels
+  ---
+  duration_ms: 0.571743
+  type: 'test'
+  ...
+# Subtest: state category prefers workflow labels over native state
+ok 186 - state category prefers workflow labels over native state
+  ---
+  duration_ms: 0.166514
+  type: 'test'
+  ...
+# Subtest: status name shows the workflow column name or the native state
+ok 187 - status name shows the workflow column name or the native state
+  ---
+  duration_ms: 0.214682
+  type: 'test'
+  ...
+# Subtest: cached summaries never retain provider comments
+ok 188 - cached summaries never retain provider comments
+  ---
+  duration_ms: 0.174619
+  type: 'test'
+  ...
+# Subtest: untriaged issues keep native open/closed choices current-flagged
+ok 189 - untriaged issues keep native open/closed choices current-flagged
+  ---
+  duration_ms: 0.33983
+  type: 'test'
+  ...
+# Subtest: stripped status names keep facet and dropdown consistent
+ok 190 - stripped status names keep facet and dropdown consistent
+  ---
+  duration_ms: 0.425546
+  type: 'test'
+  ...
+# Subtest: token line is parsed from glab stderr output
+ok 191 - token line is parsed from glab stderr output
+  ---
+  duration_ms: 0.462784
+  type: 'test'
+  ...
+# Subtest: keeps structural headers on neutral host theme surfaces
+ok 192 - keeps structural headers on neutral host theme surfaces
+  ---
+  duration_ms: 1.511909
+  type: 'test'
+  ...
+# Subtest: uses restrained state glyph, focus, and conversation treatments
+ok 193 - uses restrained state glyph, focus, and conversation treatments
+  ---
+  duration_ms: 0.501485
+  type: 'test'
+  ...
+# Subtest: keeps constrained filter values inside the vertical menu measure
+ok 194 - keeps constrained filter values inside the vertical menu measure
+  ---
+  duration_ms: 0.266787
+  type: 'test'
+  ...
+# Subtest: keeps assignee avatars compact with six theme-safe identity tones
+ok 195 - keeps assignee avatars compact with six theme-safe identity tones
+  ---
+  duration_ms: 0.469547
+  type: 'test'
+  ...
+# Subtest: shows restrained composer drop feedback and discoverable drag grips
+ok 196 - shows restrained composer drop feedback and discoverable drag grips
+  ---
+  duration_ms: 0.524667
+  type: 'test'
+  ...
+# Subtest: ticket images reject spoofed formats, active content and oversized bytes
+ok 197 - ticket images reject spoofed formats, active content and oversized bytes
+  ---
+  duration_ms: 11.175319
+  type: 'test'
+  ...
+# Subtest: Linear uploads use signed storage headers and return the asset URL
+ok 198 - Linear uploads use signed storage headers and return the asset URL
+  ---
+  duration_ms: 61.558969
+  type: 'test'
+  ...
+# Subtest: improvement asks for concrete concise scope without invented implementation
+ok 199 - improvement asks for concrete concise scope without invented implementation
+  ---
+  duration_ms: 0.236672
+  type: 'test'
+  ...
+# Subtest: draft parser accepts JSON or a single fence and rejects missing, extra or oversized fields
+ok 200 - draft parser accepts JSON or a single fence and rejects missing, extra or oversized fields
+  ---
+  duration_ms: 3.004612
+  type: 'test'
+  ...
+# Subtest: concurrent starts spawn once with project defaults and only validated text is returned
+ok 201 - concurrent starts spawn once with project defaults and only validated text is returned
+  ---
+  duration_ms: 1.825691
+  type: 'test'
+  ...
+# Subtest: cancellation before start prevents dispatch, including after service reload
+ok 202 - cancellation before start prevents dispatch, including after service reload
+  ---
+  duration_ms: 0.365286
+  type: 'test'
+  ...
+# Subtest: uncertain spawn cannot become a confirmed cancellation or be dispatched twice
+ok 203 - uncertain spawn cannot become a confirmed cancellation or be dispatched twice
+  ---
+  duration_ms: 0.598432
+  type: 'test'
+  ...
+# Subtest: stop failures stay uncertain and cleanup is retried by the sweep
+ok 204 - stop failures stay uncertain and cleanup is retried by the sweep
+  ---
+  duration_ms: 0.631232
+  type: 'test'
+  ...
+# Subtest: invalid model output never returns a replacement draft
+ok 205 - invalid model output never returns a replacement draft
+  ---
+  duration_ms: 1.81963
+  type: 'test'
+  ...
+1..205
+# tests 205
+# suites 0
+# pass 205
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 10710.272655
+
+> bb-plugin-taskboard@0.3.3 build
+> env -u BB_CLI bb plugin build .
+
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+dist/app.js
+dist/app.css
+dist/app.meta.json
+dist/host.js
+dist/host.js.map
+dist/host.meta.json
+
+> bb-plugin-taskboard@0.3.3 verify:build
+> node scripts/verify-build.mjs
+
+Taskboard build metadata is valid.
+
+> bb-plugin-touchbar@0.1.1 check
+> npm run types:check && npm run typecheck && npm test && npm run build
+
+
+> bb-plugin-touchbar@0.1.1 types:check
+> env -u BB_CLI bb plugin types --check .
+
+This plugin uses the npm package @get-bb/plugin-sdk; pin is 0.4.21, host is 0.4.21.
+The declarations are in node_modules/@get-bb/plugin-sdk/bundled-types/ — read them for exact signatures.
+
+> bb-plugin-touchbar@0.1.1 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-touchbar@0.1.1 test
+> node --import tsx --test test/*.test.ts
+
+TAP version 13
+# Subtest: BetterTouchTool preset is global, persistent, bounded, and action-safe
+ok 1 - BetterTouchTool preset is global, persistent, bounded, and action-safe
+  ---
+  duration_ms: 1.218083
+  type: 'test'
+  ...
+# Subtest: companion scripts are POSIX-shell parseable and avoid eval
+ok 2 - companion scripts are POSIX-shell parseable and avoid eval
+  ---
+  duration_ms: 7.61911
+  type: 'test'
+  ...
+# Subtest: Swift source plugin renders native status cards with safe BB actions
+ok 3 - Swift source plugin renders native status cards with safe BB actions
+  ---
+  duration_ms: 0.606596
+  type: 'test'
+  ...
+# Subtest: package includes every companion and excludes a frontend entry
+ok 4 - package includes every companion and excludes a frontend entry
+  ---
+  duration_ms: 0.499942
+  type: 'test'
+  ...
+# Subtest: native app owns the Control Strip and fullscreen panel without physical stop
+ok 5 - native app owns the Control Strip and fullscreen panel without physical stop
+  ---
+  duration_ms: 29.23677
+  type: 'test'
+  ...
+# Subtest: snapshot returns bounded JSON and queries hidden rows explicitly
+ok 6 - snapshot returns bounded JSON and queries hidden rows explicitly
+  ---
+  duration_ms: 5.537652
+  type: 'test'
+  ...
+# Subtest: snapshot includes bounded weekly subscription percentages
+ok 7 - snapshot includes bounded weekly subscription percentages
+  ---
+  duration_ms: 0.948651
+  type: 'test'
+  ...
+# Subtest: settings expose hidden-worker privacy and card count
+ok 8 - settings expose hidden-worker privacy and card count
+  ---
+  duration_ms: 0.458226
+  type: 'test'
+  ...
+# Subtest: open resolves and opens exactly one eligible thread
+ok 9 - open resolves and opens exactly one eligible thread
+  ---
+  duration_ms: 0.578295
+  type: 'test'
+  ...
+# Subtest: stop rejects idle and unknown threads without mutation
+ok 10 - stop rejects idle and unknown threads without mutation
+  ---
+  duration_ms: 0.922243
+  type: 'test'
+  ...
+# Subtest: stop mutates exactly one active thread and malformed commands fail
+ok 11 - stop mutates exactly one active thread and malformed commands fail
+  ---
+  duration_ms: 0.552778
+  type: 'test'
+  ...
+# Subtest: card and open-card share the same deterministic current slot
+ok 12 - card and open-card share the same deterministic current slot
+  ---
+  duration_ms: 0.811801
+  type: 'test'
+  ...
+# Subtest: card limit clamps invalid, low, and high settings
+ok 13 - card limit clamps invalid, low, and high settings
+  ---
+  duration_ms: 0.609933
+  type: 'test'
+  ...
+# Subtest: compact text removes controls, whitespace, and bounds user text
+ok 14 - compact text removes controls, whitespace, and bounds user text
+  ---
+  duration_ms: 0.196388
+  type: 'test'
+  ...
+# Subtest: runtime states map to stable compact states
+ok 15 - runtime states map to stable compact states
+  ---
+  duration_ms: 0.145125
+  type: 'test'
+  ...
+# Subtest: snapshot prioritizes attention and active work deterministically
+ok 16 - snapshot prioritizes attention and active work deterministically
+  ---
+  duration_ms: 0.829483
+  type: 'test'
+  ...
+# Subtest: hidden, archived, and deleted threads are excluded by default
+ok 17 - hidden, archived, and deleted threads are excluded by default
+  ---
+  duration_ms: 5.989858
+  type: 'test'
+  ...
+# Subtest: summary and cards stay compact and useful
+ok 18 - summary and cards stay compact and useful
+  ---
+  duration_ms: 0.213921
+  type: 'test'
+  ...
+1..18
+# tests 18
+# suites 0
+# pass 18
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 311.362795
+
+> bb-plugin-touchbar@0.1.1 build
+> env -u BB_CLI bb plugin build .
+
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+
+> bb-plugin-usage-tracker@0.1.15 check
+> npm run types:check && npm run typecheck && npm test && npm run build
+
+
+> bb-plugin-usage-tracker@0.1.15 types:check
+> env -u BB_CLI bb plugin types --check .
+
+This plugin uses the npm package @get-bb/plugin-sdk; pin is 0.4.6, host is 0.4.6.
+The declarations are in node_modules/@get-bb/plugin-sdk/bundled-types/ — read them for exact signatures.
+
+> bb-plugin-usage-tracker@0.1.15 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-usage-tracker@0.1.15 test
+> node --test --experimental-strip-types test/*.test.ts
+
+TAP version 13
+# Subtest: adds Antigravity without removing the v0.1.6 providers
+ok 1 - adds Antigravity without removing the v0.1.6 providers
+  ---
+  duration_ms: 1.14555
+  type: 'test'
+  ...
+# Subtest: normalizes Antigravity quota groups
+ok 2 - normalizes Antigravity quota groups
+  ---
+  duration_ms: 12.02072
+  type: 'test'
+  ...
+# Subtest: normalizes agy command-data buckets
+ok 3 - normalizes agy command-data buckets
+  ---
+  duration_ms: 6.052652
+  type: 'test'
+  ...
+# Subtest: accepts only Claude Code credential services
+ok 4 - accepts only Claude Code credential services
+  ---
+  duration_ms: 0.864537
+  type: 'test'
+  ...
+# Subtest: refreshes expired tokens and persists rotated credentials before usage
+ok 5 - refreshes expired tokens and persists rotated credentials before usage
+  ---
+  duration_ms: 21.67336
+  type: 'test'
+  ...
+# Subtest: reads usage with the configured Keychain service
+ok 6 - reads usage with the configured Keychain service
+  ---
+  duration_ms: 1.481523
+  type: 'test'
+  ...
+# Subtest: failed credential persistence stops usage and hides secret errors
+ok 7 - failed credential persistence stops usage and hides secret errors
+  ---
+  duration_ms: 1.259898
+  type: 'test'
+  ...
+# Subtest: never reads the Keychain for an unrelated service
+ok 8 - never reads the Keychain for an unrelated service
+  ---
+  duration_ms: 0.217457
+  type: 'test'
+  ...
+# Subtest: reports a missing or unreadable item as unauthenticated
+ok 9 - reports a missing or unreadable item as unauthenticated
+  ---
+  duration_ms: 0.182373
+  type: 'test'
+  ...
+# Subtest: decodes hex-encoded credentials
+ok 10 - decodes hex-encoded credentials
+  ---
+  duration_ms: 0.649165
+  type: 'test'
+  ...
+# Subtest: reports expired sessions before and after the request
+ok 11 - reports expired sessions before and after the request
+  ---
+  duration_ms: 0.321617
+  type: 'test'
+  ...
+# Subtest: explains throttling without claiming the limit is exhausted
+ok 12 - explains throttling without claiming the limit is exhausted
+  ---
+  duration_ms: 0.455391
+  type: 'test'
+  ...
+# Subtest: is unavailable outside macOS
+ok 13 - is unavailable outside macOS
+  ---
+  duration_ms: 0.32374
+  type: 'test'
+  ...
+# Subtest: overrides BB's Claude Code usage in the snapshot
+ok 14 - overrides BB's Claude Code usage in the snapshot
+  ---
+  duration_ms: 408.915891
+  type: 'test'
+  ...
+# Subtest: selects the in-flight enabled Account Pooler account as current
+ok 15 - selects the in-flight enabled Account Pooler account as current
+  ---
+  duration_ms: 1.201432
+  type: 'test'
+  ...
+# Subtest: serializes overlapping account switches
+ok 16 - serializes overlapping account switches
+  ---
+  duration_ms: 10.090168
+  type: 'test'
+  ...
+# Subtest: restores account state after a partial switch failure
+ok 17 - restores account state after a partial switch failure
+  ---
+  duration_ms: 1.050156
+  type: 'test'
+  ...
+# Subtest: combines pooled windows as a plan-weighted share with the earliest reset
+ok 18 - combines pooled windows as a plan-weighted share with the earliest reset
+  ---
+  duration_ms: 2.284088
+  type: 'test'
+  ...
+# Subtest: orders the overall weekly window ahead of model-specific windows
+ok 19 - orders the overall weekly window ahead of model-specific windows
+  ---
+  duration_ms: 0.370195
+  type: 'test'
+  ...
+# Subtest: loads every pooled account and replaces host-local usage per provider
+ok 20 - loads every pooled account and replaces host-local usage per provider
+  ---
+  duration_ms: 4.390049
+  type: 'test'
+  ...
+# Subtest: prefers the Account Pooler current account over host-local email
+ok 21 - prefers the Account Pooler current account over host-local email
+  ---
+  duration_ms: 2.668959
+  type: 'test'
+  ...
+# Subtest: skips accounts scoped to another host
+ok 22 - skips accounts scoped to another host
+  ---
+  duration_ms: 0.722659
+  type: 'test'
+  ...
+# Subtest: falls back to host-local usage when the Account Pooler is unavailable
+ok 23 - falls back to host-local usage when the Account Pooler is unavailable
+  ---
+  duration_ms: 0.672638
+  type: 'test'
+  ...
+# Subtest: unresolved hosts include only shared accounts
+ok 24 - unresolved hosts include only shared accounts
+  ---
+  duration_ms: 0.590517
+  type: 'test'
+  ...
+# Subtest: single pooled accounts preserve reported credit amounts
+ok 25 - single pooled accounts preserve reported credit amounts
+  ---
+  duration_ms: 0.586901
+  type: 'test'
+  ...
+# Subtest: keeps Grok and OpenCode independently configurable
+ok 26 - keeps Grok and OpenCode independently configurable
+  ---
+  duration_ms: 0.738257
+  type: 'test'
+  ...
+# Subtest: emits semantic severity for compact, rail, and detail presentation
+ok 27 - emits semantic severity for compact, rail, and detail presentation
+  ---
+  duration_ms: 0.161615
+  type: 'test'
+  ...
+# Subtest: summarizes larger provider sets and exposes the complete overview
+ok 28 - summarizes larger provider sets and exposes the complete overview
+  ---
+  duration_ms: 0.179417
+  type: 'test'
+  ...
+# Subtest: preserves provider-specific details and focus restoration
+ok 29 - preserves provider-specific details and focus restoration
+  ---
+  duration_ms: 0.151366
+  type: 'test'
+  ...
+# Subtest: closes an expanded provider card from the overview summary button
+ok 30 - closes an expanded provider card from the overview summary button
+  ---
+  duration_ms: 0.110051
+  type: 'test'
+  ...
+# Subtest: shows the current pooled account instead of a combined total
+ok 31 - shows the current pooled account instead of a combined total
+  ---
+  duration_ms: 0.146217
+  type: 'test'
+  ...
+# Subtest: shows reported credits as readable expanded-detail metadata
+ok 32 - shows reported credits as readable expanded-detail metadata
+  ---
+  duration_ms: 0.194134
+  type: 'test'
+  ...
+# Subtest: preparing a reset never invokes the consuming callback
+ok 33 - preparing a reset never invokes the consuming callback
+  ---
+  duration_ms: 1.431622
+  type: 'test'
+  ...
+# Subtest: reset confirmation is one-shot and idempotent
+ok 34 - reset confirmation is one-shot and idempotent
+  ---
+  duration_ms: 0.392857
+  type: 'test'
+  ...
+# Subtest: reset confirmation expires without invoking the consuming callback
+ok 35 - reset confirmation expires without invoking the consuming callback
+  ---
+  duration_ms: 0.295248
+  type: 'test'
+  ...
+# Subtest: reset preparation refuses zero or unknown availability
+ok 36 - reset preparation refuses zero or unknown availability
+  ---
+  duration_ms: 0.185779
+  type: 'test'
+  ...
+# Subtest: revokes a pending confirmation when availability becomes unknown
+ok 37 - revokes a pending confirmation when availability becomes unknown
+  ---
+  duration_ms: 0.324612
+  type: 'test'
+  ...
+# Subtest: reads the authoritative Codex reset count
+ok 38 - reads the authoritative Codex reset count
+  ---
+  duration_ms: 3.09168
+  type: 'test'
+  ...
+# Subtest: attaches reset availability to Codex only
+ok 39 - attaches reset availability to Codex only
+  ---
+  duration_ms: 1.17843
+  type: 'test'
+  ...
+# Subtest: rejects invalid reset counts before they reach the UI
+ok 40 - rejects invalid reset counts before they reach the UI
+  ---
+  duration_ms: 0.538092
+  type: 'test'
+  ...
+# Subtest: enables sidebar providers independently in display order
+ok 41 - enables sidebar providers independently in display order
+  ---
+  duration_ms: 2.09415
+  type: 'test'
+  ...
+# Subtest: normalizes compact limit preferences to the weekly default
+ok 42 - normalizes compact limit preferences to the weekly default
+  ---
+  duration_ms: 0.233176
+  type: 'test'
+  ...
+# Subtest: normalizes providers in stable order with every usage window
+ok 43 - normalizes providers in stable order with every usage window
+  ---
+  duration_ms: 0.919077
+  type: 'test'
+  ...
+# Subtest: normalizes Antigravity fractional quotas across both groups
+ok 44 - normalizes Antigravity fractional quotas across both groups
+  ---
+  duration_ms: 0.54303
+  type: 'test'
+  ...
+# Subtest: normalizes agy command-data buckets
+ok 45 - normalizes agy command-data buckets
+  ---
+  duration_ms: 0.389761
+  type: 'test'
+  ...
+# Subtest: uses the tightest Antigravity group in compact usage
+ok 46 - uses the tightest Antigravity group in compact usage
+  ---
+  duration_ms: 10.582226
+  type: 'test'
+  ...
+# Subtest: keeps current provider wire-key windows intact
+ok 47 - keeps current provider wire-key windows intact
+  ---
+  duration_ms: 0.287094
+  type: 'test'
+  ...
+# Subtest: keeps healthy legacy provider windows intact
+ok 48 - keeps healthy legacy provider windows intact
+  ---
+  duration_ms: 0.228747
+  type: 'test'
+  ...
+# Subtest: accepts legacy provider keys and normalizes explicit statuses
+ok 49 - accepts legacy provider keys and normalizes explicit statuses
+  ---
+  duration_ms: 0.322108
+  type: 'test'
+  ...
+# Subtest: prefers current provider keys over legacy aliases
+ok 50 - prefers current provider keys over legacy aliases
+  ---
+  duration_ms: 0.412071
+  type: 'test'
+  ...
+# Subtest: isolates an omitted provider response
+ok 51 - isolates an omitted provider response
+  ---
+  duration_ms: 0.20296
+  type: 'test'
+  ...
+# Subtest: normalizes Grok and OpenCode and isolates an omitted new provider
+ok 52 - normalizes Grok and OpenCode and isolates an omitted new provider
+  ---
+  duration_ms: 0.135207
+  type: 'test'
+  ...
+# Subtest: clamps progress geometry and rejects non-finite values
+ok 53 - clamps progress geometry and rejects non-finite values
+  ---
+  duration_ms: 0.327467
+  type: 'test'
+  ...
+# Subtest: classifies exact usage warning and critical thresholds
+ok 54 - classifies exact usage warning and critical thresholds
+  ---
+  duration_ms: 0.119839
+  type: 'test'
+  ...
+# Subtest: provides Grok and layered OpenCode provider marks
+ok 55 - provides Grok and layered OpenCode provider marks
+  ---
+  duration_ms: 0.096616
+  type: 'test'
+  ...
+# Subtest: formats reset, update, percentage, and cost copy safely
+ok 56 - formats reset, update, percentage, and cost copy safely
+  ---
+  duration_ms: 8.466125
+  type: 'test'
+  ...
+# Subtest: uses a reported window when weekly and five-hour labels are absent
+ok 57 - uses a reported window when weekly and five-hour labels are absent
+  ---
+  duration_ms: 0.529596
+  type: 'test'
+  ...
+# Subtest: selects the configured compact usage window
+ok 58 - selects the configured compact usage window
+  ---
+  duration_ms: 0.435384
+  type: 'test'
+  ...
+# Subtest: sums compact usage across accounts in use and ignores idle providers
+ok 59 - sums compact usage across accounts in use and ignores idle providers
+  ---
+  duration_ms: 0.290891
+  type: 'test'
+  ...
+# Subtest: selects the highest available compact usage for an overview summary
+ok 60 - selects the highest available compact usage for an overview summary
+  ---
+  duration_ms: 0.359145
+  type: 'test'
+  ...
+# Subtest: keeps additional provider windows in expanded details only
+ok 61 - keeps additional provider windows in expanded details only
+  ---
+  duration_ms: 0.394951
+  type: 'test'
+  ...
+# Subtest: falls back when the configured compact window is unavailable
+ok 62 - falls back when the configured compact window is unavailable
+  ---
+  duration_ms: 1.232208
+  type: 'test'
+  ...
+# Subtest: hides the Codex Pro five-hour row when it is not reported
+ok 63 - hides the Codex Pro five-hour row when it is not reported
+  ---
+  duration_ms: 0.933434
+  type: 'test'
+  ...
+# Subtest: prefers a fresh alternative before merged last-known compact windows
+ok 64 - prefers a fresh alternative before merged last-known compact windows
+  ---
+  duration_ms: 0.271565
+  type: 'test'
+  ...
+# Subtest: describes configured, actual, and fallback compact windows accessibly
+ok 65 - describes configured, actual, and fallback compact windows accessibly
+  ---
+  duration_ms: 0.798036
+  type: 'test'
+  ...
+# Subtest: keeps last-known sidebar windows through partial and failed refreshes
+ok 66 - keeps last-known sidebar windows through partial and failed refreshes
+  ---
+  duration_ms: 0.260846
+  type: 'test'
+  ...
+# Subtest: keeps additional last-known windows without stale duplicates
+ok 67 - keeps additional last-known windows without stale duplicates
+  ---
+  duration_ms: 0.595817
+  type: 'test'
+  ...
+# Subtest: resolves the thread environment host
+ok 68 - resolves the thread environment host
+  ---
+  duration_ms: 0.272868
+  type: 'test'
+  ...
+# Subtest: falls back when a thread has no environment or lookup fails
+ok 69 - falls back when a thread has no environment or lookup fails
+  ---
+  duration_ms: 0.157006
+  type: 'test'
+  ...
+# Subtest: loads usage for the resolved host and tolerates missing host metadata
+ok 70 - loads usage for the resolved host and tolerates missing host metadata
+  ---
+  duration_ms: 369.465409
+  type: 'test'
+  ...
+# Subtest: omits host override for primary-machine fallback
+ok 71 - omits host override for primary-machine fallback
+  ---
+  duration_ms: 454.009648
+  type: 'test'
+  ...
+# Subtest: loads the primary machine directly for the sidebar strip
+ok 72 - loads the primary machine directly for the sidebar strip
+  ---
+  duration_ms: 306.536593
+  type: 'test'
+  ...
+# Subtest: leaves provider activity unknown when thread counts are unavailable
+ok 73 - leaves provider activity unknown when thread counts are unavailable
+  ---
+  duration_ms: 0.43306
+  type: 'test'
+  ...
+# Subtest: marks inactive providers only when every thread count succeeds
+ok 74 - marks inactive providers only when every thread count succeeds
+  ---
+  duration_ms: 0.221144
+  type: 'test'
+  ...
+# Subtest: keeps activity unknown when thread counts omit provider groups
+ok 75 - keeps activity unknown when thread counts omit provider groups
+  ---
+  duration_ms: 0.314163
+  type: 'test'
+  ...
+# Subtest: omits activity when the thread count API is absent
+ok 76 - omits activity when the thread count API is absent
+  ---
+  duration_ms: 0.198542
+  type: 'test'
+  ...
+# Subtest: keeps known activity while omitting unknown activity for unmapped providers
+ok 77 - keeps known activity while omitting unknown activity for unmapped providers
+  ---
+  duration_ms: 0.3069
+  type: 'test'
+  ...
+# Subtest: removes stale activity without mutating the input snapshot
+ok 78 - removes stale activity without mutating the input snapshot
+  ---
+  duration_ms: 0.219721
+  type: 'test'
+  ...
+# Subtest: propagates thread and request-level usage failures
+ok 79 - propagates thread and request-level usage failures
+  ---
+  duration_ms: 5.254346
+  type: 'test'
+  ...
+1..79
+# tests 79
+# suites 0
+# pass 79
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1708.994945
+
+> bb-plugin-usage-tracker@0.1.15 build
+> env -u BB_CLI bb plugin build .
+
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+dist/app.js
+dist/app.css
+dist/app.meta.json
+
+> bb-plugins@0.0.0 check:dockside
+> node .github/check-dockside.mjs
+
+
+> bb-plugin-dockside@0.1.5 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-dockside@0.1.5 test
+> node --test --experimental-strip-types test/*.test.ts
+
+TAP version 13
+# Subtest: semanticStateToneClass
+    # Subtest: maps every named semantic role to theme-token utilities
+    ok 1 - maps every named semantic role to theme-token utilities
+      ---
+      duration_ms: 0.539334
+      type: 'test'
+      ...
+    1..1
+ok 1 - semanticStateToneClass
+  ---
+  duration_ms: 1.176096
+  type: 'suite'
+  ...
+# Subtest: familyProtection
+    # Subtest: fails closed for current, live, waiting, unread, and pinned descendants
+    ok 1 - fails closed for current, live, waiting, unread, and pinned descendants
+      ---
+      duration_ms: 0.595115
+      type: 'test'
+      ...
+    # Subtest: treats unknown statuses as live instead of guessing they are safe
+    ok 2 - treats unknown statuses as live instead of guessing they are safe
+      ---
+      duration_ms: 0.134695
+      type: 'test'
+      ...
+    # Subtest: rejects a child promoted into the visible root position
+    ok 3 - rejects a child promoted into the visible root position
+      ---
+      duration_ms: 0.141658
+      type: 'test'
+      ...
+    1..3
+ok 2 - familyProtection
+  ---
+  duration_ms: 1.586424
+  type: 'suite'
+  ...
+# Subtest: bulk delete preview
+    # Subtest: counts roots and recursive children and binds current-thread protection
+    ok 1 - counts roots and recursive children and binds current-thread protection
+      ---
+      duration_ms: 1.168752
+      type: 'test'
+      ...
+    # Subtest: rejects empty, duplicate, and oversized root sets
+    ok 2 - rejects empty, duplicate, and oversized root sets
+      ---
+      duration_ms: 0.6082
+      type: 'test'
+      ...
+    # Subtest: rejects overlapping root and descendant selections
+    ok 3 - rejects overlapping root and descendant selections
+      ---
+      duration_ms: 0.283377
+      type: 'test'
+      ...
+    1..3
+ok 3 - bulk delete preview
+  ---
+  duration_ms: 2.320594
+  type: 'suite'
+  ...
+# Subtest: bulk delete confirmation
+    # Subtest: confirms child trees, consumes the token, and preserves stable order
+    ok 1 - confirms child trees, consumes the token, and preserves stable order
+      ---
+      duration_ms: 0.677235
+      type: 'test'
+      ...
+    # Subtest: expires a preview without mutating anything
+    ok 2 - expires a preview without mutating anything
+      ---
+      duration_ms: 0.25761
+      type: 'test'
+      ...
+    # Subtest: revalidates, skips changed state, and continues after one failure
+    ok 3 - revalidates, skips changed state, and continues after one failure
+      ---
+      duration_ms: 0.466872
+      type: 'test'
+      ...
+    # Subtest: refuses a deletion when the descendant identity set grew after preview
+    ok 4 - refuses a deletion when the descendant identity set grew after preview
+      ---
+      duration_ms: 0.324542
+      type: 'test'
+      ...
+    # Subtest: refuses a deletion when a reviewed descendant disappeared
+    ok 5 - refuses a deletion when a reviewed descendant disappeared
+      ---
+      duration_ms: 0.148521
+      type: 'test'
+      ...
+    1..5
+ok 4 - bulk delete confirmation
+  ---
+  duration_ms: 2.948069
+  type: 'suite'
+  ...
+# Subtest: declares unshimmed runtime imports as production dependencies
+ok 5 - declares unshimmed runtime imports as production dependencies
+  ---
+  duration_ms: 8.026323
+  type: 'test'
+  ...
+# Subtest: family order persistence
+    # Subtest: round-trips bounded project-local root order
+    ok 1 - round-trips bounded project-local root order
+      ---
+      duration_ms: 1.158474
+      type: 'test'
+      ...
+    # Subtest: fails closed for malformed, duplicate, controlled, and oversized data
+    ok 2 - fails closed for malformed, duplicate, controlled, and oversized data
+      ---
+      duration_ms: 0.247942
+      type: 'test'
+      ...
+    # Subtest: keeps pinned roots leading and merges new roots canonically
+    ok 3 - keeps pinned roots leading and merges new roots canonically
+      ---
+      duration_ms: 0.245218
+      type: 'test'
+      ...
+    1..3
+ok 6 - family order persistence
+  ---
+  duration_ms: 2.404867
+  type: 'suite'
+  ...
+# Subtest: family reorder validation
+    # Subtest: moves a complete root family order and supports keyboard moves
+    ok 1 - moves a complete root family order and supports keyboard moves
+      ---
+      duration_ms: 0.351732
+      type: 'test'
+      ...
+    # Subtest: rejects cross-project, missing, duplicate, and pinned-boundary moves
+    ok 2 - rejects cross-project, missing, duplicate, and pinned-boundary moves
+      ---
+      duration_ms: 0.138403
+      type: 'test'
+      ...
+    1..2
+ok 7 - family reorder validation
+  ---
+  duration_ms: 0.648684
+  type: 'suite'
+  ...
+# Subtest: familyStatus
+    # Subtest: projects every explicit state and the exact stale boundary
+    ok 1 - projects every explicit state and the exact stale boundary
+      ---
+      duration_ms: 0.737896
+      type: 'test'
+      ...
+    # Subtest: uses stable attention precedence across root and children
+    ok 2 - uses stable attention precedence across root and children
+      ---
+      duration_ms: 0.184727
+      type: 'test'
+      ...
+    # Subtest: uses the newest family member for inactivity and never exposes Done
+    ok 3 - uses the newest family member for inactivity and never exposes Done
+      ---
+      duration_ms: 0.220893
+      type: 'test'
+      ...
+    # Subtest: keeps all six labels, shapes, and color roles distinct
+    ok 4 - keeps all six labels, shapes, and color roles distinct
+      ---
+      duration_ms: 0.205364
+      type: 'test'
+      ...
+    # Subtest: keeps the actual live activity type visible by shape and color
+    ok 5 - keeps the actual live activity type visible by shape and color
+      ---
+      duration_ms: 0.186781
+      type: 'test'
+      ...
+    1..5
+ok 8 - familyStatus
+  ---
+  duration_ms: 2.468002
+  type: 'suite'
+  ...
+# Subtest: workspace filter UI contract
+    # Subtest: presents grouped descriptive filters and an explicit active state
+    ok 1 - presents grouped descriptive filters and an explicit active state
+      ---
+      duration_ms: 5.099984
+      type: 'test'
+      ...
+    1..1
+ok 9 - workspace filter UI contract
+  ---
+  duration_ms: 6.807028
+  type: 'suite'
+  ...
+# Subtest: sortByCreatedAtDescending
+    # Subtest: puts the newest thread first
+    ok 1 - puts the newest thread first
+      ---
+      duration_ms: 1.092032
+      type: 'test'
+      ...
+    # Subtest: ignores activity and update time
+    ok 2 - ignores activity and update time
+      ---
+      duration_ms: 0.185538
+      type: 'test'
+      ...
+    # Subtest: breaks ties on id so the order is stable
+    ok 3 - breaks ties on id so the order is stable
+      ---
+      duration_ms: 6.752279
+      type: 'test'
+      ...
+    # Subtest: does not mutate its input
+    ok 4 - does not mutate its input
+      ---
+      duration_ms: 0.181561
+      type: 'test'
+      ...
+    1..4
+ok 10 - sortByCreatedAtDescending
+  ---
+  duration_ms: 9.054188
+  type: 'suite'
+  ...
+# Subtest: threadDisplayTitle
+    # Subtest: prefers the title, then the fallback, then a placeholder
+    ok 1 - prefers the title, then the fallback, then a placeholder
+      ---
+      duration_ms: 0.171222
+      type: 'test'
+      ...
+    # Subtest: treats a whitespace-only title as absent
+    ok 2 - treats a whitespace-only title as absent
+      ---
+      duration_ms: 0.079495
+      type: 'test'
+      ...
+    1..2
+ok 11 - threadDisplayTitle
+  ---
+  duration_ms: 0.415899
+  type: 'suite'
+  ...
+# Subtest: searchThreadsByTitle
+    # Subtest: matches case-insensitively on the visible title
+    ok 1 - matches case-insensitively on the visible title
+      ---
+      duration_ms: 0.255355
+      type: 'test'
+      ...
+    # Subtest: returns everything for a blank query
+    ok 2 - returns everything for a blank query
+      ---
+      duration_ms: 0.168577
+      type: 'test'
+      ...
+    1..2
+ok 12 - searchThreadsByTitle
+  ---
+  duration_ms: 0.639396
+  type: 'suite'
+  ...
+# Subtest: filtering
+    # Subtest: scopes to one project, or to all
+    ok 1 - scopes to one project, or to all
+      ---
+      duration_ms: 0.217908
+      type: 'test'
+      ...
+    # Subtest: drops archived threads
+    ok 2 - drops archived threads
+      ---
+      duration_ms: 0.255376
+      type: 'test'
+      ...
+    # Subtest: keeps an archived thread the plugin parked
+    ok 3 - keeps an archived thread the plugin parked
+      ---
+      duration_ms: 0.129536
+      type: 'test'
+      ...
+    # Subtest: splits pinned from the rest, keeping order
+    ok 4 - splits pinned from the rest, keeping order
+      ---
+      duration_ms: 0.185509
+      type: 'test'
+      ...
+    1..4
+ok 13 - filtering
+  ---
+  duration_ms: 0.906263
+  type: 'suite'
+  ...
+# Subtest: project thread groups
+    # Subtest: keeps bb's project order, pins roots within a project, and flattens descendants
+    ok 1 - keeps bb's project order, pins roots within a project, and flattens descendants
+      ---
+      duration_ms: 0.388599
+      type: 'test'
+      ...
+    # Subtest: promotes a child when its parent is not visible
+    ok 2 - promotes a child when its parent is not visible
+      ---
+      duration_ms: 0.143181
+      type: 'test'
+      ...
+    # Subtest: omits projects with no visible threads
+    ok 3 - omits projects with no visible threads
+      ---
+      duration_ms: 0.127653
+      type: 'test'
+      ...
+    # Subtest: returns no project groups when no thread exists
+    ok 4 - returns no project groups when no thread exists
+      ---
+      duration_ms: 0.124126
+      type: 'test'
+      ...
+    # Subtest: keeps a thread's unknown project without adding known empty ones
+    ok 5 - keeps a thread's unknown project without adding known empty ones
+      ---
+      duration_ms: 0.108487
+      type: 'test'
+      ...
+    # Subtest: keeps a parent as context when only its child matches search
+    ok 6 - keeps a parent as context when only its child matches search
+      ---
+      duration_ms: 0.23595
+      type: 'test'
+      ...
+    # Subtest: matches a project name and keeps the whole project
+    ok 7 - matches a project name and keeps the whole project
+      ---
+      duration_ms: 0.089674
+      type: 'test'
+      ...
+    # Subtest: never reintroduces empty projects during search
+    ok 8 - never reintroduces empty projects during search
+      ---
+      duration_ms: 0.091617
+      type: 'test'
+      ...
+    1..8
+ok 14 - project thread groups
+  ---
+  duration_ms: 1.486321
+  type: 'suite'
+  ...
+# Subtest: threadIsWorking
+    # Subtest: includes activity counts and resolved runtime states
+    ok 1 - includes activity counts and resolved runtime states
+      ---
+      duration_ms: 0.126812
+      type: 'test'
+      ...
+    1..1
+ok 15 - threadIsWorking
+  ---
+  duration_ms: 0.176693
+  type: 'suite'
+  ...
+# Subtest: child threads
+    # Subtest: hides a child whose parent is on screen
+    ok 1 - hides a child whose parent is on screen
+      ---
+      duration_ms: 0.128925
+      type: 'test'
+      ...
+    # Subtest: keeps a child whose parent is not on screen
+    ok 2 - keeps a child whose parent is not on screen
+      ---
+      duration_ms: 0.067564
+      type: 'test'
+      ...
+    # Subtest: lists a thread's children oldest first
+    ok 3 - lists a thread's children oldest first
+      ---
+      duration_ms: 0.106093
+      type: 'test'
+      ...
+    1..3
+ok 16 - child threads
+  ---
+  duration_ms: 0.373482
+  type: 'suite'
+  ...
+# Subtest: parentOf
+    # Subtest: finds a parent the inbox filters out
+    ok 1 - finds a parent the inbox filters out
+      ---
+      duration_ms: 0.150976
+      type: 'test'
+      ...
+    # Subtest: returns null for a root thread
+    ok 2 - returns null for a root thread
+      ---
+      duration_ms: 0.716567
+      type: 'test'
+      ...
+    # Subtest: returns null when the parent row is gone
+    ok 3 - returns null when the parent row is gone
+      ---
+      duration_ms: 0.08212
+      type: 'test'
+      ...
+    1..3
+ok 17 - parentOf
+  ---
+  duration_ms: 1.037353
+  type: 'suite'
+  ...
+# Subtest: canPark
+    # Subtest: refuses while the agent is blocked on the user
+    ok 1 - refuses while the agent is blocked on the user
+      ---
+      duration_ms: 0.780654
+      type: 'test'
+      ...
+    # Subtest: refuses while any work is running
+    ok 2 - refuses while any work is running
+      ---
+      duration_ms: 0.190778
+      type: 'test'
+      ...
+    # Subtest: allows a quiet thread
+    ok 3 - allows a quiet thread
+      ---
+      duration_ms: 0.154893
+      type: 'test'
+      ...
+    1..3
+ok 18 - canPark
+  ---
+  duration_ms: 2.032498
+  type: 'suite'
+  ...
+# Subtest: resolveShelf
+    # Subtest: keeps an unparked thread active
+    ok 1 - keeps an unparked thread active
+      ---
+      duration_ms: 0.363263
+      type: 'test'
+      ...
+    # Subtest: settles a parked, quiet thread
+    ok 2 - settles a parked, quiet thread
+      ---
+      duration_ms: 0.174368
+      type: 'test'
+      ...
+    # Subtest: brings a settled thread back when it starts working
+    ok 3 - brings a settled thread back when it starts working
+      ---
+      duration_ms: 0.114849
+      type: 'test'
+      ...
+    # Subtest: brings a settled thread back when it asks a question
+    ok 4 - brings a settled thread back when it asks a question
+      ---
+      duration_ms: 0.231793
+      type: 'test'
+      ...
+    # Subtest: un-settles on new attention after the settle
+    ok 5 - un-settles on new attention after the settle
+      ---
+      duration_ms: 0.321818
+      type: 'test'
+      ...
+    # Subtest: keeps a snoozed thread hidden until its wake time
+    ok 6 - keeps a snoozed thread hidden until its wake time
+      ---
+      duration_ms: 0.334621
+      type: 'test'
+      ...
+    # Subtest: wakes a snoozed thread when the timer elapses
+    ok 7 - wakes a snoozed thread when the timer elapses
+      ---
+      duration_ms: 0.228677
+      type: 'test'
+      ...
+    # Subtest: wakes a snoozed thread early when it raises its hand
+    ok 8 - wakes a snoozed thread early when it raises its hand
+      ---
+      duration_ms: 0.093932
+      type: 'test'
+      ...
+    # Subtest: does not wake on activity that predates the snooze
+    ok 9 - does not wake on activity that predates the snooze
+      ---
+      duration_ms: 0.061974
+      type: 'test'
+      ...
+    1..9
+ok 19 - resolveShelf
+  ---
+  duration_ms: 3.325648
+  type: 'suite'
+  ...
+# Subtest: wokenSettledThreadIds
+    # Subtest: leaves a thread that is still settled alone
+    ok 1 - leaves a thread that is still settled alone
+      ---
+      duration_ms: 0.524217
+      type: 'test'
+      ...
+    # Subtest: reports a settled thread that has come back
+    ok 2 - reports a settled thread that has come back
+      ---
+      duration_ms: 0.161405
+      type: 'test'
+      ...
+    # Subtest: ignores snoozed rows
+    ok 3 - ignores snoozed rows
+      ---
+      duration_ms: 0.079445
+      type: 'test'
+      ...
+    # Subtest: skips a thread bb no longer reports
+    ok 4 - skips a thread bb no longer reports
+      ---
+      duration_ms: 0.067984
+      type: 'test'
+      ...
+    1..4
+ok 20 - wokenSettledThreadIds
+  ---
+  duration_ms: 0.938983
+  type: 'suite'
+  ...
+# Subtest: rowsMatch
+    # Subtest: matches a list that says what the rows already say
+    ok 1 - matches a list that says what the rows already say
+      ---
+      duration_ms: 0.132331
+      type: 'test'
+      ...
+    # Subtest: notices a timestamp that moved
+    ok 2 - notices a timestamp that moved
+      ---
+      duration_ms: 0.067603
+      type: 'test'
+      ...
+    # Subtest: notices a row that arrived or left
+    ok 3 - notices a row that arrived or left
+      ---
+      duration_ms: 0.058186
+      type: 'test'
+      ...
+    1..3
+ok 21 - rowsMatch
+  ---
+  duration_ms: 0.341843
+  type: 'suite'
+  ...
+# Subtest: snoozeWakeLabel
+    # Subtest: rounds minutes up so a hidden thread never reads 0m
+    ok 1 - rounds minutes up so a hidden thread never reads 0m
+      ---
+      duration_ms: 0.121301
+      type: 'test'
+      ...
+    # Subtest: switches to hours and days
+    ok 2 - switches to hours and days
+      ---
+      duration_ms: 0.051313
+      type: 'test'
+      ...
+    # Subtest: reads 'now' once the wake time has passed
+    ok 3 - reads 'now' once the wake time has passed
+      ---
+      duration_ms: 0.041736
+      type: 'test'
+      ...
+    1..3
+ok 22 - snoozeWakeLabel
+  ---
+  duration_ms: 0.331615
+  type: 'suite'
+  ...
+# Subtest: resolveSnoozePresets
+    # Subtest: offers this evening while it is still well before evening
+    ok 1 - offers this evening while it is still well before evening
+      ---
+      duration_ms: 0.26861
+      type: 'test'
+      ...
+    # Subtest: drops this evening once evening is near
+    ok 2 - drops this evening once evening is near
+      ---
+      duration_ms: 0.085376
+      type: 'test'
+      ...
+    # Subtest: puts tomorrow at 9am on the next calendar day
+    ok 3 - puts tomorrow at 9am on the next calendar day
+      ---
+      duration_ms: 0.097147
+      type: 'test'
+      ...
+    # Subtest: puts next week on the coming Monday
+    ok 4 - puts next week on the coming Monday
+      ---
+      duration_ms: 0.09307
+      type: 'test'
+      ...
+    1..4
+ok 23 - resolveSnoozePresets
+  ---
+  duration_ms: 0.633256
+  type: 'suite'
+  ...
+# Subtest: nextWakeDelayMs
+    # Subtest: arms for the soonest upcoming wake
+    ok 1 - arms for the soonest upcoming wake
+      ---
+      duration_ms: 0.107556
+      type: 'test'
+      ...
+    # Subtest: ignores wakes that have already passed
+    ok 2 - ignores wakes that have already passed
+      ---
+      duration_ms: 0.055832
+      type: 'test'
+      ...
+    # Subtest: clamps a far-future wake to the maximum timeout
+    ok 3 - clamps a far-future wake to the maximum timeout
+      ---
+      duration_ms: 0.04948
+      type: 'test'
+      ...
+    1..3
+ok 24 - nextWakeDelayMs
+  ---
+  duration_ms: 0.275954
+  type: 'suite'
+  ...
+# Subtest: refreshRetryDelayMs
+    # Subtest: grows the wait with each attempt
+    ok 1 - grows the wait with each attempt
+      ---
+      duration_ms: 0.868875
+      type: 'test'
+      ...
+    # Subtest: stops once the attempts are spent
+    ok 2 - stops once the attempts are spent
+      ---
+      duration_ms: 0.09882
+      type: 'test'
+      ...
+    1..2
+ok 25 - refreshRetryDelayMs
+  ---
+  duration_ms: 1.039817
+  type: 'suite'
+  ...
+# Subtest: resolveDocksidePreferences
+    # Subtest: preserves current behavior while settings load or are unknown
+    ok 1 - preserves current behavior while settings load or are unknown
+      ---
+      duration_ms: 0.769674
+      type: 'test'
+      ...
+    # Subtest: accepts either status display mode and safely defaults invalid saved values
+    ok 2 - accepts either status display mode and safely defaults invalid saved values
+      ---
+      duration_ms: 0.185258
+      type: 'test'
+      ...
+    # Subtest: resolves distinct high-contrast and colorblind-friendly presets
+    ok 3 - resolves distinct high-contrast and colorblind-friendly presets
+      ---
+      duration_ms: 0.719172
+      type: 'test'
+      ...
+    # Subtest: accepts only six-digit custom hex colors and falls back per role
+    ok 4 - accepts only six-digit custom hex colors and falls back per role
+      ---
+      duration_ms: 0.291081
+      type: 'test'
+      ...
+    # Subtest: resolves behavior preferences independently of palette
+    ok 5 - resolves behavior preferences independently of palette
+      ---
+      duration_ms: 0.140196
+      type: 'test'
+      ...
+    1..5
+ok 26 - resolveDocksidePreferences
+  ---
+  duration_ms: 2.939063
+  type: 'suite'
+  ...
+# Subtest: docksidePreferenceStyle
+    # Subtest: projects only owner-scoped semantic variables
+    ok 1 - projects only owner-scoped semantic variables
+      ---
+      duration_ms: 0.243774
+      type: 'test'
+      ...
+    1..1
+ok 27 - docksidePreferenceStyle
+  ---
+  duration_ms: 0.331655
+  type: 'suite'
+  ...
+# Subtest: project color store
+    # Subtest: canonicalizes, persists, updates, and resets one project
+    ok 1 - canonicalizes, persists, updates, and resets one project
+      ---
+      duration_ms: 11.529745
+      type: 'test'
+      ...
+    # Subtest: contains invalid persisted rows and rejects invalid writes
+    ok 2 - contains invalid persisted rows and rejects invalid writes
+      ---
+      duration_ms: 0.730793
+      type: 'test'
+      ...
+    # Subtest: bounds new rows while allowing updates at the limit
+    ok 3 - bounds new rows while allowing updates at the limit
+      ---
+      duration_ms: 1.618813
+      type: 'test'
+      ...
+    1..3
+ok 28 - project color store
+  ---
+  duration_ms: 15.001128
+  type: 'suite'
+  ...
+# Subtest: project badge colors
+    # Subtest: selects a stable palette color from project id, not display name
+    ok 1 - selects a stable palette color from project id, not display name
+      ---
+      duration_ms: 0.811942
+      type: 'test'
+      ...
+    # Subtest: accepts only canonicalizable opaque six-digit hex overrides
+    ok 2 - accepts only canonicalizable opaque six-digit hex overrides
+      ---
+      duration_ms: 0.124557
+      type: 'test'
+      ...
+    # Subtest: uses a valid override and otherwise restores the automatic color
+    ok 3 - uses a valid override and otherwise restores the automatic color
+      ---
+      duration_ms: 0.189305
+      type: 'test'
+      ...
+    # Subtest: chooses the stronger black or white contrast at and around crossover
+    ok 4 - chooses the stronger black or white contrast at and around crossover
+      ---
+      duration_ms: 0.404458
+      type: 'test'
+      ...
+    # Subtest: bounds project ids and rejects control characters
+    ok 5 - bounds project ids and rejects control characters
+      ---
+      duration_ms: 0.183655
+      type: 'test'
+      ...
+    1..5
+ok 29 - project badge colors
+  ---
+  duration_ms: 2.513405
+  type: 'suite'
+  ...
+# Subtest: project order
+    # Subtest: round-trips, applies stored ranks, and preserves new projects
+    ok 1 - round-trips, applies stored ranks, and preserves new projects
+      ---
+      duration_ms: 1.16768
+      type: 'test'
+      ...
+    # Subtest: fails closed for malformed, duplicate, and controlled values
+    ok 2 - fails closed for malformed, duplicate, and controlled values
+      ---
+      duration_ms: 0.14774
+      type: 'test'
+      ...
+    # Subtest: moves complete project orders by drag and keyboard
+    ok 3 - moves complete project orders by drag and keyboard
+      ---
+      duration_ms: 0.297012
+      type: 'test'
+      ...
+    1..3
+ok 30 - project order
+  ---
+  duration_ms: 2.330962
+  type: 'suite'
+  ...
+# Subtest: pullRequestPresentation
+    # Subtest: gives terminal states precedence over stale attention
+    ok 1 - gives terminal states precedence over stale attention
+      ---
+      duration_ms: 0.900002
+      type: 'test'
+      ...
+    # Subtest: maps open pull request attention into compact semantic states
+    ok 2 - maps open pull request attention into compact semantic states
+      ---
+      duration_ms: 0.229839
+      type: 'test'
+      ...
+    1..2
+ok 31 - pullRequestPresentation
+  ---
+  duration_ms: 1.883406
+  type: 'suite'
+  ...
+# Subtest: PR semantic icon surface
+    # Subtest: uses the configured PR color for a visible tinted background
+    ok 1 - uses the configured PR color for a visible tinted background
+      ---
+      duration_ms: 0.260926
+      type: 'test'
+      ...
+    1..1
+ok 32 - PR semantic icon surface
+  ---
+  duration_ms: 0.37274
+  type: 'suite'
+  ...
+# Subtest: relativeTimeLabel
+    # Subtest: reads 'now' under a minute
+    ok 1 - reads 'now' under a minute
+      ---
+      duration_ms: 0.675873
+      type: 'test'
+      ...
+    # Subtest: steps through minutes, hours, days, and weeks
+    ok 2 - steps through minutes, hours, days, and weeks
+      ---
+      duration_ms: 0.178375
+      type: 'test'
+      ...
+    # Subtest: floors rather than rounds, so a label never overstates age
+    ok 3 - floors rather than rounds, so a label never overstates age
+      ---
+      duration_ms: 0.209011
+      type: 'test'
+      ...
+    # Subtest: treats a future timestamp as 'now'
+    ok 4 - treats a future timestamp as 'now'
+      ---
+      duration_ms: 0.100914
+      type: 'test'
+      ...
+    1..4
+ok 33 - relativeTimeLabel
+  ---
+  duration_ms: 2.070007
+  type: 'suite'
+  ...
+# Subtest: family reorder UI contract
+    # Subtest: applies persisted complete-family order before filter and search
+    ok 1 - applies persisted complete-family order before filter and search
+      ---
+      duration_ms: 0.534565
+      type: 'test'
+      ...
+    # Subtest: disables reorder for selection, filters, and host search
+    ok 2 - disables reorder for selection, filters, and host search
+      ---
+      duration_ms: 0.259593
+      type: 'test'
+      ...
+    # Subtest: wires explicit drag and keyboard controls with announcements
+    ok 3 - wires explicit drag and keyboard controls with announcements
+      ---
+      duration_ms: 0.281594
+      type: 'test'
+      ...
+    # Subtest: keeps navigation split props and bulk selection overlays independent
+    ok 4 - keeps navigation split props and bulk selection overlays independent
+      ---
+      duration_ms: 0.113648
+      type: 'test'
+      ...
+    1..4
+ok 34 - family reorder UI contract
+  ---
+  duration_ms: 1.980152
+  type: 'suite'
+  ...
+# Subtest: Dockside settings contract
+    # Subtest: declares every palette and behavior setting with safe defaults
+    ok 1 - declares every palette and behavior setting with safe defaults
+      ---
+      duration_ms: 0.755989
+      type: 'test'
+      ...
+    # Subtest: registers one settings preview and reads live settings
+    ok 2 - registers one settings preview and reads live settings
+      ---
+      duration_ms: 0.171793
+      type: 'test'
+      ...
+    # Subtest: edits durable project-id colors and paints only project letter badges
+    ok 3 - edits durable project-id colors and paints only project letter badges
+      ---
+      duration_ms: 0.234297
+      type: 'test'
+      ...
+    # Subtest: uses optional metadata and layout preferences without changing defaults
+    ok 4 - uses optional metadata and layout preferences without changing defaults
+      ---
+      duration_ms: 0.118175
+      type: 'test'
+      ...
+    # Subtest: uses a semantic full-row selection target and keeps navigation separate
+    ok 5 - uses a semantic full-row selection target and keeps navigation separate
+      ---
+      duration_ms: 0.14816
+      type: 'test'
+      ...
+    1..5
+ok 35 - Dockside settings contract
+  ---
+  duration_ms: 2.908726
+  type: 'suite'
+  ...
+# Subtest: isUnread
+    # Subtest: is bb's own rule: last read has to catch up with last attention
+    ok 1 - is bb's own rule: last read has to catch up with last attention
+      ---
+      duration_ms: 0.849389
+      type: 'test'
+      ...
+    # Subtest: treats a never-read thread as unread
+    ok 2 - treats a never-read thread as unread
+      ---
+      duration_ms: 1.050496
+      type: 'test'
+      ...
+    1..2
+ok 36 - isUnread
+  ---
+  duration_ms: 2.920909
+  type: 'suite'
+  ...
+# Subtest: isWithinSettledWindow
+    # Subtest: keeps a settle from inside the window
+    ok 1 - keeps a settle from inside the window
+      ---
+      duration_ms: 0.373872
+      type: 'test'
+      ...
+    # Subtest: drops a settle older than the window
+    ok 2 - drops a settle older than the window
+      ---
+      duration_ms: 0.144414
+      type: 'test'
+      ...
+    # Subtest: keeps a settle stamped in the future
+    ok 3 - keeps a settle stamped in the future
+      ---
+      duration_ms: 0.127312
+      type: 'test'
+      ...
+    # Subtest: is a day by default
+    ok 4 - is a day by default
+      ---
+      duration_ms: 0.194375
+      type: 'test'
+      ...
+    1..4
+ok 37 - isWithinSettledWindow
+  ---
+  duration_ms: 1.120554
+  type: 'suite'
+  ...
+# Subtest: settledIndicator
+    # Subtest: draws nothing for a quiet thread
+    ok 1 - draws nothing for a quiet thread
+      ---
+      duration_ms: 0.97049
+      type: 'test'
+      ...
+    # Subtest: puts a raised hand above everything else
+    ok 2 - puts a raised hand above everything else
+      ---
+      duration_ms: 0.191389
+      type: 'test'
+      ...
+    # Subtest: reports live work from the status
+    ok 3 - reports live work from the status
+      ---
+      duration_ms: 0.15916
+      type: 'test'
+      ...
+    # Subtest: reports live work from an activity count alone
+    ok 4 - reports live work from an activity count alone
+      ---
+      duration_ms: 0.19734
+      type: 'test'
+      ...
+    # Subtest: separates an unread failure from an unread success
+    ok 5 - separates an unread failure from an unread success
+      ---
+      duration_ms: 0.100734
+      type: 'test'
+      ...
+    1..5
+ok 38 - settledIndicator
+  ---
+  duration_ms: 2.030385
+  type: 'suite'
+  ...
+# Subtest: toSidebarThread
+    # Subtest: marks the thread archived, which is why this path exists
+    ok 1 - marks the thread archived, which is why this path exists
+      ---
+      duration_ms: 0.200686
+      type: 'test'
+      ...
+    # Subtest: keeps only the origin kinds this sidebar draws
+    ok 2 - keeps only the origin kinds this sidebar draws
+      ---
+      duration_ms: 0.097738
+      type: 'test'
+      ...
+    # Subtest: carries the fields the list sorts, filters, and searches on
+    ok 3 - carries the fields the list sorts, filters, and searches on
+      ---
+      duration_ms: 0.089995
+      type: 'test'
+      ...
+    1..3
+ok 39 - toSidebarThread
+  ---
+  duration_ms: 0.457664
+  type: 'suite'
+  ...
+# Subtest: mergeSettledThreads
+    # Subtest: adds the settled threads the host cannot report
+    ok 1 - adds the settled threads the host cannot report
+      ---
+      duration_ms: 0.180268
+      type: 'test'
+      ...
+    # Subtest: lets the host win a collision
+    ok 2 - lets the host win a collision
+      ---
+      duration_ms: 0.092048
+      type: 'test'
+      ...
+    # Subtest: returns the host list unchanged when nothing is settled
+    ok 3 - returns the host list unchanged when nothing is settled
+      ---
+      duration_ms: 0.096396
+      type: 'test'
+      ...
+    1..3
+ok 40 - mergeSettledThreads
+  ---
+  duration_ms: 0.490264
+  type: 'suite'
+  ...
+# Subtest: pendingSettledCount
+    # Subtest: counts a settled thread the host cannot report
+    ok 1 - counts a settled thread the host cannot report
+      ---
+      duration_ms: 0.169239
+      type: 'test'
+      ...
+    # Subtest: ignores a row that is not settled
+    ok 2 - ignores a row that is not settled
+      ---
+      duration_ms: 0.069376
+      type: 'test'
+      ...
+    # Subtest: ignores a settled thread the host still reports
+    ok 3 - ignores a settled thread the host still reports
+      ---
+      duration_ms: 0.067614
+      type: 'test'
+      ...
+    # Subtest: drops a settle that has aged out of the window
+    ok 4 - drops a settle that has aged out of the window
+      ---
+      duration_ms: 0.057054
+      type: 'test'
+      ...
+    # Subtest: counts each pending row once and nothing else
+    ok 5 - counts each pending row once and nothing else
+      ---
+      duration_ms: 0.070308
+      type: 'test'
+      ...
+    # Subtest: counts nothing when no row was seeded
+    ok 6 - counts nothing when no row was seeded
+      ---
+      duration_ms: 0.049711
+      type: 'test'
+      ...
+    # Subtest: reads any iterable of rows
+    ok 7 - reads any iterable of rows
+      ---
+      duration_ms: 0.072883
+      type: 'test'
+      ...
+    1..7
+ok 41 - pendingSettledCount
+  ---
+  duration_ms: 0.676363
+  type: 'suite'
+  ...
+# Subtest: parseArchivedThreadIds
+    # Subtest: reads back what settle stored
+    ok 1 - reads back what settle stored
+      ---
+      duration_ms: 0.102968
+      type: 'test'
+      ...
+    # Subtest: gives nothing back for a missing or unusable value
+    ok 2 - gives nothing back for a missing or unusable value
+      ---
+      duration_ms: 0.08778
+      type: 'test'
+      ...
+    1..2
+ok 42 - parseArchivedThreadIds
+  ---
+  duration_ms: 0.242222
+  type: 'suite'
+  ...
+# Subtest: statusColorRole
+    # Subtest: separates error, waiting, unread, working, and idle roles
+    ok 1 - separates error, waiting, unread, working, and idle roles
+      ---
+      duration_ms: 0.546097
+      type: 'test'
+      ...
+    1..1
+ok 43 - statusColorRole
+  ---
+  duration_ms: 1.155659
+  type: 'suite'
+  ...
+# Subtest: groupFamiliesByStatus
+    # Subtest: orders semantic sections, omits empty sections, and includes each family once
+    ok 1 - orders semantic sections, omits empty sections, and includes each family once
+      ---
+      duration_ms: 7.172234
+      type: 'test'
+      ...
+    1..1
+ok 44 - groupFamiliesByStatus
+  ---
+  duration_ms: 7.850352
+  type: 'suite'
+  ...
+# Subtest: compact root card contract
+    # Subtest: suppresses externally injected duplicate icons only inside Dockside families
+    ok 1 - suppresses externally injected duplicate icons only inside Dockside families
+      ---
+      duration_ms: 0.810308
+      type: 'test'
+      ...
+    # Subtest: keeps zero-child and no-PR roots on the same two-row skeleton
+    ok 2 - keeps zero-child and no-PR roots on the same two-row skeleton
+      ---
+      duration_ms: 0.280802
+      type: 'test'
+      ...
+    # Subtest: co-locates root PR and multiple-child controls in row two
+    ok 3 - co-locates root PR and multiple-child controls in row two
+      ---
+      duration_ms: 0.15902
+      type: 'test'
+      ...
+    # Subtest: looks up PR data only for the parent and never on child rows
+    ok 4 - looks up PR data only for the parent and never on child rows
+      ---
+      duration_ms: 0.136068
+      type: 'test'
+      ...
+    # Subtest: truncates long title and branch text without shrinking metadata
+    ok 5 - truncates long title and branch text without shrinking metadata
+      ---
+      duration_ms: 0.123224
+      type: 'test'
+      ...
+    # Subtest: keeps semantic, disclosure, provider, and reorder help keyboard-readable
+    ok 6 - keeps semantic, disclosure, provider, and reorder help keyboard-readable
+      ---
+      duration_ms: 0.200706
+      type: 'test'
+      ...
+    # Subtest: keeps project badges on headers while thread rows use the full title column
+    ok 7 - keeps project badges on headers while thread rows use the full title column
+      ---
+      duration_ms: 0.130367
+      type: 'test'
+      ...
+    # Subtest: keeps child status and disclosure-provider help keyboard-readable
+    ok 8 - keeps child status and disclosure-provider help keyboard-readable
+      ---
+      duration_ms: 0.168036
+      type: 'test'
+      ...
+    1..8
+ok 45 - compact root card contract
+  ---
+  duration_ms: 2.997439
+  type: 'suite'
+  ...
+# Subtest: family status
+    # Subtest: uses the newest member update and requires every member to be quiet
+    ok 1 - uses the newest member update and requires every member to be quiet
+      ---
+      duration_ms: 0.567475
+      type: 'test'
+      ...
+    1..1
+ok 46 - family status
+  ---
+  duration_ms: 1.196252
+  type: 'suite'
+  ...
+# Subtest: filterProjectThreadGroups
+    # Subtest: supports attention and quiet presets
+    ok 1 - supports attention and quiet presets
+      ---
+      duration_ms: 1.492102
+      type: 'test'
+      ...
+    # Subtest: uses inclusive family age boundaries
+    ok 2 - uses inclusive family age boundaries
+      ---
+      duration_ms: 0.201909
+      type: 'test'
+      ...
+    # Subtest: preserves project and family order without mutating the input
+    ok 3 - preserves project and family order without mutating the input
+      ---
+      duration_ms: 0.177494
+      type: 'test'
+      ...
+    1..3
+ok 47 - filterProjectThreadGroups
+  ---
+  duration_ms: 2.030294
+  type: 'suite'
+  ...
+# Subtest: thread filter presentation
+    # Subtest: describes every preset once in the intended menu hierarchy
+    ok 1 - describes every preset once in the intended menu hierarchy
+      ---
+      duration_ms: 0.148451
+      type: 'test'
+      ...
+    1..1
+ok 48 - thread filter presentation
+  ---
+  duration_ms: 0.215112
+  type: 'suite'
+  ...
+# Subtest: bulkEligibility
+    # Subtest: protects the current, working, waiting, unread, and pinned family
+    ok 1 - protects the current, working, waiting, unread, and pinned family
+      ---
+      duration_ms: 0.42232
+      type: 'test'
+      ...
+    # Subtest: allows a quiet read family
+    ok 2 - allows a quiet read family
+      ---
+      duration_ms: 0.145105
+      type: 'test'
+      ...
+    1..2
+ok 49 - bulkEligibility
+  ---
+  duration_ms: 0.777689
+  type: 'suite'
+  ...
+# Subtest: selection helpers
+    # Subtest: selects eligible visible roots and prunes roots that disappeared
+    ok 1 - selects eligible visible roots and prunes roots that disappeared
+      ---
+      duration_ms: 0.235219
+      type: 'test'
+      ...
+    # Subtest: keeps a selected family visible after it stops matching the filter
+    ok 2 - keeps a selected family visible after it stops matching the filter
+      ---
+      duration_ms: 0.246049
+      type: 'test'
+      ...
+    1..2
+ok 50 - selection helpers
+  ---
+  duration_ms: 0.632234
+  type: 'suite'
+  ...
+# Subtest: applyRootSelection
+    # Subtest: ordinary clicks toggle one root and replace the anchor
+    ok 1 - ordinary clicks toggle one root and replace the anchor
+      ---
+      duration_ms: 0.23047
+      type: 'test'
+      ...
+    # Subtest: selects inclusive forward and reverse Shift ranges
+    ok 2 - selects inclusive forward and reverse Shift ranges
+      ---
+      duration_ms: 0.103889
+      type: 'test'
+      ...
+    # Subtest: uses the clicked checked state to deselect a range
+    ok 3 - uses the clicked checked state to deselect a range
+      ---
+      duration_ms: 0.075567
+      type: 'test'
+      ...
+    # Subtest: skips protected gaps omitted from eligible order
+    ok 4 - skips protected gaps omitted from eligible order
+      ---
+      duration_ms: 0.069667
+      type: 'test'
+      ...
+    # Subtest: falls back to one toggle when the anchor is no longer visible
+    ok 5 - falls back to one toggle when the anchor is no longer visible
+      ---
+      duration_ms: 0.062744
+      type: 'test'
+      ...
+    # Subtest: fails closed when the target is no longer eligible
+    ok 6 - fails closed when the target is no longer eligible
+      ---
+      duration_ms: 0.073164
+      type: 'test'
+      ...
+    1..6
+ok 51 - applyRootSelection
+  ---
+  duration_ms: 0.7288
+  type: 'suite'
+  ...
+# Subtest: resolveFamilyExpanded
+    # Subtest: keeps a family with no children closed
+    ok 1 - keeps a family with no children closed
+      ---
+      duration_ms: 0.103519
+      type: 'test'
+      ...
+    # Subtest: opens a child family by default and while search forces it
+    ok 2 - opens a child family by default and while search forces it
+      ---
+      duration_ms: 0.064287
+      type: 'test'
+      ...
+    # Subtest: respects explicit open and closed overrides
+    ok 3 - respects explicit open and closed overrides
+      ---
+      duration_ms: 0.050592
+      type: 'test'
+      ...
+    # Subtest: uses the configured default until search or a user override wins
+    ok 4 - uses the configured default until search or a user override wins
+      ---
+      duration_ms: 0.05458
+      type: 'test'
+      ...
+    1..4
+ok 52 - resolveFamilyExpanded
+  ---
+  duration_ms: 0.346463
+  type: 'suite'
+  ...
+# Subtest: decodeWarmStartRows
+    # Subtest: round-trips what encodeWarmStartRows wrote
+    ok 1 - round-trips what encodeWarmStartRows wrote
+      ---
+      duration_ms: 1.212022
+      type: 'test'
+      ...
+    # Subtest: reads nothing stored as a miss
+    ok 2 - reads nothing stored as a miss
+      ---
+      duration_ms: 0.114629
+      type: 'test'
+      ...
+    # Subtest: reads unparseable text as a miss
+    ok 3 - reads unparseable text as a miss
+      ---
+      duration_ms: 0.102407
+      type: 'test'
+      ...
+    # Subtest: reads a payload that is not an array as a miss
+    ok 4 - reads a payload that is not an array as a miss
+      ---
+      duration_ms: 0.096226
+      type: 'test'
+      ...
+    # Subtest: keeps a hit with no rows apart from a miss
+    ok 5 - keeps a hit with no rows apart from a miss
+      ---
+      duration_ms: 0.092398
+      type: 'test'
+      ...
+    # Subtest: rejects a row without a usable thread id
+    ok 6 - rejects a row without a usable thread id
+      ---
+      duration_ms: 0.498489
+      type: 'test'
+      ...
+    # Subtest: rejects an entry that is not an object
+    ok 7 - rejects an entry that is not an object
+      ---
+      duration_ms: 0.167055
+      type: 'test'
+      ...
+    # Subtest: rejects a timestamp the wire could not have produced
+    ok 8 - rejects a timestamp the wire could not have produced
+      ---
+      duration_ms: 0.258462
+      type: 'test'
+      ...
+    # Subtest: rejects a non-finite timestamp
+    ok 9 - rejects a non-finite timestamp
+      ---
+      duration_ms: 0.190938
+      type: 'test'
+      ...
+    # Subtest: reads an absent timestamp as null
+    ok 10 - reads an absent timestamp as null
+      ---
+      duration_ms: 0.299406
+      type: 'test'
+      ...
+    # Subtest: rejects the whole payload when one row is bad
+    ok 11 - rejects the whole payload when one row is bad
+      ---
+      duration_ms: 0.08801
+      type: 'test'
+      ...
+    # Subtest: rejects more rows than the encoder would ever write
+    ok 12 - rejects more rows than the encoder would ever write
+      ---
+      duration_ms: 0.397846
+      type: 'test'
+      ...
+    # Subtest: rejects an entry too long to be worth parsing
+    ok 13 - rejects an entry too long to be worth parsing
+      ---
+      duration_ms: 0.067093
+      type: 'test'
+      ...
+    1..13
+ok 53 - decodeWarmStartRows
+  ---
+  duration_ms: 4.635918
+  type: 'suite'
+  ...
+# Subtest: encodeWarmStartRows
+    # Subtest: writes an array, which is the only shape that survives the trip
+    ok 1 - writes an array, which is the only shape that survives the trip
+      ---
+      duration_ms: 0.099411
+      type: 'test'
+      ...
+    # Subtest: carries only the four fields a row is made of
+    ok 2 - carries only the four fields a row is made of
+      ---
+      duration_ms: 0.071941
+      type: 'test'
+      ...
+    # Subtest: caps the entry and keeps the newest parks
+    ok 3 - caps the entry and keeps the newest parks
+      ---
+      duration_ms: 0.291102
+      type: 'test'
+      ...
+    # Subtest: ranks a park by when it was made, not by when a snooze ends
+    ok 4 - ranks a park by when it was made, not by when a snooze ends
+      ---
+      duration_ms: 0.170461
+      type: 'test'
+      ...
+    # Subtest: keeps a fresh settle over a full cap of long snoozes
+    ok 5 - keeps a fresh settle over a full cap of long snoozes
+      ---
+      duration_ms: 0.77293
+      type: 'test'
+      ...
+    1..5
+ok 54 - encodeWarmStartRows
+  ---
+  duration_ms: 1.533026
+  type: 'suite'
+  ...
+# Subtest: readWarmStartRows
+    # Subtest: serves what was stored
+    ok 1 - serves what was stored
+      ---
+      duration_ms: 0.507095
+      type: 'test'
+      ...
+    # Subtest: does not throw when the store does
+    ok 2 - does not throw when the store does
+      ---
+      duration_ms: 0.15903
+      type: 'test'
+      ...
+    # Subtest: still serves from memory after the store failed
+    ok 3 - still serves from memory after the store failed
+      ---
+      duration_ms: 0.222927
+      type: 'test'
+      ...
+    # Subtest: prefers the memory tier over what the store holds
+    ok 4 - prefers the memory tier over what the store holds
+      ---
+      duration_ms: 0.277776
+      type: 'test'
+      ...
+    # Subtest: drops an entry that did not decode
+    ok 5 - drops an entry that did not decode
+      ---
+      duration_ms: 0.18091
+      type: 'test'
+      ...
+    # Subtest: ignores an entry written under another version's key
+    ok 6 - ignores an entry written under another version's key
+      ---
+      duration_ms: 0.123185
+      type: 'test'
+      ...
+    1..6
+ok 55 - readWarmStartRows
+  ---
+  duration_ms: 1.676138
+  type: 'suite'
+  ...
+# Subtest: writeWarmStartRows
+    # Subtest: does not throw when the store does
+    ok 1 - does not throw when the store does
+      ---
+      duration_ms: 0.09866
+      type: 'test'
+      ...
+    # Subtest: writes under the versioned key
+    ok 2 - writes under the versioned key
+      ---
+      duration_ms: 0.087629
+      type: 'test'
+      ...
+    # Subtest: offers a refused value to the store again
+    ok 3 - offers a refused value to the store again
+      ---
+      duration_ms: 0.127903
+      type: 'test'
+      ...
+    1..3
+ok 56 - writeWarmStartRows
+  ---
+  duration_ms: 0.401081
+  type: 'suite'
+  ...
+# Subtest: decodeWarmStartProviders
+    # Subtest: round-trips providers
+    ok 1 - round-trips providers
+      ---
+      duration_ms: 0.240388
+      type: 'test'
+      ...
+    # Subtest: reads a miss as null
+    ok 2 - reads a miss as null
+      ---
+      duration_ms: 0.07673
+      type: 'test'
+      ...
+    # Subtest: rejects a provider with no name to fall back to
+    ok 3 - rejects a provider with no name to fall back to
+      ---
+      duration_ms: 0.057184
+      type: 'test'
+      ...
+    # Subtest: rejects a provider whose name is blank
+    ok 4 - rejects a provider whose name is blank
+      ---
+      duration_ms: 0.058046
+      type: 'test'
+      ...
+    # Subtest: drops a logo that is not a same-origin path
+    ok 5 - drops a logo that is not a same-origin path
+      ---
+      duration_ms: 0.170491
+      type: 'test'
+      ...
+    # Subtest: drops a path that resolves onto another host
+    ok 6 - drops a path that resolves onto another host
+      ---
+      duration_ms: 0.158038
+      type: 'test'
+      ...
+    # Subtest: drops a path carrying the characters that end a CSS token
+    ok 7 - drops a path carrying the characters that end a CSS token
+      ---
+      duration_ms: 0.089624
+      type: 'test'
+      ...
+    # Subtest: rejects an entry too long to be worth parsing
+    ok 8 - rejects an entry too long to be worth parsing
+      ---
+      duration_ms: 0.101344
+      type: 'test'
+      ...
+    1..8
+ok 57 - decodeWarmStartProviders
+  ---
+  duration_ms: 1.117459
+  type: 'suite'
+  ...
+# Subtest: encodeWarmStartProviders
+    # Subtest: carries only the three fields the glyph reads
+    ok 1 - carries only the three fields the glyph reads
+      ---
+      duration_ms: 0.086598
+      type: 'test'
+      ...
+    1..1
+ok 58 - encodeWarmStartProviders
+  ---
+  duration_ms: 0.130067
+  type: 'suite'
+  ...
+# Subtest: readWarmStartProviders
+    # Subtest: serves what was stored
+    ok 1 - serves what was stored
+      ---
+      duration_ms: 0.130919
+      type: 'test'
+      ...
+    # Subtest: survives a store that throws on every call
+    ok 2 - survives a store that throws on every call
+      ---
+      duration_ms: 0.095104
+      type: 'test'
+      ...
+    # Subtest: drops an entry that did not decode
+    ok 3 - drops an entry that did not decode
+      ---
+      duration_ms: 0.075818
+      type: 'test'
+      ...
+    # Subtest: ignores an entry written under another version's key
+    ok 4 - ignores an entry written under another version's key
+      ---
+      duration_ms: 0.075688
+      type: 'test'
+      ...
+    1..4
+ok 59 - readWarmStartProviders
+  ---
+  duration_ms: 0.454319
+  type: 'suite'
+  ...
+# Subtest: writeWarmStartProviders
+    # Subtest: does not throw when the store does
+    ok 1 - does not throw when the store does
+      ---
+      duration_ms: 0.086748
+      type: 'test'
+      ...
+    # Subtest: keeps its own versioned key
+    ok 2 - keeps its own versioned key
+      ---
+      duration_ms: 0.079996
+      type: 'test'
+      ...
+    1..2
+ok 60 - writeWarmStartProviders
+  ---
+  duration_ms: 0.234248
+  type: 'suite'
+  ...
+1..60
+# tests 212
+# suites 59
+# pass 212
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 372.07743
+
+> bb-plugin-dockside@0.1.5 build
+> bb plugin build .
+
+This plugin vendors types/ — `bb plugin migrate` switches it to the @get-bb/plugin-sdk npm package.
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+dist/app.js
+dist/app.css
+dist/app.meta.json
