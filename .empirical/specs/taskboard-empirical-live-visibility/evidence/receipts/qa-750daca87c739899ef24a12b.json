@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-750daca87c739899ef24a12b",
+  "criteria": [
+    "AC-2",
+    "AC-3",
+    "AC-5"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Verify malformed and unsupported Empirical overview payloads report Invalid source and preserve unavailable status for transient read failures.",
+  "passed": false,
+  "startedAt": "2026-10-15T00:31:18.360Z",
+  "completedAt": "2026-10-15T00:33:19.805Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "taskboard-empirical-live-visibility",
+    "specRevision": 2,
+    "specDigest": "sha256:23291153874870cc75cc38a787e5cee61cce6d731a247b8f8fd75da66c0b00ce",
+    "treeDigest": "sha256:c7a41bdab34a83d97bd4de828ce37f08d921a8d326a0506e599f0cbe139b6ad9",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 14,
+    "gitCommit": "1d1fe355cf8dcf9f791aead19e9bc4ee7416005b",
+    "textTreeDigest": "sha256:c7a41bdab34a83d97bd4de828ce37f08d921a8d326a0506e599f0cbe139b6ad9"
+  },
+  "digest": "sha256:9f3e8e3c2470c173b7d5e83b79451ed8ab8464a60102677243363b505a6d453c",
+  "kind": "qa",
+  "matrixDigest": "sha256:dc803ff91bcfda63e56273b11396209410b8dd81ed133b03c3cb178b2f1690cb",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "x64",
+    "node": "24.21.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "timed-out",
+      "summary": "Verify malformed and unsupported Empirical overview payloads report Invalid source and preserve unavailable status for transient read failures.",
+      "startedAt": "2026-10-15T00:31:18.360Z",
+      "completedAt": "2026-10-15T00:33:19.805Z",
+      "durationMs": 121445,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:f9b129d8080d6ae249324764ab9bf53ce8ebc569462bb37a19a9d1056d966f66",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-taskboard"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH",
+          "TMPDIR"
+        ]
+      },
+      "result": {
+        "exitCode": null,
+        "signal": "SIGTERM",
+        "timedOut": true,
+        "stdoutDigest": "sha256:84b9fe0f547a3030486ee4d1e7f6c80724a98807f76dfa88fd84c10d7ab89c0f",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "\n> bb-plugin-taskboard@0.3.3 check\n> npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build\n\n\n> bb-plugin-taskboard@0.3.3 types:check\n> node scripts/run-isolated-bb-cli.mjs plugin types --check .\n\nThis plugin uses the npm package @get-bb/plugin-sdk; pin is 0.4.21, host is 0.4.21.\nThe declarations are in node_modules/@get-bb/plugin-sdk/bundled-types/ — read them for exact signatures.\n\n> bb-plugin-taskboard@0.3.3 typecheck\n> tsc --noEmit\n\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:c7a41bdab34a83d97bd4de828ce37f08d921a8d326a0506e599f0cbe139b6ad9",
+      "sourceTreeAfter": "sha256:c7a41bdab34a83d97bd4de828ce37f08d921a8d326a0506e599f0cbe139b6ad9",
+      "artifacts": []
+    }
+  ],
+  "anomalies": [
+    "outcome-timed-out"
+  ]
+}

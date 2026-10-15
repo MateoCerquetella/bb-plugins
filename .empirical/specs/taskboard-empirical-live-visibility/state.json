@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 10,
+  "revision": 14,
   "activeFeature": "taskboard-empirical-live-visibility",
   "request": "Implement live Empirical work visibility inside Taskboard from Start work through agent progress and durable completion, with a runnable end-to-end demo and UI tests. Preserve existing tracker workflows and display stale/offline state honestly.",
   "profile": "complex",
@@ -9,7 +9,7 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 1,
-  "message": "Independent review requested changes: AC-1, AC-2, AC-3, AC-5 and AC-6 failed; F-1, F-2, F-3, F-4 and F-6 block approval. Return to implementation for host identity, freshness/reconciliation, completion truth and post-dispatch persistence fixes.",
+  "message": "Repair the remaining F-8 acceptance finding: malformed or unsupported Empirical repository overview must display Invalid source rather than Unavailable; add focused coverage, rerun required verification, and obtain independent re-review.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:23291153874870cc75cc38a787e5cee61cce6d731a247b8f8fd75da66c0b00ce",
@@ -23,20 +23,21 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": true,
+    "implemented": false,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "implemented",
+    "highest": "none",
     "reasons": {
+      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-14T16:40:36.495Z",
+  "updatedAt": "2026-10-15T00:27:34.975Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "taskboard-empirical-live-visibility-d3c61d975b15",
@@ -73,6 +74,12 @@
     "actor": "agent",
     "revision": 2
   },
-  "reviewFirst": true,
-  "budgetExtensionMinutes": 120
+  "budgetExtensionMinutes": 240,
+  "trackerGeneration": 1,
+  "lifecycle": {
+    "stage": "iteration",
+    "iteration": 1,
+    "awaitingFeedback": false
+  },
+  "reviewFirst": true
 }
