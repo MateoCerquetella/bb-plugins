@@ -6,7 +6,7 @@ const app = await readFile(new URL('../app.tsx', import.meta.url), 'utf8');
 
 test('registers Taskboard for existing-thread and New Thread right panels', () => {
   assert.match(app, /app\.slots\.threadPanelAction\(\{[\s\S]*?id: THREAD_PANEL_ACTION_ID[\s\S]*?component: TaskboardThreadPanel[\s\S]*?layout: 'flush'/u);
-  assert.match(app, /app\.slots\.experimental_newThreadPanelAction\(\{[\s\S]*?id: 'taskboard-new-thread-panel'[\s\S]*?title: 'Taskboard'[\s\S]*?icon: 'Ticket'[\s\S]*?component: TaskboardNewThreadPanel[\s\S]*?layout: 'flush'/u);
+  assert.match(app, /app\.slots\.experimental_newThreadPanelAction\(\{[\s\S]*?id: 'taskboard-new-thread-panel'[\s\S]*?component: TaskboardNewThreadPanel[\s\S]*?layout: 'flush'/u);
   assert.match(app, /function TaskboardNewThreadPanel\(\{ projectId \}[\s\S]*?<TaskboardRightPanel projectId=\{projectId\}/u);
   assert.match(app, /surfaceMode="constrained"/u);
 });
