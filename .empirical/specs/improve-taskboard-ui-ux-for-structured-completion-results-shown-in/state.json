@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 20,
+  "revision": 21,
   "activeFeature": "improve-taskboard-ui-ux-for-structured-completion-results-shown-in",
   "request": "Improve Taskboard UI/UX for structured completion results shown in BB threads and for errors displayed inside Taskboard tasks. Replace raw JSON-like result blocks such as {\"verdict\":\"blocked\",\"findings\":\"...\"} with a compact, scannable status presentation that preserves full detail, and improve task error states so they communicate what failed, what the user can do, and optional technical details. Keep the work scoped to plugins/taskboard, follow existing design patterns, preserve accessibility and responsive behavior, and verify the real UI in a browser with screenshots plus focused tests.",
   "profile": "complex",
@@ -9,7 +9,7 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Added the iteration-3 executable plan and throughput checkpoint. One source owner will implement and test fresh main-stage handoffs, bounded Build recovery, live reconciliation, and session navigation; coordinator owns Empirical and final review/verification.",
+  "message": "Implemented fresh native Investigate, Plan, Build, and Review handoffs; bounded blocked-Build recovery; complete native event reconciliation; persisted terminal outcomes until native idle; preserved live activity; and added a single accessible session selector with state-owned recovery controls. Synced with origin/main and resolved the Taskboard UI conflict by preserving both the upstream showThreadHeaderProgress setting and this feature's useId-backed session selector. Taskboard package check passed with 217 tests before sync; conflict-focused TypeScript and navigation tests plus the BB Surf desktop/panel/mobile fixture passed after sync.",
   "implementationActor": "codex",
   "workStartedAt": null,
   "specDigest": "sha256:06cf67b85bfed06d92be505da11f437bbfea740b10a253e8c4978f630a7302e5",
@@ -23,27 +23,27 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": false,
+    "implemented": true,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "none",
+    "highest": "implemented",
     "reasons": {
-      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-15T14:59:01.196Z",
+  "updatedAt": "2026-10-15T15:50:57.826Z",
   "lifecycle": {
-    "stage": "development",
+    "stage": "iteration",
     "iteration": 3,
-    "awaitingFeedback": false,
+    "awaitingFeedback": true,
     "iterative": true,
-    "contractRevision": 16
+    "contractRevision": 16,
+    "contractBaseline": 21
   },
   "sizeDecision": {
     "choice": "keep",
