@@ -28,7 +28,7 @@ All plugins in this repository are independently installable.
 | <img src="./plugins/action-topbar/assets/icon.svg" width="128" height="128" alt="" /> | [Action Topbar](./plugins/action-topbar) | [Git install](#action-topbar-install) | Adds a compact main-thread topbar with draggable BB Actions and persistent, per-thread workspace panes. |
 | <img src="./plugins/dockside/assets/icon.svg" width="128" height="128" alt="" /> | [Dockside](./plugins/dockside) | [Git release](#dockside-quick-start) | Adds a project-first sidebar plus mobile navigation across active and unread threads, with synchronized project colors and animated status icons. |
 | <img src="./plugins/host-monitor/assets/icon.svg" width="128" height="128" alt="" /> | [Host Monitor](./plugins/host-monitor) | [Git release](#host-monitor-quick-start) | Monitors CPU, RAM, disk, network, host details, and guarded process actions across every machine enrolled in BB. Requires BB 0.40+. |
-| <img src="./plugins/steel-browser/assets/icon.svg" width="128" height="128" alt="" /> | [Cerq Browser](./plugins/steel-browser) | [Local install](#cerq-browser-quick-start) | Operates self-hosted Steel browser sessions from BB with health, session lifecycle, CLI, and agent guidance. Requires BB 0.40+. |
+| <img src="./plugins/steel-browser/assets/icon.svg" width="128" height="128" alt="" /> | [BB Surf](./plugins/steel-browser) | [Local install](#bb-surf-quick-start) | Operates self-hosted Steel browser sessions from BB with health, session lifecycle, CLI, and agent guidance. Requires BB 0.40+. |
 | <img src="./plugins/taskboard/assets/icon.svg" width="128" height="128" alt="" /> | [Taskboard](./plugins/taskboard) | [Git release](#taskboard-quick-start) | Brings each BB project's GitHub, GitLab, Linear, or Jira tasks into one focused List or Kanban board. |
 | <img src="./plugins/aura/assets/icon.svg" width="128" height="128" alt="" /> | [Aura](./plugins/aura) | [Git release](./plugins/aura#install) | Adds custom PNG/JPG backgrounds and softly faded pixel textures to conversations and New thread, with six saved slots and a live preview. |
 | <img src="./plugins/touchbar/assets/icon.svg" width="128" height="128" alt="" /> | [Touch Bar Agent Monitor](./plugins/touchbar) | [Git release](#touch-bar-agent-monitor-quick-start) | Adds a native persistent Control Strip badge and fullscreen BB agent panel to Touch Bar Macs. Requires BB 0.40+. |
@@ -126,9 +126,9 @@ bb plugin update host-monitor
 bb plugin remove host-monitor
 ```
 
-## Cerq Browser quick start
+## BB Surf quick start
 
-Cerq Browser connects BB to a self-hosted
+BB Surf connects BB to a self-hosted
 [Steel](https://github.com/steel-dev/steel-browser) API. On `dyaus`, the
 service runs as a pinned Docker container on loopback port `3100`.
 
@@ -139,7 +139,7 @@ bb plugin install ./plugins/steel-browser
 bb plugin reload steel-browser
 ```
 
-Open **Cerq Browser** in BB or manage sessions from the CLI:
+Open **BB Surf** in BB or manage sessions from the CLI:
 
 ```sh
 bb steel-browser status
@@ -149,7 +149,7 @@ bb steel-browser release <session-id>
 ```
 
 The plugin also ships agent guidance for choosing the local Steel service over
-KERNEL.SH. See the [Cerq Browser README](./plugins/steel-browser) for service,
+KERNEL.SH. See the [BB Surf README](./plugins/steel-browser) for service,
 configuration, and development details.
 
 ## Taskboard quick start

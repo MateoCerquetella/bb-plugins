@@ -1,16 +1,19 @@
-# Cerq Browser
+# BB Surf
 
 Watch your agent through the Monitor icon in the thread header, or choose
 **Open browser panel** on a browser handoff. The live view opens on the right.
-Hover over the panel for two seconds to expand it toward the full window;
+Hover over the panel for two seconds to expand it to about two-thirds of the window,
+leaving the active thread visible beside it;
 moving back to chat shrinks it. **Expand browser panel** keeps it wide until
 you choose **Shrink browser panel** or press Escape in BB. Touch devices use
 these explicit controls. Expansion preserves the browser session and viewer,
 without dimming or blocking the remaining conversation.
 
-The interface follows BB's light/dark theme. The display name is Cerq Browser;
-existing `bb steel-browser` commands and `::steel-browser{}` handoffs remain
-compatible with existing installations.
+The interface follows BB's light/dark theme. BB Surf is the display name.
+Existing `steel-browser` plugin IDs, `bb steel-browser` commands,
+`::steel-browser{}` handoffs, project profiles, and saved settings remain
+compatible with existing installations. Steel Browser remains the name of the
+upstream browser engine.
 
 The installed plugin contributes browser instructions to every new BB agent
 session through `bb.agents.contributeInstructions`. Agents must check
@@ -70,7 +73,7 @@ player in place, keeping one stream and the same active tab. Disconnecting the v
 the browser running; releasing a session closes it. Idle sessions remain usable.
 The play control connects the viewer; it does not start a jev-ultrafast agent.
 
-Cerq Browser gives BB a compact operational surface for a self-hosted
+BB Surf gives BB a compact operational surface for a self-hosted
 [Steel](https://github.com/steel-dev/steel-browser) instance. It shows service
 health and active sessions, creates browser sessions, and releases them with an
 explicit confirmation.
@@ -88,12 +91,12 @@ inline viewer starts minimized and does not load until the user explicitly
 restores it. Desktop clients keep the automatic viewer connection. Minimizing
 disconnects the player stream; restoring reconnects it. Only the latest inline
 browser message streams, and hidden browser tabs stop their viewers. A manual
-**Cerq Browser**
+**BB Surf**
 thread-panel action remains available from the panel launcher.
 
 ### Agent Configuration
 
-BB Tools / Cerq Browser exposes the jev-ultrafast checkout path, host-only
+BB Tools / BB Surf exposes the jev-ultrafast checkout path, host-only
 credentials file path, and text-model identifier. The inline viewer's settings
 icon shows those saved values. The adapter connects Jev's upstream observation
 and action loop to the project's existing page through a temporary authenticated
@@ -215,7 +218,7 @@ viewer, never via agent command arguments.
 
 ## Engines
 
-BB Tools / Cerq Browser has project-scoped engine selection and a separate
+BB Tools / BB Surf has project-scoped engine selection and a separate
 fallback checkbox. Playwright is the default; fallback defaults off. Auto tries
 Jev first. Selecting Jev or Auto does not authorize paid API calls.
 
@@ -244,7 +247,7 @@ bb plugin install ./plugins/steel-browser
 bb plugin reload steel-browser
 ```
 
-Open **Cerq Browser** in BB or use:
+Open **BB Surf** in BB or use:
 
 ```sh
 bb steel-browser status
