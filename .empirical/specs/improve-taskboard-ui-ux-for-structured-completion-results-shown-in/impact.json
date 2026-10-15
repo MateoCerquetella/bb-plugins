@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "taskboard-agent-progress-ui"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:8a5a3162471454f81f2d6be3f22df0d0372d63e1e2097fdc8d8ad3b2ac0694dd"
+}

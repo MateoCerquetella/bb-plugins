@@ -153,6 +153,7 @@ import {
   writeTaskboardComposerDrag
 } from './composer-handoff.js';
 import { FactoryProgress, FactoryThreadProgress, StartTaskButton } from './factory/app.js';
+import { TaskboardResultDirective } from './factory/result-card.js';
 import { consumeTaskboardOpen, TASKBOARD_OPEN_EVENT } from './factory/navigation.js';
 import './app.css';
 
@@ -7776,6 +7777,7 @@ function TaskboardSettingsInfo() {
 
 export default definePluginApp(app => {
   registerPreparationApp(app);
+  app.slots.messageDirective({ id: 'taskboard-result', component: TaskboardResultDirective });
   app.slots.experimental_threadHeaderAction({
     id: 'taskboard-live-progress',
     title: 'Task progress',
@@ -7798,7 +7800,7 @@ export default definePluginApp(app => {
   app.slots.experimental_newThreadPanelAction({
     id: 'taskboard-new-thread-panel',
     title: 'Taskboard',
-    icon: 'Target',
+    icon: 'Ticket',
     component: TaskboardNewThreadPanel,
     layout: 'flush'
   });

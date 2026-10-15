@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-54b264e51c714e821c5f9775",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Re-run Taskboard focused checks after fixing continuation error guidance and duplicate persisted error presentation.",
+  "passed": true,
+  "startedAt": "2026-10-15T14:50:41.485Z",
+  "completedAt": "2026-10-15T14:51:03.287Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "improve-taskboard-ui-ux-for-structured-completion-results-shown-in",
+    "specRevision": 13,
+    "specDigest": "sha256:056589aacc55505b028132e5ec476f02243a3a9ec35202f27fbb9bb6f49d5826",
+    "treeDigest": "sha256:f5c6ea94b0280e2cbada4e60707f797a27c037221284938e207fa09e56e71382",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 15,
+    "gitCommit": "02d3f6731d3eee570c4f242932f338d60e9117b3",
+    "textTreeDigest": "sha256:f5c6ea94b0280e2cbada4e60707f797a27c037221284938e207fa09e56e71382"
+  },
+  "digest": "sha256:480beed16b3f29d1d062d9020fcb748e3a1fc60317a9192fc3b2c71eb72d1b44",
+  "kind": "qa",
+  "matrixDigest": "sha256:8e671ec95516a00d5bd7f187e7d88603fe32621f0b83a27bd1ed286eab5f4479",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Re-run Taskboard focused checks after fixing continuation error guidance and duplicate persisted error presentation.",
+      "startedAt": "2026-10-15T14:50:41.485Z",
+      "completedAt": "2026-10-15T14:51:03.287Z",
+      "durationMs": 21802,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:3102e0660c5a28fb09072a92af73601c0704a8badb5519082e7545d1f876aa50",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-taskboard"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:588ef5a478d4acfa2bdc78aaf5421406373f6c07d18461976f589ef7a64d6862",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": " preparation responses cannot cross selection identity or undo a mutation\nok 168 - deferred preparation responses cannot cross selection identity or undo a mutation\n  ---\n  duration_ms: 2.188543\n  type: 'test'\n  ...\n# Subtest: selects the active thread project only when it still exists\nok 169 - selects the active thread project only when it still exists\n  ---\n  duration_ms: 0.695529\n  type: 'test'\n  ...\n# Subtest: treats a different thread in the same project as new context\nok 170 - treats a different thread in the same project as new context\n  ---\n  duration_ms: 0.277386\n  type: 'test'\n  ...\n# Subtest: reads the project and thread from a BB project route\nok 171 - reads the project and thread from a BB project route\n  ---\n  duration_ms: 0.713973\n  type: 'test'\n  ...\n# Subtest: uses only the immediately previous navigation entry as source context\nok 172 - uses only the immediately previous navigation entry as source context\n  ---\n  duration_ms: 0.174339\n  type: 'test'\n  ...\n# Subtest: never replaces an explicit Taskboard project selection with route context\nok 173 - never replaces an explicit Taskboard project selection with route context\n  ---\n  duration_ms: 0.204474\n  type: 'test'\n  ...\n# Subtest: writes project credentials atomically with owner-only permissions\nok 174 - writes project credentials atomically with owner-only permissions\n  ---\n  duration_ms: 9.271226\n  type: 'test'\n  ...\n# Subtest: deleting a missing credential is harmless\nok 175 - deleting a missing credential is harmless\n  ---\n  duration_ms: 1.055656\n  type: 'test'\n  ...\n# Subtest: cached summaries never retain provider comments\nok 176 - cached summaries never retain provider comments\n  ---\n  duration_ms: 1.261803\n  type: 'test'\n  ...\n# Subtest: provider creation results carry strict native assignee confirmation\nok 177 - provider creation results carry strict native assignee confirmation\n  ---\n  duration_ms: 0.190057\n  type: 'test'\n  ...\n# Subtest: metadata failures expose only a fixed server-safe message\nok 178 - metadata failures expose only a fixed server-safe message\n  ---\n  duration_ms: 0.3456\n  type: 'test'\n  ...\n# Subtest: finds Jira project keys from common configured JQL scopes\nok 179 - finds Jira project keys from common configured JQL scopes\n  ---\n  duration_ms: 0.711588\n  type: 'test'\n  ...\n# Subtest: binds issue creation to the tracker reviewed in the modal\nok 180 - binds issue creation to the tracker reviewed in the modal\n  ---\n  duration_ms: 0.411171\n  type: 'test'\n  ...\n# Subtest: refreshes authoritative provider data after successful issue creation\nok 181 - refreshes authoritative provider data after successful issue creation\n  ---\n  duration_ms: 0.234318\n  type: 'test'\n  ...\n# Subtest: refreshes authoritative provider data after ambiguous issue creation failure\nok 182 - refreshes authoritative provider data after ambiguous issue creation failure\n  ---\n  duration_ms: 0.243174\n  type: 'test'\n  ...\n# Subtest: gitlab is a registered taskboard source\nok 183 - gitlab is a registered taskboard source\n  ---\n  duration_ms: 0.937941\n  type: 'test'\n  ...\n# Subtest: refs must be host-qualified paths\nok 184 - refs must be host-qualified paths\n  ---\n  duration_ms: 0.752853\n  type: 'test'\n  ...\n# Subtest: locators round-trip with ref and iid\nok 185 - locators round-trip with ref and iid\n  ---\n  duration_ms: 0.278508\n  type: 'test'\n  ...\n# Subtest: status label categories cover the five states\nok 186 - status label categories cover the five states\n  ---\n  duration_ms: 0.13183\n  type: 'test'\n  ...\n# Subtest: status labels filter out unrelated labels\nok 187 - status labels filter out unrelated labels\n  ---\n  duration_ms: 0.464528\n  type: 'test'\n  ...\n# Subtest: state category prefers workflow labels over native state\nok 188 - state category prefers workflow labels over native state\n  ---\n  duration_ms: 0.138713\n  type: 'test'\n  ...\n# Subtest: status name shows the workflow column name or the native state\nok 189 - status name shows the workflow column name or the native state\n  ---\n  duration_ms: 0.172845\n  type: 'test'\n  ...\n# Subtest: cached summaries never retain provider comments\nok 190 - cached summaries never retain provider comments\n  ---\n  duration_ms: 0.135808\n  type: 'test'\n  ...\n# Subtest: untriaged issues keep native open/closed choices current-flagged\nok 191 - untriaged issues keep native open/closed choices current-flagged\n  ---\n  duration_ms: 0.24655\n  type: 'test'\n  ...\n# Subtest: stripped status names keep facet and dropdown consistent\nok 192 - stripped status names keep facet and dropdown consistent\n  ---\n  duration_ms: 0.298806\n  type: 'test'\n  ...\n# Subtest: token line is parsed from glab stderr output\nok 193 - token line is parsed from glab stderr output\n  ---\n  duration_ms: 0.326335\n  type: 'test'\n  ...\n# Subtest: keeps structural headers on neutral host theme surfaces\nok 194 - keeps structural headers on neutral host theme surfaces\n  ---\n  duration_ms: 1.259117\n  type: 'test'\n  ...\n# Subtest: uses restrained state glyph, focus, and conversation treatments\nok 195 - uses restrained state glyph, focus, and conversation treatments\n  ---\n  duration_ms: 0.370476\n  type: 'test'\n  ...\n# Subtest: keeps constrained filter values inside the vertical menu measure\nok 196 - keeps constrained filter values inside the vertical menu measure\n  ---\n  duration_ms: 0.229448\n  type: 'test'\n  ...\n# Subtest: keeps assignee avatars compact with six theme-safe identity tones\nok 197 - keeps assignee avatars compact with six theme-safe identity tones\n  ---\n  duration_ms: 0.369945\n  type: 'test'\n  ...\n# Subtest: shows restrained composer drop feedback and discoverable drag grips\nok 198 - shows restrained composer drop feedback and discoverable drag grips\n  ---\n  duration_ms: 0.397665\n  type: 'test'\n  ...\n# Subtest: ticket images reject spoofed formats, active content and oversized bytes\nok 199 - ticket images reject spoofed formats, active content and oversized bytes\n  ---\n  duration_ms: 9.128215\n  type: 'test'\n  ...\n# Subtest: Linear uploads use signed storage headers and return the asset URL\nok 200 - Linear uploads use signed storage headers and return the asset URL\n  ---\n  duration_ms: 51.542102\n  type: 'test'\n  ...\n# Subtest: improvement asks for concrete concise scope without invented implementation\nok 201 - improvement asks for concrete concise scope without invented implementation\n  ---\n  duration_ms: 0.223679\n  type: 'test'\n  ...\n# Subtest: draft parser accepts JSON or a single fence and rejects missing, extra or oversized fields\nok 202 - draft parser accepts JSON or a single fence and rejects missing, extra or oversized fields\n  ---\n  duration_ms: 2.873633\n  type: 'test'\n  ...\n# Subtest: concurrent starts spawn once with project defaults and only validated text is returned\nok 203 - concurrent starts spawn once with project defaults and only validated text is returned\n  ---\n  duration_ms: 1.913461\n  type: 'test'\n  ...\n# Subtest: cancellation before start prevents dispatch, including after service reload\nok 204 - cancellation before start prevents dispatch, including after service reload\n  ---\n  duration_ms: 0.295529\n  type: 'test'\n  ...\n# Subtest: uncertain spawn cannot become a confirmed cancellation or be dispatched twice\nok 205 - uncertain spawn cannot become a confirmed cancellation or be dispatched twice\n  ---\n  duration_ms: 0.473714\n  type: 'test'\n  ...\n# Subtest: stop failures stay uncertain and cleanup is retried by the sweep\nok 206 - stop failures stay uncertain and cleanup is retried by the sweep\n  ---\n  duration_ms: 0.488521\n  type: 'test'\n  ...\n# Subtest: invalid model output never returns a replacement draft\nok 207 - invalid model output never returns a replacement draft\n  ---\n  duration_ms: 0.442697\n  type: 'test'\n  ...\n1..207\n# tests 207\n# suites 0\n# pass 207\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 10718.183135\n\n> bb-plugin-taskboard@0.3.3 build\n> env -u BB_CLI bb plugin build .\n\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\ndist/host.js\ndist/host.js.map\ndist/host.meta.json\n\n> bb-plugin-taskboard@0.3.3 verify:build\n> node scripts/verify-build.mjs\n\nTaskboard build metadata is valid.\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:f5c6ea94b0280e2cbada4e60707f797a27c037221284938e207fa09e56e71382",
+      "sourceTreeAfter": "sha256:f5c6ea94b0280e2cbada4e60707f797a27c037221284938e207fa09e56e71382",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

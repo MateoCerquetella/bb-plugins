@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "sequence": 17,
+  "previousDigest": "sha256:78d9f672118e9064516105443e65fe8fb5958bbeb3f1589fc645d1b113d2eedf",
+  "actor": "codex",
+  "type": "transition",
+  "summary": "Revise contract: Apply the user's next adjustment after the completed result/error iteration: make Taskboard automatically hand off Investigate, Plan, Build, and Review into distinct fresh native threads with bounded explicit context; automatically continue actionable blocked Builds at most twice in the same managed implementation worktree before requiring Continue; never invent decisions or retry uncertain dispatches; reconcile resumed native activity before showing Paused or Turn finished; replace repeated Open session buttons with one scalable stage/session selector and one Open session action while preserving all state-owned recovery actions.",
+  "createdAt": "2026-10-15T14:52:24.071Z",
+  "stateBeforeDigest": "sha256:43011c10384ff5dd3c2eba8d46c9daf86c60b63f26d09774e917a3b8737d77d3",
+  "stateAfterDigest": "sha256:0af35650577d26b8173b8776bf5a9b0bdccf9aad6aedd20562491ba440cc874b",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 17,
+    "activeFeature": "improve-taskboard-ui-ux-for-structured-completion-results-shown-in",
+    "request": "Improve Taskboard UI/UX for structured completion results shown in BB threads and for errors displayed inside Taskboard tasks. Replace raw JSON-like result blocks such as {\"verdict\":\"blocked\",\"findings\":\"...\"} with a compact, scannable status presentation that preserves full detail, and improve task error states so they communicate what failed, what the user can do, and optional technical details. Keep the work scoped to plugins/taskboard, follow existing design patterns, preserve accessibility and responsive behavior, and verify the real UI in a browser with screenshots plus focused tests.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Apply the user's next adjustment after the completed result/error iteration: make Taskboard automatically hand off Investigate, Plan, Build, and Review into distinct fresh native threads with bounded explicit context; automatically continue actionable blocked Builds at most twice in the same managed implementation worktree before requiring Continue; never invent decisions or retry uncertain dispatches; reconcile resumed native activity before showing Paused or Turn finished; replace repeated Open session buttons with one scalable stage/session selector and one Open session action while preserving all state-owned recovery actions.",
+    "implementationActor": "codex",
+    "workStartedAt": null,
+    "specDigest": "sha256:056589aacc55505b028132e5ec476f02243a3a9ec35202f27fbb9bb6f49d5826",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": "improve-taskboard-ui-ux-for-structured-completion-results-shown-in-fadaf8a18d53",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-15T14:52:24.071Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 3,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "contractRevision": 16
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 11,
+      "capabilities": 1,
+      "reason": "The 11 criteria are one coupled Factory workflow change: result parsing and task presentation are already implemented in the dirty worktree, while fresh stage sessions, automatic recovery, live reconciliation, and the session selector share the same persisted run model and must be verified together to avoid unsafe partial automation.",
+      "actor": "codex",
+      "revision": 7
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "improve-taskboard-ui-ux-for-structured-completion-results-shown-in-fadaf8a18d53",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "improve-taskboard-ui-ux-for-structured-completion-results-shown-in",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_kxzzi5iryw-1/bb-plugins",
+      "worktreeId": "sha256:b235622fbd7fead31d467d0e296bc815e5e97491885150c9639d9f1a8a0931a0",
+      "baseCommit": "02d3f6731d3eee570c4f242932f338d60e9117b3",
+      "baseTree": "e9c3da95ad04dbcb227b87ef10ef4f3cabb59049",
+      "bases": {
+        "taskboard-agent-progress-ui": {
+          "capability": "taskboard-agent-progress-ui",
+          "digest": "sha256:0d13d74f5495014048a382b37f6c2a1df0f5e715b252a6f70eaa07ae4f585e60",
+          "requirements": {
+            "readable native progress": "sha256:94e6e8e0836a4256049314a8eb4706b9b3a817e32baa1d27ab6b7c0d38d29178"
+          }
+        }
+      },
+      "capabilities": [
+        "taskboard-agent-progress-ui"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-15T13:31:05.069Z",
+      "heartbeatAt": "2026-10-15T13:31:05.069Z",
+      "digest": "sha256:5bc1c410cca99129dd946507f17f54c494b0759b834c6310039d83f84565a390"
+    },
+    "trackerGeneration": 3,
+    "reviewFirst": true
+  },
+  "digest": "sha256:5bfa7350dff965a89579f6177e8a6a22509f30c73785245f5d1440cdc493d9d1"
+}

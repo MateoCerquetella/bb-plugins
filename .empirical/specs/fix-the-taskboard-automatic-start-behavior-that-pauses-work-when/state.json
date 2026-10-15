@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 44,
+  "revision": 45,
   "activeFeature": "fix-the-taskboard-automatic-start-behavior-that-pauses-work-when",
   "request": "Fix the Taskboard automatic-start behavior that pauses work when a build reports recoverable blockers like the supplied Roten-App result. Improve automatic work startup so blocker summaries are handled accurately and the task does not stop prematurely when actionable implementation work can continue, while preserving genuine human-decision, tracker, evidence, and policy gates.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "implement",
-  "status": "waiting",
+  "phase": "done",
+  "status": "done",
   "repairAttempts": 0,
-  "message": "Resolved CI blocker by merging latest main, which corrects the stale Dockside assertion. Removed my unnecessary layout experiment, restoring Dockside source exactly to main. Taskboard tests passed 205/205; Dockside tests passed 212/212 after restoration. No UI layout change remains. User requests merge PR #78.",
+  "message": "Closed as merged-externally: Merged in pull request #78 as 9b1e4867641bbf8685eb5b363d96571a26da44c5 into main; closed when the merge was observed.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:7cb15be88b598d4883f48138daec22f559e2affc4f9bcc3f2ef3ff52406c774a",
@@ -36,11 +36,11 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-12T18:34:14.222Z",
+  "updatedAt": "2026-10-15T13:20:53.641Z",
   "lifecycle": {
     "stage": "iteration",
     "iteration": 8,
-    "awaitingFeedback": true,
+    "awaitingFeedback": false,
     "iterative": true,
     "contractRevision": 29,
     "contractBaseline": 41,
@@ -102,5 +102,39 @@
     "revision": 31
   },
   "budgetExtensionMinutes": 225,
-  "reviewFirst": true
+  "reviewFirst": true,
+  "closure": {
+    "schemaVersion": 1,
+    "outcome": "merged-externally",
+    "reason": "Merged in pull request #78 as 9b1e4867641bbf8685eb5b363d96571a26da44c5 into main; closed when the merge was observed.",
+    "actor": "empirical",
+    "confirmation": "merge-observed",
+    "closedAtPhase": "implement",
+    "completionAtClosure": "implemented",
+    "externalMerge": {
+      "pullRequest": 78,
+      "url": "https://github.com/MateoCerquetella/bb-plugins/pull/78",
+      "state": "MERGED",
+      "mergeCommit": "9b1e4867641bbf8685eb5b363d96571a26da44c5",
+      "targetBranch": "main",
+      "ancestorOfTarget": true,
+      "observedAt": "2026-10-15T13:20:40.740Z"
+    },
+    "closedAt": "2026-10-15T13:20:53.460Z",
+    "digest": "sha256:9e9cf1804c20dc66dfa7884ede9ad930b8d0cacf2babfce54a31bdaa2ff10444"
+  },
+  "completionRecord": {
+    "schemaVersion": 1,
+    "implementedBy": "agent",
+    "completedBy": "empirical",
+    "decisionBy": null,
+    "method": "merged-externally",
+    "reason": "Merged in pull request #78 as 9b1e4867641bbf8685eb5b363d96571a26da44c5 into main; closed when the merge was observed.",
+    "at": "2026-10-15T13:20:53.641Z",
+    "revision": 45,
+    "completion": "implemented",
+    "sourceTreeDigest": "sha256:50a585b6336754fd16343fe4ce4967834ecde9869aab19b1055004816f9eefc9",
+    "artifactTreeDigest": "sha256:374cfad8b6948e5e8244c8670f8ca1353ad49a889471f1cd5c5e8735f49018a6",
+    "digest": "sha256:5848a4150e183af338f38f2827a088624dd75b459912b32be6678d9e49969913"
+  }
 }

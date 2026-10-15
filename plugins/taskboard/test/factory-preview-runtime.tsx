@@ -60,7 +60,7 @@ const rpc = {
       window.factoryItem.status = 'In progress'; window.factoryItem.stateCategory = 'in_progress';
       record.runs = [{
         id: 'started', kind: 'investigate', status: 'running', threadId: 'thr_started',
-        environmentId: 'env_worktree', cursor: 0, turnId: null, planDigest: null,
+        environmentId: 'env_worktree', cursor: 0, turnId: null, pendingCompletion: null, planDigest: null,
         scopeDigest: record.scopeDigest, activity: 'Inspecting repository', error: null,
         output: '', reviewResult: null, buildResult: null, repairOf: null, continuationOf: null, updates: [], checks: [], steps: [], changedFiles: [], startedAt: new Date().toISOString(), finishedAt: null
       }];

@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-4ad05c10e2ef4e7b93e07019",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Execute configured Taskboard check, including new lifecycle tests. Policy currently maps through AC-7 only; do not claim coverage receipt for new AC-8/9/UI-2.",
+  "passed": false,
+  "startedAt": "2026-10-15T15:07:45.569Z",
+  "completedAt": "2026-10-15T15:08:07.868Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "improve-taskboard-ui-ux-for-structured-completion-results-shown-in",
+    "specRevision": 18,
+    "specDigest": "sha256:06cf67b85bfed06d92be505da11f437bbfea740b10a253e8c4978f630a7302e5",
+    "treeDigest": "sha256:da7b89bfa0208c51f6f586268e1684d762afe0d32cd1bc3dc1080a5843c2bd36",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 20,
+    "gitCommit": "02d3f6731d3eee570c4f242932f338d60e9117b3",
+    "textTreeDigest": "sha256:da7b89bfa0208c51f6f586268e1684d762afe0d32cd1bc3dc1080a5843c2bd36"
+  },
+  "digest": "sha256:7feb1692ae5efc3fa8bcafec1260ac120465f28fac05c775a14b5b03f049113d",
+  "kind": "qa",
+  "matrixDigest": "sha256:28af9f47fe71ad87468ad4d4033c323f492f5c3e3e296cc245ff3439e7337d17",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "failed",
+      "summary": "Execute configured Taskboard check, including new lifecycle tests. Policy currently maps through AC-7 only; do not claim coverage receipt for new AC-8/9/UI-2.",
+      "startedAt": "2026-10-15T15:07:45.569Z",
+      "completedAt": "2026-10-15T15:08:07.868Z",
+      "durationMs": 22299,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:3102e0660c5a28fb09072a92af73601c0704a8badb5519082e7545d1f876aa50",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-taskboard"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 1,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:d8dcfa27c8323c9ed83121e615e388a8ff7a99542c23d4570c0238cbbb28d91d",
+        "stderrDigest": "sha256:e1f8f22c5e23d17e7c26e980bb7973ab821023acdcd7905adf07971f0773938f",
+        "stdoutTail": ": 10018.938852\n  type: 'test'\n  ...\n# Subtest: old preparations remain discoverable and every pending record is reconciled beyond presentation limits\nok 169 - old preparations remain discoverable and every pending record is reconciled beyond presentation limits\n  ---\n  duration_ms: 44.985213\n  type: 'test'\n  ...\n# Subtest: deferred preparation responses cannot cross selection identity or undo a mutation\nok 170 - deferred preparation responses cannot cross selection identity or undo a mutation\n  ---\n  duration_ms: 1.25074\n  type: 'test'\n  ...\n# Subtest: selects the active thread project only when it still exists\nok 171 - selects the active thread project only when it still exists\n  ---\n  duration_ms: 1.006485\n  type: 'test'\n  ...\n# Subtest: treats a different thread in the same project as new context\nok 172 - treats a different thread in the same project as new context\n  ---\n  duration_ms: 0.240067\n  type: 'test'\n  ...\n# Subtest: reads the project and thread from a BB project route\nok 173 - reads the project and thread from a BB project route\n  ---\n  duration_ms: 0.852775\n  type: 'test'\n  ...\n# Subtest: uses only the immediately previous navigation entry as source context\nok 174 - uses only the immediately previous navigation entry as source context\n  ---\n  duration_ms: 0.262488\n  type: 'test'\n  ...\n# Subtest: never replaces an explicit Taskboard project selection with route context\nok 175 - never replaces an explicit Taskboard project selection with route context\n  ---\n  duration_ms: 0.304765\n  type: 'test'\n  ...\n# Subtest: writes project credentials atomically with owner-only permissions\nok 176 - writes project credentials atomically with owner-only permissions\n  ---\n  duration_ms: 8.47345\n  type: 'test'\n  ...\n# Subtest: deleting a missing credential is harmless\nok 177 - deleting a missing credential is harmless\n  ---\n  duration_ms: 1.513019\n  type: 'test'\n  ...\n# Subtest: cached summaries never retain provider comments\nok 178 - cached summaries never retain provider comments\n  ---\n  duration_ms: 1.66182\n  type: 'test'\n  ...\n# Subtest: provider creation results carry strict native assignee confirmation\nok 179 - provider creation results carry strict native assignee confirmation\n  ---\n  duration_ms: 0.228347\n  type: 'test'\n  ...\n# Subtest: metadata failures expose only a fixed server-safe message\nok 180 - metadata failures expose only a fixed server-safe message\n  ---\n  duration_ms: 0.426277\n  type: 'test'\n  ...\n# Subtest: finds Jira project keys from common configured JQL scopes\nok 181 - finds Jira project keys from common configured JQL scopes\n  ---\n  duration_ms: 0.93208\n  type: 'test'\n  ...\n# Subtest: binds issue creation to the tracker reviewed in the modal\nok 182 - binds issue creation to the tracker reviewed in the modal\n  ---\n  duration_ms: 0.847395\n  type: 'test'\n  ...\n# Subtest: refreshes authoritative provider data after successful issue creation\nok 183 - refreshes authoritative provider data after successful issue creation\n  ---\n  duration_ms: 0.355308\n  type: 'test'\n  ...\n# Subtest: refreshes authoritative provider data after ambiguous issue creation failure\nok 184 - refreshes authoritative provider data after ambiguous issue creation failure\n  ---\n  duration_ms: 0.372379\n  type: 'test'\n  ...\n# Subtest: gitlab is a registered taskboard source\nok 185 - gitlab is a registered taskboard source\n  ---\n  duration_ms: 1.138976\n  type: 'test'\n  ...\n# Subtest: refs must be host-qualified paths\nok 186 - refs must be host-qualified paths\n  ---\n  duration_ms: 1.075711\n  type: 'test'\n  ...\n# Subtest: locators round-trip with ref and iid\nok 187 - locators round-trip with ref and iid\n  ---\n  duration_ms: 0.408876\n  type: 'test'\n  ...\n# Subtest: status label categories cover the five states\nok 188 - status label categories cover the five states\n  ---\n  duration_ms: 0.216334\n  type: 'test'\n  ...\n# Subtest: status labels filter out unrelated labels\nok 189 - status labels filter out unrelated labels\n  ---\n  duration_ms: 0.650587\n  type: 'test'\n  ...\n# Subtest: state category prefers workflow labels over native state\nok 190 - state category prefers workflow labels over native state\n  ---\n  duration_ms: 0.214932\n  type: 'test'\n  ...\n# Subtest: status name shows the workflow column name or the native state\nok 191 - status name shows the workflow column name or the native state\n  ---\n  duration_ms: 0.245918\n  type: 'test'\n  ...\n# Subtest: cached summaries never retain provider comments\nok 192 - cached summaries never retain provider comments\n  ---\n  duration_ms: 0.271646\n  type: 'test'\n  ...\n# Subtest: untriaged issues keep native open/closed choices current-flagged\nok 193 - untriaged issues keep native open/closed choices current-flagged\n  ---\n  duration_ms: 0.37816\n  type: 'test'\n  ...\n# Subtest: stripped status names keep facet and dropdown consistent\nok 194 - stripped status names keep facet and dropdown consistent\n  ---\n  duration_ms: 0.400741\n  type: 'test'\n  ...\n# Subtest: token line is parsed from glab stderr output\nok 195 - token line is parsed from glab stderr output\n  ---\n  duration_ms: 0.517062\n  type: 'test'\n  ...\n# Subtest: keeps structural headers on neutral host theme surfaces\nok 196 - keeps structural headers on neutral host theme surfaces\n  ---\n  duration_ms: 1.356233\n  type: 'test'\n  ...\n# Subtest: uses restrained state glyph, focus, and conversation treatments\nok 197 - uses restrained state glyph, focus, and conversation treatments\n  ---\n  duration_ms: 0.486597\n  type: 'test'\n  ...\n# Subtest: keeps constrained filter values inside the vertical menu measure\nok 198 - keeps constrained filter values inside the vertical menu measure\n  ---\n  duration_ms: 0.240619\n  type: 'test'\n  ...\n# Subtest: keeps assignee avatars compact with six theme-safe identity tones\nok 199 - keeps assignee avatars compact with six theme-safe identity tones\n  ---\n  duration_ms: 0.453166\n  type: 'test'\n  ...\n# Subtest: shows restrained composer drop feedback and discoverable drag grips\nok 200 - shows restrained composer drop feedback and discoverable drag grips\n  ---\n  duration_ms: 0.447906\n  type: 'test'\n  ...\n# Subtest: ticket images reject spoofed formats, active content and oversized bytes\nok 201 - ticket images reject spoofed formats, active content and oversized bytes\n  ---\n  duration_ms: 10.300541\n  type: 'test'\n  ...\n# Subtest: Linear uploads use signed storage headers and return the asset URL\nok 202 - Linear uploads use signed storage headers and return the asset URL\n  ---\n  duration_ms: 65.910768\n  type: 'test'\n  ...\n# Subtest: improvement asks for concrete concise scope without invented implementation\nok 203 - improvement asks for concrete concise scope without invented implementation\n  ---\n  duration_ms: 0.292093\n  type: 'test'\n  ...\n# Subtest: draft parser accepts JSON or a single fence and rejects missing, extra or oversized fields\nok 204 - draft parser accepts JSON or a single fence and rejects missing, extra or oversized fields\n  ---\n  duration_ms: 3.2904\n  type: 'test'\n  ...\n# Subtest: concurrent starts spawn once with project defaults and only validated text is returned\nok 205 - concurrent starts spawn once with project defaults and only validated text is returned\n  ---\n  duration_ms: 1.50858\n  type: 'test'\n  ...\n# Subtest: cancellation before start prevents dispatch, including after service reload\nok 206 - cancellation before start prevents dispatch, including after service reload\n  ---\n  duration_ms: 0.345921\n  type: 'test'\n  ...\n# Subtest: uncertain spawn cannot become a confirmed cancellation or be dispatched twice\nok 207 - uncertain spawn cannot become a confirmed cancellation or be dispatched twice\n  ---\n  duration_ms: 0.479814\n  type: 'test'\n  ...\n# Subtest: stop failures stay uncertain and cleanup is retried by the sweep\nok 208 - stop failures stay uncertain and cleanup is retried by the sweep\n  ---\n  duration_ms: 3.830114\n  type: 'test'\n  ...\n# Subtest: invalid model output never returns a replacement draft\nok 209 - invalid model output never returns a replacement draft\n  ---\n  duration_ms: 0.572284\n  type: 'test'\n  ...\n1..209\n# tests 209\n# suites 0\n# pass 204\n# fail 5\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 10923.981362\n",
+        "stderrTail": "npm error Lifecycle script `test` failed with error:\nnpm error code 1\nnpm error path /home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_kxzzi5iryw-1/bb-plugins/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.3\nnpm error location /home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_kxzzi5iryw-1/bb-plugins/plugins/taskboard\nnpm error command failed\nnpm error command sh -c node --test --experimental-strip-types test/*.test.ts\nnpm error Lifecycle script `check` failed with error:\nnpm error code 1\nnpm error path /home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_kxzzi5iryw-1/bb-plugins/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.3\nnpm error location /home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_kxzzi5iryw-1/bb-plugins/plugins/taskboard\nnpm error command failed\nnpm error command sh -c npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build\n",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:da7b89bfa0208c51f6f586268e1684d762afe0d32cd1bc3dc1080a5843c2bd36",
+      "sourceTreeAfter": "sha256:da7b89bfa0208c51f6f586268e1684d762afe0d32cd1bc3dc1080a5843c2bd36",
+      "artifacts": []
+    }
+  ],
+  "anomalies": [
+    "outcome-failed"
+  ]
+}

@@ -60,7 +60,8 @@ export function startRun(record: FactoryRecord, kind: FactoryRunKind, retry: boo
   if (!retry && last && ['failed', 'canceled'].includes(last.status)) {
     throw new Error('Use the explicit retry action for this stage.');
   }
-  if (kind === 'plan' && !record.runs.some(run => run.kind === 'investigate' && run.status === 'finished')) {
+  if (kind === 'plan' && !record.runs.some(run => run.kind === 'investigate' &&
+    run.status === 'finished' && run.scopeDigest === record.scopeDigest && !run.error && run.output.trim())) {
     throw new Error('Inspect completed investigation findings before generating a plan.');
   }
   if (kind === 'build' || kind === 'review') {
@@ -80,7 +81,7 @@ export function startRun(record: FactoryRecord, kind: FactoryRunKind, retry: boo
   }
   const run: FactoryRun = {
     id: randomUUID(), kind, status: 'starting' as const, threadId: null,
-    environmentId: null, cursor: 0, turnId: null,
+    environmentId: null, cursor: 0, turnId: null, pendingCompletion: null,
     planDigest: record.approvedDigest, scopeDigest: record.scopeDigest, activity: 'Starting native BB session',
     error: null, output: '', reviewResult: null, buildResult: null, repairOf: null,
     continuationOf: null,

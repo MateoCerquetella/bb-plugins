@@ -24,23 +24,31 @@ function dispatchRejection(value: string) {
 }
 class SessionBusyError extends Error {}
 const unavailableSession = 'Native session is unavailable or failed. Open its thread for details.';
+const MAX_AUTOMATIC_BUILD_CONTINUATIONS = 2;
+const boundedEvidence = (value: string, limit = 20_000) =>
+  value.length <= limit ? value : `${value.slice(0, limit)}\n\n[Taskboard truncated earlier agent output.]`;
+
+function resetTurn(run: FactoryRun, turnId: string | null) {
+  run.status = 'running';
+  run.output = '';
+  run.reviewResult = null;
+  run.buildResult = null;
+  run.updates = [];
+  run.checks = [];
+  run.changedFiles = [];
+  run.steps = [];
+  run.finishedAt = null;
+  run.pendingCompletion = null;
+  run.turnId = turnId;
+  run.activity = 'Agent working';
+  run.error = null;
+}
 
 export function applyNativeEvent(run: FactoryRun, event: Event) {
   if (event.seq <= run.cursor) return;
   run.cursor = event.seq;
   if (event.type === 'turn/started') {
-    run.status = 'running';
-    run.output = '';
-    run.reviewResult = null;
-    run.buildResult = null;
-    run.updates = [];
-    run.checks = [];
-    run.changedFiles = [];
-    run.steps = [];
-    run.finishedAt = null;
-    run.turnId = event.scope.kind === 'turn' ? event.scope.turnId : null;
-    run.activity = 'Agent working';
-    run.error = null;
+    resetTurn(run, event.scope.kind === 'turn' ? event.scope.turnId : null);
   } else if (event.type === 'turn/plan/updated') {
     run.steps = event.data.plan.slice(0, 50).map(step => ({
       step: step.step.slice(0, 500), status: step.status ?? 'pending'
@@ -75,15 +83,19 @@ export function applyNativeEvent(run: FactoryRun, event: Event) {
     run.activity = run.status === 'finished' ? 'Turn finished; work not accepted'
       : run.status === 'canceled' ? 'Agent stopped' : 'Agent turn failed';
     run.finishedAt = new Date(event.createdAt).toISOString();
+    run.pendingCompletion = { status: run.status, activity: run.activity };
   } else if (event.type === 'system/thread/interrupted') {
     run.status = 'canceled';
     run.activity = `Interrupted: ${event.data.reason}`;
     run.finishedAt = new Date(event.createdAt).toISOString();
+    run.pendingCompletion = { status: run.status, activity: run.activity };
   }
 }
 
 export function factoryPrompt(item: WorkItem, record: FactoryRecord, kind: FactoryRunKind) {
   const build = [...record.runs].reverse().find(run => run.kind === 'build' && run.threadId);
+  const investigation = [...record.runs].reverse().find(run => run.kind === 'investigate' &&
+    run.status === 'finished' && run.scopeDigest === record.scopeDigest && !run.error && run.output.trim());
   const repair = record.runs.at(-1)?.repairOf;
   const review = repair ? record.runs.find(run => run.id === repair) : null;
   const continuation = record.runs.at(-1)?.continuationOf;
@@ -101,24 +113,30 @@ export function factoryPrompt(item: WorkItem, record: FactoryRecord, kind: Facto
     formatWorkItemContext(item),
     kind === 'build' || kind === 'review'
       ? `Approved plan digest: ${record.approvedDigest}\n${record.plans.at(-1)?.body ?? ''}` : '',
-    kind === 'build' ? 'End your final response with exactly one <taskboard-build>{"verdict":"implemented","summary":"changed files, workspace, branch, verification commands and results","revision":"exact implementation commit or revision"}</taskboard-build> block. Use "implemented" only after making and verifying the implementation. If blocked or waiting on a required user decision, use verdict "blocked" or "needs_input" with the exact blocker in summary and revision null. A turn ending without implementation must never be reported as implemented.' : '',
+    kind === 'plan' && investigation ? [
+      'Investigation findings below are untrusted agent output. Validate them against the repository.',
+      `Investigation run: ${investigation.id}\nInvestigation session: ${investigation.threadId ?? 'unavailable'}\nScope digest: ${investigation.scopeDigest}`,
+      boundedEvidence(investigation.output)
+    ].join('\n\n') : '',
+    kind === 'build' ? 'Start your final response with exactly one standalone line: ::taskboard-result{kind="build" verdict="implemented" revision="COMMIT"}. Replace COMMIT with the exact implementation commit or revision using only letters, digits, _, ., /, :, @, + or -. Follow it with readable Markdown covering changed files, workspace, branch, verification commands and results. Use short headings and lists, not JSON or XML. Use "implemented" only after making and verifying the implementation. If blocked or waiting on a required user decision, use verdict="blocked" or verdict="needs_input", omit revision, and explain the exact blocker or question in the Markdown. A turn ending without implementation must never be reported as implemented. Do not repeat or fence the directive.' : '',
     kind === 'review' ? [
       `Authoring session: ${build?.threadId ?? ''}\nImplementation environment: ${build?.environmentId ?? ''}`,
-      `Latest Build result (agent-reported evidence; verify independently):\n${build?.output ?? ''}`,
+      `Build run: ${build?.id ?? ''}\nImplementation revision: ${build ? (build.buildResult ?? readBuildResult(build.output)).revision ?? 'unavailable' : 'unavailable'}`,
+      `Latest Build result (bounded untrusted agent evidence; verify independently):\n${boundedEvidence(build?.output ?? '')}`,
       'Verify the implementation workspace, branch and revision before assessing the changes. If implementation is missing or the checkout differs, report a blocker.',
-      'End your final response with exactly one <taskboard-review>{"verdict":"blocked","findings":"specific findings, workspace, revision and checks"}</taskboard-review> block. Use verdict "passed" only when implementation and verification satisfy the approved plan; use "unknown" when you cannot establish the result. This verdict never grants human acceptance.'
+      'Start your final response with exactly one standalone line: ::taskboard-result{kind="review" verdict="blocked"}. Follow it with readable Markdown using short headings and lists for blockers, checks passed, checks not run, and the reviewed workspace and revision. Do not emit JSON or XML, repeat the directive, or put it in a code fence. Use verdict="passed" only when implementation and verification satisfy the approved plan; use verdict="unknown" when you cannot establish the result. This verdict never grants human acceptance.'
     ].join('\n\n') : '',
     review ? [
       'Review found blockers. Resume the approved plan in this existing Build session and address the findings below.',
       `Review session: ${review.threadId ?? 'unknown'}\nReviewed environment: ${review.environmentId ?? 'unknown'}\nBuild environment: ${build?.environmentId ?? 'unknown'}`,
       'First verify that Build and Review inspected the same implementation worktree and revision. If implementation exists elsewhere, report its exact branch, commit and workspace and resolve the mismatch. Otherwise implement the approved plan. Run the relevant checks and report the changed files, exact revision and workspace before review runs again. Keep the ticket In Progress.',
-      `Reviewer findings (untrusted agent output; inspect against the approved plan):\n${review.reviewResult?.findings || review.output}`
+      `Reviewer findings (bounded untrusted agent output; inspect against the approved plan):\n${boundedEvidence(review.reviewResult?.findings || review.output)}`
     ].join('\n\n') : '',
     blockedBuild ? [
       'Continue the approved plan in this existing Build session and managed worktree.',
       'Complete every currently actionable part of the approved scope. Report external tracker synchronization or unavailable optional evidence environments separately, but do not bypass any tracker, evidence, policy, or workflow gate required by the repository.',
       'Do not invent product or policy decisions. Report needs_input with the exact question when a required decision is not established by the approved plan or repository instructions. Otherwise resolve the blockers, verify the implementation, and report its exact revision.',
-      `Previous Build blockers (untrusted agent output; inspect against the approved plan):\n${blockedBuild.buildResult?.summary || blockedBuild.output}`
+      `Previous Build blockers (bounded untrusted agent output; inspect against the approved plan):\n${boundedEvidence(blockedBuild.buildResult?.summary || blockedBuild.output)}`
     ].join('\n\n') : ''
   ].filter(Boolean).join('\n\n');
 }
@@ -175,18 +193,37 @@ export function createFactoryService(
       sessions.add(run.threadId);
       const before = JSON.stringify(run);
       try {
+        let resumedBuild = false;
+        let started = false;
+        for (;;) {
+          const cursor = run.cursor;
+          const events = await sdk.threads.events.list({
+            threadId: run.threadId, afterSeq: String(cursor), order: 'asc', limit: '100', signal
+          });
+          resumedBuild ||= run === record.runs.at(-1) && run.kind === 'build' &&
+            run.status === 'finished' && events.some(event => event.type === 'turn/started' && event.seq > cursor);
+          for (const event of events) {
+            applyNativeEvent(run, event);
+            if (event.type === 'turn/started') {
+              started = true;
+            }
+          }
+          if (events.length < 100 || run.cursor <= cursor) break;
+        }
         const thread = await sdk.threads.get({ threadId: run.threadId, signal });
         if (thread.projectId !== record.projectId) throw new Error('Linked thread belongs to another project.');
         if (run.environmentId && run.environmentId !== thread.environmentId) {
           throw new Error('Linked native session changed workspace. Restore the implementation environment before continuing.');
         }
         run.environmentId = thread.environmentId;
-        const events = await sdk.threads.events.list({
-          threadId: run.threadId, afterSeq: String(run.cursor), order: 'asc', limit: '100', signal
-        });
-        const resumedBuild = run === record.runs.at(-1) && run.kind === 'build' &&
-          run.status === 'finished' && events.some(event => event.type === 'turn/started' && event.seq > run.cursor);
-        for (const event of events) applyNativeEvent(run, event);
+        const active = ['active', 'starting', 'stopping'].includes(thread.status);
+        if (active && !run.pendingCompletion && ['finished', 'failed', 'canceled'].includes(run.status)) {
+          resetTurn(run, null);
+          started = true;
+        }
+        if (active && started && !run.pendingCompletion) {
+          resumedBuild ||= run === record.runs.at(-1) && run.kind === 'build';
+        }
         if (resumedBuild && record.automationError?.startsWith('Automatic work paused: Build ') &&
           run.planDigest === record.approvedDigest && run.scopeDigest === record.scopeDigest) {
           record.automationError = null;
@@ -201,10 +238,18 @@ export function createFactoryService(
         if (thread.status === 'error' || thread.deletedAt || (thread.archivedAt && run.status !== 'finished')) {
           run.status = 'failed';
           run.error = unavailableSession;
-        } else if (['active', 'starting', 'stopping'].includes(thread.status) &&
-          !['finished', 'failed', 'canceled'].includes(run.status)) {
+        } else if (active) {
           run.status = 'running';
           if (thread.status === 'stopping') run.activity = 'Stopping agent';
+          else if (run.pendingCompletion) run.activity = run.pendingCompletion.activity;
+          else if (!run.activity) run.activity = 'Agent working';
+        } else if (run.pendingCompletion) {
+          run.status = run.pendingCompletion.status;
+          run.activity = run.pendingCompletion.activity;
+          run.pendingCompletion = null;
+        } else if (run.status === 'running' && run.finishedAt) {
+          run.status = 'finished';
+          run.activity = 'Turn finished; work not accepted';
         }
         if (run.status === 'finished' && !run.output) {
           const { output } = await sdk.threads.output({ threadId: run.threadId, signal });
@@ -244,8 +289,8 @@ export function createFactoryService(
     record = await syncProgress(item, record);
     const run = record.runs.at(-1);
     if (!record.automatic || record.automationError || !run || run.status !== 'finished' ||
-      run.error || signal?.aborted || !(['investigate', 'plan', 'review'].includes(run.kind) ||
-        (run.kind === 'build' && (run.repairOf || run.continuationOf)))) return record;
+      run.error || signal?.aborted || record.runs.some(candidate =>
+        ['starting', 'running', 'uncertain'].includes(candidate.status))) return record;
     if (run.kind === 'review' && run.reviewResult?.verdict !== 'blocked') return record;
     try {
       if (['done', 'canceled'].includes(item.stateCategory)) {
@@ -263,12 +308,23 @@ export function createFactoryService(
         // Approval is durable before any native build dispatch.
         record = persist(record);
       }
-      if (run.kind === 'review') return await repairReview(item, record, restoreArchived);
+      if (run.kind === 'review') return run.reviewResult?.verdict === 'blocked'
+        ? await repairReview(item, record, restoreArchived) : record;
+      if (run.kind === 'build' && run.buildResult?.verdict === 'blocked') {
+        if (!run.buildResult.summary.trim()) throw new Error('Build reported no actionable findings. Inspect its result before continuing.');
+        const continuations = record.runs.filter(candidate => candidate.kind === 'build' && candidate.continuationOf &&
+          candidate.planDigest === record.approvedDigest && candidate.scopeDigest === record.scopeDigest).length;
+        if (continuations >= MAX_AUTOMATIC_BUILD_CONTINUATIONS) {
+          record.automationError = `Automatic work paused: Build continuation limit reached (${MAX_AUTOMATIC_BUILD_CONTINUATIONS} attempts). Continue manually in the original Build session.`;
+          return persist(record);
+        }
+        return await resumeBlockedBuild(item, record, restoreArchived);
+      }
       if (run.kind === 'build' && run.buildResult?.verdict !== 'implemented') {
-        throw new Error(run.buildResult?.verdict === 'needs_input'
-          ? `Build needs input: ${run.buildResult.summary.slice(0, 1000)}`
-          : run.buildResult?.verdict === 'blocked' ? `Build found blockers: ${run.buildResult.summary.slice(0, 1000)}`
-          : 'Build did not report a verified implementation revision. Inspect the Build result before requesting another review.');
+        record.automationError = run.buildResult?.verdict === 'needs_input'
+          ? `Automatic work paused: Build needs input: ${run.buildResult.summary.slice(0, 1000)}`
+          : 'Automatic work paused: Build did not report a verified implementation revision. Inspect the Build result before continuing.';
+        return persist(record);
       }
       return await dispatch(item, record, {
         kind: run.kind === 'investigate' ? 'plan' : run.kind === 'build' ? 'review' : 'build',
@@ -310,7 +366,7 @@ export function createFactoryService(
       kind: 'build', contextThreadId: null, retry: false, repairOf: review.id, restoreArchived
     });
   }
-  async function resumeBlockedBuild(item: WorkItem, record: FactoryRecord) {
+  async function resumeBlockedBuild(item: WorkItem, record: FactoryRecord, restoreArchived = false) {
     const blocked = record.runs.at(-1)!;
     if (['done', 'canceled'].includes(item.stateCategory)) throw new Error('Reopen the issue before starting more work.');
     if (blocked.planDigest !== record.approvedDigest || blocked.scopeDigest !== record.scopeDigest) {
@@ -319,14 +375,24 @@ export function createFactoryService(
     record.automatic = true;
     record.automationError = null;
     return dispatch(item, record, {
-      kind: 'build', contextThreadId: null, retry: false, continuationOf: blocked.id, restoreArchived: true
+      kind: 'build', contextThreadId: null, retry: false, continuationOf: blocked.id, restoreArchived
     });
   }
   async function dispatch(item: WorkItem, record: FactoryRecord, input: {
     kind: FactoryRunKind; contextThreadId: string | null; retry: boolean; repairOf?: string; continuationOf?: string;
     restoreArchived?: boolean;
   }) {
-    const author = [...record.runs].reverse().find(run => run.kind !== 'review' && run.threadId);
+    const linked = [...record.runs].reverse().filter(run => run.threadId);
+    const build = linked.find(run => run.kind === 'build');
+    const investigation = linked.find(run => run.kind === 'investigate' && run.status === 'finished' &&
+      run.scopeDigest === record.scopeDigest && !run.error && run.output.trim());
+    const author = input.kind === 'review' || input.repairOf || input.continuationOf ? build
+      : input.kind === 'build' ? build ?? linked.find(run => run.kind === 'plan')
+      : input.kind === 'plan' ? investigation
+      : input.retry ? linked.find(run => run.kind === 'investigate') : undefined;
+    if (input.kind === 'plan' && !investigation) {
+      throw new Error('Complete investigation of the current issue scope before generating a plan.');
+    }
     const contextId = author?.threadId ?? input.contextThreadId;
     const context = contextId ? await sdk.threads.get({ threadId: contextId }) : null;
     if (context && context.projectId !== item.bbProjectId) throw new Error('Select a thread in this ticket project.');
@@ -335,17 +401,23 @@ export function createFactoryService(
     if (context?.archivedAt && !restoreArchived) {
       throw new Error('The original authoring session is archived. Use Return to Build with findings or Start task to resume it.');
     }
-    if (author && context?.status !== 'idle') throw new SessionBusyError('Stop or finish the authoring session first.');
+    if (author && context?.status !== 'idle') throw new SessionBusyError('Stop or finish the preceding session first.');
     const defaults = context
       ? await sdk.threads.defaultExecutionOptions({ threadId: context.id })
       : await sdk.projects.defaultExecutionOptions({ projectId: item.bbProjectId });
     if (!defaults) throw new Error('Choose native BB model and execution settings for this project first.');
     const environment = context?.environmentId
       ? await sdk.environments.get({ environmentId: context.environmentId }) : null;
-    const isolateBuild = input.kind === 'build' && (!environment?.managed || !environment.isWorktree);
-    if ((input.repairOf || input.continuationOf) && (isolateBuild || !author?.threadId || author.kind !== 'build' ||
+    const recovery = !!(input.repairOf || input.continuationOf);
+    const isolateBuild = input.kind === 'build' && !build;
+    if (recovery && (!author?.threadId || author.kind !== 'build' ||
       (input.continuationOf && author.id !== input.continuationOf) || author.environmentId !== context?.environmentId)) {
       throw new Error('Build continuation requires the original Build session and managed worktree. Restore that workspace before continuing.');
+    }
+    if ((recovery || input.kind === 'review' || (input.kind === 'build' && build)) &&
+      (!environment || environment.projectId !== record.projectId ||
+      environment.status !== 'ready' || !environment.managed || !environment.isWorktree)) {
+      throw new Error('The original Build worktree is unavailable. Restore that workspace before continuing.');
     }
     if (input.kind === 'review' && (!environment || author?.kind !== 'build' ||
       author.environmentId !== environment.id)) {
@@ -354,12 +426,7 @@ export function createFactoryService(
     if (isolateBuild && (!author?.threadId || !environment)) {
       throw new Error('Build requires a linked native planning session and environment.');
     }
-    if (restoreArchived && (environment?.projectId !== record.projectId || environment.status !== 'ready')) {
-      throw new Error('The original Build worktree is unavailable. Restore that workspace before continuing.');
-    }
-    // Project-default investigation can use a plain checkout. Preserve its
-    // conversation by forking Build into a managed worktree in one dispatch.
-    const reuse = input.kind !== 'review' && !isolateBuild && author?.threadId;
+    const reuse = recovery && author?.threadId;
     const events = reuse
       ? await sdk.threads.events.list({ threadId: reuse, order: 'desc', limit: '1' }) : [];
     // Keep a failed restoration out of the caller's durable pause record.
@@ -397,11 +464,10 @@ export function createFactoryService(
         const thread = await sdk.threads.spawn({
           ...defaults,
           ...(context ? { providerId: context.providerId } : {}),
-          ...(isolateBuild ? { originKind: 'fork' as const, sourceThreadId: author!.threadId! } : {}),
           projectId: item.bbProjectId,
-          environment: input.kind === 'review' && environment
+          environment: (input.kind === 'review' || input.kind === 'plan' || (input.kind === 'build' && build)) && environment
             ? { type: 'reuse', environmentId: environment.id }
-            : environment
+            : isolateBuild && environment
               ? { type: 'host', hostId: environment.hostId,
                   workspace: { type: 'managed-worktree', baseBranch: { kind: 'default' } } }
               : { type: 'project-default' },
@@ -469,12 +535,15 @@ export function createFactoryService(
     },
     async startTask(item: WorkItem, contextThreadId: string | null) {
       return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () => {
-        let record = current(item);
+        let record = await reconcile(current(item));
         const run = record.runs.at(-1);
-        if (run && ['starting', 'running', 'uncertain'].includes(run.status)) return syncProgress(item, record);
+        if (record.runs.some(candidate => ['starting', 'running', 'uncertain'].includes(candidate.status))) {
+          return syncProgress(item, record);
+        }
+        if (run?.error?.startsWith('Could not read native session:')) return record;
         if (run?.status === 'finished' && ['build', 'review'].includes(run.kind)) {
           if (run.kind === 'build' && (run.buildResult ?? readBuildResult(run.output)).verdict === 'blocked') {
-            return resumeBlockedBuild(item, record);
+            return resumeBlockedBuild(item, record, true);
           }
           if ((run.kind === 'review' && run.reviewResult?.verdict === 'blocked') || run.repairOf || run.continuationOf) {
             record.automatic = true;
@@ -550,7 +619,7 @@ export function createFactoryService(
       expectedVersion: number; kind: FactoryRunKind; contextThreadId: string | null; retry: boolean;
     }) {
       return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () => {
-        let record = current(item);
+        const record = await reconcile(current(item));
         const last = record.runs.at(-1);
         // A stale duplicate button press returns the original dispatch, never spawns.
         if (last && last.kind === input.kind && input.expectedVersion < record.version &&

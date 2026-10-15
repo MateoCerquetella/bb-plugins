@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "sequence": 2,
+  "previousDigest": "sha256:465fa7b69a3725a8a7a34d88db6718f9b8638c7210eb3674cddff830cdb353b6",
+  "actor": "codex",
+  "type": "transition",
+  "summary": "Size: keep as one (The seven criteria describe one user-visible presentation change across a shared result contract: the native result card, backward-compatible parsing, and actionable error state must be changed and verified together to avoid a half-migrated protocol or duplicated controls.)",
+  "createdAt": "2026-10-15T13:30:40.135Z",
+  "stateBeforeDigest": "sha256:6cf5af57a220fdf729cfec95ec2dd2861692be6b077620a0a0578eb016cbb36e",
+  "stateAfterDigest": "sha256:962f0492dac447b02f20b0a06479aa181d3f53bad8a2d66fc72b895e83697495",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 2,
+    "activeFeature": "improve-taskboard-ui-ux-for-structured-completion-results-shown-in",
+    "request": "Improve Taskboard UI/UX for structured completion results shown in BB threads and for errors displayed inside Taskboard tasks. Replace raw JSON-like result blocks such as {\"verdict\":\"blocked\",\"findings\":\"...\"} with a compact, scannable status presentation that preserves full detail, and improve task error states so they communicate what failed, what the user can do, and optional technical details. Keep the work scoped to plugins/taskboard, follow existing design patterns, preserve accessibility and responsive behavior, and verify the real UI in a browser with screenshots plus focused tests.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": null,
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:e1707de85645e26df50489ba641126bebe00dc7112afa90927223dd9aa6eb481",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": null,
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-15T13:30:40.135Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true
+    },
+    "reviewFirst": true,
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 7,
+      "capabilities": 1,
+      "reason": "The seven criteria describe one user-visible presentation change across a shared result contract: the native result card, backward-compatible parsing, and actionable error state must be changed and verified together to avoid a half-migrated protocol or duplicated controls.",
+      "actor": "codex",
+      "revision": 1
+    }
+  },
+  "digest": "sha256:f4a3e8f3b65691a2fc2e6a17751d8d964afbb39c87d60e399a74bbd8425f0a91"
+}

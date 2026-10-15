@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-2567ea64a87fe1fc971c93b8",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8",
+    "AC-9",
+    "AC-UI-1",
+    "AC-UI-2"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review requested changes to the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-10-15T15:59:59.186Z",
+  "completedAt": "2026-10-15T15:59:59.186Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "improve-taskboard-ui-ux-for-structured-completion-results-shown-in",
+    "specRevision": 18,
+    "specDigest": "sha256:06cf67b85bfed06d92be505da11f437bbfea740b10a253e8c4978f630a7302e5",
+    "treeDigest": "sha256:51ea9905cc9090e9772ffef8f53bb476b6b7a83a55d007fa69ca27669fc46153",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:76ddbf62150e2c5299acd9e162bcbebe743f8de571ddf9613126ea2543d4d29f",
+  "kind": "collected",
+  "collector": "empirical-review:codex-independent-fresh-review-close",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/improve-taskboard-ui-ux-for-structured-completion-results-shown-in/reviews/8363b667c3b60e91a902ecaf.json",
+      "mediaType": "application/json",
+      "bytes": 3946,
+      "digest": "sha256:543e6a05e53f5c347932dd10fe507fa21804fd7867efe7db4296a894f77b0ed9"
+    },
+    {
+      "path": ".empirical/specs/improve-taskboard-ui-ux-for-structured-completion-results-shown-in/reviews/8363b667c3b60e91a902ecaf.md",
+      "mediaType": "text/markdown",
+      "bytes": 2797,
+      "digest": "sha256:1248548aea8c2235be340303ae5ed6c8abe58b770bb4fdf840bd782862ee35c7"
+    }
+  ]
+}
