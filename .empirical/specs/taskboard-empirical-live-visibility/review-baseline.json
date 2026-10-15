@@ -1,22 +1,7 @@
 {
   "schemaVersion": 1,
-  "resultPath": ".empirical/specs/taskboard-empirical-live-visibility/reviews/79ae0d5b3abadb7f7101f665.json",
-  "resultDigest": "sha256:79ae0d5b3abadb7f7101f665c1e93cf291e43bb1d9bd0b410c6f5fd076cf795a",
+  "resultPath": ".empirical/specs/taskboard-empirical-live-visibility/reviews/32305fa7b93ca95a4be80bbe.json",
+  "resultDigest": "sha256:32305fa7b93ca95a4be80bbe8d40bd1dc7432a0e333cdeea1de9bbaa482f420c",
   "contractDigest": "sha256:cf9e468dbc873f488ac1ae44c3c72e105338bf8b8e52f18089a36cff63077f5b",
-  "carriedDeferred": [
-    {
-      "id": "F-5",
-      "severity": "medium",
-      "category": "correctness",
-      "summary": "Invalid and uninitialized observations overwrite the persisted last usable snapshot.",
-      "path": "plugins/taskboard/server.ts"
-    },
-    {
-      "id": "F-7",
-      "severity": "medium",
-      "category": "design",
-      "summary": "Host observation shells out to an executable on PATH, diverging from the accepted read-only Empirical export.",
-      "path": "plugins/taskboard/empirical/status.ts"
-    }
-  ]
+  "carriedDeferred": []
 }
