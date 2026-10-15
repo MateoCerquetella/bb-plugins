@@ -57,7 +57,7 @@ const hostCss = await readFile(resolve(hostAssets, hostStylesheet), 'utf8');
 const html = `<html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>
 ${hostCss}
 :root{font:16px system-ui;--border:#ddd;--muted:#f2f3f5;--primary:#286bd4;--muted-foreground:#71757e;--canvas:#fff;--ink:#292b31;--timeline-accent:#286bd4;--success:#19714d;--destructive-text:#b13a4b}
-*{box-sizing:border-box}body{margin:0;color:#292b31;font-size:13px}#preview-detail{width:100%;min-width:0}#preview-manual{padding:20px}pre{font-size:11px}
+*{box-sizing:border-box}body{margin:0;color:var(--ink);background:var(--canvas);font-size:13px}#preview-detail{width:100%;min-width:0}#preview-manual{padding:20px}pre{font-size:11px}
 ${css}</style></head><body><div id="root"></div><script>window.factoryFixture=${JSON.stringify(fixture)}</script><script>${result.outputFiles[0].text.replaceAll('</script>', '<\\/script>')}</script></body></html>`;
 try {
   await page.setViewportSize({ width: 1280, height: 1000 });
@@ -99,8 +99,35 @@ try {
     document.documentElement.style.cssText = '';
   });
   await page.keyboard.press('Escape');
-  await manual.getByRole('button', { name: 'Open session' }).first().click();
-  assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_test']);
+  await page.evaluate(() => {
+    const record = window.factoryFixture;
+    record.runs.unshift({ ...record.runs[0], id: 'investigate-run', kind: 'investigate',
+      threadId: 'thr_investigate', output: 'Bounded investigation findings.' });
+    record.version++; window.factoryRefresh();
+  });
+  const sessionSelect = manual.locator('.tb-session-picker select');
+  await sessionSelect.selectOption('investigate-run');
+  await page.evaluate(() => window.factoryRefresh());
+  assert.equal(await sessionSelect.inputValue(), 'investigate-run');
+  await manual.getByText('Stage result', { exact: true }).click();
+  await manual.getByText('Bounded investigation findings.', { exact: true }).waitFor();
+  assert.equal(await manual.getByText('Preserve filters per project.', { exact: true }).count(), 0);
+  await page.evaluate(() => {
+    const record = window.factoryFixture;
+    record.runs.push({ ...record.runs.at(-1), id: 'new-review', kind: 'review', threadId: 'thr_review',
+      output: 'New review details.', reviewResult: { verdict: 'passed', findings: 'New review details.' } });
+    record.version++; window.factoryRefresh();
+  });
+  assert.equal(await sessionSelect.inputValue(), 'investigate-run');
+  await page.evaluate(() => {
+    window.factoryFixture.runs.pop();
+    window.factoryFixture.version++;
+    window.factoryRefresh();
+  });
+  assert.equal(await manual.getByRole('button', { name: 'Open session', exact: true }).count(), 1);
+  await manual.getByRole('button', { name: 'Open session', exact: true }).click();
+  assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_investigate']);
+  await sessionSelect.selectOption('run');
   await manual.getByText('Implementation plan', { exact: true }).click();
   await manual.getByRole('button', { name: 'Save revision' }).click();
   await manual.getByRole('button', { name: 'Approve revision 1' }).click();
@@ -112,7 +139,7 @@ try {
   await page.locator('#preview-card').getByRole('button', { name: 'Start task', exact: true }).click();
   assert.equal(await page.evaluate(() => window.factoryStarts), 1);
   assert.equal(await page.evaluate(() => localStorage.getItem('bb-taskboard:right-panel-pinned')), null);
-  assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_test', 'thr_started']);
+  assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_investigate', 'thr_started']);
   await manual.locator('.tb-run[data-live="true"] .tb-live-mark').waitFor();
   assert.equal(await manual.locator('.tb-live-mark').evaluate(el => getComputedStyle(el).animationName), 'tb-working');
   await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -180,7 +207,11 @@ try {
   const navigationBeforeContinue = await page.evaluate(() => window.factoryNavigation.length);
   await manual.getByRole('button', { name: 'Continue in thread', exact: true }).click();
   assert.equal(await manual.getByRole('button', { name: 'Continuing...', exact: true }).isDisabled(), true);
-  await manual.getByText('Git checkout is unavailable', { exact: true }).waitFor();
+  await manual.getByText('Build could not continue', { exact: true }).waitFor();
+  const continuationNotice = manual.locator('.tb-error-notice').filter({ hasText: 'Build could not continue' });
+  assert.equal(await continuationNotice.locator('details').getAttribute('open'), null);
+  await continuationNotice.getByText('Technical details', { exact: true }).click();
+  await continuationNotice.getByText('Git checkout is unavailable', { exact: true }).waitFor();
   assert.equal(await page.evaluate(() => window.factoryNavigation.length), navigationBeforeContinue);
   assert.equal(await page.evaluate(() => window.factoryStarts), startsBeforeContinue + 1);
   await page.evaluate(() => { window.factoryStartError = null; });
@@ -202,6 +233,36 @@ try {
     await manual.getByRole('button', { name: 'Open session', exact: true }).click();
     assert.equal(await page.evaluate(() => window.factoryStarts), startsBeforeOpen);
   }
+  await page.evaluate(() => {
+    const record = window.factoryFixture;
+    const error = 'Provider request failed: connection closed while reading ' + '/workspace/very-long-path/'.repeat(15);
+    record.runs = [{ ...record.runs.at(-1), status: 'failed', error, activity: error }];
+    record.automationError = error;
+    record.version++; window.factoryRefresh();
+  });
+  await manual.getByText('Build could not finish', { exact: true }).waitFor();
+  assert.equal(await manual.locator('.tb-error-notice').count(), 1);
+  assert.equal(await manual.locator('.tb-error-notice details').getAttribute('open'), null);
+  await page.locator('#preview-result').getByRole('status').getByText('Review · Blocked', { exact: true }).waitFor();
+  for (const dark of [false, true]) {
+    await page.evaluate(dark => {
+      document.documentElement.classList.toggle('dark', dark);
+      document.documentElement.style.cssText = dark
+        ? '--canvas:#202124;--ink:#ececf0;--background:#202124;--foreground:#ececf0;--muted-foreground:#a2a4ae;--border:#393b42;--timeline-accent:#7ba8fa;--success:#69c69b;--destructive:#f18694;--destructive-text:#f18694;--surface-recessed-soft-solid:#292a2f'
+        : '';
+    }, dark);
+    for (const width of [1280, 390]) {
+      await page.setViewportSize({ width, height: 900 });
+      await manual.locator('.tb-error-notice summary').click();
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+      await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, `taskboard-result-errors-${dark ? 'dark' : 'light'}-${width}.png`), fullPage: true });
+      await manual.locator('.tb-error-notice summary').click();
+    }
+  }
+  await page.evaluate(() => {
+    document.documentElement.classList.remove('dark');
+    document.documentElement.style.cssText = '';
+  });
   for (const start of [false, true]) {
     await page.goto(`https://taskboard-preview.test/?creation=${start}`);
     await page.getByLabel('Title', { exact: true }).fill('Fix screenshot layout');

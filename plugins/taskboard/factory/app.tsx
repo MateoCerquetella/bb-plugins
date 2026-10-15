@@ -1,21 +1,23 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { Markdown, experimental_Diff as Diff, useBbContext, useBbNavigate, useRealtime, useRpc } from '@get-bb/plugin-sdk/app';
 import type { TaskboardRpcContract, WorkItem } from '../contract.js';
 import type { FactoryRecord, FactoryRun, FactoryRunKind } from './contract.js';
-import { MAX_REVIEW_REPAIRS } from './review.js';
+import { MAX_REVIEW_REPAIRS, readableResultOutput } from './review.js';
 import { Button } from '../components/ui/button.js';
 import { Icon } from '../components/ui/icon.js';
 import { Textarea } from '../components/ui/textarea.js';
 import { Input } from '../components/ui/input.js';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '../components/ui/dialog.js';
 import { originalTicketPath, requestTaskboardOpen } from './navigation.js';
+import { ErrorNotice } from './error-notice.js';
+import { ResultCard } from './result-card.js';
 
 function tone(run: FactoryRun) {
+  if (run.status === 'running' || run.status === 'starting') return 'active';
   if (run.status === 'failed') return 'failed';
   if (run.status === 'uncertain' || run.status === 'canceled' ||
     run.buildResult?.verdict === 'blocked' || run.buildResult?.verdict === 'needs_input' ||
     (run.kind === 'review' && run.status === 'finished' && run.reviewResult?.verdict !== 'passed')) return 'attention';
-  if (run.status === 'running' || run.status === 'starting') return 'active';
   return run.reviewResult?.verdict === 'passed' ? 'success' : 'neutral';
 }
 
@@ -79,20 +81,13 @@ function ChangedFiles({ record, run }: { record: FactoryRecord; run: FactoryRun 
   </details>;
 }
 
-function RunDetail({ run, record, historical = false }: { run: FactoryRun; record: FactoryRecord; historical?: boolean }) {
+function ContinueBuild({ run, record }: { run: FactoryRun; record: FactoryRecord }) {
   const rpc = useRpc<TaskboardRpcContract>();
   const navigate = useBbNavigate();
   const context = useBbContext();
   const [continuing, setContinuing] = useState(false);
   const [continueError, setContinueError] = useState<string | null>(null);
   const continuePending = useRef(false);
-  const passed = run.checks.filter(check => check.exitCode === 0).length;
-  const failed = run.checks.filter(check => check.exitCode !== null && check.exitCode !== 0).length;
-  const unknown = run.checks.length - passed - failed;
-  const live = !historical && tone(run) === 'active' && !record.automationError;
-  const needsAttention = tone(run) === 'attention' || tone(run) === 'failed' || !!record.automationError;
-  const canContinueBlockedBuild = !historical && run.kind === 'build' && run.status === 'finished' &&
-    run.buildResult?.verdict === 'blocked' && !!run.threadId;
   async function continueBlockedBuild() {
     if (continuePending.current) return;
     continuePending.current = true;
@@ -123,22 +118,32 @@ function RunDetail({ run, record, historical = false }: { run: FactoryRun; recor
       setContinuing(false);
     }
   }
-  return <section className="tb-run" data-tone={tone(run)} data-live={live}>
-    {!historical && <div className="tb-run-heading">
+  return <div className="tb-current-recovery" aria-label="Current Build recovery">
+    <Button size="sm" variant="outline" disabled={continuing} aria-busy={continuing} onClick={() => void continueBlockedBuild()}>
+      <Icon name={continuing ? 'Loading' : 'MessageCirclePlus'} className="size-3.5" />
+      {continuing ? 'Continuing...' : 'Continue in thread'}
+    </Button>
+    {continueError && continueError !== run.error && continueError !== record.automationError &&
+      <ErrorNotice title="Build could not continue" nextStep="Inspect the technical details, then try Continue in thread again." detail={continueError} />}
+  </div>;
+}
+
+function RunDetail({ run, record, historical = false }: { run: FactoryRun; record: FactoryRecord; historical?: boolean }) {
+  const passed = run.checks.filter(check => check.exitCode === 0).length;
+  const failed = run.checks.filter(check => check.exitCode !== null && check.exitCode !== 0).length;
+  const unknown = run.checks.length - passed - failed;
+  const live = tone(run) === 'active';
+  return <section className="tb-run" data-tone={tone(run)} data-live={live} aria-label={`${labels[run.kind]} session details`}>
+    <div className="tb-run-heading">
       <Icon name={live ? 'Loading' : tone(run) === 'attention' || tone(run) === 'failed' ? 'AlertCircle' : 'Circle'} className="tb-live-mark size-4" />
       <strong>{labels[run.kind]}</strong><span className="tb-run-status">{runStatus(run)}</span>
-      {run.threadId && <span className="tb-session-action">{canContinueBlockedBuild ?
-        <Button size="sm" variant="outline" disabled={continuing} aria-busy={continuing} onClick={() => void continueBlockedBuild()}>
-          <Icon name={continuing ? 'Loading' : 'MessageCirclePlus'} className="size-3.5" />
-          {continuing ? 'Continuing...' : 'Continue in thread'}
-        </Button> :
-        <Button size="sm" variant={needsAttention ? 'outline' : 'ghost'} onClick={() => navigate.toThread(run.threadId!)}>
-          <Icon name="MessageCirclePlus" className="size-3.5" />Open session
-        </Button>}
-      </span>}
-    </div>}
-    {continueError && <p role="alert" className="text-xs text-destructive break-words">{continueError}</p>}
-    <div className="tb-run-now"><p key={run.activity} aria-live={live ? 'polite' : 'off'}>{run.error ?? run.activity}</p>
+    </div>
+    {run.error && <ErrorNotice title={`${labels[run.kind]} ${run.status === 'uncertain' ? 'needs recovery' : run.status === 'failed' ? 'could not finish' : 'progress is unavailable'}`}
+      nextStep={run.status === 'uncertain' ? 'Confirm the native session before linking it. Do not start duplicate work.'
+        : historical ? 'Inspect the technical details of this earlier run.'
+        : run.status === 'failed' ? 'Inspect the technical details, then retry this stage from the original ticket.'
+        : 'Progress refresh will retry automatically. Open the session to inspect its current state.'} detail={run.error} />}
+    <div className="tb-run-now">{!run.error && <p key={run.activity} aria-live={live ? 'polite' : 'off'}>{run.activity}</p>}
       <time dateTime={run.startedAt}>{new Date(run.startedAt).toLocaleString()}</time>
     </div>
     {run.steps.length > 0 && <div className="tb-run-steps">
@@ -173,33 +178,55 @@ function RunDetail({ run, record, historical = false }: { run: FactoryRun; recor
       </div>)}
     </details>}
     {run.changedFiles.length > 0 && <ChangedFiles record={record} run={run} />}
-    {run.output && <details className="tb-run-disclosure"><summary>Stage result</summary>
-      <div className="max-h-96 overflow-auto break-words"><Markdown content={run.output} /></div>
+    {!live && run.output && <details className="tb-run-disclosure"><summary>Stage result</summary>
+      {run.buildResult && <ResultCard result={{ kind: 'build', verdict: run.buildResult.verdict, ...(run.buildResult.revision ? { revision: run.buildResult.revision } : {}) }} />}
+      {run.reviewResult && <ResultCard result={{ kind: 'review', verdict: run.reviewResult.verdict }} />}
+      <div className="max-h-96 overflow-auto break-words"><Markdown content={readableResultOutput(run.output)} /></div>
     </details>}
-    {historical && run.threadId && <Button size="sm" variant="ghost" onClick={() => navigate.toThread(run.threadId!)}>
-      <Icon name="MessageCirclePlus" className="size-3.5" />Open session
-    </Button>}
   </section>;
 }
 
 function RunInsights({ record }: { record: FactoryRecord }) {
   const run = record.runs.at(-1);
+  const navigate = useBbNavigate();
+  const selectorId = useId();
+  const identity = JSON.stringify([record.projectId, record.source, record.locator]);
+  const [selection, setSelection] = useState<{ identity: string; runId: string } | null>(null);
+  const selected = selection?.identity === identity
+    ? record.runs.find(candidate => candidate.id === selection.runId) ?? run : run;
+  useEffect(() => {
+    if (selection && (selection.identity !== identity ||
+      !record.runs.some(candidate => candidate.id === selection.runId))) setSelection(null);
+  }, [identity, record.runs, selection]);
   if (!run) return null;
+  const canContinueBlockedBuild = run.kind === 'build' && run.status === 'finished' &&
+    run.buildResult?.verdict === 'blocked' && !!run.threadId &&
+    !record.runs.some(candidate => ['starting', 'running', 'uncertain'].includes(candidate.status));
   return <div className="tb-progress-ui">
     <ol className="tb-phase-track" aria-label="Work phases">{(Object.keys(labels) as FactoryRunKind[]).map(kind => {
       const previous = record.runs.some(candidate => candidate.kind === kind);
       return <li key={kind} data-current={run.kind === kind} data-observed={!!previous}
         aria-current={run.kind === kind ? 'step' : undefined}>{labels[kind]}</li>;
     })}</ol>
-    <RunDetail key={run.id} run={run} record={record} />
-    {record.runs.length > 1 && <details className="tb-run-disclosure"><summary>Earlier runs <span className="tb-run-caption">{record.runs.length - 1}</span></summary>
-      {[...record.runs].slice(0, -1).reverse().map(previous => <details key={previous.id} className="tb-run-disclosure tb-run-history" data-tone={tone(previous)}>
-        <summary>{labels[previous.kind]} <span className="tb-run-status">{runStatus(previous)}</span>
-          <time className="tb-run-caption">{new Date(previous.startedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</time>
-        </summary>
-        <RunDetail run={previous} record={record} historical />
-      </details>)}
-    </details>}
+    {selected && <div className="tb-session-picker">
+      <label htmlFor={selectorId}>Session<span className="sr-only"> for {record.locator}</span></label>
+      <select id={selectorId} value={selected.id}
+        onChange={event => setSelection({ identity, runId: event.target.value })}>
+        {record.runs.map(candidate => {
+          const attempt = record.runs.slice(0, record.runs.indexOf(candidate) + 1)
+            .filter(prior => prior.kind === candidate.kind).length;
+          return <option key={candidate.id} value={candidate.id}>
+            {labels[candidate.kind]} {attempt} · {runStatus(candidate)}
+          </option>;
+        })}
+      </select>
+      <Button size="sm" variant={tone(selected) === 'attention' || tone(selected) === 'failed' ? 'outline' : 'ghost'}
+        disabled={!selected.threadId} onClick={() => { if (selected.threadId) navigate.toThread(selected.threadId); }}>
+        <Icon name="MessageCirclePlus" className="size-3.5" />Open session
+      </Button>
+    </div>}
+    {selected && <RunDetail key={selected.id} run={selected} record={record} historical={selected.id !== run.id} />}
+    {canContinueBlockedBuild && <ContinueBuild key={run.id} run={run} record={record} />}
   </div>;
 }
 
@@ -236,8 +263,8 @@ export function FactoryThreadProgress({ threadId, isCompactViewport }: { threadI
     <Dialog open={open} onOpenChange={setOpen}><DialogContent className="tb-progress-ui max-h-[80vh] overflow-y-auto">
       <DialogTitle>Task progress</DialogTitle>
       <DialogDescription>{record.stage} · Updated {new Date(record.updatedAt).toLocaleTimeString()}</DialogDescription>
-      {error && <p role="alert">{error}</p>}
-      {record.automationError && <p role="alert">{record.automationError}</p>}
+      {error && <ErrorNotice title="Progress could not refresh" nextStep="The last known progress is shown. Refresh will be retried automatically." detail={error} />}
+      {record.automationError && record.automationError !== run.error && <ErrorNotice title="Automatic work paused" nextStep="Inspect the latest run and open the original ticket for available recovery actions." detail={record.automationError} />}
       <RunInsights record={record} />
       <OriginalTicket record={record} />
     </DialogContent></Dialog>
@@ -290,7 +317,7 @@ export function StartTaskButton({ item, disabled = false }: {
       onClick={event => { event.stopPropagation(); void start(); }}>
       <Icon name="AiContentGenerator01" className="size-3.5" />{busy ? 'Starting...' : 'Start task'}
     </Button>
-    {error && <p role="alert" className="mt-2 text-xs text-destructive break-words">{error}</p>}
+    {error && <ErrorNotice title="Task needs attention" nextStep="Inspect Agent progress before starting again; a session may already exist." detail={error} />}
   </div>;
 }
 export function FactoryProgress({ item }: { item: WorkItem }) {
@@ -356,10 +383,12 @@ export function FactoryProgress({ item }: { item: WorkItem }) {
       <h2>Agent</h2>
       <span role="status" className="status">{run ? runStatus(run) : 'Not started'}</span>
     </div>
-    {error && <p role="alert" className="text-xs text-destructive break-words">{error}</p>}
-    {record?.automationError && <p role="alert" className="mb-2 text-xs text-destructive break-words">{record.automationError}</p>}
+    {error && error !== run?.error && error !== record?.automationError && <ErrorNotice title="Task action failed" nextStep="Inspect the current progress before trying the action again." detail={error} />}
+    {record?.automationError && record.automationError !== run?.error && <ErrorNotice title="Automatic work paused" nextStep="Inspect the latest run and use its available recovery action." detail={record.automationError} />}
     {record?.trackerProgress.message && <div className="mb-3 text-xs">
-      <p role={record.trackerProgress.status === 'failed' ? 'alert' : 'status'} className="break-words">{record.trackerProgress.message}</p>
+      {record.trackerProgress.status === 'failed'
+        ? <ErrorNotice title="Tracker status could not update" nextStep="Retry the status update. This does not restart the agent session." detail={record.trackerProgress.message} />
+        : <p role="status" className="break-words">{record.trackerProgress.message}</p>}
       {record.trackerProgress.status === 'failed' && <Button variant="outline" size="sm" disabled={busy} onClick={() => void action(() =>
         rpc.call('factoryRetryStatus', identity)
       )}>Retry status update</Button>}

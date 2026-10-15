@@ -2,6 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { FactoryProgress, FactoryThreadProgress } from '../factory/app.js';
 import { TooltipProvider } from '../components/ui/tooltip.js';
+import { TaskboardResultDirective } from '../factory/result-card.js';
 // The browser build exports these local components through its onLoad hook.
 // @ts-expect-error Only the preview build adds component exports.
 import { KanbanCard, TrackerDetail, CreateIssueDialog } from '../app.js';
@@ -26,6 +27,14 @@ function Preview() {
     <CreateIssueDialog mode="direct" projectId="proj_test" open={creating} onOpenChange={setCreating} />
   </TooltipProvider>;
   return <TooltipProvider><div className="tb-linear">
+    <div id="preview-result" style={{ padding: 20 }}>
+      <TaskboardResultDirective attributes={{ kind: 'review', verdict: 'blocked' }}
+        source={'::taskboard-result{kind="review" verdict="blocked"}'}
+        message={{ id: 'message-review', threadId: 'thr_test', turnId: 'turn', projectId: 'proj_test' }}
+        openWorkspaceFile={null} />
+      <h3>Blockers</h3>
+      <ul><li>Acquisition-cost permissions leak.</li><li>Historical allocation backfill is missing.</li></ul>
+    </div>
     <FactoryThreadProgress threadId="thr_test" isCompactViewport={false} />
     <div id="preview-detail">{detail}</div>
     <div id="preview-card" style={{ width: 264, padding: 8 }}>

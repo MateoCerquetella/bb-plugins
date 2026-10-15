@@ -60,7 +60,8 @@ export function startRun(record: FactoryRecord, kind: FactoryRunKind, retry: boo
   if (!retry && last && ['failed', 'canceled'].includes(last.status)) {
     throw new Error('Use the explicit retry action for this stage.');
   }
-  if (kind === 'plan' && !record.runs.some(run => run.kind === 'investigate' && run.status === 'finished')) {
+  if (kind === 'plan' && !record.runs.some(run => run.kind === 'investigate' &&
+    run.status === 'finished' && run.scopeDigest === record.scopeDigest && !run.error && run.output.trim())) {
     throw new Error('Inspect completed investigation findings before generating a plan.');
   }
   if (kind === 'build' || kind === 'review') {
