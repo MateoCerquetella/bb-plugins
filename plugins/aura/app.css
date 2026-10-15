@@ -75,10 +75,8 @@
 .aura-save-slot { background:var(--muted); color:var(--foreground); border:1px solid var(--aura-border); border-radius:7px; min-height:36px; padding:7px 12px; font-size:12px !important; }
 @container (max-width:380px) { .aura-slots { grid-template-columns:repeat(2,minmax(0,1fr)); } .aura-save-slot { width:100%; } }
 
-/* Approved compact overview direction; every selector stays inside AURA. */
 .aura-overview-setting { margin: 0 0 24px; }
 .aura-activity-slot[hidden] { display: none; }
-[data-testid="plugin-homepage-sections"] > section:has(.aura-activity-slot) > h2 { display: none; }
 [data-testid="plugin-homepage-sections"] > section:has(.aura-activity-slot[hidden]) { display: none; }
 [data-testid="plugin-homepage-sections"]:not(:has(> section:not(:has(.aura-activity-slot[hidden])))) { display: none; }
 .aura-activity { --activity-active: #438966; color: var(--foreground); font: inherit; font-size: 13px; width: 100%; max-width: 760px; margin: auto; border-top: 1px solid var(--border); padding-top: 18px; min-width: 0; }
