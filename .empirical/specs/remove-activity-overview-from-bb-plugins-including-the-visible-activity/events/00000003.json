@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "sequence": 3,
+  "previousDigest": "sha256:99ccaaa8279abb4e9e57741a48c16f9160f0fc6340e15a3c0d599616a2c6234b",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Designed complete Activity Overview retirement with no replacement CSS: delete its package and current catalog/workspace references, remove the live installation, and verify BB core's centered thread layout. Recorded the rejected registration-only and core-layout alternatives and the scoped dirty-worktree risk.",
+  "createdAt": "2026-10-15T02:52:13.860Z",
+  "stateBeforeDigest": "sha256:3947b4fa18f086e6f3fc57152684efdff13ce6db5f0dbe2f75bc903eb84702f4",
+  "stateAfterDigest": "sha256:a3911b3eaa025e0b6bed37d6ac6a54413699b037df5400aa85d953da3cfb1afa",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 3,
+    "activeFeature": "remove-activity-overview-from-bb-plugins-including-the-visible-activity",
+    "request": "Remove Activity Overview from bb-plugins, including the visible ACTIVITY / Overview contribution dashboard shown on the BB home surface, and center the thread in the resulting layout. Verify the human UI and repository checks, then create a pull request.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "plan",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Designed complete Activity Overview retirement with no replacement CSS: delete its package and current catalog/workspace references, remove the live installation, and verify BB core's centered thread layout. Recorded the rejected registration-only and core-layout alternatives and the scoped dirty-worktree risk.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:ed1d09349c48e3061be70bac71524a00d302ba9caed82e39460842d8ae36dde6",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:c7a1067d312563af9a877ae3b32eb51be87d284d94e855476329b74e76abedd0",
+    "impactDigest": "sha256:3c1cff6a9a3c548605b2bc8e5d988efc3f3b3e393f4c34e1ad8aece3b6787cbb",
+    "capabilityClaimId": "remove-activity-overview-from-bb-plugins-including-the-visible-activity-e276554a0ca5",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-15T02:52:13.860Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "remove-activity-overview-from-bb-plugins-including-the-visible-activity-e276554a0ca5",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "remove-activity-overview-from-bb-plugins-including-the-visible-activity",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_bmvu2vdbxt-1/bb-plugins",
+      "worktreeId": "sha256:2f81c6df5cf38b1afc1b7a9fd65674be15918067f11be5b376bc65f8a35587e1",
+      "baseCommit": "0a0b622342c0e2ad3f8fee0c80ee759a2bfa6956",
+      "baseTree": "36c68e193ad32950c50f1d761d33a702bf237835",
+      "bases": {
+        "activity-overview": {
+          "capability": "activity-overview",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "activity overview is absent": null
+          }
+        }
+      },
+      "capabilities": [
+        "activity-overview"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-15T02:44:14.420Z",
+      "heartbeatAt": "2026-10-15T02:44:14.420Z",
+      "digest": "sha256:ac22ceebbd27104182f870bd4cb9abbb9d45eefa65a4acae2675bee44c782d68"
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:f30cc09055795bcbad1727ae23f03b02ef3ad22940b6495c8d729ff44e1ad5d5"
+}
