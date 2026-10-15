@@ -65,3 +65,33 @@ bound. Exact plans stay intact while agent evidence uses bounded excerpts.
 Service tests cover fresh spawns, worktree reuse, safety stops, pagination,
 live thread status, and concurrency. Browser tests cover selected navigation,
 latest-run recovery, keyboard labels, and narrow layout.
+
+## D-003: Keep mention branding in the plugin asset
+
+Status: Accepted
+
+### Evidence
+
+The user's rendered New Thread screenshot shows the created `SDD-174` mention
+using the ticket artwork after Taskboard was reinstalled from this checkout.
+The host owns the mention renderer and reads Taskboard's branding asset.
+
+### Options
+
+Duplicate the branding SVG inside the create action, change the panel launcher,
+or keep the icon in the plugin branding asset.
+
+### Chosen approach
+
+Keep the mention icon in `assets/icon.svg`. Preserve the existing ticket glyph
+on the create action and restore Target on the New Thread panel launcher.
+
+### Trade-offs and risks
+
+This keeps one canonical branding asset and avoids changing adjacent controls.
+The host-rendered mention must be checked after reinstalling the plugin.
+
+### Verification
+
+Build and reload Taskboard, then inspect a work-item mention created from the
+New Thread prompt. Confirm the separate panel registration still uses Target.

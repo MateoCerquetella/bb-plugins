@@ -63,4 +63,11 @@ results, actionable failures, and original-ticket navigation.
 - AND explicit selection survives updates for the same task
 - AND recovery actions continue to reflect the current task state
 
+#### Scenario: Create a Taskboard work-item mention from a prompt
+- GIVEN the New Thread composer contains a prompt
+- WHEN Taskboard creates a work item and inserts its mention
+- THEN the mention uses Taskboard's current branding artwork
+- AND the create-from-prompt button keeps its existing ticket glyph
+- AND the New Thread panel launcher keeps its Target icon
+
 

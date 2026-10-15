@@ -43,3 +43,14 @@ Factory tests cover state transitions; browser checks cover layout and controls.
   The coordinator owns Empirical state and final verification.
 - Smallest safe decomposition: preserve the existing schema, RPCs, lock, and
   recovery contract. Extend the current run ledger rather than add a scheduler.
+
+## Iteration 6 correction
+
+1. Remove the duplicated inline branding SVG from the create-from-prompt action
+   and restore its existing `Ticket` icon component.
+2. Keep the New Thread panel registration on `Target`.
+3. Build and reload Taskboard.
+4. Use the supplied rendered screenshot as evidence that the created mention
+   uses Taskboard's current branding artwork.
+5. Commit only the Taskboard correction and its Empirical records, merge it to
+   `main`, and push.

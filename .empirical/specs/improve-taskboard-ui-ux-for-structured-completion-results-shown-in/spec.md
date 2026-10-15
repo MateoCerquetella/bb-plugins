@@ -19,6 +19,13 @@ manual Continue. Never invent decisions or retry uncertain dispatches. Reconcile
 resumed native activity before showing Paused or Turn finished. Replace repeated
 Open session buttons with one stage/session selector and one Open session action.
 
+## Iteration 6 adjustment
+
+Use Taskboard's current branding artwork on the work-item mention created from
+the New Thread prompt. Keep the create-from-prompt button on the existing
+library ticket glyph and keep the unrelated New Thread panel launcher on its
+original Target icon.
+
 ## Acceptance Criteria
 
 - [ ] [AC-1] A new Build or Review completion displays a native Taskboard
@@ -53,6 +60,9 @@ Open session buttons with one stage/session selector and one Open session action
   replace repeated navigation buttons. It defaults to the newest run, preserves
   an explicit selection while the ticket stays open, and falls back when that
   selection disappears. State-owned recovery controls remain available.
+- [ ] [AC-UI-3] [UI] A work-item mention created from the New Thread prompt uses
+  Taskboard's current branding artwork. The create-from-prompt button retains
+  its existing ticket glyph, and the New Thread panel launcher retains Target.
 
 ## Scope
 
@@ -72,6 +82,7 @@ Open session buttons with one stage/session selector and one Open session action
 - Adding a new server mutation or result-submission tool
 - Replacing the persisted run model or adding a second workflow scheduler
 - Creating replacement worktrees during recovery or treating Review as acceptance
+- Redesigning the create-from-prompt button or the New Thread panel launcher
 
 ## Risks and bounds
 
@@ -97,6 +108,7 @@ Open session buttons with one stage/session selector and one Open session action
   recovery, uncertainty, concurrent reconciliation, and event pagination
 - Browser checks for session selection, navigation, live state, and recovery
   controls at desktop and 390px
+- A screenshot of a created work-item mention in the New Thread composer
 
 ## Capability Deltas
 
