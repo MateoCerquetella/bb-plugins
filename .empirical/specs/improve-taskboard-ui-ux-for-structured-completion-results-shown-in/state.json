@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 29,
+  "revision": 36,
   "activeFeature": "improve-taskboard-ui-ux-for-structured-completion-results-shown-in",
   "request": "Improve Taskboard UI/UX for structured completion results shown in BB threads and for errors displayed inside Taskboard tasks. Replace raw JSON-like result blocks such as {\"verdict\":\"blocked\",\"findings\":\"...\"} with a compact, scannable status presentation that preserves full detail, and improve task error states so they communicate what failed, what the user can do, and optional technical details. Keep the work scoped to plugins/taskboard, follow existing design patterns, preserve accessibility and responsive behavior, and verify the real UI in a browser with screenshots plus focused tests.",
   "profile": "complex",
@@ -9,13 +9,13 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 1,
-  "message": "Changed the Taskboard New Thread panel icon from the generic Target glyph to the Ticket glyph and added a focused registration assertion.",
-  "implementationActor": "codex",
+  "message": "Planned the minimal correction: remove the duplicated inline SVG, keep the existing Ticket component on the create action, keep Target on the panel launcher, rebuild and reload, use the supplied screenshot as rendered mention evidence, then commit, merge, and push only the correction and its workflow records.",
+  "implementationActor": "agent",
   "workStartedAt": null,
-  "specDigest": "sha256:06cf67b85bfed06d92be505da11f437bbfea740b10a253e8c4978f630a7302e5",
-  "approvedSpecRevision": 18,
+  "specDigest": "sha256:c9909cceb91d41079586b2e12d82353f34449465f3a5cbe6c05173b65ab17006",
+  "approvedSpecRevision": 33,
   "capabilityArchiveRequired": true,
-  "capabilityDeltaDigest": "sha256:59cb39bcd8421f01f94b73e62c97d727c92df5117c07183b5f75de0c72de4442",
+  "capabilityDeltaDigest": "sha256:7653dbe565ee46ca480214ad3622f390789b5c9c7e286087967afe5d904fdd87",
   "impactDigest": "sha256:8a5a3162471454f81f2d6be3f22df0d0372d63e1e2097fdc8d8ad3b2ac0694dd",
   "capabilityClaimId": "improve-taskboard-ui-ux-for-structured-completion-results-shown-in-fadaf8a18d53",
   "authorizationDigest": null,
@@ -23,35 +23,36 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": true,
+    "implemented": false,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "implemented",
+    "highest": "none",
     "reasons": {
+      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-15T16:13:55.359Z",
+  "updatedAt": "2026-10-15T16:49:07.610Z",
   "lifecycle": {
-    "stage": "iteration",
-    "iteration": 4,
-    "awaitingFeedback": true,
+    "stage": "development",
+    "iteration": 6,
+    "awaitingFeedback": false,
     "iterative": true,
-    "contractRevision": 16,
-    "contractBaseline": 21
+    "contractRevision": 31,
+    "riskRequest": "Correct the implementation and the prior inaccurate report using the user's screenshot as direct evidence. The desired new ticket icon is already visibly rendered on the SDD-174 mention created from the prompt via the plugin branding asset. Remove the unnecessary custom inline SVG change to the composer action button. Keep the unrelated New Thread panel launcher restored to its original Target icon. Rebuild, reload, commit, merge, and push this correction."
   },
   "sizeDecision": {
     "choice": "keep",
-    "criteria": 11,
+    "criteria": 12,
     "capabilities": 1,
-    "reason": "The 11 criteria are one coupled Factory workflow change: result parsing and task presentation are already implemented in the dirty worktree, while fresh stage sessions, automatic recovery, live reconciliation, and the session selector share the same persisted run model and must be verified together to avoid unsafe partial automation.",
-    "actor": "codex",
-    "revision": 7
+    "reason": "The new icon criterion is a corrective adjustment to the already implemented Taskboard feature and consists only of restoring ownership boundaries; splitting now would create a separate delivery unit for a two-line correction.",
+    "actor": "agent",
+    "revision": 33
   },
   "capabilityBase": {
     "schemaVersion": 1,
@@ -80,7 +81,7 @@
     "heartbeatAt": "2026-10-15T13:31:05.069Z",
     "digest": "sha256:5bc1c410cca99129dd946507f17f54c494b0759b834c6310039d83f84565a390"
   },
-  "trackerGeneration": 4,
+  "trackerGeneration": 6,
   "budgetExtensionMinutes": 30,
   "reviewFirst": true
 }

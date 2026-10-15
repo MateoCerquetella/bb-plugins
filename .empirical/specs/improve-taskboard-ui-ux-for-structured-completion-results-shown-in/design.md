@@ -74,3 +74,13 @@ Exercise distinct stage IDs, bounded handoff content, original worktree reuse,
 automatic initial Review, two Build continuations, unsafe stop states, event
 pagination, live resumed activity, and concurrent dispatch. Browser checks
 exercise historical navigation without moving current recovery ownership.
+
+## New Thread mention branding
+
+The host renders plugin mentions with the icon from Taskboard's branding asset.
+Keep `assets/icon.svg` as the canonical mention artwork. Do not duplicate that
+artwork inside the create-from-prompt button. Restore the separate New Thread
+panel registration to its established Target icon.
+
+Verify the ownership boundary in source and use the supplied screenshot as
+direct rendered evidence for the created mention.

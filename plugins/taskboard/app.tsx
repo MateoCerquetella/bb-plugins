@@ -1595,7 +1595,7 @@ function ComposerCreateIssueAction() {
                   }
                 }}
               >
-                <Icon name="Ticket" className="size-4" aria-hidden="true" />
+                <Icon name="Target" className="size-4" aria-hidden="true" />
               </Button>
             </span>
           </TooltipTrigger>
@@ -7800,7 +7800,7 @@ export default definePluginApp(app => {
   app.slots.experimental_newThreadPanelAction({
     id: 'taskboard-new-thread-panel',
     title: 'Taskboard',
-    icon: 'Ticket',
+    icon: 'Target',
     component: TaskboardNewThreadPanel,
     layout: 'flush'
   });
