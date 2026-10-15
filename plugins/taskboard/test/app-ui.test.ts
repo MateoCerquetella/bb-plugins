@@ -5,14 +5,14 @@ import { test } from 'node:test';
 const app = await readFile(new URL('../app.tsx', import.meta.url), 'utf8');
 
 test('registers Taskboard for existing-thread and New Thread right panels', () => {
-  assert.match(app, /app\.slots\.threadPanelAction\(\{[\s\S]*?id: THREAD_PANEL_ACTION_ID[\s\S]*?icon: 'Ticket'[\s\S]*?component: TaskboardThreadPanel[\s\S]*?layout: 'flush'/u);
-  assert.match(app, /app\.slots\.experimental_newThreadPanelAction\(\{[\s\S]*?id: 'taskboard-new-thread-panel'[\s\S]*?icon: 'Ticket'[\s\S]*?component: TaskboardNewThreadPanel[\s\S]*?layout: 'flush'/u);
+  assert.match(app, /app\.slots\.threadPanelAction\(\{[\s\S]*?id: THREAD_PANEL_ACTION_ID[\s\S]*?icon: 'Target'[\s\S]*?component: TaskboardThreadPanel[\s\S]*?layout: 'flush'/u);
+  assert.match(app, /app\.slots\.experimental_newThreadPanelAction\(\{[\s\S]*?id: 'taskboard-new-thread-panel'[\s\S]*?icon: 'Target'[\s\S]*?component: TaskboardNewThreadPanel[\s\S]*?layout: 'flush'/u);
   assert.match(app, /function TaskboardNewThreadPanel\(\{ projectId \}[\s\S]*?<TaskboardRightPanel projectId=\{projectId\}/u);
   assert.match(app, /surfaceMode="constrained"/u);
 });
 
-test('uses the current ticket artwork for Taskboard navigation identity', () => {
-  assert.match(app, /app\.slots\.navPanel\(\{[\s\S]*?id: 'taskboard'[\s\S]*?icon: 'Ticket'[\s\S]*?path: PANEL_PATH/u);
+test('uses the dartboard artwork for Taskboard navigation identity', () => {
+  assert.match(app, /app\.slots\.navPanel\(\{[\s\S]*?id: 'taskboard'[\s\S]*?icon: 'Target'[\s\S]*?path: PANEL_PATH/u);
 });
 
 test('accepts bounded Taskboard drops only on the visible composer textbox', () => {
