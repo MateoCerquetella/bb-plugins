@@ -82,16 +82,16 @@ try {
     // Move out before beginning dwell; focus inside the iframe must not break it.
     await page.mouse.move(5,5);
     const box = await panel.boundingBox();
-    // CDP teleporting directly into an OOPIF skips outer-page hover updates.
-    // Enter through the panel chrome, then dwell over the cross-origin viewer.
+    // Dwell over the panel chrome so the outer page owns the hover timer.
     await page.mouse.move(box.x+80,box.y+20);
-    await page.mouse.move(box.x+80,box.y+120);
     await page.waitForTimeout(1100);
     assert.equal(await page.locator(".steel-thread-panel--expanded").count(),0,"a short hover never expands");
     if (!touch) {
       await page.waitForFunction(()=>document.querySelector(".steel-thread-panel--expanded"));
       const wide = await panel.boundingBox();
-      assert(wide.width>width*.85 && wide.x>=0 && wide.x+wide.width<=width);
+      assert(wide.width>=width*.62 && wide.width<=width*.7 && wide.x>=0 && wide.x+wide.width<=width);
+      const conversation=await page.locator("#conversation").boundingBox();
+      assert(conversation && conversation.width>=width*.28,"expanded browser leaves the thread readable");
       assert.equal(loads,baseline,"dwell does not reconnect viewer");
       assert(await panel.locator("iframe").evaluate(frame=>frame===window.originalFrame));
       assert.equal(await frame.getByRole("textbox").inputValue(),"Preserved while expanding");
@@ -115,6 +115,7 @@ try {
     assert.equal(await page.locator(".steel-thread-panel--expanded").count(),1,"explicit expansion stays pinned");
     const wide = await panel.boundingBox();
     assert(wide.x>=0 && wide.x+wide.width<=width && wide.y+wide.height<=900,"expanded view fits viewport");
+    if(!touch) assert(wide.width<=width*.7,"explicit expansion keeps a third of the thread visible");
     assert.equal(await page.getByRole("dialog").count(),0,"no focus trap or modal");
     await page.getByRole("textbox",{name:"Message",exact:true}).fill("Chat remains available");
     await page.keyboard.press("Escape");

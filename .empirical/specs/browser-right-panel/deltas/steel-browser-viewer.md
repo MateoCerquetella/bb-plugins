@@ -22,7 +22,7 @@ Cerq Browser SHALL expose Open in your browser on its right-panel, plugin-page a
 
 ### Requirement: Expand the live right panel without a modal
 
-The browser SHALL offer the host right thread panel through its Monitor icon and an Open browser panel button in each handoff. A fine pointer dwelling for 2000ms SHALL expand the visible panel toward the viewport width without a backdrop or focus trap. Pointer leave SHALL restore a hover expansion. Explicit Expand/Shrink and Escape SHALL be available, and the same iframe SHALL survive resizing. Mobile SHALL use explicit controls without automatic hover expansion. Timer cleanup SHALL prevent expansion after leave, blur, unmount or thread change.
+The browser SHALL offer the host right thread panel through its Monitor icon and an Open browser panel button in each handoff. A fine pointer dwelling for 2000ms SHALL expand the visible panel to about two-thirds of the viewport without a backdrop or focus trap, leaving at least 28% for the active thread. Pointer leave SHALL restore a hover expansion. Explicit Expand/Shrink and Escape SHALL be available, and the same iframe SHALL survive resizing. Mobile SHALL use explicit controls without automatic hover expansion. Timer cleanup SHALL prevent expansion after leave, blur, unmount or thread change.
 
 #### Scenario: Watch an agent and return to chat
 
