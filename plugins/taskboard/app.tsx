@@ -7793,14 +7793,14 @@ export default definePluginApp(app => {
   app.slots.threadPanelAction({
     id: THREAD_PANEL_ACTION_ID,
     title: 'Taskboard',
-    icon: 'Target',
+    icon: 'Ticket',
     component: TaskboardThreadPanel,
     layout: 'flush'
   });
   app.slots.experimental_newThreadPanelAction({
     id: 'taskboard-new-thread-panel',
     title: 'Taskboard',
-    icon: 'Target',
+    icon: 'Ticket',
     component: TaskboardNewThreadPanel,
     layout: 'flush'
   });
@@ -7812,7 +7812,7 @@ export default definePluginApp(app => {
   app.slots.navPanel({
     id: 'taskboard',
     title: 'Taskboard',
-    icon: 'Target',
+    icon: 'Ticket',
     path: PANEL_PATH,
     component: TaskboardPanel,
     headerContent: ManageHeaderAction
