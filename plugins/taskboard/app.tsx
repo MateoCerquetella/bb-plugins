@@ -1595,7 +1595,11 @@ function ComposerCreateIssueAction() {
                   }
                 }}
               >
-                <Icon name="Ticket" className="size-4" aria-hidden="true" />
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
+                  className="size-4" aria-hidden="true">
+                  <path d="M5 4h14a2 2 0 0 1 2 2v3a3 3 0 0 0 0 6v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3a3 3 0 0 0 0-6V6a2 2 0 0 1 2-2Z" />
+                </svg>
               </Button>
             </span>
           </TooltipTrigger>
