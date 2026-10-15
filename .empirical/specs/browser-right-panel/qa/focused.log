@@ -1,0 +1,360 @@
+
+> bb-plugin-steel-browser@0.1.0 check
+> npm run types:check && npm run typecheck && npm test && npm run build
+
+
+> bb-plugin-steel-browser@0.1.0 types:check
+> env -u BB_CLI bb plugin types --check .
+
+This plugin uses the npm package @get-bb/plugin-sdk; pin is 0.4.21, host is 0.4.21.
+The declarations are in node_modules/@get-bb/plugin-sdk/bundled-types/ — read them for exact signatures.
+
+> bb-plugin-steel-browser@0.1.0 typecheck
+> tsc --noEmit
+
+
+> bb-plugin-steel-browser@0.1.0 test
+> node --test --experimental-transform-types test/*.test.ts
+
+TAP version 13
+# (node:3887107) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: browser commands accept bounded actions and reject ambiguous input
+ok 1 - browser commands accept bounded actions and reject ambiguous input
+  ---
+  duration_ms: 2.348241
+  type: 'test'
+  ...
+# Subtest: newest open tab is the default and earlier tabs remain addressable
+ok 2 - newest open tab is the default and earlier tabs remain addressable
+  ---
+  duration_ms: 0.439171
+  type: 'test'
+  ...
+# Subtest: remote actions select exactly one accessible target and return the current page
+ok 3 - remote actions select exactly one accessible target and return the current page
+  ---
+  duration_ms: 0.698805
+  type: 'test'
+  ...
+# Subtest: ambiguous targets fail without clicking
+ok 4 - ambiguous targets fail without clicking
+  ---
+  duration_ms: 1.745994
+  type: 'test'
+  ...
+# (node:3887108) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: declares an independent BB app, server, CLI skill, and pinned SDK
+ok 5 - declares an independent BB app, server, CLI skill, and pinned SDK
+  ---
+  duration_ms: 5.280507
+  type: 'test'
+  ...
+# Subtest: contributes Steel discovery instructions to new agent sessions
+ok 6 - contributes Steel discovery instructions to new agent sessions
+  ---
+  duration_ms: 3.764073
+  type: 'test'
+  ...
+# Subtest: ships the required operational and responsive UI states
+ok 7 - ships the required operational and responsive UI states
+  ---
+  duration_ms: 4.42651
+  type: 'test'
+  ...
+# (node:3887110) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: viewer URL pins the authenticated origin and enables the native bridge
+ok 8 - viewer URL pins the authenticated origin and enables the native bridge
+  ---
+  duration_ms: 0.975859
+  type: 'test'
+  ...
+# Subtest: clipboard bridge requires exact source and origin; login paste rejects control keys
+ok 9 - clipboard bridge requires exact source and origin; login paste rejects control keys
+  ---
+  duration_ms: 0.344879
+  type: 'test'
+  ...
+# Subtest: sign-in labels are scoped, validated and explicitly forgettable without profile access
+ok 10 - sign-in labels are scoped, validated and explicitly forgettable without profile access
+  ---
+  duration_ms: 4.325205
+  type: 'test'
+  ...
+# Subtest: service login navigates only to the service catalog and never runs a model
+ok 11 - service login navigates only to the service catalog and never runs a model
+  ---
+  duration_ms: 0.610273
+  type: 'test'
+  ...
+# Subtest: dashboard coalesces concurrent reads, expires and invalidates after mutation
+ok 12 - dashboard coalesces concurrent reads, expires and invalidates after mutation
+  ---
+  duration_ms: 0.675542
+  type: 'test'
+  ...
+# (node:3887115) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: page targets remain bound to the current project endpoint, excluding browser UI targets
+ok 13 - page targets remain bound to the current project endpoint, excluding browser UI targets
+  ---
+  duration_ms: 0.933682
+  type: 'test'
+  ...
+# Subtest: navigation rejects credential-bearing and non-web destinations before opening a connection
+ok 14 - navigation rejects credential-bearing and non-web destinations before opening a connection
+  ---
+  duration_ms: 2.20992
+  type: 'test'
+  ...
+# (node:3887126) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: project bindings are isolated, immutable and fail closed
+ok 15 - project bindings are isolated, immutable and fail closed
+  ---
+  duration_ms: 4.120282
+  type: 'test'
+  ...
+# Subtest: engine preferences do not leak between projects
+ok 16 - engine preferences do not leak between projects
+  ---
+  duration_ms: 1.115584
+  type: 'test'
+  ...
+# Subtest: automatic setup serializes projects, coalesces duplicates, and revalidates bindings
+ok 17 - automatic setup serializes projects, coalesces duplicates, and revalidates bindings
+  ---
+  duration_ms: 16.171824
+  type: 'test'
+  ...
+# Subtest: failed provisioning persists nothing and a later request can retry
+ok 18 - failed provisioning persists nothing and a later request can retry
+  ---
+  duration_ms: 0.858264
+  type: 'test'
+  ...
+# Subtest: healthy stored bindings coalesce probes and bypass provisioning
+ok 19 - healthy stored bindings coalesce probes and bypass provisioning
+  ---
+  duration_ms: 0.477971
+  type: 'test'
+  ...
+# Subtest: recent healthy bindings avoid repeated probes but expire for recovery
+ok 20 - recent healthy bindings avoid repeated probes but expire for recovery
+  ---
+  duration_ms: 0.772919
+  type: 'test'
+  ...
+# Subtest: failed readiness repairs only the stored project and preserves its binding
+ok 21 - failed readiness repairs only the stored project and preserves its binding
+  ---
+  duration_ms: 0.557316
+  type: 'test'
+  ...
+# Subtest: viewer readiness errors are not cached and never enter container provisioning
+ok 22 - viewer readiness errors are not cached and never enter container provisioning
+  ---
+  duration_ms: 0.622054
+  type: 'test'
+  ...
+# Subtest: healthy projects do not wait for another project's slow setup
+ok 23 - healthy projects do not wait for another project's slow setup
+  ---
+  duration_ms: 0.849949
+  type: 'test'
+  ...
+# Subtest: existing bindings are passed into recovery and retained after a failed check
+ok 24 - existing bindings are passed into recovery and retained after a failed check
+  ---
+  duration_ms: 1.158192
+  type: 'test'
+  ...
+# Subtest: fallback is opt-in and only selects an engine during preflight
+ok 25 - fallback is opt-in and only selects an engine during preflight
+  ---
+  duration_ms: 0.503138
+  type: 'test'
+  ...
+# Subtest: cancellation during preflight never dispatches fallback
+ok 26 - cancellation during preflight never dispatches fallback
+  ---
+  duration_ms: 0.481548
+  type: 'test'
+  ...
+# (node:3887132) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: missing viewer share validates the container then exposes only API on the Steel host
+ok 27 - missing viewer share validates the container then exposes only API on the Steel host
+  ---
+  duration_ms: 2.188099
+  type: 'test'
+  ...
+# Subtest: matching viewer share validates ownership and is reused without share mutations
+ok 28 - matching viewer share validates ownership and is reused without share mutations
+  ---
+  duration_ms: 0.483161
+  type: 'test'
+  ...
+# Subtest: matching viewer share rejects container mismatch without calling Connect
+ok 29 - matching viewer share rejects container mismatch without calling Connect
+  ---
+  duration_ms: 0.570439
+  type: 'test'
+  ...
+# Subtest: viewer share validation and Connect errors propagate without repair
+ok 30 - viewer share validation and Connect errors propagate without repair
+  ---
+  duration_ms: 0.913785
+  type: 'test'
+  ...
+# Subtest: viewer recovery refuses nonlocal and CDP ports before calling Connect
+ok 31 - viewer recovery refuses nonlocal and CDP ports before calling Connect
+  ---
+  duration_ms: 0.552898
+  type: 'test'
+  ...
+# Subtest: readiness probes API and CDP concurrently and rejects unhealthy responses
+ok 32 - readiness probes API and CDP concurrently and rejects unhealthy responses
+  ---
+  duration_ms: 24.130935
+  type: 'test'
+  ...
+# Subtest: new setup skips occupied/shared ports and exposes only API on the server host
+ok 33 - new setup skips occupied/shared ports and exposes only API on the server host
+  ---
+  duration_ms: 0.978714
+  type: 'test'
+  ...
+# Subtest: existing project with inherited DNS is recreated with the same profile
+ok 34 - existing project with inherited DNS is recreated with the same profile
+  ---
+  duration_ms: 0.728108
+  type: 'test'
+  ...
+# Subtest: dead CDP on a validated project triggers one scoped repair
+ok 35 - dead CDP on a validated project triggers one scoped repair
+  ---
+  duration_ms: 0.822058
+  type: 'test'
+  ...
+# Subtest: persistent CDP failure is bounded to one recovery attempt
+ok 36 - persistent CDP failure is bounded to one recovery attempt
+  ---
+  duration_ms: 0.708161
+  type: 'test'
+  ...
+# Subtest: shared profile or changed saved binding cannot trigger destructive repair
+ok 37 - shared profile or changed saved binding cannot trigger destructive repair
+  ---
+  duration_ms: 0.683296
+  type: 'test'
+  ...
+# Subtest: existing stopped project is validated and resumed without replacing its profile
+ok 38 - existing stopped project is validated and resumed without replacing its profile
+  ---
+  duration_ms: 0.527712
+  type: 'test'
+  ...
+# Subtest: foreign profile and Connect errors fail closed
+ok 39 - foreign profile and Connect errors fail closed
+  ---
+  duration_ms: 0.584054
+  type: 'test'
+  ...
+# Subtest: viewer origins reject credentials, non-HTTPS and paths
+ok 40 - viewer origins reject credentials, non-HTTPS and paths
+  ---
+  duration_ms: 1.231015
+  type: 'test'
+  ...
+# Subtest: Docker port inspection requests only bounded port metadata
+ok 41 - Docker port inspection requests only bounded port metadata
+  ---
+  duration_ms: 0.388819
+  type: 'test'
+  ...
+# (node:3887134) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: RPC returns successful results and preserves actionable errors
+ok 42 - RPC returns successful results and preserves actionable errors
+  ---
+  duration_ms: 1.520231
+  type: 'test'
+  ...
+# Subtest: stalled RPC expires without replaying the operation or accepting a late result
+ok 43 - stalled RPC expires without replaying the operation or accepting a late result
+  ---
+  duration_ms: 10.807464
+  type: 'test'
+  ...
+# Subtest: late RPC rejection after timeout is handled
+ok 44 - late RPC rejection after timeout is handled
+  ---
+  duration_ms: 14.098354
+  type: 'test'
+  ...
+# Subtest: stalled reads retry once and recover, while permanent hangs are bounded
+ok 45 - stalled reads retry once and recover, while permanent hangs are bounded
+  ---
+  duration_ms: 68.97229
+  type: 'test'
+  ...
+# Subtest: mutations and explicit server failures are never replayed
+ok 46 - mutations and explicit server failures are never replayed
+  ---
+  duration_ms: 30.706263
+  type: 'test'
+  ...
+# (node:3887160) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: normalizes a safe endpoint and rejects unsupported URL forms
+ok 47 - normalizes a safe endpoint and rejects unsupported URL forms
+  ---
+  duration_ms: 1.253585
+  type: 'test'
+  ...
+# Subtest: loads a normalized dashboard
+ok 48 - loads a normalized dashboard
+  ---
+  duration_ms: 26.527986
+  type: 'test'
+  ...
+# Subtest: creates and releases an exact session
+ok 49 - creates and releases an exact session
+  ---
+  duration_ms: 27.415945
+  type: 'test'
+  ...
+# Subtest: idle bootstrap sessions allow new session creation; live sessions do not
+ok 50 - idle bootstrap sessions allow new session creation; live sessions do not
+  ---
+  duration_ms: 13.820788
+  type: 'test'
+  ...
+# Subtest: returns a stable unavailable dashboard
+ok 51 - returns a stable unavailable dashboard
+  ---
+  duration_ms: 0.881808
+  type: 'test'
+  ...
+1..51
+# tests 51
+# suites 0
+# pass 51
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 433.279168
+
+> bb-plugin-steel-browser@0.1.0 build
+> env -u BB_CLI bb plugin build .
+
+dist/server.js
+dist/server.js.map
+dist/server.meta.json
+dist/app.js
+dist/app.css
+dist/app.meta.json

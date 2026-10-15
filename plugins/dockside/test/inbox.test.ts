@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 import type {
   PluginSidebarProject,
   PluginSidebarThread,
-} from "@bb/plugin-sdk";
+} from "@get-bb/plugin-sdk";
 import {
   childrenOf,
   filterByProject,

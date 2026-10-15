@@ -36,7 +36,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-09T00:38:56.815Z",
+  "updatedAt": "2026-10-12T19:07:40.715Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "retire-the-unused-save-my-model-plugin-from-the-mateocerquetella-05a8ee8dda3b",
@@ -80,10 +80,10 @@
       "mergeCommit": "ff4dec1308f8ae69d040eebdf77863182c7a45ca",
       "targetBranch": "main",
       "ancestorOfTarget": true,
-      "observedAt": "2026-10-09T00:38:36.613Z"
+      "observedAt": "2026-10-12T19:07:21.023Z"
     },
-    "closedAt": "2026-10-09T00:38:56.511Z",
-    "digest": "sha256:65e5955b15a1595782ea7038ad663f65b363787853c8f8017ff269680fd60c6e"
+    "closedAt": "2026-10-12T19:07:40.537Z",
+    "digest": "sha256:cf3cbcfb40427096f70e2f739f0de50b8a45a47aa3c64b7a3e7faeb102fce685"
   },
   "completionRecord": {
     "schemaVersion": 1,
@@ -92,11 +92,11 @@
     "decisionBy": null,
     "method": "merged-externally",
     "reason": "Merged in pull request #67 as ff4dec1308f8ae69d040eebdf77863182c7a45ca into main; closed when the merge was observed.",
-    "at": "2026-10-09T00:38:56.815Z",
+    "at": "2026-10-12T19:07:40.715Z",
     "revision": 8,
     "completion": "implemented",
-    "sourceTreeDigest": "sha256:891c1f325f62d9b66e26d8aa3f21125885032117f56d532b394f62061e82c106",
-    "artifactTreeDigest": "sha256:b71fc6e3cd34c20f1fa40ffcee0eea4a3fcaa8da9cbd2fc98d2e32bc7f7ee819",
-    "digest": "sha256:349de2b582e8f06355135da78dc9d86c27c2d3adad056597f5a62a3fd210f0bc"
+    "sourceTreeDigest": "sha256:cdde1d5250efb1080dca5c434aa7d56a8a608e18193cb54c553736eb60645b5d",
+    "artifactTreeDigest": "sha256:8d0baa64a501608c19169c04326e08b06dba2f0bef447f1cbf1abdc2aab154ec",
+    "digest": "sha256:36c5885a332d048d6dad165ece9780eca64715b734cdfb213a883272b160ac4e"
   }
 }

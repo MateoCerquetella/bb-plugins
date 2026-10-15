@@ -1,5 +1,8 @@
-import type { PluginSidebarThreadIndicator } from "@bb/plugin-sdk";
+import type { PluginSidebarThreadIndicator } from "@get-bb/plugin-sdk";
 import { StatusMark, type StatusMarkKind } from "@/components/inbox/status-mark";
+import { Icon } from "@/components/ui/icon";
+import { workingActivityPresentation } from "@/lib/family-status";
+import { CUSTOM_COLOR_DEFAULTS } from "@/lib/preferences";
 import { cn } from "@/lib/utils";
 import {
   statusColorRole,
@@ -7,16 +10,7 @@ import {
 } from "@/lib/status-presentation";
 
 function statusColor(role: ThreadStatusColorRole): string {
-  const fallback =
-    role === "error"
-      ? "var(--destructive)"
-      : role === "waiting"
-        ? "var(--warning-text, var(--warning))"
-        : role === "unread"
-          ? "var(--primary)"
-          : role === "working"
-            ? "var(--success-foreground, var(--primary))"
-            : "var(--muted-foreground)";
+  const fallback = CUSTOM_COLOR_DEFAULTS[role];
   return `var(--dockside-status-${role}, ${fallback})`;
 }
 
@@ -62,6 +56,15 @@ export function StatusGlyph({
   const aria = label ?? undefined;
   const role = statusColorRole(indicator);
   const style = role === null ? undefined : { color: statusColor(role) };
+  if (role === "workflow" || role === "agent" || role === "command" ||
+      role === "plan" || role === "goal") {
+    return (
+      <span role={aria ? "img" : undefined} aria-label={aria} title={aria} className={shared}>
+        <Icon name={workingActivityPresentation(role).icon} aria-hidden
+          className="size-full dockside-status-mark-activity" style={style} />
+      </span>
+    );
+  }
 
   const kind: StatusMarkKind | null =
     role === "working" ? "working" :

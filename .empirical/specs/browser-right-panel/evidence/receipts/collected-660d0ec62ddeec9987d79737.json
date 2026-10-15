@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-660d0ec62ddeec9987d79737",
+  "criteria": [
+    "AC-5",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3",
+    "AC-UI-4"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-10-13T22:11:33.227Z",
+  "completedAt": "2026-10-13T22:11:33.227Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "browser-right-panel",
+    "specRevision": 2,
+    "specDigest": "sha256:fbc6ec7bb81874a98ed84b1d1e6e95960f9b459ccfee4cb85d00c800a13a7c46",
+    "treeDigest": "sha256:1e3b97f616e0eb5ff7dfe2bf20dc929f1a0b68b5e983740e4bea448e10adb054",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:208b07f9bfef83f832f17e935556f5252d8d03113589eb75ecbb12c92cffc501",
+  "kind": "collected",
+  "collector": "empirical-review:isolated-browser-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/browser-right-panel/reviews/13edb11632db7e962abd8520.json",
+      "mediaType": "application/json",
+      "bytes": 3136,
+      "digest": "sha256:9231ca91d14386640b4d8a8bee6dbe4259cc14107bb1abb186a0c8e7c3b81cfa"
+    },
+    {
+      "path": ".empirical/specs/browser-right-panel/reviews/13edb11632db7e962abd8520.md",
+      "mediaType": "text/markdown",
+      "bytes": 2371,
+      "digest": "sha256:ea5f92f3c7a94750e408536e23a5ef76b51df7779b676079cff3a8e26fe0972b"
+    }
+  ]
+}

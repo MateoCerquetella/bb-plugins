@@ -4,6 +4,7 @@ import { normalizeBaseUrl, SteelClient, SteelClientError } from "./steel-client.
 import { ProjectBrowsers } from "./projects.ts";
 import { runBrowser } from "./engines.ts";
 import { bindingReady, ensureViewerShare, provisionProjectInstance, verifyProjectInstance } from "./provisioning.ts";
+import { navigateProject } from "./navigation.ts";
 import { actOnProject, parseBrowserAction } from "./actions.ts";
 import { SignIns } from "./sign-ins.ts";
 import { DashboardCache } from "./dashboard-cache.ts";
@@ -21,12 +22,13 @@ function message(error: unknown): string {
 
 export default function steelBrowserPlugin(bb: BbPluginApi): void {
   bb.agents.contributeInstructions(() => [
-    "Steel Browser is installed in this BB environment and is available through the terminal CLI, even without a browser-specific tool in your tool list.",
+    "BB Surf is installed in this BB environment, powered by Steel and available through the terminal CLI, even without a browser-specific tool in your tool list.",
     "For any browser task (including AWS Console, website sign-in, screenshots, scraping, or navigation between web apps), read the steel-browser skill and first run `bb steel-browser project` in the current thread.",
     "Never claim Steel is unavailable merely because no dedicated browser tool is exposed. Check the CLI result and report the exact binding or connection error.",
     "The `bb steel-browser project` command automatically provisions and binds a dedicated Steel browser if missing. Run it and continue, instead of stopping at 'no binding'. Use `bb steel-browser run <url>` or Playwright attached to the returned project CDP endpoint. Do not launch a separate browser or use another project's binding or cookies.",
     "Before visible browser work, emit ::steel-browser{} on its own line in this thread. Whenever you ask the user to enter credentials, sign in, complete MFA, approve consent, or perform any other manual browser action, repeat ::steel-browser{} on its own line in that same assistant message; never refer to an embedded browser 'above' unless that response contains the directive. Keep navigation in that same Steel session so the user can watch. Never open Safari, local Chrome, an external window, or an external viewer link.",
     "Let the user enter website credentials and MFA directly into the embedded browser, never chat. If viewer authentication is blocked, report it without an external-browser fallback.",
+    "The browser UI is named BB Surf. Its Monitor icon and Open browser panel button show the agent's project browser on the right. Hover for two seconds to expand; leaving shrinks the hover view. Explicit Expand pins the wider view until Shrink or Escape in BB. Commands and the ::steel-browser{} directive keep their existing names.",
     "Do not use --allow-paid without explicit permission. Inspect and verify results; an agent-handoff response is not task completion.",
     "If the project CDP loopback is on another host, use bb steel-browser tabs/inspect/click/fill/press/screenshot. Routed actions default to the newest tab; use --tab <index> to target an older one. Do not enter credentials in CLI arguments.",
   ].join("\n"));
@@ -99,6 +101,11 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
   }
 
   const handlers = {
+    async navigate({ scope, url }: { scope: Scope; url: string }) {
+      const { projectId } = await resolve(scope);
+      const binding = await ensureBinding(projectId);
+      return mutate(() => navigateProject(binding, url));
+    },
     async signIns(scope: Scope) {
       return signIns.list((await resolve(scope)).projectId);
     },

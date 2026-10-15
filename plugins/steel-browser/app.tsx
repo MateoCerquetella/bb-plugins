@@ -10,12 +10,14 @@ import {
   List,
   Maximize2,
   Minimize2,
+  PanelRightOpen,
 } from "lucide-react";
 import {
   definePluginApp,
   useRpc,
   useSettings,
   useBbContext,
+  useBbNavigate,
   experimental_useSidebarThreads,
   type PluginRpcClient,
   type PluginMessageDirectiveProps,
@@ -27,6 +29,7 @@ import { useFollowViewer } from "./use-follow-viewer.ts";
 import { LiveViewer, useDocumentVisible } from "./live-viewer.tsx";
 import { liveViewerUrl } from "./viewer-protocol.ts";
 import { SignInsPanel } from "./sign-ins-panel.tsx";
+import { usePanelExpansion } from "./use-panel-expansion.ts";
 import "./app.css";
 
 const CREATE_OPTIONS = { blockAds: true, width: 1440, height: 900 } as const;
@@ -121,11 +124,12 @@ function useSteelDashboard(scope: Scope, shouldPoll: () => boolean = ALWAYS_POLL
   return { dashboard, error, refresh, start, starting };
 }
 
-function SteelThreadPanel({ threadId }: PluginThreadPanelProps) {
+export function SteelThreadPanel({ threadId }: PluginThreadPanelProps) {
   return <ScopedSteelThreadPanel key={threadId} threadId={threadId} />;
 }
 
 function ScopedSteelThreadPanel({ threadId }: { threadId: string }) {
+  const expansion = usePanelExpansion();
   const scope = useScope(threadId);
   const { dashboard, error, refresh, start, starting } = useSteelDashboard(scope);
   const [playerKey, setPlayerKey] = useState(0);
@@ -134,20 +138,31 @@ function ScopedSteelThreadPanel({ threadId }: { threadId: string }) {
   const active = dashboard?.sessions.some(session => ["idle", "live"].includes(session.status));
 
   return (
-    <section className="steel-thread-panel" aria-label="Steel live browser">
+    <div ref={expansion.anchor} className="steel-thread-panel-anchor">
+    <section ref={expansion.panel} style={expansion.geometry}
+      onPointerEnter={expansion.enter} onPointerLeave={expansion.leave}
+      onPointerOverCapture={expansion.enter} onPointerOutCapture={expansion.leave}
+      className={`steel-thread-panel${expansion.expanded ? " steel-thread-panel--expanded" : ""}`} aria-label="BB Surf">
       <header className="steel-thread-panel__bar">
         <div>
-          <strong>Steel Browser</strong>
+          <strong>BB Surf</strong>
           <span>{error ? "Unavailable" : active ? "Live in this thread" : dashboard?.connected ? "No active session" : "Connecting..."}</span>
         </div>
-        <button aria-label="Reload Steel browser panel" className="steel-icon-button"
+        <div className="steel-panel-actions">
+        <button aria-label={expansion.expanded ? "Shrink browser panel" : "Expand browser panel"}
+          title={expansion.expanded ? "Shrink browser panel (Esc)" : "Expand browser panel · or hover for 2 seconds"}
+          aria-expanded={expansion.expanded} className="steel-icon-button" onClick={expansion.toggle} type="button">
+          {expansion.expanded ? <Minimize2 aria-hidden="true" /> : <Maximize2 aria-hidden="true" />}
+        </button>
+        <button aria-label="Reload browser panel" className="steel-icon-button"
           onClick={() => { void refresh(); setPlayerKey(key => key + 1); }}
           title="Reload viewer" type="button">
           <RefreshCw aria-hidden="true" />
         </button>
+        </div>
       </header>
       {playerUrl && active && visible ? (
-        <LiveViewer key={playerKey} url={playerUrl} title={`Steel browser for ${threadId}`} />
+        <LiveViewer key={playerKey} url={playerUrl} title={`BB Surf for ${threadId}`} />
       ) : error || dashboard?.error ? (
         <div className="steel-panel-state" role="alert">{error ?? dashboard?.error}</div>
       ) : (
@@ -161,6 +176,7 @@ function ScopedSteelThreadPanel({ threadId }: { threadId: string }) {
         </div>
       )}
     </section>
+    </div>
   );
 }
 
@@ -169,6 +185,7 @@ export function SteelBrowserDirective(props: PluginMessageDirectiveProps) {
 }
 
 function ScopedSteelBrowser({ message }: PluginMessageDirectiveProps) {
+  const navigate = useBbNavigate();
   const { anchor, style, anchorStyle, latest } = useFollowViewer(message.threadId);
   const scope = useScope(message.threadId);
   const [minimized, setMinimized] = useState(startsInlineViewerMinimized);
@@ -186,17 +203,22 @@ function ScopedSteelBrowser({ message }: PluginMessageDirectiveProps) {
     <div ref={anchor} style={anchorStyle} className="steel-inline-anchor" data-steel-thread={message.threadId}>
     <section style={style}
       className={`steel-inline-browser${minimized ? " steel-inline-browser--minimized" : ""}${style ? " steel-inline-browser--following" : ""}`}
-      aria-label="Steel browser in this thread"
+      aria-label="BB Surf in this thread"
     >
       <header>
         <div>
           <Monitor aria-hidden="true" />
           <span>
-            <strong>Steel Browser</strong>
+            <strong>BB Surf</strong>
             <small>{error ? "Unavailable" : active ? "Session available" : dashboard?.connected ? "No active session" : minimized ? "Minimized" : "Connecting"}</small>
           </span>
         </div>
         <div className="steel-inline-browser__actions">
+          <button aria-label="Open browser panel" title="Watch in the right panel" type="button"
+            onClick={() => {
+              if (navigate.openThreadPanel({ actionId: THREAD_PANEL_ACTION_ID })) setMinimized(true);
+              else setMinimized(false);
+            }}><PanelRightOpen aria-hidden="true" /></button>
           <button
             aria-expanded={!minimized}
             aria-label={minimized ? "Restore inline browser" : "Minimize inline browser"}
@@ -216,7 +238,7 @@ function ScopedSteelBrowser({ message }: PluginMessageDirectiveProps) {
       </header>
       <div className="steel-inline-browser__viewport" hidden={minimized}>
         {playerUrl && active && latest && visible && !minimized ? (
-          <LiveViewer key={playerKey} url={playerUrl} title={`Steel browser for ${message.threadId}`} />
+          <LiveViewer key={playerKey} url={playerUrl} title={`BB Surf for ${message.threadId}`} />
         ) : !latest ? (
           <div className="steel-panel-state">Viewer active in the latest browser message</div>
         ) : error || dashboard?.error ? (
@@ -307,7 +329,7 @@ export function SteelAgentSettings() {
         <dt>Credentials file</dt><dd>{isLoading ? "Loading..." : String(values?.jevEnvFile || "Not configured")}</dd>
         <dt>Text model</dt><dd>{isLoading ? "Loading..." : String(values?.jevTextModel || "Not configured")}</dd>
       </dl>
-      <p>Configuration: BB Tools / Steel Browser. Credentials stay on the host.
+      <p>Configuration: BB Tools / BB Surf. Credentials stay on the host.
         Live Jev runs use potentially billable TypeSafe and text-model APIs. DNS changes apply when a project browser is next provisioned or repaired.</p>
     </section>
   );
@@ -404,7 +426,7 @@ export function SteelBrowserPage() {
         <header className="steel-header">
           <div className="steel-identity">
             <span className="steel-brand" aria-hidden="true"><PanelsTopLeft /></span>
-            <h1>Steel Browser</h1>
+            <h1>BB Surf</h1>
           </div>
         </header>
         {picker}
@@ -492,7 +514,7 @@ function ScopedSteelBrowserPage({ scope, picker }: { scope: Scope; picker: React
         <div className="steel-identity">
           <span className="steel-brand" aria-hidden="true"><PanelsTopLeft /></span>
           <div>
-            <h1>Steel Browser</h1>
+            <h1>BB Surf</h1>
             <p>Persistent project browser</p>
           </div>
         </div>
@@ -551,7 +573,7 @@ function ScopedSteelBrowserPage({ scope, picker }: { scope: Scope; picker: React
         </div>
         <div className="steel-viewport">
           {watching && visible && connected && activeSession && playerUrl ? (
-            <LiveViewer key={playerKey} url={playerUrl} title="Live Steel browser" />
+            <LiveViewer key={playerKey} url={playerUrl} title="Live BB Surf" />
           ) : (
             <div className="steel-viewer-empty">
               <Monitor aria-hidden="true" />
@@ -661,7 +683,7 @@ export default definePluginApp((app) => {
   });
   app.slots.threadPanelAction({
     id: THREAD_PANEL_ACTION_ID,
-    title: "Steel Browser",
+    title: "BB Surf",
     icon: "Monitor",
     component: SteelThreadPanel,
     layout: "flush",
@@ -672,7 +694,7 @@ export default definePluginApp((app) => {
   });
   app.slots.navPanel({
     id: "steel-browser",
-    title: "Steel Browser",
+    title: "BB Surf",
     icon: "Monitor",
     path: "steel-browser",
     component: SteelBrowserPage,

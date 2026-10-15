@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "activity-overview"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:3c1cff6a9a3c548605b2bc8e5d988efc3f3b3e393f4c34e1ad8aece3b6787cbb"
+}

@@ -36,6 +36,7 @@ const result = await build({
             websocketUrl:"ws://127.0.0.1:3100/"}))};
       }};
       export const useRpc=()=>rpc;export const definePluginApp=()=>null;
+      export const useBbNavigate=()=>({openThreadPanel:()=>false});
       export const useBbContext=()=>({threadId:null,projectId:"test-project"});
       export const experimental_useSidebarThreads=()=>({status:"ready",projects:[{id:"test-project",name:"Test project"}]});
       export const useSettings=()=>({values:{},isLoading:false});`

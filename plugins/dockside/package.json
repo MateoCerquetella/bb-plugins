@@ -1,7 +1,7 @@
 {
   "name": "bb-plugin-dockside",
-  "version": "0.1.5",
-  "description": "A project-first sidebar with stable threads and inline child agents.",
+  "version": "0.1.7",
+  "description": "Project-first threads, inline agents, and mobile active-thread navigation.",
   "license": "MIT",
   "author": "Mateo Cerquetella",
   "homepage": "https://github.com/mateocerquetella/bb-plugins/tree/main/plugins/dockside#readme",
@@ -20,6 +20,7 @@
     "dockside",
     "projects",
     "threads",
+    "mobile",
     "snooze"
   ],
   "publishConfig": {
@@ -27,12 +28,12 @@
   },
   "type": "module",
   "engines": {
-    "bb": ">=0.36",
-    "bbPluginSdk": "^0.4.1"
+    "bb": ">=0.40.0",
+    "bbPluginSdk": ">=0.4.21"
   },
   "bb": {
     "name": "Dockside",
-    "description": "A project-first sidebar with stable threads and inline child agents.",
+    "description": "Project-first threads, inline agents, and mobile active-thread navigation.",
     "branding": {
       "icon": "./assets/icon.svg",
       "logo": {
@@ -70,6 +71,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@get-bb/plugin-sdk": "0.4.21",
     "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
@@ -79,7 +81,7 @@
   },
   "scripts": {
     "dev": "bun ../../scripts/dev-plugin.ts",
-    "build": "bb plugin build .",
+    "build": "env -u BB_CLI bb plugin build .",
     "typecheck": "tsc --noEmit",
     "test": "node --test --experimental-strip-types test/*.test.ts",
     "clean": "rm -rf dist"

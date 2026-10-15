@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-5aa9f2938c853ff434a07eef",
+  "criteria": [
+    "AC-5",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3",
+    "AC-UI-4"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "The local plugin is installed/reloaded, automation and all interaction fixtures pass, but the actual BB host is blocked by BB Connect owner sign-in in this project's embedded browser. Await the user's direct sign-in before fresh outcome verification of host panel placement/stacking. Do not count fixture evidence or code review as this fresh host outcome check.",
+  "passed": false,
+  "startedAt": "2026-10-13T22:14:06.158Z",
+  "completedAt": "2026-10-13T22:14:06.158Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "browser-right-panel",
+    "specRevision": 2,
+    "specDigest": "sha256:fbc6ec7bb81874a98ed84b1d1e6e95960f9b459ccfee4cb85d00c800a13a7c46",
+    "treeDigest": "sha256:1e3b97f616e0eb5ff7dfe2bf20dc929f1a0b68b5e983740e4bea448e10adb054",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 6,
+    "gitCommit": "aa82bb1282adba29c0ab0e58820498f744c5fab3",
+    "textTreeDigest": "sha256:1e3b97f616e0eb5ff7dfe2bf20dc929f1a0b68b5e983740e4bea448e10adb054"
+  },
+  "digest": "sha256:7e21e4ebae77397f518bee7e3c49b56828df53bb6c213855740db2205fbca385",
+  "kind": "qa",
+  "matrixDigest": "sha256:1abd4c00f567b6f55b460c7bc1afeab1c44aae47e70a74bcf485dcd839aa6f2f",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "missing-environment",
+      "summary": "The local plugin is installed/reloaded, automation and all interaction fixtures pass, but the actual BB host is blocked by BB Connect owner sign-in in this project's embedded browser. Await the user's direct sign-in before fresh outcome verification of host panel placement/stacking. Do not count fixture evidence or code review as this fresh host outcome check.",
+      "startedAt": "2026-10-13T22:14:06.158Z",
+      "completedAt": "2026-10-13T22:14:06.158Z",
+      "durationMs": 0,
+      "collector": "codex-project-browser",
+      "command": null,
+      "result": null,
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:1e3b97f616e0eb5ff7dfe2bf20dc929f1a0b68b5e983740e4bea448e10adb054",
+      "sourceTreeAfter": "sha256:1e3b97f616e0eb5ff7dfe2bf20dc929f1a0b68b5e983740e4bea448e10adb054",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/browser-right-panel/qa/host-auth.json",
+          "mediaType": "application/json",
+          "bytes": 188,
+          "digest": "sha256:772478ed2475c94dc7d789a5220fc478e64113ad9a6fbffd38e6b3ab897bdc5b"
+        }
+      ]
+    }
+  ],
+  "anomalies": [
+    "outcome-missing-environment"
+  ]
+}

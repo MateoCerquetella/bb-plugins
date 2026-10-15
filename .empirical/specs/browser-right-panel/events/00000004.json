@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "sequence": 4,
+  "previousDigest": "sha256:6f69dca077cc87a64695dbe536b13fd4885c59ab148f33f04d4694e2d88d5be9",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Planned native panel wiring, stable hover expansion, compatible branding, browser interaction evidence and fresh-context review.",
+  "createdAt": "2026-10-13T21:50:25.650Z",
+  "stateBeforeDigest": "sha256:aafa726b8148ebc4a9526701ff30be4901a37d4d680c128cbbb612d3d6cf30fc",
+  "stateAfterDigest": "sha256:5130af283b6e56b2b1b844a6f5e8ef24fb728c9adb18939bb627cfb929f5cde7",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 4,
+    "activeFeature": "browser-right-panel",
+    "request": "Improve the existing Steel Browser plugin: put the live agent browser viewer on the right side opened/closed by clicking a browser icon; dwelling the pointer over the browser panel for about two seconds expands it toward nearly full screen without a blocking modal, with a reversible return to compact view; mimic BB native UI styling, and replace Steel Browser user-facing branding with a personalized name (user preference pending; use configurable display name if needed). Preserve same project-bound browser session and ability to watch the agent work. Implement and verify the human UI and CLI.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Planned native panel wiring, stable hover expansion, compatible branding, browser interaction evidence and fresh-context review.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:fbc6ec7bb81874a98ed84b1d1e6e95960f9b459ccfee4cb85d00c800a13a7c46",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:f266397b20093c83bb8151d9933009819d788ab78150a806073bfeb6640b991e",
+    "impactDigest": "sha256:f6d77a4fed828be597167b4855c2535dd0ed9160c4e323e42ba753b8ad5c0b08",
+    "capabilityClaimId": "browser-right-panel-1a47658651f8",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-13T21:50:25.650Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "browser-right-panel-1a47658651f8",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "browser-right-panel",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_3bq8hj3659-1/bb-plugins",
+      "worktreeId": "sha256:f851d2d20e9e598a6653b1376a649315e5e4e5583dc439b20520d19a30b731d1",
+      "baseCommit": "e18c3aadb34d54673e144d7a309697a795e65ad1",
+      "baseTree": "626746b9da79baa76193482188beaf9ef9707b59",
+      "bases": {
+        "steel-browser-viewer": {
+          "capability": "steel-browser-viewer",
+          "digest": "sha256:28b7fb1494b5bd937cabcf1ca485bdc0e70adb1ccee1f0d701e566d442f3b04f",
+          "requirements": {
+            "expand the live right panel without a modal": null,
+            "personalized browser presentation": null
+          }
+        }
+      },
+      "capabilities": [
+        "steel-browser-viewer"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-13T21:48:52.453Z",
+      "heartbeatAt": "2026-10-13T21:48:52.453Z",
+      "digest": "sha256:fdd05bc6904611d467673f522ef2e1f56f445e61e1683aafe42d9eb0a5535398"
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:0cd4ae9b2e6c71e8c0d0ca5495bbb35fa9a255f44df3c2ec119b1d2178f8f828"
+}

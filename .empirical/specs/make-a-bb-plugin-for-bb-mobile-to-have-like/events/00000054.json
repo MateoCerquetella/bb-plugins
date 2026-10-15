@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "sequence": 54,
+  "previousDigest": "sha256:2b7d821885280e33d8949cf9890e7547beae23a9e7ad126668ea4ec968f52283",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Added touchstart, touchmove, touchend, and touchcancel propagation containment to Dockside's mobile swipe strip in addition to pointer containment, without preventDefault and with touch-action pan-y preserved. Extended the UI contract test, passed 8 focused tests plus typecheck/build, reinstalled and reloaded Dockside 0.1.7 as running, committed and pushed the fix, and confirmed the branch is current with main.",
+  "createdAt": "2026-10-13T15:42:04.931Z",
+  "stateBeforeDigest": "sha256:69f47b086614bf18c4f4c02417ee78da14efa2c19b3d3f34cb5fe16e5bde874e",
+  "stateAfterDigest": "sha256:4ad57ca1e834f318be4ece53df4514f57d3ccc9c9b8b7d1f18967191e3b113d5",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 54,
+    "activeFeature": "make-a-bb-plugin-for-bb-mobile-to-have-like",
+    "request": "Make a bb plugin for bb mobile to have like arrows or tinder stylrer to go strong it the threads more easily. You teasesrch and do it don’t ask me",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Added touchstart, touchmove, touchend, and touchcancel propagation containment to Dockside's mobile swipe strip in addition to pointer containment, without preventDefault and with touch-action pan-y preserved. Extended the UI contract test, passed 8 focused tests plus typecheck/build, reinstalled and reloaded Dockside 0.1.7 as running, committed and pushed the fix, and confirmed the branch is current with main.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:97e9c76bc176347484978a922dae03d3eec90d19404ed05d299aad693d94fed8",
+    "approvedSpecRevision": 45,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:3b9c4e898dcbaec29538a26fcb033a713e9adc02d4e39f7ccf41f8caa0990db7",
+    "impactDigest": "sha256:59fe412620416a2f2caf357fa5cead797c072e679dc0be4cf8b87add6cd691d2",
+    "capabilityClaimId": "make-a-bb-plugin-for-bb-mobile-to-have-like-07aee46cf0cd",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-13T15:42:04.931Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "make-a-bb-plugin-for-bb-mobile-to-have-like-07aee46cf0cd",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "make-a-bb-plugin-for-bb-mobile-to-have-like",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_ty3rbbybde-1/bb-plugins",
+      "worktreeId": "sha256:af5fb25e529005d46159f2f14ce9445c21fc05a1dbfa4174e61fc42bd09a6051",
+      "baseCommit": "40a9e575a3002a3229be1c9ec43494c60561ffc5",
+      "baseTree": "4ea3ba71a1d6f06e0946a81cb3b6e936bf93495a",
+      "bases": {
+        "mobile-thread-navigation": {
+          "capability": "mobile-thread-navigation",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "mobile threads support continuous one-thumb navigation": null,
+            "project context uses dockside's effective color": null,
+            "gestures preserve ordinary conversation interaction": null,
+            "unavailable lists fail safely": null,
+            "current thread status uses live host semantics": null,
+            "dockside mobile navigation is released immutably": null
+          }
+        }
+      },
+      "capabilities": [
+        "mobile-thread-navigation"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-12T19:17:24.549Z",
+      "heartbeatAt": "2026-10-13T15:22:42.666Z",
+      "digest": "sha256:93b4681ab8f5cd416259db6aac07bcdfad48da0a919c97dea5010134b7dd0c98"
+    },
+    "trackerGeneration": 8,
+    "lifecycle": {
+      "stage": "iteration",
+      "iteration": 8,
+      "awaitingFeedback": true,
+      "contractRevision": 43,
+      "riskRequest": "Replace the currently installed Dockside v0.1.5 with this updated Dockside build, verify it is running, then create and push the new Dockside v0.1.6 release."
+    },
+    "budgetExtensionMinutes": 99,
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 8,
+      "capabilities": 1,
+      "reason": "Installation replacement and immutable release are the final delivery of the already atomic Dockside ownership migration; splitting would create a release without proving the installed artifact or an installation without the requested release.",
+      "actor": "agent",
+      "revision": 39
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:1013f389088aacad5e46c2a2d1471a293539005d03edfba5c14859590ff61c31"
+}

@@ -27,7 +27,7 @@
     "bbPluginSdk": ">=0.4.21"
   },
   "bb": {
-    "name": "Steel Browser",
+    "name": "BB Surf",
     "description": "Operate self-hosted Steel browser sessions from BB.",
     "branding": {
       "icon": "./assets/nav-icon.svg",
@@ -57,8 +57,10 @@
     "projects.ts",
     "rpc-timeout.ts",
     "use-follow-viewer.ts",
+    "use-panel-expansion.ts",
     "engines.ts",
     "actions.ts",
+    "navigation.ts",
     "viewer-protocol.ts",
     "live-viewer.tsx",
     "service-catalog.ts",

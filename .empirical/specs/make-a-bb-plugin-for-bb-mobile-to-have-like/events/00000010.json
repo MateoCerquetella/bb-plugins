@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "sequence": 10,
+  "previousDigest": "sha256:ff6ebf86bb569dd5d8482f0bba23021409ed9e72c4f07b3285112ca479135ea0",
+  "actor": "human",
+  "type": "transition",
+  "summary": "Resumed workflow",
+  "createdAt": "2026-10-12T21:01:45.309Z",
+  "stateBeforeDigest": "sha256:3d5728e2fb720c513cee6425f736b049954faae8760df4426acd48c66a494ab4",
+  "stateAfterDigest": "sha256:677c485815a15b60da39da6b679ac443db29ab9d402c7cdab78a2ec271ff44c6",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 10,
+    "activeFeature": "make-a-bb-plugin-for-bb-mobile-to-have-like",
+    "request": "Make a bb plugin for bb mobile to have like arrows or tinder stylrer to go strong it the threads more easily. You teasesrch and do it don’t ask me",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "yolo",
+    "phase": "review",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": null,
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:fe067828b306ae2663a373e1aa830378aaf176d36e88328ef70f9cf4ca544ad3",
+    "approvedSpecRevision": 5,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:4df04e9e9caa8af3d7ec4586e2adc4bf65c3825e902e083bc6356b851e971b36",
+    "impactDigest": "sha256:59fe412620416a2f2caf357fa5cead797c072e679dc0be4cf8b87add6cd691d2",
+    "capabilityClaimId": "make-a-bb-plugin-for-bb-mobile-to-have-like-07aee46cf0cd",
+    "authorizationDigest": "sha256:f7e9bfd4e1b4243f479b3853505baeb1c8721ed0dfd3ecf10041d9bf434c3f56",
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-12T21:01:45.309Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "make-a-bb-plugin-for-bb-mobile-to-have-like-07aee46cf0cd",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "make-a-bb-plugin-for-bb-mobile-to-have-like",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_ty3rbbybde-1/bb-plugins",
+      "worktreeId": "sha256:af5fb25e529005d46159f2f14ce9445c21fc05a1dbfa4174e61fc42bd09a6051",
+      "baseCommit": "40a9e575a3002a3229be1c9ec43494c60561ffc5",
+      "baseTree": "4ea3ba71a1d6f06e0946a81cb3b6e936bf93495a",
+      "bases": {
+        "mobile-thread-navigation": {
+          "capability": "mobile-thread-navigation",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "mobile threads support bounded one-thumb navigation": null,
+            "gestures preserve ordinary conversation interaction": null,
+            "unavailable lists fail safely": null
+          }
+        }
+      },
+      "capabilities": [
+        "mobile-thread-navigation"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-12T19:17:24.549Z",
+      "heartbeatAt": "2026-10-12T19:17:24.549Z",
+      "digest": "sha256:c0fdfc1aef543766dcc7da4ddac535db06b08a96109ba02c623dce953c463e88"
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:9b6e5455098bdae41a6d96a036d49cbb9e5139b45fef20cc4f7ed3c23d4c8d57"
+}

@@ -70,6 +70,11 @@ export const createOptionsSchema = z
   })
   .strict();
 
+export const navigationUrlSchema = z.string().url().max(2000).refine(value => {
+  const url = new URL(value);
+  return ["http:", "https:"].includes(url.protocol) && !url.username && !url.password;
+}, "Use an HTTP(S) URL without embedded credentials.");
+
 export const serviceIdSchema = z.enum(["github", "linear", "google"]);
 export const accountRecordSchema = z.object({
   service: serviceIdSchema,
@@ -80,6 +85,10 @@ export type ServiceId = z.infer<typeof serviceIdSchema>;
 export type AccountRecord = z.infer<typeof accountRecordSchema>;
 
 export const rpcContract = defineRpcContract({
+  navigate: {
+    input: z.object({ scope: scopeSchema, url: navigationUrlSchema }).strict(),
+    output: z.object({ url: z.string(), title: z.string(), viewerUrl: z.string().url() }).strict(),
+  },
   signIns: { input: scopeSchema, output: z.array(accountRecordSchema) },
   confirmSignIn: {
     input: z.object({ scope: scopeSchema, service: serviceIdSchema, label: accountRecordSchema.shape.label }).strict(),

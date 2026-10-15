@@ -1,4 +1,19 @@
-# Steel Browser
+# BB Surf
+
+Watch your agent through the Monitor icon in the thread header, or choose
+**Open browser panel** on a browser handoff. The live view opens on the right.
+Hover over the panel for two seconds to expand it to about two-thirds of the window,
+leaving the active thread visible beside it;
+moving back to chat shrinks it. **Expand browser panel** keeps it wide until
+you choose **Shrink browser panel** or press Escape in BB. Touch devices use
+these explicit controls. Expansion preserves the browser session and viewer,
+without dimming or blocking the remaining conversation.
+
+The interface follows BB's light/dark theme. BB Surf is the display name.
+Existing `steel-browser` plugin IDs, `bb steel-browser` commands,
+`::steel-browser{}` handoffs, project profiles, and saved settings remain
+compatible with existing installations. Steel Browser remains the name of the
+upstream browser engine.
 
 The installed plugin contributes browser instructions to every new BB agent
 session through `bb.agents.contributeInstructions`. Agents must check
@@ -58,7 +73,7 @@ player in place, keeping one stream and the same active tab. Disconnecting the v
 the browser running; releasing a session closes it. Idle sessions remain usable.
 The play control connects the viewer; it does not start a jev-ultrafast agent.
 
-Steel Browser gives BB a compact operational surface for a self-hosted
+BB Surf gives BB a compact operational surface for a self-hosted
 [Steel](https://github.com/steel-dev/steel-browser) instance. It shows service
 health and active sessions, creates browser sessions, and releases them with an
 explicit confirmation.
@@ -76,12 +91,12 @@ inline viewer starts minimized and does not load until the user explicitly
 restores it. Desktop clients keep the automatic viewer connection. Minimizing
 disconnects the player stream; restoring reconnects it. Only the latest inline
 browser message streams, and hidden browser tabs stop their viewers. A manual
-**Steel Browser**
+**BB Surf**
 thread-panel action remains available from the panel launcher.
 
 ### Agent Configuration
 
-BB Tools / Steel Browser exposes the jev-ultrafast checkout path, host-only
+BB Tools / BB Surf exposes the jev-ultrafast checkout path, host-only
 credentials file path, and text-model identifier. The inline viewer's settings
 icon shows those saved values. The adapter connects Jev's upstream observation
 and action loop to the project's existing page through a temporary authenticated
@@ -203,7 +218,7 @@ viewer, never via agent command arguments.
 
 ## Engines
 
-BB Tools / Steel Browser has project-scoped engine selection and a separate
+BB Tools / BB Surf has project-scoped engine selection and a separate
 fallback checkbox. Playwright is the default; fallback defaults off. Auto tries
 Jev first. Selecting Jev or Auto does not authorize paid API calls.
 
@@ -232,7 +247,7 @@ bb plugin install ./plugins/steel-browser
 bb plugin reload steel-browser
 ```
 
-Open **Steel Browser** in BB or use:
+Open **BB Surf** in BB or use:
 
 ```sh
 bb steel-browser status
@@ -268,3 +283,16 @@ npm run check --workspace bb-plugin-steel-browser
 
 Steel is Apache-2.0 software maintained by Steel.dev. This plugin is not
 affiliated with or endorsed by Steel.dev.
+
+## Canvas portals
+
+The `navigate` RPC accepts `{scope: {projectId} | {threadId}, url}` and returns
+`{url, title, viewerUrl}` after confirming navigation. It resolves the existing
+project binding, rejects URLs with embedded credentials or non-web schemes,
+and uses that project's page CDP target. It does not start a separate browser
+or a paid engine. Agent Canvas embeds the returned viewer for interaction;
+website credentials and MFA belong in that embedded browser.
+
+Page-level navigation avoids browser-wide attachment stalls caused by unrelated
+browser UI targets in newer Chromium builds. Navigation failures are not replayed;
+inspect the same session before retrying an uncertain result.

@@ -1,6 +1,11 @@
-import type { PluginSidebarThreadIndicator } from "@bb/plugin-sdk";
+import type { PluginSidebarThreadIndicator } from "@get-bb/plugin-sdk";
 
 export type ThreadStatusColorRole =
+  | "workflow"
+  | "agent"
+  | "command"
+  | "plan"
+  | "goal"
   | "error"
   | "inactive"
   | "unread"
@@ -18,12 +23,17 @@ export function statusColorRole(
     case "unread-success":
       return "unread";
     case "runtime":
-    case "workflow":
-    case "background-agent":
-    case "background-command":
-    case "plan-mode":
-    case "goal":
       return "working";
+    case "workflow":
+      return "workflow";
+    case "background-agent":
+      return "agent";
+    case "background-command":
+      return "command";
+    case "plan-mode":
+      return "plan";
+    case "goal":
+      return "goal";
     case "draft":
     case "working-draft":
       return "inactive";
