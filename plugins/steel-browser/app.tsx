@@ -142,10 +142,10 @@ function ScopedSteelThreadPanel({ threadId }: { threadId: string }) {
     <section ref={expansion.panel} style={expansion.geometry}
       onPointerEnter={expansion.enter} onPointerLeave={expansion.leave}
       onPointerOverCapture={expansion.enter} onPointerOutCapture={expansion.leave}
-      className={`steel-thread-panel${expansion.expanded ? " steel-thread-panel--expanded" : ""}`} aria-label="Cerq Browser">
+      className={`steel-thread-panel${expansion.expanded ? " steel-thread-panel--expanded" : ""}`} aria-label="BB Surf">
       <header className="steel-thread-panel__bar">
         <div>
-          <strong>Cerq Browser</strong>
+          <strong>BB Surf</strong>
           <span>{error ? "Unavailable" : active ? "Live in this thread" : dashboard?.connected ? "No active session" : "Connecting..."}</span>
         </div>
         <div className="steel-panel-actions">
@@ -162,7 +162,7 @@ function ScopedSteelThreadPanel({ threadId }: { threadId: string }) {
         </div>
       </header>
       {playerUrl && active && visible ? (
-        <LiveViewer key={playerKey} url={playerUrl} title={`Cerq Browser for ${threadId}`} />
+        <LiveViewer key={playerKey} url={playerUrl} title={`BB Surf for ${threadId}`} />
       ) : error || dashboard?.error ? (
         <div className="steel-panel-state" role="alert">{error ?? dashboard?.error}</div>
       ) : (
@@ -203,13 +203,13 @@ function ScopedSteelBrowser({ message }: PluginMessageDirectiveProps) {
     <div ref={anchor} style={anchorStyle} className="steel-inline-anchor" data-steel-thread={message.threadId}>
     <section style={style}
       className={`steel-inline-browser${minimized ? " steel-inline-browser--minimized" : ""}${style ? " steel-inline-browser--following" : ""}`}
-      aria-label="Cerq Browser in this thread"
+      aria-label="BB Surf in this thread"
     >
       <header>
         <div>
           <Monitor aria-hidden="true" />
           <span>
-            <strong>Cerq Browser</strong>
+            <strong>BB Surf</strong>
             <small>{error ? "Unavailable" : active ? "Session available" : dashboard?.connected ? "No active session" : minimized ? "Minimized" : "Connecting"}</small>
           </span>
         </div>
@@ -238,7 +238,7 @@ function ScopedSteelBrowser({ message }: PluginMessageDirectiveProps) {
       </header>
       <div className="steel-inline-browser__viewport" hidden={minimized}>
         {playerUrl && active && latest && visible && !minimized ? (
-          <LiveViewer key={playerKey} url={playerUrl} title={`Cerq Browser for ${message.threadId}`} />
+          <LiveViewer key={playerKey} url={playerUrl} title={`BB Surf for ${message.threadId}`} />
         ) : !latest ? (
           <div className="steel-panel-state">Viewer active in the latest browser message</div>
         ) : error || dashboard?.error ? (
@@ -329,7 +329,7 @@ export function SteelAgentSettings() {
         <dt>Credentials file</dt><dd>{isLoading ? "Loading..." : String(values?.jevEnvFile || "Not configured")}</dd>
         <dt>Text model</dt><dd>{isLoading ? "Loading..." : String(values?.jevTextModel || "Not configured")}</dd>
       </dl>
-      <p>Configuration: BB Tools / Cerq Browser. Credentials stay on the host.
+      <p>Configuration: BB Tools / BB Surf. Credentials stay on the host.
         Live Jev runs use potentially billable TypeSafe and text-model APIs. DNS changes apply when a project browser is next provisioned or repaired.</p>
     </section>
   );
@@ -426,7 +426,7 @@ export function SteelBrowserPage() {
         <header className="steel-header">
           <div className="steel-identity">
             <span className="steel-brand" aria-hidden="true"><PanelsTopLeft /></span>
-            <h1>Cerq Browser</h1>
+            <h1>BB Surf</h1>
           </div>
         </header>
         {picker}
@@ -514,7 +514,7 @@ function ScopedSteelBrowserPage({ scope, picker }: { scope: Scope; picker: React
         <div className="steel-identity">
           <span className="steel-brand" aria-hidden="true"><PanelsTopLeft /></span>
           <div>
-            <h1>Cerq Browser</h1>
+            <h1>BB Surf</h1>
             <p>Persistent project browser</p>
           </div>
         </div>
@@ -573,7 +573,7 @@ function ScopedSteelBrowserPage({ scope, picker }: { scope: Scope; picker: React
         </div>
         <div className="steel-viewport">
           {watching && visible && connected && activeSession && playerUrl ? (
-            <LiveViewer key={playerKey} url={playerUrl} title="Live Cerq Browser" />
+            <LiveViewer key={playerKey} url={playerUrl} title="Live BB Surf" />
           ) : (
             <div className="steel-viewer-empty">
               <Monitor aria-hidden="true" />
@@ -683,7 +683,7 @@ export default definePluginApp((app) => {
   });
   app.slots.threadPanelAction({
     id: THREAD_PANEL_ACTION_ID,
-    title: "Cerq Browser",
+    title: "BB Surf",
     icon: "Monitor",
     component: SteelThreadPanel,
     layout: "flush",
@@ -694,7 +694,7 @@ export default definePluginApp((app) => {
   });
   app.slots.navPanel({
     id: "steel-browser",
-    title: "Cerq Browser",
+    title: "BB Surf",
     icon: "Monitor",
     path: "steel-browser",
     component: SteelBrowserPage,

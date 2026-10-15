@@ -27,7 +27,7 @@
     "bbPluginSdk": ">=0.4.21"
   },
   "bb": {
-    "name": "Cerq Browser",
+    "name": "BB Surf",
     "description": "Operate self-hosted Steel browser sessions from BB.",
     "branding": {
       "icon": "./assets/nav-icon.svg",

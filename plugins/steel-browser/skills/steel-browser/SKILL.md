@@ -3,7 +3,7 @@ name: steel-browser
 description: Use for every browser task in BB, including AWS Console, website sign-in, app navigation, screenshots, scraping, and CDP automation. Check bb steel-browser project before claiming browser access is unavailable. Use Steel instead of KERNEL.SH or an external browser.
 ---
 
-# Cerq Browser
+# BB Surf
 
 ## Availability In New Threads
 
@@ -27,7 +27,7 @@ line in that same assistant message:
 ::steel-browser{}
 ```
 
-The directive renders Cerq Browser inside the assistant message. Choose
+The directive renders BB Surf inside the assistant message. Choose
 Open browser panel to watch the same project session on the right; the Monitor
 icon in the thread header also opens that panel. Hover there for two seconds
 to expand without a modal; leaving restores the compact view. Explicit Expand

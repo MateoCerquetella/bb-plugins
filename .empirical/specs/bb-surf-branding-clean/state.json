@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 5,
+  "revision": 8,
   "activeFeature": "bb-surf-branding-clean",
   "request": "Rebuild the already implemented BB Surf branding and responsiveness follow-up from current main so review contains only this feature. Preserve compatibility identifiers and upstream Steel attribution. Update the root and plugin READMEs and icon accessibility title to BB Surf, suspend automatic hover sampling while panel expansion is pinned, preserve compact and hover behavior, add the browser behavior assertion, then run independent review and focused plugin/browser verification. Do not publish or rename the compatibility protocol.",
   "profile": "complex",
@@ -9,8 +9,8 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Planned the clean BB Surf implementation, focused diff audit, commit, independent review, and selected verification receipts.",
-  "implementationActor": null,
+  "message": "The clean branch must include every current BB-owned BB Surf display-name change, not only the five follow-up files. Current main still has Cerq Browser in package.json and related app/server/skill copy. Apply the remaining display-only changes from the preserved BB Surf implementation while keeping stable steel-browser identifiers and upstream attribution unchanged. Then rerun review before verification.",
+  "implementationActor": "root",
   "workStartedAt": "2026-10-15T14:52:21.877Z",
   "specDigest": "sha256:0223d0f9df88d4c7e80fe501f02c9e90c1f09e418f3841a6c9a4a8a1459aed72",
   "approvedSpecRevision": 3,
@@ -37,7 +37,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-15T14:53:49.483Z",
+  "updatedAt": "2026-10-15T14:56:31.351Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "bb-surf-branding-clean-126e96e64c00",
@@ -65,5 +65,11 @@
     "heartbeatAt": "2026-10-15T14:53:09.824Z",
     "digest": "sha256:d552038ba876b75d220d52e7722649f26f36df4d1ca8ac6a38eb8d081f4fc126"
   },
-  "reviewFirst": true
+  "reviewFirst": true,
+  "trackerGeneration": 1,
+  "lifecycle": {
+    "stage": "iteration",
+    "iteration": 1,
+    "awaitingFeedback": false
+  }
 }

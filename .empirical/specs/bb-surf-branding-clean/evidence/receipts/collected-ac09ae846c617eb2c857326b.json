@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-ac09ae846c617eb2c857326b",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-5",
+    "AC-6",
+    "AC-UI-4"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-10-15T14:55:47.216Z",
+  "completedAt": "2026-10-15T14:55:47.216Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "bb-surf-branding-clean",
+    "specRevision": 3,
+    "specDigest": "sha256:0223d0f9df88d4c7e80fe501f02c9e90c1f09e418f3841a6c9a4a8a1459aed72",
+    "treeDigest": "sha256:1803717e65a4a9fe121e09159fe0388ff07cc5fba0f16111183195a112fd05ba",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:46ba36fdc149350779c80c7127671bce72a57ecb25c4adc45a7e3e9988013146",
+  "kind": "collected",
+  "collector": "empirical-review:surf_clean_review",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/bb-surf-branding-clean/reviews/c4d77aad842b281f650e4feb.json",
+      "mediaType": "application/json",
+      "bytes": 2866,
+      "digest": "sha256:80446c3e9f361884ff12dbba8564b39e0b7fd5fbba06c5852218f16bccc5d848"
+    },
+    {
+      "path": ".empirical/specs/bb-surf-branding-clean/reviews/c4d77aad842b281f650e4feb.md",
+      "mediaType": "text/markdown",
+      "bytes": 2102,
+      "digest": "sha256:cf05ed0b21ec1be28f81eed482f40fa574562621c42e070f95f940d6ed6c30e5"
+    }
+  ]
+}
