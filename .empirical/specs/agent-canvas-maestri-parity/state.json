@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 5,
+  "revision": 6,
   "activeFeature": "agent-canvas-maestri-parity",
   "request": "Continue working on Agent Canvas. This is a complex task: inspect https://www.themaestri.app/en and mimic all observable features and, as far as possible, its style and interactions in our independently installable BB plugin.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "implement",
-  "status": "waiting",
+  "phase": "done",
+  "status": "done",
   "repairAttempts": 0,
-  "message": "Executable plan covers baseline import, validated model, spatial UI, scoped live orchestration, host resources, reusable libraries, browser evidence and independent integration.",
+  "message": "Closed as merged-externally: Merged in pull request #69 as 06698fc715d561e9e3b168219ee7d813944217fe into main; closed when the merge was observed.",
   "implementationActor": null,
   "workStartedAt": null,
   "specDigest": "sha256:0dbdb4703630d28db34440377795beb1204de6b6275d51eb43d16ee55220172d",
@@ -37,7 +37,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-06T02:15:03.008Z",
+  "updatedAt": "2026-10-15T13:20:51.069Z",
   "sizeDecision": {
     "choice": "keep",
     "criteria": 14,
@@ -77,5 +77,39 @@
     "heartbeatAt": "2026-10-06T02:13:52.958Z",
     "digest": "sha256:8f06308b851d627e1c9faa78c1bd49a656e69d865079c95c14e7d477c0a02f0f"
   },
-  "reviewFirst": true
+  "reviewFirst": true,
+  "closure": {
+    "schemaVersion": 1,
+    "outcome": "merged-externally",
+    "reason": "Merged in pull request #69 as 06698fc715d561e9e3b168219ee7d813944217fe into main; closed when the merge was observed.",
+    "actor": "empirical",
+    "confirmation": "merge-observed",
+    "closedAtPhase": "implement",
+    "completionAtClosure": "none",
+    "externalMerge": {
+      "pullRequest": 69,
+      "url": "https://github.com/MateoCerquetella/bb-plugins/pull/69",
+      "state": "MERGED",
+      "mergeCommit": "06698fc715d561e9e3b168219ee7d813944217fe",
+      "targetBranch": "main",
+      "ancestorOfTarget": true,
+      "observedAt": "2026-10-15T13:20:40.740Z"
+    },
+    "closedAt": "2026-10-15T13:20:50.901Z",
+    "digest": "sha256:a79c17a83baae755177a8d2a16b1467c443b365b26c413a0072f284c3059910e"
+  },
+  "completionRecord": {
+    "schemaVersion": 1,
+    "implementedBy": null,
+    "completedBy": "empirical",
+    "decisionBy": null,
+    "method": "merged-externally",
+    "reason": "Merged in pull request #69 as 06698fc715d561e9e3b168219ee7d813944217fe into main; closed when the merge was observed.",
+    "at": "2026-10-15T13:20:51.069Z",
+    "revision": 6,
+    "completion": "none",
+    "sourceTreeDigest": "sha256:50a585b6336754fd16343fe4ce4967834ecde9869aab19b1055004816f9eefc9",
+    "artifactTreeDigest": "sha256:932604f20829db0f4fe9d9bca1755afeac9eeee456eac65a7a1257c8d078bf94",
+    "digest": "sha256:49a3b00172ae5b87ccb0ad190bcc77250835b5e4c80ac01bbb1c82ff437bb345"
+  }
 }

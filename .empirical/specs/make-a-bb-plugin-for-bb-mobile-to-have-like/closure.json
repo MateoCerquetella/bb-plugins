@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "outcome": "merged-externally",
+  "reason": "Merged in pull request #82 as a16dda0dd942d0bd1a7967329142f4209d5c9231 into main; closed when the merge was observed.",
+  "actor": "empirical",
+  "confirmation": "merge-observed",
+  "closedAtPhase": "verify",
+  "completionAtClosure": "implemented",
+  "externalMerge": {
+    "pullRequest": 82,
+    "url": "https://github.com/MateoCerquetella/bb-plugins/pull/82",
+    "state": "MERGED",
+    "mergeCommit": "a16dda0dd942d0bd1a7967329142f4209d5c9231",
+    "targetBranch": "main",
+    "ancestorOfTarget": true,
+    "observedAt": "2026-10-15T13:20:40.740Z"
+  },
+  "closedAt": "2026-10-15T13:20:54.356Z",
+  "digest": "sha256:90eb6e49d2289af32668d56fa5364ed67efe9998909d21c9399c8e988f61b909"
+}
