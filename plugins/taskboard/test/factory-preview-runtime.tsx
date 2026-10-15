@@ -16,6 +16,9 @@ declare global {
 export function useRpc() {
   return rpc;
 }
+export function useSettings() {
+  return { values: {}, isLoading: false };
+}
 const rpc = {
   async call(method: string, input: { body?: string; digest?: string; kind?: string; path?: string }) {
     const record = window.factoryFixture;
