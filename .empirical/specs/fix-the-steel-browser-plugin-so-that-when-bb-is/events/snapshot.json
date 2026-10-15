@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "feature": "fix-the-steel-browser-plugin-so-that-when-bb-is",
+  "lastSequence": 13,
+  "lastEventDigest": "sha256:6708baeb44ccfbf3ee64417158217d329ddc5a5a33d56fb2acf7eedd8a768d78",
+  "stateDigest": "sha256:f4203563b412585c712a46062b84c9969f735c9bbe7857288f45e7503c2ad146",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 13,
+    "activeFeature": "fix-the-steel-browser-plugin-so-that-when-bb-is",
+    "request": "Fix the steel-browser plugin so that when BB is being used on mobile it does not automatically open the browser link/viewer, while preserving appropriate desktop behavior; add or update tests, run required verification, create a pull request, and merge it.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "done",
+    "status": "done",
+    "repairAttempts": 0,
+    "message": "Closed as merged-externally: Merged in pull request #79 as a2170ef63d19ea466306d2dc2ece0a33a86887a9 into main; closed when the merge was observed.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:aca9f3255ce916f421ac20c7d6d52e4c9ebceebea91a6e3f3cc7bec30f386c7c",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:5a9b8b916898bd56113d50009b2eba2c1eed55e226a96b6fe02472ec08ffb07d",
+    "impactDigest": "sha256:f6d77a4fed828be597167b4855c2535dd0ed9160c4e323e42ba753b8ad5c0b08",
+    "capabilityClaimId": "fix-the-steel-browser-plugin-so-that-when-bb-is-21c37e987a71",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "collected-aeefd1df7733d26da0a34d94",
+      "qa-88a0431b58389f3bb6c477d3",
+      "qa-8450166047641a84818ce7b4",
+      "collected-430dca0d08010491ed809e45"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": true,
+      "integrated": true,
+      "delivered": false,
+      "published": false,
+      "highest": "integrated",
+      "reasons": {
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-15T13:20:52.652Z",
+    "lifecycle": {
+      "stage": "consolidation",
+      "iteration": 1,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "contractBaseline": 9,
+      "amendments": [
+        8
+      ]
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "fix-the-steel-browser-plugin-so-that-when-bb-is-21c37e987a71",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "fix-the-steel-browser-plugin-so-that-when-bb-is",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_ph4zesju56-1/bb-plugins",
+      "worktreeId": "sha256:0102a4c59797342e14b314b77d5b2867b0e4e40e906f86dc6c1bef5b8c78a6c3",
+      "baseCommit": "9b1e4867641bbf8685eb5b363d96571a26da44c5",
+      "baseTree": "e5b5f754077d2f2af4f8e2f869d3d7e126ee99be",
+      "bases": {
+        "steel-browser-viewer": {
+          "capability": "steel-browser-viewer",
+          "digest": "sha256:1b6f3b4ba00080925b9363deaffa6552844dd72b1368b93935449488737bbac0",
+          "requirements": {
+            "render the viewer for every human browser handoff": "sha256:c2be62e0a43b4d2a2107f95aa572f7709d879df18d402253c5cfe0e26333ca13"
+          }
+        }
+      },
+      "capabilities": [
+        "steel-browser-viewer"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-12T19:19:11.182Z",
+      "heartbeatAt": "2026-10-12T19:19:11.182Z",
+      "digest": "sha256:d78ba15558fffbbab12b09754c02ae224caa5b1a8cf5c9664c2016757d47db95"
+    },
+    "trackerGeneration": 1,
+    "reviewFirst": true,
+    "closure": {
+      "schemaVersion": 1,
+      "outcome": "merged-externally",
+      "reason": "Merged in pull request #79 as a2170ef63d19ea466306d2dc2ece0a33a86887a9 into main; closed when the merge was observed.",
+      "actor": "empirical",
+      "confirmation": "merge-observed",
+      "closedAtPhase": "integrate",
+      "completionAtClosure": "integrated",
+      "externalMerge": {
+        "pullRequest": 79,
+        "url": "https://github.com/MateoCerquetella/bb-plugins/pull/79",
+        "state": "MERGED",
+        "mergeCommit": "a2170ef63d19ea466306d2dc2ece0a33a86887a9",
+        "targetBranch": "main",
+        "ancestorOfTarget": true,
+        "observedAt": "2026-10-15T13:20:40.740Z"
+      },
+      "closedAt": "2026-10-15T13:20:52.488Z",
+      "digest": "sha256:1d6f189f91ba0f8e94c5185ab80dcd50ee15f70826c1548a8cf40226d780561b"
+    },
+    "completionRecord": {
+      "schemaVersion": 1,
+      "implementedBy": "agent",
+      "completedBy": "empirical",
+      "decisionBy": null,
+      "method": "merged-externally",
+      "reason": "Merged in pull request #79 as a2170ef63d19ea466306d2dc2ece0a33a86887a9 into main; closed when the merge was observed.",
+      "at": "2026-10-15T13:20:52.652Z",
+      "revision": 13,
+      "completion": "integrated",
+      "sourceTreeDigest": "sha256:50a585b6336754fd16343fe4ce4967834ecde9869aab19b1055004816f9eefc9",
+      "artifactTreeDigest": "sha256:1e37b7573b73202f89f3bea3b677399c0e9a38df651ccb25cee5312d87ae47ea",
+      "digest": "sha256:5e595d594cb6979c5337921fd719c2096c0eee2111f010505ccbf5a8e6fabe22"
+    }
+  },
+  "compactedAt": "2026-10-15T13:20:53.386Z",
+  "digest": "sha256:50db3785f4c63c8016ba1e47dbb3a67c4297e586fed9e129ef9b589435546252"
+}

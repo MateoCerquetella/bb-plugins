@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:2fb2e6a56581e647a1843b1aed5bad5961cfaea73bf77dfcfa916eb3940dc0c1",
+  "resultPath": ".empirical/specs/improve-taskboard-ui-ux-for-structured-completion-results-shown-in/reviews/20f7e94352e89306c90ed0c9.json",
+  "resultDigest": "sha256:20f7e94352e89306c90ed0c9a41251e040ed248476e89391e1daf738ef6d343d",
+  "receiptId": "collected-aace6dd2c6450fcff521896f",
+  "reReview": {
+    "previousResultDigest": "sha256:8363b667c3b60e91a902ecaf0f0e4223e0ab05801a1f296fccc9c11c1a369cc1",
+    "previousBaseCommit": "02d3f6731d3eee570c4f242932f338d60e9117b3",
+    "previousHeadCommit": "149356cafd7942fcefbab651d8d5add11bb80e1e",
+    "previousVerdict": "CHANGES_REQUESTED",
+    "previousReview": "# Verdict: CHANGES_REQUESTED\n\n- PASS AC-1: Build and Review prompts emit the registered taskboard-result directive with Markdown outside the card.\n- PASS AC-2: The card shows stage and verdict. Invalid attributes produce a neutral status without consuming the following Markdown.\n- PASS AC-3: Directive parsing rejects malformed, repeated, mixed, wrong-kind, and unsupported headers. Implemented Builds require a revision; blocked Reviews require findings.\n- PASS AC-4: The legacy XML/JSON parsing paths remain present and retain their conservative verdict checks.\n- FAIL AC-5: Latest-run failures can disappear when an earlier session remains selected. Their error notice, next step, and technical details are rendered only in the selected RunDetail.\n- PASS AC-6: Retry, continuation, recovery linking, tracker status retry, original-ticket navigation, and session navigation remain available through their existing state predicates.\n- PASS AC-UI-1: The committed presentation uses alert/status roles, native details disclosures, wrapping, and constrained widths. Browser checks cover desktop and 390px; this review did not execute them.\n- PASS AC-7: Main stages spawn distinct threads without sourceThreadId or inherited conversation. Handoffs include bounded evidence, the exact persisted approved plan, and the implementation revision.\n- PASS AC-8: Initial implemented Builds advance to Review. Automatic blocked-Build continuations count persisted attempts per plan and scope and stop after two. Recovery requires the existing managed worktree.\n- PASS AC-9: Reconciliation drains event pages, checks current native status, retains pending terminal outcomes until idle, and runs under the same per-ticket lock as starts.\n- PASS AC-UI-2: The single labelled selector follows the newest run until explicitly changed, preserves selection by ticket identity, and falls back when the selected run disappears. Recovery actions remain tied to the latest run.\n\n## Security / correctness\n\nThe exact committed changes preserve conservative verdict parsing, durable dispatch intent, uncertainty handling, workspace validation, and bounded recovery. No new credential or authorization exposure was identified. One user-visible correctness issue remains in failure presentation during historical selection. Tests and browser checks were inspected but not executed.\n\n## Design / maintainability\n\nThe result schema and display-only card are small, focused additions. Extending the existing run ledger avoids a second scheduler, and the pendingCompletion field makes delayed native idle explicit. However, latest-run failure presentation now depends on historical navigation selection while deduplication still assumes the latest RunDetail is visible. That ownership mismatch should be fixed before approval.",
+    "openFindings": [],
+    "deferredFindings": [
+      {
+        "id": "F-1",
+        "severity": "medium",
+        "category": "correctness",
+        "summary": "Keep the latest failure visible while browsing historical sessions. RunInsights renders only the selected RunDetail, so a latest Build failure can be hidden behind an older selection.",
+        "path": "plugins/taskboard/factory/app.tsx"
+      }
+    ]
+  }
+}

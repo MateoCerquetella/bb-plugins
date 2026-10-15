@@ -1,8 +1,26 @@
 import { factoryBuildResultSchema, factoryReviewResultSchema } from './contract.js';
+import { readResultMessage } from './result.js';
 
 export const MAX_REVIEW_REPAIRS = 2;
 
+export function readableResultOutput(output: string) {
+  const message = readResultMessage(output);
+  if (message?.valid) return message.body;
+  return output.replace(/<taskboard-(build|review)>[\s\S]*?<\/taskboard-\1>/g, (block, kind: string) =>
+    kind === 'build' ? readBuildResult(block).summary : readReviewResult(block).findings);
+}
+
 export function readBuildResult(output: string) {
+  const message = readResultMessage(output);
+  if (message) {
+    if (message.valid && message.header.kind === 'build') {
+      const parsed = factoryBuildResultSchema.safeParse({
+        verdict: message.header.verdict, summary: message.body, revision: message.header.revision ?? null
+      });
+      if (parsed.success && (parsed.data.verdict !== 'implemented' || parsed.data.revision)) return parsed.data;
+    }
+    return { verdict: 'unknown' as const, summary: output, revision: null };
+  }
   const blocks = [...output.matchAll(/<taskboard-build>\s*([\s\S]*?)\s*<\/taskboard-build>/g)];
   if (blocks.length) {
     try {
@@ -16,6 +34,14 @@ export function readBuildResult(output: string) {
 }
 
 export function readReviewResult(output: string) {
+  const message = readResultMessage(output);
+  if (message) {
+    if (message.valid && message.header.kind === 'review') {
+      const parsed = factoryReviewResultSchema.safeParse({ verdict: message.header.verdict, findings: message.body });
+      if (parsed.success && (parsed.data.verdict !== 'blocked' || parsed.data.findings)) return parsed.data;
+    }
+    return { verdict: 'unknown' as const, findings: output };
+  }
   // Only the final reviewer output is interpreted, never tracker text or live updates.
   const blocks = [...output.matchAll(/<taskboard-review>\s*([\s\S]*?)\s*<\/taskboard-review>/g)];
   if (blocks.length) {

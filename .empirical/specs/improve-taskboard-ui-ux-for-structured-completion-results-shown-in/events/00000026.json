@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "sequence": 26,
+  "previousDigest": "sha256:43a55d7743efdc3defc1901078e86ef1eace9f37b75dec487daf4e3e9349cc34",
+  "actor": "codex",
+  "type": "transition",
+  "summary": "Consolidate: Close the repaired Taskboard iteration after preserving latest-run failure visibility during historical session selection.",
+  "createdAt": "2026-10-15T16:01:24.652Z",
+  "stateBeforeDigest": "sha256:18a33e39396746a7da7ba5c0345d363b9e5aa7580b14c5d4c7c68f0aa8c20e7c",
+  "stateAfterDigest": "sha256:2ac1885e7a1b50330a8f2d5811d0b2b34723a064045d181e4b418a14fc8b9503",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 26,
+    "activeFeature": "improve-taskboard-ui-ux-for-structured-completion-results-shown-in",
+    "request": "Improve Taskboard UI/UX for structured completion results shown in BB threads and for errors displayed inside Taskboard tasks. Replace raw JSON-like result blocks such as {\"verdict\":\"blocked\",\"findings\":\"...\"} with a compact, scannable status presentation that preserves full detail, and improve task error states so they communicate what failed, what the user can do, and optional technical details. Keep the work scoped to plugins/taskboard, follow existing design patterns, preserve accessibility and responsive behavior, and verify the real UI in a browser with screenshots plus focused tests.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "review",
+    "status": "waiting",
+    "repairAttempts": 1,
+    "message": "Close the repaired Taskboard iteration after preserving latest-run failure visibility during historical session selection.",
+    "implementationActor": "codex",
+    "workStartedAt": null,
+    "specDigest": "sha256:06cf67b85bfed06d92be505da11f437bbfea740b10a253e8c4978f630a7302e5",
+    "approvedSpecRevision": 18,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:59cb39bcd8421f01f94b73e62c97d727c92df5117c07183b5f75de0c72de4442",
+    "impactDigest": "sha256:8a5a3162471454f81f2d6be3f22df0d0372d63e1e2097fdc8d8ad3b2ac0694dd",
+    "capabilityClaimId": "improve-taskboard-ui-ux-for-structured-completion-results-shown-in-fadaf8a18d53",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-15T16:01:24.652Z",
+    "lifecycle": {
+      "stage": "consolidation",
+      "iteration": 3,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "contractRevision": 16,
+      "contractBaseline": 21
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 11,
+      "capabilities": 1,
+      "reason": "The 11 criteria are one coupled Factory workflow change: result parsing and task presentation are already implemented in the dirty worktree, while fresh stage sessions, automatic recovery, live reconciliation, and the session selector share the same persisted run model and must be verified together to avoid unsafe partial automation.",
+      "actor": "codex",
+      "revision": 7
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "improve-taskboard-ui-ux-for-structured-completion-results-shown-in-fadaf8a18d53",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "improve-taskboard-ui-ux-for-structured-completion-results-shown-in",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_kxzzi5iryw-1/bb-plugins",
+      "worktreeId": "sha256:b235622fbd7fead31d467d0e296bc815e5e97491885150c9639d9f1a8a0931a0",
+      "baseCommit": "02d3f6731d3eee570c4f242932f338d60e9117b3",
+      "baseTree": "e9c3da95ad04dbcb227b87ef10ef4f3cabb59049",
+      "bases": {
+        "taskboard-agent-progress-ui": {
+          "capability": "taskboard-agent-progress-ui",
+          "digest": "sha256:0d13d74f5495014048a382b37f6c2a1df0f5e715b252a6f70eaa07ae4f585e60",
+          "requirements": {
+            "readable native progress": "sha256:94e6e8e0836a4256049314a8eb4706b9b3a817e32baa1d27ab6b7c0d38d29178"
+          }
+        }
+      },
+      "capabilities": [
+        "taskboard-agent-progress-ui"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-15T13:31:05.069Z",
+      "heartbeatAt": "2026-10-15T13:31:05.069Z",
+      "digest": "sha256:5bc1c410cca99129dd946507f17f54c494b0759b834c6310039d83f84565a390"
+    },
+    "trackerGeneration": 3,
+    "budgetExtensionMinutes": 30,
+    "reviewFirst": true
+  },
+  "digest": "sha256:8772faddb18883fc73bfa82fdfb3ab9ccf35688b8068fc77e4e095491205deec"
+}

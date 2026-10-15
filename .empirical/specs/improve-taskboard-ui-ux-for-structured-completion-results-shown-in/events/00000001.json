@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "sequence": 1,
+  "previousDigest": "sha256:778e68243e78fecaa33b75d8f12c768a563f62a2db49d7feb3c61f96fa55fae7",
+  "actor": "empirical-start",
+  "type": "transition",
+  "summary": "Started improve-taskboard-ui-ux-for-structured-completion-results-shown-in",
+  "createdAt": "2026-10-15T13:21:30.933Z",
+  "stateBeforeDigest": "sha256:74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+  "stateAfterDigest": "sha256:6cf5af57a220fdf729cfec95ec2dd2861692be6b077620a0a0578eb016cbb36e",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 1,
+    "activeFeature": "improve-taskboard-ui-ux-for-structured-completion-results-shown-in",
+    "request": "Improve Taskboard UI/UX for structured completion results shown in BB threads and for errors displayed inside Taskboard tasks. Replace raw JSON-like result blocks such as {\"verdict\":\"blocked\",\"findings\":\"...\"} with a compact, scannable status presentation that preserves full detail, and improve task error states so they communicate what failed, what the user can do, and optional technical details. Keep the work scoped to plugins/taskboard, follow existing design patterns, preserve accessibility and responsive behavior, and verify the real UI in a browser with screenshots plus focused tests.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": null,
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:e1707de85645e26df50489ba641126bebe00dc7112afa90927223dd9aa6eb481",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": null,
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-15T13:21:30.933Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:465fa7b69a3725a8a7a34d88db6718f9b8638c7210eb3674cddff830cdb353b6"
+}

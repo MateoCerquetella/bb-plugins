@@ -19,7 +19,37 @@ const { progressStatus } = await import('../factory/tracker.ts');
 const { newRecord, savePlan, approvePlan, startRun } = await import('../factory/state.ts');
 const { createFactoryStore } = await import('../factory/store.ts');
 const { createFactoryService, applyNativeEvent, factoryPrompt } = await import('../factory/service.ts');
-const { readReviewResult } = await import('../factory/review.ts');
+const { readReviewResult, readBuildResult, readableResultOutput } = await import('../factory/review.ts');
+test('readable reports retain surrounding legacy details and malformed evidence', () => {
+  assert.equal(readableResultOutput('## Checks\n680 tests passed.\n<taskboard-review>{"verdict":"blocked","findings":"Missing backfill."}</taskboard-review>\nNo deployment.'),
+    '## Checks\n680 tests passed.\nMissing backfill.\nNo deployment.');
+  assert.equal(readableResultOutput('<taskboard-review>invalid</taskboard-review>'),
+    '<taskboard-review>invalid</taskboard-review>');
+  assert.equal(readableResultOutput('::taskboard-result{kind="review" verdict="blocked"}\n## Blockers\nMissing backfill.'),
+    '## Blockers\nMissing backfill.');
+});
+test('result directives preserve Markdown and require explicit implementation evidence', () => {
+  assert.deepEqual(readReviewResult('::taskboard-result{kind="review" verdict="blocked"}\n\n## Blockers\n- Missing backfill.'),
+    { verdict: 'blocked', findings: '## Blockers\n- Missing backfill.' });
+  assert.deepEqual(readBuildResult('::taskboard-result{kind="build" verdict="implemented" revision="abc123"}\n\nTests passed.'),
+    { verdict: 'implemented', summary: 'Tests passed.', revision: 'abc123' });
+  assert.deepEqual(readBuildResult('::taskboard-result{kind="build" verdict="needs_input"}\nChoose retention policy.'),
+    { verdict: 'needs_input', summary: 'Choose retention policy.', revision: null });
+  assert.deepEqual(readReviewResult('::taskboard-result{kind="review" verdict="passed"}\nVerified the plan.'),
+    { verdict: 'passed', findings: 'Verified the plan.' });
+  for (const output of [
+    '::taskboard-result{kind="build" verdict="implemented"}\nDone',
+    '::taskboard-result{kind="review" verdict="blocked"}\n',
+    '::taskboard-result{kind="review" verdict="passed" extra="yes"}\nDone',
+    '```text\n::taskboard-result{kind="review" verdict="passed"}\n```\nDone',
+    '::taskboard-result{kind="review" verdict="passed"}\n::taskboard-result{kind="review" verdict="blocked"}\nMissing',
+    '::taskboard-result{kind="review" verdict="passed"}\n<taskboard-review>{"verdict":"blocked","findings":"Missing"}</taskboard-review>',
+    '::taskboard-result{kind="review" verdict="passed" revision="abc"}\nDone'
+  ]) {
+    assert.equal(readBuildResult(output).verdict, 'unknown');
+    assert.equal(readReviewResult(output).verdict, 'unknown');
+  }
+});
 const item: WorkItem = {
   bbProjectId: 'proj_test', source: 'gitlab', locator: 'gitlab.com/group/repo#12',
   key: '#12', title: 'Keep panel open', description: 'Show progress.', url: 'https://gitlab.com/group/repo/-/issues/12',
@@ -49,6 +79,9 @@ function fixture() {
   let managed = true;
   let spawnInput: unknown;
   let currentThreadId = 'thr_native';
+  const threadEnvironments = new Map<string, string>([
+    ['thr_native', 'env_test'], ['thr_build', 'env_build'], ['thr_review_seed', 'env_test']
+  ]);
   const sent: { threadId: string; input: { text: string }[] }[] = [];
   const events: Parameters<typeof applyNativeEvent>[1][] = [];
   const sdk = {
@@ -59,15 +92,21 @@ function fixture() {
         if (rejectSpawn) throw new Error('HTTP 400: hostId is required unless workspace.type is personal');
         if (rejectWorktree) throw new Error('HTTP 409: This project checkout has no usable git branch.');
         if (failSpawn) throw new Error('Response lost');
-        const fork = (input as { originKind?: string }).originKind === 'fork';
-        const review = (input as { title: string }).title.endsWith(': review');
-        currentThreadId = review ? `thr_review_${spawns}` : fork ? 'thr_build' : 'thr_native';
-        return { id: currentThreadId, environmentId: fork ? 'env_build' : 'env_test', projectId: item.bbProjectId };
+        const request = input as { title: string; environment: { type: string; environmentId?: string } };
+        const kind = request.title.split(': ').at(-1);
+        currentThreadId = kind === 'investigate' && spawns === 1 ? 'thr_native'
+          : kind === 'build' ? 'thr_build'
+          : `thr_${kind}_${spawns}`;
+        const environmentId = request.environment.type === 'reuse'
+          ? request.environment.environmentId!
+          : request.environment.type === 'host' ? 'env_build' : 'env_test';
+        threadEnvironments.set(currentThreadId, environmentId);
+        return { id: currentThreadId, environmentId, projectId: item.bbProjectId };
       },
       get: async ({ threadId }: { threadId: string }) => ({
         id: threadId, status: threadStatuses.get(threadId) ?? threadStatus,
         projectId: item.bbProjectId,
-        environmentId: threadId === 'thr_build' ? 'env_build' : threadId === 'thr_native' ? buildEnvironment : 'env_test',
+        environmentId: threadId === 'thr_native' ? buildEnvironment : threadEnvironments.get(threadId) ?? 'env_test',
         providerId: 'codex', archivedAt: archived.has(threadId) ? 1 : null, deletedAt: deleted.has(threadId) ? 1 : null
       }),
       unarchive: async ({ threadId }: { threadId: string }) => {
@@ -85,7 +124,8 @@ function fixture() {
       events: { list: async (input: { threadId: string; limit?: string; order?: string; afterSeq?: string }) => {
         assert.ok(Number(input.limit) <= 100, 'Native event limit must not exceed 100');
         const matching = events.filter(event => event.threadId === input.threadId);
-        return input.order === 'desc' ? matching.slice(-1) : matching.filter(event => event.seq > Number(input.afterSeq ?? 0));
+        return input.order === 'desc' ? matching.slice(-1)
+          : matching.filter(event => event.seq > Number(input.afterSeq ?? 0)).slice(0, Number(input.limit ?? 100));
       } },
       output: async () => ({ output })
     },
@@ -389,6 +429,57 @@ test('native polling observes completion and persists the result', async () => {
     assert.equal(record.runs[0].cursor, 1);
   } finally { f.db.close(); }
 });
+test('native polling drains every event page before advancing', async () => {
+  const f = fixture();
+  try {
+    await f.service.startTask(item, null);
+    for (let seq = 1; seq <= 100; seq++) f.events.push({
+      id: `update-${seq}`, threadId: 'thr_native', seq, createdAt: Date.now(),
+      scope: { kind: 'turn', turnId: 'turn_1' }, type: 'item/completed',
+      data: { item: { type: 'agentMessage', id: `message-${seq}`, text: `Update ${seq}` } }
+    } as Parameters<typeof applyNativeEvent>[1]);
+    f.events.push({
+      id: 'completed-101', threadId: 'thr_native', seq: 101, createdAt: Date.now(),
+      scope: { kind: 'turn', turnId: 'turn_1' }, type: 'turn/completed',
+      data: { status: 'completed', providerThreadId: null }
+    });
+    const record = await f.service.get(item);
+    assert.equal(record.runs[0].cursor, 101);
+    assert.equal(record.runs[0].status, 'finished');
+    assert.equal(record.runs.at(-1)?.kind, 'plan');
+  } finally { f.db.close(); }
+});
+
+test('resumed native activity clears stale results before automatic advancement', async () => {
+  const f = fixture();
+  try {
+    await f.service.startTask(item, null);
+    f.complete('Old investigation findings');
+    let record = await f.service.get(item);
+    assert.equal(record.runs.at(-1)?.kind, 'plan');
+    const plan = record.runs.at(-1)!;
+    plan.status = 'finished';
+    plan.finishedAt = new Date().toISOString();
+    plan.output = 'Stale plan';
+    f.store.save(record);
+    f.threadStatus('active', plan.threadId!);
+    record = await f.service.get(item);
+    assert.equal(record.runs.at(-1)?.status, 'running');
+    assert.equal(record.runs.at(-1)?.output, '');
+    assert.equal(record.runs.at(-1)?.finishedAt, null);
+    assert.equal(record.runs.length, 2);
+    f.events.push({
+      id: 'resumed-plan', threadId: plan.threadId!, seq: plan.cursor + 1, createdAt: Date.now(),
+      scope: { kind: 'turn', turnId: 'resumed-turn' }, type: 'turn/started',
+      data: { providerThreadId: 'provider-resumed' }
+    });
+    record = await f.service.get(item);
+    assert.equal(record.runs.at(-1)?.status, 'running');
+    assert.equal(record.runs.at(-1)?.output, '');
+    assert.equal(record.runs.at(-1)?.finishedAt, null);
+    assert.equal(record.runs.length, 2);
+  } finally { f.db.close(); }
+});
 test('Review requires approved, completed Build and never implies acceptance', () => {
   const record = newRecord(item);
   savePlan(record, 'Implement current scope');
@@ -416,7 +507,7 @@ test('recovery rejects a different project thread', async () => {
   } finally { f.db.close(); }
 });
 
-test('Start task moves status once and automatically reuses the session through planning and build', async () => {
+test('Start task hands four stages to fresh sessions and preserves the exact approved plan', async () => {
   const f = fixture();
   try {
     const [a, b] = await Promise.all([f.service.startTask(item, null), f.service.startTask(item, null)]);
@@ -427,7 +518,8 @@ test('Start task moves status once and automatically reuses the session through 
     await f.service.poll(new AbortController().signal);
     let record = f.store.all()[0];
     assert.equal(record.runs.at(-1)?.kind, 'plan');
-    assert.equal(f.sends(), 1);
+    assert.notEqual(record.runs[0].threadId, record.runs[1].threadId);
+    assert.equal(f.sends(), 0);
     f.complete('Implement current scope and run npm test');
     await Promise.all([f.service.get(item), f.service.get(item), f.service.startTask(item, null)]);
     record = f.store.all()[0];
@@ -435,14 +527,20 @@ test('Start task moves status once and automatically reuses the session through 
     assert.equal(record.runs.at(-1)?.planDigest, record.plans[0].digest);
     assert.equal(record.approvedDigest, record.plans[0].digest);
     assert.equal(record.plans[0].body, 'Implement current scope and run npm test');
-    assert.equal(f.sends(), 2);
-    assert.equal(f.spawns(), 1);
-    f.complete('Implemented and tested');
+    assert.equal(f.sends(), 0);
+    assert.equal(f.spawns(), 3);
+    assert.equal(new Set(record.runs.map(run => run.threadId)).size, 3);
+    const buildInput = f.spawnInput() as { originKind?: string; sourceThreadId?: string; prompt: string };
+    assert.equal(buildInput.originKind, undefined);
+    assert.equal(buildInput.sourceThreadId, undefined);
+    assert.match(buildInput.prompt, /Implement current scope and run npm test/);
+    f.complete('::taskboard-result{kind="build" verdict="implemented" revision="abc123"}\nImplemented and tested');
     record = await f.service.get(item);
-    await f.service.startTask(item, null);
-    assert.equal(record.stage, 'Build');
-    assert.equal(record.runs.at(-1)?.status, 'finished');
-    assert.equal(f.sends(), 2);
+    assert.equal(record.stage, 'Review');
+    assert.equal(record.runs.at(-1)?.kind, 'review');
+    assert.equal(new Set(record.runs.map(run => run.threadId)).size, 4);
+    assert.equal(f.spawns(), 4);
+    assert.equal(f.sends(), 0);
     assert.equal(f.progressWrites(), 1);
   } finally { f.db.close(); }
 });
@@ -451,32 +549,121 @@ test('completion before native idle continues automatically on the next poll', a
   const f = fixture();
   try {
     await f.service.startTask(item, null);
-    f.threadStatus('active');
+    f.threadStatus('active', 'thr_native');
     f.complete('Investigation findings');
     let record = await f.service.get(item);
-    assert.equal(record.runs.at(-1)?.status, 'finished');
+    assert.equal(record.runs.at(-1)?.status, 'running');
+    assert.ok(record.runs.at(-1)?.finishedAt);
+    record = await f.service.get(item);
+    assert.equal(record.runs.at(-1)?.status, 'running');
+    assert.ok(record.runs.at(-1)?.finishedAt);
     assert.equal(record.automationError, null);
     assert.equal(f.sends(), 0);
-    f.threadStatus('idle');
+    f.threadStatus('idle', 'thr_native');
     await f.service.poll(new AbortController().signal);
     record = f.store.all()[0];
     assert.equal(record.runs.at(-1)?.kind, 'plan');
-    f.threadStatus('active');
+    const planThread = record.runs.at(-1)!.threadId!;
+    f.threadStatus('active', planThread);
     f.complete('Plan with verification');
     record = await f.service.get(item);
-    assert.equal(record.runs.at(-1)?.status, 'finished');
+    assert.equal(record.runs.at(-1)?.status, 'running');
     assert.equal(record.automationError, null);
-    assert.equal(f.sends(), 1);
-    f.threadStatus('idle');
+    assert.equal(f.sends(), 0);
+    f.threadStatus('idle', planThread);
     await f.service.poll(new AbortController().signal);
     record = f.store.all()[0];
     assert.equal(record.runs.at(-1)?.kind, 'build');
-    assert.equal(f.sends(), 2);
-    assert.equal(f.spawns(), 1);
+    assert.equal(f.sends(), 0);
+    assert.equal(f.spawns(), 3);
   } finally { f.db.close(); }
 });
 
-test('planning in a project checkout forks Build into a managed worktree exactly once', async () => {
+for (const outcome of ['failed', 'interrupted', 'system-interrupted'] as const) {
+  test(`${outcome} survives active and stopping polls until native idle`, async () => {
+    const f = fixture();
+    try {
+      await f.service.startTask(item, null);
+      const createdAt = Date.now();
+      const scope = { kind: 'turn' as const, turnId: 'terminal-turn' };
+      f.events.push(outcome === 'system-interrupted' ? {
+        id: 'terminal', threadId: 'thr_native', seq: 1, createdAt,
+        scope: { kind: 'thread' }, type: 'system/thread/interrupted', data: { reason: 'manual-stop' }
+      } : {
+        id: 'terminal', threadId: 'thr_native', seq: 1, createdAt, scope, type: 'turn/completed',
+        data: { status: outcome, providerThreadId: null,
+          ...(outcome === 'failed' ? { error: { message: 'Provider request failed' } } : {}) }
+      });
+      const expectedError = outcome === 'failed' ? 'Provider request failed' : null;
+      for (const status of ['active', 'active', 'stopping', 'stopping', 'idle', 'idle']) {
+        f.threadStatus(status, 'thr_native');
+        const record = await f.service.get(item);
+        const run = record.runs[0];
+        assert.equal(run.status, status === 'idle' ? outcome === 'failed' ? 'failed' : 'canceled' : 'running');
+        assert.equal(run.error, expectedError);
+        assert.equal(run.finishedAt, new Date(createdAt).toISOString());
+        assert.equal(run.cursor, 1);
+        if (status === 'idle') assert.equal(run.activity, outcome === 'failed' ? 'Agent turn failed'
+          : outcome === 'interrupted' ? 'Agent stopped' : 'Interrupted: manual-stop');
+        assert.equal(record.runs.length, 1);
+        assert.equal(f.spawns(), 1);
+      }
+      f.threadStatus('active', 'thr_native');
+      const resumed = await f.service.get(item);
+      assert.equal(resumed.runs[0].status, 'running');
+      assert.equal(resumed.runs[0].finishedAt, null);
+      assert.equal(resumed.runs[0].error, null);
+      assert.equal(resumed.runs[0].activity, 'Agent working');
+    } finally { f.db.close(); }
+  });
+}
+
+test('polls preserve event-derived live activity until stopping', async () => {
+  const f = fixture();
+  try {
+    await f.service.startTask(item, null);
+    f.threadStatus('active', 'thr_native');
+    const activities: [Parameters<typeof applyNativeEvent>[1], string][] = [
+      [{
+        id: 'plan', threadId: 'thr_native', seq: 1, createdAt: Date.now(),
+        scope: { kind: 'turn', turnId: 'turn_1' }, type: 'turn/plan/updated',
+        data: { plan: [{ step: 'Inspect project selection', status: 'active' }],
+          providerThreadId: 'provider_1' }
+      }, 'Inspect project selection'],
+      ...([
+        [{ type: 'commandExecution', id: 'command', command: 'npm test' }, 'Running: npm test'],
+        [{ type: 'fileChange', id: 'files', changes: [] }, 'Editing files'],
+        [{ type: 'agentMessage', id: 'message', text: '' }, 'Writing response']
+      ] as const).map(([item, activity], index) => [{
+        id: item.id, threadId: 'thr_native', seq: index + 2, createdAt: Date.now(),
+        scope: { kind: 'turn', turnId: 'turn_1' }, type: 'item/started', data: { item }
+      } as Parameters<typeof applyNativeEvent>[1], activity] satisfies [Parameters<typeof applyNativeEvent>[1], string])
+    ];
+    for (const [event, activity] of activities) {
+      f.events.push(event);
+      assert.equal((await f.service.get(item)).runs[0].activity, activity);
+      await f.service.poll(new AbortController().signal);
+      assert.equal(f.store.all()[0].runs[0].activity, activity);
+    }
+    f.threadStatus('stopping', 'thr_native');
+    assert.equal((await f.service.get(item)).runs[0].activity, 'Stopping agent');
+  } finally { f.db.close(); }
+});
+
+test('legacy successful completion waiting for idle still advances', async () => {
+  const f = fixture();
+  try {
+    let record = await f.service.startTask(item, null);
+    record.runs[0].finishedAt = new Date().toISOString();
+    f.store.save(record);
+    record = await f.service.get(item);
+    assert.equal(record.runs[0].status, 'finished');
+    assert.equal(record.runs[0].output, 'Observed repository findings');
+    assert.equal(record.runs[1].kind, 'plan');
+  } finally { f.db.close(); }
+});
+
+test('planning in a project checkout starts a fresh Build in a managed worktree exactly once', async () => {
   const f = fixture();
   try {
     f.unmanaged();
@@ -485,9 +672,9 @@ test('planning in a project checkout forks Build into a managed worktree exactly
     await f.service.get(item);
     f.complete('Implement current scope and verify');
     const [record] = await Promise.all([f.service.get(item), f.service.get(item)]);
-    const input = f.spawnInput() as { originKind: string; sourceThreadId: string; environment: unknown; prompt: string };
-    assert.equal(input.originKind, 'fork');
-    assert.equal(input.sourceThreadId, 'thr_native');
+    const input = f.spawnInput() as { originKind?: string; sourceThreadId?: string; environment: unknown; prompt: string };
+    assert.equal(input.originKind, undefined);
+    assert.equal(input.sourceThreadId, undefined);
     assert.deepEqual(input.environment, {
       type: 'host', hostId: 'host_test', workspace: { type: 'managed-worktree', baseBranch: { kind: 'default' } }
     });
@@ -497,10 +684,10 @@ test('planning in a project checkout forks Build into a managed worktree exactly
     assert.equal(record.runs.at(-1)?.environmentId, 'env_build');
     assert.equal(f.store.forThread('thr_native')?.locator, item.locator);
     assert.equal(f.store.forThread('thr_build')?.locator, item.locator);
-    assert.equal(f.spawns(), 2);
-    assert.equal(f.sends(), 1);
+    assert.equal(f.spawns(), 3);
+    assert.equal(f.sends(), 0);
     await f.service.startTask(item, null);
-    assert.equal(f.spawns(), 2);
+    assert.equal(f.spawns(), 3);
   } finally { f.db.close(); }
 });
 
@@ -519,7 +706,7 @@ test('a lost Build fork response pauses without creating another worktree or cha
     record = await f.service.startTask(item, null);
     assert.equal(record.runs.at(-1)?.status, 'uncertain');
     await f.service.poll(new AbortController().signal);
-    assert.equal(f.spawns(), 2);
+    assert.equal(f.spawns(), 3);
     assert.equal(f.progressWrites(), 1);
   } finally { f.db.close(); }
 });
@@ -539,14 +726,14 @@ test('a broken checkout is a confirmed retryable Build failure, including legacy
     assert.equal(record.runs.at(-1)?.threadId, null);
     assert.match(record.runs.at(-1)?.error ?? '', /Repair the project checkout, then retry/);
     await f.service.poll(new AbortController().signal);
-    assert.equal(f.spawns(), 2);
+    assert.equal(f.spawns(), 3);
 
     record.runs.at(-1)!.status = 'uncertain';
     record.runs.at(-1)!.error = 'Native dispatch outcome uncertain: HTTP 409: This project checkout has no usable git branch.. Inspect recent BB threads; no automatic retry.';
     f.store.save(record);
     record = await f.service.get(item);
     assert.equal(record.runs.at(-1)?.status, 'failed');
-    assert.equal(f.spawns(), 2);
+    assert.equal(f.spawns(), 3);
     assert.equal(f.progressWrites(), 1);
   } finally { f.db.close(); }
 });
@@ -609,8 +796,8 @@ test('legacy completed planning resumes automatically after restart without anot
     const resumed = f.store.all()[0];
     assert.equal(resumed.runs.at(-1)?.kind, 'build');
     assert.equal(resumed.plans[0].body, 'Existing plan to implement');
-    assert.equal(f.sends(), 1);
-    assert.equal(f.spawns(), 0);
+    assert.equal(f.sends(), 0);
+    assert.equal(f.spawns(), 1);
   } finally { f.db.close(); }
 });
 
@@ -673,7 +860,7 @@ test('repair completion starts independent review of the repaired Build workspac
     seedReview(f);
     let record = await f.service.get(item);
     const buildThread = record.runs.at(-1)!.threadId;
-    f.complete('Changed panel.ts; npm test passed. Revision def456, workspace /work/panel.\n<taskboard-build>{"verdict":"implemented","summary":"Verified panel.ts","revision":"def456"}</taskboard-build>');
+    f.complete('::taskboard-result{kind="build" verdict="implemented" revision="def456"}\nChanged panel.ts; npm test passed. Revision def456, workspace /work/panel.');
     record = await f.service.get(item);
     assert.equal(record.stage, 'Review');
     assert.notEqual(record.runs.at(-1)!.threadId, buildThread);
@@ -681,8 +868,8 @@ test('repair completion starts independent review of the repaired Build workspac
     assert.deepEqual(input.environment, { type: 'reuse', environmentId: 'env_test' });
     assert.match(input.prompt, /Revision def456/);
     assert.match(input.prompt, /Authoring session: thr_native/);
-    assert.match(input.prompt, /<taskboard-review>/);
-    f.complete('<taskboard-review>{"verdict":"passed","findings":"Verified def456 and required checks"}</taskboard-review>');
+    assert.match(input.prompt, /::taskboard-result\{kind="review"/);
+    f.complete('::taskboard-result{kind="review" verdict="passed"}\nVerified def456 and required checks');
     record = await f.service.get(item);
     assert.equal(record.runs.at(-1)?.reviewResult?.verdict, 'passed');
     assert.equal(record.stage, 'Review');
@@ -842,6 +1029,53 @@ test('explicit blocked Build continuation restores its archived thread without a
   } finally { f.db.close(); }
 });
 
+test('automatic blocked Build continuation never restores an archived session', async () => {
+  const f = fixture();
+  try {
+    const record = seedReview(f);
+    record.runs.pop();
+    record.stage = 'Build';
+    const build = record.runs[0];
+    build.buildResult = { verdict: 'blocked', summary: 'Finish the implementation', revision: null };
+    build.output = `<taskboard-build>${JSON.stringify(build.buildResult)}</taskboard-build>`;
+    f.store.save(record);
+    f.archived.add('thr_native');
+    const paused = await f.service.get(item);
+    assert.equal(paused.runs.length, 1);
+    assert.match(paused.automationError!, /authoring session is archived/);
+    assert.equal(f.unarchives(), 0);
+    assert.equal(f.sends(), 0);
+  } finally { f.db.close(); }
+});
+
+test('retrying a rejected Build dispatch reuses the existing implementation worktree', async () => {
+  const f = fixture();
+  try {
+    const record = newRecord(item);
+    savePlan(record, 'Implement current scope and run the relevant checks');
+    approvePlan(record, record.plans[0].digest);
+    const implementation = startRun(record, 'build', false);
+    Object.assign(implementation, {
+      status: 'finished', threadId: 'thr_native', environmentId: 'env_test',
+      output: '::taskboard-result{kind="build" verdict="blocked"}\nFinish verification.',
+      buildResult: { verdict: 'blocked', summary: 'Finish verification.', revision: null }
+    });
+    const rejected = startRun(record, 'build', false);
+    Object.assign(rejected, {
+      status: 'failed', error: 'BB rejected the environment before starting a session.',
+      activity: 'Native session was not started'
+    });
+    const saved = f.store.save(record);
+    const retried = await f.service.start(item, {
+      expectedVersion: saved.version, kind: 'build', contextThreadId: null, retry: true
+    });
+    assert.equal(retried.runs.at(-1)?.environmentId, 'env_test');
+    assert.deepEqual((f.spawnInput() as { environment: unknown }).environment,
+      { type: 'reuse', environmentId: 'env_test' });
+    assert.equal(f.unarchives(), 0);
+  } finally { f.db.close(); }
+});
+
 test('review repair loop stops after two attempts without closing the tracker', async () => {
   const f = fixture();
   try {
@@ -885,6 +1119,11 @@ test('busy review completion waits for native idle without consuming a repair at
   const f = fixture();
   try {
     seedReview(f);
+    f.events.push({
+      id: 'review-completed', threadId: 'thr_review_seed', seq: 1, createdAt: Date.now(),
+      scope: { kind: 'turn', turnId: 'review-turn' }, type: 'turn/completed',
+      data: { status: 'completed', providerThreadId: null }
+    });
     f.threadStatus('active', 'thr_review_seed');
     let record = await f.service.get(item);
     assert.equal(record.runs.length, 2);
@@ -997,6 +1236,37 @@ test('Start task resumes a blocked Build in the same managed session exactly onc
   } finally { f.db.close(); }
 });
 
+test('actionable blocked Builds continue automatically twice and manual continuation does not reset the budget', async () => {
+  const f = fixture();
+  try {
+    const record = newRecord(item);
+    savePlan(record, 'Implement current scope and run the relevant checks');
+    approvePlan(record, record.plans[0].digest);
+    record.automatic = true;
+    const blocked = startRun(record, 'build', false);
+    blocked.status = 'finished';
+    blocked.threadId = 'thr_native';
+    blocked.environmentId = 'env_test';
+    blocked.output = '::taskboard-result{kind="build" verdict="blocked"}\nFinish the remaining validation.';
+    blocked.buildResult = readBuildResult(blocked.output);
+    f.store.save(record);
+
+    let current = await f.service.get(item);
+    assert.equal(current.runs.at(-1)?.continuationOf, blocked.id);
+    f.complete('::taskboard-result{kind="build" verdict="blocked"}\nThe validation is still actionable.');
+    current = await f.service.get(item);
+    assert.equal(current.runs.filter(run => run.continuationOf).length, 2);
+    f.complete('::taskboard-result{kind="build" verdict="blocked"}\nOne actionable step remains.');
+    current = await f.service.get(item);
+    assert.match(current.automationError ?? '', /continuation limit reached \(2 attempts\)/);
+    assert.equal(f.sends(), 2);
+
+    current = await f.service.startTask(item, null);
+    assert.equal(current.runs.filter(run => run.continuationOf).length, 3);
+    assert.equal(f.sends(), 3);
+  } finally { f.db.close(); }
+});
+
 test('continued blocked Build starts review only after implementation evidence', async () => {
   const f = fixture();
   try {
@@ -1079,9 +1349,9 @@ test('scope changes and an empty plan pause automatic build', async () => {
     let record = await f.service.get(item);
     assert.match(record.automationError!, /without a plan/);
     assert.equal(record.plans.length, 0);
-    assert.equal(f.sends(), 1);
+    assert.equal(f.sends(), 0);
     await f.service.get(item);
-    assert.equal(f.sends(), 1);
+    assert.equal(f.sends(), 0);
     const changed = { ...item, description: 'Changed requirements' };
     record = await f.service.get(changed);
     assert.equal(record.automatic, false);

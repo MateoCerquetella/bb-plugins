@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "sequence": 4,
+  "previousDigest": "sha256:6e04f1d861c30e7ee4a459c198343b9e1abadafb7e2cdb10ffa7517f00c2769e",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Recorded directive-plus-Markdown design, legacy compatibility, conservative validation and state-owned error actions with alternatives and verification.",
+  "createdAt": "2026-10-15T13:32:41.579Z",
+  "stateBeforeDigest": "sha256:b051b383812bf6865878a74a2fa60790f9cd7ab85e5b6adc3d03d00bd68eaa1b",
+  "stateAfterDigest": "sha256:44457f83cdf93d51a2343da6fb35f4930b8aaecfc94592fbf4550c15d9c21d84",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 4,
+    "activeFeature": "improve-taskboard-ui-ux-for-structured-completion-results-shown-in",
+    "request": "Improve Taskboard UI/UX for structured completion results shown in BB threads and for errors displayed inside Taskboard tasks. Replace raw JSON-like result blocks such as {\"verdict\":\"blocked\",\"findings\":\"...\"} with a compact, scannable status presentation that preserves full detail, and improve task error states so they communicate what failed, what the user can do, and optional technical details. Keep the work scoped to plugins/taskboard, follow existing design patterns, preserve accessibility and responsive behavior, and verify the real UI in a browser with screenshots plus focused tests.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "plan",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Recorded directive-plus-Markdown design, legacy compatibility, conservative validation and state-owned error actions with alternatives and verification.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:056589aacc55505b028132e5ec476f02243a3a9ec35202f27fbb9bb6f49d5826",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:2304d5d10a99fc4cd9e0eb361a5aac462d3d318d32d73423f8552660670758f2",
+    "impactDigest": "sha256:8a5a3162471454f81f2d6be3f22df0d0372d63e1e2097fdc8d8ad3b2ac0694dd",
+    "capabilityClaimId": "improve-taskboard-ui-ux-for-structured-completion-results-shown-in-fadaf8a18d53",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-15T13:32:41.579Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 7,
+      "capabilities": 1,
+      "reason": "The seven criteria describe one user-visible presentation change across a shared result contract: the native result card, backward-compatible parsing, and actionable error state must be changed and verified together to avoid a half-migrated protocol or duplicated controls.",
+      "actor": "codex",
+      "revision": 1
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "improve-taskboard-ui-ux-for-structured-completion-results-shown-in-fadaf8a18d53",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "improve-taskboard-ui-ux-for-structured-completion-results-shown-in",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_kxzzi5iryw-1/bb-plugins",
+      "worktreeId": "sha256:b235622fbd7fead31d467d0e296bc815e5e97491885150c9639d9f1a8a0931a0",
+      "baseCommit": "02d3f6731d3eee570c4f242932f338d60e9117b3",
+      "baseTree": "e9c3da95ad04dbcb227b87ef10ef4f3cabb59049",
+      "bases": {
+        "taskboard-agent-progress-ui": {
+          "capability": "taskboard-agent-progress-ui",
+          "digest": "sha256:0d13d74f5495014048a382b37f6c2a1df0f5e715b252a6f70eaa07ae4f585e60",
+          "requirements": {
+            "readable native progress": "sha256:94e6e8e0836a4256049314a8eb4706b9b3a817e32baa1d27ab6b7c0d38d29178"
+          }
+        }
+      },
+      "capabilities": [
+        "taskboard-agent-progress-ui"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-15T13:31:05.069Z",
+      "heartbeatAt": "2026-10-15T13:31:05.069Z",
+      "digest": "sha256:5bc1c410cca99129dd946507f17f54c494b0759b834c6310039d83f84565a390"
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:259602f2794d4e553e6a5f8c6e77c2541a567a2e1a5d9daa4f9eb7e29df1174a"
+}

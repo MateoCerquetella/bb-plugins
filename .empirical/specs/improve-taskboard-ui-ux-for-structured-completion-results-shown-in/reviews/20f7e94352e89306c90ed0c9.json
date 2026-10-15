@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:2fb2e6a56581e647a1843b1aed5bad5961cfaea73bf77dfcfa916eb3940dc0c1",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "02d3f6731d3eee570c4f242932f338d60e9117b3",
+  "headCommit": "10a50362822105e5b8b3b6234bc7b80cf5a5f651",
+  "diffDigest": "sha256:164f37fa866778ce99dec3d5cd773fe91ac51738bae66321ff3c8dbf3fbb3eab",
+  "verdict": "APPROVED",
+  "reviewerActor": "codex-independent-fresh-review-repair",
+  "reviewerInvocationId": "fresh-review-repair-10a503628-20261015",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: Prior pass carried forward. The repair does not change the native result card.\n- PASS AC-2: Prior pass carried forward. Verdict and Markdown presentation are unchanged.\n- PASS AC-3: Prior pass carried forward. Directive parsing is unchanged.\n- PASS AC-4: Prior pass carried forward. Legacy XML and JSON parsing are unchanged.\n- PASS AC-5: F-1 is fixed. RunInsights renders the latest run ErrorNotice during historical selection and deduplicates it when the latest run is visible.\n- PASS AC-6: Prior pass carried forward. Recovery and navigation predicates are unchanged.\n- PASS AC-UI-1: Prior pass carried forward. The repair reuses the accessible ErrorNotice and changes no layout styles.\n- PASS AC-7: Prior pass carried forward. Fresh main-stage handoffs are unchanged.\n- PASS AC-8: Prior pass carried forward. Bounded automatic Build recovery is unchanged.\n- PASS AC-9: Prior pass carried forward. Reconciliation and dispatch deduplication are unchanged.\n- PASS AC-UI-2: Prior pass carried forward. Latest-run errors now remain visible during historical selection.\n\n## Security / correctness\n\nThe repair closes the visibility gap without changing state transitions, dispatch, parsing, or authorization. No material correctness or security finding was identified.\n\n## Design / maintainability\n\nThe local change reuses ErrorNotice and separates current failure visibility from historical detail selection without new state or abstraction.",
+  "bodyDigest": "sha256:aa550d26ecfe929e0fdaeaef901b57727efc6cf62be89f905bfaedde357b152a",
+  "findings": [],
+  "digest": "sha256:20f7e94352e89306c90ed0c9a41251e040ed248476e89391e1daf738ef6d343d"
+}
