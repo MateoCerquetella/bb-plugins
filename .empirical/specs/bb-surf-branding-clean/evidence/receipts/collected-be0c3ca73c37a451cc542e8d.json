@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-be0c3ca73c37a451cc542e8d",
+  "criteria": [
+    "AC-5",
+    "AC-UI-4"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Real Steel browser component fixture exited 0 for desktop dark/light, mobile touch light, desktop touch dark. Verified pinned sampling suspension, hover, controls, thread changes and iframe preservation. BB RPC and viewer content are mocked; not production authentication proof.",
+  "passed": true,
+  "startedAt": "2026-10-15T15:04:14.517Z",
+  "completedAt": "2026-10-15T15:04:14.517Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "bb-surf-branding-clean",
+    "specRevision": 3,
+    "specDigest": "sha256:0223d0f9df88d4c7e80fe501f02c9e90c1f09e418f3841a6c9a4a8a1459aed72",
+    "treeDigest": "sha256:8098360833a81e6804b3b404387ace199dfaf5f709d46679a482c75fb50af93a",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:07455b3d3a015fb2699db5e6b5df914d20461084a3767b495dc56d7f59e5f9f3",
+  "kind": "collected",
+  "collector": "root-browser-fixture",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/bb-surf-branding-clean/qa/cerq-panel-compact-390-true-light.png",
+      "mediaType": "image/png",
+      "bytes": 28864,
+      "digest": "sha256:560c5cc01efe480a52db15bf30eb0249b0f2aeea08f5d34531f1348eb1db5eab"
+    },
+    {
+      "path": ".empirical/specs/bb-surf-branding-clean/qa/cerq-panel-expanded-dark.png",
+      "mediaType": "image/png",
+      "bytes": 34411,
+      "digest": "sha256:f6d6896838f9b176f5f630a3b24cf59dcde0434621da9d268a44d5f99eb1adac"
+    },
+    {
+      "path": ".empirical/specs/bb-surf-branding-clean/qa/cerq-panel-expanded-light.png",
+      "mediaType": "image/png",
+      "bytes": 34537,
+      "digest": "sha256:8ed2f33aa4c3489df059dfd81f6a4b881b6e0d8e3f70ae13d28afe444d9dbd8b"
+    }
+  ]
+}

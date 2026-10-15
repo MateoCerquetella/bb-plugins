@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:b4b67bf21436e4ed0727d5870f30c48f7e872fc2db8e255bf5857cc836d2fef1",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "02d3f6731d3eee570c4f242932f338d60e9117b3",
+  "headCommit": "7df6db2a74da7745c17f8fb40a9c185a5b70a4bb",
+  "diffDigest": "sha256:79dfcc93857f3e1ac020a0141b9d233003c75755d5b143dddddf290502b94218",
+  "verdict": "APPROVED",
+  "reviewerActor": "surf_final_review",
+  "reviewerInvocationId": "surf-final-review-20261015T160000Z-b4b67bf2",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: PASS: The delta completes BB-owned current-facing copy in the manifest, navigation, headings, panel and inline viewer labels, settings guidance, contributed instructions, and skill heading; the prior approved README and icon-title coverage carries forward unchanged.\n- PASS AC-2: PASS: The delta changes display strings only; steel-browser package/plugin/path identifiers, commands, directive syntax, and other compatibility surfaces shown in the packet remain unchanged, while the previously approved Steel Browser attribution carries forward.\n- PASS AC-3: PASS: The prior approved plugin README coverage for panel behavior, compatibility, project isolation, and verification commands is unaffected by this delta and carries forward.\n- PASS AC-UI-4: PASS: The delta renames the panel, inline viewer, plugin page, slot titles, manifest display name, accessibility labels, and viewer titles to BB Surf without adding theme-specific styling or behavior; the prior light/dark-theme verdict carries forward.\n- PASS AC-5: PASS: The delta does not alter the previously approved hover-sampling implementation or compact/hover behavior; the added capability-contract scenarios accurately describe the accepted pinned and compact lifecycle.\n- PASS AC-6: PASS: The delta introduces no executable behavior or check change beyond display-copy updates, so the prior packet verdict carries forward; execution evidence remains the responsibility of separate verification receipts and no tests were run in this review.\n\n## Security / correctness\n\nNo material security or correctness issue is introduced by the delta. It changes BB-owned display copy and workflow/specification artifacts without exposing credentials or personal data, changing authentication or authorization, or modifying stable protocol identifiers. The previously reviewed runtime behavior is untouched.\n\n## Design / maintainability\n\nAPPROVED. The remaining branding changes stay localized to existing display surfaces and reuse the existing ownership boundaries. The capability-contract addition documents the accepted hover lifecycle without adding production indirection or branching. The Empirical review/context artifacts are workflow bookkeeping and do not create a product maintainability regression.",
+  "bodyDigest": "sha256:ced8368aa609ffb2b4d1572232f7330c59cae36bfb456eced72296551fc15241",
+  "findings": [],
+  "digest": "sha256:8533793c454820ffd9c72ec3563343f7066c591f34324cd64c04d337a0b69330"
+}
