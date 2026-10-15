@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 4,
+  "revision": 6,
   "activeFeature": "finish-pr-83-keep-the-aura-new-thread-composer-thread",
   "request": "Finish PR 83. Keep the AURA new-thread composer/thread centered at every viewport size, remove the duplicated Activity overview heading shown in the installed UI, reconcile the branch with current main without losing the existing activity overview behavior, verify the live installed AURA UI and repository checks, update the pull request, and make it merge-ready.",
   "profile": "complex",
@@ -9,7 +9,7 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Planned main reconciliation, live DOM inspection, minimal AURA layout and heading changes, behavioral coverage, installed UI verification, review, checks, and PR readiness.",
+  "message": null,
   "implementationActor": null,
   "workStartedAt": null,
   "specDigest": "sha256:590b44c9f393b0ad300711b9022eb2a45646e02f9f0a04cf86162bb7ff8c84cc",
@@ -37,7 +37,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-15T15:52:49.277Z",
+  "updatedAt": "2026-10-15T18:21:39.890Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "finish-pr-83-keep-the-aura-new-thread-composer-thread-60cbf0e62f93",

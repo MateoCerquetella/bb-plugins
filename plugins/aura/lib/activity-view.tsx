@@ -58,8 +58,8 @@ function ActivityContent() {
   const offset = data?.days?.length ? new Date(data.days[0].date + "T00:00:00Z").getUTCDay() : 0;
   const empty = result?.status === "ready" && data && [data.contributions, data.opened, data.merged, data.reviews].every(value => value === 0);
   const retry = () => { setResult(null); setAttempt(value => value + 1); };
-  return <section className="aura-activity overview" aria-labelledby={`${id}-title`} aria-busy={!result}>
-    <header className="overview-header"><div><h2 id={`${id}-title`}>Activity overview</h2><p>{data ? `${data.login} · GitHub${repository ? ` · ${repository}` : ""}` : "GitHub activity"}</p></div><div className="filters">
+  return <section className="aura-activity overview" aria-label="GitHub activity" aria-busy={!result}>
+    <header className="overview-header"><div><p>{data ? `${data.login} · GitHub${repository ? ` · ${repository}` : ""}` : "GitHub activity"}</p></div><div className="filters">
       <label className="aura-sr-only" htmlFor={`${id}-period`}>Activity period</label><select id={`${id}-period`} aria-label="Activity period" value={period} onChange={e => { setResult(null); setPeriod(e.target.value as ActivityInput["period"]); }}><option value="year">Last 365 days</option><option value="quarter">Last 90 days</option><option value="month">Last 30 days</option></select>
       <label className="aura-sr-only" htmlFor={`${id}-repo`}>Activity repository</label><select id={`${id}-repo`} aria-label="Activity repository" value={repository ?? ""} onChange={e => { setResult(null); setRepository(e.target.value || null); }}><option value="">All repositories</option>{repositories.map(name => <option key={name} value={name}>{name}</option>)}</select>
     </div></header>

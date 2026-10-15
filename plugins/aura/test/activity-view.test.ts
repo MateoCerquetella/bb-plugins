@@ -31,6 +31,8 @@ test("default-off never requests activity; enabling loads and stale period respo
     assert.equal(pending.length, 0);
     enabled = true; await slot.emitRealtime(CHANGED, null);
     await waitFor(() => assert.equal(pending.length, 1));
+    assert.equal(slot.queryByRole("heading", { name: "Activity overview" }), null);
+    assert.ok(slot.getByRole("region", { name: "GitHub activity" }));
     fireEvent.change(slot.getByLabelText("Activity period"), { target: { value: "month" } });
     await waitFor(() => assert.equal(pending.length, 2));
     assert.deepEqual(pending[1].input, { period: "month", repository: null });
