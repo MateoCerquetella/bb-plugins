@@ -1,7 +1,15 @@
 {
   "schemaVersion": 1,
-  "resultPath": ".empirical/specs/improve-taskboard-ui-ux-for-structured-completion-results-shown-in/reviews/8363b667c3b60e91a902ecaf.json",
-  "resultDigest": "sha256:8363b667c3b60e91a902ecaf0f0e4223e0ab05801a1f296fccc9c11c1a369cc1",
+  "resultPath": ".empirical/specs/improve-taskboard-ui-ux-for-structured-completion-results-shown-in/reviews/20f7e94352e89306c90ed0c9.json",
+  "resultDigest": "sha256:20f7e94352e89306c90ed0c9a41251e040ed248476e89391e1daf738ef6d343d",
   "contractDigest": "sha256:0b78c8535ac8c053878b42123779d3b09fee1fdb5146ca4f17f0be14df60d2a4",
-  "carriedDeferred": []
+  "carriedDeferred": [
+    {
+      "id": "F-1",
+      "severity": "medium",
+      "category": "correctness",
+      "summary": "Keep the latest failure visible while browsing historical sessions. RunInsights renders only the selected RunDetail, so a latest Build failure can be hidden behind an older selection.",
+      "path": "plugins/taskboard/factory/app.tsx"
+    }
+  ]
 }
