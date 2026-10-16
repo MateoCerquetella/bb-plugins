@@ -569,7 +569,7 @@ describe("Host Monitor sidebar refresh cadence", () => {
 });
 
 describe("Host Monitor floating metric privacy", () => {
-  it("colors only CPU/RAM percentages by threshold and marks network direction", () => {
+  it("colors resource percentages by threshold and marks network direction", () => {
     const source = readFileSync(
       new URL("../lib/sidebar-host-monitor.ts", import.meta.url),
       "utf8",
@@ -578,6 +578,10 @@ describe("Host Monitor floating metric privacy", () => {
     assert.match(source, /sendBytesPerSecond/u);
     assert.match(source, /thresholdToneAccessibleLabel\(tones\.cpu\)/u);
     assert.match(source, /thresholdToneAccessibleLabel\(tones\.memory\)/u);
+    assert.match(
+      source,
+      /thresholdToneAccessibleLabel\(resources\[2\]\?\.tone \?\? "normal"\)/u,
+    );
     assert.match(source, /value\.dataset\.tone = tone/u);
     assert.match(source, /metricValue\.dataset\.tone = options\.tone/u);
     assert.match(source, /metric\.dataset\.networkDirection = options\.direction/u);
@@ -586,7 +590,7 @@ describe("Host Monitor floating metric privacy", () => {
     assert.equal(
       [
         ...source.matchAll(
-          /network\.available\s*\?\s*\{\s*direction:\s*"(?:down|up)"\s*\}\s*:\s*\{\}/gu,
+          /network\.available\s*\?\s*\{\s*kind:\s*"network",\s*direction:\s*"(?:down|up)"\s*\}\s*:\s*\{\s*kind:\s*"plain"\s*\}/gu,
         ),
       ].length,
       2,
