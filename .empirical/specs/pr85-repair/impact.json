@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "taskboard-pr85-repair"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:49777cf96efdb4d8be643bb0ced0b1c8ddf311723babd7c4ce48bb60ddf2aed7"
+}

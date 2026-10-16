@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 5,
+  "revision": 5,
+  "activeFeature": "pr85-repair",
+  "request": "Repair existing PR #85 in a fresh temporary worktree, rebase onto current origin/main preserving Taskboard behavior, run focused and root checks plus installed browser verification, push existing PR branch and mark ready, do not merge.",
+  "profile": "complex",
+  "workflow": "complex",
+  "mode": "normal",
+  "phase": "implement",
+  "status": "waiting",
+  "repairAttempts": 0,
+  "message": "Planned isolated rebase, focused and root checks, browser verification and safe PR publication.",
+  "implementationActor": null,
+  "workStartedAt": "2026-10-16T02:12:56.159Z",
+  "specDigest": "sha256:f09fe70305423a4a86e431f80b1a14d455d5a33e28a51140383cdbe1bb38f707",
+  "approvedSpecRevision": 3,
+  "capabilityArchiveRequired": true,
+  "capabilityDeltaDigest": "sha256:75d1f5c79ee782cb2319be7233ead0b321b4829d367cd43d42d847f2ce001feb",
+  "impactDigest": "sha256:49777cf96efdb4d8be643bb0ced0b1c8ddf311723babd7c4ce48bb60ddf2aed7",
+  "capabilityClaimId": "pr85-repair-4b7fcb0bec06",
+  "authorizationDigest": null,
+  "evidence": [],
+  "evidenceReceiptIds": [],
+  "legacyEvidenceCount": 0,
+  "completion": {
+    "implemented": false,
+    "verified": false,
+    "integrated": false,
+    "delivered": false,
+    "published": false,
+    "highest": "none",
+    "reasons": {
+      "implemented": "implemented has not been proven by a durable receipt.",
+      "verified": "verified has not been proven by a durable receipt.",
+      "integrated": "integrated has not been proven by a durable receipt.",
+      "delivered": "delivered has not been proven by a durable receipt.",
+      "published": "published has not been proven by a durable receipt."
+    }
+  },
+  "updatedAt": "2026-10-16T02:22:30.038Z",
+  "capabilityBase": {
+    "schemaVersion": 1,
+    "id": "pr85-repair-4b7fcb0bec06",
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "pr85-repair",
+    "worktree": "/tmp/bb-plugins-pr85-repair",
+    "worktreeId": "sha256:8068747f21028ea9fe94a74044fd7583c78b9181c3e42da065e72391ea20cf2a",
+    "baseCommit": "28209b163692c3b168395d635d11a78f00597c1e",
+    "baseTree": "828bf741d66841048482bc8bc0999307641886c0",
+    "bases": {
+      "taskboard-pr85-repair": {
+        "capability": "taskboard-pr85-repair",
+        "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "requirements": {
+          "current-main compatibility": null
+        }
+      }
+    },
+    "capabilities": [
+      "taskboard-pr85-repair"
+    ],
+    "status": "active",
+    "integrationReceiptDigest": null,
+    "createdAt": "2026-10-16T02:19:45.722Z",
+    "heartbeatAt": "2026-10-16T02:19:45.722Z",
+    "digest": "sha256:d0c826f53201159ab075970837742abadeed9f88843b6cb5cf7d5a71a33ee4c6"
+  },
+  "reviewFirst": true
+}

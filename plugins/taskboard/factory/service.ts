@@ -652,12 +652,13 @@ export function createFactoryService(
       expectedVersion: number; kind: FactoryRunKind; contextThreadId: string | null; retry: boolean;
     }) {
       return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () => {
-        const record = await reconcile(current(item));
+        const requested = current(item);
+        const record = await reconcile(structuredClone(requested));
         const last = record.runs.at(-1);
         // A stale duplicate button press returns the original dispatch, never spawns.
-        if (last && last.kind === input.kind && input.expectedVersion < record.version &&
+        if (last && last.kind === input.kind && input.expectedVersion < requested.version &&
           last.status !== 'uncertain') return record;
-        assertVersion(record, input.expectedVersion);
+        assertVersion(requested, input.expectedVersion);
         record.automationError = null;
         if (input.kind === 'build' && last?.kind === 'review' && last.status === 'finished') {
           return repairReview(item, record, true);

@@ -144,7 +144,7 @@ try {
   });
   assert.equal(await sessionSelect.inputValue(), 'investigate-run');
   assert.equal(await manual.getByRole('button', { name: 'Continue in thread', exact: true }).count(), 1);
-  await manual.getByRole('button', { name: 'Open session', exact: true }).click();
+  await manual.locator('.tb-session-picker').getByRole('button', { name: 'Open session', exact: true }).click();
   assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_investigate']);
   await page.evaluate(() => {
     const record = window.factoryFixture;
@@ -153,8 +153,8 @@ try {
     window.factoryRefresh();
   });
   assert.equal(await sessionSelect.inputValue(), 'new-build');
-  assert.equal(await manual.getByRole('button', { name: 'Open session', exact: true }).count(), 1);
-  await manual.getByRole('button', { name: 'Open session', exact: true }).click();
+  assert.equal(await manual.locator('.tb-session-picker').getByRole('button', { name: 'Open session', exact: true }).count(), 1);
+  await manual.locator('.tb-session-picker').getByRole('button', { name: 'Open session', exact: true }).click();
   assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_investigate', 'thr_build']);
   await page.evaluate(() => {
     const record = window.factoryFixture;
@@ -287,7 +287,7 @@ try {
     assert.equal(await manual.getByRole('button', { name: 'Start build', exact: true }).count(), 0);
     assert.equal(await manual.getByRole('button', { name: 'Continue in thread', exact: true }).count(), 0);
     const startsBeforeOpen = await page.evaluate(() => window.factoryStarts);
-    await manual.getByRole('button', { name: 'Open session', exact: true }).click();
+    await manual.locator('.tb-session-picker').getByRole('button', { name: 'Open session', exact: true }).click();
     assert.equal(await page.evaluate(() => window.factoryStarts), startsBeforeOpen);
   }
   await page.evaluate(() => {
