@@ -10,7 +10,6 @@ import {
   hostMonitorNativeOpenRpcRequest,
   hostMonitorPanelPath,
   hostMonitorSidebarMetricTones,
-  hostMonitorSidebarResourceMetrics,
   hostMonitorSidebarPreferencesRpcRequest,
   hostMonitorSidebarRefreshDelay,
   hostMonitorSidebarRpcRequest,
@@ -388,33 +387,6 @@ describe("Host Monitor sidebar threshold colors", () => {
     );
   });
 
-  it("presents CPU, RAM, and disk in order with shared freshness thresholds", () => {
-    assert.deepEqual(
-      hostMonitorSidebarResourceMetrics(
-        40,
-        72,
-        91,
-        true,
-        { attentionPercent: 70, criticalPercent: 90 },
-      ),
-      [
-        { key: "cpu", label: "CPU", percent: 40, tone: "normal" },
-        { key: "memory", label: "RAM", percent: 72, tone: "attention" },
-        { key: "disk", label: "Disk", percent: 91, tone: "critical" },
-      ],
-    );
-    assert.deepEqual(
-      hostMonitorSidebarResourceMetrics(null, 72, 91, false).map(
-        ({ key, tone }) => ({ key, tone }),
-      ),
-      [
-        { key: "cpu", tone: "unavailable" },
-        { key: "memory", tone: "neutral" },
-        { key: "disk", tone: "neutral" },
-      ],
-    );
-  });
-
   it("gates sidebar tones behind the default-on preference attribute", () => {
     const css = readFileSync(
       new URL("../app.css", import.meta.url),
@@ -569,7 +541,7 @@ describe("Host Monitor sidebar refresh cadence", () => {
 });
 
 describe("Host Monitor floating metric privacy", () => {
-  it("colors resource percentages by threshold and marks network direction", () => {
+  it("colors only CPU/RAM percentages by threshold and marks network direction", () => {
     const source = readFileSync(
       new URL("../lib/sidebar-host-monitor.ts", import.meta.url),
       "utf8",
@@ -578,10 +550,6 @@ describe("Host Monitor floating metric privacy", () => {
     assert.match(source, /sendBytesPerSecond/u);
     assert.match(source, /thresholdToneAccessibleLabel\(tones\.cpu\)/u);
     assert.match(source, /thresholdToneAccessibleLabel\(tones\.memory\)/u);
-    assert.match(
-      source,
-      /thresholdToneAccessibleLabel\(resources\[2\]\?\.tone \?\? "normal"\)/u,
-    );
     assert.match(source, /value\.dataset\.tone = tone/u);
     assert.match(source, /metricValue\.dataset\.tone = options\.tone/u);
     assert.match(source, /metric\.dataset\.networkDirection = options\.direction/u);
@@ -590,7 +558,7 @@ describe("Host Monitor floating metric privacy", () => {
     assert.equal(
       [
         ...source.matchAll(
-          /network\.available\s*\?\s*\{\s*kind:\s*"network",\s*direction:\s*"(?:down|up)"\s*\}\s*:\s*\{\s*kind:\s*"plain"\s*\}/gu,
+          /network\.available\s*\?\s*\{\s*direction:\s*"(?:down|up)"\s*\}\s*:\s*\{\}/gu,
         ),
       ].length,
       2,
