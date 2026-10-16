@@ -799,6 +799,7 @@ export function ThreadInbox({
                     onToggleRoot={changeSelectedRoot}
                     preferences={preferences}
                     projectNames={projectNames}
+                    projectColorOverrides={projectColorOverrides}
                   />
                 ))}
             {activePreset === "all" ? projectGroups

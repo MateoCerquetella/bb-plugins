@@ -30,6 +30,10 @@ import { threadDisplayTitle, threadIsWorking } from "@/lib/inbox";
 import { resolveFamilyExpanded } from "@/lib/thread-management";
 import type { RootSelectionIntent } from "@/lib/thread-management";
 import type { DocksidePreferences } from "@/lib/preferences";
+import {
+  projectBadgeLetter,
+  projectBadgePresentation,
+} from "@/lib/project-colors";
 import { relativeTimeLabel } from "@/lib/relative-time";
 import { resolveSnoozePresets } from "@/lib/lifecycle";
 import "./thread-card.css";
@@ -270,8 +274,7 @@ export function ThreadCard({
                 <span
                   title={threadDisplayTitle(thread)}
                   className={cn(
-                    "min-w-0 flex-1 truncate",
-                    grouped ? "text-xs" : "text-sm",
+                    "min-w-0 flex-1 truncate text-sm",
                     thread.isUnread ? "font-semibold" : "font-medium",
                     !familyState.receded
                       ? "text-foreground"
@@ -297,7 +300,11 @@ export function ThreadCard({
                     : "text-muted-foreground",
                 )}
               >
-                <ThreadLocation thread={thread} projectName={grouped ? projectName : undefined} />
+                <ThreadLocation
+                  thread={thread}
+                  projectName={grouped ? projectName : undefined}
+                  projectColorOverride={projectColorOverride}
+                />
               </div>
             </div>
 
@@ -634,9 +641,20 @@ function ThreadStatusLabel({
   );
 }
 
-function ThreadLocation({ thread, projectName }: { thread: PluginSidebarThread; projectName?: string }) {
+function ThreadLocation({
+  thread,
+  projectName,
+  projectColorOverride,
+}: {
+  thread: PluginSidebarThread;
+  projectName?: string;
+  projectColorOverride?: string;
+}) {
   const branch = thread.environment?.branchName;
   const host = thread.host?.name;
+  const projectBadge = projectName
+    ? projectBadgePresentation(thread.projectId, projectColorOverride)
+    : null;
   if (branch || host || projectName) {
     return (
       <span
@@ -645,7 +663,19 @@ function ThreadLocation({ thread, projectName }: { thread: PluginSidebarThread; 
           .join(" · ")}
         className="flex min-w-0 flex-1 items-center gap-1 truncate text-muted-foreground"
       >
-        {projectName ? <span className="max-w-[35%] truncate">{projectName}</span> : null}
+        {projectName && projectBadge ? (
+          <span
+            aria-label={`Project: ${projectName}`}
+            title={projectName}
+            className="flex size-4 shrink-0 items-center justify-center rounded border border-black/15 text-[9px] font-semibold uppercase shadow-sm"
+            style={{
+              backgroundColor: projectBadge.backgroundColor,
+              color: projectBadge.foregroundColor,
+            }}
+          >
+            {projectBadgeLetter(projectName)}
+          </span>
+        ) : null}
         {branch ? (
           <>
             <Icon

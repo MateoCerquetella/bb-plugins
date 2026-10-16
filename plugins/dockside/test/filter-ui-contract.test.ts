@@ -34,6 +34,12 @@ describe("workspace filter UI contract", () => {
       "utf8",
     );
     assert.match(statusGroup, /<ThreadCard/);
+    assert.match(statusGroup, /<FamilyStatusIcon/);
+    assert.match(statusGroup, /familyStatusPresentation/);
+    assert.match(statusGroup, /group\.kind === "pinned"/);
+    assert.match(statusGroup, /text-xs font-semibold text-foreground\/90/);
+    assert.match(statusGroup, /\{group\.families\.length\}/);
+    assert.match(statusGroup, /transition-transform/);
     assert.match(statusGroup, /effectiveExpanded = forceExpanded \|\| expanded/);
     assert.match(statusGroup, /aria-expanded=\{effectiveExpanded\}/);
     assert.match(statusGroup, /\{group.label\}/);

@@ -9,6 +9,10 @@ const threadCardSource = await readFile(
 const childRowStart = threadCardSource.indexOf("function ChildThreadRow");
 const rootSource = threadCardSource.slice(0, childRowStart);
 const childSource = threadCardSource.slice(childRowStart);
+const childRowOnlySource = childSource.slice(
+  0,
+  childSource.indexOf("function ThreadLocation"),
+);
 const familyStatusSource = await readFile(
   new URL("../components/inbox/family-status.tsx", import.meta.url),
   "utf8",
@@ -29,7 +33,7 @@ describe("compact root card contract", () => {
     assert.match(rootSource, /<ProviderGlyph/);
     assert.match(childSource, /<ProviderGlyph/);
     assert.match(childSource, /data-dockside-child-row/);
-    assert.doesNotMatch(childSource, /projectBadgeLetter|projectBadgePresentation/);
+    assert.doesNotMatch(childRowOnlySource, /projectBadgeLetter|projectBadgePresentation/);
   });
 
   it("keeps zero-child and no-PR roots on the same two-row skeleton", () => {
@@ -78,7 +82,7 @@ describe("compact root card contract", () => {
   it("truncates long title and branch text without shrinking metadata", () => {
     assert.match(
       rootSource,
-      /"min-w-0 flex-1 truncate"[\s\S]*grouped \? "text-xs" : "text-sm"/,
+      /"min-w-0 flex-1 truncate text-sm"/,
     );
     assert.match(threadCardSource, /className="truncate font-mono"/);
     assert.match(threadCardSource, /\{branch\}/);
@@ -111,9 +115,20 @@ describe("compact root card contract", () => {
     );
   });
 
-  it("keeps project badges on headers while thread rows use the full title column", () => {
-    assert.doesNotMatch(rootSource, /aria-label={`Project:/);
-    assert.doesNotMatch(rootSource, /projectBadgeLetter|projectBadgePresentation/);
+  it("shows project badges in grouped metadata while preserving the full title column", () => {
+    assert.match(rootSource, /<ThreadLocation[\s\S]*projectColorOverride=\{projectColorOverride\}/);
+    const metadataStart = rootSource.indexOf("data-dockside-root-metadata");
+    const pullRequestStart = rootSource.indexOf(
+      "<PullRequestMetadata",
+      metadataStart,
+    );
+    assert.ok(pullRequestStart > metadataStart);
+    assert.doesNotMatch(
+      rootSource.slice(metadataStart, pullRequestStart),
+      /projectBadgeLetter|aria-label=\{`Project:/,
+    );
+    assert.match(threadCardSource, /function ThreadLocation\([\s\S]*projectColorOverride/);
+    assert.match(threadCardSource, /projectBadgeLetter\(projectName\)/);
     assert.match(rootSource, /data-dockside-select-root/);
     assert.match(rootSource, /col-start-1 row-span-2 min-w-0/);
     assert.match(rootSource, /col-start-2 row-span-2 flex/);
