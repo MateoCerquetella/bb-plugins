@@ -1092,6 +1092,29 @@ test('automatic blocked Build continuation never restores an archived session', 
   } finally { f.db.close(); }
 });
 
+test('legacy workspace metadata backfill does not invalidate a current Start request', async () => {
+  const f = fixture();
+  try {
+    const record = newRecord(item);
+    const investigation = startRun(record, 'investigate', false);
+    Object.assign(investigation, {
+      status: 'finished', threadId: 'thr_native', environmentId: 'env_test',
+      output: 'Investigation complete. Preserve the current workspace.'
+    });
+    const saved = f.store.save(record);
+    assert.equal(saved.runs[0].hostId, null);
+    assert.equal(saved.runs[0].checkoutRoot, null);
+    const started = await f.service.start(item, {
+      expectedVersion: saved.version, kind: 'plan', contextThreadId: null, retry: false
+    });
+    assert.equal(started.runs[0].hostId, 'host_test');
+    assert.equal(started.runs[0].checkoutRoot, '/repo/worktree');
+    assert.equal(started.runs.at(-1)?.kind, 'plan');
+    assert.equal(started.runs.at(-1)?.status, 'running');
+    assert.equal(f.spawns(), 1);
+  } finally { f.db.close(); }
+});
+
 test('retrying a rejected Build dispatch reuses the existing implementation worktree', async () => {
   const f = fixture();
   try {
