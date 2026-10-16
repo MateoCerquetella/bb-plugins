@@ -1,4 +1,4 @@
-import { defineRpcContract } from '@get-bb/plugin-sdk';
+import type { PluginRpcContract } from '@get-bb/plugin-sdk';
 import { factoryRpcMethods } from './factory/contract.js';
 import { improvementRpcMethods } from './ticket-improvement.js';
 import { z } from 'zod';
@@ -71,7 +71,7 @@ export type {
   SecretMutation
 } from './credential-contract.js';
 
-export const workSourceSchema = z.enum(['linear', 'github', 'jira', 'gitlab']);
+export const workSourceSchema = z.enum(['linear', 'github', 'jira', 'gitlab', 'gitea']);
 export type WorkSource = z.infer<typeof workSourceSchema>;
 
 export const trackerProjectSchema = z
@@ -110,6 +110,17 @@ export const gitlabProjectRefSchema = z
   });
 export type GitLabProjectRef = z.infer<typeof gitlabProjectRefSchema>;
 
+export const giteaProjectRefSchema = z.string().trim().max(500).superRefine((value, context) => {
+  if (!value) return;
+  const parts = value.split('/');
+  let valid = parts.length === 3 && parts.slice(1).every(part => /^[A-Za-z0-9_.-]+$/u.test(part) && !['.', '..'].includes(part));
+  try {
+    const url = new URL(`https://${parts[0]}`);
+    valid &&= url.host.toLowerCase() === parts[0].toLowerCase() && !url.username && !url.password && url.pathname === '/' && !url.search && !url.hash;
+  } catch { valid = false; }
+  if (!valid) context.addIssue({ code: 'custom', message: 'Gitea repository must be host/owner/repo, e.g. git.example.com/team/app' });
+});
+
 export const LINEAR_FINISHED_DAYS_MAX = 365;
 
 export const projectSourceConfigSchema = z
@@ -121,7 +132,9 @@ export const projectSourceConfigSchema = z
     jiraBaseUrl: jiraBaseUrlSchema,
     jiraEmail: z.string().trim(),
     jiraJql: z.string().trim().min(1),
-    gitlabProjectRef: gitlabProjectRefSchema
+    gitlabProjectRef: gitlabProjectRefSchema,
+    giteaLogin: z.string().trim().max(500).regex(/^[^\u0000-\u001f\u007f]*$/u).default(''),
+    giteaProjectRef: giteaProjectRefSchema.default('')
   })
   .strict();
 export type ProjectSourceConfig = z.infer<typeof projectSourceConfigSchema>;
@@ -156,6 +169,9 @@ export const projectConfigMutationSchema = projectSourceConfigSchema
         path: ['gitlabProjectRef'],
         message: 'GitLab project ref is required when GitLab is selected'
       });
+    }
+    if (config.source === 'gitea' && (!config.giteaLogin || !config.giteaProjectRef)) {
+      context.addIssue({ code: 'custom', path: ['giteaProjectRef'], message: 'A tea login and Gitea repository are required when Gitea is selected' });
     }
   });
 export type ProjectConfigMutation = z.infer<typeof projectConfigMutationSchema>;
@@ -339,7 +355,7 @@ const listInputSchema = z
   })
   .strict();
 
-export const taskboardRpcContract = defineRpcContract({
+export const taskboardRpcContract = {
   ...factoryRpcMethods,
   ...improvementRpcMethods,
   listProjects: {
@@ -515,7 +531,7 @@ export const taskboardRpcContract = defineRpcContract({
       })
       .strict()
   }
-});
+} as const satisfies PluginRpcContract;
 
 export type TaskboardRpcContract = typeof taskboardRpcContract;
 
@@ -601,5 +617,7 @@ function delimiterValue(value: string): string {
 export function sourceName(source: WorkSource): string {
   if (source === 'github') return 'GitHub';
   if (source === 'jira') return 'Jira';
+  if (source === 'gitea') return 'Gitea';
+  if (source === 'gitlab') return 'GitLab';
   return 'Linear';
 }

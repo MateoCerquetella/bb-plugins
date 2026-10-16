@@ -95,7 +95,7 @@ test('upgrades a retained Work-board migration without rewriting history or losi
     createWorkItemStore(bb);
     assert.equal(db.prepare('SELECT data_json FROM work_board_settings').pluck().get(), 'preserved');
     assert.equal(db.prepare('SELECT document FROM preparations').pluck().get(), 'preserved');
-    assert.equal(db.prepare('SELECT count(*) FROM _bb_migrations').pluck().get(), 12);
+    assert.equal(db.prepare('SELECT count(*) FROM _bb_migrations').pluck().get(), 13);
     createWorkItemStore(bb);
   } finally {
     db.close();

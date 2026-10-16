@@ -1,4 +1,4 @@
-import { defineRpcContract } from '@get-bb/plugin-sdk';
+import type { PluginRpcContract } from '@get-bb/plugin-sdk';
 import { z } from 'zod';
 import { workSourceSchema } from '../contract.js';
 
@@ -113,7 +113,7 @@ export type Context = z.infer<typeof contextSchema>;
 export type Brief = z.infer<typeof briefSchema>;
 export type TaskRef = z.infer<typeof taskRefSchema>;
 export const scope = z.object({ id, projectId: id });
-export const preparationRpc = defineRpcContract({
+export const preparationRpc = {
   prepareCreate: {
     input: z.object({ projectId: id, request: text.min(1) }),
     output: preparationSchema
@@ -196,14 +196,14 @@ export const preparationRpc = defineRpcContract({
       json: z.string()
     })
   }
-});
-export const hostContract = defineRpcContract({
+} as const satisfies PluginRpcContract;
+export const hostContract = {
   collect: {
     input: z.object({ root: z.string().min(1), request: text }),
     output: contextSchema
   },
   workspace: { input: z.object({ id }), output: z.object({ path: z.string() }) }
-});
+} as const satisfies PluginRpcContract;
 
 export function parseAgentResult(output: string, kind: 'brief' | 'prototype') {
   if (output.length > 200_000)

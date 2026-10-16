@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const factoryIdentitySchema = z.object({
   projectId: z.string().startsWith('proj_').max(500),
-  source: z.enum(['github', 'gitlab', 'linear', 'jira']),
+  source: z.enum(['github', 'gitlab', 'linear', 'jira', 'gitea']),
   locator: z.string().min(1).max(2000)
 }).strict();
 export type FactoryIdentity = z.infer<typeof factoryIdentitySchema>;
