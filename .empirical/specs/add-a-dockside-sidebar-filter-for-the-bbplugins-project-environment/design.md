@@ -24,6 +24,10 @@ or selected project name in its trigger.
 
 ## UI behavior
 
+ThreadLocation renders branch and host as independent optional values in its
+existing flex row. The host has a bounded width and title; the branch truncates
+in the remaining space. Both root and child callers reuse this component.
+
 The existing filter icon remains the only toolbar control. Selecting a project
 shows its name beside the icon using the current active-filter styling. The
 menu remains compact and uses BB's existing Select components, labels, and

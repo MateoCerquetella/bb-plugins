@@ -1,22 +1,22 @@
 {
   "schemaVersion": 5,
-  "revision": 4,
+  "revision": 23,
   "activeFeature": "add-a-dockside-sidebar-filter-for-the-bbplugins-project-environment",
   "request": "Add a Dockside sidebar filter for the bbplugins project/environment, matching Cursor-style project filtering and the grouped sidebar shown in the supplied screenshots. Preserve existing status and inactivity filters. The filter must narrow visible thread groups to the selected project, expose the active selection in the filter control, and include behavioral tests for filtering and UI contract coverage.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "implement",
+  "phase": "specify",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Planned a localized implementation across thread-management, the existing filter menu, and inbox wiring, with behavioral and UI contract tests followed by Dockside checks and live BB verification.",
-  "implementationActor": null,
+  "message": "Direct work: 5 files: package-lock.json, plugins/dockside/components/inbox/status-group.tsx, plugins/dockside/components/inbox/thread-card.tsx, plugins/dockside/test/filter-ui-contract.test.ts, plugins/dockside/test/thread-card-layout.test.ts",
+  "implementationActor": "agent",
   "workStartedAt": null,
-  "specDigest": "sha256:beaa58261533e0864a7033bfaad46f481e1ed0e46989e3d4c8a50adfd2f022eb",
-  "approvedSpecRevision": 2,
+  "specDigest": "sha256:a8619b205158b009ce02531fefbde1db119917aa58253e83f2c88187fd05c256",
+  "approvedSpecRevision": null,
   "capabilityArchiveRequired": true,
-  "capabilityDeltaDigest": "sha256:a47f616a7161c295ce5e47ae76d7b7a28da42ca0abf8a68512e5b7f361e0f348",
-  "impactDigest": "sha256:098d8f4282d3aa8aa1199db02f8764b35ce7c00b3b450ece444b4a46892aec3f",
+  "capabilityDeltaDigest": null,
+  "impactDigest": null,
   "capabilityClaimId": "add-a-dockside-sidebar-filter-for-the-bbplugins-project-environment-32ea5aca5849",
   "authorizationDigest": null,
   "evidence": [],
@@ -37,12 +37,13 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-16T16:21:13.128Z",
+  "updatedAt": "2026-10-16T18:57:28.553Z",
   "lifecycle": {
     "stage": "development",
-    "iteration": 0,
+    "iteration": 2,
     "awaitingFeedback": false,
-    "iterative": true
+    "iterative": true,
+    "contractRevision": 14
   },
   "capabilityBase": {
     "schemaVersion": 1,
@@ -71,5 +72,6 @@
     "heartbeatAt": "2026-10-16T16:19:30.898Z",
     "digest": "sha256:620080314a0e7e83e963b2f53bc66ed5a9137d0e993ca82290c53f195f46445f"
   },
+  "trackerGeneration": 2,
   "reviewFirst": true
 }

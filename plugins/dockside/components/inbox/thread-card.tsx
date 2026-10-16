@@ -252,6 +252,13 @@ export function ThreadCard({
                 data-dockside-root-title-row=""
                 className="flex h-4 min-w-0 items-center gap-1.5"
               >
+                {!selectionMode && groupedByStatus && projectName ? (
+                  <ProjectBadge
+                    projectId={thread.projectId}
+                    projectName={projectName}
+                    projectColorOverride={projectColorOverride}
+                  />
+                ) : null}
                 <span
                   title={threadDisplayTitle(thread)}
                   className={cn(
@@ -386,13 +393,6 @@ export function ThreadCard({
                     providerId={thread.providerId}
                     provider={providerInfoById.get(thread.providerId)}
                     className="size-3.5"
-                  />
-                ) : null}
-                {!selectionMode && groupedByStatus && projectName ? (
-                  <ProjectBadge
-                    projectId={thread.projectId}
-                    projectName={projectName}
-                    projectColorOverride={projectColorOverride}
                   />
                 ) : null}
                 {!selectionMode && groupedByStatus ? (

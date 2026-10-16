@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "sequence": 7,
+  "previousDigest": "sha256:d349b0c90ea0126ad254579b012bf31b33d639186ba067f1458c882369b45640",
+  "actor": "empirical-merge-observed",
+  "type": "compaction-boundary",
+  "summary": "Compacted through journal event 6",
+  "createdAt": "2026-10-16T16:18:01.853Z",
+  "stateBeforeDigest": "sha256:c589de9e93c7bbc26bcc925045f684debb5f4f9e9c5e0d91132af9d8680cacc7",
+  "stateAfterDigest": "sha256:c589de9e93c7bbc26bcc925045f684debb5f4f9e9c5e0d91132af9d8680cacc7",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 6,
+    "activeFeature": "remove-activity-overview-from-bb-plugins-including-the-visible-activity",
+    "request": "Remove Activity Overview from bb-plugins, including the visible ACTIVITY / Overview contribution dashboard shown on the BB home surface, and center the thread in the resulting layout. Verify the human UI and repository checks, then create a pull request.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "done",
+    "status": "done",
+    "repairAttempts": 0,
+    "message": "Closed as merged-externally: Merged in pull request #86 as 02d3f6731d3eee570c4f242932f338d60e9117b3 into main; closed when the merge was observed.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:ed1d09349c48e3061be70bac71524a00d302ba9caed82e39460842d8ae36dde6",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:c7a1067d312563af9a877ae3b32eb51be87d284d94e855476329b74e76abedd0",
+    "impactDigest": "sha256:3c1cff6a9a3c548605b2bc8e5d988efc3f3b3e393f4c34e1ad8aece3b6787cbb",
+    "capabilityClaimId": "remove-activity-overview-from-bb-plugins-including-the-visible-activity-e276554a0ca5",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-16T16:18:01.031Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "remove-activity-overview-from-bb-plugins-including-the-visible-activity-e276554a0ca5",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "remove-activity-overview-from-bb-plugins-including-the-visible-activity",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_bmvu2vdbxt-1/bb-plugins",
+      "worktreeId": "sha256:2f81c6df5cf38b1afc1b7a9fd65674be15918067f11be5b376bc65f8a35587e1",
+      "baseCommit": "0a0b622342c0e2ad3f8fee0c80ee759a2bfa6956",
+      "baseTree": "36c68e193ad32950c50f1d761d33a702bf237835",
+      "bases": {
+        "activity-overview": {
+          "capability": "activity-overview",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "activity overview is absent": null
+          }
+        }
+      },
+      "capabilities": [
+        "activity-overview"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-15T02:44:14.420Z",
+      "heartbeatAt": "2026-10-15T02:44:14.420Z",
+      "digest": "sha256:ac22ceebbd27104182f870bd4cb9abbb9d45eefa65a4acae2675bee44c782d68"
+    },
+    "reviewFirst": true,
+    "closure": {
+      "schemaVersion": 1,
+      "outcome": "merged-externally",
+      "reason": "Merged in pull request #86 as 02d3f6731d3eee570c4f242932f338d60e9117b3 into main; closed when the merge was observed.",
+      "actor": "empirical",
+      "confirmation": "merge-observed",
+      "closedAtPhase": "review",
+      "completionAtClosure": "implemented",
+      "externalMerge": {
+        "pullRequest": 86,
+        "url": "https://github.com/MateoCerquetella/bb-plugins/pull/86",
+        "state": "MERGED",
+        "mergeCommit": "02d3f6731d3eee570c4f242932f338d60e9117b3",
+        "targetBranch": "main",
+        "ancestorOfTarget": true,
+        "observedAt": "2026-10-16T16:17:48.769Z"
+      },
+      "closedAt": "2026-10-16T16:18:00.789Z",
+      "digest": "sha256:ec8aaf7cbe6eb76294ea155333130a9a6a99e1672d24e89eb01161ccefbb5eb0"
+    },
+    "completionRecord": {
+      "schemaVersion": 1,
+      "implementedBy": "agent",
+      "completedBy": "empirical",
+      "decisionBy": null,
+      "method": "merged-externally",
+      "reason": "Merged in pull request #86 as 02d3f6731d3eee570c4f242932f338d60e9117b3 into main; closed when the merge was observed.",
+      "at": "2026-10-16T16:18:01.031Z",
+      "revision": 6,
+      "completion": "implemented",
+      "sourceTreeDigest": "sha256:1d8f57459ea33efa799e3e453deed0f6b2e40c1d0c181a37d27a8427e38defaa",
+      "artifactTreeDigest": "sha256:31c0fc3bf99454846e3e5c6549e58dfcef351fa6623b3111d9f81005e5a4b904",
+      "digest": "sha256:120019a3639ff395de5ef8005616547916db30e9c0e80e044a3797372c0d5c91"
+    }
+  },
+  "digest": "sha256:be1c1a84a5aee16e3679e1eebde38f3ecaeee1c10ff54a5b881df6e850623d2d"
+}

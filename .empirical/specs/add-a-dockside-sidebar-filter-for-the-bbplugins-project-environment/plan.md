@@ -1,5 +1,8 @@
 # Plan
 
+Show host independently of branch in ThreadLocation, then typecheck and reload
+the locally installed Dockside. Verify root and child rows in the live sidebar.
+
 1. Extend `thread-management.ts` with a preset-or-project filter selection and
    one pure group-filtering function.
 2. Add project choices and active project labeling to `filter-menu.tsx`.

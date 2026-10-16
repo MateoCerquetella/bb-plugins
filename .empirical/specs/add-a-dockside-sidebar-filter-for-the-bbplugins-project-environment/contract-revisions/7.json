@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "feature": "add-a-dockside-sidebar-filter-for-the-bbplugins-project-environment",
+  "revision": 7,
+  "reason": "Also show which machine/host is running each Dockside thread, for example Mac or Jupiter, even when the row already has a branch name. Keep it compact in the existing secondary metadata row and apply it to root and child thread rows. Install this checkout's Dockside locally in the current BB so the user can test it.",
+  "spec": "# Add A Dockside Sidebar Filter For The Bbplugins Project Environment\n\n## Request\n\n> Add a Dockside sidebar filter for the bbplugins project/environment, matching Cursor-style project filtering and the grouped sidebar shown in the supplied screenshots. Preserve existing status and inactivity filters. The filter must narrow visible thread groups to the selected project, expose the active selection in the filter control, and include behavioral tests for filtering and UI contract coverage.\n\n## Goal\n\nLet a Dockside user narrow the sidebar to one BB project from the existing\nworkspace filter menu. The project list comes from BB's current project data,\nso a `bbplugins` project appears without a hard-coded repository name.\n\n## Acceptance Criteria\n\n- [ ] [AC-1] The workspace filter lists every project currently represented in\n  Dockside's active project groups.\n- [ ] [AC-2] Selecting a project keeps only that project's thread family group\n  visible while retaining its normal row order and hierarchy.\n- [ ] [AC-3] Existing All, Status, status-state, and inactivity presets retain\n  their current behavior.\n- [ ] [AC-UI-1] [UI] The filter trigger shows the selected project's name and\n  its accessible label names that active project.\n- [ ] [AC-UI-2] [UI] Selecting All restores every project group.\n\n## Scope\n\n- The Dockside project-first active inbox.\n- The existing workspace filter menu and trigger.\n- Pure thread-group filtering and its behavioral tests.\n- Source contract coverage for the project section and active label.\n\n## Non-goals\n\n- Hard-coding `bbplugins` or any other project name.\n- Persisting the filter across reloads.\n- Filtering Snoozed or Settled shelves.\n- Adding a second toolbar control or changing project grouping.\n\n## Verification\n\n- Run Dockside's thread-management behavioral tests.\n- Run Dockside's complete test and typecheck scripts.\n- Install and reload the local Dockside plugin.\n- Verify in BB that selecting the `bbplugins` project shows only that project,\n  the trigger names it, and All restores the complete list.\n## Capability Deltas\n\n- `deltas/dockside-thread-management.md`\n",
+  "deltas": [
+    {
+      "capability": "dockside-thread-management",
+      "purpose": null,
+      "requirements": [
+        {
+          "operation": "modified",
+          "name": "Dockside filters its project-first hierarchy by intent",
+          "contents": "### Requirement: Dockside filters its project-first hierarchy by intent\n\nDockside MUST offer compact All, Status, Working, Needs you, Unread, Quiet,\nQuiet 1d+, and Quiet 7d+ presets. The same filter menu MUST list every project\nrepresented in the active project groups. Selecting a project MUST keep only\nthat complete project group visible. Filtering MUST compose with host search\nwhile preserving project order, root context for matching children, and\nexisting status styling. The filter trigger MUST visibly and accessibly name\nthe active preset or project.\n\n#### Scenario: User narrows the sidebar to the bbplugins project\n\n- **Given** the active inbox contains `bbplugins` and another project\n- **When** the user selects `bbplugins` in the workspace filter\n- **Then** only the `bbplugins` project group remains visible\n- **And** its thread families retain their order and hierarchy\n- **And** the filter trigger displays `bbplugins`\n\n#### Scenario: User restores every project\n\n- **Given** the workspace filter is scoped to one project\n- **When** the user selects All\n- **Then** every active project group is visible again"
+        }
+      ],
+      "source": ".empirical/specs/add-a-dockside-sidebar-filter-for-the-bbplugins-project-environment/deltas/dockside-thread-management.md"
+    }
+  ],
+  "specDigest": "sha256:beaa58261533e0864a7033bfaad46f481e1ed0e46989e3d4c8a50adfd2f022eb",
+  "approvedSpecRevision": 2,
+  "capabilityClaimId": "add-a-dockside-sidebar-filter-for-the-bbplugins-project-environment-32ea5aca5849",
+  "impactDigest": "sha256:098d8f4282d3aa8aa1199db02f8764b35ce7c00b3b450ece444b4a46892aec3f",
+  "evidenceReceiptIds": [
+    "collected-893a4432a1fea9299744825f"
+  ]
+}

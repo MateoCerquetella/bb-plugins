@@ -24,6 +24,10 @@ so a `bbplugins` project appears without a hard-coded repository name.
 
 ## Scope
 
+- [AC-UI-3] [UI] Root and child thread metadata show the supplied host name
+  alongside the branch when both exist; either value can appear alone.
+  Long values truncate without pushing status controls outside the row.
+
 - The Dockside project-first active inbox.
 - The existing workspace filter menu and trigger.
 - Pure thread-group filtering and its behavioral tests.
@@ -37,6 +41,8 @@ so a `bbplugins` project appears without a hard-coded repository name.
 - Adding a second toolbar control or changing project grouping.
 
 ## Verification
+
+- Check machine names with and without branches on root and child rows.
 
 - Run Dockside's thread-management behavioral tests.
 - Run Dockside's complete test and typecheck scripts.

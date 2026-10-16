@@ -129,7 +129,7 @@ describe("compact root card contract", () => {
     );
   });
 
-  it("shows project badges in the trailing metadata slot for status groups", () => {
+  it("shows project badges at the start of status-group rows", () => {
     assert.match(rootSource, /groupedByStatus && projectName/);
     assert.match(
       rootSource,
@@ -150,13 +150,11 @@ describe("compact root card contract", () => {
       /function ProjectBadge\([\s\S]*projectColorOverride/,
     );
     assert.match(threadCardSource, /projectBadgeLetter\(projectName\)/);
-    assert.doesNotMatch(
-      rootSource.slice(
-        rootSource.indexOf("data-dockside-root-title-row"),
-        rootSource.indexOf("data-dockside-root-detail-row"),
-      ),
-      /groupedByStatus/,
+    const titleRow = rootSource.slice(
+      rootSource.indexOf("data-dockside-root-title-row"),
+      rootSource.indexOf("data-dockside-root-detail-row"),
     );
+    assert.ok(titleRow.indexOf("<ProjectBadge") < titleRow.indexOf("<span"));
     assert.match(rootSource, /data-dockside-select-root/);
     assert.match(rootSource, /col-start-1 row-span-2 min-w-0/);
     assert.match(rootSource, /col-start-2 row-span-2 flex/);

@@ -1,5 +1,18 @@
 # Dockside Thread Management Delta
 
+## ADDED Requirements
+
+### Requirement: Thread machine identity
+
+Root and child rows MUST show the BB-provided host name even when a branch is
+present, without inventing a machine name when host data is absent.
+
+#### Scenario: Branch and host are available
+
+- Given a thread on Jupiter with a branch
+- When its root or child row appears
+- Then both Jupiter and the branch are shown in the secondary metadata row.
+
 ## MODIFIED Requirements
 
 ### Requirement: Dockside filters its project-first hierarchy by intent
