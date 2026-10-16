@@ -270,6 +270,7 @@
   position: fixed;
   z-index: 80;
   display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
   width: min(360px, calc(100vw - 16px));
   max-height: min(620px, calc(100vh - 80px));
   overflow: hidden;
@@ -511,7 +512,6 @@
 @media (max-width: 460px) {
   .host-monitor-mini {
     left: 8px !important;
-    bottom: 8px !important;
     max-height: calc(100vh - 16px);
   }
 }
