@@ -383,6 +383,14 @@ export const rpcContract = defineRpcContract({
     input: z.object({ hostId: z.string().min(1).max(256).nullable() }).strict(),
     output: fleetSchema,
   },
+  saveThresholds: {
+    input: z.object({
+      cpu: z.number().int().min(1).max(100),
+      ram: z.number().int().min(1).max(100),
+      disk: z.number().int().min(1).max(100),
+    }).strict(),
+    output: thresholdsSchema,
+  },
 });
 
 export type Fleet = z.infer<typeof fleetSchema>;

@@ -348,6 +348,35 @@
   padding: 0 8px;
 }
 
+.host-monitor-mini__cadence {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  font-size: 11px;
+}
+
+.host-monitor-mini__cadence select {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 8px;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.host-monitor-thresholds label {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr) 3rem;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.host-monitor-thresholds input {
+  min-width: 0;
+  width: 100%;
+}
+
 .host-monitor-mini__icon {
   width: 28px;
   padding: 0;

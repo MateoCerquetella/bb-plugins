@@ -94,5 +94,5 @@ test("owns a cleanup-safe DOM lifecycle without unsafe HTML or legacy features",
   assert.match(source, /button\.click\(\)/u);
   assert.match(source, /textContent/u);
   assert.doesNotMatch(source, /guide\.textContent|term\.append\(" ", guide\)/u);
-  assert.doesNotMatch(source, /location\.assign|location\.replace|innerHTML|insertAdjacentHTML|localStorage|primaryIpAddress|process|terminate|Notification|toast|floating/iu);
+  assert.doesNotMatch(source, /innerHTML|insertAdjacentHTML|localStorage|primaryIpAddress|process|terminate|Notification|toast|floating/iu);
 });

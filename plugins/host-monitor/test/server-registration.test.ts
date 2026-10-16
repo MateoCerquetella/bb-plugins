@@ -188,7 +188,7 @@ test("dashboard configuration is isolated by enrolled host and survives plugin r
 });
 
 test("settings are passive in-page threshold guides", async (t) => {
-  const fake = createFakePluginHost({ pluginId: "host-monitor" });
+  const fake = createFakePluginHost({ pluginId: "host-monitor", sdk: { hosts: { list: async () => [] } } });
   t.after(() => fake.harness.lifecycle.dispose());
   await plugin(fake.bb);
   const descriptors = fake.harness.inspection.registrations.settingsDescriptors;
@@ -196,6 +196,16 @@ test("settings are passive in-page threshold guides", async (t) => {
   assert.equal(descriptors.ramWarningPercent?.default, "90");
   assert.equal(descriptors.diskWarningPercent?.default, "90");
   assert.match(descriptors.cpuWarningPercent?.description ?? "", /not a notification/u);
+  await fake.harness.behavior.setSettings({
+    cpuWarningPercent: "55",
+    ramWarningPercent: "63",
+    diskWarningPercent: "82",
+  });
+  const fleet = await fake.harness.behavior.callRpc("fleet") as Fleet;
+  assert.deepEqual(fleet.thresholds, { cpu: 55, ram: 63, disk: 82 });
+  await assert.rejects(fake.harness.behavior.callRpc("saveThresholds", { cpu: 0, ram: 63, disk: 82 }));
+  await assert.rejects(fake.harness.behavior.callRpc("saveThresholds", { cpu: 55, ram: 101, disk: 82 }));
+  await assert.rejects(fake.harness.behavior.callRpc("saveThresholds", { cpu: 55, ram: 63, disk: 82.5 }));
 });
 
 test("host monitor CLI rejects unknown open targets and malformed verbs", async (t) => {

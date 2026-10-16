@@ -2,7 +2,14 @@ export const HOST_MONITOR_TOGGLE_EVENT = "host-monitor:toggle-mini-modal";
 export const HOST_MONITOR_PAGE_PATH = "/plugins/host-monitor/host-monitor";
 export const HOST_MONITOR_NAV_ROW_SELECTOR = '[data-sidebar-navigation-item="host-monitor/host-monitor"]';
 export const HOST_MONITOR_FOOTER_SELECTOR = '[data-testid="plugin-sidebar-footer-action-host-monitor-host-monitor"]';
-export const MINI_MODAL_REFRESH_MS = 10_000;
+export const MINI_MODAL_REFRESH_MS = 1_000;
+export const MINI_MODAL_CADENCES = [
+  { value: "live", label: "Live", ms: MINI_MODAL_REFRESH_MS },
+  { value: "1000", label: "1 sec", ms: 1_000 },
+  { value: "5000", label: "5 sec", ms: 5_000 },
+  { value: "30000", label: "30 sec", ms: 30_000 },
+  { value: "60000", label: "1 min", ms: 60_000 },
+] as const;
 export const NATIVE_OPEN_POLL_MS = 1_000;
 export const NATIVE_OPEN_HOST_KEY = "host-monitor:native-open-host";
 export const MINI_MODAL_MACHINE_LIMIT = 128;
@@ -126,6 +133,7 @@ export function mountHostMonitorMiniModal(pluginId: string, signal: AbortSignal)
   let request: Promise<void> | null = null;
   let requestController: AbortController | null = null;
   let disposed = false;
+  let cadence: typeof MINI_MODAL_CADENCES[number] = MINI_MODAL_CADENCES[0];
   const hiddenNavRows = new Map<HTMLElement, HTMLElement["hidden"]>();
 
   const findTrigger = (): HTMLButtonElement | null => document.querySelector<HTMLButtonElement>(HOST_MONITOR_FOOTER_SELECTOR)
@@ -140,13 +148,12 @@ export function mountHostMonitorMiniModal(pluginId: string, signal: AbortSignal)
     }
   };
 
-  const openPage = (hostId: string | null = null): boolean => {
+  const openPage = (hostId: string | null = null): void => {
     const row = document.querySelector<HTMLElement>(HOST_MONITOR_NAV_ROW_SELECTOR);
     const button = row?.querySelector<HTMLButtonElement>('button:not([disabled])');
-    if (button === null || button === undefined) return false;
     if (hostId !== null) sessionStorage.setItem(NATIVE_OPEN_HOST_KEY, hostId);
-    button.click();
-    return true;
+    if (button) button.click();
+    else window.location.assign(HOST_MONITOR_PAGE_PATH);
   };
 
   const claimNativeOpen = (): void => {
@@ -186,7 +193,7 @@ export function mountHostMonitorMiniModal(pluginId: string, signal: AbortSignal)
     trigger = null;
   };
 
-  const refresh = (): Promise<void> => {
+  const refresh = (sample = false): Promise<void> => {
     if (modal === null) return Promise.resolve();
     if (request !== null) return request;
     const status = modal.querySelector<HTMLElement>("[data-host-monitor-mini-status]");
@@ -195,16 +202,16 @@ export function mountHostMonitorMiniModal(pluginId: string, signal: AbortSignal)
     const controller = new AbortController();
     requestController = controller;
     if (status !== null) status.textContent = "Refreshing machines…";
-    const pending = fetch(`/api/v1/plugins/${encodeURIComponent(pluginId)}/rpc/fleet`, {
+    const pending = fetch(`/api/v1/plugins/${encodeURIComponent(pluginId)}/rpc/${sample ? "refresh" : "fleet"}`, {
       method: "POST",
       credentials: "same-origin",
       headers: { "content-type": "application/json" },
-      body: "null",
+      body: sample ? JSON.stringify({ hostId: null }) : "null",
       signal: controller.signal,
     }).then(async (response) => {
       const fleet = parseMiniModalFleet(await response.json());
       if (!response.ok || fleet === null) throw new Error("Could not load machines.");
-      if (modal === null || rows === null || summary === null || status === null) return;
+      if (controller.signal.aborted || modal === null || rows === null || summary === null || status === null) return;
       summary.textContent = `${fleet.connected}/${fleet.total} connected`;
       rows.replaceChildren(...fleet.machines.map((machine) => machineRow(machine, fleet.thresholds)));
       status.textContent = fleet.machines.length === 0 ? "No machines are enrolled in BB." : "Updated now";
@@ -221,13 +228,24 @@ export function mountHostMonitorMiniModal(pluginId: string, signal: AbortSignal)
     return pending;
   };
 
+  const schedule = (): void => {
+    if (interval !== null) clearInterval(interval);
+    interval = setInterval(() => { void refresh(cadence.value !== "live"); }, cadence.ms);
+  };
+
   const open = (): void => {
     trigger = findTrigger();
     if (trigger === null || modal !== null) return;
-    modal = createModal(close, refresh, openPage);
+    modal = createModal(close, () => refresh(true), openPage, cadence.value, (value) => {
+      const selected = MINI_MODAL_CADENCES.find((option) => option.value === value);
+      if (!selected) return;
+      cadence = selected;
+      schedule();
+      void refresh(cadence.value !== "live");
+    });
     document.body.append(modal);
     position();
-    interval = setInterval(() => { void refresh(); }, MINI_MODAL_REFRESH_MS);
+    schedule();
     void refresh();
     modal.querySelector<HTMLButtonElement>("[data-host-monitor-mini-close]")?.focus();
   };
@@ -322,7 +340,9 @@ function stateLabel(state: string): string {
 function createModal(
   close: (restoreFocus?: boolean) => void,
   refresh: () => Promise<void>,
-  openPage: () => boolean,
+  openPage: () => void,
+  cadence: string,
+  changeCadence: (value: string) => void,
 ): HTMLElement {
   const modal = document.createElement("section");
   modal.className = "host-monitor-mini";
@@ -349,6 +369,17 @@ function createModal(
   closeButton.addEventListener("click", () => close());
   controls.append(refreshButton, closeButton);
   header.append(titles, controls);
+  const cadenceLabel = document.createElement("label");
+  cadenceLabel.className = "host-monitor-mini__cadence";
+  cadenceLabel.append("Refresh ");
+  const cadenceSelect = document.createElement("select");
+  cadenceSelect.setAttribute("aria-label", "Refresh interval");
+  for (const option of MINI_MODAL_CADENCES) {
+    cadenceSelect.add(new Option(option.label, option.value));
+  }
+  cadenceSelect.value = cadence;
+  cadenceSelect.addEventListener("change", () => changeCadence(cadenceSelect.value));
+  cadenceLabel.append(cadenceSelect);
 
   const rows = document.createElement("ul");
   rows.dataset.hostMonitorMiniRows = "";
@@ -358,10 +389,10 @@ function createModal(
   status.textContent = "Loading machines…";
   const openButton = button("Open Host Monitor", "host-monitor-mini__open");
   openButton.addEventListener("click", () => {
-    if (openPage()) close(false);
-    else status.textContent = "The Host Monitor page is unavailable. Reload the plugin and retry.";
+    openPage();
+    close(false);
   });
-  modal.append(header, rows, status, openButton);
+  modal.append(header, cadenceLabel, rows, status, openButton);
   return modal;
 }
 

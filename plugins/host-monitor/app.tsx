@@ -60,6 +60,7 @@ import {
   toggleHostMonitorMiniModal,
 } from "./sidebar-modal.ts";
 import "./app.css";
+import { ThresholdSettings } from "./threshold-settings.tsx";
 
 echarts.use([
   AriaComponent,
@@ -1489,6 +1490,11 @@ function isOver(value: number | null | undefined, threshold: number): boolean {
 }
 
 export default definePluginApp((app) => {
+  app.slots.settingsSection({
+    id: "thresholds",
+    title: "Metric thresholds",
+    component: ThresholdSettings,
+  });
   app.contentScripts.register({
     id: "host-monitor-sidebar",
     mount: ({ pluginId, signal }) => mountHostMonitorMiniModal(pluginId, signal),

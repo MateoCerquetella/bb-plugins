@@ -108,23 +108,23 @@ export default async function hostMonitorPlugin(bb: BbPluginApi): Promise<void> 
   const settings = bb.settings.define({
     cpuWarningPercent: {
       type: "select" as const,
-      label: "CPU guide",
+      label: "CPU critical threshold (%)",
       description: "Highlight CPU panels at this percentage. This is an in-page visual guide, not a notification.",
-      options: ["70", "80", "90", "95"],
+      options: Array.from({ length: 100 }, (_, index) => String(index + 1)),
       default: "90",
     },
     ramWarningPercent: {
       type: "select" as const,
-      label: "RAM guide",
+      label: "RAM critical threshold (%)",
       description: "Highlight RAM panels at this percentage. This is an in-page visual guide, not a notification.",
-      options: ["70", "80", "90", "95"],
+      options: Array.from({ length: 100 }, (_, index) => String(index + 1)),
       default: "90",
     },
     diskWarningPercent: {
       type: "select" as const,
-      label: "Disk guide",
+      label: "Disk critical threshold (%)",
       description: "Highlight root-disk panels at this percentage. This is an in-page visual guide, not a notification.",
-      options: ["70", "80", "90", "95"],
+      options: Array.from({ length: 100 }, (_, index) => String(index + 1)),
       default: "90",
     },
   });
@@ -391,6 +391,19 @@ export default async function hostMonitorPlugin(bb: BbPluginApi): Promise<void> 
   }
 
   bb.rpc.register(rpcContract, {
+    async saveThresholds(next) {
+      await bb.sdk.plugins.updateSettings({
+        pluginId: "host-monitor",
+        values: {
+          cpuWarningPercent: String(next.cpu),
+          ramWarningPercent: String(next.ram),
+          diskWarningPercent: String(next.disk),
+        },
+      });
+      thresholds = await readThresholds();
+      publish(hosts.map((host) => host.id));
+      return thresholds;
+    },
     async claimNativeOpen() {
       const request = nativeOpenRequest;
       nativeOpenRequest = null;

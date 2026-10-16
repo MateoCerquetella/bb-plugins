@@ -24,14 +24,19 @@ page.
 The bottom-left Host Monitor icon opens a compact machine mini-modal with every
 enrolled host's current state, CPU, RAM, and disk. Choose **Open Host Monitor**
 there to enter the dedicated full dashboard page. The monitor never redirects
-you into plugin Settings and the transition does not reload BB. The dedicated
+you into plugin Settings. On shells without a sidebar navigation row, it opens
+the registered dashboard URL. The dedicated
 route stays available without adding a second Host Monitor row to the main
 sidebar.
 
-CPU and RAM values use the existing configured guides. A fresh reading at or
-above its guide receives passive visual treatment and explicit accessible
-wording inside the mini-modal; numeric guide chips are not shown and it does
-not create a badge or notification.
+CPU, RAM, and disk use their configured critical thresholds. Fresh readings
+are green below 80% of the threshold, yellow up to the threshold, and red at
+or above it. Stale and unavailable readings stay neutral.
+
+The modal refresh selector offers Live, 1 sec, 5 sec, 30 sec, and 1 min.
+Live reads the latest background samples every second. Timed modes request
+new samples at the selected interval while the modal is open. Slow requests
+coalesce instead of overlapping. Closing the modal stops its refresh timer.
 
 The mini-modal is quick telemetry and navigation—not a warning surface. It has
 no notification badge, toast, alert banner, IP controls, or draggable floating
@@ -78,7 +83,9 @@ collapses into a single readable column on narrow/mobile views.
 ## Threshold guides and notifications
 
 Configure CPU, RAM, and root-disk guides in **Extensions → Plugins → Host
-Monitor**. Each guide offers 70%, 80%, 90%, or 95%.
+Monitor**. The Metric thresholds section has CPU, RAM, and disk sliders from
+1% to 100%. Choose **Save thresholds** to persist them. The same values are
+available in the plugin's configuration fields.
 
 Guides only tint in-page panels and chart lines. Host Monitor deliberately has:
 

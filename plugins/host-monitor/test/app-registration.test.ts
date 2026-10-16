@@ -29,7 +29,6 @@ test("restores the bottom modal and dedicated Host Monitor page", () => {
   assert.match(app, /mountHostMonitorMiniModal\(pluginId, signal\)/u);
   assert.match(app, /app\.slots\.navPanel\(\{/u);
   assert.match(app, /path: "host-monitor"/u);
-  assert.doesNotMatch(app, /app\.slots\.settingsSection\(/u);
   assert.doesNotMatch(app, /experimental_sidebarAccessory/u);
 });
 

@@ -62,6 +62,7 @@
     "chart-data.ts",
     "dashboard-config.ts",
     "sidebar-modal.ts",
+    "threshold-settings.tsx",
     "host.ts",
     "contract.ts",
     "store.ts",
