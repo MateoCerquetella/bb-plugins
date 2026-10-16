@@ -4,6 +4,7 @@ import type { PluginSidebarProject, PluginSidebarThread } from "@get-bb/plugin-s
 import { groupThreadsByProject } from "../lib/inbox.ts";
 import { DAY_MS } from "../lib/thread-management.ts";
 import { groupFamiliesByStatus } from "../lib/status-groups.ts";
+import { groupSidebarFamilies } from "../lib/sidebar-sections.ts";
 
 function thread(overrides: Partial<PluginSidebarThread>): PluginSidebarThread {
   return {
@@ -46,21 +47,66 @@ describe("groupFamiliesByStatus", () => {
         thread({ id: "working", indicator: "runtime", updatedAt: now }),
         thread({ id: "needs", hasPendingInteraction: true, updatedAt: now }),
         thread({ id: "stale", updatedAt: now - 7 * DAY_MS }),
+        thread({ id: "pinned", isPinned: true, indicator: "runtime", updatedAt: now }),
+        thread({ id: "failed", indicator: "unread-error", updatedAt: now }),
+        thread({ id: "unread", isUnread: true, updatedAt: now }),
       ],
       projects,
     )[0]!.families;
 
     const groups = groupFamiliesByStatus(families, now);
     assert.deepEqual(groups.map((group) => group.kind), [
+      "pinned",
       "needs-you",
+      "failed",
       "working",
-      "inactive",
-      "stale",
+      "unread",
+      "idle",
     ]);
     assert.deepEqual(
       groups.flatMap((group) => group.families.map((family) => family.root.id)),
-      ["needs", "working", "inactive", "stale"],
+      ["pinned", "needs", "failed", "working", "unread", "inactive", "stale"],
     );
-    assert.ok(groups.every((group) => group.presentation.kind === group.kind));
+    assert.deepEqual(groups.map((group) => group.label), [
+      "Pinned", "Needs your input", "Failed", "Working", "Unread", "Idle",
+    ]);
+  });
+
+  it("keeps a child with its root and uses child attention for status", () => {
+    const families = groupThreadsByProject([
+      thread({ id: "root" }),
+      thread({ id: "child", parentThreadId: "root", hasPendingInteraction: true }),
+    ], projects)[0]!.families;
+    const groups = groupFamiliesByStatus(families, DAY_MS);
+    assert.deepEqual(groups.map((group) => group.kind), ["needs-you"]);
+    assert.equal(groups[0]?.families[0]?.children[0]?.id, "child");
+    assert.deepEqual(groupFamiliesByStatus([], DAY_MS), []);
+  });
+
+  it("sorts Updated globally by latest family activity, with pins first", () => {
+    const families = groupThreadsByProject([
+      thread({ id: "pinned", isPinned: true }),
+      thread({ id: "older", updatedAt: 10 }),
+      thread({ id: "newer", updatedAt: 20 }),
+      thread({ id: "child", parentThreadId: "older", updatedAt: 30 }),
+    ], projects)[0]!.families;
+    const groups = groupSidebarFamilies(families, "updated");
+    assert.deepEqual(groups.map((group) => group.label), ["Pinned", "Updated"]);
+    assert.deepEqual(groups.flatMap((group) => group.families.map((family) => family.root.id)),
+      ["pinned", "older", "newer"]);
+  });
+
+  it("groups environments by identity and machine, not project selection", () => {
+    const environment = { id: "env", name: "main", branchName: "main", workspaceDisplayKind: null };
+    const families = [
+      { root: thread({ id: "mac", environment: { ...environment, workspaceDisplayKind: "managed-worktree" }, host: { id: "mac", name: "Mac" } }), children: [] },
+      { root: thread({ id: "mac2", environment: { ...environment, workspaceDisplayKind: "managed-worktree" }, host: { id: "mac", name: "Mac" } }), children: [] },
+      { root: thread({ id: "jupiter", environment: { ...environment, workspaceDisplayKind: "managed-worktree" }, host: { id: "jupiter", name: "Jupiter" } }), children: [] },
+      { root: thread({ id: "none" }), children: [] },
+    ];
+    const groups = groupSidebarFamilies(families, "environment");
+    assert.deepEqual(groups.map((group) => group.label), ["main · Mac", "main · Jupiter", "No environment"]);
+    assert.deepEqual(groups.map((group) => group.families.map((family) => family.root.id)), [["mac", "mac2"], ["jupiter"], ["none"]]);
+    assert.deepEqual(groupSidebarFamilies([], "environment"), []);
   });
 });

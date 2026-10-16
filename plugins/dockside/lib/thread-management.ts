@@ -5,9 +5,12 @@ export const DAY_MS = 24 * 60 * 60 * 1_000;
 
 export const THREAD_FILTER_PRESETS = [
   "all",
+  "updated",
+  "environment",
   "status",
   "working",
   "needs-you",
+  "failed",
   "unread",
   "quiet",
   "quiet-1d",
@@ -36,9 +39,12 @@ export interface ThreadFilterOption {
 
 export const THREAD_FILTER_OPTIONS = [
   { preset: "all", label: "All", description: "Every active workspace", group: null },
+  { preset: "updated", label: "Updated", description: "Most recently updated first", group: null },
+  { preset: "environment", label: "Environment", description: "Group by execution environment", group: null },
   { preset: "status", label: "Status", description: "Group workspaces by current status", group: null },
   { preset: "working", label: "Working", description: "Workspaces with active runs", group: "status" },
   { preset: "needs-you", label: "Needs you", description: "Waiting for your response", group: "status" },
+  { preset: "failed", label: "Failed", description: "Workspaces with failed runs", group: "status" },
   { preset: "unread", label: "Unread", description: "Workspaces with new activity", group: "status" },
   { preset: "quiet", label: "Quiet", description: "No active or unread work", group: "inactivity" },
   { preset: "quiet-1d", label: "Quiet 1d+", description: "Inactive for at least one day", group: "inactivity" },
@@ -49,9 +55,12 @@ export const THREAD_FILTER_LABELS: Readonly<
   Record<ThreadFilterPreset, string>
 > = {
   all: "All",
+  updated: "Updated",
+  environment: "Environment",
   status: "Status",
   working: "Working",
   "needs-you": "Needs you",
+  failed: "Failed",
   unread: "Unread",
   quiet: "Quiet",
   "quiet-1d": "Quiet 1d+",
@@ -122,6 +131,12 @@ export function familyNeedsUser(family: ThreadFamily): boolean {
   );
 }
 
+export function familyHasFailure(family: ThreadFamily): boolean {
+  return familyMembers(family).some(
+    (thread) => thread.indicator === "unread-error",
+  );
+}
+
 export function familyIsUnread(family: ThreadFamily): boolean {
   return familyMembers(family).some(
     (thread) =>
@@ -182,7 +197,9 @@ export function filterProjectThreadGroups(
   }
 
   const { preset } = filter;
-  if (preset === "all" || preset === "status") return [...groups];
+  if (preset === "all" || preset === "updated" || preset === "environment" || preset === "status") {
+    return [...groups];
+  }
 
   return groups.flatMap((group) => {
     const families = group.families.filter((family) =>
@@ -301,7 +318,7 @@ export function includeSelectedFamilies(
 
 function familyMatchesPreset(
   family: ThreadFamily,
-  preset: Exclude<ThreadFilterPreset, "all" | "status">,
+  preset: Exclude<ThreadFilterPreset, "all" | "updated" | "environment" | "status">,
   now: number,
 ): boolean {
   switch (preset) {
@@ -309,6 +326,8 @@ function familyMatchesPreset(
       return familyIsWorking(family);
     case "needs-you":
       return familyNeedsUser(family);
+    case "failed":
+      return familyHasFailure(family);
     case "unread":
       return familyIsUnread(family);
     case "quiet":

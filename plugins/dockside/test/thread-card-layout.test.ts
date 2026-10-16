@@ -78,7 +78,7 @@ describe("compact root card contract", () => {
   it("truncates long title and branch text without shrinking metadata", () => {
     assert.match(
       rootSource,
-      /min-w-0 flex-1 truncate text-sm/,
+      /"min-w-0 flex-1 truncate"[\s\S]*grouped \? "text-xs" : "text-sm"/,
     );
     assert.match(threadCardSource, /className="truncate font-mono"/);
     assert.match(threadCardSource, /\{branch\}/);

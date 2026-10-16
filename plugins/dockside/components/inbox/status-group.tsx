@@ -1,10 +1,10 @@
 import { useId, useState } from "react";
-import { FamilyStatusIcon } from "@/components/inbox/family-status";
 import { ThreadCard } from "@/components/inbox/thread-card";
+import { Icon } from "@/components/ui/icon";
 import type { ProviderGlyphInfo } from "@/components/inbox/provider-glyph";
 import type { LifecycleApi } from "@/hooks/use-lifecycle";
 import type { DocksidePreferences } from "@/lib/preferences";
-import type { StatusThreadGroup } from "@/lib/status-groups";
+import type { ThreadSection } from "@/lib/status-groups";
 import {
   BULK_PROTECTION_LABELS,
   bulkEligibility,
@@ -24,8 +24,10 @@ export function StatusGroup({
   selectionHintId,
   onToggleRoot,
   preferences,
+  projectNames,
 }: {
-  group: StatusThreadGroup;
+  group: ThreadSection;
+  projectNames: ReadonlyMap<string, string>;
   providerInfoById: ReadonlyMap<string, ProviderGlyphInfo>;
   activeThreadId: string | null;
   forceExpanded: boolean;
@@ -43,7 +45,7 @@ export function StatusGroup({
   const effectiveExpanded = forceExpanded || expanded;
 
   return (
-    <section aria-label={group.presentation.label} className="mt-2 first:mt-0">
+    <section aria-label={group.label} className="mt-4 first:mt-0">
       <button
         type="button"
         aria-expanded={effectiveExpanded}
@@ -51,17 +53,10 @@ export function StatusGroup({
         onClick={() => setExpanded((open) => !open)}
         className="flex h-7 w-full items-center gap-2 rounded-md px-1.5 text-left hover:bg-sidebar-accent/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
       >
-        <FamilyStatusIcon
-          status={group.presentation}
-          interactive={false}
-          className="pointer-events-none"
-        />
-        <span className="min-w-0 flex-1 text-xs font-medium text-muted-foreground">
-          {group.presentation.label}
+        <span title={group.label} className="min-w-0 truncate text-2xs font-medium text-muted-foreground">
+          {group.label}
         </span>
-        <span className="tabular-nums text-2xs text-muted-foreground/70">
-          {group.families.length}
-        </span>
+        <Icon name={effectiveExpanded ? "ChevronDown" : "ChevronRight"} className="size-3 shrink-0 text-muted-foreground/60" aria-hidden />
       </button>
       {effectiveExpanded ? (
         <ul id={listId} className="mt-0.5 flex flex-col gap-0.5">
@@ -96,6 +91,8 @@ export function StatusGroup({
                 onReorderDragOver={() => {}}
                 onReorderDrop={(event) => event.preventDefault()}
                 preferences={preferences}
+                grouped
+                projectName={projectNames.get(family.root.projectId)}
               />
             );
           })}

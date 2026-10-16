@@ -59,7 +59,9 @@ export function ThreadCard({
   preferences,
   projectName,
   projectColorOverride,
+  grouped = false,
 }: {
+  grouped?: boolean;
   projectName?: string;
   projectColorOverride?: string;
   thread: PluginSidebarThread;
@@ -254,10 +256,22 @@ export function ThreadCard({
                 data-dockside-root-title-row=""
                 className="flex h-4 min-w-0 items-center gap-1.5"
               >
+                {grouped ? (
+                  <span
+                    title={`${familyState.label}: ${familyState.description}`}
+                    className="flex size-3.5 shrink-0 items-center justify-center"
+                    style={{ color: `var(--dockside-status-${familyState.colorRole})` }}
+                  >
+                    {familyState.kind === "working" ? (
+                      <Icon name="Loading" className="size-3 animate-spin" aria-hidden />
+                    ) : <span className="size-1.5 rounded-full bg-current" />}
+                  </span>
+                ) : null}
                 <span
                   title={threadDisplayTitle(thread)}
                   className={cn(
-                    "min-w-0 flex-1 truncate text-sm",
+                    "min-w-0 flex-1 truncate",
+                    grouped ? "text-xs" : "text-sm",
                     thread.isUnread ? "font-semibold" : "font-medium",
                     !familyState.receded
                       ? "text-foreground"
@@ -283,7 +297,7 @@ export function ThreadCard({
                     : "text-muted-foreground",
                 )}
               >
-                <ThreadLocation thread={thread} />
+                <ThreadLocation thread={thread} projectName={grouped ? projectName : undefined} />
               </div>
             </div>
 
@@ -388,7 +402,7 @@ export function ThreadCard({
                     className="size-3.5"
                   />
                 ) : null}
-                {!selectionMode ? (
+                {!selectionMode && !grouped ? (
                   <FamilyStatusIcon
                     status={familyState}
                     tooltipAlign="right"
@@ -620,30 +634,30 @@ function ThreadStatusLabel({
   );
 }
 
-function ThreadLocation({ thread }: { thread: PluginSidebarThread }) {
+function ThreadLocation({ thread, projectName }: { thread: PluginSidebarThread; projectName?: string }) {
   const branch = thread.environment?.branchName;
-  if (branch) {
+  const host = thread.host?.name;
+  if (branch || host || projectName) {
     return (
       <span
-        title={`Branch: ${branch}`}
+        title={[projectName, branch && `Branch: ${branch}`, host && `Host: ${host}`]
+          .filter(Boolean)
+          .join(" · ")}
         className="flex min-w-0 flex-1 items-center gap-1 truncate text-muted-foreground"
       >
-        <Icon
-          name="GitBranch"
-          aria-label="Branch"
-          className="size-3 shrink-0 text-muted-foreground/60"
-        />
-        <span className="truncate font-mono">{branch}</span>
-      </span>
-    );
-  }
-  if (thread.host) {
-    return (
-      <span
-        title={`Host: ${thread.host.name}`}
-        className="min-w-0 flex-1 truncate text-muted-foreground"
-      >
-        {thread.host.name}
+        {projectName ? <span className="max-w-[35%] truncate">{projectName}</span> : null}
+        {branch ? (
+          <>
+            <Icon
+              name="GitBranch"
+              aria-label="Branch"
+              className="size-3 shrink-0 text-muted-foreground/60"
+            />
+            <span className="truncate font-mono">{branch}</span>
+          </>
+        ) : null}
+        {branch && host ? <span aria-hidden="true">·</span> : null}
+        {host ? <span className="max-w-[40%] shrink-0 truncate">{host}</span> : null}
       </span>
     );
   }

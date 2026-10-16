@@ -89,6 +89,7 @@ describe("filterProjectThreadGroups", () => {
   const groups = groupThreadsByProject(
     [
       thread({ id: "working", indicator: "runtime", updatedAt: now }),
+      thread({ id: "failed", indicator: "unread-error", updatedAt: now }),
       thread({
         id: "waiting",
         hasPendingInteraction: true,
@@ -120,6 +121,7 @@ describe("filterProjectThreadGroups", () => {
 
   it("supports attention and quiet presets", () => {
     assert.deepEqual(ids("status"), [
+      "failed",
       "quiet-day",
       "quiet-new",
       "unread",
@@ -129,7 +131,8 @@ describe("filterProjectThreadGroups", () => {
     ]);
     assert.deepEqual(ids("working"), ["working"]);
     assert.deepEqual(ids("needs-you"), ["waiting"]);
-    assert.deepEqual(ids("unread"), ["unread"]);
+    assert.deepEqual(ids("failed"), ["failed"]);
+    assert.deepEqual(ids("unread"), ["failed", "unread"]);
     assert.deepEqual(ids("quiet"), ["quiet-day", "quiet-new", "quiet-week"]);
   });
 
@@ -190,7 +193,7 @@ describe("thread filter presentation", () => {
       THREAD_FILTER_OPTIONS.filter((option) => option.group === "status").map(
         (option) => option.preset,
       ),
-      ["working", "needs-you", "unread"],
+      ["working", "needs-you", "failed", "unread"],
     );
     assert.deepEqual(
       THREAD_FILTER_OPTIONS.filter(

@@ -4,7 +4,7 @@ import { describe, it } from "node:test";
 
 describe("workspace filter UI contract", () => {
   it("presents grouped descriptive filters and an explicit active state", async () => {
-    const [menu, inbox, select] = await Promise.all([
+    const [menu, inbox] = await Promise.all([
       readFile(
         new URL("../components/inbox/filter-menu.tsx", import.meta.url),
         "utf8",
@@ -13,31 +13,22 @@ describe("workspace filter UI contract", () => {
         new URL("../components/inbox/thread-inbox.tsx", import.meta.url),
         "utf8",
       ),
-      readFile(new URL("../components/ui/select.tsx", import.meta.url), "utf8"),
     ]);
 
-    assert.match(inbox, />\s*Workspaces\s*</);
-    assert.match(menu, /Filter workspaces/);
-    assert.match(menu, /status: "Status"/);
-    assert.match(menu, /inactivity: "Inactivity"/);
-    assert.match(menu, />Projects</);
-    assert.match(menu, /projects\.map\(\(project\)/);
-    assert.match(menu, /projectValue\(project\.id\)/);
-    assert.match(menu, /projectId: project\.id/);
-    assert.match(menu, /<FilterOption preset="all"/);
-    assert.match(menu, /<FilterOption preset="status"/);
-    assert.match(menu, /selectedValue === presetValue\("all"\) \? null/);
-    assert.match(menu, /max-w-20 truncate/);
-    assert.match(menu, /items-start py-1/);
-    assert.match(menu, /w-64 bg-background/);
-    assert.match(menu, /aria-label={`Filter workspaces: \${label}`}/);
-    assert.match(menu, /option\.description/);
-    assert.match(select, /SelectPrimitive\.ItemIndicator/);
-    assert.match(select, /focus:bg-state-hover/);
+    assert.match(inbox, />\s*Chats\s*</);
+    assert.match(menu, /aria-label=\{`Filter chats:/);
+    assert.match(menu, /label: "Projects"/);
+    assert.match(menu, /label: "Updated"/);
+    assert.match(menu, /label: "Status"/);
+    assert.match(menu, /label: "Environment"/);
+    assert.match(menu, /<SelectLabel>Group by<\/SelectLabel>/);
+    assert.match(menu, /<SelectLabel>Status<\/SelectLabel>/);
+    assert.match(menu, /label: "Failed"/);
     assert.match(inbox, /activePreset === "status"/);
-    assert.match(inbox, /projects=\{unfilteredProjectGroups\.map/);
     assert.match(inbox, /setWorkspaceFilter\(ALL_WORKSPACES_FILTER\)/);
     assert.match(inbox, /statusGroups\.map/);
+    assert.match(inbox, /groupSidebarFamilies\(families, activePreset\)/);
+    assert.match(inbox, /localStorage\.setItem\("dockside:group-by"/);
     const statusGroup = await readFile(
       new URL("../components/inbox/status-group.tsx", import.meta.url),
       "utf8",
@@ -45,7 +36,7 @@ describe("workspace filter UI contract", () => {
     assert.match(statusGroup, /<ThreadCard/);
     assert.match(statusGroup, /effectiveExpanded = forceExpanded \|\| expanded/);
     assert.match(statusGroup, /aria-expanded=\{effectiveExpanded\}/);
-    assert.match(statusGroup, /interactive=\{false\}/);
+    assert.match(statusGroup, /\{group.label\}/);
     assert.match(statusGroup, /\{effectiveExpanded \? \(/);
   });
 });
