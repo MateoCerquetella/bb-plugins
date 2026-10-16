@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-6e29f951034e352bcf8494d3",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-10-16T02:38:40.245Z",
+  "completedAt": "2026-10-16T02:38:40.245Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "pr85-repair",
+    "specRevision": 3,
+    "specDigest": "sha256:f09fe70305423a4a86e431f80b1a14d455d5a33e28a51140383cdbe1bb38f707",
+    "treeDigest": "sha256:3b9dd751ce603cd2b20a3522cd7b63bf25c1665ddebdf45b4ac268f285cc5032",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:4817bc87efc336d949930165bd4f80987eb06df62c0cfa994a0e315a3195166a",
+  "kind": "collected",
+  "collector": "empirical-review:pr85-isolated-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/pr85-repair/reviews/ba5796214aaa10d7e09fc9dd.json",
+      "mediaType": "application/json",
+      "bytes": 3230,
+      "digest": "sha256:3a859f264dd32600cb09ba51becd7650a3317956f0871fc4a9b288ef0f2c43ee"
+    },
+    {
+      "path": ".empirical/specs/pr85-repair/reviews/ba5796214aaa10d7e09fc9dd.md",
+      "mediaType": "text/markdown",
+      "bytes": 2067,
+      "digest": "sha256:bbc345c95f1996a3b46819d89ec71a094b5025929bf586772a539a1954901766"
+    }
+  ]
+}

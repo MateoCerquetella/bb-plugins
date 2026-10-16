@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:8c944111a165723de922050a171db972d7e1f4cf61056bc2b5112c48d56eac8c",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "1807befaa9c0732d83b6223d3821ba83268d98e7",
+  "headCommit": "ec08baaf06b06da3ab39a6a220faab0877e9286d",
+  "diffDigest": "sha256:3df3438ac96cc893bbd8a7dac759781df5428b4ddee1b8ec245f9ee85284bfea",
+  "verdict": "APPROVED",
+  "reviewerActor": "pr85-isolated-reviewer",
+  "reviewerInvocationId": "/root/fix85b/pr85_review",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: The committed packet has no conflict markers, preserves current native event reconciliation, pendingCompletion, structured results and ErrorNotice, and adds Empirical progress independently. git merge-base --is-ancestor origin/main ec08baaf06b06da3ab39a6a220faab0877e9286d exited 0.\n- PASS AC-2: Inspected /tmp/pr85-root-verified.log: Taskboard type/declaration checks, 258/258 tests, build including host bundle, and build metadata validation passed; root check continued through the final plugin build with no failed tests. The parent execution reported root npm run check exit 0.\n- PASS AC-UI-1: The packet's browser script explicitly checks phase/revision changes, awaiting input, blocked state, offline stale retention, reconnection and implemented versus verified completion. /tmp/pr85-browser.log records desktop, panel, mobile and all listed functional checks passed with errors: []. This proves the real progress components with fixture responses, not end-to-end host-routed delivery.\n- PASS AC-3: Independently queried PR85: headRefOid equals reviewed ec08baaf06b06da3ab39a6a220faab0877e9286d, isDraft true, state OPEN. Parent supplied successful force-with-lease output from expected previous head 2b6548df9. No merge or readiness claim is made.\n\n## Security / correctness\n\nNo blocking security or correctness defects found in the exact packet. Host/environment/checkout identity is checked before accepting observations; unavailable status retains only matching persisted snapshots; observation reads do not advance Empirical state. Workspace metadata failures are caught after native dispatch and recovery, and metadata backfill no longer invalidates a current Start request. Current native progress behavior remains present.\n\n## Design / maintainability\n\nThe discriminated observation model, host-owned reader, additive snapshot storage and per-ticket serialization keep Empirical observation separate from native lifecycle state. No material structural regression found. One nonblocking README accuracy issue remains.",
+  "bodyDigest": "sha256:78319b71ed022387da451838b0690b23dc0d31a03d628b4538f3d6642e5ddb38",
+  "findings": [
+    {
+      "id": "F-1",
+      "severity": "low",
+      "category": "docs",
+      "summary": "The new README says repository-wide ownership inventory is slower and cached separately, but readEmpiricalStatus calls repositoryOverview for every observation and both UI/background use the same reader; describe the actual refresh strategy or add the stated cache.",
+      "path": "plugins/taskboard/README.md"
+    }
+  ],
+  "digest": "sha256:ba5796214aaa10d7e09fc9dd67bf4ae173e16d8c74ec805306eea48ea4ff7ed6"
+}

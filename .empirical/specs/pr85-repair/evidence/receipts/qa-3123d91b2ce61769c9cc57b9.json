@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-3123d91b2ce61769c9cc57b9",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "Installed Taskboard shell, reload services and CLI pass; full fixture passes phase/offline/completion states. A real host-bound existing task cannot be verified: configured GitHub plugin disabled (HTTP503), Linear SDD174 not cached for selected project, and its native thread remains Loading models without a Taskboard progress control. No human QA pass is claimed.",
+  "passed": false,
+  "startedAt": "2026-10-16T02:40:30.386Z",
+  "completedAt": "2026-10-16T02:40:30.386Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "pr85-repair",
+    "specRevision": 3,
+    "specDigest": "sha256:f09fe70305423a4a86e431f80b1a14d455d5a33e28a51140383cdbe1bb38f707",
+    "treeDigest": "sha256:3b9dd751ce603cd2b20a3522cd7b63bf25c1665ddebdf45b4ac268f285cc5032",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 7,
+    "gitCommit": "ec08baaf06b06da3ab39a6a220faab0877e9286d",
+    "textTreeDigest": "sha256:3b9dd751ce603cd2b20a3522cd7b63bf25c1665ddebdf45b4ac268f285cc5032"
+  },
+  "digest": "sha256:073aaea69de24f329e1b9ddba18b66ec9352440c538c6d215326e2438e2225c2",
+  "kind": "qa",
+  "matrixDigest": "sha256:ca90b5557e1b812f0620dbba7790e36551afa7decfda4acf518fd866051cec6d",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "missing-environment",
+      "summary": "Installed Taskboard shell, reload services and CLI pass; full fixture passes phase/offline/completion states. A real host-bound existing task cannot be verified: configured GitHub plugin disabled (HTTP503), Linear SDD174 not cached for selected project, and its native thread remains Loading models without a Taskboard progress control. No human QA pass is claimed.",
+      "startedAt": "2026-10-16T02:40:30.386Z",
+      "completedAt": "2026-10-16T02:40:30.386Z",
+      "durationMs": 0,
+      "collector": "installed-ui-environment-check",
+      "command": null,
+      "result": null,
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:3b9dd751ce603cd2b20a3522cd7b63bf25c1665ddebdf45b4ac268f285cc5032",
+      "sourceTreeAfter": "sha256:3b9dd751ce603cd2b20a3522cd7b63bf25c1665ddebdf45b4ac268f285cc5032",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/pr85-repair/evidence/artifacts/installed-taskboard.png",
+          "mediaType": "image/png",
+          "bytes": 104167,
+          "digest": "sha256:021ea4597e8e21d19517df0134976920a5796c8abdb2a7bff546d9081acd0f8f"
+        }
+      ]
+    }
+  ],
+  "anomalies": [
+    "outcome-missing-environment"
+  ]
+}

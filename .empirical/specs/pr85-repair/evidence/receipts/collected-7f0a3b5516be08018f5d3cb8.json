@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-7f0a3b5516be08018f5d3cb8",
+  "criteria": [
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "BB Surf fixture passed desktop/panel/mobile checks, phase changes, offline retention, verified completion, native navigation and all assertions; no browser errors.",
+  "passed": true,
+  "startedAt": "2026-10-16T02:32:39.605Z",
+  "completedAt": "2026-10-16T02:32:39.605Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "pr85-repair",
+    "specRevision": 3,
+    "specDigest": "sha256:f09fe70305423a4a86e431f80b1a14d455d5a33e28a51140383cdbe1bb38f707",
+    "treeDigest": "sha256:3b9dd751ce603cd2b20a3522cd7b63bf25c1665ddebdf45b4ac268f285cc5032",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:c1e1f97be0fd2cf5f35c60c0227b9b9b215e03d5f9c7d93077b18a6931932b72",
+  "kind": "collected",
+  "collector": "bb-surf-playwright",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/pr85-repair/evidence/artifacts/pr85-browser.log",
+      "mediaType": "application/json",
+      "bytes": 262,
+      "digest": "sha256:2717830265ed7f356e193fd2861cecb9bb123256d76a69c5ae0b49340c9887a3"
+    },
+    {
+      "path": ".empirical/specs/pr85-repair/evidence/artifacts/taskboard-empirical-demo.png",
+      "mediaType": "image/png",
+      "bytes": 83802,
+      "digest": "sha256:43b6a3ab180abccc880ca1557f64c62c795c37cc83a92073ada420bc859f9490"
+    },
+    {
+      "path": ".empirical/specs/pr85-repair/evidence/artifacts/taskboard-progress-mobile.png",
+      "mediaType": "image/png",
+      "bytes": 205089,
+      "digest": "sha256:56a4552f507b4eaa08c8b85f0cb93ad1d59ec98151625c7d906da1c1934b3bd6"
+    }
+  ]
+}

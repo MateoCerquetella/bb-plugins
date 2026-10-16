@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "id": "executed-cd44ada8ebda7e0c8712d3b9",
+  "criteria": [
+    "AC-1",
+    "AC-2"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Configured final Taskboard verification on rebased implementation and direct metadata-backfill regression.",
+  "passed": true,
+  "startedAt": "2026-10-16T02:39:20.507Z",
+  "completedAt": "2026-10-16T02:39:50.449Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "pr85-repair",
+    "specRevision": 3,
+    "specDigest": "sha256:f09fe70305423a4a86e431f80b1a14d455d5a33e28a51140383cdbe1bb38f707",
+    "treeDigest": "sha256:3b9dd751ce603cd2b20a3522cd7b63bf25c1665ddebdf45b4ac268f285cc5032",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:842ffed9adb005f2794f5b4d8a57aadf1894dba05e502e0911059e5a1748edd8",
+  "kind": "executed",
+  "command": {
+    "argv": [
+      "npm",
+      "run",
+      "check",
+      "--workspace",
+      "bb-plugin-taskboard"
+    ],
+    "cwd": ".",
+    "timeoutMs": 120000,
+    "maxOutputBytes": 1048576,
+    "environmentKeys": [
+      "PATH"
+    ]
+  },
+  "result": {
+    "exitCode": 0,
+    "signal": null,
+    "timedOut": false,
+    "stdoutDigest": "sha256:8febca3c3f1fc51b0e75a59a6a2c36fd4734ea53bb7d7cf433b2d33255f0ca2e",
+    "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdoutTail": "ion\nok 220 - server-capped pages include every issue, comment and creation metadata option\n  ---\n  duration_ms: 4.825392\n  type: 'test'\n  ...\n# Subtest: pagination fails explicitly rather than truncating a server that never exhausts\nok 221 - pagination fails explicitly rather than truncating a server that never exhausts\n  ---\n  duration_ms: 6.711735\n  type: 'test'\n  ...\n# Subtest: terminal and resumed workflow moves preserve unrelated labels\nok 222 - terminal and resumed workflow moves preserve unrelated labels\n  ---\n  duration_ms: 6.003266\n  type: 'test'\n  ...\n# Subtest: native Open clears workflow labels and retains ordinary labels\nok 223 - native Open clears workflow labels and retains ordinary labels\n  ---\n  duration_ms: 1.474113\n  type: 'test'\n  ...\n# Subtest: workflow moves preserve concurrent ordinary label additions and removals\nok 224 - workflow moves preserve concurrent ordinary label additions and removals\n  ---\n  duration_ms: 1.130417\n  type: 'test'\n  ...\n# Subtest: reopened issue with status/done is open until explicitly closed again\nok 225 - reopened issue with status/done is open until explicitly closed again\n  ---\n  duration_ms: 1.249824\n  type: 'test'\n  ...\n# Subtest: reopened issue with status/canceled is open until explicitly closed again\nok 226 - reopened issue with status/canceled is open until explicitly closed again\n  ---\n  duration_ms: 1.237813\n  type: 'test'\n  ...\n# Subtest: failed label removal stops further writes and reports a partial outcome\nok 227 - failed label removal stops further writes and reports a partial outcome\n  ---\n  duration_ms: 0.609299\n  type: 'test'\n  ...\n# Subtest: partial state write is reported without retries\nok 228 - partial state write is reported without retries\n  ---\n  duration_ms: 0.825512\n  type: 'test'\n  ...\n# Subtest: unknown status is rejected without any write\nok 229 - unknown status is rejected without any write\n  ---\n  duration_ms: 0.563425\n  type: 'test'\n  ...\n# Subtest: creation uses stdin JSON and confirms the requested assignee\nok 230 - creation uses stdin JSON and confirms the requested assignee\n  ---\n  duration_ms: 1.490883\n  type: 'test'\n  ...\n# Subtest: ambiguous creation is not retried and uses the shared uncertainty marker\nok 231 - ambiguous creation is not retried and uses the shared uncertainty marker\n  ---\n  duration_ms: 0.807009\n  type: 'test'\n  ...\n# Subtest: metadata and creation reject foreign destinations before invoking tea\nok 232 - metadata and creation reject foreign destinations before invoking tea\n  ---\n  duration_ms: 0.309784\n  type: 'test'\n  ...\n# Subtest: workflow taxonomy covers review and terminal stages\nok 233 - workflow taxonomy covers review and terminal stages\n  ---\n  duration_ms: 0.118075\n  type: 'test'\n  ...\n# Subtest: gitlab is a registered taskboard source\nok 234 - gitlab is a registered taskboard source\n  ---\n  duration_ms: 7.155542\n  type: 'test'\n  ...\n# Subtest: refs must be host-qualified paths\nok 235 - refs must be host-qualified paths\n  ---\n  duration_ms: 1.032429\n  type: 'test'\n  ...\n# Subtest: locators round-trip with ref and iid\nok 236 - locators round-trip with ref and iid\n  ---\n  duration_ms: 0.383829\n  type: 'test'\n  ...\n# Subtest: status label categories cover the five states\nok 237 - status label categories cover the five states\n  ---\n  duration_ms: 0.201116\n  type: 'test'\n  ...\n# Subtest: status labels filter out unrelated labels\nok 238 - status labels filter out unrelated labels\n  ---\n  duration_ms: 0.596346\n  type: 'test'\n  ...\n# Subtest: state category prefers workflow labels over native state\nok 239 - state category prefers workflow labels over native state\n  ---\n  duration_ms: 0.171142\n  type: 'test'\n  ...\n# Subtest: status name shows the workflow column name or the native state\nok 240 - status name shows the workflow column name or the native state\n  ---\n  duration_ms: 0.210263\n  type: 'test'\n  ...\n# Subtest: cached summaries never retain provider comments\nok 241 - cached summaries never retain provider comments\n  ---\n  duration_ms: 0.167054\n  type: 'test'\n  ...\n# Subtest: untriaged issues keep native open/closed choices current-flagged\nok 242 - untriaged issues keep native open/closed choices current-flagged\n  ---\n  duration_ms: 0.317098\n  type: 'test'\n  ...\n# Subtest: stripped status names keep facet and dropdown consistent\nok 243 - stripped status names keep facet and dropdown consistent\n  ---\n  duration_ms: 0.398445\n  type: 'test'\n  ...\n# Subtest: token line is parsed from glab stderr output\nok 244 - token line is parsed from glab stderr output\n  ---\n  duration_ms: 0.44535\n  type: 'test'\n  ...\n# Subtest: keeps structural headers on neutral host theme surfaces\nok 245 - keeps structural headers on neutral host theme surfaces\n  ---\n  duration_ms: 1.488078\n  type: 'test'\n  ...\n# Subtest: uses restrained state glyph, focus, and conversation treatments\nok 246 - uses restrained state glyph, focus, and conversation treatments\n  ---\n  duration_ms: 0.416287\n  type: 'test'\n  ...\n# Subtest: keeps constrained filter values inside the vertical menu measure\nok 247 - keeps constrained filter values inside the vertical menu measure\n  ---\n  duration_ms: 0.233965\n  type: 'test'\n  ...\n# Subtest: keeps assignee avatars compact with six theme-safe identity tones\nok 248 - keeps assignee avatars compact with six theme-safe identity tones\n  ---\n  duration_ms: 0.370064\n  type: 'test'\n  ...\n# Subtest: shows restrained composer drop feedback and discoverable drag grips\nok 249 - shows restrained composer drop feedback and discoverable drag grips\n  ---\n  duration_ms: 0.372197\n  type: 'test'\n  ...\n# Subtest: ticket images reject spoofed formats, active content and oversized bytes\nok 250 - ticket images reject spoofed formats, active content and oversized bytes\n  ---\n  duration_ms: 10.070518\n  type: 'test'\n  ...\n# Subtest: Linear uploads use signed storage headers and return the asset URL\nok 251 - Linear uploads use signed storage headers and return the asset URL\n  ---\n  duration_ms: 64.327182\n  type: 'test'\n  ...\n# Subtest: improvement asks for concrete concise scope without invented implementation\nok 252 - improvement asks for concrete concise scope without invented implementation\n  ---\n  duration_ms: 0.209031\n  type: 'test'\n  ...\n# Subtest: draft parser accepts JSON or a single fence and rejects missing, extra or oversized fields\nok 253 - draft parser accepts JSON or a single fence and rejects missing, extra or oversized fields\n  ---\n  duration_ms: 2.729297\n  type: 'test'\n  ...\n# Subtest: concurrent starts spawn once with project defaults and only validated text is returned\nok 254 - concurrent starts spawn once with project defaults and only validated text is returned\n  ---\n  duration_ms: 1.690256\n  type: 'test'\n  ...\n# Subtest: cancellation before start prevents dispatch, including after service reload\nok 255 - cancellation before start prevents dispatch, including after service reload\n  ---\n  duration_ms: 0.349776\n  type: 'test'\n  ...\n# Subtest: uncertain spawn cannot become a confirmed cancellation or be dispatched twice\nok 256 - uncertain spawn cannot become a confirmed cancellation or be dispatched twice\n  ---\n  duration_ms: 2.300156\n  type: 'test'\n  ...\n# Subtest: stop failures stay uncertain and cleanup is retried by the sweep\nok 257 - stop failures stay uncertain and cleanup is retried by the sweep\n  ---\n  duration_ms: 0.625578\n  type: 'test'\n  ...\n# Subtest: invalid model output never returns a replacement draft\nok 258 - invalid model output never returns a replacement draft\n  ---\n  duration_ms: 0.491435\n  type: 'test'\n  ...\n1..258\n# tests 258\n# suites 0\n# pass 258\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 11046.135413\n\n> bb-plugin-taskboard@0.3.5 build\n> node scripts/run-isolated-bb-cli.mjs plugin build .\n\nDownloading the plugin build toolchain (one time)…\n  esbuild@0.28.1, @tailwindcss/node@4.3.0, @tailwindcss/oxide@4.3.0, tailwindcss@4.3.0\nToolchain ready (2.5s)\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\ndist/host.js\ndist/host.js.map\ndist/host.meta.json\n\n> bb-plugin-taskboard@0.3.5 verify:build\n> node scripts/verify-build.mjs\n\nTaskboard build metadata is valid.\n",
+    "stderrTail": "",
+    "stdoutTruncated": false,
+    "stderrTruncated": false
+  }
+}

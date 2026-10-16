@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-a4c2c279ea4b50ea49625cae",
+  "criteria": [
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Installed Taskboard 0.3.5 loaded at /plugins/taskboard/tasks after reload, with New issue/Manage/project sidebar and no page errors. Live native progress could not be checked because the selected Linear item is not cached and thread remained Loading models; phase/offline/completion behavior is covered by the passing fixture.",
+  "passed": true,
+  "startedAt": "2026-10-16T02:38:51.806Z",
+  "completedAt": "2026-10-16T02:38:51.806Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "pr85-repair",
+    "specRevision": 3,
+    "specDigest": "sha256:f09fe70305423a4a86e431f80b1a14d455d5a33e28a51140383cdbe1bb38f707",
+    "treeDigest": "sha256:3b9dd751ce603cd2b20a3522cd7b63bf25c1665ddebdf45b4ac268f285cc5032",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:4bd1fcdbf83e5eec72004e3ac97391a2c30eaa4a9cfd6e5306433124b22a8760",
+  "kind": "collected",
+  "collector": "installed-taskboard-bb-surf",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/pr85-repair/evidence/artifacts/installed-taskboard.png",
+      "mediaType": "image/png",
+      "bytes": 104167,
+      "digest": "sha256:021ea4597e8e21d19517df0134976920a5796c8abdb2a7bff546d9081acd0f8f"
+    }
+  ]
+}

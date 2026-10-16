@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-8758b771e288926dcccbbd18",
+  "criteria": [
+    "AC-1",
+    "AC-2"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Full root npm run check exited 0 after merging current main e48ee00d; 258 Taskboard tests, all plugin checks, builds, types and Dockside guard passed.",
+  "passed": true,
+  "startedAt": "2026-10-16T02:34:11.915Z",
+  "completedAt": "2026-10-16T02:34:11.915Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "pr85-repair",
+    "specRevision": 3,
+    "specDigest": "sha256:f09fe70305423a4a86e431f80b1a14d455d5a33e28a51140383cdbe1bb38f707",
+    "treeDigest": "sha256:3b9dd751ce603cd2b20a3522cd7b63bf25c1665ddebdf45b4ac268f285cc5032",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:a02e8f164439957432d475eb49ac3303796dc0a15890cd17498d493d0efedec2",
+  "kind": "collected",
+  "collector": "workspace-npm-check",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/pr85-repair/evidence/artifacts/workspace-check.log",
+      "mediaType": "text/plain",
+      "bytes": 193567,
+      "digest": "sha256:42fe0acb2ba3f1c090b11147ce28ce9fe0e971593c901ab499776adfa5df0e9f"
+    }
+  ]
+}
