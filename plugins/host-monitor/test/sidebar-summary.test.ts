@@ -10,6 +10,7 @@ import {
   hostMonitorNativeOpenRpcRequest,
   hostMonitorPanelPath,
   hostMonitorSidebarMetricTones,
+  hostMonitorSidebarResourceMetrics,
   hostMonitorSidebarPreferencesRpcRequest,
   hostMonitorSidebarRefreshDelay,
   hostMonitorSidebarRpcRequest,
@@ -384,6 +385,33 @@ describe("Host Monitor sidebar threshold colors", () => {
         { attentionPercent: 70, criticalPercent: 90 },
       ),
       { cpu: "critical", memory: "attention" },
+    );
+  });
+
+  it("presents CPU, RAM, and disk in order with shared freshness thresholds", () => {
+    assert.deepEqual(
+      hostMonitorSidebarResourceMetrics(
+        40,
+        72,
+        91,
+        true,
+        { attentionPercent: 70, criticalPercent: 90 },
+      ),
+      [
+        { key: "cpu", label: "CPU", percent: 40, tone: "normal" },
+        { key: "memory", label: "RAM", percent: 72, tone: "attention" },
+        { key: "disk", label: "Disk", percent: 91, tone: "critical" },
+      ],
+    );
+    assert.deepEqual(
+      hostMonitorSidebarResourceMetrics(null, 72, 91, false).map(
+        ({ key, tone }) => ({ key, tone }),
+      ),
+      [
+        { key: "cpu", tone: "unavailable" },
+        { key: "memory", tone: "neutral" },
+        { key: "disk", tone: "neutral" },
+      ],
     );
   });
 

@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "resultPath": ".empirical/specs/add-color-thresholds-for-cpu-ram-and-disk-usage-in/reviews/96838c65a4f6ea441bbe2242.json",
+  "resultDigest": "sha256:96838c65a4f6ea441bbe2242a0af130319d9501ad6f63054599dd64ea927299e",
+  "contractDigest": "sha256:24bebe5c0497e8f259b143cd60a9e689d1d2d0e873fb3be9e18edca4b7c4a287",
+  "carriedDeferred": []
+}

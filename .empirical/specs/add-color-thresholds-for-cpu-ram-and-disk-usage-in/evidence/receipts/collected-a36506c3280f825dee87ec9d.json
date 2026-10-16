@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-a36506c3280f825dee87ec9d",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-10-16T18:24:09.406Z",
+  "completedAt": "2026-10-16T18:24:09.406Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "add-color-thresholds-for-cpu-ram-and-disk-usage-in",
+    "specRevision": 2,
+    "specDigest": "sha256:69d15995a172d14b5fb2e221527276937a7d7b0cf487acbe2b008aa1d47b7918",
+    "treeDigest": "sha256:bc712560e402a34bbe2977c9159aed4e1076c79628570e251c6322b8bb7e4611",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:99d0a7864d3443f0c3ea3ca998da2ba9756c5c9b0cec3d3e7e1d6ee91dad72a2",
+  "kind": "collected",
+  "collector": "empirical-review:codex-fresh-context-review",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/add-color-thresholds-for-cpu-ram-and-disk-usage-in/reviews/96838c65a4f6ea441bbe2242.json",
+      "mediaType": "application/json",
+      "bytes": 2096,
+      "digest": "sha256:15702e1f0ddde98785700b4ae8aeb8b6b6d5b89f3183eb41299dd3a3e2e369f8"
+    },
+    {
+      "path": ".empirical/specs/add-color-thresholds-for-cpu-ram-and-disk-usage-in/reviews/96838c65a4f6ea441bbe2242.md",
+      "mediaType": "text/markdown",
+      "bytes": 1127,
+      "digest": "sha256:2f1e115efc7d8f831635afc953b3657968ece9eef455df089aeffc1eed44e488"
+    }
+  ]
+}

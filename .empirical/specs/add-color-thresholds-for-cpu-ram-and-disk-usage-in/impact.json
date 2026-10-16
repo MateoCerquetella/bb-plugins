@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "host-monitor-resource-presentation"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:e1be1cf678ace4f1c2774e3c47e73fbc239e912379046f74acca7761ad81f2c5"
+}

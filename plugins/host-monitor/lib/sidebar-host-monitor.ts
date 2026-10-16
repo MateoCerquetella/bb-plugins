@@ -1,5 +1,6 @@
 import type { Dashboard, MachineRow } from "../contract.ts";
 import { networkRateSummary } from "./network-presentation.ts";
+import { applyPortalScope } from "./portal-scope.ts";
 import {
   thresholdToneAccessibleLabel,
   thresholdToneForReading,
@@ -116,6 +117,13 @@ export interface HostMonitorSidebarPreferences {
 export interface HostMonitorSidebarMetricTones {
   cpu: ThresholdTone;
   memory: ThresholdTone;
+}
+
+export interface HostMonitorSidebarResourceMetric {
+  key: "cpu" | "memory" | "disk";
+  label: "CPU" | "RAM" | "Disk";
+  percent: number | null;
+  tone: ThresholdTone;
 }
 
 export function hostMonitorSidebarRpcRequest(
@@ -251,6 +259,30 @@ export function hostMonitorSidebarMetricTones(
     cpu: thresholdToneForReading(cpuPercent, isFresh, thresholds),
     memory: thresholdToneForReading(memoryPercent, isFresh, thresholds),
   };
+}
+
+export function hostMonitorSidebarResourceMetrics(
+  cpuPercent: number | null,
+  memoryPercent: number | null,
+  diskPercent: number | null,
+  isFresh = true,
+  thresholds: HealthThresholds = DEFAULT_HEALTH_THRESHOLDS,
+): HostMonitorSidebarResourceMetric[] {
+  const definitions: Array<[
+    HostMonitorSidebarResourceMetric["key"],
+    HostMonitorSidebarResourceMetric["label"],
+    number | null,
+  ]> = [
+    ["cpu", "CPU", cpuPercent],
+    ["memory", "RAM", memoryPercent],
+    ["disk", "Disk", diskPercent],
+  ];
+  return definitions.map(([key, label, percent]) => ({
+    key,
+    label,
+    percent,
+    tone: thresholdToneForReading(percent, isFresh, thresholds),
+  }));
 }
 
 export function hostMonitorDragThresholdExceeded(
@@ -629,19 +661,24 @@ function compactHostRow(
     );
   } else {
     const tones = hostMonitorSidebarMetricTones(
-      snapshot.cpu.usagePercent,
-      snapshot.memory.usagePercent,
-      machine.sampleState === "fresh",
-      thresholds,
+      snapshot.cpu.usagePercent, snapshot.memory.usagePercent,
+      machine.sampleState === "fresh", thresholds,
+    );
+    const resources = hostMonitorSidebarResourceMetrics(
+      snapshot.cpu.usagePercent, snapshot.memory.usagePercent,
+      snapshot.disk?.usagePercent ?? null, machine.sampleState === "fresh", thresholds,
     );
     const metrics = element(
       "span",
       "host-monitor-sidebar__compact-metrics",
     );
     metrics.append(
-      compactMetric("CPU", snapshot.cpu.usagePercent, tones.cpu),
-      element("span", "host-monitor-sidebar__compact-separator", "·"),
-      compactMetric("RAM", snapshot.memory.usagePercent, tones.memory),
+      ...resources.flatMap((metric, index) => [
+        compactMetric(metric.label, metric.percent, metric.tone),
+        ...(index < resources.length - 1
+          ? [element("span", "host-monitor-sidebar__compact-separator", "·")]
+          : []),
+      ]),
     );
     identity.append(metrics);
   }
@@ -660,15 +697,15 @@ function compactHostRow(
 
 type HostMonitorNetworkDirection = "down" | "up";
 
-interface FloatingMetricOptions {
-  tone?: ThresholdTone;
-  direction?: HostMonitorNetworkDirection;
-}
+type FloatingMetricOptions =
+  | { kind: "plain" }
+  | { kind: "resource"; tone: ThresholdTone }
+  | { kind: "network"; direction: HostMonitorNetworkDirection };
 
 function floatingMetric(
   label: string,
   value: string,
-  options: FloatingMetricOptions = {},
+  options: FloatingMetricOptions,
 ): HTMLSpanElement {
   const metric = element("span", "host-monitor-sidebar__metric");
   const metricValue = element(
@@ -676,8 +713,8 @@ function floatingMetric(
     "host-monitor-sidebar__metric-value",
     value,
   );
-  if (options.tone !== undefined) metricValue.dataset.tone = options.tone;
-  if (options.direction !== undefined) {
+  if (options.kind === "resource") metricValue.dataset.tone = options.tone;
+  if (options.kind === "network") {
     metric.classList.add("host-monitor-sidebar__metric--network");
     metric.dataset.networkDirection = options.direction;
   }
@@ -709,13 +746,14 @@ function floatingHostRow(
   const snapshot = machine.snapshot;
   const cpuPercent = snapshot?.cpu.usagePercent ?? null;
   const memoryPercent = snapshot?.memory.usagePercent ?? null;
+  const diskPercent = snapshot?.disk?.usagePercent ?? null;
   const cpu = formatPercent(cpuPercent);
   const memory = formatPercent(memoryPercent);
   const tones = hostMonitorSidebarMetricTones(
-    cpuPercent,
-    memoryPercent,
-    machine.sampleState === "fresh",
-    thresholds,
+    cpuPercent, memoryPercent, machine.sampleState === "fresh", thresholds,
+  );
+  const resources = hostMonitorSidebarResourceMetrics(
+    cpuPercent, memoryPercent, diskPercent, machine.sampleState === "fresh", thresholds,
   );
   const network = networkRateSummary(
     snapshot?.network.receiveBytesPerSecond ?? null,
@@ -724,20 +762,23 @@ function floatingHostRow(
   const metrics = element("div", "host-monitor-sidebar__metrics");
   metrics.setAttribute(
     "aria-label",
-    `CPU ${cpu}, ${thresholdToneAccessibleLabel(tones.cpu)} for this reading; RAM ${memory}, ${thresholdToneAccessibleLabel(tones.memory)} for this reading; ${network.accessibleText}`,
+    `CPU ${cpu}, ${thresholdToneAccessibleLabel(tones.cpu)} for this reading; RAM ${memory}, ${thresholdToneAccessibleLabel(tones.memory)} for this reading; ${resources[2]?.label} ${formatPercent(resources[2]?.percent ?? null)}, ${thresholdToneAccessibleLabel(resources[2]?.tone ?? "normal")} for this reading; ${network.accessibleText}`,
   );
   metrics.append(
-    floatingMetric("CPU", cpu, { tone: tones.cpu }),
-    floatingMetric("RAM", memory, { tone: tones.memory }),
+    ...resources.map((metric) => floatingMetric(metric.label, formatPercent(metric.percent), { kind: "resource", tone: metric.tone })),
     floatingMetric(
       "Down",
       `↓ ${network.receive}`,
-      network.available ? { direction: "down" } : {},
+      network.available
+        ? { kind: "network", direction: "down" }
+        : { kind: "plain" },
     ),
     floatingMetric(
       "Up",
       `↑ ${network.send}`,
-      network.available ? { direction: "up" } : {},
+      network.available
+        ? { kind: "network", direction: "up" }
+        : { kind: "plain" },
     ),
   );
   row.append(top, metrics);
@@ -1009,6 +1050,8 @@ export function mountHostMonitorSidebar(
     element("span", undefined, "Drop to float"),
   );
   document.body.append(surface, ghost);
+  applyPortalScope(surface, pluginId);
+  applyPortalScope(ghost, pluginId);
 
   function currentViewport(): HostMonitorViewport {
     const visual = window.visualViewport;

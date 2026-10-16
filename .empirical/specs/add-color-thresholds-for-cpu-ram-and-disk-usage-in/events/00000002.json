@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "sequence": 2,
+  "previousDigest": "sha256:c85c6f4d3f64fe5029b31ca622f198e7e64afc869e004ce47889a13263041d80",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Specified shared CPU/RAM/disk threshold tones, stale/unavailable behavior, accessibility, and current-BB plugin scoping requirements for the floating surface and drag preview.",
+  "createdAt": "2026-10-16T18:13:11.779Z",
+  "stateBeforeDigest": "sha256:3149bba0f4441986ee1e4d82c95a0d65d7376b16c38c3d48bab0f1b26ea6eb03",
+  "stateAfterDigest": "sha256:b6b4751b3a707dad9282dfc1adee56330274f63eecc26efcbe6135ea98292aa2",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 2,
+    "activeFeature": "add-color-thresholds-for-cpu-ram-and-disk-usage-in",
+    "request": "Add color thresholds for CPU, RAM, and disk usage in the host monitor, and fix the floating monitor modal/popover positioning that is broken in the new BB shell. Preserve the existing host-monitor design and verify both threshold presentation and the live floating UI in current BB.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "design",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Specified shared CPU/RAM/disk threshold tones, stale/unavailable behavior, accessibility, and current-BB plugin scoping requirements for the floating surface and drag preview.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:69d15995a172d14b5fb2e221527276937a7d7b0cf487acbe2b008aa1d47b7918",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:9a7469ade6d0000c10b8b3b348dab4c619752dad994b776043c56c62d15f34b9",
+    "impactDigest": "sha256:e1be1cf678ace4f1c2774e3c47e73fbc239e912379046f74acca7761ad81f2c5",
+    "capabilityClaimId": "add-color-thresholds-for-cpu-ram-and-disk-usage-in-c7a49e521781",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-16T18:13:11.779Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true
+    },
+    "reviewFirst": true,
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "add-color-thresholds-for-cpu-ram-and-disk-usage-in-c7a49e521781",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "add-color-thresholds-for-cpu-ram-and-disk-usage-in",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_xxsxfue9fm-1/bb-plugins",
+      "worktreeId": "sha256:b0e131270034626ff077c6df9e87c0a12903158856fe462c63517fbc283ef2cd",
+      "baseCommit": "00fc12410a1c2f3c959436c6cdcc9a8f6b299bee",
+      "baseTree": "5fe25297af55151470e81e199772e5c59170baa7",
+      "bases": {
+        "host-monitor-resource-presentation": {
+          "capability": "host-monitor-resource-presentation",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "resource threshold tones": null,
+            "body-mounted host monitor surfaces": null
+          }
+        }
+      },
+      "capabilities": [
+        "host-monitor-resource-presentation"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-16T18:13:11.773Z",
+      "heartbeatAt": "2026-10-16T18:13:11.773Z",
+      "digest": "sha256:0ec5024a0dc8ad38cea4264980c8050970e20f9c46ed7581825120b3c39cd7db"
+    }
+  },
+  "digest": "sha256:2883cfdf600caec605957202e14ef38fe8b20d6721b50258150278030f4f9bd6"
+}

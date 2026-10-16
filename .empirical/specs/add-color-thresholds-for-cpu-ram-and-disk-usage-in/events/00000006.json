@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "sequence": 6,
+  "previousDigest": "sha256:ba7ac695ac4e2fc511e289caac76ffb68d4cd387fdf2ec8de6e5afbbb255cb4f",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Consolidate: Implementation complete for threshold-colored CPU/RAM/disk metrics and portal-scoped floating monitor positioning.",
+  "createdAt": "2026-10-16T18:23:51.295Z",
+  "stateBeforeDigest": "sha256:bdc1b541f5c0ad57acd1911dbb048298d8ded73384a9515ae88816df444c9ee3",
+  "stateAfterDigest": "sha256:06d1f524c1cb36107bdd276ddedde9bf193fc5c2685ce6b023758db4f585c4e1",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 6,
+    "activeFeature": "add-color-thresholds-for-cpu-ram-and-disk-usage-in",
+    "request": "Add color thresholds for CPU, RAM, and disk usage in the host monitor, and fix the floating monitor modal/popover positioning that is broken in the new BB shell. Preserve the existing host-monitor design and verify both threshold presentation and the live floating UI in current BB.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "review",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Implementation complete for threshold-colored CPU/RAM/disk metrics and portal-scoped floating monitor positioning.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:69d15995a172d14b5fb2e221527276937a7d7b0cf487acbe2b008aa1d47b7918",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:9a7469ade6d0000c10b8b3b348dab4c619752dad994b776043c56c62d15f34b9",
+    "impactDigest": "sha256:e1be1cf678ace4f1c2774e3c47e73fbc239e912379046f74acca7761ad81f2c5",
+    "capabilityClaimId": "add-color-thresholds-for-cpu-ram-and-disk-usage-in-c7a49e521781",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-16T18:23:51.295Z",
+    "lifecycle": {
+      "stage": "consolidation",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "contractBaseline": 5
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "add-color-thresholds-for-cpu-ram-and-disk-usage-in-c7a49e521781",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "add-color-thresholds-for-cpu-ram-and-disk-usage-in",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_xxsxfue9fm-1/bb-plugins",
+      "worktreeId": "sha256:b0e131270034626ff077c6df9e87c0a12903158856fe462c63517fbc283ef2cd",
+      "baseCommit": "00fc12410a1c2f3c959436c6cdcc9a8f6b299bee",
+      "baseTree": "5fe25297af55151470e81e199772e5c59170baa7",
+      "bases": {
+        "host-monitor-resource-presentation": {
+          "capability": "host-monitor-resource-presentation",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "resource threshold tones": null,
+            "body-mounted host monitor surfaces": null
+          }
+        }
+      },
+      "capabilities": [
+        "host-monitor-resource-presentation"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-16T18:13:11.773Z",
+      "heartbeatAt": "2026-10-16T18:13:11.773Z",
+      "digest": "sha256:0ec5024a0dc8ad38cea4264980c8050970e20f9c46ed7581825120b3c39cd7db"
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:177035a1ae0fd8c607543f99c5b90fbadd527eb82179bca839d9f89f47970346"
+}

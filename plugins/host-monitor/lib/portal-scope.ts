@@ -17,3 +17,12 @@ export function usePortalScopeProps(): {
     ...(pluginId === undefined ? {} : { "data-bb-plugin": pluginId }),
   };
 }
+
+export function applyPortalScope(
+  element: HTMLElement,
+  pluginId?: string,
+): void {
+  element.setAttribute("data-bb-portaled-overlay", "");
+  element.setAttribute("data-bb-plugin-root", "");
+  if (pluginId !== undefined) element.setAttribute("data-bb-plugin", pluginId);
+}
