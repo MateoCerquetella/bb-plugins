@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-48c35be76c6ac3d0b6c9d253",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review requested changes to the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-10-15T18:35:28.211Z",
+  "completedAt": "2026-10-15T18:35:28.211Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "finish-pr-83-keep-the-aura-new-thread-composer-thread",
+    "specRevision": 2,
+    "specDigest": "sha256:590b44c9f393b0ad300711b9022eb2a45646e02f9f0a04cf86162bb7ff8c84cc",
+    "treeDigest": "sha256:5234ac73d63825d5ab638a4283d1f91950b48ad3c7fda782f1b3450a00540799",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:e911fd701e04861577520fda23d8a96cd5b22e22e1d286450111780aa948f670",
+  "kind": "collected",
+  "collector": "empirical-review:codex",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/finish-pr-83-keep-the-aura-new-thread-composer-thread/reviews/2598e8188b6a765fdf9fb847.json",
+      "mediaType": "application/json",
+      "bytes": 4193,
+      "digest": "sha256:cb867504c808b5ca330c3ce809d9cbe8672d40bdb65dff226647ce1feb95c4cd"
+    },
+    {
+      "path": ".empirical/specs/finish-pr-83-keep-the-aura-new-thread-composer-thread/reviews/2598e8188b6a765fdf9fb847.md",
+      "mediaType": "text/markdown",
+      "bytes": 2991,
+      "digest": "sha256:8e59bc050d69f11a23c09942e1af04331f0fc34fb80d42fdd837578dee7dba3b"
+    }
+  ]
+}

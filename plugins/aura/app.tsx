@@ -5,6 +5,7 @@ import { CHANGED, defaults, imageUrl, SLOT_COUNT, type BackgroundSettings, type 
 import { backgroundRules, mountBackground, notifyChange } from "./lib/background.ts";
 import { CAPY_CSS, mountCapyEffect, type CapyEffect } from "./lib/capy-effect.ts";
 import { readImage } from "./lib/upload.ts";
+import { ActivityOverview } from "./lib/activity-view.tsx";
 import "./app.css";
 
 function message(cause: unknown): string { return cause instanceof Error ? cause.message : String(cause); }
@@ -95,6 +96,21 @@ export function BackgroundEditor() {
     } catch (cause) { if (mounted.current) setError(message(cause)); }
     finally { saving.current = false; if (mounted.current) setBusy(false); }
   }
+  async function toggleOverview(enabled: boolean) {
+    if (saving.current) return;
+    saving.current = true; setBusy(true); setError(null);
+    try {
+      const value = await rpc.call("setActivityOverview", { enabled });
+      requests.current++;
+      notifyChange(value);
+      if (mounted.current) {
+        setSnapshot(value);
+        setDraft(previous => ({ ...previous, activityOverview: value.settings.activityOverview }));
+        setStatus(enabled ? "Activity overview enabled" : "Activity overview hidden");
+      }
+    } catch (cause) { if (mounted.current) setError(message(cause)); }
+    finally { saving.current = false; if (mounted.current) setBusy(false); }
+  }
   const currentImage = upload?.dataUrl ?? (remove ? null : imageUrl(snapshot?.image ?? null));
   const imageName = upload?.name ?? (!remove ? snapshot?.image?.name : null);
   return (
@@ -105,6 +121,7 @@ export function BackgroundEditor() {
         <label className="aura-switch"><input type="checkbox" checked={draft.enabled} disabled={busy || !snapshot} onChange={e => change("enabled", e.target.checked)} /><span>Enabled</span></label>
       </div>
       {error && <p className="aura-error" role="alert">{error}</p>}
+      <label className="aura-scope aura-overview-setting"><input type="checkbox" aria-label="Activity overview" checked={snapshot?.settings.activityOverview ?? false} disabled={busy || !snapshot} onChange={e => void toggleOverview(e.target.checked)} /><span><strong>Activity overview</strong><small>Show your GitHub activity below the centered New thread composer. Saves immediately; your background draft stays intact.</small></span></label>
       <div className="aura-layout">
         <div className="aura-preview-wrap">
           <div className="aura-preview-scene">
@@ -134,6 +151,10 @@ export function BackgroundEditor() {
             {imageName && <div className="aura-file"><span title={imageName}>{imageName}</span><button type="button" onClick={() => { setUpload(null); setRemove(true); dirty.current = true; setStatus("Unsaved changes"); }}>Remove</button></div>}
           </div>
           <div className="aura-field"><label className="aura-field-title" htmlFor={`${id}-effect`}>Texture</label><select id={`${id}-effect`} value={draft.effect} onChange={e => change("effect", e.target.value as BackgroundSettings["effect"])}><option value="pixels">Capy dithering</option><option value="none">No texture</option></select></div>
+          {draft.effect === "pixels" && <>
+            <SegmentedControl id={`${id}-fps`} label="Animation speed" help="Higher FPS uses more GPU." value={String(draft.fps)} options={[["15", "15 FPS"], ["30", "30 FPS"], ["60", "60 FPS"]]} onChange={value => change("fps", Number(value) as BackgroundSettings["fps"])} />
+            <SegmentedControl id={`${id}-quality`} label="Render quality" help="Sharp uses a denser drawing buffer." value={draft.quality} options={[["performance", "Performance"], ["balanced", "Balanced"], ["sharp", "Sharp"]]} onChange={value => change("quality", value as BackgroundSettings["quality"])} />
+          </>}
           {draft.effect === "pixels" && !currentImage && <><div className="aura-field"><label className="aura-field-title" htmlFor={`${id}-tint`}>Pixel color</label><select id={`${id}-tint`} value={draft.tint} onChange={e => change("tint", e.target.value as BackgroundSettings["tint"])}><option value="lavender">Lavender</option><option value="theme">Follow BB theme</option></select></div>
           <Slider id={`${id}-strength`} label="Texture strength" value={draft.intensity} onChange={v => change("intensity", v)} /></>}
           {currentImage && <><Slider id={`${id}-opacity`} label="Image visibility" value={draft.imageOpacity} max={1} onChange={v => change("imageOpacity", v)} /><div className="aura-field"><label className="aura-field-title" htmlFor={`${id}-fit`}>Image fit</label><select id={`${id}-fit`} value={draft.fit} onChange={e => change("fit", e.target.value as BackgroundSettings["fit"])}><option value="cover">Fill the conversation</option><option value="contain">Show the whole image</option></select></div></>}
@@ -181,9 +202,14 @@ function CapyPreview({ settings, image }: { settings: BackgroundSettings; image:
 function Slider({ id, label, value, max = 1, onChange }: { id: string; label: string; value: number; max?: number; onChange: (value: number) => void }) {
   return <div className="aura-field"><label className="aura-field-title" htmlFor={id}>{label}<output htmlFor={id}>{Math.round(value * 100)}%</output></label><input id={id} type="range" min="0" max={max} step="0.01" value={value} onChange={e => onChange(Number(e.target.value))} /></div>;
 }
+function SegmentedControl({ id, label, help, value, options, onChange }: { id: string; label: string; help: string; value: string; options: readonly (readonly [string, string])[]; onChange: (value: string) => void }) {
+  const helpId = `${id}-help`;
+  return <div className="aura-field"><span className="aura-field-title" id={`${id}-label`}>{label}</span><div className="aura-segmented" role="group" aria-labelledby={`${id}-label`} aria-describedby={helpId}>{options.map(([option, text]) => <button key={option} type="button" aria-pressed={value === option} onClick={() => onChange(option)}>{text}</button>)}</div><small className="aura-field-help" id={helpId}>{help}</small></div>;
+}
 export default definePluginApp(app => {
   app.contentScripts.register({ id: "aura-background", mount: ({ signal }) => mountBackground(signal) });
   app.slots.settingsSection({ id: "backgrounds", title: "Aura", component: BackgroundEditor });
+  app.slots.homepageSection({ id: "activity-overview", title: "Activity overview", component: ActivityOverview });
   app.slots.threadPanelAction({ id: "backgrounds", title: "Aura", icon: "Image", component: BackgroundEditor, layout: "flush" });
   app.slots.experimental_newThreadPanelAction({ id: "backgrounds", title: "Aura", icon: "Image", component: BackgroundEditor, layout: "flush" });
 });

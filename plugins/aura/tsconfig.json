@@ -18,6 +18,7 @@
     "server.ts",
     "app.tsx",
     "lib/**/*.ts",
+    "lib/**/*.tsx",
     "test/**/*.ts",
     "types/**/*.d.ts"
   ]

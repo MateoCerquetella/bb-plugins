@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-0461bfe6bcb5e93e8b741aef",
+  "criteria": [
+    "AC-1",
+    "AC-2"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Aura focused checks, including the duplicate-heading component assertion. Installed UI layout remains unverified.",
+  "passed": true,
+  "startedAt": "2026-10-15T16:22:03.532Z",
+  "completedAt": "2026-10-15T16:22:07.834Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "finish-pr-83-keep-the-aura-new-thread-composer-thread",
+    "specRevision": 2,
+    "specDigest": "sha256:590b44c9f393b0ad300711b9022eb2a45646e02f9f0a04cf86162bb7ff8c84cc",
+    "treeDigest": "sha256:3ee2fb1dbf11f4baed1ac6d0c8620a92cdf225ff2c2c0e5b40eec86269c90f99",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 4,
+    "gitCommit": "e0535352497e2d060a12caabfe6a3659559e566e",
+    "textTreeDigest": "sha256:3ee2fb1dbf11f4baed1ac6d0c8620a92cdf225ff2c2c0e5b40eec86269c90f99"
+  },
+  "digest": "sha256:fb2c9620c74333b9e7e398b8af4acfe56a037888e734836978d67e418e482bdb",
+  "kind": "qa",
+  "matrixDigest": "sha256:74accd0ea8e68974b5d7ddecc8ca2007ca282541e94046d9494a56dc5ca14844",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Aura focused checks, including the duplicate-heading component assertion. Installed UI layout remains unverified.",
+      "startedAt": "2026-10-15T16:22:03.532Z",
+      "completedAt": "2026-10-15T16:22:07.834Z",
+      "durationMs": 4302,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:3102e0660c5a28fb09072a92af73601c0704a8badb5519082e7545d1f876aa50",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-aura"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:653b93fcef7d6c0191360293ef8304d49aca3a3c33bc5e42f91c54ce77dd9ba5",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "\n> bb-plugin-aura@0.2.3 check\n> npm run typecheck && npm test && npm run build\n\n\n> bb-plugin-aura@0.2.3 typecheck\n> tsc --noEmit\n\n\n> bb-plugin-aura@0.2.3 test\n> tsx --test test/*.test.ts\n\nTAP version 13\n# Subtest: default-off never requests activity; enabling loads and stale period responses cannot replace newer scope\nok 1 - default-off never requests activity; enabling loads and stale period responses cannot replace newer scope\n  ---\n  duration_ms: 121.394728\n  type: 'test'\n  ...\n# Subtest: failed and unavailable requests omit counts; retry recovers; verified empty differs from error\nok 2 - failed and unavailable requests omit counts; retry recovers; verified empty differs from error\n  ---\n  duration_ms: 56.679603\n  type: 'test'\n  ...\n# Subtest: unmount ignores a late source result and leaves native composer state untouched\nok 3 - unmount ignores a late source result and leaves native composer state untouched\n  ---\n  duration_ms: 5.14988\n  type: 'test'\n  ...\n# Subtest: ranges cover exact inclusive UTC days across leap years and timezone offsets\nok 4 - ranges cover exact inclusive UTC days across leap years and timezone offsets\n  ---\n  duration_ms: 0.901263\n  type: 'test'\n  ...\n# Subtest: calendar validation refuses missing, duplicate and impossible dates instead of filling zero days\nok 5 - calendar validation refuses missing, duplicate and impossible dates instead of filling zero days\n  ---\n  duration_ms: 6.679168\n  type: 'test'\n  ...\n# Subtest: patterns use real consecutive days, yesterday grace, earliest ties and no-activity values\nok 6 - patterns use real consecutive days, yesterday grace, earliest ties and no-activity values\n  ---\n  duration_ms: 0.580729\n  type: 'test'\n  ...\n# Subtest: authenticated counts and dated cells pass through unchanged; explicit viewer login scopes authored searches\nok 7 - authenticated counts and dated cells pass through unchanged; explicit viewer login scopes authored searches\n  ---\n  duration_ms: 6.877319\n  type: 'test'\n  ...\n# Subtest: repository selection scopes actual PR counts and reviews but does not relabel the global calendar\nok 8 - repository selection scopes actual PR counts and reviews but does not relabel the global calendar\n  ---\n  duration_ms: 0.509348\n  type: 'test'\n  ...\n# Subtest: API/authentication failures are sanitized, partial counts stay unconfirmed, and invalid calendars are unavailable\nok 9 - API/authentication failures are sanitized, partial counts stay unconfirmed, and invalid calendars are unavailable\n  ---\n  duration_ms: 1.290383\n  type: 'test'\n  ...\n# Subtest: empty is a complete source response; repository discovery caps never imply missing reviews are zero\nok 10 - empty is a complete source response; repository discovery caps never imply missing reviews are zero\n  ---\n  duration_ms: 0.95973\n  type: 'test'\n  ...\n# Subtest: cache coalesces matching requests, expires after five minutes and does not retain failed counts\nok 11 - cache coalesces matching requests, expires after five minutes and does not retain failed counts\n  ---\n  duration_ms: 3.88865\n  type: 'test'\n  ...\n# Subtest: render-quality tiers increase drawing-buffer density\nok 12 - render-quality tiers increase drawing-buffer density\n  ---\n  duration_ms: 1.039816\n  type: 'test'\n  ...\n# Subtest: selected FPS limits the next draw after an immediate frame\nok 13 - selected FPS limits the next draw after an immediate frame\n  ---\n  duration_ms: 0.162165\n  type: 'test'\n  ...\n# Subtest: applies scoped backgrounds, disables cleanly and ignores a late fetch after disposal\nok 14 - applies scoped backgrounds, disables cleanly and ignores a late fetch after disposal\n  ---\n  duration_ms: 94.265574\n  type: 'test'\n  ...\n# Subtest: six independent slots retain images and appearance across switches and reload\nok 15 - six independent slots retain images and appearance across switches and reload\n  ---\n  duration_ms: 24.343165\n  type: 'test'\n  ...\n# Subtest: invalid image or slot rejects the entire apply without partially changing settings\nok 16 - invalid image or slot rejects the entire apply without partially changing settings\n  ---\n  duration_ms: 20.154057\n  type: 'test'\n  ...\n# Subtest: scope stays global across slots; clearing/resetting preserves saved work\nok 17 - scope stays global across slots; clearing/resetting preserves saved work\n  ---\n  duration_ms: 4.204516\n  type: 'test'\n  ...\n# Subtest: image type must match bytes; legacy settings get new defaults\nok 18 - image type must match bytes; legacy settings get new defaults\n  ---\n  duration_ms: 1.372433\n  type: 'test'\n  ...\n# Subtest: overview is default-off and stays global across slots/reset/reload without changing a saved image\nok 19 - overview is default-off and stays global across slots/reset/reload without changing a saved image\n  ---\n  duration_ms: 4.561758\n  type: 'test'\n  ...\n# Subtest: animation speed and quality persist in saved slots\nok 20 - animation speed and quality persist in saved slots\n  ---\n  duration_ms: 2.000398\n  type: 'test'\n  ...\n# Subtest: versioned images use an immutable private browser cache\nok 21 - versioned images use an immutable private browser cache\n  ---\n  duration_ms: 18.668578\n  type: 'test'\n  ...\n# Subtest: New thread dimmer toggles without replacing images or saved slots\nok 22 - New thread dimmer toggles without replacing images or saved slots\n  ---\n  duration_ms: 4.28363\n  type: 'test'\n  ...\n1..22\n# tests 22\n# suites 0\n# pass 22\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 1136.390743\n\n> bb-plugin-aura@0.2.3 build\n> env -u BB_CLI bb plugin build .\n\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:3ee2fb1dbf11f4baed1ac6d0c8620a92cdf225ff2c2c0e5b40eec86269c90f99",
+      "sourceTreeAfter": "sha256:3ee2fb1dbf11f4baed1ac6d0c8620a92cdf225ff2c2c0e5b40eec86269c90f99",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

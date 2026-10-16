@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "sequence": 7,
+  "previousDigest": "sha256:d3ac363344553f5c546a4ba6594dbffc11e05656788a7bfafa77f9620f6e1b17",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Implemented the remaining PR 83 acceptance work. Removed the duplicate internal Activity overview h2 while keeping the host title as the single heading and naming the component region GitHub activity. Added rendered-component assertions. Installed this checkout as the live Aura plugin after database backup and restored all five saved slots, the active image, and settings. Live BB Surf measurements passed at 1440x900 and 390x844 with overview enabled and disabled: exact shared horizontal centers, overview below the composer, one visible heading, zero horizontal overflow, and reachable mobile controls via the compact-home scroll container. Merged latest origin/main cleanly at 5d2f087b9483df21549e68d2c61b29c62601732a. Aura focused typecheck, 22 tests, and build passed before the final main merge; final workflow verification remains pending.",
+  "createdAt": "2026-10-15T18:30:03.959Z",
+  "stateBeforeDigest": "sha256:bde39a63966c699cbfc1cde8134641c4a84f63ad2b3b3451ebc0232323165085",
+  "stateAfterDigest": "sha256:1a991ce4382c9449de53b0209ca20a37c0ab44f2360e106cbaffa37b2c86543b",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 7,
+    "activeFeature": "finish-pr-83-keep-the-aura-new-thread-composer-thread",
+    "request": "Finish PR 83. Keep the AURA new-thread composer/thread centered at every viewport size, remove the duplicated Activity overview heading shown in the installed UI, reconcile the branch with current main without losing the existing activity overview behavior, verify the live installed AURA UI and repository checks, update the pull request, and make it merge-ready.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "review",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Implemented the remaining PR 83 acceptance work. Removed the duplicate internal Activity overview h2 while keeping the host title as the single heading and naming the component region GitHub activity. Added rendered-component assertions. Installed this checkout as the live Aura plugin after database backup and restored all five saved slots, the active image, and settings. Live BB Surf measurements passed at 1440x900 and 390x844 with overview enabled and disabled: exact shared horizontal centers, overview below the composer, one visible heading, zero horizontal overflow, and reachable mobile controls via the compact-home scroll container. Merged latest origin/main cleanly at 5d2f087b9483df21549e68d2c61b29c62601732a. Aura focused typecheck, 22 tests, and build passed before the final main merge; final workflow verification remains pending.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:590b44c9f393b0ad300711b9022eb2a45646e02f9f0a04cf86162bb7ff8c84cc",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:57a0b925288bf6ef37836a00f3eae3caf67078fe2b83b5abf90e1d7fd3a27945",
+    "impactDigest": "sha256:a6f584d7071149c058c875e6dbd8bf471b88b77d2dbde00d37ef9c21345f595c",
+    "capabilityClaimId": "finish-pr-83-keep-the-aura-new-thread-composer-thread-60cbf0e62f93",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "qa-0461bfe6bcb5e93e8b741aef"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-15T18:30:03.959Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "finish-pr-83-keep-the-aura-new-thread-composer-thread-60cbf0e62f93",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "finish-pr-83-keep-the-aura-new-thread-composer-thread",
+      "worktree": "/home/dyaus/Developer/projects/MateoCerquetella/BB/bb-plugins-pr83",
+      "worktreeId": "sha256:48f25849c197743b5b7ce9cee5e3d1e52511ca36e06ea2d3907d12f44f4d2bbd",
+      "baseCommit": "6d8dd79791025ed5e02560d8874a576e759650b4",
+      "baseTree": "7a303e1dfaa4858af2504b02100106442497a8a5",
+      "bases": {
+        "aura-activity-overview": {
+          "capability": "aura-activity-overview",
+          "digest": "sha256:c29ea81e9ef4b10d8c1f98491939332a21103aaed4895a92f0fda9a3014ccb71",
+          "requirements": {
+            "optional activity within aura": "sha256:1c49feeb91824cda5550cfd282f9c44a93470cab768d8fc7d00068cb79ac22da",
+            "responsive native presentation": "sha256:409c274928c939126ca658af0f68457266070987d8ed22d348b191c84273ebd5"
+          }
+        }
+      },
+      "capabilities": [
+        "aura-activity-overview"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-15T15:52:06.214Z",
+      "heartbeatAt": "2026-10-15T15:52:06.214Z",
+      "digest": "sha256:fb432ce240ba15104b21680836b2df1243543bf4534bad1b331d5b90c87a99ac"
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:f9b1ddcb2d0334fed35ef9e2146e93c9f657172b42b695a620c68be6e629dbaa"
+}
