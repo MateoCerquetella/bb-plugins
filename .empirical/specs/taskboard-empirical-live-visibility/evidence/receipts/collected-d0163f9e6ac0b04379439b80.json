@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-d0163f9e6ac0b04379439b80",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review requested changes to the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-10-14T17:15:38.050Z",
+  "completedAt": "2026-10-14T17:15:38.050Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "taskboard-empirical-live-visibility",
+    "specRevision": 2,
+    "specDigest": "sha256:23291153874870cc75cc38a787e5cee61cce6d731a247b8f8fd75da66c0b00ce",
+    "treeDigest": "sha256:db9de73e31b7bdc2eb549bf341111a426f86031269155bc83ff5f1eac4ecdf60",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:8259127b502786ccddf33822f74e3816ec1f41464f021a49f9c56c4cbcf6eb92",
+  "kind": "collected",
+  "collector": "empirical-review:/root/empirical_rereview",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/taskboard-empirical-live-visibility/reviews/79ae0d5b3abadb7f7101f665.json",
+      "mediaType": "application/json",
+      "bytes": 2918,
+      "digest": "sha256:f82eb1062f28c707b55b3e414bd990fe68ed00f5feedb8c3b6cf355aa9c262d7"
+    },
+    {
+      "path": ".empirical/specs/taskboard-empirical-live-visibility/reviews/79ae0d5b3abadb7f7101f665.md",
+      "mediaType": "text/markdown",
+      "bytes": 1839,
+      "digest": "sha256:f7aff2d10997775e31bdc8c2cd0dae9d4242fe8d700d5ac2774a94197654850b"
+    }
+  ]
+}

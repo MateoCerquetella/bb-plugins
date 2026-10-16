@@ -71,6 +71,7 @@ function fixture() {
   let unarchives = 0;
   let onUnarchive = () => {};
   let environmentStatus = 'ready';
+  let failEnvironmentGet = false;
   let buildEnvironment = 'env_test';
   let failSpawn = false;
   let failSend = false;
@@ -130,11 +131,14 @@ function fixture() {
       output: async () => ({ output })
     },
     projects: { defaultExecutionOptions: async () => ({ model: 'test', providerId: 'codex' }) },
-    environments: { get: async ({ environmentId }: { environmentId: string }) => ({
-      id: environmentId, managed: managed || environmentId === 'env_build',
-      isWorktree: managed || environmentId === 'env_build', hostId: 'host_test',
-      projectId: item.bbProjectId, status: environmentStatus
-    }) }
+    environments: { get: async ({ environmentId }: { environmentId: string }) => {
+      if (failEnvironmentGet) throw new Error('Workspace lookup temporarily unavailable');
+      return {
+        id: environmentId, managed: managed || environmentId === 'env_build',
+        isWorktree: managed || environmentId === 'env_build', hostId: 'host_test',
+        projectId: item.bbProjectId, status: environmentStatus, path: '/repo/worktree'
+      };
+    } }
   } as unknown as Parameters<typeof createFactoryService>[0];
   const service = createFactoryService(sdk, store, () => {}, {
     getItem: () => item,
@@ -149,6 +153,7 @@ function fixture() {
     archived, deleted, unarchives: () => unarchives,
     onUnarchive: (callback: () => void) => { onUnarchive = callback; },
     environmentStatus: (value: string) => { environmentStatus = value; },
+    failEnvironmentGet: (value = true) => { failEnvironmentGet = value; },
     buildEnvironment: (value: string) => { buildEnvironment = value; },
     fail: () => { failSpawn = true; },
     failSend: () => { failSend = true; },
@@ -348,6 +353,27 @@ test('crash recovery preserves an ambiguous intent and refuses duplicate dispatc
     assert.equal(f.spawns(), 0);
   } finally { f.db.close(); }
 });
+test('recovered native dispatch persists even when workspace lookup fails', async () => {
+  const f = fixture();
+  try {
+    const record = newRecord(item);
+    const run = startRun(record, 'investigate', false);
+    run.status = 'uncertain';
+    run.threadId = 'thr_native';
+    run.error = 'Native dispatch outcome uncertain';
+    const saved = f.store.save(record);
+    f.failEnvironmentGet();
+    const recovered = await f.service.linkRecovered(item, saved.version, 'thr_native');
+    assert.equal(recovered.runs[0]?.threadId, 'thr_native');
+    assert.equal(recovered.runs[0]?.status, 'running');
+    assert.equal(f.store.get(saved)?.runs[0]?.status, 'running');
+    assert.equal(f.spawns(), 0);
+    f.failEnvironmentGet(false);
+    await f.service.get(item);
+    assert.equal(f.store.get(saved)?.runs[0]?.hostId, 'host_test');
+    assert.equal(f.store.get(saved)?.runs[0]?.checkoutRoot, '/repo/worktree');
+  } finally { f.db.close(); }
+});
 test('lost spawn response is uncertain, not a retryable failure', async () => {
   const f = fixture();
   try {
@@ -394,6 +420,24 @@ test('additive storage preserves unrelated preparation data across reopen', () =
     const reopened = createFactoryStore(f.db);
     assert.equal(reopened.all().length, 1);
     assert.equal(f.db.prepare('SELECT body FROM preparation_user_data').pluck().get(), 'preserve');
+  } finally { f.db.close(); }
+});
+test('Empirical observations survive reopen and older responses cannot replace them', () => {
+  const f = fixture();
+  try {
+    const identity = newRecord(item);
+    const snapshot = {
+      hostId: 'host_a', environmentId: 'env_a', checkoutRoot: '/repo/worktree',
+      observedAt: 200,
+      status: { kind: 'feature', feature: 'task-1', revision: 4, phase: 'verify',
+        status: 'waiting', nextAction: 'Run checks', verification: 'pending',
+        completionLevel: 'implemented', completionMethod: null }
+    } as const;
+    f.store.saveEmpirical(identity, snapshot);
+    f.store.saveEmpirical(identity, { ...snapshot, observedAt: 100,
+      status: { ...snapshot.status, revision: 3 } });
+    const reopened = createFactoryStore(f.db);
+    assert.deepEqual(reopened.getEmpirical(identity), snapshot);
   } finally { f.db.close(); }
 });
 test('prompts keep tracker data untrusted and impose no Empirical runtime', () => {
@@ -1045,6 +1089,29 @@ test('automatic blocked Build continuation never restores an archived session', 
     assert.match(paused.automationError!, /authoring session is archived/);
     assert.equal(f.unarchives(), 0);
     assert.equal(f.sends(), 0);
+  } finally { f.db.close(); }
+});
+
+test('legacy workspace metadata backfill does not invalidate a current Start request', async () => {
+  const f = fixture();
+  try {
+    const record = newRecord(item);
+    const investigation = startRun(record, 'investigate', false);
+    Object.assign(investigation, {
+      status: 'finished', threadId: 'thr_native', environmentId: 'env_test',
+      output: 'Investigation complete. Preserve the current workspace.'
+    });
+    const saved = f.store.save(record);
+    assert.equal(saved.runs[0].hostId, null);
+    assert.equal(saved.runs[0].checkoutRoot, null);
+    const started = await f.service.start(item, {
+      expectedVersion: saved.version, kind: 'plan', contextThreadId: null, retry: false
+    });
+    assert.equal(started.runs[0].hostId, 'host_test');
+    assert.equal(started.runs[0].checkoutRoot, '/repo/worktree');
+    assert.equal(started.runs.at(-1)?.kind, 'plan');
+    assert.equal(started.runs.at(-1)?.status, 'running');
+    assert.equal(f.spawns(), 1);
   } finally { f.db.close(); }
 });
 

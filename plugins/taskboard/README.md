@@ -112,6 +112,34 @@ existing Linear details, comments and external link. **Start task** opens
 context once without pinning the panel. Manual pinning remains a separate
 choice in the Taskboard panel.
 
+For tickets started from an initialized Empirical checkout, the progress view
+also shows the selected feature, revision, phase, next action, verification
+and durable completion level. Empirical is read on the native run's exact BB
+host and checkout; this does not start, complete or otherwise change an
+Empirical workflow. Status refreshes serially while the progress view is open.
+The slower repository-wide ownership check runs in the background and fills in
+duplicate-owner or invalid-copy warnings when available. A disconnected host
+keeps the last good observation marked stale, and the native thread remains
+available from **Open session**. Empty, uninitialized, invalid and unavailable
+Empirical states are distinct.
+
+To run the isolated progress demo, build Taskboard and start the fixture server
+from the workspace root:
+
+```sh
+npm run build -w bb-plugin-taskboard
+TASKBOARD_DEMO_PORT=8421 node plugins/taskboard/scripts/factory-browser-check.mjs
+```
+
+The page uses Taskboard's real progress components with in-memory BB responses.
+Click **Start task** on the example card, then use the demo controls to switch
+between awaiting input, blocked, offline, implemented-only and verified states.
+The fixture creates no native agents or external tickets. The panel polls every
+eight seconds while open and marks an observation older than 20 seconds stale;
+it also refreshes immediately on a fixture event. The host-wide ownership
+inventory is slower and cached separately. The demo does not prove host-routed
+delivery; verify that with a locally installed plugin in a connected BB host.
+
 In **Create new ticket**, enter rough text in Title or Description and select
 **Improve title & description**. Taskboard uses a hidden helper with the BB
 project's current provider/model defaults to rewrite only those two fields.

@@ -224,6 +224,17 @@ export function createFactoryService(
         if (active && started && !run.pendingCompletion) {
           resumedBuild ||= run === record.runs.at(-1) && run.kind === 'build';
         }
+        if (run.environmentId && (!run.hostId || !run.checkoutRoot)) {
+          try {
+            const workspace = await sdk.environments.get({ environmentId: run.environmentId });
+            if (workspace.projectId === record.projectId && workspace.hostId && workspace.path) {
+              run.hostId = workspace.hostId;
+              run.checkoutRoot = workspace.path;
+            }
+          } catch {
+            // Keep the native session linked while its environment is temporarily unavailable.
+          }
+        }
         if (resumedBuild && record.automationError?.startsWith('Automatic work paused: Build ') &&
           run.planDigest === record.approvedDigest && run.scopeDigest === record.scopeDigest) {
           record.automationError = null;
@@ -437,6 +448,8 @@ export function createFactoryService(
     if (reuse) {
       draft.threadId = reuse;
       draft.environmentId = context!.environmentId;
+      draft.hostId = environment?.hostId ?? null;
+      draft.checkoutRoot = environment?.path ?? null;
       draft.cursor = events[0]?.seq ?? 0;
     }
     if (restoreArchived) {
@@ -476,6 +489,16 @@ export function createFactoryService(
         });
         run.threadId = thread.id;
         run.environmentId = thread.environmentId;
+        try {
+          const workspace = thread.environmentId
+            ? await sdk.environments.get({ environmentId: thread.environmentId }) : null;
+          if (workspace?.projectId === record.projectId) {
+            run.hostId = workspace.hostId;
+            run.checkoutRoot = workspace.path ?? null;
+          }
+        } catch {
+          // The session was dispatched; a later observation can resolve its workspace.
+        }
       }
       run.status = 'running';
       run.activity = 'Waiting for native agent events';
@@ -593,6 +616,16 @@ export function createFactoryService(
         }
         run.threadId = thread.id;
         run.environmentId = thread.environmentId;
+        try {
+          const workspace = thread.environmentId
+            ? await sdk.environments.get({ environmentId: thread.environmentId }) : null;
+          if (workspace?.projectId === record.projectId) {
+            run.hostId = workspace.hostId;
+            run.checkoutRoot = workspace.path ?? null;
+          }
+        } catch {
+          // The recovered thread is authoritative; its workspace can resolve on the next observation.
+        }
         run.status = 'running';
         run.error = null;
         return reconcile(persist(record));
@@ -619,12 +652,13 @@ export function createFactoryService(
       expectedVersion: number; kind: FactoryRunKind; contextThreadId: string | null; retry: boolean;
     }) {
       return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () => {
-        const record = await reconcile(current(item));
+        const requested = current(item);
+        const record = await reconcile(structuredClone(requested));
         const last = record.runs.at(-1);
         // A stale duplicate button press returns the original dispatch, never spawns.
-        if (last && last.kind === input.kind && input.expectedVersion < record.version &&
+        if (last && last.kind === input.kind && input.expectedVersion < requested.version &&
           last.status !== 'uncertain') return record;
-        assertVersion(record, input.expectedVersion);
+        assertVersion(requested, input.expectedVersion);
         record.automationError = null;
         if (input.kind === 'build' && last?.kind === 'review' && last.status === 'finished') {
           return repairReview(item, record, true);

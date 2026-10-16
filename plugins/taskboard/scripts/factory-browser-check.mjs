@@ -1,12 +1,8 @@
 import { build } from 'esbuild';
 import { readFile, readdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { createServer } from 'node:http';
 import assert from 'node:assert/strict';
-const { chromium } = await import(process.env.PLAYWRIGHT_MODULE ?? 'playwright');
-
-// Attach only to the endpoint returned by this project's Steel binding.
-const endpoint = process.env.STEEL_CDP_URL;
-if (!endpoint || !process.env.BB_THREAD_STORAGE) throw new Error('Requires Steel CDP and thread storage.');
 const plugin = resolve('plugins/taskboard');
 const result = await build({
   entryPoints: [resolve(plugin, 'test/factory-preview.tsx')], bundle: true,
@@ -24,14 +20,6 @@ const result = await build({
     }
   }]
 });
-const metadata = await fetch(endpoint + '/json/version').then(r => r.json());
-const ws = new URL(metadata.webSocketDebuggerUrl);
-ws.host = new URL(endpoint).host;
-const browser = await chromium.connectOverCDP(ws.href);
-const context = browser.contexts()[0];
-const page = await context.newPage();
-const errors = [];
-page.on('pageerror', e => errors.push(e.message));
 const fixture = {
   schemaVersion: 1, projectId: 'proj_test', source: 'github', locator: 'example/repo#42',
   version: 3, scopeDigest: 'scope', approvedDigest: null, plans: [],
@@ -39,6 +27,7 @@ const fixture = {
   stage: 'Planning', updatedAt: new Date().toISOString(),
   runs: [{
     id: 'run', kind: 'plan', status: 'finished', threadId: 'thr_test', environmentId: 'env_managed_worktree',
+    hostId: 'host_demo', checkoutRoot: '/demo/empirical',
     cursor: 9, turnId: 'turn', planDigest: null, activity: 'Turn finished; work not accepted',
     error: null, output: 'Preserve filters per project. Add a regression test for switching between two projects.',
     updates: [{ id: 'message', text: 'Found the project-switch race. Checking saved preferences.', at: new Date().toISOString() }],
@@ -58,7 +47,27 @@ const html = `<html><head><meta name="viewport" content="width=device-width,init
 ${hostCss}
 :root{font:16px system-ui;--border:#ddd;--muted:#f2f3f5;--primary:#286bd4;--muted-foreground:#71757e;--canvas:#fff;--ink:#292b31;--timeline-accent:#286bd4;--success:#19714d;--destructive-text:#b13a4b}
 *{box-sizing:border-box}body{margin:0;color:var(--ink);background:var(--canvas);font-size:13px}#preview-detail{width:100%;min-width:0}#preview-manual{padding:20px}pre{font-size:11px}
-${css}</style></head><body><div id="root"></div><script>window.factoryFixture=${JSON.stringify(fixture)}</script><script>${result.outputFiles[0].text.replaceAll('</script>', '<\\/script>')}</script></body></html>`;
+${css}</style></head><body><div id="root"></div><script>window.factoryFixture=${JSON.stringify(fixture)};window.empiricalOffline=false;window.empiricalLastKnown=null;window.empiricalStatus={kind:'feature',feature:'demo-live-work',revision:1,phase:'implement',status:'waiting',nextAction:'Implement the current acceptance criteria',verification:'pending',completionLevel:'none',completionMethod:null};</script><script>${result.outputFiles[0].text.replaceAll('</script>', '<\\/script>')}</script></body></html>`;
+if (process.env.TASKBOARD_DEMO_PORT) {
+  const port = Number(process.env.TASKBOARD_DEMO_PORT);
+  if (!Number.isSafeInteger(port) || port < 1 || port > 65535) throw new Error('Invalid demo port.');
+  createServer((_request, response) => {
+    response.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' });
+    response.end(html);
+  }).listen(port, '0.0.0.0', () => console.log(`Taskboard demo listening on ${port}`));
+} else {
+// Attach only to the endpoint returned by this project's Steel binding.
+const endpoint = process.env.STEEL_CDP_URL;
+if (!endpoint || !process.env.BB_THREAD_STORAGE) throw new Error('Requires Steel CDP and thread storage.');
+const { chromium } = await import(process.env.PLAYWRIGHT_MODULE ?? 'playwright');
+const metadata = await fetch(endpoint + '/json/version').then(r => r.json());
+const ws = new URL(metadata.webSocketDebuggerUrl);
+ws.host = new URL(endpoint).host;
+const browser = await chromium.connectOverCDP(ws.href);
+const context = browser.contexts()[0];
+const page = await context.newPage();
+const errors = [];
+page.on('pageerror', e => errors.push(e.message));
 try {
   await page.setViewportSize({ width: 1280, height: 1000 });
   await page.route('https://taskboard-preview.test/**', route => route.fulfill({ contentType: 'text/html', body: html }));
@@ -135,7 +144,7 @@ try {
   });
   assert.equal(await sessionSelect.inputValue(), 'investigate-run');
   assert.equal(await manual.getByRole('button', { name: 'Continue in thread', exact: true }).count(), 1);
-  await manual.getByRole('button', { name: 'Open session', exact: true }).click();
+  await manual.locator('.tb-session-picker').getByRole('button', { name: 'Open session', exact: true }).click();
   assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_investigate']);
   await page.evaluate(() => {
     const record = window.factoryFixture;
@@ -144,8 +153,8 @@ try {
     window.factoryRefresh();
   });
   assert.equal(await sessionSelect.inputValue(), 'new-build');
-  assert.equal(await manual.getByRole('button', { name: 'Open session', exact: true }).count(), 1);
-  await manual.getByRole('button', { name: 'Open session', exact: true }).click();
+  assert.equal(await manual.locator('.tb-session-picker').getByRole('button', { name: 'Open session', exact: true }).count(), 1);
+  await manual.locator('.tb-session-picker').getByRole('button', { name: 'Open session', exact: true }).click();
   assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_investigate', 'thr_build']);
   await page.evaluate(() => {
     const record = window.factoryFixture;
@@ -169,6 +178,27 @@ try {
   assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_investigate', 'thr_build', 'thr_started']);
   await manual.locator('.tb-run[data-live="true"] .tb-live-mark').waitFor();
   assert.equal(await manual.locator('.tb-run[data-live="true"] .tb-live-mark').evaluate(el => getComputedStyle(el).animationName), 'tb-working');
+  const empirical = manual.locator('.tb-empirical-progress');
+  await empirical.getByText('demo-live-work').waitFor();
+  await empirical.getByText('implement · r1').waitFor();
+  await page.getByRole('button', { name: 'Awaiting input' }).click();
+  await empirical.getByText('implement · r2').waitFor();
+  await empirical.getByText('Answer the implementation question').waitFor();
+  await page.getByRole('button', { name: 'Blocked', exact: true }).click();
+  await empirical.getByText('review · r3').waitFor();
+  await empirical.getByText('Resolve review findings').waitFor();
+  await page.getByRole('button', { name: 'Host offline' }).click();
+  await empirical.getByText('Stale').waitFor();
+  await empirical.getByText('The host is offline or Empirical did not respond.', { exact: false }).waitFor();
+  await page.getByRole('button', { name: 'Reconnect' }).click();
+  await empirical.getByText('review · r3').waitFor();
+  await page.getByRole('button', { name: 'Implemented only' }).click();
+  await empirical.getByText('done · r4').waitFor();
+  await empirical.getByText('implemented · workflow').waitFor();
+  await page.getByRole('button', { name: 'Verified', exact: true }).click();
+  await empirical.getByText('done · r5').waitFor();
+  await empirical.getByText('verified · workflow').waitFor();
+  await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, 'taskboard-empirical-demo.png') });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   assert.equal(await manual.locator('.tb-run[data-live="true"] .tb-live-mark').evaluate(el => getComputedStyle(el).animationName), 'none');
   await page.emulateMedia({ reducedMotion: 'no-preference' });
@@ -257,7 +287,7 @@ try {
     assert.equal(await manual.getByRole('button', { name: 'Start build', exact: true }).count(), 0);
     assert.equal(await manual.getByRole('button', { name: 'Continue in thread', exact: true }).count(), 0);
     const startsBeforeOpen = await page.evaluate(() => window.factoryStarts);
-    await manual.getByRole('button', { name: 'Open session', exact: true }).click();
+    await manual.locator('.tb-session-picker').getByRole('button', { name: 'Open session', exact: true }).click();
     assert.equal(await page.evaluate(() => window.factoryStarts), startsBeforeOpen);
   }
   await page.evaluate(() => {
@@ -321,3 +351,4 @@ try {
   console.error(JSON.stringify({ errors, page: await page.locator('body').innerText() }));
   throw error;
 } finally { await browser.close(); }
+}

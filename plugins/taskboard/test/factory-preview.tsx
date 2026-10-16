@@ -23,6 +23,11 @@ window.factoryItem = { ...item, source: 'linear', locator: 'issue-42', key: 'SDD
 const detail = <TrackerDetail route={{ kind: 'item', projectId: 'proj_test', source: 'linear', locator: 'issue-42' }} refreshGeneration={0} />;
 function Preview() {
   const [creating, setCreating] = React.useState(true);
+  const setEmpirical = (status: Record<string, unknown>, offline = false) => {
+    window.empiricalOffline = offline;
+    window.empiricalStatus = { ...window.empiricalStatus, ...status };
+    window.empiricalRefresh();
+  };
   if (location.search.includes('creation')) return <TooltipProvider>
     <CreateIssueDialog mode="direct" projectId="proj_test" open={creating} onOpenChange={setCreating} />
   </TooltipProvider>;
@@ -34,6 +39,20 @@ function Preview() {
         openWorkspaceFile={null} />
       <h3>Blockers</h3>
       <ul><li>Acquisition-cost permissions leak.</li><li>Historical allocation backfill is missing.</li></ul>
+    </div>
+    <div id="demo-controls" style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: 12 }}>
+      <button onClick={() => setEmpirical({ revision: 2, phase: 'implement', status: 'awaiting_human',
+        nextAction: 'Answer the implementation question' })}>Awaiting input</button>
+      <button onClick={() => setEmpirical({ revision: 3, phase: 'review', status: 'blocked',
+        nextAction: 'Resolve review findings' })}>Blocked</button>
+      <button onClick={() => setEmpirical({}, true)}>Host offline</button>
+      <button onClick={() => setEmpirical({}, false)}>Reconnect</button>
+      <button onClick={() => setEmpirical({ revision: 4, phase: 'done', status: 'done',
+        nextAction: 'Completed at implemented', verification: 'skipped',
+        completionLevel: 'implemented', completionMethod: 'workflow' })}>Implemented only</button>
+      <button onClick={() => setEmpirical({ revision: 5, phase: 'done', status: 'done',
+        nextAction: 'Completed at verified', verification: 'verified',
+        completionLevel: 'verified', completionMethod: 'workflow' })}>Verified</button>
     </div>
     <FactoryThreadProgress threadId="thr_test" isCompactViewport={false} />
     <div id="preview-detail">{detail}</div>
