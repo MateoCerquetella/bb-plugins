@@ -42,13 +42,14 @@ import {
   visibleInboxThreads,
 } from "@/lib/inbox";
 import {
+  ALL_WORKSPACES_FILTER,
   applyRootSelection,
   filterProjectThreadGroups,
   includeSelectedFamilies,
   pruneSelectedRootIds,
   selectableRootIds,
-  type ThreadFilterPreset,
   type RootSelectionIntent,
+  type WorkspaceFilter,
 } from "@/lib/thread-management";
 import {
   docksidePreferenceStyle,
@@ -119,8 +120,8 @@ export function ThreadInbox({
   const lifecycle = useLifecycle(threads);
   const [showSnoozed, setShowSnoozed] = useState(false);
   const [showSettled, setShowSettled] = useState(false);
-  const [filterPreset, setFilterPreset] =
-    useState<ThreadFilterPreset>("all");
+  const [workspaceFilter, setWorkspaceFilter] =
+    useState<WorkspaceFilter>(ALL_WORKSPACES_FILTER);
   const [selectionMode, setSelectionMode] = useState(false);
   const [familyOrder, setFamilyOrder] = useState(readFamilyOrder);
   const [projectOrder, setProjectOrder] = useState(readProjectOrder);
@@ -178,7 +179,7 @@ export function ThreadInbox({
     );
     const filteredProjectGroups = filterProjectThreadGroups(
       unfilteredProjectGroups,
-      filterPreset,
+      workspaceFilter,
       now,
     );
 
@@ -210,7 +211,7 @@ export function ThreadInbox({
       ),
     };
   }, [
-    filterPreset,
+    workspaceFilter,
     familyOrder,
     lifecycle,
     now,
@@ -221,6 +222,21 @@ export function ThreadInbox({
     selectionMode,
     threads,
   ]);
+
+  const activePreset =
+    workspaceFilter.kind === "preset" ? workspaceFilter.preset : null;
+
+  useEffect(() => {
+    if (
+      status === "ready" &&
+      workspaceFilter.kind === "project" &&
+      !unfilteredProjectGroups.some(
+        (group) => group.project.id === workspaceFilter.projectId,
+      )
+    ) {
+      setWorkspaceFilter(ALL_WORKSPACES_FILTER);
+    }
+  }, [status, unfilteredProjectGroups, workspaceFilter]);
 
   useEffect(() => {
     setSelectedRootIds((current) => {
@@ -233,7 +249,7 @@ export function ThreadInbox({
   // the collapsed Settled count truthful during that one round trip.
   const pendingSettled = useMemo(() => {
     if (
-      filterPreset !== "all" ||
+      activePreset !== "all" ||
       selectionMode ||
       !settledRowsPending ||
       searchQuery.trim().length > 0
@@ -247,7 +263,7 @@ export function ThreadInbox({
     );
   }, [
     lifecycle.parkedRows,
-    filterPreset,
+    activePreset,
     now,
     searchQuery,
     selectionMode,
@@ -272,14 +288,14 @@ export function ThreadInbox({
       ),
     [now, projectGroups],
   );
-  const showParkedShelves = filterPreset === "all" && !selectionMode;
+  const showParkedShelves = activePreset === "all" && !selectionMode;
   const visibleTotal = showParkedShelves
     ? activeVisibleCount + snoozed.length + settled.length + pendingSettled
     : activeVisibleCount;
   const searching = searchQuery.trim().length > 0;
   const reorderDisabledReason = selectionMode
     ? "Exit bulk selection to reorder thread families."
-    : filterPreset !== "all"
+    : activePreset !== "all"
       ? "Choose the All filter to reorder the complete project."
       : searching
         ? "Clear search to reorder the complete project."
@@ -313,7 +329,7 @@ export function ThreadInbox({
 
   useEffect(() => {
     selectionAnchorRootId.current = null;
-  }, [filterPreset, searchQuery, selectionMode, visibleRootOrderKey]);
+  }, [workspaceFilter, searchQuery, selectionMode, visibleRootOrderKey]);
 
   const changeSelectedRoot = (
     threadId: string,
@@ -622,7 +638,11 @@ export function ThreadInbox({
           </span>
           <span className="ml-auto flex items-center gap-0.5">
             {selectionMode ? null : (
-              <FilterMenu value={filterPreset} onChange={setFilterPreset} />
+              <FilterMenu
+                value={workspaceFilter}
+                projects={unfilteredProjectGroups.map((group) => group.project)}
+                onChange={setWorkspaceFilter}
+              />
             )}
             <button
               type="button"
@@ -746,7 +766,7 @@ export function ThreadInbox({
           </p>
         ) : (
           <>
-            {filterPreset === "status"
+            {activePreset === "status"
               ? statusGroups.map((group) => (
                   <StatusGroup
                     key={group.kind}

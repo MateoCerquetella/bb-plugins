@@ -18,6 +18,8 @@ import {
   selectableRootIds,
   THREAD_FILTER_OPTIONS,
   THREAD_FILTER_PRESETS,
+  type ThreadFilterPreset,
+  type WorkspaceFilter,
 } from "../lib/thread-management.ts";
 
 function thread(
@@ -104,10 +106,16 @@ describe("filterProjectThreadGroups", () => {
     projects,
   );
 
-  function ids(preset: Parameters<typeof filterProjectThreadGroups>[1]) {
-    return filterProjectThreadGroups(groups, preset, now).flatMap((group) =>
-      group.families.map((family) => family.root.id),
-    );
+  function presetFilter(preset: ThreadFilterPreset): WorkspaceFilter {
+    return { kind: "preset", preset };
+  }
+
+  function ids(preset: ThreadFilterPreset) {
+    return filterProjectThreadGroups(
+      groups,
+      presetFilter(preset),
+      now,
+    ).flatMap((group) => group.families.map((family) => family.root.id));
   }
 
   it("supports attention and quiet presets", () => {
@@ -133,7 +141,7 @@ describe("filterProjectThreadGroups", () => {
   it("preserves project and family order without mutating the input", () => {
     const before = groups.map((group) => group.families.length);
     assert.deepEqual(
-      filterProjectThreadGroups(groups, "quiet", now).map(
+      filterProjectThreadGroups(groups, presetFilter("quiet"), now).map(
         (group) => group.project.id,
       ),
       ["proj_1", "proj_2"],
@@ -141,6 +149,33 @@ describe("filterProjectThreadGroups", () => {
     assert.deepEqual(
       groups.map((group) => group.families.length),
       before,
+    );
+  });
+
+  it("keeps one complete project group when scoped by project", () => {
+    const filtered = filterProjectThreadGroups(
+      groups,
+      { kind: "project", projectId: "proj_2" },
+      now,
+    );
+    assert.deepEqual(
+      filtered.map((group) => group.project.id),
+      ["proj_2"],
+    );
+    assert.deepEqual(
+      filtered[0]?.families.map((family) => family.root.id),
+      ["quiet-week"],
+    );
+  });
+
+  it("returns no groups for a project that is no longer present", () => {
+    assert.deepEqual(
+      filterProjectThreadGroups(
+        groups,
+        { kind: "project", projectId: "missing" },
+        now,
+      ),
+      [],
     );
   });
 });
@@ -233,7 +268,11 @@ describe("selection helpers", () => {
       ],
       projects,
     );
-    const quietGroups = filterProjectThreadGroups(allGroups, "quiet", 1_000);
+    const quietGroups = filterProjectThreadGroups(
+      allGroups,
+      { kind: "preset", preset: "quiet" },
+      1_000,
+    );
 
     const visible = includeSelectedFamilies(
       quietGroups,

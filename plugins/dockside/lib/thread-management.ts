@@ -16,6 +16,15 @@ export const THREAD_FILTER_PRESETS = [
 
 export type ThreadFilterPreset = (typeof THREAD_FILTER_PRESETS)[number];
 
+export type WorkspaceFilter =
+  | { kind: "preset"; preset: ThreadFilterPreset }
+  | { kind: "project"; projectId: string };
+
+export const ALL_WORKSPACES_FILTER: WorkspaceFilter = {
+  kind: "preset",
+  preset: "all",
+};
+
 export type ThreadFilterGroup = "status" | "inactivity";
 
 export interface ThreadFilterOption {
@@ -165,9 +174,14 @@ export function bulkEligibility(
 
 export function filterProjectThreadGroups(
   groups: readonly ProjectThreadGroup[],
-  preset: ThreadFilterPreset,
+  filter: WorkspaceFilter,
   now: number,
 ): ProjectThreadGroup[] {
+  if (filter.kind === "project") {
+    return groups.filter((group) => group.project.id === filter.projectId);
+  }
+
+  const { preset } = filter;
   if (preset === "all" || preset === "status") return [...groups];
 
   return groups.flatMap((group) => {

@@ -20,9 +20,13 @@ describe("workspace filter UI contract", () => {
     assert.match(menu, /Filter workspaces/);
     assert.match(menu, /status: "Status"/);
     assert.match(menu, /inactivity: "Inactivity"/);
+    assert.match(menu, />Projects</);
+    assert.match(menu, /projects\.map\(\(project\)/);
+    assert.match(menu, /projectValue\(project\.id\)/);
+    assert.match(menu, /projectId: project\.id/);
     assert.match(menu, /<FilterOption preset="all"/);
     assert.match(menu, /<FilterOption preset="status"/);
-    assert.match(menu, /value === "all" \? null/);
+    assert.match(menu, /selectedValue === presetValue\("all"\) \? null/);
     assert.match(menu, /max-w-20 truncate/);
     assert.match(menu, /items-start py-1/);
     assert.match(menu, /w-64 bg-background/);
@@ -30,7 +34,9 @@ describe("workspace filter UI contract", () => {
     assert.match(menu, /option\.description/);
     assert.match(select, /SelectPrimitive\.ItemIndicator/);
     assert.match(select, /focus:bg-state-hover/);
-    assert.match(inbox, /filterPreset === "status"/);
+    assert.match(inbox, /activePreset === "status"/);
+    assert.match(inbox, /projects=\{unfilteredProjectGroups\.map/);
+    assert.match(inbox, /setWorkspaceFilter\(ALL_WORKSPACES_FILTER\)/);
     assert.match(inbox, /statusGroups\.map/);
     const statusGroup = await readFile(
       new URL("../components/inbox/status-group.tsx", import.meta.url),

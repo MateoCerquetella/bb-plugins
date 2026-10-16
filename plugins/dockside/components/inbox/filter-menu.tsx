@@ -15,6 +15,7 @@ import {
   THREAD_FILTER_PRESETS,
   type ThreadFilterGroup,
   type ThreadFilterPreset,
+  type WorkspaceFilter,
 } from "@/lib/thread-management";
 
 const FILTER_GROUP_LABELS: Readonly<Record<ThreadFilterGroup, string>> = {
@@ -26,20 +27,39 @@ const FILTER_GROUPS = ["status", "inactivity"] as const;
 
 export function FilterMenu({
   value,
+  projects,
   onChange,
 }: {
-  value: ThreadFilterPreset;
-  onChange: (value: ThreadFilterPreset) => void;
+  value: WorkspaceFilter;
+  projects: readonly { id: string; name: string }[];
+  onChange: (value: WorkspaceFilter) => void;
 }) {
-  const label = THREAD_FILTER_LABELS[value];
+  const label =
+    value.kind === "preset"
+      ? THREAD_FILTER_LABELS[value.preset]
+      : projects.find((project) => project.id === value.projectId)?.name ??
+        "Project";
+  const selectedValue =
+    value.kind === "preset"
+      ? presetValue(value.preset)
+      : projectValue(value.projectId);
+
   return (
     <Select
-      value={value}
+      value={selectedValue}
       onValueChange={(next) => {
-        if (
-          THREAD_FILTER_PRESETS.includes(next as ThreadFilterPreset)
-        ) {
-          onChange(next as ThreadFilterPreset);
+        const preset = THREAD_FILTER_PRESETS.find(
+          (candidate) => next === presetValue(candidate),
+        );
+        if (preset) {
+          onChange({ kind: "preset", preset });
+          return;
+        }
+        const project = projects.find(
+          (candidate) => next === projectValue(candidate.id),
+        );
+        if (project) {
+          onChange({ kind: "project", projectId: project.id });
         }
       }}
     >
@@ -50,11 +70,11 @@ export function FilterMenu({
         className={cn(
           "h-6 w-auto min-w-6 shrink-0 justify-center gap-1 border-0 px-1.5 text-muted-foreground shadow-none",
           "hover:bg-sidebar-accent hover:text-foreground focus:ring-1 focus:ring-ring",
-          value !== "all" && "bg-primary/10 text-primary",
+          selectedValue !== presetValue("all") && "bg-primary/10 text-primary",
         )}
       >
         <Icon name="Filter" className="size-3.5 shrink-0" aria-hidden />
-        {value === "all" ? null : (
+        {selectedValue === presetValue("all") ? null : (
           <span className="max-w-20 truncate text-2xs font-medium">{label}</span>
         )}
       </SelectTrigger>
@@ -64,6 +84,21 @@ export function FilterMenu({
         </div>
         <FilterOption preset="all" />
         <FilterOption preset="status" />
+        {projects.length > 0 ? (
+          <SelectGroup>
+            <SelectSeparator />
+            <SelectLabel className="pb-0.5 pt-1">Projects</SelectLabel>
+            {projects.map((project) => (
+              <SelectItem
+                key={project.id}
+                value={projectValue(project.id)}
+                className="py-1 pl-2 pr-8 text-xs font-medium focus:bg-sidebar-accent"
+              >
+                <span className="truncate text-foreground">{project.name}</span>
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        ) : null}
         {FILTER_GROUPS.map((group) => (
           <SelectGroup key={group}>
             <SelectSeparator />
@@ -88,7 +123,7 @@ function FilterOption({ preset }: { preset: ThreadFilterPreset }) {
 
   return (
     <SelectItem
-      value={preset}
+      value={presetValue(preset)}
       className="items-start py-1 pl-2 pr-8 focus:bg-sidebar-accent"
     >
       <span className="flex min-w-0 flex-col">
@@ -101,4 +136,12 @@ function FilterOption({ preset }: { preset: ThreadFilterPreset }) {
       </span>
     </SelectItem>
   );
+}
+
+function presetValue(preset: ThreadFilterPreset): string {
+  return `preset:${preset}`;
+}
+
+function projectValue(projectId: string): string {
+  return `project:${projectId}`;
 }
