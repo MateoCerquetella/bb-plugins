@@ -4,6 +4,49 @@
 
 <h1 align="center">Taskboard</h1>
 
+## Gitea through tea
+
+Gitea repositories, including self-hosted servers, are supported through
+[tea](https://gitea.com/gitea/tea) 0.16 or newer. Configure a login with
+`tea login add`, then choose **Gitea** in **Taskboard → Manage** and enter
+its login name and repository in `host/owner/repo` form. Non-default ports
+are supported; the repository host must match the selected login's URL.
+Each BB project has one selected tracker and one Gitea repository.
+
+Taskboard invokes `tea api --login <name>` for every authenticated request;
+it never reads a token from tea's config or stores another token. The tea
+login must be configured on the machine running the BB server.
+
+```sh
+bb taskboard config --source gitea --gitea-login my-gitea --gitea-project git.example.com/team/app
+bb taskboard refresh gitea
+bb taskboard list --source gitea --json
+bb taskboard show gitea 'git.example.com/team/app#7'
+bb taskboard transitions gitea 'git.example.com/team/app#7'
+bb taskboard move gitea 'git.example.com/team/app#7' --status __closed__
+```
+
+Lists include open and closed issues, exclude pull requests and paginate,
+including when the server caps pages below the requested size.
+Opening an issue loads current details and comments. The reviewed creation
+form supports available assignees, labels, milestones and due dates.
+Gitea issues have no native priority or issue type; those fields stay hidden.
+
+Open and Closed are always available. Create repository labels such as
+`status/backlog`, `status/todo`, `status/in-progress`, `status/review`,
+`status/done` and `status/canceled` to expose additional Kanban stages.
+Taskboard uses existing workflow labels; it does not create them implicitly.
+Moving stages changes only `status/*` labels, preserving concurrent edits to
+unrelated labels. Done/canceled closes an issue; a nonterminal stage reopens it.
+An externally reopened issue is shown as Open even if it retains a terminal
+workflow label; a terminal category requires the issue to actually be closed.
+Native Open/Closed clears workflow labels to keep the displayed state consistent.
+
+Gitea updates labels and issue state through separate endpoints, so a failed
+move can be partial. Refresh before retrying. Creation with a lost or invalid
+response is treated as uncertain and is never automatically retried.
+Image uploads are not supported by this source.
+
 ## Native Agent Progress (Development)
 
 Create new ticket accepts pasted or selected PNG/JPEG/WebP images (up to five,

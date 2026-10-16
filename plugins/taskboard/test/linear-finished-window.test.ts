@@ -79,7 +79,9 @@ test('finished window is a bounded whole number of days', () => {
     jiraBaseUrl: '',
     jiraEmail: '',
     jiraJql: 'order by updated',
-    gitlabProjectRef: ''
+    gitlabProjectRef: '',
+    giteaLogin: '',
+    giteaProjectRef: '',
   };
   for (const linearFinishedDays of [0, 30, 365]) {
     assert.ok(
@@ -128,7 +130,9 @@ test('store defaults existing projects to no finished window and persists it', (
       jiraBaseUrl: '',
       jiraEmail: '',
       jiraJql: 'order by updated',
-      gitlabProjectRef: ''
+      gitlabProjectRef: '',
+      giteaLogin: '',
+      giteaProjectRef: '',
     };
     const ensured = store.ensureProjectConfig('proj_alpha', defaults);
     assert.equal(ensured.linearFinishedDays, 0);
