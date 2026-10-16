@@ -83,19 +83,6 @@ describe("groupFamiliesByStatus", () => {
     assert.deepEqual(groupFamiliesByStatus([], DAY_MS), []);
   });
 
-  it("sorts Updated globally by latest family activity, with pins first", () => {
-    const families = groupThreadsByProject([
-      thread({ id: "pinned", isPinned: true }),
-      thread({ id: "older", updatedAt: 10 }),
-      thread({ id: "newer", updatedAt: 20 }),
-      thread({ id: "child", parentThreadId: "older", updatedAt: 30 }),
-    ], projects)[0]!.families;
-    const groups = groupSidebarFamilies(families, "updated");
-    assert.deepEqual(groups.map((group) => group.label), ["Pinned", "Updated"]);
-    assert.deepEqual(groups.flatMap((group) => group.families.map((family) => family.root.id)),
-      ["pinned", "older", "newer"]);
-  });
-
   it("groups environments by identity and machine, not project selection", () => {
     const environment = { id: "env", name: "main", branchName: "main", workspaceDisplayKind: null };
     const families = [
@@ -104,9 +91,9 @@ describe("groupFamiliesByStatus", () => {
       { root: thread({ id: "jupiter", environment: { ...environment, workspaceDisplayKind: "managed-worktree" }, host: { id: "jupiter", name: "Jupiter" } }), children: [] },
       { root: thread({ id: "none" }), children: [] },
     ];
-    const groups = groupSidebarFamilies(families, "environment");
+    const groups = groupSidebarFamilies(families);
     assert.deepEqual(groups.map((group) => group.label), ["main · Mac", "main · Jupiter", "No environment"]);
     assert.deepEqual(groups.map((group) => group.families.map((family) => family.root.id)), [["mac", "mac2"], ["jupiter"], ["none"]]);
-    assert.deepEqual(groupSidebarFamilies([], "environment"), []);
+    assert.deepEqual(groupSidebarFamilies([]), []);
   });
 });

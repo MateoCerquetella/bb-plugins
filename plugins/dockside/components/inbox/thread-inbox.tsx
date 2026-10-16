@@ -298,8 +298,8 @@ export function ThreadInbox({
   const statusGroups = useMemo(
     () => {
       const families = projectGroups.flatMap((group) => group.families);
-      if (activePreset === "updated" || activePreset === "environment") {
-        return groupSidebarFamilies(families, activePreset);
+      if (activePreset === "environment") {
+        return groupSidebarFamilies(families);
       }
       const groups = groupFamiliesByStatus(families, now);
       return activePreset === "status" ? groups : groups.filter((group) => group.kind === "pinned");

@@ -18,7 +18,7 @@ describe("workspace filter UI contract", () => {
     assert.match(inbox, />\s*Chats\s*</);
     assert.match(menu, /aria-label=\{`Filter chats:/);
     assert.match(menu, /label: "Projects"/);
-    assert.match(menu, /label: "Updated"/);
+    assert.doesNotMatch(menu, /label: "Updated"/);
     assert.match(menu, /label: "Status"/);
     assert.match(menu, /label: "Environment"/);
     assert.match(menu, /<SelectLabel>Group by<\/SelectLabel>/);
@@ -27,7 +27,7 @@ describe("workspace filter UI contract", () => {
     assert.match(inbox, /activePreset === "status"/);
     assert.match(inbox, /setWorkspaceFilter\(ALL_WORKSPACES_FILTER\)/);
     assert.match(inbox, /statusGroups\.map/);
-    assert.match(inbox, /groupSidebarFamilies\(families, activePreset\)/);
+    assert.match(inbox, /groupSidebarFamilies\(families\)/);
     assert.match(inbox, /localStorage\.setItem\("dockside:group-by"/);
     const statusGroup = await readFile(
       new URL("../components/inbox/status-group.tsx", import.meta.url),

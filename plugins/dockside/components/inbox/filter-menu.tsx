@@ -17,7 +17,6 @@ import {
 
 const GROUPING_OPTIONS = [
   { preset: "all", label: "Projects" },
-  { preset: "updated", label: "Updated" },
   { preset: "status", label: "Status" },
   { preset: "environment", label: "Environment" },
 ] as const satisfies readonly FilterOption[];

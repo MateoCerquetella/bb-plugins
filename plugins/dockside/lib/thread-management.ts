@@ -5,7 +5,6 @@ export const DAY_MS = 24 * 60 * 60 * 1_000;
 
 export const THREAD_FILTER_PRESETS = [
   "all",
-  "updated",
   "environment",
   "status",
   "working",
@@ -39,7 +38,6 @@ export interface ThreadFilterOption {
 
 export const THREAD_FILTER_OPTIONS = [
   { preset: "all", label: "All", description: "Every active workspace", group: null },
-  { preset: "updated", label: "Updated", description: "Most recently updated first", group: null },
   { preset: "environment", label: "Environment", description: "Group by execution environment", group: null },
   { preset: "status", label: "Status", description: "Group workspaces by current status", group: null },
   { preset: "working", label: "Working", description: "Workspaces with active runs", group: "status" },
@@ -55,7 +53,6 @@ export const THREAD_FILTER_LABELS: Readonly<
   Record<ThreadFilterPreset, string>
 > = {
   all: "All",
-  updated: "Updated",
   environment: "Environment",
   status: "Status",
   working: "Working",
@@ -197,7 +194,7 @@ export function filterProjectThreadGroups(
   }
 
   const { preset } = filter;
-  if (preset === "all" || preset === "updated" || preset === "environment" || preset === "status") {
+  if (preset === "all" || preset === "environment" || preset === "status") {
     return [...groups];
   }
 
@@ -318,7 +315,7 @@ export function includeSelectedFamilies(
 
 function familyMatchesPreset(
   family: ThreadFamily,
-  preset: Exclude<ThreadFilterPreset, "all" | "updated" | "environment" | "status">,
+  preset: Exclude<ThreadFilterPreset, "all" | "environment" | "status">,
   now: number,
 ): boolean {
   switch (preset) {
