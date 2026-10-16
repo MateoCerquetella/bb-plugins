@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "sequence": 11,
+  "previousDigest": "sha256:6ed001c88357ec11915897a33784cc9373e36d1877b9f570885a2842bfd532ed",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Repaired host identity, synchronous read-only Empirical snapshot, periodic reconciliation, post-dispatch persistence and owner details; focused Taskboard check passed. Browser demo execution remains pending authentication.",
+  "createdAt": "2026-10-14T17:10:23.069Z",
+  "stateBeforeDigest": "sha256:c9df87abb6824985c535c83c45bef3868a592d94e50efd5f507933ecc645a794",
+  "stateAfterDigest": "sha256:5ad39a7c5e076440e13715edc2481bc372a0f11b80cd2c17ef76740ba9533355",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 11,
+    "activeFeature": "taskboard-empirical-live-visibility",
+    "request": "Implement live Empirical work visibility inside Taskboard from Start work through agent progress and durable completion, with a runnable end-to-end demo and UI tests. Preserve existing tracker workflows and display stale/offline state honestly.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "context",
+    "status": "waiting",
+    "repairAttempts": 1,
+    "message": "Repaired host identity, synchronous read-only Empirical snapshot, periodic reconciliation, post-dispatch persistence and owner details; focused Taskboard check passed. Browser demo execution remains pending authentication.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:23291153874870cc75cc38a787e5cee61cce6d731a247b8f8fd75da66c0b00ce",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:8c292f6c9665bae5b9e2d77be26bb2959ea9fad0a84df0aff178babdbfd61a55",
+    "impactDigest": "sha256:edd7339a93729e25d6e968f6c9d90dbb63e501bef02b98bbcec07afe344a8003",
+    "capabilityClaimId": "taskboard-empirical-live-visibility-d3c61d975b15",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "qa-1f4e92663151b3cf006ed594"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-14T17:10:23.069Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "taskboard-empirical-live-visibility-d3c61d975b15",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "taskboard-empirical-live-visibility",
+      "worktree": "/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical",
+      "worktreeId": "sha256:03d9d7bade6e304ca7d3f55b37f6c289e95dfa2862e1238ad94c52a985287800",
+      "baseCommit": "9614dd51fc203d740614aba4de44f31cda50ec04",
+      "baseTree": "41b659cfcdc3046ebe70fbe0fc4e4b9502d04e38",
+      "bases": {
+        "taskboard-empirical-progress": {
+          "capability": "taskboard-empirical-progress",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "taskboard shows authoritative empirical progress for a started task": null,
+            "live observation has explicit freshness and recovery": null
+          }
+        }
+      },
+      "capabilities": [
+        "taskboard-empirical-progress"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-14T13:31:33.977Z",
+      "heartbeatAt": "2026-10-14T13:31:33.977Z",
+      "digest": "sha256:3f494111fba6616a4b84bcb3a182d3cce4b874582f4bb2a70fe5fa28b11ef241"
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 7,
+      "capabilities": 1,
+      "reason": "Both criteria describe one independently shippable Taskboard capability: link each started native task to its exact Empirical checkout and continuously render truthful, host-scoped workflow state. Splitting the observation protocol from the UI would not independently deliver the requested start-to-completion experience.",
+      "actor": "agent",
+      "revision": 2
+    },
+    "budgetExtensionMinutes": 120,
+    "reviewFirst": true
+  },
+  "digest": "sha256:b7781cbc901f1190fa5e48efd541735e7d85263473a273b9eb97b7baeffb13ac"
+}

@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-7663b28decca1cf8bbbcdb2c",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Re-run Taskboard-focused checks with the local SQLite addon rebuilt for the verification runtime.",
+  "passed": false,
+  "startedAt": "2026-10-14T15:37:06.918Z",
+  "completedAt": "2026-10-14T15:42:08.129Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "taskboard-empirical-live-visibility",
+    "specRevision": 2,
+    "specDigest": "sha256:23291153874870cc75cc38a787e5cee61cce6d731a247b8f8fd75da66c0b00ce",
+    "treeDigest": "sha256:7257cbaf55b8a0e59c88c0fa315d51ea0426824b6705525e01f434639f1c892f",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 6,
+    "gitCommit": "9c48c8a473b3f53e512d0ca5b72d13f979c1ebe1",
+    "textTreeDigest": "sha256:7257cbaf55b8a0e59c88c0fa315d51ea0426824b6705525e01f434639f1c892f"
+  },
+  "digest": "sha256:59f251c3ebf874abb883addafd220a3de28c8e4fbb357b485385e8cd0ae7e6fb",
+  "kind": "qa",
+  "matrixDigest": "sha256:dc803ff91bcfda63e56273b11396209410b8dd81ed133b03c3cb178b2f1690cb",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "x64",
+    "node": "24.21.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "failed",
+      "summary": "Run the Taskboard-focused type, test, build, and build-metadata checks for live Empirical progress.",
+      "startedAt": "2026-10-14T15:37:06.918Z",
+      "completedAt": "2026-10-14T15:37:49.836Z",
+      "durationMs": 42918,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:f9b129d8080d6ae249324764ab9bf53ce8ebc569462bb37a19a9d1056d966f66",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-taskboard"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH",
+          "TMPDIR"
+        ]
+      },
+      "result": {
+        "exitCode": 1,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:6a99146d81a1d813dc5f95216fb74febd676495e85b9c1acbaaad1830904f98c",
+        "stderrDigest": "sha256:ed6889d0ea25c289afcf26abec6d9c6e09881ca99a804cb4d371b436bfd3da6b",
+        "stdoutTail": "transfer/plugins/taskboard/test/filter-presets-backend.test.ts:374:25) {\n    code: 'ERR_DLOPEN_FAILED'\n  }\n\ntest at test/filter-presets-backend.test.ts:513:1\n✖ enforces a transactional aggregate state-byte limit per project (6.981281ms)\n  Error: The module '/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/better-sqlite3/build/Release/better_sqlite3.node'\n  was compiled against a different Node.js version using\n  NODE_MODULE_VERSION 127. This version of Node.js requires\n  NODE_MODULE_VERSION 137. Please try re-compiling or re-installing\n  the module (for instance, using `npm rebuild` or `npm install`).\n      at Object..node (node:internal/modules/cjs/loader:2087:18)\n      at Module.load (node:internal/modules/cjs/loader:1651:32)\n      at Module._load (node:internal/modules/cjs/loader:1443:12)\n      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n      at Module.require (node:internal/modules/cjs/loader:1674:12)\n      at require (node:internal/modules/helpers:157:16)\n      at bindings (/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/bindings/bindings.js:112:48)\n      at new Database (/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/better-sqlite3/lib/database.js:48:64)\n      at createStore (file:///Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/plugins/taskboard/test/filter-presets-backend.test.ts:45:14)\n      at TestContext.<anonymous> (file:///Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/plugins/taskboard/test/filter-presets-backend.test.ts:514:25) {\n    code: 'ERR_DLOPEN_FAILED'\n  }\n\ntest at test/linear-finished-window.test.ts:112:1\n✖ store defaults existing projects to no finished window and persists it (11.500856ms)\n  Error: The module '/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/better-sqlite3/build/Release/better_sqlite3.node'\n  was compiled against a different Node.js version using\n  NODE_MODULE_VERSION 127. This version of Node.js requires\n  NODE_MODULE_VERSION 137. Please try re-compiling or re-installing\n  the module (for instance, using `npm rebuild` or `npm install`).\n      at Object..node (node:internal/modules/cjs/loader:2087:18)\n      at Module.load (node:internal/modules/cjs/loader:1651:32)\n      at Module._load (node:internal/modules/cjs/loader:1443:12)\n      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n      at Module.require (node:internal/modules/cjs/loader:1674:12)\n      at require (node:internal/modules/helpers:157:16)\n      at bindings (/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/bindings/bindings.js:112:48)\n      at new Database (/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/better-sqlite3/lib/database.js:48:64)\n      at TestContext.<anonymous> (file:///Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/plugins/taskboard/test/linear-finished-window.test.ts:113:14)\n      at Test.runInAsyncScope (node:async_hooks:227:14) {\n    code: 'ERR_DLOPEN_FAILED'\n  }\n\ntest at test/preparation.test.ts:134:1\n✖ real SQLite preparation retains direct edits, project isolation, jobs and settings after reload (28.924747ms)\n  Error: The module '/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/better-sqlite3/build/Release/better_sqlite3.node'\n  was compiled against a different Node.js version using\n  NODE_MODULE_VERSION 127. This version of Node.js requires\n  NODE_MODULE_VERSION 137. Please try re-compiling or re-installing\n  the module (for instance, using `npm rebuild` or `npm install`).\n      at Object..node (node:internal/modules/cjs/loader:2087:18)\n      at Module.load (node:internal/modules/cjs/loader:1651:32)\n      at Module._load (node:internal/modules/cjs/loader:1443:12)\n      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n      at Module.require (node:internal/modules/cjs/loader:1674:12)\n      at require (node:internal/modules/helpers:157:16)\n      at bindings (/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/bindings/bindings.js:112:48)\n      at new Database (/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/better-sqlite3/lib/database.js:48:64)\n      at TestContext.<anonymous> (file:///Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/plugins/taskboard/test/preparation.test.ts:135:14)\n      at Test.runInAsyncScope (node:async_hooks:227:14) {\n    code: 'ERR_DLOPEN_FAILED'\n  }\n\ntest at test/preparation.test.ts:259:1\n✖ job service routes context to the remote host and preserves partial success and immutable retries (5.762768ms)\n  Error: The module '/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/better-sqlite3/build/Release/better_sqlite3.node'\n  was compiled against a different Node.js version using\n  NODE_MODULE_VERSION 127. This version of Node.js requires\n  NODE_MODULE_VERSION 137. Please try re-compiling or re-installing\n  the module (for instance, using `npm rebuild` or `npm install`).\n      at Object..node (node:internal/modules/cjs/loader:2087:18)\n      at Module.load (node:internal/modules/cjs/loader:1651:32)\n      at Module._load (node:internal/modules/cjs/loader:1443:12)\n      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n      at Module.require (node:internal/modules/cjs/loader:1674:12)\n      at require (node:internal/modules/helpers:157:16)\n      at bindings (/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/bindings/bindings.js:112:48)\n      at new Database (/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/better-sqlite3/lib/database.js:48:64)\n      at TestContext.<anonymous> (file:///Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/plugins/taskboard/test/preparation.test.ts:260:14)\n      at Test.runInAsyncScope (node:async_hooks:227:14) {\n    code: 'ERR_DLOPEN_FAILED'\n  }\n\ntest at test/preparation.test.ts:441:1\n✖ old preparations remain discoverable and every pending record is reconciled beyond presentation limits (5.431375ms)\n  Error: The module '/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/better-sqlite3/build/Release/better_sqlite3.node'\n  was compiled against a different Node.js version using\n  NODE_MODULE_VERSION 127. This version of Node.js requires\n  NODE_MODULE_VERSION 137. Please try re-compiling or re-installing\n  the module (for instance, using `npm rebuild` or `npm install`).\n      at Object..node (node:internal/modules/cjs/loader:2087:18)\n      at Module.load (node:internal/modules/cjs/loader:1651:32)\n      at Module._load (node:internal/modules/cjs/loader:1443:12)\n      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n      at Module.require (node:internal/modules/cjs/loader:1674:12)\n      at require (node:internal/modules/helpers:157:16)\n      at bindings (/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/bindings/bindings.js:112:48)\n      at new Database (/Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/better-sqlite3/lib/database.js:48:64)\n      at TestContext.<anonymous> (file:///Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/plugins/taskboard/test/preparation.test.ts:443:14)\n      at async Test.run (node:internal/test_runner/test:1409:7) {\n    code: 'ERR_DLOPEN_FAILED'\n  }\n",
+        "stderrTail": "npm error Lifecycle script `test` failed with error:\nnpm error code 1\nnpm error path /Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.3\nnpm error location /Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/plugins/taskboard\nnpm error command failed\nnpm error command sh -c node --test --experimental-strip-types test/*.test.ts\nnpm error Lifecycle script `check` failed with error:\nnpm error code 1\nnpm error path /Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.3\nnpm error location /Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/plugins/taskboard\nnpm error command failed\nnpm error command sh -c npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build\n",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:7257cbaf55b8a0e59c88c0fa315d51ea0426824b6705525e01f434639f1c892f",
+      "sourceTreeAfter": "sha256:7257cbaf55b8a0e59c88c0fa315d51ea0426824b6705525e01f434639f1c892f",
+      "artifacts": []
+    },
+    {
+      "number": 2,
+      "outcome": "passed",
+      "summary": "Re-run Taskboard-focused checks with the local SQLite addon rebuilt for the verification runtime.",
+      "startedAt": "2026-10-14T15:41:06.346Z",
+      "completedAt": "2026-10-14T15:42:08.129Z",
+      "durationMs": 61783,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:f9b129d8080d6ae249324764ab9bf53ce8ebc569462bb37a19a9d1056d966f66",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-taskboard"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH",
+          "TMPDIR"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:04e20225163ac499f286b3c91010dfacc4b13bb0e5f88f2e090869874fdfd32c",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "vider status (20.549883ms)\n✔ legacy completed planning resumes automatically after restart without another planning turn (4.506888ms)\n✔ review outcomes require a valid result; legacy negative verdicts are recoverable (2.316881ms)\n✔ blocked review automatically resumes the same Build with findings exactly once (5.612356ms)\n✔ repair completion starts independent review of the repaired Build workspace (7.531455ms)\n✔ archived Build results survive polling and explicit review repair restores the same session once (10.284368ms)\n✔ legacy archive-only failure preserves completed evidence and can return to Build (19.914802ms)\n✔ archive recovery rejects deleted, moved, unavailable and busy Build sessions before restoration (9.093047ms)\n✔ archive recovery rechecks identity and idle state and does not dispatch after restoration failures (8.40842ms)\n✔ a lost send after unarchive stays uncertain across restart without another dispatch (3.255414ms)\n✔ Start task restoration failure keeps the review actionable without a phantom Build run (2.661681ms)\n✔ explicit blocked Build continuation restores its archived thread without a replacement (2.334468ms)\n✔ review repair loop stops after two attempts without closing the tracker (29.436514ms)\n✔ manual and unknown reviews remain actionable without an automatic dispatch (5.025094ms)\n✔ busy review completion waits for native idle without consuming a repair attempt (2.793687ms)\n✔ lost repair response is uncertain and cannot dispatch again after restart (3.311386ms)\n✔ review repairs reject scope changes and replacement workspaces (4.458839ms)\n✔ resumed review turns invalidate the previous verdict (0.500584ms)\n✔ repair Build that needs input pauses without requesting another review (5.150183ms)\n✔ Start task resumes a blocked Build in the same managed session exactly once (3.367338ms)\n✔ continued blocked Build starts review only after implementation evidence (21.919149ms)\n✔ a native Build restart clears only its obsolete Build pause (3.016898ms)\n✔ legacy waiting Build and repaired turns without a revision cannot imply implementation (5.155427ms)\n✔ scope changes and an empty plan pause automatic build (8.353483ms)\n✔ only provider-supported In progress transitions are selected (0.608375ms)\n✔ upgrades a retained Work-board migration without rewriting history or losing data (43.548222ms)\n✔ appends only the preset migration and round-trips complete state (54.470763ms)\n✔ isolates names and ids between projects (12.698239ms)\n✔ contains corrupt rows and makes reorder exact and atomic (36.923377ms)\n✔ enforces the per-project preset limit without blocking updates (68.882651ms)\n✔ bounds reads and fails closed when raw rows exceed the preset limit (80.404811ms)\n✔ rejects --from-state on wrong verbs and preserves explicit precedence (1.488301ms)\n✔ keeps maximum aggregate preset JSON compact and under the CLI cap (70.093617ms)\n✔ enforces a transactional aggregate state-byte limit per project (183.401986ms)\n✔ accepts a complete strict project browse preference snapshot (46.750511ms)\n✔ requires a project provider and matching source (42.150904ms)\n✔ bounds names, ids, positions, order size, and state fields (9.823501ms)\n✔ rejects control characters in preset identity and state (3.209776ms)\n✔ rejects oversized adversarial containers before inspecting elements (6.092727ms)\n✔ accepts the maximum valid browse state inside the UTF-8 envelope (88.230171ms)\n✔ normalizes unique names without depending on locale (0.905478ms)\n✔ resolves only exact preset order permutations (1.668466ms)\n✔ Linear sync excludes finished issues when the window is off (92.696835ms)\n✔ Linear sync includes issues finished within the window (2.588258ms)\n✔ finished window is a bounded whole number of days (4.42024ms)\n✔ CLI parses --linear-finished-days as days (1.072214ms)\n✔ store defaults existing projects to no finished window and persists it (36.67351ms)\n✔ preparation references retain support for every Taskboard tracker (10.97779ms)\n✔ repository context excludes credentials, generated content and symlink escapes (555.857469ms)\n✔ context and generation boundaries reject dangerous and malformed input (4.473032ms)\n✔ real SQLite preparation retains direct edits, project isolation, jobs and settings after reload (41.632614ms)\n✔ job service routes context to the remote host and preserves partial success and immutable retries (10055.568394ms)\n✔ old preparations remain discoverable and every pending record is reconciled beyond presentation limits (139.932778ms)\n✔ deferred preparation responses cannot cross selection identity or undo a mutation (2.84064ms)\n✔ selects the active thread project only when it still exists (9.236285ms)\n✔ treats a different thread in the same project as new context (0.764428ms)\n✔ reads the project and thread from a BB project route (2.282196ms)\n✔ uses only the immediately previous navigation entry as source context (0.624913ms)\n✔ never replaces an explicit Taskboard project selection with route context (0.448424ms)\n✔ writes project credentials atomically with owner-only permissions (46.29195ms)\n✔ deleting a missing credential is harmless (2.488336ms)\n✔ cached summaries never retain provider comments (43.587765ms)\n✔ provider creation results carry strict native assignee confirmation (0.506575ms)\n✔ metadata failures expose only a fixed server-safe message (0.941426ms)\n✔ finds Jira project keys from common configured JQL scopes (2.235013ms)\n✔ binds issue creation to the tracker reviewed in the modal (1.80052ms)\n✔ refreshes authoritative provider data after successful issue creation (0.701157ms)\n✔ refreshes authoritative provider data after ambiguous issue creation failure (1.076394ms)\n✔ gitlab is a registered taskboard source (1.869272ms)\n✔ refs must be host-qualified paths (4.245315ms)\n✔ locators round-trip with ref and iid (0.569408ms)\n✔ status label categories cover the five states (0.857018ms)\n✔ status labels filter out unrelated labels (1.441795ms)\n✔ state category prefers workflow labels over native state (0.369381ms)\n✔ status name shows the workflow column name or the native state (0.344239ms)\n✔ cached summaries never retain provider comments (0.38917ms)\n✔ untriaged issues keep native open/closed choices current-flagged (0.357062ms)\n✔ stripped status names keep facet and dropdown consistent (0.436387ms)\n✔ token line is parsed from glab stderr output (0.842218ms)\n✔ keeps structural headers on neutral host theme surfaces (3.383065ms)\n✔ uses restrained state glyph, focus, and conversation treatments (0.851302ms)\n✔ keeps constrained filter values inside the vertical menu measure (0.516269ms)\n✔ keeps assignee avatars compact with six theme-safe identity tones (1.007172ms)\n✔ shows restrained composer drop feedback and discoverable drag grips (1.160049ms)\n✔ ticket images reject spoofed formats, active content and oversized bytes (35.739064ms)\n✔ Linear uploads use signed storage headers and return the asset URL (205.311516ms)\n✔ improvement asks for concrete concise scope without invented implementation (0.561175ms)\n✔ draft parser accepts JSON or a single fence and rejects missing, extra or oversized fields (6.057865ms)\n✔ concurrent starts spawn once with project defaults and only validated text is returned (2.805168ms)\n✔ cancellation before start prevents dispatch, including after service reload (0.704563ms)\n✔ uncertain spawn cannot become a confirmed cancellation or be dispatched twice (0.94675ms)\n✔ stop failures stay uncertain and cleanup is retried by the sweep (1.032416ms)\n✔ invalid model output never returns a replacement draft (0.662077ms)\nℹ tests 218\nℹ suites 0\nℹ pass 218\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 12443.367838\n\n> bb-plugin-taskboard@0.3.3 build\n> node scripts/run-isolated-bb-cli.mjs plugin build .\n\nDownloading the plugin build toolchain (one time)…\n  esbuild@0.28.1, @tailwindcss/node@4.3.0, @tailwindcss/oxide@4.3.0, tailwindcss@4.3.0\nToolchain ready (9.8s)\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\ndist/host.js\ndist/host.js.map\ndist/host.meta.json\n\n> bb-plugin-taskboard@0.3.3 verify:build\n> node scripts/verify-build.mjs\n\nTaskboard build metadata is valid.\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:7257cbaf55b8a0e59c88c0fa315d51ea0426824b6705525e01f434639f1c892f",
+      "sourceTreeAfter": "sha256:7257cbaf55b8a0e59c88c0fa315d51ea0426824b6705525e01f434639f1c892f",
+      "artifacts": []
+    }
+  ],
+  "anomalies": [
+    "prior-nonpassing-attempt",
+    "retry-history-present"
+  ]
+}

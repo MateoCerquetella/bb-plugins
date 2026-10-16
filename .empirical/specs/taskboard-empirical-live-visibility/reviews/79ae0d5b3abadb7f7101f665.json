@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:2127bbe7fd3432110ebc343bd1d237d6023b40834d90a6d5c432e028b15a9d41",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "a16dda0dd942d0bd1a7967329142f4209d5c9231",
+  "headCommit": "1d1fe355cf8dcf9f791aead19e9bc4ee7416005b",
+  "diffDigest": "sha256:be11c2b94219db4373a5173f0f26c2a6ba53e3d815eccbd117a072ca1eb4fd53",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "/root/empirical_rereview",
+  "reviewerInvocationId": "/root/empirical_rereview",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- PASS AC-1: The run retains its BB environment, host, and checkout; recovered dispatch persists despite environment lookup failure, and reopening can resolve the missing binding.\n- PASS AC-2: The host projects the selected checkout through Empirical's read-only overview and cross-checks feature, revision, phase, status, and completion against the read-only project status. Native and tracker states do not drive completion.\n- FAIL AC-3: Server reconciliation, panel refresh, and reconnect recovery are present, but a malformed or unsupported overview is caught as unavailable rather than displayed as an invalid source.\n- PASS AC-4: The Empirical panel remains separate from native activity, and Open session targets the linked thread.\n- PASS AC-5: Completion level and method come from Empirical; verification and merged-but-unclosed are displayed separately, without promoting native completion to verified Done.\n- PASS AC-6: The server checks thread/environment/project binding and host response root and environment; the panel lists duplicate ownership roots and retains a prior snapshot only for matching identity.\n- PASS AC-7: The runnable fixture and focused tests cover Start, phase and input/blocked changes, completion distinctions, persistence, and offline/reconnect behavior.\n\n## Security / correctness\n\nThe previous source-identity, asynchronous ownership, and post-dispatch persistence blockers are addressed. One classification error remains: schema validation errors are treated as connectivity failures, obscuring an invalid Empirical projection.\n\n## Design / maintainability\n\nThe host now uses Empirical's read-only exports, with one synchronous checkout projection and a server reconciler. Polling recovers missed changes, though the 55-second host timeout can delay offline indication.",
+  "bodyDigest": "sha256:a8e3edec5b25031894c15ec9d206b745288f4f0ab8d3693b1efd11eeb116b96c",
+  "findings": [
+    {
+      "id": "F-8",
+      "severity": "medium",
+      "category": "acceptance",
+      "summary": "An invalid or unsupported repository overview fails Zod parsing and falls through to unavailable, so the required invalid-source state is not shown.",
+      "path": "plugins/taskboard/empirical/status.ts"
+    }
+  ],
+  "digest": "sha256:79ae0d5b3abadb7f7101f665c1e93cf291e43bb1d9bd0b410c6f5fd076cf795a"
+}

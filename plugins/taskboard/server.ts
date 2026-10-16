@@ -76,6 +76,10 @@ import { createWorkItemStore } from './store.js';
 import { decodeTicketImage } from './ticket-images-server.js';
 import { createFactoryStore } from './factory/store.js';
 import { createFactoryService } from './factory/service.js';
+import type { FactoryIdentity } from './factory/contract.js';
+import { factoryKey } from './factory/state.js';
+import { createEmpiricalObservationQueue } from './empirical/serial.js';
+import { hostContract } from './preparation/contract.js';
 import { progressStatus } from './factory/tracker.js';
 
 const SOURCES: readonly WorkSource[] = ['linear', 'github', 'jira', 'gitlab', 'gitea'];
@@ -481,7 +485,9 @@ export default async function plugin(bb: BbPluginApi) {
     }
   });
   const store = createWorkItemStore(bb);
-  const factory = createFactoryService(bb.sdk, createFactoryStore(bb.storage.database()), projectId =>
+  const factoryStore = createFactoryStore(bb.storage.database());
+  const empiricalHost = bb.hosts.experimental_client({ contract: hostContract });
+  const factory = createFactoryService(bb.sdk, factoryStore, projectId =>
     bb.realtime.publish('taskboard:factory', { projectId }), {
       getItem: identity => store.get(identity.projectId, identity.source, identity.locator) ?? null,
       async markInProgress(item) {
@@ -501,6 +507,98 @@ export default async function plugin(bb: BbPluginApi) {
       }
     }
   );
+  const queueEmpiricalObservation = createEmpiricalObservationQueue();
+  function observeFactoryEmpirical(input: FactoryIdentity) {
+    return queueEmpiricalObservation(factoryKey(input), () => readFactoryEmpirical(input));
+  }
+  async function readFactoryEmpirical(input: FactoryIdentity) {
+    const record = factoryStore.get(input);
+    const run = [...(record?.runs ?? [])].reverse().find(candidate =>
+      candidate.threadId && candidate.environmentId);
+    if (!run?.threadId || !run.environmentId) {
+      return { kind: 'unbound' as const, reason: 'Start task to link an agent workspace.' };
+    }
+    const prior = factoryStore.getEmpirical(input);
+    const lastKnown = prior && prior.hostId === run.hostId &&
+      prior.environmentId === run.environmentId &&
+      prior.checkoutRoot === run.checkoutRoot ? prior : null;
+    try {
+      const [thread, environment] = await Promise.all([
+        bb.sdk.threads.get({ threadId: run.threadId }),
+        bb.sdk.environments.get({ environmentId: run.environmentId })
+      ]);
+      if (thread.projectId !== input.projectId || thread.environmentId !== run.environmentId ||
+        environment.projectId !== input.projectId || !environment.hostId || !environment.path ||
+        (run.hostId && run.hostId !== environment.hostId) ||
+        (run.checkoutRoot && run.checkoutRoot !== environment.path)) {
+        return { kind: 'unbound' as const, reason: 'The linked session workspace changed or is unavailable.' };
+      }
+      const response = await empiricalHost.call('observeEmpirical',
+        { root: environment.path, environmentId: environment.id },
+        { hostId: environment.hostId, signal: AbortSignal.timeout(55_000) });
+      if (response.environmentId !== environment.id || response.root !== environment.path) {
+        return { kind: 'unbound' as const, reason: 'Empirical responded from another workspace.' };
+      }
+      const status = response.status;
+      const observedAt = Date.now();
+      if (status.kind === 'feature' || status.kind === 'empty') {
+        factoryStore.saveEmpirical(input, {
+          hostId: environment.hostId, environmentId: environment.id,
+          checkoutRoot: environment.path, observedAt, status
+        });
+      }
+      return {
+        kind: 'observation' as const,
+        hostId: environment.hostId,
+        environmentId: environment.id,
+        checkoutRoot: environment.path,
+        threadId: run.threadId,
+        observedAt,
+        status,
+        lastKnown: status.kind === 'feature' || status.kind === 'empty' ? null : lastKnown
+      };
+    } catch {
+      if (!run.hostId || !run.checkoutRoot) {
+        return { kind: 'unbound' as const, reason: 'The linked session workspace is offline or unavailable.' };
+      }
+      return {
+        kind: 'observation' as const,
+        hostId: run.hostId,
+        environmentId: run.environmentId,
+        checkoutRoot: run.checkoutRoot,
+        threadId: run.threadId,
+        observedAt: Date.now(),
+        status: { kind: 'unavailable' as const, reason: 'The host is offline or Empirical did not respond.' },
+        lastKnown
+      };
+    }
+  }
+  const empiricalState = new Map<string, string>();
+  bb.background.service('taskboard-empirical-reconciliation', {
+    async start(signal) {
+      let offset = 0;
+      while (!signal.aborted) {
+        const records = factoryStore.all().filter(record =>
+          record.runs.some(run => run.threadId && run.environmentId));
+        const batch = records.slice(offset, offset + 32);
+        offset = offset + batch.length >= records.length ? 0 : offset + batch.length;
+        for (let index = 0; index < batch.length && !signal.aborted; index += 4) {
+          await Promise.allSettled(batch.slice(index, index + 4).map(async record => {
+            const key = JSON.stringify([record.projectId, record.source, record.locator]);
+            const observed = await observeFactoryEmpirical(record);
+            const fingerprint = JSON.stringify(observed.kind === 'observation'
+              ? [observed.hostId, observed.environmentId, observed.checkoutRoot, observed.status]
+              : [observed.kind, observed.reason]);
+            if (empiricalState.get(key) !== fingerprint) {
+              empiricalState.set(key, fingerprint);
+              bb.realtime.publish('taskboard:factory', { projectId: record.projectId });
+            }
+          }));
+        }
+        await sleep(8000, signal);
+      }
+    }
+  });
   bb.background.service('taskboard-factory-progress', {
     async start(signal) {
       await factory.recover();
@@ -1870,6 +1968,10 @@ export default async function plugin(bb: BbPluginApi) {
     async factoryDiff(input) {
       await assertProjectExists(input.projectId);
       return factory.diff(input, input.runId, input.path);
+    },
+    async factoryEmpirical(input) {
+      await assertProjectExists(input.projectId);
+      return observeFactoryEmpirical(input);
     },
     async factoryStartTask(input) {
       await assertProjectExists(input.projectId);

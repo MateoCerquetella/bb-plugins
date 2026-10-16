@@ -1,5 +1,6 @@
 import type { BbPluginApi } from '@get-bb/plugin-sdk';
 import { factoryRecordSchema, type FactoryIdentity, type FactoryRecord } from './contract.js';
+import { empiricalSnapshotSchema, type EmpiricalSnapshot } from '../empirical/contract.js';
 import { factoryKey } from './state.js';
 
 export function createFactoryStore(db: ReturnType<BbPluginApi['storage']['database']>) {
@@ -10,6 +11,9 @@ export function createFactoryStore(db: ReturnType<BbPluginApi['storage']['databa
     );
     CREATE TABLE IF NOT EXISTS taskboard_factory_threads_v1 (
       thread_id TEXT PRIMARY KEY, identity TEXT NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS taskboard_factory_empirical_v1 (
+      identity TEXT PRIMARY KEY, observed_at INTEGER NOT NULL, document TEXT NOT NULL
     );
   `);
   const parse = (row: { document: string } | undefined) =>
@@ -31,6 +35,21 @@ export function createFactoryStore(db: ReturnType<BbPluginApi['storage']['databa
       return db.prepare<[], { document: string }>(
         'SELECT document FROM taskboard_factory_v1'
       ).all().map(row => parse(row)!);
+    },
+    getEmpirical(identity: FactoryIdentity) {
+      const row = db.prepare<[string], { document: string }>(
+        'SELECT document FROM taskboard_factory_empirical_v1 WHERE identity = ?'
+      ).get(factoryKey(identity));
+      return row ? empiricalSnapshotSchema.parse(JSON.parse(row.document)) : null;
+    },
+    saveEmpirical(identity: FactoryIdentity, snapshot: EmpiricalSnapshot) {
+      const value = empiricalSnapshotSchema.parse(snapshot);
+      db.prepare<[string, number, string]>(`
+        INSERT INTO taskboard_factory_empirical_v1 VALUES (?, ?, ?)
+        ON CONFLICT(identity) DO UPDATE SET
+          observed_at = excluded.observed_at, document = excluded.document
+        WHERE taskboard_factory_empirical_v1.observed_at < excluded.observed_at
+      `).run(factoryKey(identity), value.observedAt, JSON.stringify(value));
     },
     save(record: FactoryRecord) {
       const expected = record.version;

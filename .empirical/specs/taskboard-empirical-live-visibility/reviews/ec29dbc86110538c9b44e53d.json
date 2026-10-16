@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:389aca3ab15e4b27d54ececb861a9088340cbf075e82e0307bacbcd50d463cab",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "a16dda0dd942d0bd1a7967329142f4209d5c9231",
+  "headCommit": "51e6d6c82dd024efe7e0a82bdd7371451b33597d",
+  "diffDigest": "sha256:b857ad8c6a4eddf291d173617d66c10f956e45fbd41c148fe530c2c2ea42e2dd",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "/root/empirical_review",
+  "reviewerInvocationId": "/root/empirical_review",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- FAIL AC-1: The run records BB environment, host and checkout, but continuation can throw after native dispatch while resolving its environment.\n- FAIL AC-2: Status and ownership come from separate reads; a changed selection may display until the asynchronous ownership check completes.\n- FAIL AC-3: Refresh occurs only while the panel is mounted; no host watch or server-side reconciliation updates closed panels or handles reconnect promptly.\n- PASS AC-4: Native progress remains separate, and Open session targets the linked BB thread.\n- FAIL AC-5: Merged-but-unclosed detection arrives asynchronously and may remain stale while the panel displays verified completion.\n- FAIL AC-6: The host response contains no root or environment identity to validate, and duplicate-owner roots are not displayed.\n- PASS AC-7: An isolated runnable UI fixture and browser assertions cover Start task, phase changes, input, blocked, offline/reconnect and completion; reviewer did not execute it.\n\n## Security / correctness\n\nNo direct authentication bypass is evident in the committed diff. The main correctness gaps are unvalidated host observation identity, asynchronous status/ownership disagreement and a post-dispatch failure path.\n\n## Design / maintainability\n\nThe implementation uses a host shell command and module-global ownership cache although accepted D-001 selects the read-only Empirical overview export. Separate status and ownership reads weaken the single-checkout snapshot.",
+  "bodyDigest": "sha256:3b723bb9fc9335ac5f44c3a646fb33b2ff9b3137839d25c295aa30eb5e2901ce",
+  "findings": [
+    {
+      "id": "F-1",
+      "severity": "high",
+      "category": "acceptance",
+      "summary": "The host returns only status, so the server stamps expected host and checkout onto a response without validating the actual source root.",
+      "path": "plugins/taskboard/server.ts"
+    },
+    {
+      "id": "F-2",
+      "severity": "high",
+      "category": "acceptance",
+      "summary": "Observations refresh only in mounted progress views; no journal watcher or server reconciliation updates closed panels or handles reconnect promptly.",
+      "path": "plugins/taskboard/factory/app.tsx"
+    },
+    {
+      "id": "F-3",
+      "severity": "high",
+      "category": "correctness",
+      "summary": "Background ownership reads and a 30-second cache allow changed selection or merged-but-unclosed state to appear as current completion.",
+      "path": "plugins/taskboard/empirical/status.ts"
+    },
+    {
+      "id": "F-4",
+      "severity": "high",
+      "category": "correctness",
+      "summary": "Continuation awaits environments.get after native dispatch without a catch, so lookup failure can prevent the dispatched run from being persisted.",
+      "path": "plugins/taskboard/factory/service.ts"
+    },
+    {
+      "id": "F-5",
+      "severity": "medium",
+      "category": "correctness",
+      "summary": "Invalid and uninitialized observations overwrite the persisted last usable snapshot.",
+      "path": "plugins/taskboard/server.ts"
+    },
+    {
+      "id": "F-6",
+      "severity": "medium",
+      "category": "acceptance",
+      "summary": "Duplicate-owner warning does not identify either claiming checkout root.",
+      "path": "plugins/taskboard/factory/app.tsx"
+    },
+    {
+      "id": "F-7",
+      "severity": "medium",
+      "category": "design",
+      "summary": "Host observation shells out to an executable on PATH, diverging from the accepted read-only Empirical export.",
+      "path": "plugins/taskboard/empirical/status.ts"
+    }
+  ],
+  "digest": "sha256:ec29dbc86110538c9b44e53d7249c5bcdfd8dbfd94192ea4f98646c167582c53"
+}

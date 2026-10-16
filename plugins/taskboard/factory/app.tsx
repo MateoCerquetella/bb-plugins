@@ -3,6 +3,7 @@ import { Markdown, experimental_Diff as Diff, useBbContext, useBbNavigate, useRe
 import type { TaskboardRpcContract, WorkItem } from '../contract.js';
 import type { FactoryRecord, FactoryRun, FactoryRunKind } from './contract.js';
 import { MAX_REVIEW_REPAIRS, readableResultOutput } from './review.js';
+import type { EmpiricalObservation } from '../empirical/contract.js';
 import { Button } from '../components/ui/button.js';
 import { Icon } from '../components/ui/icon.js';
 import { Textarea } from '../components/ui/textarea.js';
@@ -235,6 +236,119 @@ function RunInsights({ record }: { record: FactoryRecord }) {
   </div>;
 }
 
+function EmpiricalProgress({ record }: { record: FactoryRecord }) {
+  const rpc = useRpc<TaskboardRpcContract>();
+  const navigate = useBbNavigate();
+  const [observation, setObservation] = useState<EmpiricalObservation | null>(null);
+  const [lastGood, setLastGood] = useState<Extract<EmpiricalObservation, { kind: 'observation' }> | null>(null);
+  const [failure, setFailure] = useState<string | null>(null);
+  const [clock, setClock] = useState(Date.now());
+  useEffect(() => {
+    let canceled = false;
+    let generation = 0;
+    let refreshTimer = 0;
+    setObservation(null); setLastGood(null); setFailure(null);
+    const load = async () => {
+      const request = ++generation;
+      try {
+        const next = await rpc.call('factoryEmpirical', {
+          projectId: record.projectId, source: record.source, locator: record.locator
+        });
+        if (canceled || request !== generation) return;
+        setObservation(next);
+        setClock(Date.now());
+        if (next.kind === 'observation' && next.status.kind !== 'unavailable') {
+          setLastGood(next);
+          setFailure(null);
+        } else {
+          if (next.kind === 'unbound') setLastGood(null);
+          setFailure(next.kind === 'unbound' ? next.reason :
+            next.status.kind === 'unavailable' ? next.status.reason : null);
+        }
+      } catch {
+        if (!canceled && request === generation) {
+          setFailure('Empirical observation could not be refreshed.'); setClock(Date.now());
+        }
+      } finally {
+        if (!canceled && request === generation) refreshTimer = window.setTimeout(() => { void load(); }, 8000);
+      }
+    };
+    void load();
+    const clockInterval = window.setInterval(() => setClock(Date.now()), 1000);
+    const refresh = () => {
+      window.clearTimeout(refreshTimer);
+      void load();
+    };
+    window.addEventListener('taskboard:empirical-refresh', refresh);
+    window.addEventListener('online', refresh);
+    window.addEventListener('focus', refresh);
+    const visible = () => { if (document.visibilityState === 'visible') refresh(); };
+    document.addEventListener('visibilitychange', visible);
+    return () => {
+      canceled = true; window.clearTimeout(refreshTimer); window.clearInterval(clockInterval);
+      window.removeEventListener('taskboard:empirical-refresh', refresh);
+      window.removeEventListener('online', refresh);
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', visible);
+    };
+  }, [rpc, record.projectId, record.source, record.locator, record.runs.at(-1)?.environmentId]);
+  useRealtime('taskboard:factory', () => window.dispatchEvent(new Event('taskboard:empirical-refresh')));
+  const current = observation?.kind === 'observation' ? observation : null;
+  const sameWorkspace = current && lastGood &&
+    current.hostId === lastGood.hostId &&
+    current.environmentId === lastGood.environmentId &&
+    current.checkoutRoot === lastGood.checkoutRoot;
+  const saved = current?.lastKnown;
+  const retained = saved && current &&
+    saved.hostId === current.hostId &&
+    saved.environmentId === current.environmentId &&
+    saved.checkoutRoot === current.checkoutRoot
+    ? { ...current, observedAt: saved.observedAt, status: saved.status }
+    : sameWorkspace || !current ? lastGood : null;
+  const offline = !!failure || current?.status.kind === 'unavailable';
+  const displayed = offline ? retained ?? current : current;
+  const stale = offline || !!displayed && clock - displayed.observedAt > 20_000;
+  const state = displayed?.status;
+  const title = !observation && !failure ? 'Connecting' :
+    state?.kind === 'invalid' ? 'Invalid source' :
+    state?.kind === 'uninitialized' ? 'Not initialized' :
+    stale ? 'Stale' :
+    state?.kind === 'feature' ? `${state.phase} · r${state.revision}` :
+    state?.kind === 'empty' ? 'No active feature' :
+    'Unavailable';
+  return <section className="tb-empirical-progress" aria-label="Empirical workflow" data-stale={stale}>
+    <div className="tb-empirical-heading">
+      <strong>Empirical</strong><span role="status">{title}</span>
+      {displayed?.threadId && <Button size="sm" variant="ghost"
+        onClick={() => navigate.toThread(displayed.threadId)}>
+        <Icon name="MessageCirclePlus" className="size-3.5" />Open session
+      </Button>}
+    </div>
+    {failure && <p role="status" className="tb-run-caption">{failure}{retained ? ' Last observation retained.' : ''}</p>}
+    {state?.kind === 'feature' && <>
+      <p className="tb-empirical-feature">{state.feature}</p>
+      {state.ownership === 'conflict' && <div role="alert" className="tb-run-caption">
+        Multiple worktrees claim this feature.
+        <ul>{state.owners?.map(owner => <li key={owner}><code>{owner}</code></li>)}</ul>
+      </div>}
+      {state.mergedButUnclosed && <p role="status" className="tb-run-caption">Merged, but Empirical has not closed this feature.</p>}
+      <dl className="tb-empirical-facts">
+        <div><dt>Phase</dt><dd>{state.phase} · {state.status}</dd></div>
+        <div><dt>Verification</dt><dd>{state.verification}</dd></div>
+        <div><dt>Completion</dt><dd>{state.completionLevel}{state.completionMethod ? ` · ${state.completionMethod}` : ''}</dd></div>
+      </dl>
+      <p className="tb-run-caption">Next: {state.nextAction}</p>
+    </>}
+    {state?.kind === 'empty' && <p className="tb-run-caption">No Empirical feature is selected in this checkout.</p>}
+    {state?.kind === 'uninitialized' && <p className="tb-run-caption">This checkout has no Empirical project.</p>}
+    {state?.kind === 'invalid' && <p role="alert" className="tb-run-caption">{state.reason}</p>}
+    {state?.kind === 'unavailable' && <p role="status" className="tb-run-caption">{state.reason}</p>}
+    {displayed && <p className="tb-empirical-source" title={displayed.checkoutRoot}>
+      {displayed.hostId} · {displayed.checkoutRoot} · observed {new Date(displayed.observedAt).toLocaleTimeString()}
+    </p>}
+  </section>;
+}
+
 function FactoryThreadProgressContent({ threadId, isCompactViewport }: { threadId: string; isCompactViewport: boolean }) {
   const rpc = useRpc<TaskboardRpcContract>();
   const [record, setRecord] = useState<FactoryRecord | null>(null);
@@ -270,6 +384,7 @@ function FactoryThreadProgressContent({ threadId, isCompactViewport }: { threadI
       <DialogDescription>{record.stage} · Updated {new Date(record.updatedAt).toLocaleTimeString()}</DialogDescription>
       {error && <ErrorNotice title="Progress could not refresh" nextStep="The last known progress is shown. Refresh will be retried automatically." detail={error} />}
       {record.automationError && record.automationError !== run.error && <ErrorNotice title="Automatic work paused" nextStep="Inspect the latest run and open the original ticket for available recovery actions." detail={record.automationError} />}
+      <EmpiricalProgress record={record} />
       <RunInsights record={record} />
       <OriginalTicket record={record} />
     </DialogContent></Dialog>
@@ -406,6 +521,7 @@ export function FactoryProgress({ item }: { item: WorkItem }) {
       )}>Retry status update</Button>}
     </div>}
     {!run ? <StartTaskButton item={item} disabled={!loaded || busy || ['done', 'canceled'].includes(item.stateCategory)} /> : <>
+      {record && <EmpiricalProgress record={record} />}
       {record && <RunInsights record={record} />}
       {run.status === 'uncertain' && <div className="my-3 space-y-2">
         <Input aria-label="Recovered native thread ID" placeholder="Native thread ID" value={recoveryId} onChange={e => setRecoveryId(e.target.value)} />

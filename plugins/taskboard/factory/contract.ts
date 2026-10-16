@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { empiricalObservationSchema } from '../empirical/contract.js';
 
 export const factoryIdentitySchema = z.object({
   projectId: z.string().startsWith('proj_').max(500),
@@ -30,6 +31,8 @@ export const factoryRunSchema = z.object({
   status: z.enum(['starting', 'running', 'finished', 'failed', 'canceled', 'uncertain']),
   threadId: z.string().nullable(),
   environmentId: z.string().nullable(),
+  hostId: z.string().nullable().default(null),
+  checkoutRoot: z.string().nullable().default(null),
   cursor: z.number().int().nonnegative(),
   turnId: z.string().nullable(),
   pendingCompletion: z.object({
@@ -80,6 +83,10 @@ export const factoryVersionInputSchema = factoryIdentitySchema.extend({
   expectedVersion: z.number().int().nonnegative()
 }).strict();
 export const factoryRpcMethods = {
+  factoryEmpirical: {
+    input: factoryIdentitySchema,
+    output: empiricalObservationSchema
+  },
   factoryDiff: {
     input: factoryIdentitySchema.extend({
       runId: z.string().min(1).max(500), path: z.string().min(1).max(4000)

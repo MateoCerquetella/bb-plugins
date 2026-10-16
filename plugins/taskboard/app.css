@@ -727,6 +727,23 @@
 
 /* Evidence is secondary to the current activity, in both panel and portal. */
 .tb-progress-ui { color: var(--ink); font-size: 12px; line-height: 1.5; }
+.tb-empirical-progress {
+  margin-block: 12px 16px;
+  padding-block: 10px;
+  border-block: 1px solid var(--border);
+  min-width: 0;
+}
+.tb-empirical-heading { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.tb-empirical-heading strong { font-size: 12px; }
+.tb-empirical-heading [role='status'] { color: var(--muted-foreground); font-size: 11px; }
+.tb-empirical-heading button { margin-left: auto; }
+.tb-empirical-progress[data-stale='true'] .tb-empirical-heading [role='status'] { color: var(--warning); }
+.tb-empirical-feature { margin-block: 8px; font-weight: 600; overflow-wrap: anywhere; }
+.tb-empirical-facts { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-block: 8px; }
+.tb-empirical-facts div { min-width: 90px; }
+.tb-empirical-facts dt, .tb-empirical-source { color: var(--muted-foreground); font-size: 10px; }
+.tb-empirical-facts dd { margin: 0; font-size: 11px; }
+.tb-empirical-source { margin-top: 8px; overflow-wrap: anywhere; }
 .tb-progress-ui .tb-run-heading { gap: 8px; margin-bottom: 6px; min-height: 30px; }
 .tb-run-heading > .tb-session-action { margin-left: auto; }
 .tb-session-picker { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; align-items: center; margin: 0 0 12px; }

@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-e47518536233789446e6f3ac",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Run the selected Taskboard-focused validation for live Empirical progress.",
+  "passed": false,
+  "startedAt": "2026-10-14T15:23:29.736Z",
+  "completedAt": "2026-10-14T15:23:32.086Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "taskboard-empirical-live-visibility",
+    "specRevision": 2,
+    "specDigest": "sha256:23291153874870cc75cc38a787e5cee61cce6d731a247b8f8fd75da66c0b00ce",
+    "treeDigest": "sha256:55313ec2cf0d70f4066097efddc362072d53248a2c570596ef02e4505d806b40",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 6,
+    "gitCommit": "9c48c8a473b3f53e512d0ca5b72d13f979c1ebe1",
+    "textTreeDigest": "sha256:55313ec2cf0d70f4066097efddc362072d53248a2c570596ef02e4505d806b40"
+  },
+  "digest": "sha256:a31b37522a9ea4b5f6d928f7ef45c14da8f210fa97b5b123e4cf4a9efca1515b",
+  "kind": "qa",
+  "matrixDigest": "sha256:dc803ff91bcfda63e56273b11396209410b8dd81ed133b03c3cb178b2f1690cb",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "x64",
+    "node": "24.21.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "failed",
+      "summary": "Run the selected Taskboard-focused validation for live Empirical progress.",
+      "startedAt": "2026-10-14T15:23:29.736Z",
+      "completedAt": "2026-10-14T15:23:32.086Z",
+      "durationMs": 2350,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:f9b129d8080d6ae249324764ab9bf53ce8ebc569462bb37a19a9d1056d966f66",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-taskboard"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH",
+          "TMPDIR"
+        ]
+      },
+      "result": {
+        "exitCode": 1,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:c474614febccc39971822ff33e18dc2f852019c58c9f81f3425870b49dad9df6",
+        "stderrDigest": "sha256:24aeb75f6af41cd07183abef587f4b1e08328785a21ebb91260a2d0833928c27",
+        "stdoutTail": "\n> bb-plugin-taskboard@0.3.3 check\n> npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build\n\n\n> bb-plugin-taskboard@0.3.3 types:check\n> env -u BB_CLI bb plugin types --check .\n\n",
+        "stderrTail": "Error: Invalid bb-app config at /Users/mateocerquetella/.bb/config.json: [\n  {\n    \"code\": \"unrecognized_keys\",\n    \"keys\": [\n      \"serverHeaders\"\n    ],\n    \"path\": [],\n    \"message\": \"Unrecognized key: \\\"serverHeaders\\\"\"\n  }\n]\n    at readManagedConfig (file:///Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/bb-app/dist/bb.js:15004:13)\n    at async resolveBbAppRuntimeState (file:///Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/bb-app/dist/bb.js:15099:19)\n    at async runBbCli (file:///Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/node_modules/bb-app/dist/bb.js:15272:19)\nnpm error Lifecycle script `types:check` failed with error:\nnpm error code 1\nnpm error path /Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.3\nnpm error location /Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/plugins/taskboard\nnpm error command failed\nnpm error command sh -c env -u BB_CLI bb plugin types --check .\nnpm error Lifecycle script `check` failed with error:\nnpm error code 1\nnpm error path /Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.3\nnpm error location /Users/mateocerquetella/Developer/projects/MateoCerquetella/bb-plugins-taskboard-empirical-transfer/plugins/taskboard\nnpm error command failed\nnpm error command sh -c npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build\n",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:55313ec2cf0d70f4066097efddc362072d53248a2c570596ef02e4505d806b40",
+      "sourceTreeAfter": "sha256:55313ec2cf0d70f4066097efddc362072d53248a2c570596ef02e4505d806b40",
+      "artifacts": []
+    }
+  ],
+  "anomalies": [
+    "outcome-failed"
+  ]
+}
