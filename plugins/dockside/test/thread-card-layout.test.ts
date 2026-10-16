@@ -33,7 +33,10 @@ describe("compact root card contract", () => {
     assert.match(rootSource, /<ProviderGlyph/);
     assert.match(childSource, /<ProviderGlyph/);
     assert.match(childSource, /data-dockside-child-row/);
-    assert.doesNotMatch(childRowOnlySource, /projectBadgeLetter|projectBadgePresentation/);
+    assert.doesNotMatch(
+      childRowOnlySource,
+      /projectBadgeLetter|projectBadgePresentation/,
+    );
   });
 
   it("keeps zero-child and no-PR roots on the same two-row skeleton", () => {
@@ -64,7 +67,9 @@ describe("compact root card contract", () => {
     );
 
     assert.ok(metadataStart >= 0);
-    assert.ok(rootSource.indexOf("<FamilyStatusBadge", metadataStart) > metadataStart);
+    assert.ok(
+      rootSource.indexOf("<FamilyStatusBadge", metadataStart) > metadataStart,
+    );
     assert.ok(pullRequestStart > metadataStart);
     assert.ok(disclosureStart > pullRequestStart);
   });
@@ -80,10 +85,7 @@ describe("compact root card contract", () => {
   });
 
   it("truncates long title and branch text without shrinking metadata", () => {
-    assert.match(
-      rootSource,
-      /"min-w-0 flex-1 truncate text-sm"/,
-    );
+    assert.match(rootSource, /"min-w-0 flex-1 truncate text-sm"/);
     assert.match(threadCardSource, /className="truncate font-mono"/);
     assert.match(threadCardSource, /\{branch\}/);
     assert.match(
@@ -97,7 +99,10 @@ describe("compact root card contract", () => {
     assert.match(rootSource, /role="tooltip"/);
     assert.match(rootSource, /reorderHelp=/);
     assert.match(familyStatusSource, /aria-keyshortcuts=/);
-    assert.match(rootSource, /application\/x-dockside-family|onReorderDragStart/);
+    assert.match(
+      rootSource,
+      /application\/x-dockside-family|onReorderDragStart/,
+    );
     assert.doesNotMatch(rootSource, /function ReorderHandle|group\/reorder/);
     assert.match(familyStatusSource, /w-14/);
     assert.match(familyStatusSource, /px-0/);
@@ -105,9 +110,18 @@ describe("compact root card contract", () => {
     const badgeStart = rootSource.indexOf("<FamilyStatusBadge", metadataStart);
     assert.ok(badgeStart > metadataStart);
     const providerStart = rootSource.indexOf("<ProviderGlyph", metadataStart);
-    const statusIconStart = rootSource.indexOf("<FamilyStatusIcon", metadataStart);
-    assert.ok(providerStart > metadataStart, "provider identity sits in trailing metadata");
-    assert.ok(statusIconStart > providerStart, "provider identity is immediately before status");
+    const statusIconStart = rootSource.indexOf(
+      "<FamilyStatusIcon",
+      metadataStart,
+    );
+    assert.ok(
+      providerStart > metadataStart,
+      "provider identity sits in trailing metadata",
+    );
+    assert.ok(
+      statusIconStart > providerStart,
+      "provider identity is immediately before status",
+    );
     assert.equal(
       rootSource.indexOf("<ProviderGlyph", providerStart + 1),
       -1,
@@ -115,8 +129,12 @@ describe("compact root card contract", () => {
     );
   });
 
-  it("shows project badges in grouped metadata while preserving the full title column", () => {
-    assert.match(rootSource, /<ThreadLocation[\s\S]*projectColorOverride=\{projectColorOverride\}/);
+  it("shows project badges in the trailing metadata slot for status groups", () => {
+    assert.match(rootSource, /groupedByStatus && projectName/);
+    assert.match(
+      rootSource,
+      /<ProjectBadge[\s\S]*projectColorOverride=\{projectColorOverride\}/,
+    );
     const metadataStart = rootSource.indexOf("data-dockside-root-metadata");
     const pullRequestStart = rootSource.indexOf(
       "<PullRequestMetadata",
@@ -127,8 +145,18 @@ describe("compact root card contract", () => {
       rootSource.slice(metadataStart, pullRequestStart),
       /projectBadgeLetter|aria-label=\{`Project:/,
     );
-    assert.match(threadCardSource, /function ThreadLocation\([\s\S]*projectColorOverride/);
+    assert.match(
+      threadCardSource,
+      /function ProjectBadge\([\s\S]*projectColorOverride/,
+    );
     assert.match(threadCardSource, /projectBadgeLetter\(projectName\)/);
+    assert.doesNotMatch(
+      rootSource.slice(
+        rootSource.indexOf("data-dockside-root-title-row"),
+        rootSource.indexOf("data-dockside-root-detail-row"),
+      ),
+      /groupedByStatus/,
+    );
     assert.match(rootSource, /data-dockside-select-root/);
     assert.match(rootSource, /col-start-1 row-span-2 min-w-0/);
     assert.match(rootSource, /col-start-2 row-span-2 flex/);

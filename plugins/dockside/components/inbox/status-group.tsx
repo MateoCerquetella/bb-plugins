@@ -4,10 +4,6 @@ import { ThreadCard } from "@/components/inbox/thread-card";
 import { Icon } from "@/components/ui/icon";
 import type { ProviderGlyphInfo } from "@/components/inbox/provider-glyph";
 import type { LifecycleApi } from "@/hooks/use-lifecycle";
-import {
-  familyStatusPresentation,
-  type FamilyStatusKind,
-} from "@/lib/family-status";
 import type { DocksidePreferences } from "@/lib/preferences";
 import type { ThreadSection } from "@/lib/status-groups";
 import { cn } from "@/lib/utils";
@@ -51,8 +47,6 @@ export function StatusGroup({
   const [expanded, setExpanded] = useState(true);
   const listId = useId();
   const effectiveExpanded = forceExpanded || expanded;
-  const presentation = sectionStatusPresentation(group.kind);
-
   return (
     <section aria-label={group.label} className="mt-1.5 first:mt-0">
       <button
@@ -62,18 +56,10 @@ export function StatusGroup({
         onClick={() => setExpanded((open) => !open)}
         className="flex h-8 w-full items-center gap-2 rounded-md px-1.5 text-left hover:bg-sidebar-accent/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
       >
-        {presentation ? (
-          <FamilyStatusIcon
-            status={presentation}
-            interactive={false}
-            className="pointer-events-none"
-          />
-        ) : group.kind === "pinned" ? (
-          <span className="flex size-5 shrink-0 items-center justify-center text-muted-foreground">
-            <Icon name="Pin" className="size-3.5" aria-hidden />
-          </span>
-        ) : null}
-        <span title={group.label} className="min-w-0 flex-1 truncate text-xs font-semibold text-foreground/90">
+        <span
+          title={group.label}
+          className="min-w-0 flex-1 truncate text-xs font-semibold text-foreground/90"
+        >
           {group.label}
         </span>
         <span className="shrink-0 tabular-nums text-2xs text-muted-foreground/70">
@@ -113,7 +99,9 @@ export function StatusGroup({
                     : BULK_PROTECTION_LABELS[eligibility.reason]
                 }
                 selectionHintId={selectionHintId}
-                onToggleSelected={(intent) => onToggleRoot(family.root.id, intent)}
+                onToggleSelected={(intent) =>
+                  onToggleRoot(family.root.id, intent)
+                }
                 reorderEnabled={false}
                 reorderDisabledReason="Switch to All to reorder thread families."
                 onMoveByKeyboard={() => {}}
@@ -121,7 +109,7 @@ export function StatusGroup({
                 onReorderDragOver={() => {}}
                 onReorderDrop={(event) => event.preventDefault()}
                 preferences={preferences}
-                grouped
+                groupedByStatus
                 projectName={projectNames.get(family.root.projectId)}
                 projectColorOverride={projectColorOverrides.get(
                   family.root.projectId,
@@ -133,17 +121,4 @@ export function StatusGroup({
       ) : null}
     </section>
   );
-}
-
-function sectionStatusPresentation(kind: string) {
-  const statusKind: FamilyStatusKind | null =
-    kind === "idle"
-      ? "inactive"
-      : kind === "needs-you" ||
-          kind === "failed" ||
-          kind === "working" ||
-          kind === "unread"
-        ? kind
-        : null;
-  return statusKind ? familyStatusPresentation(statusKind) : null;
 }

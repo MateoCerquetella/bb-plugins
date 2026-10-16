@@ -1,9 +1,4 @@
-import {
-  useId,
-  useMemo,
-  useState,
-  type DragEvent,
-} from "react";
+import { useId, useMemo, useState, type DragEvent } from "react";
 import {
   experimental_useSidebarThreadPullRequest as useSidebarThreadPullRequest,
   experimental_useSidebarThreadSplit as useSidebarThreadSplit,
@@ -63,9 +58,9 @@ export function ThreadCard({
   preferences,
   projectName,
   projectColorOverride,
-  grouped = false,
+  groupedByStatus = false,
 }: {
-  grouped?: boolean;
+  groupedByStatus?: boolean;
   projectName?: string;
   projectColorOverride?: string;
   thread: PluginSidebarThread;
@@ -107,9 +102,7 @@ export function ThreadCard({
     childThreads.some((child) => child.id === activeThreadId);
   const childNeedsAttention = childThreads.some(
     (child) =>
-      child.hasPendingInteraction ||
-      child.isUnread ||
-      threadIsWorking(child),
+      child.hasPendingInteraction || child.isUnread || threadIsWorking(child),
   );
   const expanded = resolveFamilyExpanded({
     childCount: childThreads.length,
@@ -119,7 +112,8 @@ export function ThreadCard({
   });
   const waitingForAgents = familyWaitingForAgents(childThreads);
   const childProviderIds = useMemo(
-    () => [...new Set(childThreads.map((child) => child.providerId))].slice(0, 2),
+    () =>
+      [...new Set(childThreads.map((child) => child.providerId))].slice(0, 2),
     [childThreads],
   );
   const childProviderNames = childProviderIds
@@ -156,9 +150,7 @@ export function ThreadCard({
               preferences.density === "compact"
                 ? "min-h-10 py-1"
                 : "min-h-12 py-1.5",
-              rootIsActive
-                ? "bg-sidebar-accent"
-                : "hover:bg-sidebar-accent/60",
+              rootIsActive ? "bg-sidebar-accent" : "hover:bg-sidebar-accent/60",
             )}
           >
             {selectionMode ? (
@@ -260,17 +252,6 @@ export function ThreadCard({
                 data-dockside-root-title-row=""
                 className="flex h-4 min-w-0 items-center gap-1.5"
               >
-                {grouped ? (
-                  <span
-                    title={`${familyState.label}: ${familyState.description}`}
-                    className="flex size-3.5 shrink-0 items-center justify-center"
-                    style={{ color: `var(--dockside-status-${familyState.colorRole})` }}
-                  >
-                    {familyState.kind === "working" ? (
-                      <Icon name="Loading" className="size-3 animate-spin" aria-hidden />
-                    ) : <span className="size-1.5 rounded-full bg-current" />}
-                  </span>
-                ) : null}
                 <span
                   title={threadDisplayTitle(thread)}
                   className={cn(
@@ -300,11 +281,7 @@ export function ThreadCard({
                     : "text-muted-foreground",
                 )}
               >
-                <ThreadLocation
-                  thread={thread}
-                  projectName={grouped ? projectName : undefined}
-                  projectColorOverride={projectColorOverride}
-                />
+                <ThreadLocation thread={thread} />
               </div>
             </div>
 
@@ -314,7 +291,10 @@ export function ThreadCard({
                 selectionMode && "pointer-events-none",
               )}
             >
-              <div data-dockside-root-status-row="" className="flex h-4 items-center justify-end gap-1.5">
+              <div
+                data-dockside-root-status-row=""
+                className="flex h-4 items-center justify-end gap-1.5"
+              >
                 <span
                   data-dockside-root-time=""
                   className={cn(
@@ -347,7 +327,6 @@ export function ThreadCard({
                     />
                   </span>
                 ) : null}
-
               </div>
               <div
                 data-dockside-root-metadata=""
@@ -409,7 +388,21 @@ export function ThreadCard({
                     className="size-3.5"
                   />
                 ) : null}
-                {!selectionMode && !grouped ? (
+                {!selectionMode && groupedByStatus && projectName ? (
+                  <ProjectBadge
+                    projectId={thread.projectId}
+                    projectName={projectName}
+                    projectColorOverride={projectColorOverride}
+                  />
+                ) : null}
+                {!selectionMode && groupedByStatus ? (
+                  <FamilyStatusIcon
+                    status={familyState}
+                    tooltipAlign="right"
+                    className="size-3.5"
+                  />
+                ) : null}
+                {!selectionMode && !groupedByStatus ? (
                   <FamilyStatusIcon
                     status={familyState}
                     tooltipAlign="right"
@@ -418,7 +411,8 @@ export function ThreadCard({
                     reorderHelp={
                       reorderEnabled
                         ? "Drag this status icon to reorder. Press Alt+Up or Alt+Down to move the family."
-                        : (reorderDisabledReason ?? "Reordering is unavailable.")
+                        : (reorderDisabledReason ??
+                          "Reordering is unavailable.")
                     }
                     onDragStart={(event) => {
                       event.stopPropagation();
@@ -430,7 +424,10 @@ export function ThreadCard({
                     }}
                     onKeyDown={(event) => {
                       if (!event.altKey) return;
-                      if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+                      if (
+                        event.key === "ArrowUp" ||
+                        event.key === "ArrowDown"
+                      ) {
                         event.preventDefault();
                         event.stopPropagation();
                         onMoveByKeyboard(event.key === "ArrowUp" ? -1 : 1);
@@ -448,9 +445,7 @@ export function ThreadCard({
               aria-label={`Agents for ${threadDisplayTitle(thread)}`}
               className={cn(
                 "ml-[14px] border-l pb-0.5 pl-3 transition-colors",
-                waitingForAgents
-                  ? "border-current"
-                  : "border-sidebar-border",
+                waitingForAgents ? "border-current" : "border-sidebar-border",
               )}
               style={
                 waitingForAgents
@@ -641,41 +636,17 @@ function ThreadStatusLabel({
   );
 }
 
-function ThreadLocation({
-  thread,
-  projectName,
-  projectColorOverride,
-}: {
-  thread: PluginSidebarThread;
-  projectName?: string;
-  projectColorOverride?: string;
-}) {
+function ThreadLocation({ thread }: { thread: PluginSidebarThread }) {
   const branch = thread.environment?.branchName;
   const host = thread.host?.name;
-  const projectBadge = projectName
-    ? projectBadgePresentation(thread.projectId, projectColorOverride)
-    : null;
-  if (branch || host || projectName) {
+  if (branch || host) {
     return (
       <span
-        title={[projectName, branch && `Branch: ${branch}`, host && `Host: ${host}`]
+        title={[branch && `Branch: ${branch}`, host && `Host: ${host}`]
           .filter(Boolean)
           .join(" · ")}
         className="flex min-w-0 flex-1 items-center gap-1 truncate text-muted-foreground"
       >
-        {projectName && projectBadge ? (
-          <span
-            aria-label={`Project: ${projectName}`}
-            title={projectName}
-            className="flex size-4 shrink-0 items-center justify-center rounded border border-black/15 text-[9px] font-semibold uppercase shadow-sm"
-            style={{
-              backgroundColor: projectBadge.backgroundColor,
-              color: projectBadge.foregroundColor,
-            }}
-          >
-            {projectBadgeLetter(projectName)}
-          </span>
-        ) : null}
         {branch ? (
           <>
             <Icon
@@ -687,11 +658,38 @@ function ThreadLocation({
           </>
         ) : null}
         {branch && host ? <span aria-hidden="true">·</span> : null}
-        {host ? <span className="max-w-[40%] shrink-0 truncate">{host}</span> : null}
+        {host ? (
+          <span className="max-w-[40%] shrink-0 truncate">{host}</span>
+        ) : null}
       </span>
     );
   }
   return <span className="flex-1" />;
+}
+
+function ProjectBadge({
+  projectId,
+  projectName,
+  projectColorOverride,
+}: {
+  projectId: string;
+  projectName: string;
+  projectColorOverride?: string;
+}) {
+  const badge = projectBadgePresentation(projectId, projectColorOverride);
+  return (
+    <span
+      aria-label={`Project: ${projectName}`}
+      title={projectName}
+      className="flex size-4 shrink-0 items-center justify-center rounded border border-black/15 text-[9px] font-semibold uppercase shadow-sm"
+      style={{
+        backgroundColor: badge.backgroundColor,
+        color: badge.foregroundColor,
+      }}
+    >
+      {projectBadgeLetter(projectName)}
+    </span>
+  );
 }
 
 function ParkButton({
