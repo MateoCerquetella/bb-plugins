@@ -218,6 +218,9 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
     async run(argv, context) {
       const [command, ...args] = argv;
       try {
+        if ((command === "--help" || command === "-h") && args.length === 0) {
+          return { exitCode: 0, stdout: usage };
+        }
         const scope = scopeSchema.parse(context.threadId ? { threadId: context.threadId } : { projectId: context.projectId });
         if (command === "run") {
           const allowPaid = args.at(-1) === "--allow-paid";

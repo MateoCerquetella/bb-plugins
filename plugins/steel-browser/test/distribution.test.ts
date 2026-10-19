@@ -38,6 +38,10 @@ test("registers the public surf CLI contract", async () => {
       { name: "press", usage: "bb surf press <key>" },
       { name: "screenshot", usage: "bb surf screenshot" },
     ]);
+    const help = await host.harness.runCli(["--help"]);
+    assert.equal(help.exitCode, 0);
+    assert.match(help.stdout ?? "", /^bb surf status$/mu);
+    assert.match(help.stdout ?? "", /^bb surf screenshot$/mu);
   } finally {
     await host.harness.dispose();
   }
