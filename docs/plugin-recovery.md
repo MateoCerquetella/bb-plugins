@@ -35,8 +35,8 @@ The commands above use the repository's default branch. They retain the
 
 Both plugins should report `running`. BB Surf's status also checks its Steel
 service. Taskboard's status reports whether its configured tracker is
-available. A disabled GitHub plugin prevents GitHub refresh even when
-Taskboard itself is running.
+available. Taskboard uses the authenticated `gh` CLI directly for GitHub and
+does not require BB's separate GitHub plugin.
 
 ## Keep the recovery durable
 

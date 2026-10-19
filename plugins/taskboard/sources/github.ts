@@ -433,13 +433,14 @@ export function createGithubAdapter(options: {
           }))
         )
       );
-      return results.flatMap(({ repo, issues }) =>
+      const items = results.flatMap(({ repo, issues }) =>
         issues.flatMap(issue =>
           issue.pull_request === undefined
             ? [withoutComments(toItem(repo, issue))]
             : []
         )
       );
+      return [...new Map(items.map(item => [item.locator, item])).values()];
     },
     async get(locator) {
       return scopedIssue(locator);

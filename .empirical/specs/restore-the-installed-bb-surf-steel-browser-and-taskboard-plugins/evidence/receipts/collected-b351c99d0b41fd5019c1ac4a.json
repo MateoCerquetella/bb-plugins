@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-b351c99d0b41fd5019c1ac4a",
+  "criteria": [
+    "AC-1",
+    "AC-10",
+    "AC-11",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8",
+    "AC-9"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review requested changes to the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-10-19T15:38:47.210Z",
+  "completedAt": "2026-10-19T15:38:47.210Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "restore-the-installed-bb-surf-steel-browser-and-taskboard-plugins",
+    "specRevision": 11,
+    "specDigest": "sha256:9e784032dbfcb23e5cd49db7417e7e676e9968cfd0b0df9b84163059a0019e07",
+    "treeDigest": "sha256:d68ef0b06d854aa0d601dbfbc84774cd6e87c6505ba1db0a95e4f38d17b52cfc",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:9dbe2ce8bdaca18aa8bfe447f80f1fc800ca1db2ed1ff22eb17d6e54046ba2de",
+  "kind": "collected",
+  "collector": "empirical-review:codex",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/restore-the-installed-bb-surf-steel-browser-and-taskboard-plugins/reviews/66e86d619fbf880d32b2efb2.json",
+      "mediaType": "application/json",
+      "bytes": 4511,
+      "digest": "sha256:a703205f64c2bcad7ad6b4a56c3ca378bf9dc5043324c2dca3165240c293d569"
+    },
+    {
+      "path": ".empirical/specs/restore-the-installed-bb-surf-steel-browser-and-taskboard-plugins/reviews/66e86d619fbf880d32b2efb2.md",
+      "mediaType": "text/markdown",
+      "bytes": 2900,
+      "digest": "sha256:51d6ced1de99b0177906534f3bea1ab8fc8230da380b0ffcb770362da1128979"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:d638ed043f8db60e11c9c7ad7cea9c044ee2f790d9fc858f9a4f050c10c454e5",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "1807befaa9c0732d83b6223d3821ba83268d98e7",
+  "headCommit": "38d5d241342d0d1cadce30a5b58ba57db3074b82",
+  "diffDigest": "sha256:be0ece62ce02c2c669072977060f13b086878c2c8c6b046592fdede8c108c582",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "codex",
+  "reviewerInvocationId": "native_github_review-38d5d241",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- FAIL AC-1: D-001 records successful installation and reload, but the committed review artifacts contain no command receipt proving the durable steel-browser registration and running status.\n- FAIL AC-2: D-001 records successful Taskboard relocation, but no committed command receipt establishes its final source and running status.\n- PASS AC-3: The reviewed changes preserve both plugin IDs and document relocation without removal. No uninstall or data-reset operation appears in the committed implementation.\n- PASS AC-4: The root and plugin READMEs use public Git release ranges with the correct plugin subdirectories and tag prefixes.\n- FAIL AC-5: Checks and focused PR creation are not evidenced in the committed feature. The committed GitHub list test also expects one locator from a fixture that the implementation returns twice. Execution could not begin because zod was unavailable.\n- FAIL AC-6: Taskboard README records marketplace PR 129 as merged and Surf documents community availability, but the reviewed artifacts do not record both existing merged marketplace PRs and their inspected status. No duplicate marketplace entry is introduced.\n- FAIL AC-7: The code removes GitHub-plugin RPC dependencies and discovers selected-project repositories before invoking authenticated gh. The required live refresh with the GitHub BB plugin absent is not evidenced.\n- PASS AC-8: The native adapter retains source github, existing issue locators, project configuration and the existing persistence boundary. No migration clears stored selection or cache.\n- FAIL AC-9: Native detail/comments, creation metadata, creation warnings and open/closed operations have implementation and controlled-response tests. List reconciliation can return duplicate identities and corrupt the reported cache count.\n- FAIL AC-10: The implementation provides missing-gh/authentication errors, scope rejection and cache-preserving sync error handling. Malformed-response and failure/cache-retention behavioral tests are absent and unexecuted.\n- FAIL AC-11: Taskboard README describes native gh and removes GitHub-plugin installation commands, but the linked recovery guide still states that a disabled GitHub BB plugin prevents refresh.\n\n## Security / correctness\n\nexecFile avoids shell interpolation, repository inputs are validated and scoped before detail/mutation requests, and sync failures retain cached rows. A correctness blocker remains in merging concurrent open/closed snapshots: duplicate identities reach persistence and inflate itemCount. No security exploit was established.\n\n## Design / maintainability\n\nCompleting the existing direct-gh adapter and retaining Taskboard's store is a sound ownership change. The adapter avoids another cache or credential store. Reconciliation needs explicit identity deduplication and verification must cover promised failure boundaries.",
+  "bodyDigest": "sha256:df38b492dfbefaa554d0dc95e826ba9125241de822669361377cbe88da6c5682",
+  "findings": [
+    {
+      "id": "F-1",
+      "severity": "high",
+      "category": "correctness",
+      "summary": "Deduplicate concurrent open/closed results by issue identity; an issue closing between requests can appear twice and inflate itemCount.",
+      "path": "plugins/taskboard/sources/github.ts:436"
+    },
+    {
+      "id": "F-2",
+      "severity": "medium",
+      "category": "tests",
+      "summary": "Add native GitHub failure and reconciliation tests for missing authentication, malformed responses, cache retention, and concurrent reconciliation.",
+      "path": "plugins/taskboard/test/create-metadata.test.ts"
+    },
+    {
+      "id": "F-3",
+      "severity": "low",
+      "category": "docs",
+      "summary": "Remove the obsolete claim that disabling the GitHub BB plugin prevents Taskboard refresh.",
+      "path": "docs/plugin-recovery.md:38"
+    }
+  ],
+  "digest": "sha256:66e86d619fbf880d32b2efb230195c3b80de98be423c40360e610f56c19491dc"
+}
