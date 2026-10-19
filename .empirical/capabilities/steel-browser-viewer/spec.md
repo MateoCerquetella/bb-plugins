@@ -106,7 +106,7 @@ User-facing plugin navigation and viewer headings SHALL use Cerq Browser unless 
 
 #### Scenario: Existing browser task
 
-- **WHEN** an agent uses bb steel-browser project and emits ::steel-browser{}
+- **WHEN** an agent uses bb surf project and emits ::steel-browser{}
 - **THEN** the existing bound browser remains visible through the personalized UI
 
 ### Requirement: Bounded panel hover work
