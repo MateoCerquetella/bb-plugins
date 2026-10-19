@@ -142,10 +142,10 @@ bb plugin reload steel-browser
 Open **BB Surf** in BB or manage sessions from the CLI:
 
 ```sh
-bb steel-browser status
-bb steel-browser sessions
-bb steel-browser create
-bb steel-browser release <session-id>
+bb surf status
+bb surf sessions
+bb surf create
+bb surf release <session-id>
 ```
 
 The plugin also ships agent guidance for choosing the local Steel service over

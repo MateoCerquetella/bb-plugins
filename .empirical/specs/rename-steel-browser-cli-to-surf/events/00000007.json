@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "sequence": 7,
+  "previousDigest": "sha256:935c0b1369301729c33b4b46b583774f3f4eb7e12b81f1aa85a3722ed2e31b19",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "All workspace checks passed with a clean applicable receipt. Focused Surf tests, build, live help, isolated review and scoped security consult passed. Local missing better-sqlite3 binary repaired without source changes.",
+  "createdAt": "2026-10-19T15:40:36.214Z",
+  "stateBeforeDigest": "sha256:76186404095193e9e2cbaef216b2102ab2ef3f3ffc90597ac6cc526ab1b0282e",
+  "stateAfterDigest": "sha256:89deb7852cbd7f71a01848f81e910c045eb5b392817b81164220b5cf400059a7",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 7,
+    "activeFeature": "rename-steel-browser-cli-to-surf",
+    "request": "Rename the public Steel Browser CLI command from `bb steel-browser` to `bb surf` so the installed BB Surf interface and terminal command use the same name. Preserve the internal plugin ID, persisted configuration, project browser bindings, handoff directive, and upstream Steel engine terminology to avoid data loss or migration. Update agent instructions, skill guidance, help usage, tests, and README examples; verify the focused plugin checks and locally install/reload the plugin so `bb surf --help` works. Create a pull request against main and merge it after checks pass, as explicitly approved by the user.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "integrate",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "All workspace checks passed with a clean applicable receipt. Focused Surf tests, build, live help, isolated review and scoped security consult passed. Local missing better-sqlite3 binary repaired without source changes.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:63a2560dc67cec6b415c1d0420b2a82381875027ee5a0fcddb609043db1c2e8e",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:9075d69e01815bfc3a9d3b0bc4dbbedace2cd49f2520be61158a701ef35f358f",
+    "impactDigest": "sha256:f6d77a4fed828be597167b4855c2535dd0ed9160c4e323e42ba753b8ad5c0b08",
+    "capabilityClaimId": "rename-steel-browser-cli-to-surf-7fb6bbf4a7dd",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "collected-d93641da0b6b525ef8be8896",
+      "qa-a8d302c8daf713fc4bf048da"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": true,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "verified",
+      "reasons": {
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-19T15:40:36.214Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "rename-steel-browser-cli-to-surf-7fb6bbf4a7dd",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "rename-steel-browser-cli-to-surf",
+      "worktree": "/home/dyaus/.bb/worktrees/rename-steel-browser-cli-to-surf",
+      "worktreeId": "sha256:4a755ecd5df8e9e09b5132b95b2393c8896e7a36e2ee9a7234a56bf700734ea5",
+      "baseCommit": "00fc12410a1c2f3c959436c6cdcc9a8f6b299bee",
+      "baseTree": "5fe25297af55151470e81e199772e5c59170baa7",
+      "bases": {
+        "steel-browser-viewer": {
+          "capability": "steel-browser-viewer",
+          "digest": "sha256:6090818f1b6f6aad008d2d778d841cd01ba2e7aee7969dd0265ce00f715afbfe",
+          "requirements": {
+            "surf command identity": null
+          }
+        }
+      },
+      "capabilities": [
+        "steel-browser-viewer"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-19T15:18:11.943Z",
+      "heartbeatAt": "2026-10-19T15:18:11.943Z",
+      "digest": "sha256:231083fa27403fe9d21c10ee0be12bb62d250e47d283c1ec8648a22740850a29"
+    },
+    "reviewFirst": true,
+    "verificationCoverage": {
+      "kind": "review-derived",
+      "checkId": "qa-fresh-context",
+      "receiptId": "collected-d93641da0b6b525ef8be8896",
+      "matrixDigest": "sha256:25ada92577a076954ce38c0c824ad8ce6c1f723ff6d7c358aeebf22a41bfcf35",
+      "specDigest": "sha256:63a2560dc67cec6b415c1d0420b2a82381875027ee5a0fcddb609043db1c2e8e",
+      "revision": 7
+    }
+  },
+  "digest": "sha256:add01d1c78c54375eff7d7d807112008515c1a36e053c613ddedf6240dee891d"
+}

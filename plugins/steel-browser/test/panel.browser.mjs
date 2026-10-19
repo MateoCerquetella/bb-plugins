@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { fileURLToPath } from "node:url";
 import { mkdir } from "node:fs/promises";
 
-assert(process.env.STEEL_CDP_URL, "Use this thread's bb steel-browser project CDP URL");
+assert(process.env.STEEL_CDP_URL, "Use this thread's bb surf project CDP URL");
 const result = await build({
   stdin: { contents: `import React,{useState} from "react";import {createRoot} from "react-dom/client";
     import {SteelThreadPanel,SteelBrowserDirective} from "./app.tsx";

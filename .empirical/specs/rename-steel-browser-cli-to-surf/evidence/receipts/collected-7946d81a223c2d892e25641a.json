@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-7946d81a223c2d892e25641a",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Focused Steel Browser plugin check passed: SDK types, TypeScript, 53 tests including executable help behavior, production build, and live Surf help with exit code 0.",
+  "passed": true,
+  "startedAt": "2026-10-19T15:33:39.264Z",
+  "completedAt": "2026-10-19T15:33:39.264Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "rename-steel-browser-cli-to-surf",
+    "specRevision": 2,
+    "specDigest": "sha256:63a2560dc67cec6b415c1d0420b2a82381875027ee5a0fcddb609043db1c2e8e",
+    "treeDigest": "sha256:c5707bb6a4f66621be7efa0715c6fd3796d4ae1442ac0fa202d664c6238ea820",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:8aa4dc8142232d85f5674e5e137c7d6804b6fabb9c433b703a3dd75b0a7d85b5",
+  "kind": "collected",
+  "collector": "agent",
+  "artifacts": [
+    {
+      "path": ".empirical/evidence/rename-steel-browser-cli-to-surf/focused-check.log",
+      "mediaType": "text/plain",
+      "bytes": 12819,
+      "digest": "sha256:a633df43b34ab1746a91e276e1447853f5a177eace1c33b88ddc67e50eb4ce66"
+    },
+    {
+      "path": ".empirical/evidence/rename-steel-browser-cli-to-surf/live-surf-help.log",
+      "mediaType": "text/plain",
+      "bytes": 401,
+      "digest": "sha256:845ed89e87578f0f197d7b080ed209b0344919c6226d4688cb545a52dd5a1935"
+    }
+  ]
+}

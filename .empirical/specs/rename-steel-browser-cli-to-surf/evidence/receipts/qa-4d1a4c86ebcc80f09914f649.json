@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-4d1a4c86ebcc80f09914f649",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Retry selected workspace check after rebuilding the missing better-sqlite3 native dependency; source unchanged.",
+  "passed": false,
+  "startedAt": "2026-10-19T15:35:56.626Z",
+  "completedAt": "2026-10-19T15:38:50.758Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "rename-steel-browser-cli-to-surf",
+    "specRevision": 2,
+    "specDigest": "sha256:63a2560dc67cec6b415c1d0420b2a82381875027ee5a0fcddb609043db1c2e8e",
+    "treeDigest": "sha256:c5707bb6a4f66621be7efa0715c6fd3796d4ae1442ac0fa202d664c6238ea820",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 6,
+    "gitCommit": "cae0f482a9827062152ef04c2706a17c328a5447",
+    "textTreeDigest": "sha256:c5707bb6a4f66621be7efa0715c6fd3796d4ae1442ac0fa202d664c6238ea820"
+  },
+  "digest": "sha256:4a7d2186f0d3563cdb470e3c5cf6fe25e18fe2688e690b9da7dedce910d1caff",
+  "kind": "qa",
+  "matrixDigest": "sha256:25ada92577a076954ce38c0c824ad8ce6c1f723ff6d7c358aeebf22a41bfcf35",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "failed",
+      "summary": "Run the selected workspace check for the Surf CLI rename at commit cae0f48.",
+      "startedAt": "2026-10-19T15:35:56.626Z",
+      "completedAt": "2026-10-19T15:36:47.132Z",
+      "durationMs": 50506,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:3102e0660c5a28fb09072a92af73601c0704a8badb5519082e7545d1f876aa50",
+        "argv": [
+          "npm",
+          "run",
+          "check"
+        ],
+        "cwd": ".",
+        "timeoutMs": 900000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 1,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:9da5833ab177ebbcda62ce5b1f88e600eb9123901b6788a7f0d1c9e0407766d2",
+        "stderrDigest": "sha256:f11037dc65073f002da57ed58c4da600a37e7493642b44994f798d5c893768ac",
+        "stdoutTail": "t: revokes a pending confirmation when availability becomes unknown\nok 37 - revokes a pending confirmation when availability becomes unknown\n  ---\n  duration_ms: 0.206457\n  type: 'test'\n  ...\n# Subtest: reads the authoritative Codex reset count\nok 38 - reads the authoritative Codex reset count\n  ---\n  duration_ms: 2.675675\n  type: 'test'\n  ...\n# Subtest: attaches reset availability to Codex only\nok 39 - attaches reset availability to Codex only\n  ---\n  duration_ms: 0.832457\n  type: 'test'\n  ...\n# Subtest: rejects invalid reset counts before they reach the UI\nok 40 - rejects invalid reset counts before they reach the UI\n  ---\n  duration_ms: 0.350809\n  type: 'test'\n  ...\n# Subtest: enables sidebar providers independently in display order\nok 41 - enables sidebar providers independently in display order\n  ---\n  duration_ms: 1.4215\n  type: 'test'\n  ...\n# Subtest: normalizes compact limit preferences to the weekly default\nok 42 - normalizes compact limit preferences to the weekly default\n  ---\n  duration_ms: 0.146476\n  type: 'test'\n  ...\n# Subtest: normalizes providers in stable order with every usage window\nok 43 - normalizes providers in stable order with every usage window\n  ---\n  duration_ms: 0.639916\n  type: 'test'\n  ...\n# Subtest: normalizes Antigravity fractional quotas across both groups\nok 44 - normalizes Antigravity fractional quotas across both groups\n  ---\n  duration_ms: 0.46632\n  type: 'test'\n  ...\n# Subtest: normalizes agy command-data buckets\nok 45 - normalizes agy command-data buckets\n  ---\n  duration_ms: 1.903778\n  type: 'test'\n  ...\n# Subtest: uses the tightest Antigravity group in compact usage\nok 46 - uses the tightest Antigravity group in compact usage\n  ---\n  duration_ms: 10.53154\n  type: 'test'\n  ...\n# Subtest: keeps current provider wire-key windows intact\nok 47 - keeps current provider wire-key windows intact\n  ---\n  duration_ms: 0.293395\n  type: 'test'\n  ...\n# Subtest: keeps healthy legacy provider windows intact\nok 48 - keeps healthy legacy provider windows intact\n  ---\n  duration_ms: 0.171362\n  type: 'test'\n  ...\n# Subtest: accepts legacy provider keys and normalizes explicit statuses\nok 49 - accepts legacy provider keys and normalizes explicit statuses\n  ---\n  duration_ms: 0.304856\n  type: 'test'\n  ...\n# Subtest: prefers current provider keys over legacy aliases\nok 50 - prefers current provider keys over legacy aliases\n  ---\n  duration_ms: 0.490805\n  type: 'test'\n  ...\n# Subtest: isolates an omitted provider response\nok 51 - isolates an omitted provider response\n  ---\n  duration_ms: 0.188343\n  type: 'test'\n  ...\n# Subtest: normalizes Grok and OpenCode and isolates an omitted new provider\nok 52 - normalizes Grok and OpenCode and isolates an omitted new provider\n  ---\n  duration_ms: 0.124928\n  type: 'test'\n  ...\n# Subtest: clamps progress geometry and rejects non-finite values\nok 53 - clamps progress geometry and rejects non-finite values\n  ---\n  duration_ms: 0.343606\n  type: 'test'\n  ...\n# Subtest: classifies exact usage warning and critical thresholds\nok 54 - classifies exact usage warning and critical thresholds\n  ---\n  duration_ms: 0.113627\n  type: 'test'\n  ...\n# Subtest: provides Grok and layered OpenCode provider marks\nok 55 - provides Grok and layered OpenCode provider marks\n  ---\n  duration_ms: 0.098659\n  type: 'test'\n  ...\n# Subtest: formats reset, update, percentage, and cost copy safely\nok 56 - formats reset, update, percentage, and cost copy safely\n  ---\n  duration_ms: 3.658376\n  type: 'test'\n  ...\n# Subtest: uses a reported window when weekly and five-hour labels are absent\nok 57 - uses a reported window when weekly and five-hour labels are absent\n  ---\n  duration_ms: 0.190057\n  type: 'test'\n  ...\n# Subtest: selects the configured compact usage window\nok 58 - selects the configured compact usage window\n  ---\n  duration_ms: 0.325423\n  type: 'test'\n  ...\n# Subtest: sums compact usage across accounts in use and ignores idle providers\nok 59 - sums compact usage across accounts in use and ignores idle providers\n  ---\n  duration_ms: 0.237633\n  type: 'test'\n  ...\n# Subtest: selects the highest available compact usage for an overview summary\nok 60 - selects the highest available compact usage for an overview summary\n  ---\n  duration_ms: 0.177824\n  type: 'test'\n  ...\n# Subtest: keeps additional provider windows in expanded details only\nok 61 - keeps additional provider windows in expanded details only\n  ---\n  duration_ms: 0.288075\n  type: 'test'\n  ...\n# Subtest: falls back when the configured compact window is unavailable\nok 62 - falls back when the configured compact window is unavailable\n  ---\n  duration_ms: 0.180549\n  type: 'test'\n  ...\n# Subtest: hides the Codex Pro five-hour row when it is not reported\nok 63 - hides the Codex Pro five-hour row when it is not reported\n  ---\n  duration_ms: 0.395311\n  type: 'test'\n  ...\n# Subtest: prefers a fresh alternative before merged last-known compact windows\nok 64 - prefers a fresh alternative before merged last-known compact windows\n  ---\n  duration_ms: 0.249394\n  type: 'test'\n  ...\n# Subtest: describes configured, actual, and fallback compact windows accessibly\nok 65 - describes configured, actual, and fallback compact windows accessibly\n  ---\n  duration_ms: 0.591228\n  type: 'test'\n  ...\n# Subtest: keeps last-known sidebar windows through partial and failed refreshes\nok 66 - keeps last-known sidebar windows through partial and failed refreshes\n  ---\n  duration_ms: 0.273318\n  type: 'test'\n  ...\n# Subtest: keeps additional last-known windows without stale duplicates\nok 67 - keeps additional last-known windows without stale duplicates\n  ---\n  duration_ms: 0.301108\n  type: 'test'\n  ...\n# Subtest: resolves the thread environment host\nok 68 - resolves the thread environment host\n  ---\n  duration_ms: 0.203781\n  type: 'test'\n  ...\n# Subtest: falls back when a thread has no environment or lookup fails\nok 69 - falls back when a thread has no environment or lookup fails\n  ---\n  duration_ms: 0.154542\n  type: 'test'\n  ...\n# Subtest: loads usage for the resolved host and tolerates missing host metadata\nok 70 - loads usage for the resolved host and tolerates missing host metadata\n  ---\n  duration_ms: 419.466368\n  type: 'test'\n  ...\n# Subtest: omits host override for primary-machine fallback\nok 71 - omits host override for primary-machine fallback\n  ---\n  duration_ms: 412.808758\n  type: 'test'\n  ...\n# Subtest: loads the primary machine directly for the sidebar strip\nok 72 - loads the primary machine directly for the sidebar strip\n  ---\n  duration_ms: 395.255915\n  type: 'test'\n  ...\n# Subtest: leaves provider activity unknown when thread counts are unavailable\nok 73 - leaves provider activity unknown when thread counts are unavailable\n  ---\n  duration_ms: 0.43346\n  type: 'test'\n  ...\n# Subtest: marks inactive providers only when every thread count succeeds\nok 74 - marks inactive providers only when every thread count succeeds\n  ---\n  duration_ms: 0.238875\n  type: 'test'\n  ...\n# Subtest: keeps activity unknown when thread counts omit provider groups\nok 75 - keeps activity unknown when thread counts omit provider groups\n  ---\n  duration_ms: 0.25826\n  type: 'test'\n  ...\n# Subtest: omits activity when the thread count API is absent\nok 76 - omits activity when the thread count API is absent\n  ---\n  duration_ms: 0.185127\n  type: 'test'\n  ...\n# Subtest: keeps known activity while omitting unknown activity for unmapped providers\nok 77 - keeps known activity while omitting unknown activity for unmapped providers\n  ---\n  duration_ms: 0.327988\n  type: 'test'\n  ...\n# Subtest: removes stale activity without mutating the input snapshot\nok 78 - removes stale activity without mutating the input snapshot\n  ---\n  duration_ms: 0.234037\n  type: 'test'\n  ...\n# Subtest: propagates thread and request-level usage failures\nok 79 - propagates thread and request-level usage failures\n  ---\n  duration_ms: 5.577713\n  type: 'test'\n  ...\n1..79\n# tests 79\n# suites 0\n# pass 79\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 1923.493239\n\n> bb-plugin-usage-tracker@0.1.15 build\n> env -u BB_CLI bb plugin build .\n\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\n",
+        "stderrTail": "npm error Lifecycle script `test` failed with error:\nnpm error code 1\nnpm error path /home/dyaus/.bb/worktrees/rename-steel-browser-cli-to-surf/plugins/aura\nnpm error workspace bb-plugin-aura@0.2.3\nnpm error location /home/dyaus/.bb/worktrees/rename-steel-browser-cli-to-surf/plugins/aura\nnpm error command failed\nnpm error command sh -c tsx --test test/*.test.ts\nnpm error Lifecycle script `check` failed with error:\nnpm error code 1\nnpm error path /home/dyaus/.bb/worktrees/rename-steel-browser-cli-to-surf/plugins/aura\nnpm error workspace bb-plugin-aura@0.2.3\nnpm error location /home/dyaus/.bb/worktrees/rename-steel-browser-cli-to-surf/plugins/aura\nnpm error command failed\nnpm error command sh -c npm run typecheck && npm test && npm run build\n\nnpm error Lifecycle script `test` failed with error:\nnpm error code 1\nnpm error path /home/dyaus/.bb/worktrees/rename-steel-browser-cli-to-surf/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.5\nnpm error location /home/dyaus/.bb/worktrees/rename-steel-browser-cli-to-surf/plugins/taskboard\nnpm error command failed\nnpm error command sh -c node --test --experimental-strip-types test/*.test.ts\nnpm error Lifecycle script `check` failed with error:\nnpm error code 1\nnpm error path /home/dyaus/.bb/worktrees/rename-steel-browser-cli-to-surf/plugins/taskboard\nnpm error workspace bb-plugin-taskboard@0.3.5\nnpm error location /home/dyaus/.bb/worktrees/rename-steel-browser-cli-to-surf/plugins/taskboard\nnpm error command failed\nnpm error command sh -c npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build\n\n",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:c5707bb6a4f66621be7efa0715c6fd3796d4ae1442ac0fa202d664c6238ea820",
+      "sourceTreeAfter": "sha256:c5707bb6a4f66621be7efa0715c6fd3796d4ae1442ac0fa202d664c6238ea820",
+      "artifacts": []
+    },
+    {
+      "number": 2,
+      "outcome": "passed",
+      "summary": "Retry selected workspace check after rebuilding the missing better-sqlite3 native dependency; source unchanged.",
+      "startedAt": "2026-10-19T15:37:43.851Z",
+      "completedAt": "2026-10-19T15:38:50.758Z",
+      "durationMs": 66907,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:3102e0660c5a28fb09072a92af73601c0704a8badb5519082e7545d1f876aa50",
+        "argv": [
+          "npm",
+          "run",
+          "check"
+        ],
+        "cwd": ".",
+        "timeoutMs": 900000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:66c432604768960356d434fbb3040bd1313d51c550278aba32cd87b3d5f53cce",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": " ---\n      duration_ms: 0.09899\n      type: 'test'\n      ...\n    # Subtest: reads a payload that is not an array as a miss\n    ok 4 - reads a payload that is not an array as a miss\n      ---\n      duration_ms: 0.089524\n      type: 'test'\n      ...\n    # Subtest: keeps a hit with no rows apart from a miss\n    ok 5 - keeps a hit with no rows apart from a miss\n      ---\n      duration_ms: 0.07717\n      type: 'test'\n      ...\n    # Subtest: rejects a row without a usable thread id\n    ok 6 - rejects a row without a usable thread id\n      ---\n      duration_ms: 0.082149\n      type: 'test'\n      ...\n    # Subtest: rejects an entry that is not an object\n    ok 7 - rejects an entry that is not an object\n      ---\n      duration_ms: 0.222365\n      type: 'test'\n      ...\n    # Subtest: rejects a timestamp the wire could not have produced\n    ok 8 - rejects a timestamp the wire could not have produced\n      ---\n      duration_ms: 0.425927\n      type: 'test'\n      ...\n    # Subtest: rejects a non-finite timestamp\n    ok 9 - rejects a non-finite timestamp\n      ---\n      duration_ms: 0.23018\n      type: 'test'\n      ...\n    # Subtest: reads an absent timestamp as null\n    ok 10 - reads an absent timestamp as null\n      ---\n      duration_ms: 0.293255\n      type: 'test'\n      ...\n    # Subtest: rejects the whole payload when one row is bad\n    ok 11 - rejects the whole payload when one row is bad\n      ---\n      duration_ms: 0.086248\n      type: 'test'\n      ...\n    # Subtest: rejects more rows than the encoder would ever write\n    ok 12 - rejects more rows than the encoder would ever write\n      ---\n      duration_ms: 0.384701\n      type: 'test'\n      ...\n    # Subtest: rejects an entry too long to be worth parsing\n    ok 13 - rejects an entry too long to be worth parsing\n      ---\n      duration_ms: 0.080297\n      type: 'test'\n      ...\n    1..13\nok 63 - decodeWarmStartRows\n  ---\n  duration_ms: 4.479975\n  type: 'suite'\n  ...\n# Subtest: encodeWarmStartRows\n    # Subtest: writes an array, which is the only shape that survives the trip\n    ok 1 - writes an array, which is the only shape that survives the trip\n      ---\n      duration_ms: 0.108107\n      type: 'test'\n      ...\n    # Subtest: carries only the four fields a row is made of\n    ok 2 - carries only the four fields a row is made of\n      ---\n      duration_ms: 0.074165\n      type: 'test'\n      ...\n    # Subtest: caps the entry and keeps the newest parks\n    ok 3 - caps the entry and keeps the newest parks\n      ---\n      duration_ms: 0.300197\n      type: 'test'\n      ...\n    # Subtest: ranks a park by when it was made, not by when a snooze ends\n    ok 4 - ranks a park by when it was made, not by when a snooze ends\n      ---\n      duration_ms: 0.160142\n      type: 'test'\n      ...\n    # Subtest: keeps a fresh settle over a full cap of long snoozes\n    ok 5 - keeps a fresh settle over a full cap of long snoozes\n      ---\n      duration_ms: 0.782736\n      type: 'test'\n      ...\n    1..5\nok 64 - encodeWarmStartRows\n  ---\n  duration_ms: 1.549064\n  type: 'suite'\n  ...\n# Subtest: readWarmStartRows\n    # Subtest: serves what was stored\n    ok 1 - serves what was stored\n      ---\n      duration_ms: 0.205454\n      type: 'test'\n      ...\n    # Subtest: does not throw when the store does\n    ok 2 - does not throw when the store does\n      ---\n      duration_ms: 0.09912\n      type: 'test'\n      ...\n    # Subtest: still serves from memory after the store failed\n    ok 3 - still serves from memory after the store failed\n      ---\n      duration_ms: 0.123095\n      type: 'test'\n      ...\n    # Subtest: prefers the memory tier over what the store holds\n    ok 4 - prefers the memory tier over what the store holds\n      ---\n      duration_ms: 0.145124\n      type: 'test'\n      ...\n    # Subtest: drops an entry that did not decode\n    ok 5 - drops an entry that did not decode\n      ---\n      duration_ms: 0.09859\n      type: 'test'\n      ...\n    # Subtest: ignores an entry written under another version's key\n    ok 6 - ignores an entry written under another version's key\n      ---\n      duration_ms: 0.068445\n      type: 'test'\n      ...\n    1..6\nok 65 - readWarmStartRows\n  ---\n  duration_ms: 0.861571\n  type: 'suite'\n  ...\n# Subtest: writeWarmStartRows\n    # Subtest: does not throw when the store does\n    ok 1 - does not throw when the store does\n      ---\n      duration_ms: 0.083462\n      type: 'test'\n      ...\n    # Subtest: writes under the versioned key\n    ok 2 - writes under the versioned key\n      ---\n      duration_ms: 0.083883\n      type: 'test'\n      ...\n    # Subtest: offers a refused value to the store again\n    ok 3 - offers a refused value to the store again\n      ---\n      duration_ms: 0.116211\n      type: 'test'\n      ...\n    1..3\nok 66 - writeWarmStartRows\n  ---\n  duration_ms: 0.354396\n  type: 'suite'\n  ...\n# Subtest: decodeWarmStartProviders\n    # Subtest: round-trips providers\n    ok 1 - round-trips providers\n      ---\n      duration_ms: 0.222305\n      type: 'test'\n      ...\n    # Subtest: reads a miss as null\n    ok 2 - reads a miss as null\n      ---\n      duration_ms: 0.080116\n      type: 'test'\n      ...\n    # Subtest: rejects a provider with no name to fall back to\n    ok 3 - rejects a provider with no name to fall back to\n      ---\n      duration_ms: 0.053658\n      type: 'test'\n      ...\n    # Subtest: rejects a provider whose name is blank\n    ok 4 - rejects a provider whose name is blank\n      ---\n      duration_ms: 0.051193\n      type: 'test'\n      ...\n    # Subtest: drops a logo that is not a same-origin path\n    ok 5 - drops a logo that is not a same-origin path\n      ---\n      duration_ms: 0.154281\n      type: 'test'\n      ...\n    # Subtest: drops a path that resolves onto another host\n    ok 6 - drops a path that resolves onto another host\n      ---\n      duration_ms: 0.147418\n      type: 'test'\n      ...\n    # Subtest: drops a path carrying the characters that end a CSS token\n    ok 7 - drops a path carrying the characters that end a CSS token\n      ---\n      duration_ms: 0.08224\n      type: 'test'\n      ...\n    # Subtest: rejects an entry too long to be worth parsing\n    ok 8 - rejects an entry too long to be worth parsing\n      ---\n      duration_ms: 0.092308\n      type: 'test'\n      ...\n    1..8\nok 67 - decodeWarmStartProviders\n  ---\n  duration_ms: 1.024526\n  type: 'suite'\n  ...\n# Subtest: encodeWarmStartProviders\n    # Subtest: carries only the three fields the glyph reads\n    ok 1 - carries only the three fields the glyph reads\n      ---\n      duration_ms: 0.081699\n      type: 'test'\n      ...\n    1..1\nok 68 - encodeWarmStartProviders\n  ---\n  duration_ms: 0.1483\n  type: 'suite'\n  ...\n# Subtest: readWarmStartProviders\n    # Subtest: serves what was stored\n    ok 1 - serves what was stored\n      ---\n      duration_ms: 0.126852\n      type: 'test'\n      ...\n    # Subtest: survives a store that throws on every call\n    ok 2 - survives a store that throws on every call\n      ---\n      duration_ms: 0.095353\n      type: 'test'\n      ...\n    # Subtest: drops an entry that did not decode\n    ok 3 - drops an entry that did not decode\n      ---\n      duration_ms: 0.074125\n      type: 'test'\n      ...\n    # Subtest: ignores an entry written under another version's key\n    ok 4 - ignores an entry written under another version's key\n      ---\n      duration_ms: 0.075378\n      type: 'test'\n      ...\n    1..4\nok 69 - readWarmStartProviders\n  ---\n  duration_ms: 0.446304\n  type: 'suite'\n  ...\n# Subtest: writeWarmStartProviders\n    # Subtest: does not throw when the store does\n    ok 1 - does not throw when the store does\n      ---\n      duration_ms: 0.083021\n      type: 'test'\n      ...\n    # Subtest: keeps its own versioned key\n    ok 2 - keeps its own versioned key\n      ---\n      duration_ms: 0.088542\n      type: 'test'\n      ...\n    1..2\nok 70 - writeWarmStartProviders\n  ---\n  duration_ms: 0.239627\n  type: 'suite'\n  ...\n1..70\n# tests 222\n# suites 59\n# pass 222\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 392.669461\n\n> bb-plugin-dockside@0.1.7 build\n> env -u BB_CLI bb plugin build .\n\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:c5707bb6a4f66621be7efa0715c6fd3796d4ae1442ac0fa202d664c6238ea820",
+      "sourceTreeAfter": "sha256:c5707bb6a4f66621be7efa0715c6fd3796d4ae1442ac0fa202d664c6238ea820",
+      "artifacts": []
+    }
+  ],
+  "anomalies": [
+    "prior-nonpassing-attempt",
+    "retry-history-present"
+  ]
+}

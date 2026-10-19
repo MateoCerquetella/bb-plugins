@@ -116,7 +116,7 @@ export async function runBrowser(
   }, signal);
   if (selected.engine === "playwright" && request.goal) {
     return { ...selected, status: "agent-handoff", cdpUrl: binding.cdpUrl,
-      message: "No browser action has run. Use bb steel-browser inspect/click/fill/press on this project, including when CDP is on another host." };
+      message: "No browser action has run. Use bb surf inspect/click/fill/press on this project, including when CDP is on another host." };
   }
   const versionResponse = await fetch(new URL("/json/version", binding.cdpUrl), {
     signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(8000)]) : AbortSignal.timeout(8000),
