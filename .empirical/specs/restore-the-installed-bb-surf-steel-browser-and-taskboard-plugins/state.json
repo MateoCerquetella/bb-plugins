@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 18,
+  "revision": 21,
   "activeFeature": "restore-the-installed-bb-surf-steel-browser-and-taskboard-plugins",
   "request": "Restore the installed BB Surf (steel-browser) and Taskboard plugins from durable sources that will not disappear with temporary directories or BB thread worktree cleanup. Preserve existing plugin settings, project data, and credentials. Verify both plugins run. Inspect their existing BB Community marketplace publication and create the necessary focused pull requests in MateoCerquetella/bb-plugins so durable installation and current releases are correct and users can add them without relying on local worktree paths.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "implement",
+  "phase": "review",
   "status": "waiting",
   "repairAttempts": 1,
-  "message": "Fresh-context review requested changes. Blocking F-1: concurrent open/closed GitHub snapshots can contain the same issue twice, inflating cache count. Failed criteria: AC-1, AC-2, AC-5, AC-6, AC-7, AC-9, AC-10, AC-11. Repair will deduplicate native list results, add failure-boundary coverage, correct stale docs, then collect runtime and verification evidence.",
+  "message": "User explicitly requested pushing the PR and skipping validation. Known blocking correctness finding has been repaired; proceed through the remaining gates with the validation exception recorded.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:9e784032dbfcb23e5cd49db7417e7e676e9968cfd0b0df9b84163059a0019e07",
@@ -36,9 +36,9 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-19T15:47:23.815Z",
+  "updatedAt": "2026-10-19T15:48:27.589Z",
   "lifecycle": {
-    "stage": "iteration",
+    "stage": "consolidation",
     "iteration": 2,
     "awaitingFeedback": false,
     "iterative": true,
@@ -93,6 +93,10 @@
     "digest": "sha256:c7edd00297f69a41fdb39932ff8506d902fcd509402a9092bb5844519e906ee6"
   },
   "trackerGeneration": 2,
+  "budgetExtensionMinutes": 60,
   "reviewFirst": true,
-  "budgetExtensionMinutes": 60
+  "pause": {
+    "since": "2026-10-19T15:48:27.584Z",
+    "baseCommit": "64e101f07e4ff73bb6f75bdf3cd016741a6c541e"
+  }
 }
