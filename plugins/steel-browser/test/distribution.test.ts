@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
+import { createFakePluginHost } from "@get-bb/plugin-sdk/testing";
+import plugin from "../server.ts";
 
 test("declares an independent BB app, server, CLI skill, and pinned SDK", async () => {
   const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
@@ -14,12 +16,37 @@ test("declares an independent BB app, server, CLI skill, and pinned SDK", async 
   assert.match(packageJson.scripts.build, /^env -u BB_CLI /u);
 });
 
+test("registers the public surf CLI contract", async () => {
+  const host = createFakePluginHost({ pluginId: "steel-browser" });
+  try {
+    plugin(host.bb);
+    const cli = host.harness.inspection.registrations.cli;
+    assert.equal(cli?.name, "surf");
+    assert.deepEqual(cli?.commands.map(({ name, usage }) => ({ name, usage })), [
+      { name: "status", usage: "bb surf status" },
+      { name: "sessions", usage: "bb surf sessions" },
+      { name: "create", usage: "bb surf create" },
+      { name: "release", usage: "bb surf release <session-id>" },
+      { name: "project", usage: "bb surf project" },
+      { name: "bind", usage: "bb surf bind <api-url> <cdp-url> <viewer-origin>" },
+      { name: "engine", usage: "bb surf engine <playwright|jev|auto> <fallback-on|fallback-off>" },
+      { name: "run", usage: "bb surf run <url> [goal] [--allow-paid]" },
+      { name: "tabs", usage: "bb surf tabs" },
+      { name: "inspect", usage: "bb surf inspect" },
+      { name: "click", usage: "bb surf click <role> <exact-name>" },
+      { name: "fill", usage: "bb surf fill <role> <exact-name> <value>" },
+      { name: "press", usage: "bb surf press <key>" },
+      { name: "screenshot", usage: "bb surf screenshot" },
+    ]);
+  } finally {
+    await host.harness.dispose();
+  }
+});
+
 test("contributes Steel discovery instructions to new agent sessions", async () => {
   const server = await readFile(new URL("../server.ts", import.meta.url), "utf8");
   assert.match(server, /bb\.agents\.contributeInstructions/u);
   assert.match(server, /first run `bb surf project`/u);
-  assert.match(server, /name: "surf"/u);
-  assert.doesNotMatch(server, /name: "steel-browser"/u);
   assert.match(server, /Never claim Steel is unavailable/u);
   assert.match(server, /emit ::steel-browser\{\}/u);
   assert.match(server,
