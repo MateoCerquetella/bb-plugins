@@ -1,0 +1,16 @@
+bb surf status
+bb surf sessions
+bb surf create
+bb surf release <session-id>
+bb surf project
+bb surf bind <api-url> <cdp-url> <viewer-origin>
+bb surf engine <playwright|jev|auto> <fallback-on|fallback-off>
+bb surf run <url> [goal] [--allow-paid]
+bb surf tabs
+bb surf inspect
+bb surf click <role> <exact-name>
+bb surf fill <role> <exact-name> <value>
+bb surf press <key>
+bb surf screenshot
+
+exit_code=0
