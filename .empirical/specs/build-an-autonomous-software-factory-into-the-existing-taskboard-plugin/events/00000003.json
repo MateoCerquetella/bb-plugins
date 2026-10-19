@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "sequence": 3,
+  "previousDigest": "sha256:7af4657ce47cfa99bc6c294dd51016e0b05d834aa607b361ab4d54b1fc1f61d7",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Specified an opt-in project factory that admits live provider todo tickets, persists claims before dispatch, enforces bounded capacity, fails closed on provider or dispatch ambiguity, preserves manual starts and the existing managed-worktree review loop, and never merges, deploys, or closes tickets automatically.",
+  "createdAt": "2026-10-19T18:18:31.865Z",
+  "stateBeforeDigest": "sha256:7632892431408c55506e3c05046d7667e33fe46468a1dbdbada17deccc3953ff",
+  "stateAfterDigest": "sha256:8730e93a48fbbe233aad7b950447e1f64ef95e8245c8842aff2c08adb1bfe59d",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 3,
+    "activeFeature": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin",
+    "request": "Build an autonomous software factory into the existing Taskboard plugin, inspired by https://github.com/lpbaril/bb-plugin-factory. Make Linear, Jira, or the configured issue provider the source of truth. The factory should continuously select eligible tickets, start and supervise BB agent work, avoid duplicate dispatch, recover after restart, and reflect progress back through the existing Taskboard provider/status model. Reuse the current taskboard architecture and keep the first implementation focused and operable.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "yolo",
+    "phase": "design",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Specified an opt-in project factory that admits live provider todo tickets, persists claims before dispatch, enforces bounded capacity, fails closed on provider or dispatch ambiguity, preserves manual starts and the existing managed-worktree review loop, and never merges, deploys, or closes tickets automatically.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:46c956effc54752721e11ed0d76f54c5f146b708ff687f54dc1eeb85d249b9ce",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:0913a381d95602585021535e5e1861d7599ef1e12a4f7c97d240a29dba435cd3",
+    "impactDigest": "sha256:3b1f1bda9a9699c5aed42506511efb1ee8f26c95c985cda5ebaed43154a5b479",
+    "capabilityClaimId": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin-63a17a591999",
+    "authorizationDigest": "sha256:a88dd178cbce9e7e2ef4d72cb7e377cc69c0ec27a2be66a4cf32fdda58886aea",
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-19T18:18:31.865Z",
+    "reviewFirst": true,
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin-63a17a591999",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_4crs23q8tu-1/bb-plugins",
+      "worktreeId": "sha256:97b93e0724b7096066b8243160868d9560541df602c0b09b923e7a1473e60397",
+      "baseCommit": "85d1b0655b9883adf940eab0d82d7bd95c956e28",
+      "baseTree": "a25cd39c6da0e7c195c6eabcdbd1b94b045ee2d4",
+      "bases": {
+        "taskboard-autonomous-factory": {
+          "capability": "taskboard-autonomous-factory",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "explicit project factory admission": null,
+            "bounded and observable automation": null,
+            "preserve execution and acceptance boundaries": null
+          }
+        }
+      },
+      "capabilities": [
+        "taskboard-autonomous-factory"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-19T18:18:31.861Z",
+      "heartbeatAt": "2026-10-19T18:18:31.861Z",
+      "digest": "sha256:f94c42c56f582e4c4696ad012786b22a1f52d1faedc703f2ad61a4b2752a93e7"
+    }
+  },
+  "digest": "sha256:f2d17a79979ceadfd793120b196499c643b7b36e43161949b3af732710a64663"
+}

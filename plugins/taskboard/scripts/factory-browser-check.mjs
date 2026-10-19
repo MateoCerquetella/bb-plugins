@@ -23,6 +23,7 @@ const result = await build({
 const fixture = {
   schemaVersion: 1, projectId: 'proj_test', source: 'github', locator: 'example/repo#42',
   version: 3, scopeDigest: 'scope', approvedDigest: null, plans: [],
+  admission: { kind: 'manual' },
   automatic: false, automationError: null, trackerProgress: { status: 'pending', message: null },
   stage: 'Planning', updatedAt: new Date().toISOString(),
   runs: [{
@@ -72,6 +73,20 @@ try {
   await page.setViewportSize({ width: 1280, height: 1000 });
   await page.route('https://taskboard-preview.test/**', route => route.fulfill({ contentType: 'text/html', body: html }));
   await page.goto('https://taskboard-preview.test/');
+  const factorySettings = page.locator('#preview-factory-settings');
+  await factorySettings.getByRole('checkbox', { name: 'Enable automatic intake' }).check();
+  await factorySettings.getByRole('spinbutton', { name: 'Automatic concurrency' }).fill('2');
+  await factorySettings.getByRole('button', { name: 'Save factory settings' }).click();
+  await factorySettings.getByText('running · github').waitFor();
+  for (const width of [1280, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, `taskboard-factory-settings-${width}.png`) });
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+  }
+  await factorySettings.getByRole('checkbox', { name: 'Enable automatic intake' }).uncheck();
+  await factorySettings.getByRole('button', { name: 'Save factory settings' }).click();
+  await factorySettings.getByText('disabled · github').waitFor();
+  await page.setViewportSize({ width: 1280, height: 1000 });
   const manual = page.locator('#preview-manual');
   await manual.getByRole('heading', { name: 'Agent', exact: true }).waitFor();
   await page.getByRole('button', { name: /^Task progress:/ }).click();

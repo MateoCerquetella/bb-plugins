@@ -1,7 +1,7 @@
 import type { BbPluginApi } from '@get-bb/plugin-sdk';
 import { posix, win32 } from 'node:path';
 import { formatWorkItemContext, type WorkItem } from '../contract.js';
-import type { FactoryIdentity, FactoryRecord, FactoryRun, FactoryRunKind } from './contract.js';
+import type { FactoryIdentity, FactoryProjectPolicy, FactoryRecord, FactoryRun, FactoryRunKind } from './contract.js';
 import { approvePlan, assertVersion, factoryKey, newRecord, savePlan, scopeDigest, startRun } from './state.js';
 import type { createFactoryStore } from './store.js';
 import { MAX_REVIEW_REPAIRS, readBuildResult, readReviewResult } from './review.js';
@@ -146,9 +146,15 @@ export function createFactoryService(
   tracker?: {
     getItem: (identity: FactoryIdentity) => WorkItem | null;
     markInProgress: (item: WorkItem) => Promise<FactoryRecord['trackerProgress']>;
+  },
+  queue?: {
+    provider: (projectId: string) => FactoryProjectPolicy['provider'];
+    candidates: (policy: FactoryProjectPolicy) => Promise<WorkItem[]>;
+    liveItem: (identity: FactoryIdentity) => Promise<WorkItem>;
   }
 ) {
   const locks = new Map<string, Promise<unknown>>();
+  const lastScanStarted = new Map<string, number>();
   async function locked<T>(identity: FactoryIdentity, operation: () => Promise<T>): Promise<T> {
     const key = factoryKey(identity);
     const prior = locks.get(key) ?? Promise.resolve();
@@ -296,13 +302,32 @@ export function createFactoryService(
     }
     return persist(record);
   }
-  async function advance(item: WorkItem, record: FactoryRecord, signal?: AbortSignal, restoreArchived = false) {
-    record = await syncProgress(item, record);
+  async function advance(item: WorkItem | null, record: FactoryRecord, signal?: AbortSignal, restoreArchived = false, automaticDispatch = true) {
+    if (item) record = await syncProgress(item, record);
     const run = record.runs.at(-1);
     if (!record.automatic || record.automationError || !run || run.status !== 'finished' ||
       run.error || signal?.aborted || record.runs.some(candidate =>
         ['starting', 'running', 'uncertain'].includes(candidate.status))) return record;
     if (run.kind === 'review' && run.reviewResult?.verdict !== 'blocked') return record;
+    if (record.admission.kind === 'factory') {
+      const policy = store.getProjectPolicy(record.projectId, record.source);
+      if (automaticDispatch && !policy.enabled) return record;
+      try {
+        if (!queue || policy.provider !== record.source || queue.provider(record.projectId) !== record.source) {
+          throw new Error('Project provider changed. Save factory settings before continuing.');
+        }
+        item = await queue.liveItem(record);
+        if (item.bbProjectId !== record.projectId || item.source !== record.source ||
+          item.locator !== record.locator || ['done', 'canceled'].includes(item.stateCategory) ||
+          scopeDigest(item) !== record.scopeDigest) {
+          throw new Error('Issue scope or status changed. Inspect the ticket before continuing.');
+        }
+      } catch (error) {
+        record.automationError = `Automatic work paused: ${message(error)}`;
+        return persist(record);
+      }
+    }
+    if (!item) return record;
     try {
       if (['done', 'canceled'].includes(item.stateCategory)) {
         throw new Error('Issue was closed or canceled. Reopen it before starting more work.');
@@ -320,7 +345,7 @@ export function createFactoryService(
         record = persist(record);
       }
       if (run.kind === 'review') return run.reviewResult?.verdict === 'blocked'
-        ? await repairReview(item, record, restoreArchived) : record;
+        ? await repairReview(item, record, restoreArchived, automaticDispatch) : record;
       if (run.kind === 'build' && run.buildResult?.verdict === 'blocked') {
         if (!run.buildResult.summary.trim()) throw new Error('Build reported no actionable findings. Inspect its result before continuing.');
         const continuations = record.runs.filter(candidate => candidate.kind === 'build' && candidate.continuationOf &&
@@ -329,7 +354,7 @@ export function createFactoryService(
           record.automationError = `Automatic work paused: Build continuation limit reached (${MAX_AUTOMATIC_BUILD_CONTINUATIONS} attempts). Continue manually in the original Build session.`;
           return persist(record);
         }
-        return await resumeBlockedBuild(item, record, restoreArchived);
+        return await resumeBlockedBuild(item, record, restoreArchived, automaticDispatch);
       }
       if (run.kind === 'build' && run.buildResult?.verdict !== 'implemented') {
         record.automationError = run.buildResult?.verdict === 'needs_input'
@@ -339,7 +364,7 @@ export function createFactoryService(
       }
       return await dispatch(item, record, {
         kind: run.kind === 'investigate' ? 'plan' : run.kind === 'build' ? 'review' : 'build',
-        contextThreadId: null, retry: false
+        contextThreadId: null, retry: false, automaticDispatch
       });
     } catch (error) {
       if (signal?.aborted) throw error;
@@ -350,7 +375,7 @@ export function createFactoryService(
       return persist(record);
     }
   }
-  async function repairReview(item: WorkItem, record: FactoryRecord, restoreArchived = false) {
+  async function repairReview(item: WorkItem, record: FactoryRecord, restoreArchived = false, automaticDispatch = false) {
     const review = record.runs.at(-1);
     if (!review || review.kind !== 'review' || review.status !== 'finished' || !review.output.trim()) {
       throw new Error('Finish review and collect its findings before returning to Build.');
@@ -374,10 +399,10 @@ export function createFactoryService(
     }
     record.automatic = true;
     return dispatch(item, record, {
-      kind: 'build', contextThreadId: null, retry: false, repairOf: review.id, restoreArchived
+      kind: 'build', contextThreadId: null, retry: false, repairOf: review.id, restoreArchived, automaticDispatch
     });
   }
-  async function resumeBlockedBuild(item: WorkItem, record: FactoryRecord, restoreArchived = false) {
+  async function resumeBlockedBuild(item: WorkItem, record: FactoryRecord, restoreArchived = false, automaticDispatch = false) {
     const blocked = record.runs.at(-1)!;
     if (['done', 'canceled'].includes(item.stateCategory)) throw new Error('Reopen the issue before starting more work.');
     if (blocked.planDigest !== record.approvedDigest || blocked.scopeDigest !== record.scopeDigest) {
@@ -386,12 +411,13 @@ export function createFactoryService(
     record.automatic = true;
     record.automationError = null;
     return dispatch(item, record, {
-      kind: 'build', contextThreadId: null, retry: false, continuationOf: blocked.id, restoreArchived
+      kind: 'build', contextThreadId: null, retry: false, continuationOf: blocked.id, restoreArchived, automaticDispatch
     });
   }
   async function dispatch(item: WorkItem, record: FactoryRecord, input: {
     kind: FactoryRunKind; contextThreadId: string | null; retry: boolean; repairOf?: string; continuationOf?: string;
     restoreArchived?: boolean;
+    automaticDispatch?: boolean;
   }) {
     const linked = [...record.runs].reverse().filter(run => run.threadId);
     const build = linked.find(run => run.kind === 'build');
@@ -465,6 +491,13 @@ export function createFactoryService(
       if (restored.status !== 'idle') throw new SessionBusyError('Stop or finish the authoring session first.');
     }
     const id = draft.id;
+    if (input.automaticDispatch && record.admission.kind === 'factory') {
+      const policy = store.getProjectPolicy(record.projectId, record.source);
+      if (!policy.enabled) return record;
+      if (!queue || policy.provider !== record.source || queue.provider(record.projectId) !== record.source) {
+        throw new Error('Project provider changed before dispatch.');
+      }
+    }
     record = persist(draftRecord);
     const run = record.runs.find(run => run.id === id)!;
     try {
@@ -518,6 +551,49 @@ export function createFactoryService(
     return syncProgress(item, persist(record));
   }
   return {
+    async scan(projectId?: string): Promise<void> {
+      if (!queue) throw new Error('Factory provider access is unavailable.');
+      for (const policy of store.projectPolicies().filter(candidate =>
+        candidate.enabled && (!projectId || candidate.projectId === projectId))) {
+        const now = Date.now();
+        if (!projectId && now - (lastScanStarted.get(policy.projectId) ?? -Infinity) < 30_000) continue;
+        lastScanStarted.set(policy.projectId, now);
+        try {
+          if (queue.provider(policy.projectId) !== policy.provider) {
+            throw new Error('Project provider changed. Save factory settings before continuing.');
+          }
+          const candidates = await queue.candidates(policy);
+          for (const candidate of candidates.slice(0, 500)) {
+            if (candidate.bbProjectId !== policy.projectId || candidate.source !== policy.provider ||
+              candidate.stateCategory !== 'todo') continue;
+            const identity = { projectId: candidate.bbProjectId, source: candidate.source, locator: candidate.locator };
+            if (store.get(identity)) continue;
+            const item = await queue.liveItem(identity);
+            if (item.bbProjectId !== policy.projectId || item.source !== policy.provider ||
+              item.locator !== candidate.locator || item.stateCategory !== 'todo') continue;
+            const result = await this.admit(item, policy);
+            if ('kind' in result && (result.kind === 'capacity' || result.kind === 'disabled')) break;
+          }
+          store.saveScan({ projectId: policy.projectId, observedAt: new Date().toISOString(),
+            kind: 'success', reason: null, candidates: candidates.length });
+        } catch (error) {
+          store.saveScan({ projectId: policy.projectId, observedAt: new Date().toISOString(),
+            kind: 'blocked', reason: message(error), candidates: 0 });
+        }
+        changed(policy.projectId);
+      }
+    },
+    async admit(item: WorkItem, policy: FactoryProjectPolicy) {
+      return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () => {
+        const result = store.admit({
+          projectId: item.bbProjectId, source: item.source, locator: item.locator,
+          scopeDigest: scopeDigest(item)
+        }, policy);
+        if (result.kind !== 'admitted') return result;
+        const record = result.record;
+        return dispatch(item, record, { kind: 'investigate', contextThreadId: null, retry: false, automaticDispatch: true });
+      });
+    },
     async diff(identity: FactoryIdentity, runId: string, path: string) {
       const run = store.get(identity)?.runs.find(candidate => candidate.id === runId);
       if (!run || !run.changedFiles.includes(path)) throw new Error('File is not part of this run.');
@@ -553,8 +629,12 @@ export function createFactoryService(
       };
     },
     async get(item: WorkItem, signal?: AbortSignal) {
-      return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () =>
-        advance(item, await reconcile(current(item), signal), signal));
+      const identity = { projectId: item.bbProjectId, source: item.source, locator: item.locator };
+      return locked(identity, async () => {
+        const saved = store.get(identity);
+        const record = saved?.admission.kind === 'factory' ? saved : current(item);
+        return advance(item, await reconcile(record, signal), signal);
+      });
     },
     async startTask(item: WorkItem, contextThreadId: string | null) {
       return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () => {
@@ -571,7 +651,7 @@ export function createFactoryService(
           if ((run.kind === 'review' && run.reviewResult?.verdict === 'blocked') || run.repairOf || run.continuationOf) {
             record.automatic = true;
             record.automationError = null;
-            return advance(item, persist(record), undefined, true);
+            return advance(item, persist(record), undefined, true, false);
           }
           return record;
         }
@@ -588,7 +668,7 @@ export function createFactoryService(
         if (run.kind === 'plan' && !run.output.trim()) {
           return dispatch(item, record, { kind: 'plan', contextThreadId, retry: false });
         }
-        return advance(item, record);
+        return advance(item, record, undefined, false, false);
       });
     },
     async retryStatus(item: WorkItem) {
@@ -684,9 +764,30 @@ export function createFactoryService(
       for (const record of store.all()) {
         if (signal.aborted) return;
         await locked(record, async () => {
-          const item = tracker?.getItem(record);
-          if (item) await advance(item, await reconcile(current(item), signal), signal);
-          else await reconcile(store.get(record)!, signal);
+          const item = tracker?.getItem(record) ?? null;
+          const saved = store.get(record)!;
+          let latest = await reconcile(saved.admission.kind === 'manual' && item ? current(item) : saved, signal);
+          if (latest.admission.kind === 'factory' && latest.runs.length === 0 &&
+            !latest.automationError && !signal.aborted) {
+            const policy = store.getProjectPolicy(latest.projectId, latest.source);
+            if (policy.enabled) {
+              try {
+                if (!queue || policy.provider !== latest.source || queue.provider(latest.projectId) !== latest.source) {
+                  throw new Error('Project provider changed. Save factory settings before continuing.');
+                }
+                const live = await queue.liveItem(latest);
+                if (live.bbProjectId !== latest.projectId || live.source !== latest.source ||
+                  live.locator !== latest.locator || live.stateCategory !== 'todo' ||
+                  scopeDigest(live) !== latest.scopeDigest) {
+                  throw new Error('Reserved issue changed before dispatch.');
+                }
+                latest = await dispatch(live, latest, { kind: 'investigate', contextThreadId: null, retry: false, automaticDispatch: true });
+              } catch (error) {
+                latest.automationError = message(error);
+                persist(latest);
+              }
+            }
+          } else await advance(item, latest, signal);
         });
       }
     }

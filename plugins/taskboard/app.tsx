@@ -153,6 +153,7 @@ import {
   writeTaskboardComposerDrag
 } from './composer-handoff.js';
 import { FactoryProgress, FactoryThreadProgress, StartTaskButton } from './factory/app.js';
+import { FactoryProjectSettings } from './factory/project-settings.js';
 import { TaskboardResultDirective } from './factory/result-card.js';
 import { consumeTaskboardOpen, TASKBOARD_OPEN_EVENT } from './factory/navigation.js';
 import './app.css';
@@ -6767,6 +6768,8 @@ function ManageView({
                 return result.settings;
               }}
             />
+            <FactoryProjectSettings key={`factory:${config.projectId}:${config.source}`}
+              projectId={config.projectId} provider={config.source} />
             <FilterPresetsForm
               key={`presets:${boardSettings.projectId}`}
               projectId={boardSettings.projectId}

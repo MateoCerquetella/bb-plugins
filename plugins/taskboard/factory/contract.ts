@@ -1,6 +1,36 @@
 import { z } from 'zod';
 import { empiricalObservationSchema } from '../empirical/contract.js';
 
+export const factoryProjectPolicySchema = z.object({
+  projectId: z.string().startsWith('proj_').max(500),
+  enabled: z.boolean().default(false),
+  provider: z.enum(['github', 'gitlab', 'linear', 'jira', 'gitea']),
+  intake: z.literal('todo').default('todo'),
+  maxConcurrent: z.number().int().min(1).max(20).default(1),
+  updatedAt: z.string()
+}).strict();
+export type FactoryProjectPolicy = z.infer<typeof factoryProjectPolicySchema>;
+export const factoryAdmissionSchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('manual') }).strict(),
+  z.object({ kind: z.literal('factory'), claimedAt: z.string() }).strict()
+]);
+export type FactoryAdmission = z.infer<typeof factoryAdmissionSchema>;
+export const factoryScanObservationSchema = z.object({
+  projectId: z.string().startsWith('proj_').max(500),
+  observedAt: z.string(),
+  kind: z.enum(['success', 'blocked']),
+  reason: z.string().nullable(),
+  candidates: z.number().int().nonnegative()
+}).strict();
+export type FactoryScanObservation = z.infer<typeof factoryScanObservationSchema>;
+export const factoryProjectStatusSchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('disabled'), policy: factoryProjectPolicySchema }).strict(),
+  z.object({ kind: z.literal('running'), policy: factoryProjectPolicySchema, active: z.number().int().nonnegative(), available: z.number().int().nonnegative() }).strict(),
+  z.object({ kind: z.literal('paused'), policy: factoryProjectPolicySchema, active: z.number().int().nonnegative() }).strict(),
+  z.object({ kind: z.literal('blocked'), policy: factoryProjectPolicySchema, reason: z.string(), active: z.number().int().nonnegative() }).strict()
+]);
+export type FactoryProjectStatus = z.infer<typeof factoryProjectStatusSchema>;
+
 export const factoryIdentitySchema = z.object({
   projectId: z.string().startsWith('proj_').max(500),
   source: z.enum(['github', 'gitlab', 'linear', 'jira', 'gitea']),
@@ -68,6 +98,7 @@ export const factoryRecordSchema = factoryIdentitySchema.extend({
   scopeDigest: z.string(),
   plans: z.array(planSchema),
   approvedDigest: z.string().nullable(),
+  admission: factoryAdmissionSchema.default({ kind: 'manual' }),
   // Older dispatched items also adopt the automatic investigate -> plan -> build flow.
   automatic: z.boolean().default(true),
   automationError: z.string().nullable().default(null),
@@ -83,6 +114,18 @@ export const factoryVersionInputSchema = factoryIdentitySchema.extend({
   expectedVersion: z.number().int().nonnegative()
 }).strict();
 export const factoryRpcMethods = {
+  factoryGetProject: {
+    input: z.object({ projectId: z.string().startsWith('proj_') }).strict(),
+    output: z.object({ policy: factoryProjectPolicySchema, status: factoryProjectStatusSchema }).strict()
+  },
+  factorySaveProject: {
+    input: factoryProjectPolicySchema.omit({ updatedAt: true }).strict(),
+    output: z.object({ policy: factoryProjectPolicySchema, status: factoryProjectStatusSchema }).strict()
+  },
+  factoryScanProject: {
+    input: z.object({ projectId: z.string().startsWith('proj_') }).strict(),
+    output: z.object({ status: factoryProjectStatusSchema }).strict()
+  },
   factoryEmpirical: {
     input: factoryIdentitySchema,
     output: empiricalObservationSchema

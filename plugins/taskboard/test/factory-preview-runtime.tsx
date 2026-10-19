@@ -23,9 +23,19 @@ export function useRpc() {
 export function useSettings() {
   return { values: {}, isLoading: false };
 }
+let factoryPolicy = { projectId: 'proj_test', provider: 'github', enabled: false,
+  maxConcurrent: 1, intake: 'todo', updatedAt: new Date().toISOString() };
 const rpc = {
-  async call(method: string, input: { body?: string; digest?: string; kind?: string; path?: string }) {
+  async call(method: string, input: { body?: string; digest?: string; kind?: string; path?: string;
+    enabled?: boolean; maxConcurrent?: number }) {
     const record = window.factoryFixture;
+    if (method === 'factoryGetProject' || method === 'factorySaveProject') {
+      if (method === 'factorySaveProject') factoryPolicy = { ...factoryPolicy,
+        enabled: input.enabled ?? false, maxConcurrent: input.maxConcurrent ?? 1 };
+      return { policy: factoryPolicy, status: factoryPolicy.enabled
+        ? { kind: 'running', policy: factoryPolicy, active: 0, available: factoryPolicy.maxConcurrent }
+        : { kind: 'disabled', policy: factoryPolicy } };
+    }
     if (method === 'getCreateIssueContext') return { context: {
       projectId: 'proj_test', projectName: 'Preview', source: 'linear', available: true,
       message: null, destinationLabel: 'Team', destinations: [{ id: 'TEST', label: 'Test team' }],

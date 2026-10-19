@@ -165,6 +165,32 @@ revision, PR evidence capture, accepted-review and Done gates remain pending.
 Command results are observations, not proof that all required checks passed.
 No factory action merges, deploys or closes a ticket.
 
+### Autonomous intake
+
+Open **Manage → Autonomous factory** to opt a project into automatic intake.
+Taskboard scans the project's configured Linear, Jira, GitHub, GitLab, or
+Gitea provider for `todo` tickets. It claims eligible tickets in the Taskboard
+database before starting the existing investigate, plan, build, and review
+workflow. The setting is disabled by default and the concurrency limit applies
+only to automatically claimed work. Manual **Start task** actions remain
+available.
+
+Pausing automatic intake stops new claims and later automatic stages. It does
+not cancel an active native thread. Provider read failures, provider changes,
+ticket closure, and ticket scope changes block later dispatch and remain
+visible in Manage. Claims prevent duplicates only for Taskboard processes that
+share the same plugin database. The factory does not merge, deploy, close a
+ticket, or accept a passed review for the operator.
+
+The same controls are available from the CLI:
+
+```sh
+bb taskboard factory status --project proj_example --json
+bb taskboard factory enable 2 --project proj_example
+bb taskboard factory scan --project proj_example
+bb taskboard factory pause --project proj_example
+```
+
 Run `npm run check --workspace bb-plugin-taskboard` from the workspace root.
 The opt-in native harness uses isolated storage and does not install a plugin
 or contact a tracker:

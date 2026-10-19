@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { FactoryProgress, FactoryThreadProgress } from '../factory/app.js';
+import { FactoryProjectSettings } from '../factory/project-settings.js';
 import { TooltipProvider } from '../components/ui/tooltip.js';
 import { TaskboardResultDirective } from '../factory/result-card.js';
 // The browser build exports these local components through its onLoad hook.
@@ -32,6 +33,9 @@ function Preview() {
     <CreateIssueDialog mode="direct" projectId="proj_test" open={creating} onOpenChange={setCreating} />
   </TooltipProvider>;
   return <TooltipProvider><div className="tb-linear">
+    <div id="preview-factory-settings" style={{ padding: 20 }}>
+      <FactoryProjectSettings projectId="proj_test" provider="github" />
+    </div>
     <div id="preview-result" style={{ padding: 20 }}>
       <TaskboardResultDirective attributes={{ kind: 'review', verdict: 'blocked' }}
         source={'::taskboard-result{kind="review" verdict="blocked"}'}

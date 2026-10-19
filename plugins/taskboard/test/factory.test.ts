@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
-import { existsSync } from 'node:fs';
+import { existsSync, mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { registerHooks } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
@@ -56,9 +58,122 @@ const item: WorkItem = {
   status: 'Open', stateCategory: 'todo', priority: null, assignee: null,
   project: null, labels: [], updatedAt: new Date().toISOString()
 };
-function fixture() {
+test('factory policy defaults disabled and durable admission is idempotent and capacity bounded', () => {
+  const store = createFactoryStore(new Database(':memory:'));
+  const initial = store.getProjectPolicy(item.bbProjectId, item.source);
+  assert.equal(initial.enabled, false);
+  const policy = store.saveProjectPolicy({ ...initial, enabled: true, maxConcurrent: 1 });
+  const first = store.admit({
+    projectId: item.bbProjectId, source: item.source, locator: item.locator,
+    scopeDigest: 'scope-a'
+  }, policy);
+  assert.equal(first.kind, 'admitted');
+  assert.equal(first.kind === 'admitted' && first.record.admission.kind, 'factory');
+  const duplicate = store.admit({
+    projectId: item.bbProjectId, source: item.source, locator: item.locator,
+    scopeDigest: 'scope-a'
+  }, policy);
+  assert.equal(duplicate.kind, 'existing');
+  const capacity = store.admit({
+    projectId: item.bbProjectId, source: item.source, locator: 'second',
+    scopeDigest: 'scope-b'
+  }, policy);
+  assert.equal(capacity.kind, 'capacity');
+  assert.deepEqual(store.projectStatus(item.bbProjectId, item.source), {
+    kind: 'paused', policy, active: 1
+  });
+});
+test('two database connections preserve claims, capacity, and policy after reopen', () => {
+  const root = mkdtempSync(join(tmpdir(), 'taskboard-admission-'));
+  const path = join(root, 'factory.sqlite');
+  const a = new Database(path);
+  const b = new Database(path);
+  try {
+    const first = createFactoryStore(a);
+    const second = createFactoryStore(b);
+    const policy = first.saveProjectPolicy({
+      ...first.getProjectPolicy(item.bbProjectId, item.source), enabled: true
+    });
+    const identity = { projectId: item.bbProjectId, source: item.source, locator: item.locator, scopeDigest: 'scope' };
+    assert.equal(first.admit(identity, policy).kind, 'admitted');
+    assert.equal(second.admit(identity, policy).kind, 'existing');
+    assert.equal(second.admit({ ...identity, locator: 'another' }, policy).kind, 'capacity');
+    a.close();
+    b.close();
+    const reopened = new Database(path);
+    try {
+      const store = createFactoryStore(reopened);
+      assert.equal(store.getProjectPolicy(item.bbProjectId, item.source).enabled, true);
+      assert.equal(store.admit(identity, policy).kind, 'existing');
+      assert.equal(store.all().length, 1);
+    } finally { reopened.close(); }
+  } finally {
+    if (a.open) a.close();
+    if (b.open) b.close();
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('automatic scans revalidate tickets, suppress duplicate ticks, and stop stages when paused', async () => {
+  let live = { ...item };
+  const f = fixture({
+    provider: () => item.source,
+    candidates: async () => [item],
+    liveItem: async () => live
+  });
+  const policy = f.store.saveProjectPolicy({
+    ...f.store.getProjectPolicy(item.bbProjectId, item.source), enabled: true
+  });
+  live = { ...item, stateCategory: 'done' };
+  await f.service.scan();
+  assert.equal(f.spawns(), 0);
+  live = { ...item };
+  await Promise.all([f.service.scan(item.bbProjectId), f.service.scan(item.bbProjectId)]);
+  assert.equal(f.spawns(), 1);
+  assert.equal(f.store.all()[0]?.admission.kind, 'factory');
+  f.complete();
+  f.store.saveProjectPolicy({ ...policy, enabled: false });
+  await f.service.poll(new AbortController().signal);
+  assert.equal(f.spawns(), 1);
+  assert.equal(f.store.all()[0]?.runs[0]?.status, 'finished');
+});
+
+test('automatic scans retain uncertain dispatch without spawning again', async () => {
+  const f = fixture({
+    provider: () => item.source, candidates: async () => [item], liveItem: async () => item
+  });
+  f.store.saveProjectPolicy({ ...f.store.getProjectPolicy(item.bbProjectId, item.source), enabled: true });
+  f.fail();
+  await f.service.scan();
+  await f.service.scan();
+  await f.service.recover();
+  await f.service.poll(new AbortController().signal);
+  assert.equal(f.spawns(), 1);
+  assert.equal(f.store.all()[0]?.runs[0]?.status, 'uncertain');
+});
+
+test('factory admission fails closed for stale, disabled, and wrong-provider policy', () => {
+  const store = createFactoryStore(new Database(':memory:'));
+  const disabled = store.getProjectPolicy(item.bbProjectId, item.source);
+  assert.equal(store.admit({
+    projectId: item.bbProjectId, source: item.source, locator: item.locator,
+    scopeDigest: 'scope'
+  }, disabled).kind, 'disabled');
+  const enabled = store.saveProjectPolicy({ ...disabled, enabled: true });
+  store.saveProjectPolicy({ ...enabled, enabled: false });
+  assert.equal(store.admit({
+    projectId: item.bbProjectId, source: item.source, locator: item.locator,
+    scopeDigest: 'scope'
+  }, enabled).kind, 'disabled');
+  assert.equal(store.admit({
+    projectId: item.bbProjectId, source: 'linear', locator: item.locator,
+    scopeDigest: 'scope'
+  }, enabled).kind, 'disabled');
+});
+function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
   const db = new Database(':memory:');
   const store = createFactoryStore(db);
+  let cachedItem: WorkItem | null = item;
   let spawns = 0;
   let sends = 0;
   let progressWrites = 0;
@@ -70,6 +185,7 @@ function fixture() {
   const deleted = new Set<string>();
   let unarchives = 0;
   let onUnarchive = () => {};
+  let onExecutionOptions = () => {};
   let environmentStatus = 'ready';
   let failEnvironmentGet = false;
   let buildEnvironment = 'env_test';
@@ -116,7 +232,10 @@ function fixture() {
         archived.delete(threadId);
         return { ok: true };
       },
-      defaultExecutionOptions: async () => ({ model: 'test', permissionMode: 'accept-edits', reasoningLevel: 'medium', serviceTier: 'default' }),
+      defaultExecutionOptions: async () => {
+        onExecutionOptions();
+        return { model: 'test', permissionMode: 'accept-edits', reasoningLevel: 'medium', serviceTier: 'default' };
+      },
       send: async (input: typeof sent[number]) => {
         sends++; sent.push(input); currentThreadId = input.threadId;
         if (failSend) throw new Error('Send response lost');
@@ -141,17 +260,19 @@ function fixture() {
     } }
   } as unknown as Parameters<typeof createFactoryService>[0];
   const service = createFactoryService(sdk, store, () => {}, {
-    getItem: () => item,
+    getItem: () => cachedItem,
     async markInProgress() {
       progressWrites++;
       if (failProgress) throw new Error('Provider permission denied');
       return { status: 'synced', message: null };
     }
-  });
+  }, queue);
   return {
     db, store, service, events, spawns: () => spawns, spawnInput: () => spawnInput,
+    cachedItem: (value: WorkItem | null) => { cachedItem = value; },
     archived, deleted, unarchives: () => unarchives,
     onUnarchive: (callback: () => void) => { onUnarchive = callback; },
+    onExecutionOptions: (callback: () => void) => { onExecutionOptions = callback; },
     environmentStatus: (value: string) => { environmentStatus = value; },
     failEnvironmentGet: (value = true) => { failEnvironmentGet = value; },
     buildEnvironment: (value: string) => { buildEnvironment = value; },
@@ -175,6 +296,246 @@ function fixture() {
     rejectWorktree: () => { rejectWorktree = true; }
   };
 }
+
+test('background intake is throttled while explicit scans and native observations remain immediate', async t => {
+  t.mock.timers.enable({ apis: ['Date'], now: 1_800_000_000_000 });
+  let scans = 0;
+  const f = fixture({
+    provider: () => item.source,
+    candidates: async () => { scans++; return [item]; },
+    liveItem: async () => item
+  });
+  try {
+    f.store.saveProjectPolicy({ ...f.store.getProjectPolicy(item.bbProjectId, item.source), enabled: true });
+    await f.service.scan();
+    assert.equal(f.store.all()[0].runs[0].status, 'running');
+    f.complete('Investigation findings');
+    t.mock.timers.tick(2500);
+    await f.service.scan();
+    await f.service.poll(new AbortController().signal);
+    assert.equal(scans, 1);
+    assert.equal(f.store.all()[0].runs.at(-1)?.kind, 'plan');
+    await f.service.scan(item.bbProjectId);
+    assert.equal(scans, 2);
+    t.mock.timers.tick(29_999);
+    await f.service.scan();
+    assert.equal(scans, 2);
+    t.mock.timers.tick(1);
+    await f.service.scan();
+    assert.equal(scans, 3);
+    assert.equal(f.store.getScan(item.bbProjectId)?.kind, 'success');
+  } finally { f.db.close(); }
+});
+
+test('running and accepted-review observations do not re-read the provider or mutate scope from cache', async () => {
+  let reads = 0;
+  const f = fixture({
+    provider: () => item.source, candidates: async () => [item],
+    liveItem: async () => { reads++; return item; }
+  });
+  try {
+    f.store.saveProjectPolicy({ ...f.store.getProjectPolicy(item.bbProjectId, item.source), enabled: true });
+    await f.service.scan();
+    const admitted = f.store.all()[0];
+    const observed = await f.service.get({ ...item, description: 'Outdated cached scope' });
+    f.cachedItem(null);
+    await f.service.poll(new AbortController().signal);
+    assert.equal(observed.scopeDigest, admitted.scopeDigest);
+    assert.equal(observed.automatic, true);
+    assert.equal(observed.automationError, null);
+    assert.equal(reads, 1);
+    const record = f.store.all()[0];
+    Object.assign(record.runs[0], {
+      kind: 'review', status: 'finished',
+      output: '::taskboard-result{kind="review" verdict="passed"}\nVerified revision abc123',
+      reviewResult: { verdict: 'passed', findings: 'Verified revision abc123' }
+    });
+    f.store.save(record);
+    await f.service.get(item);
+    await f.service.poll(new AbortController().signal);
+    assert.equal(reads, 1);
+    assert.equal(f.store.all()[0].runs.at(-1)?.reviewResult?.verdict, 'passed');
+  } finally { f.db.close(); }
+});
+
+test('factory polling revalidates uncached reservations and completed stages against the live provider', async () => {
+  for (const stage of ['reserved', 'completed'] as const) {
+    for (const outcome of ['open', 'closed', 'missing'] as const) {
+      let live: WorkItem | null = item;
+      const f = fixture({
+        provider: () => item.source, candidates: async () => [item],
+        liveItem: async () => {
+          if (!live) throw new Error('Issue not found');
+          return live;
+        }
+      });
+      try {
+        const policy = f.store.saveProjectPolicy({
+          ...f.store.getProjectPolicy(item.bbProjectId, item.source), enabled: true
+        });
+        if (stage === 'reserved') f.store.admit(newRecord(item), policy);
+        else {
+          await f.service.scan();
+          f.complete('Investigation findings');
+        }
+        f.cachedItem(null);
+        if (outcome === 'closed') live = { ...item, stateCategory: 'done' };
+        if (outcome === 'missing') live = null;
+        await f.service.poll(new AbortController().signal);
+        const record = f.store.all()[0];
+        if (outcome === 'open') {
+          assert.equal(record.runs.at(-1)?.kind, stage === 'reserved' ? 'investigate' : 'plan');
+          assert.equal(record.runs.at(-1)?.status, 'running');
+          assert.equal(record.automationError, null);
+        } else {
+          assert.equal(record.runs.length, stage === 'reserved' ? 0 : 1);
+          if (stage === 'completed') assert.equal(record.runs[0].status, 'finished');
+          assert.match(record.automationError ?? '', outcome === 'missing' ? /Issue not found/ : /changed/);
+          assert.equal(f.spawns(), stage === 'reserved' ? 0 : 1);
+        }
+      } finally { f.db.close(); }
+    }
+  }
+});
+
+test('uncached manual records still observe completion without advancing', async () => {
+  const f = fixture();
+  try {
+    await f.service.startTask(item, null);
+    f.cachedItem(null);
+    f.complete('Investigation findings');
+    await f.service.poll(new AbortController().signal);
+    const record = f.store.all()[0];
+    assert.equal(record.admission.kind, 'manual');
+    assert.equal(record.runs.length, 1);
+    assert.equal(record.runs[0].status, 'finished');
+    assert.equal(record.automationError, null);
+    assert.equal(f.spawns(), 1);
+  } finally { f.db.close(); }
+});
+
+test('factory stage advancement blocks live closure, scope drift, identity drift, and provider failures', async () => {
+  for (const change of ['closed', 'scope', 'identity', 'unavailable'] as const) {
+    let live: WorkItem = item;
+    let unavailable = false;
+    const f = fixture({
+      provider: () => item.source, candidates: async () => [item],
+      liveItem: async () => {
+        if (unavailable) throw new Error('Provider unavailable');
+        return live;
+      }
+    });
+    try {
+      f.store.saveProjectPolicy({ ...f.store.getProjectPolicy(item.bbProjectId, item.source), enabled: true });
+      await f.service.scan();
+      const originalScope = f.store.all()[0].scopeDigest;
+      if (change === 'closed') live = { ...item, stateCategory: 'done' };
+      if (change === 'scope') live = { ...item, description: 'Changed live scope' };
+      if (change === 'identity') live = { ...item, locator: 'another-ticket' };
+      if (change === 'unavailable') unavailable = true;
+      f.complete('Investigation findings');
+      const record = await f.service.get(item);
+      assert.equal(record.runs.at(-1)?.kind, 'investigate');
+      assert.equal(record.runs.at(-1)?.status, 'finished');
+      assert.equal(record.scopeDigest, originalScope);
+      assert.match(record.automationError ?? '', /Automatic work paused:/);
+      assert.equal(f.spawns(), 1);
+    } finally { f.db.close(); }
+  }
+});
+
+test('one unavailable provider does not stop another project scan or native completion observation', async () => {
+  const f = fixture({
+    provider: () => item.source,
+    candidates: async policy => {
+      if (policy.projectId === 'proj_aaa_unavailable') throw new Error('Provider unavailable');
+      return [item];
+    },
+    liveItem: async () => item
+  });
+  try {
+    for (const projectId of ['proj_aaa_unavailable', item.bbProjectId]) {
+      f.store.saveProjectPolicy({ ...f.store.getProjectPolicy(projectId, item.source), enabled: true });
+    }
+    await f.service.scan();
+    assert.equal(f.store.getScan('proj_aaa_unavailable')?.kind, 'blocked');
+    assert.equal(f.store.getScan(item.bbProjectId)?.kind, 'success');
+    assert.equal(f.store.all()[0].runs[0].status, 'running');
+    f.complete('Investigation findings');
+    await f.service.poll(new AbortController().signal);
+    assert.equal(f.store.all()[0].runs.at(-1)?.kind, 'plan');
+  } finally { f.db.close(); }
+});
+
+test('reserved-claim recovery validates all identity fields before dispatch', async () => {
+  for (const live of [
+    { ...item, bbProjectId: 'proj_other' },
+    { ...item, source: 'linear' as const },
+    { ...item, locator: 'another-ticket' }
+  ]) {
+    const f = fixture({
+      provider: () => item.source, candidates: async () => [], liveItem: async () => live
+    });
+    try {
+      const policy = f.store.saveProjectPolicy({
+        ...f.store.getProjectPolicy(item.bbProjectId, item.source), enabled: true
+      });
+      const record = newRecord(item);
+      f.store.admit({ ...record }, policy);
+      await f.service.poll(new AbortController().signal);
+      assert.equal(f.spawns(), 0);
+      assert.equal(f.store.all()[0].runs.length, 0);
+      assert.equal(f.store.all()[0].automationError, 'Reserved issue changed before dispatch.');
+    } finally { f.db.close(); }
+  }
+});
+
+test('automatic repairs honor a pause during preflight while explicit continuations still run', async () => {
+  for (const kind of ['review', 'build'] as const) {
+    const f = fixture({
+      provider: () => item.source, candidates: async () => [], liveItem: async () => item
+    });
+    try {
+      const policy = f.store.saveProjectPolicy({
+        ...f.store.getProjectPolicy(item.bbProjectId, item.source), enabled: true
+      });
+      const record = newRecord(item);
+      savePlan(record, 'Implement current scope and run the relevant checks');
+      approvePlan(record, record.plans[0].digest);
+      record.automatic = true;
+      record.trackerProgress = { status: 'synced', message: null };
+      const build = startRun(record, 'build', false);
+      Object.assign(build, {
+        status: 'finished', threadId: 'thr_native', environmentId: 'env_test',
+        output: '::taskboard-result{kind="build" verdict="implemented" revision="abc123"}\nImplemented.',
+        buildResult: { verdict: 'implemented', summary: 'Implemented.', revision: 'abc123' }
+      });
+      if (kind === 'review') {
+        const review = startRun(record, 'review', false);
+        Object.assign(review, {
+          status: 'finished', threadId: 'thr_review_seed', environmentId: 'env_test',
+          output: '::taskboard-result{kind="review" verdict="blocked"}\nFix the review finding.',
+          reviewResult: { verdict: 'blocked', findings: 'Fix the review finding.' }
+        });
+      }
+      record.admission = { kind: 'factory', claimedAt: new Date().toISOString() };
+      if (kind === 'build') {
+        record.runs[0].output = '::taskboard-result{kind="build" verdict="blocked"}\nFinish verification.';
+        record.runs[0].buildResult = readBuildResult(record.runs[0].output);
+      }
+      f.store.save(record);
+      f.onExecutionOptions(() => { f.store.saveProjectPolicy({ ...policy, enabled: false }); });
+      const paused = await f.service.get(item);
+      assert.equal(paused.runs.length, record.runs.length);
+      assert.equal(paused.runs.at(-1)?.status, 'finished');
+      assert.equal(f.sends(), 0);
+      const resumed = await f.service.startTask(item, null);
+      assert.equal(resumed.runs.length, record.runs.length + 1);
+      assert.equal(resumed.runs.at(-1)?.status, 'running');
+      assert.equal(f.sends(), 1);
+    } finally { f.db.close(); }
+  }
+});
 test('diff resolves only a recorded path in the linked project workspace', async () => {
   const f = fixture();
   const record = newRecord(item);

@@ -16,6 +16,7 @@ export function newRecord(item: WorkItem): FactoryRecord {
     schemaVersion: 1, projectId: item.bbProjectId, source: item.source,
     locator: item.locator, version: 0, stage: 'Intake',
     scopeDigest: scopeDigest(item), plans: [], approvedDigest: null, runs: [],
+    admission: { kind: 'manual' },
     automatic: false, automationError: null,
     trackerProgress: { status: 'pending', message: null },
     updatedAt: new Date().toISOString()

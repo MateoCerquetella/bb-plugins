@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "taskboard-autonomous-factory"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:3b1f1bda9a9699c5aed42506511efb1ee8f26c95c985cda5ebaed43154a5b479"
+}
