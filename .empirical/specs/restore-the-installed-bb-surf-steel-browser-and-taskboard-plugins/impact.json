@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "plugin-git-distribution",
+    "taskboard-native-github"
+  ],
+  "surfaces": [
+    "taskboard-provider",
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:16316443c38b4fc12ca902984735f39fac24ed24908c8eede0deaf17d35ceaa5"
+}

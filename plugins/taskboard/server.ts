@@ -53,9 +53,7 @@ import {
 } from './credentials.js';
 import {
   createGithubAdapter,
-  githubReposForProject,
-  githubStatusOutputSchema,
-  loadGithubStatus
+  discoverGithubRepositories
 } from './sources/github.js';
 import {
   createGitlabAdapter,
@@ -450,27 +448,6 @@ function refreshedItemCount(
     .reduce((total, entry) => total + entry.itemCount, 0);
 }
 
-function parseGithubRepoFromRemote(
-  value: string | null | undefined
-): string | null {
-  if (!value) return null;
-  const trimmed = value.trim();
-  if (!trimmed) return null;
-  const sshMatch =
-    /^git@github\.com:(?<repo>[^/\s]+\/[^/\s]+?)(?:\.git)?$/iu.exec(trimmed);
-  if (sshMatch?.groups?.repo) return sshMatch.groups.repo;
-  try {
-    const url = new URL(trimmed);
-    if (url.hostname !== 'github.com') return null;
-    const path = url.pathname
-      .replace(/^\/+|\/+$/gu, '')
-      .replace(/\.git$/iu, '');
-    return /^[^/\s]+\/[^/\s]+$/u.test(path) ? path : null;
-  } catch {
-    return null;
-  }
-}
-
 export default async function plugin(bb: BbPluginApi) {
   bb.settings.define({
     showThreadHeaderProgress: {
@@ -764,19 +741,15 @@ export default async function plugin(bb: BbPluginApi) {
     });
   }
 
-  async function fallbackGithubRepos(projectId: string): Promise<string[]> {
-    const project = (await liveProjects()).find(
-      entry => entry.id === projectId
-    );
-    const repo = parseGithubRepoFromRemote(
-      typeof project === 'object' &&
-        project !== null &&
-        'gitRemoteUrl' in project &&
-        typeof project.gitRemoteUrl === 'string'
-        ? project.gitRemoteUrl
-        : null
-    );
-    return repo ? [repo] : [];
+  async function githubReposForProject(projectId: string): Promise<string[]> {
+    const [project, system] = await Promise.all([
+      bb.sdk.projects.get({ projectId }),
+      bb.sdk.system.config()
+    ]);
+    return discoverGithubRepositories({
+      project,
+      primaryHostId: system.primaryHostId
+    });
   }
 
   function projectConfig(
@@ -944,15 +917,7 @@ export default async function plugin(bb: BbPluginApi) {
         // network probe runs in the background and refreshes the view via
         // realtime when it settles.
         glabGlabOkHeuristic(config),
-        bb.sdk.plugins
-          .callRpc({
-            pluginId: 'github',
-            method: 'status',
-            input: null,
-            outputSchema: githubStatusOutputSchema
-          })
-          .then(status => githubReposForProject(status, config.projectId))
-          .catch(() => fallbackGithubRepos(config.projectId))
+        githubReposForProject(config.projectId).catch(() => [])
       ]);
     return {
       ...config,
@@ -1028,24 +993,9 @@ export default async function plugin(bb: BbPluginApi) {
           : config.source === 'gitlab'
             ? 'GitLab project'
             : 'Project key';
-    let githubMessage: string | null = null;
-    let githubRepos = config.githubRepos;
-    if (config.source === 'github') {
-      try {
-        const status = await loadGithubStatus(bb);
-        githubRepos = githubReposForProject(status, projectId);
-        if (!status.ghOk) {
-          githubMessage = status.ghError ?? 'GitHub is not authenticated.';
-        }
-      } catch {
-        githubRepos = [];
-        githubMessage =
-          'Install and enable BB’s official GitHub plugin before creating GitHub issues.';
-      }
-    }
     const destinationIds =
       config.source === 'github'
-        ? githubRepos
+        ? config.githubRepos
         : config.source === 'gitea'
           ? config.giteaProjectRef ? [config.giteaProjectRef] : []
         : config.source === 'linear'
@@ -1068,9 +1018,9 @@ export default async function plugin(bb: BbPluginApi) {
           : config.source === 'gitlab' && destinations.length === 0
             ? 'Choose a GitLab project (host/path) for this BB project in Manage.'
             : null;
-    const configurationMessage =
-      githubMessage ??
-      (adapter.configured() ? null : adapter.configurationMessage());
+    const configurationMessage = adapter.configured()
+      ? null
+      : adapter.configurationMessage();
 
     return {
       projectId,
@@ -1148,6 +1098,10 @@ export default async function plugin(bb: BbPluginApi) {
         config.source === 'linear' || config.source === 'jira'
           ? await credentials.read(projectId, config.source)
           : undefined;
+      const githubRepos =
+        config.source === 'github'
+          ? await githubReposForProject(projectId)
+          : [];
       const after = revisionSnapshot(projectId);
       if (!SOURCES.every(source => before[source] === after[source])) continue;
       const adapter =
@@ -1170,7 +1124,10 @@ export default async function plugin(bb: BbPluginApi) {
               ? createGitlabAdapter(bb, true, projectId, config.gitlabProjectRef)
               : config.source === 'gitea'
                 ? createGiteaAdapter({ enabled: true, login: config.giteaLogin, projectRef: config.giteaProjectRef })
-                : createGithubAdapter(bb, true, projectId);
+                : createGithubAdapter({
+                    enabled: true,
+                    repositories: githubRepos
+                  });
       return new Map([[config.source, adapter]]);
     }
   }
