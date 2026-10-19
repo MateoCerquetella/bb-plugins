@@ -37,8 +37,8 @@ export function selectProjectPage(context: BrowserContext, tab?: number): Page {
   const page = tab === undefined ? pages.at(-1) : pages[tab];
   if (!page) throw new Error(
     pages.length
-      ? `Tab ${tab} is unavailable. Use \`bb steel-browser tabs\` to list open tabs.`
-      : "No active project browser page. Navigate with `bb steel-browser run <url>` first.",
+      ? `Tab ${tab} is unavailable. Use \`bb surf tabs\` to list open tabs.`
+      : "No active project browser page. Navigate with `bb surf run <url>` first.",
   );
   return page;
 }
@@ -50,7 +50,7 @@ export function parseBrowserAction(
   let tab: number | undefined;
   if (args.length >= 2 && args.at(-2) === "--tab") {
     const value = args.at(-1)!;
-    if (!/^(0|[1-9]\d{0,3})$/.test(value)) throw new Error("Invalid tab index. Use `bb steel-browser tabs`.");
+    if (!/^(0|[1-9]\d{0,3})$/.test(value)) throw new Error("Invalid tab index. Use `bb surf tabs`.");
     tab = Number(value);
     args = args.slice(0, -2);
   }

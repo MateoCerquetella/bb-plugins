@@ -5,6 +5,7 @@ import { test } from "node:test";
 test("declares an independent BB app, server, CLI skill, and pinned SDK", async () => {
   const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
   assert.equal(packageJson.name, "bb-plugin-steel-browser");
+  assert.equal(packageJson.bb.name, "BB Surf");
   assert.equal(packageJson.bb.server, "./server.ts");
   assert.equal(packageJson.bb.app, "./app.tsx");
   assert.deepEqual(packageJson.bb.skills, ["./skills/steel-browser"]);
@@ -16,7 +17,9 @@ test("declares an independent BB app, server, CLI skill, and pinned SDK", async 
 test("contributes Steel discovery instructions to new agent sessions", async () => {
   const server = await readFile(new URL("../server.ts", import.meta.url), "utf8");
   assert.match(server, /bb\.agents\.contributeInstructions/u);
-  assert.match(server, /first run `bb steel-browser project`/u);
+  assert.match(server, /first run `bb surf project`/u);
+  assert.match(server, /name: "surf"/u);
+  assert.doesNotMatch(server, /name: "steel-browser"/u);
   assert.match(server, /Never claim Steel is unavailable/u);
   assert.match(server, /emit ::steel-browser\{\}/u);
   assert.match(server,
@@ -55,5 +58,5 @@ test("ships the required operational and responsive UI states", async () => {
   assert.match(skill, /current thread is the only browser surface/u);
   assert.match(skill,
     /whenever you ask the\s+user to enter credentials, sign in, complete MFA, approve consent, or perform\s+another manual browser action,[\s\S]+line in that same assistant message:[\s\S]+::steel-browser\{\}[\s\S]+Never tell the user to use an embedded browser "above" unless this response\s+contains the directive\. Repeat the directive for later sign-in, MFA, consent,\s+or manual-action handoffs; an earlier viewer message is not sufficient\./u);
-  assert.match(skill, /bb steel-browser release/u);
+  assert.match(skill, /bb surf release/u);
 });
