@@ -1,5 +1,4 @@
 import { execFile } from 'node:child_process';
-import type { BbPluginApi } from '@get-bb/plugin-sdk';
 import { z } from 'zod';
 import { CREATE_OUTCOME_UNCERTAIN_MARKER } from '../contract.js';
 import type {
@@ -10,65 +9,47 @@ import type {
 } from './types.js';
 import { withoutComments } from './types.js';
 
-const githubItemSchema = z
+const GITHUB_HOST = 'github.com';
+const GITHUB_TIMEOUT_MS = 30_000;
+
+const githubRepositorySchema = z
+  .string()
+  .regex(
+    /^(?!\.{1,2}(?:\/|$))[A-Za-z0-9_.-]+\/(?!\.{1,2}$)[A-Za-z0-9_.-]+$/u,
+    'GitHub repository must be owner/repo'
+  );
+
+const githubIssueSchema = z
   .object({
-    repo: z.string(),
     number: z.number().int().positive(),
-    kind: z.enum(['issue', 'pr']),
     title: z.string(),
-    state: z.string(),
-    author: z.string(),
-    labels: z.array(z.string()),
-    assignees: z.array(z.string()),
-    url: z.string(),
-    body: z.string(),
-    updatedAt: z.string()
-  })
-  .strict();
-
-const listOutputSchema = z
-  .object({ items: z.array(githubItemSchema) })
-  .strict();
-
-const detailOutputSchema = z
-  .object({
-    issue: githubItemSchema
-      .omit({ kind: true })
-      .extend({
-        comments: z.array(
-          z
-            .object({
-              author: z.string(),
-              body: z.string(),
-              createdAt: z.string()
-            })
-            .strict()
-        )
-      })
-      .strict()
-  })
-  .strict();
-
-export const githubStatusOutputSchema = z
-  .object({
-    ghOk: z.boolean(),
-    ghError: z.string().nullable(),
-    repos: z.array(
-      z.object({ repo: z.string(), projectId: z.string().nullable() }).strict()
+    state: z.enum(['open', 'closed']),
+    user: z.object({ login: z.string() }).passthrough(),
+    labels: z.array(
+      z.union([
+        z.string(),
+        z.object({ name: z.string().nullable() }).passthrough()
+      ])
     ),
-    lastSyncedAt: z.string().nullable()
+    assignees: z.array(
+      z.object({ login: z.string() }).passthrough()
+    ),
+    html_url: z.string().url(),
+    body: z.string().nullable(),
+    updated_at: z.string(),
+    pull_request: z.unknown().optional()
   })
-  .strict();
+  .passthrough();
 
-const refreshOutputSchema = z
+const githubIssueListSchema = z.array(githubIssueSchema);
+const githubCommentSchema = z
   .object({
-    repos: z.number().int().nonnegative(),
-    items: z.number().int().nonnegative()
+    user: z.object({ login: z.string() }).passthrough(),
+    body: z.string().nullable(),
+    created_at: z.string()
   })
-  .strict();
-
-const okOutputSchema = z.object({ ok: z.literal(true) }).strict();
-
+  .passthrough();
+const paginatedGithubCommentsSchema = z.array(z.array(githubCommentSchema));
 const githubAssigneeSchema = z
   .object({ login: z.string().min(1) })
   .passthrough();
@@ -89,47 +70,47 @@ const githubMilestoneSchema = z
 const paginatedGithubMilestonesSchema = z.array(
   z.array(githubMilestoneSchema)
 );
-const createdGithubIssueSchema = z
-  .object({
-    number: z.number().int().positive(),
-    html_url: z.string().min(1),
-    assignees: z
-      .array(z.object({ login: z.string().min(1) }).passthrough()),
-    labels: z
-      .array(
-        z.union([
-          z.string(),
-          z.object({ name: z.string().min(1) }).passthrough()
-        ])
-      )
-      .default([]),
-    milestone: z
-      .object({ number: z.number().int().positive() })
-      .passthrough()
-      .nullable()
-      .default(null)
-  })
-  .passthrough();
+const createdGithubIssueSchema = githubIssueSchema.extend({
+  milestone: z
+    .object({ number: z.number().int().positive() })
+    .passthrough()
+    .nullable()
+    .default(null)
+});
 
-interface ActiveGithubRefresh {
-  mutationRevision: number;
-  promise: Promise<void>;
+export type GithubCliRunner = (
+  args: string[],
+  timeoutMs?: number
+) => Promise<string>;
+
+export type GitRunner = (
+  cwd: string,
+  args: string[],
+  timeoutMs?: number
+) => Promise<string>;
+
+export interface GithubProject {
+  gitRemoteUrl: string | null;
+  sources: readonly {
+    type: 'local_path';
+    hostId: string;
+    path: string;
+  }[];
 }
 
-const githubMutationRevisions = new WeakMap<BbPluginApi, number>();
-const activeRefreshes = new WeakMap<BbPluginApi, ActiveGithubRefresh>();
 let resolvedGhPath: string | null = null;
 
 function runFile(
   file: string,
   args: string[],
-  timeoutMs = 20_000
+  timeoutMs = 20_000,
+  env = process.env
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     execFile(
       file,
       args,
-      { timeout: timeoutMs, maxBuffer: 16 * 1024 * 1024 },
+      { env, timeout: timeoutMs, maxBuffer: 16 * 1024 * 1024 },
       (error, stdout, stderr) => {
         if (error) {
           reject(new Error(stderr.trim() || error.message));
@@ -156,11 +137,101 @@ async function resolveGhPath(): Promise<string> {
       // Try the next common GitHub CLI location.
     }
   }
-  throw new Error('GitHub CLI is not available');
+  throw new Error(
+    'GitHub CLI is not available. Install gh and run "gh auth login --hostname github.com".'
+  );
 }
 
 async function runGh(args: string[], timeoutMs?: number): Promise<string> {
-  return runFile(await resolveGhPath(), args, timeoutMs);
+  return runFile(await resolveGhPath(), args, timeoutMs, {
+    ...process.env,
+    GH_HOST: GITHUB_HOST
+  });
+}
+
+const runGit: GitRunner = (cwd, args, timeoutMs) =>
+  runFile('git', ['-C', cwd, ...args], timeoutMs);
+
+export function parseGithubRepoFromRemote(
+  value: string | null | undefined
+): string | null {
+  if (!value) return null;
+  const trimmed = value.trim();
+  const ssh =
+    /^git@github\.com:(?<repo>[^/\s]+\/[^/\s]+?)(?:\.git)?$/iu.exec(trimmed);
+  if (ssh?.groups?.repo) {
+    const parsed = githubRepositorySchema.safeParse(ssh.groups.repo);
+    return parsed.success ? parsed.data : null;
+  }
+  try {
+    const url = new URL(trimmed);
+    if (url.hostname.toLowerCase() !== GITHUB_HOST) return null;
+    const path = url.pathname
+      .replace(/^\/+|\/+$/gu, '')
+      .replace(/\.git$/iu, '');
+    const parsed = githubRepositorySchema.safeParse(path);
+    return parsed.success ? parsed.data : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function discoverGithubRepositories(options: {
+  project: GithubProject;
+  primaryHostId: string | null;
+  runGit?: GitRunner;
+}): Promise<string[]> {
+  const sources = options.primaryHostId
+    ? options.project.sources.filter(
+        source => source.hostId === options.primaryHostId
+      )
+    : [];
+  const runner = options.runGit ?? runGit;
+  const remotes = await Promise.allSettled(
+    sources.map(source =>
+      runner(source.path, ['remote', 'get-url', 'origin'], 5_000)
+    )
+  );
+  const readableRemotes = remotes.flatMap(result =>
+    result.status === 'fulfilled' ? [result.value] : []
+  );
+  const candidates =
+    readableRemotes.length > 0
+      ? readableRemotes
+      : [options.project.gitRemoteUrl];
+  return [
+    ...new Set(
+      candidates
+        .map(parseGithubRepoFromRemote)
+        .filter((repo): repo is string => repo !== null)
+    )
+  ];
+}
+
+function githubArgs(...args: string[]): string[] {
+  return ['api', '--hostname', GITHUB_HOST, ...args];
+}
+
+async function assertGithubReady(runGithubCli: GithubCliRunner): Promise<void> {
+  try {
+    await runGithubCli(
+      ['auth', 'status', '--hostname', GITHUB_HOST, '--active'],
+      10_000
+    );
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    throw new Error(
+      `GitHub CLI is not authenticated for github.com. Run "gh auth login --hostname github.com". ${detail}`
+    );
+  }
+}
+
+function parseJson(output: string): unknown {
+  try {
+    return JSON.parse(output);
+  } catch {
+    throw new Error('GitHub CLI returned malformed JSON');
+  }
 }
 
 function milestoneLabel(milestone: z.infer<typeof githubMilestoneSchema>) {
@@ -181,121 +252,132 @@ function uniqueByIdentity<T>(
   });
 }
 
-function markGithubCacheStale(bb: BbPluginApi): void {
-  githubMutationRevisions.set(
-    bb,
-    (githubMutationRevisions.get(bb) ?? 0) + 1
+function issueLabels(issue: z.infer<typeof githubIssueSchema>): string[] {
+  return issue.labels.flatMap(label =>
+    typeof label === 'string' ? [label] : label.name ? [label.name] : []
   );
 }
 
-function refreshGithubCache(bb: BbPluginApi): Promise<void> {
-  const mutationRevision = githubMutationRevisions.get(bb) ?? 0;
-  const active = activeRefreshes.get(bb);
-  if (active && active.mutationRevision >= mutationRevision) {
-    return active.promise;
-  }
-  const run = () =>
-    bb.sdk.plugins
-      .callRpc({
-        pluginId: 'github',
-        method: 'refresh',
-        input: null,
-        outputSchema: refreshOutputSchema
-      })
-      .then(() => undefined);
-  const pending = active
-    ? active.promise.then(run, run)
-    : run();
-  const promise = pending.finally(() => {
-    if (activeRefreshes.get(bb)?.promise === promise) {
-      activeRefreshes.delete(bb);
-    }
-  });
-  activeRefreshes.set(bb, { mutationRevision, promise });
-  return promise;
-}
-
-export function loadGithubStatus(bb: BbPluginApi) {
-  return bb.sdk.plugins.callRpc({
-    pluginId: 'github',
-    method: 'status',
-    input: null,
-    outputSchema: githubStatusOutputSchema
-  });
-}
-
-export type GithubStatus = z.infer<typeof githubStatusOutputSchema>;
-
-export function githubReposForProject(
-  status: GithubStatus,
-  projectId: string
-): string[] {
-  return [
-    ...new Set(
-      status.repos
-        .filter(repo => repo.projectId === projectId)
-        .map(repo => repo.repo)
-    )
-  ];
-}
-
 function toItem(
-  value: z.infer<typeof githubItemSchema>,
+  repo: string,
+  issue: z.infer<typeof githubIssueSchema>,
   comments: ExternalWorkItemDetail['comments'] = []
 ): ExternalWorkItemDetail {
-  const open = value.state.toLowerCase() === 'open';
+  const open = issue.state === 'open';
   return {
     source: 'github',
-    locator: `${value.repo}#${value.number}`,
-    key: `${value.repo}#${value.number}`,
-    title: value.title,
-    description: value.body,
-    url: value.url,
-    status: value.state,
+    locator: `${repo}#${issue.number}`,
+    key: `${repo}#${issue.number}`,
+    title: issue.title,
+    description: issue.body ?? '',
+    url: issue.html_url,
+    status: open ? 'OPEN' : 'CLOSED',
     stateCategory: open ? 'todo' : 'done',
     priority: null,
-    assignee: value.assignees.join(', ') || null,
-    project: value.repo,
-    labels: value.labels,
-    updatedAt: value.updatedAt,
+    assignee: issue.assignees.map(value => value.login).join(', ') || null,
+    project: repo,
+    labels: issueLabels(issue),
+    updatedAt: issue.updated_at,
     comments
   };
 }
 
 function parseLocator(locator: string): { repo: string; number: number } {
   const match = /^(?<repo>[^#]+)#(?<number>[1-9]\d*)$/u.exec(locator);
-  if (!match?.groups)
+  if (!match?.groups) {
     throw new Error(`Invalid GitHub issue locator: ${locator}`);
-  return { repo: match.groups.repo!, number: Number(match.groups.number) };
+  }
+  const repo = githubRepositorySchema.safeParse(match.groups.repo);
+  if (!repo.success) {
+    throw new Error(`Invalid GitHub issue locator: ${locator}`);
+  }
+  return { repo: repo.data, number: Number(match.groups.number) };
 }
 
-export function createGithubAdapter(
-  bb: BbPluginApi,
-  enabled: boolean,
-  projectId: string,
-  runGithubCli: (args: string[], timeoutMs?: number) => Promise<string> = runGh
-): WorkSourceAdapter {
-  async function scopedIssue(locator: string): Promise<ExternalWorkItemDetail> {
-    const { repo, number } = parseLocator(locator);
-    const status = await loadGithubStatus(bb);
-    if (!status.ghOk) {
-      throw new Error(status.ghError ?? 'GitHub is not authenticated');
+export function createGithubAdapter(options: {
+  enabled: boolean;
+  repositories: readonly string[];
+  runGithubCli?: GithubCliRunner;
+}): WorkSourceAdapter {
+  const repositories = [
+    ...new Set(options.repositories.map(repo => githubRepositorySchema.parse(repo)))
+  ];
+  const repositoryByIdentity = new Map(
+    repositories.map(repo => [repo.toLowerCase(), repo])
+  );
+  const runGithubCli = options.runGithubCli ?? runGh;
+
+  function scopedRepository(repo: string): string {
+    const parsed = githubRepositorySchema.safeParse(repo);
+    if (!parsed.success) {
+      throw new Error(`Invalid GitHub repository: ${repo}`);
     }
-    if (!githubReposForProject(status, projectId).includes(repo)) {
+    const scoped = repositoryByIdentity.get(parsed.data.toLowerCase());
+    if (!scoped) {
       throw new Error(
-        `GitHub repository ${repo} is not mapped to BB project ${projectId}`
+        `GitHub repository ${repo} is outside this BB project's repository scope`
       );
     }
-    const result = await bb.sdk.plugins.callRpc({
-      pluginId: 'github',
-      method: 'getIssue',
-      input: { repo, number },
-      outputSchema: detailOutputSchema
-    });
-    if (result.issue.repo !== repo || result.issue.number !== number) {
-      throw new Error(`GitHub returned the wrong issue for ${locator}`);
+    return scoped;
+  }
+
+  function assertConfigured(): void {
+    if (!options.enabled) throw new Error('GitHub is disabled');
+    if (repositories.length === 0) {
+      throw new Error(
+        'No GitHub repository is mapped to this BB project on the current host'
+      );
     }
-    return toItem({ ...result.issue, kind: 'issue' }, result.issue.comments);
+  }
+
+  async function loadIssue(
+    repo: string,
+    number: number
+  ): Promise<z.infer<typeof githubIssueSchema>> {
+    const issue = githubIssueSchema.parse(
+      parseJson(
+        await runGithubCli(
+          githubArgs(`repos/${repo}/issues/${number}`),
+          GITHUB_TIMEOUT_MS
+        )
+      )
+    );
+    if (issue.pull_request !== undefined) {
+      throw new Error(`${repo}#${number} is a pull request, not an issue`);
+    }
+    if (issue.number !== number) {
+      throw new Error(`GitHub returned the wrong issue for ${repo}#${number}`);
+    }
+    return issue;
+  }
+
+  async function scopedIssue(locator: string): Promise<ExternalWorkItemDetail> {
+    assertConfigured();
+    const parsed = parseLocator(locator);
+    const repo = scopedRepository(parsed.repo);
+    await assertGithubReady(runGithubCli);
+    const [issue, comments] = await Promise.all([
+      loadIssue(repo, parsed.number),
+      runGithubCli(
+        githubArgs(
+          '--paginate',
+          '--slurp',
+          `repos/${repo}/issues/${parsed.number}/comments?per_page=100`
+        ),
+        GITHUB_TIMEOUT_MS
+      ).then(output =>
+        paginatedGithubCommentsSchema.parse(parseJson(output)).flat()
+      )
+    ]);
+    return toItem(
+      repo,
+      issue,
+      comments.map(comment => ({
+        author: comment.user.login,
+        body: comment.body ?? '',
+        createdAt: comment.created_at
+      }))
+    );
   }
 
   async function statusOptions(
@@ -319,109 +401,94 @@ export function createGithubAdapter(
     ];
   }
 
-  async function assertMappedRepository(repo: string): Promise<void> {
-    const status = await loadGithubStatus(bb);
-    if (!status.ghOk) {
-      throw new Error(status.ghError ?? 'GitHub is not authenticated');
-    }
-    if (!githubReposForProject(status, projectId).includes(repo)) {
-      throw new Error(
-        `GitHub repository ${repo} is not mapped to this BB project`
-      );
-    }
-  }
-
   return {
     source: 'github',
-    configured: () => enabled,
+    configured: () => options.enabled && repositories.length > 0,
     configurationMessage: () =>
-      enabled ? null : 'Enable GitHub in Taskboard settings.',
-    async list(options) {
-      if (!enabled) throw new Error('GitHub is disabled');
-      if (options?.refresh) await refreshGithubCache(bb);
-      const status = await loadGithubStatus(bb);
-      if (!status.ghOk) {
-        throw new Error(status.ghError ?? 'GitHub is not authenticated');
-      }
-      const repos = githubReposForProject(status, projectId);
+      !options.enabled
+        ? 'Enable GitHub in Taskboard settings.'
+        : repositories.length === 0
+          ? 'No GitHub repository is mapped to this BB project on the current host.'
+          : null,
+    async list() {
+      assertConfigured();
+      await assertGithubReady(runGithubCli);
       const results = await Promise.all(
-        repos.map(async repo => ({
-          repo,
-          result: await bb.sdk.plugins.callRpc({
-            pluginId: 'github',
-            method: 'listItems',
-            input: { kind: 'issue', repo },
-            outputSchema: listOutputSchema
-          })
-        }))
+        repositories.flatMap(repo =>
+          [
+            { state: 'open', limit: 100 },
+            { state: 'closed', limit: 50 }
+          ].map(async query => ({
+            repo,
+            issues: githubIssueListSchema.parse(
+              parseJson(
+                await runGithubCli(
+                  githubArgs(
+                    `repos/${repo}/issues?state=${query.state}&sort=updated&direction=desc&per_page=${query.limit}`
+                  ),
+                  GITHUB_TIMEOUT_MS
+                )
+              )
+            )
+          }))
+        )
       );
-      return results.flatMap(({ repo, result }) =>
-        result.items.map(item => {
-          if (item.repo !== repo || item.kind !== 'issue') {
-            throw new Error(
-              `GitHub returned an item outside requested repository ${repo}`
-            );
-          }
-          return withoutComments(toItem(item));
-        })
+      return results.flatMap(({ repo, issues }) =>
+        issues.flatMap(issue =>
+          issue.pull_request === undefined
+            ? [withoutComments(toItem(repo, issue))]
+            : []
+        )
       );
     },
     async get(locator) {
-      if (!enabled) throw new Error('GitHub is disabled');
       return scopedIssue(locator);
     },
     async statusOptions(locator) {
-      if (!enabled) throw new Error('GitHub is disabled');
       return statusOptions(locator);
     },
     async createMetadata(input) {
-      if (!enabled) throw new Error('GitHub is disabled');
-      await assertMappedRepository(input.destinationId);
+      assertConfigured();
+      const repo = scopedRepository(input.destinationId);
+      await assertGithubReady(runGithubCli);
       const [users, labels, milestones] = await Promise.all([
         runGithubCli(
-          [
-            'api',
+          githubArgs(
             '--paginate',
             '--slurp',
-            `repos/${input.destinationId}/assignees?per_page=100`
-          ],
-          30_000
+            `repos/${repo}/assignees?per_page=100`
+          ),
+          GITHUB_TIMEOUT_MS
         ).then(output =>
           uniqueByIdentity(
-            paginatedGithubAssigneesSchema
-              .parse(JSON.parse(output))
-              .flat(),
+            paginatedGithubAssigneesSchema.parse(parseJson(output)).flat(),
             user => user.login
           )
         ),
         runGithubCli(
-          [
-            'api',
+          githubArgs(
             '--paginate',
             '--slurp',
-            `repos/${input.destinationId}/labels?per_page=100`
-          ],
-          30_000
+            `repos/${repo}/labels?per_page=100`
+          ),
+          GITHUB_TIMEOUT_MS
         ).then(output =>
           uniqueByIdentity(
-            paginatedGithubLabelsSchema.parse(JSON.parse(output)).flat(),
+            paginatedGithubLabelsSchema.parse(parseJson(output)).flat(),
             label => label.name
           )
         ),
         runGithubCli(
-          [
-            'api',
+          githubArgs(
             '--paginate',
             '--slurp',
-            `repos/${input.destinationId}/milestones?state=open&per_page=100`
-          ],
-          30_000
+            `repos/${repo}/milestones?state=open&per_page=100`
+          ),
+          GITHUB_TIMEOUT_MS
         )
           .then(output =>
             uniqueByIdentity(
-              paginatedGithubMilestonesSchema
-                .parse(JSON.parse(output))
-                .flat(),
+              paginatedGithubMilestonesSchema.parse(parseJson(output)).flat(),
               milestone => String(milestone.number)
             )
           )
@@ -449,8 +516,9 @@ export function createGithubAdapter(
       };
     },
     async create(input: ExternalWorkItemCreateInput) {
-      if (!enabled) throw new Error('GitHub is disabled');
-      await assertMappedRepository(input.destinationId);
+      assertConfigured();
+      const repo = scopedRepository(input.destinationId);
+      await assertGithubReady(runGithubCli);
       if (input.dueDate !== null || input.priorityId !== null) {
         throw new Error(
           'GitHub issues use milestones instead of direct due dates or priorities'
@@ -467,18 +535,17 @@ export function createGithubAdapter(
       ) {
         throw new Error('GitHub milestone is invalid');
       }
-      const args = [
-        'api',
+      const args = githubArgs(
         '--method',
         'POST',
-        `repos/${input.destinationId}/issues`,
+        `repos/${repo}/issues`,
         '--raw-field',
         `title=${input.title}`,
         '--raw-field',
         `body=${input.description}`,
-        ...input.assigneeId
+        ...(input.assigneeId
           ? ['--raw-field', `assignees[]=${input.assigneeId}`]
-          : [],
+          : []),
         ...input.labelIds.flatMap(label => [
           '--raw-field',
           `labels[]=${label}`
@@ -486,28 +553,22 @@ export function createGithubAdapter(
         ...(milestone !== null
           ? ['--field', `milestone=${milestone}`]
           : [])
-      ];
-      // The write may commit even when the response is lost or malformed.
-      // Advance before attempting it so reconciliation never reuses a refresh
-      // that began before this possibly-committed mutation.
-      markGithubCacheStale(bb);
+      );
       let created: z.infer<typeof createdGithubIssueSchema>;
       try {
         created = createdGithubIssueSchema.parse(
-          JSON.parse(await runGithubCli(args, 30_000))
+          parseJson(await runGithubCli(args, GITHUB_TIMEOUT_MS))
         );
       } catch {
         throw new Error(
           `${CREATE_OUTCOME_UNCERTAIN_MARKER} GitHub may have created the issue, but Taskboard could not confirm the response. Refresh the board and check for it before trying again.`
         );
       }
-      const createdAssignees = created.assignees.map(assignee => assignee.login);
-      const createdLabels = created.labels.map(label =>
-        typeof label === 'string' ? label : label.name
+      const createdAssignees = created.assignees.map(
+        assignee => assignee.login
       );
-      const returnedAssignees = new Set(
-        createdAssignees
-      );
+      const createdLabels = issueLabels(created);
+      const returnedAssignees = new Set(createdAssignees);
       const returnedLabels = new Set(createdLabels);
       const confirmedId =
         (input.assigneeId && returnedAssignees.has(input.assigneeId)
@@ -533,22 +594,7 @@ export function createGithubAdapter(
         );
       }
       return {
-        item: {
-          source: 'github',
-          locator: `${input.destinationId}#${created.number}`,
-          key: `${input.destinationId}#${created.number}`,
-          title: input.title,
-          description: input.description,
-          url: created.html_url,
-          status: 'OPEN',
-          stateCategory: 'todo',
-          priority: null,
-          assignee: createdAssignees.join(', ') || null,
-          project: input.destinationId,
-          labels: createdLabels,
-          updatedAt: new Date().toISOString(),
-          comments: []
-        },
+        item: toItem(repo, created),
         warnings,
         assigneeConfirmation: {
           confirmed: true,
@@ -557,22 +603,37 @@ export function createGithubAdapter(
       };
     },
     async updateStatus(locator, statusId) {
-      if (!enabled) throw new Error('GitHub is disabled');
-      const available = await statusOptions(locator);
-      const target = available.find(option => option.id === statusId);
-      if (!target) {
+      assertConfigured();
+      if (statusId !== 'open' && statusId !== 'closed') {
         throw new Error('GitHub status is not available for this issue');
       }
-      if (!target.current) {
-        const { repo, number } = parseLocator(locator);
-        await bb.sdk.plugins.callRpc({
-          pluginId: 'github',
-          method: 'setIssueState',
-          input: { repo, number, state: statusId },
-          outputSchema: okOutputSchema
-        });
+      const parsed = parseLocator(locator);
+      const repo = scopedRepository(parsed.repo);
+      const issue = await scopedIssue(`${repo}#${parsed.number}`);
+      const current = issue.status.toLowerCase();
+      if (current !== statusId) {
+        const updated = githubIssueSchema.parse(
+          parseJson(
+            await runGithubCli(
+              githubArgs(
+                '--method',
+                'PATCH',
+                `repos/${repo}/issues/${parsed.number}`,
+                '--field',
+                `state=${statusId}`
+              ),
+              GITHUB_TIMEOUT_MS
+            )
+          )
+        );
+        if (
+          updated.pull_request !== undefined ||
+          updated.number !== parsed.number
+        ) {
+          throw new Error(`GitHub returned the wrong issue for ${locator}`);
+        }
       }
-      return scopedIssue(locator);
+      return scopedIssue(`${repo}#${parsed.number}`);
     }
   };
 }

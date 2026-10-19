@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "sequence": 3,
+  "previousDigest": "sha256:e8938c7d93198767e4ff10438b5926eab51b1565bafa9b573b963da1127bd0a7",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Specified durable non-destructive relocation and install documentation with one added distribution capability delta, risks, and observable acceptance criteria.",
+  "createdAt": "2026-10-19T14:47:54.685Z",
+  "stateBeforeDigest": "sha256:8a40f6a444bd9e65824c0eafd4e9d36c52228836376adf1939f6c62d7de2fef0",
+  "stateAfterDigest": "sha256:f3a6c505307a5bb5c30ff78cd0e520319b17c3b1dedffc721aba57ec7ce7b700",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 3,
+    "activeFeature": "restore-the-installed-bb-surf-steel-browser-and-taskboard-plugins",
+    "request": "Restore the installed BB Surf (steel-browser) and Taskboard plugins from durable sources that will not disappear with temporary directories or BB thread worktree cleanup. Preserve existing plugin settings, project data, and credentials. Verify both plugins run. Inspect their existing BB Community marketplace publication and create the necessary focused pull requests in MateoCerquetella/bb-plugins so durable installation and current releases are correct and users can add them without relying on local worktree paths.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "design",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Specified durable non-destructive relocation and install documentation with one added distribution capability delta, risks, and observable acceptance criteria.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:6c60c02f05209bbf8343588192eb09633b790ef5e9ccc843f6cba253e26eac39",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:53d467f08b0032e5224a3252abe57d5e0308985633552c947e5ba579a64b23b3",
+    "impactDigest": "sha256:0ef2490ec0f0e93898cd2a2844c877df03835199d8011d5476417ab6fdbda821",
+    "capabilityClaimId": "restore-the-installed-bb-surf-steel-browser-and-taskboard-plugins-dd428787e890",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-19T14:47:54.685Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "riskRequest": "Repository checks pass and each focused repository PR is opened against `main`."
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 6,
+      "capabilities": 3,
+      "reason": "The two runtime repairs and their documentation are one tightly coupled recovery: splitting would duplicate the durable-source migration and make it harder to verify that both plugin IDs remain intact.",
+      "actor": "codex",
+      "revision": 1
+    },
+    "reviewFirst": true,
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "restore-the-installed-bb-surf-steel-browser-and-taskboard-plugins-dd428787e890",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "restore-the-installed-bb-surf-steel-browser-and-taskboard-plugins",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_ptw9gqichm-1/bb-plugins",
+      "worktreeId": "sha256:c70a40f6d3e38c3f6407819f90f09b4e44f93dbbfdb64973dd6cd8c8a0a048bc",
+      "baseCommit": "00fc12410a1c2f3c959436c6cdcc9a8f6b299bee",
+      "baseTree": "5fe25297af55151470e81e199772e5c59170baa7",
+      "bases": {
+        "plugin-git-distribution": {
+          "capability": "plugin-git-distribution",
+          "digest": "sha256:a32930971c97dd3612b83783fb6bff5cd69102dc6267b6b56640e62cdf684950",
+          "requirements": {
+            "durable user-facing install sources": null,
+            "durable local registration": null
+          }
+        }
+      },
+      "capabilities": [
+        "plugin-git-distribution"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-19T14:47:54.672Z",
+      "heartbeatAt": "2026-10-19T14:47:54.672Z",
+      "digest": "sha256:71f66d4f59f43b18bddac1fe9c21a5f4225de63e4147e1bb6c9655fa31605268"
+    }
+  },
+  "digest": "sha256:7e0efa7f89f317e11823d88edef66fe455aef88575384966a26a10e7516796a0"
+}

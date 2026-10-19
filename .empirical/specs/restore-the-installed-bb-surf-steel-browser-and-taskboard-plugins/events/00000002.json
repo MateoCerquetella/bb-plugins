@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "sequence": 2,
+  "previousDigest": "sha256:abbde75b8fb1f175fbc80d20d508b4df753eb29d83d5f4aa0ea10983625b9c32",
+  "actor": "codex",
+  "type": "transition",
+  "summary": "Size: keep as one (The two runtime repairs and their documentation are one tightly coupled recovery: splitting would duplicate the durable-source migration and make it harder to verify that both plugin IDs remain intact.)",
+  "createdAt": "2026-10-19T14:45:41.711Z",
+  "stateBeforeDigest": "sha256:7d6b10fee73eb2a4dfc6f2cb1c486369296c85a040f5242eb106dfb33841a674",
+  "stateAfterDigest": "sha256:8a40f6a444bd9e65824c0eafd4e9d36c52228836376adf1939f6c62d7de2fef0",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 2,
+    "activeFeature": "restore-the-installed-bb-surf-steel-browser-and-taskboard-plugins",
+    "request": "Restore the installed BB Surf (steel-browser) and Taskboard plugins from durable sources that will not disappear with temporary directories or BB thread worktree cleanup. Preserve existing plugin settings, project data, and credentials. Verify both plugins run. Inspect their existing BB Community marketplace publication and create the necessary focused pull requests in MateoCerquetella/bb-plugins so durable installation and current releases are correct and users can add them without relying on local worktree paths.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": null,
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:acecfdab2b99ac1032290962666e16dd1e957dd40139973371083007dc92c5c5",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": null,
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-19T14:45:41.711Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true
+    },
+    "reviewFirst": true,
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 6,
+      "capabilities": 3,
+      "reason": "The two runtime repairs and their documentation are one tightly coupled recovery: splitting would duplicate the durable-source migration and make it harder to verify that both plugin IDs remain intact.",
+      "actor": "codex",
+      "revision": 1
+    }
+  },
+  "digest": "sha256:e8938c7d93198767e4ff10438b5926eab51b1565bafa9b573b963da1127bd0a7"
+}

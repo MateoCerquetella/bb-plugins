@@ -249,15 +249,19 @@ Taskboard is a full-trust BB plugin. Review the source, then install its trackin
 Git release directly from this monorepo:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.5 --subdirectory plugins/taskboard --tag-prefix taskboard/
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.4 --subdirectory plugins/taskboard --tag-prefix taskboard/
 ```
 
-After [the BB Community entry](https://github.com/get-bb/marketplace/pull/129)
-is merged and live, the equivalent shorthand is:
+The [BB Community entry](https://github.com/get-bb/marketplace/pull/129)
+is merged. You can also install its configured release range:
 
 ```sh
-bb plugin install taskboard
+bb plugin install taskboard@bb-community
 ```
+
+The main branch includes unreleased 0.3.5 changes. For a missing local
+installation, use [the recovery guide](../../docs/plugin-recovery.md) to
+preserve your configuration without uninstalling or downgrading.
 
 Open **Taskboard → Manage**, choose a BB project, select its tracker, and save
 the connection. The same page configures that project's filters, default
@@ -277,14 +281,20 @@ bb plugin remove taskboard
 
 ### GitHub
 
-Taskboard reuses BB's official GitHub plugin and the repositories already
-mapped to the BB project. There is no second GitHub token or repository picker.
+Taskboard reads the GitHub remote from the selected BB project's local checkout
+on the current host. It uses the authenticated GitHub CLI directly and does not
+require BB's separate GitHub plugin. Taskboard stores neither a GitHub token nor
+a separate repository selection.
 
 ```sh
-bb plugin install github
-gh auth login
-bb plugin reload github
+gh auth login --hostname github.com
+gh auth status --hostname github.com
 ```
+
+The selected project must have a readable local checkout whose `origin` points
+to `github.com`. If no local checkout is available, Taskboard uses the BB
+project's saved Git remote. A readable non-GitHub `origin` takes precedence over
+stale project metadata and leaves GitHub unconfigured.
 
 ### Linear
 

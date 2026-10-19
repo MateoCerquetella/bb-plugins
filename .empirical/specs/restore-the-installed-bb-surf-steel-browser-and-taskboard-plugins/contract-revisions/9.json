@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "feature": "restore-the-installed-bb-surf-steel-browser-and-taskboard-plugins",
+  "revision": 9,
+  "reason": "Make Taskboard's GitHub source native so users do not need to install the separate GitHub BB plugin. Keep the GitHub plugin removed. Preserve existing Taskboard project configuration and cached items, migrate the existing GitHub source transparently, add behavioral regression coverage, verify the existing configured source for project proj_ykxahiys47 refreshes successfully, and update Taskboard documentation to describe native GitHub support.",
+  "spec": "# Restore The Installed Bb Surf Steel Browser And Taskboard Plugins\n\n## Request\n\n> Restore the installed BB Surf (steel-browser) and Taskboard plugins from durable sources that will not disappear with temporary directories or BB thread worktree cleanup. Preserve existing plugin settings, project data, and credentials. Verify both plugins run. Inspect their existing BB Community marketplace publication and create the necessary focused pull requests in MateoCerquetella/bb-plugins so durable installation and current releases are correct and users can add them without relying on local worktree paths.\n\n## Goal\n\nBoth registered plugins resolve from durable, non-worktree sources and run\nwithout removing their existing IDs, settings, project data, or credentials.\nThe repository's user-facing install instructions point at immutable Git\nrelease ranges, and focused pull requests are opened for any required\ndistribution fixes.\n\n## Acceptance Criteria\n\n- [ ] [AC-1] `steel-browser` resolves from a durable Git source and reports\n  `running` after reload.\n- [ ] [AC-2] `taskboard` resolves from a durable Git source and reports\n  `running` after reload.\n- [ ] [AC-3] Existing plugin IDs remain unchanged and no uninstall or data\n  reset is performed.\n- [ ] [AC-4] BB Surf and Taskboard README install commands use public immutable\n  release ranges rather than a checkout, `/tmp`, or a thread worktree.\n- [ ] [AC-5] Repository checks pass and each focused repository PR is opened\n  against `main`.\n- [ ] [AC-6] Marketplace publication status is recorded from the existing\n  merged marketplace PRs; no duplicate marketplace entry is created.\n\n## Scope\n\n- Relocate the two local registrations to a durable clone under\n  `~/.bb/plugin-sources`.\n- Update only distribution/install documentation needed to prevent recurrence.\n- Verify plugin status, reload behavior, and repository checks.\n- Open focused GitHub PRs for the repository changes.\n\n## Non-goals\n\n- Do not remove/reinstall either plugin through a destructive command.\n- Do not alter plugin settings, credentials, project tracker connections, or\n  persisted data.\n- Do not rewrite marketplace history or create duplicate marketplace entries.\n- Do not change plugin runtime behavior unrelated to distribution.\n\n## Verification\n\n- Inspect `bb plugin list --json` before and after migration.\n- Run `bb plugin reload steel-browser` and `bb plugin reload taskboard`, then\n  confirm both statuses are `running`.\n- Run `npm run check` from the repository root.\n- Inspect the resulting Git diff and PR metadata.\n\n## Risks\n\n- Local path installations are pinned and require an explicit update; their\n  durable clone must not be removed by an operator.\n- A published release may lag current main. Preserve the installed Taskboard\n  0.3.5 behavior during recovery rather than silently downgrading.\n- A semver range selects immutable release tags but is not itself an immutable\n  version pin.\n- Plugin running status does not alone prove external tracker or browser\n  service connectivity.\n\n## Capability Deltas\n\nCreate one or more files under deltas/<capability>.md using ADDED, MODIFIED, or\nREMOVED Requirements sections, named Requirement blocks, and concrete Scenario\nexamples. These merge into living specifications\nafter verification and review.\n",
+  "deltas": [
+    {
+      "capability": "plugin-git-distribution",
+      "purpose": null,
+      "requirements": [
+        {
+          "operation": "added",
+          "name": "Durable user-facing install sources",
+          "contents": "### Requirement: Durable user-facing install sources\n\nBB Surf and Taskboard SHALL document public immutable Git release ranges with\ntheir monorepo subdirectories and tag prefixes. They SHALL NOT present a local\ncheckout, `/tmp` path, or disposable thread worktree as the normal install\nsource.\n\n#### Scenario: Install BB Surf from the published release\n\n- **WHEN** a user follows the BB Surf quick start\n- **THEN** BB resolves `plugins/steel-browser` from the public repository using\n  the `steel-browser/` tag prefix and a semver range\n- **AND** the instructions do not require this repository to exist locally.\n\n#### Scenario: Install Taskboard from the published release\n\n- **WHEN** a user follows the Taskboard quick start\n- **THEN** BB resolves `plugins/taskboard` from the public repository using the\n  `taskboard/` tag prefix and a semver range\n- **AND** the instructions do not point at `/tmp` or a thread worktree."
+        },
+        {
+          "operation": "added",
+          "name": "Durable local registration",
+          "contents": "### Requirement: Durable local registration\n\nA repaired local registration SHALL use a clone under the persistent\n`~/.bb/plugin-sources` directory, preserving the existing plugin ID and\nconfiguration while allowing BB's managed source cache to survive worktree\ncleanup.\n\n#### Scenario: Restart after source checkout cleanup\n\n- **WHEN** the original repository worktree is removed\n- **THEN** both plugin registrations still resolve their source directories\n- **AND** both plugins remain reloadable without restoring settings manually."
+        }
+      ],
+      "source": ".empirical/specs/restore-the-installed-bb-surf-steel-browser-and-taskboard-plugins/deltas/plugin-git-distribution.md"
+    }
+  ],
+  "specDigest": "sha256:6c60c02f05209bbf8343588192eb09633b790ef5e9ccc843f6cba253e26eac39",
+  "approvedSpecRevision": 3,
+  "capabilityClaimId": "restore-the-installed-bb-surf-steel-browser-and-taskboard-plugins-dd428787e890",
+  "impactDigest": "sha256:0ef2490ec0f0e93898cd2a2844c877df03835199d8011d5476417ab6fdbda821",
+  "evidenceReceiptIds": []
+}

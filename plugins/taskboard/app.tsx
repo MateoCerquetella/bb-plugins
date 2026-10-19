@@ -5635,8 +5635,9 @@ function ProjectConfigForm({
                 </h3>
               </div>
               <p className="max-w-xl text-xs leading-relaxed text-muted-foreground">
-                Uses this BB project&apos;s repository mapping and the official
-                GitHub connection. Taskboard never stores a GitHub token.
+                Uses the GitHub remote from this BB project&apos;s local
+                checkout and the authenticated gh CLI. Taskboard never stores
+                a GitHub token.
               </p>
               <p className="max-w-xl text-xs leading-relaxed text-muted-foreground">
                 {config.githubRepos.length > 0
