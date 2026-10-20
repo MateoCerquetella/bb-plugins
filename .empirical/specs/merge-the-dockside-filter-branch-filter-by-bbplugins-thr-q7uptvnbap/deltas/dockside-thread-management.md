@@ -4,12 +4,29 @@
 
 ### Requirement: Dockside filters its project-first hierarchy by intent
 
-Dockside MUST offer All, Working, Needs you, Failed, Unread, Quiet, Quiet 1d+,
-and Quiet 7d+ filtering presets, and MUST let the user group the sidebar by
-Projects, Status, or Environment. Filtering MUST compose with host search while
-preserving project order, root context for matching children, and existing
-status styling. Grouping by Environment MUST keep worktrees with the same name
-on different hosts in separate sections and MUST show a stable section label.
+Dockside MUST offer compact All, Status, Working, Needs you, Failed, Unread,
+Quiet, Quiet 1d+, and Quiet 7d+ presets. The same filter menu MUST list every
+project represented in the active project groups. Selecting a project MUST keep
+only that complete project group visible. The sidebar MUST also let the user
+group families by Projects, Status, or Environment. Environment grouping MUST
+keep same-named environments on different hosts in separate sections with a
+stable label. Filtering MUST compose with host search while preserving project
+order, root context for matching children, and existing status styling. The
+filter trigger MUST visibly and accessibly name the active preset or project.
+
+#### Scenario: User narrows the sidebar to the bbplugins project
+
+- **Given** the active inbox contains `bbplugins` and another project
+- **When** the user selects `bbplugins` in the workspace filter
+- **Then** only the `bbplugins` project group remains visible
+- **And** its thread families retain their order and hierarchy
+- **And** the filter trigger displays `bbplugins`
+
+#### Scenario: User restores every project
+
+- **Given** the workspace filter is scoped to one project
+- **When** the user selects All
+- **Then** every active project group is visible again
 
 #### Scenario: User narrows the sidebar to old quiet work
 
@@ -17,7 +34,6 @@ on different hosts in separate sections and MUST show a stable section label.
 - **When** the user chooses `Quiet 7d+`
 - **Then** only quiet families at least seven days old remain
 - **And** their project and child hierarchy is unchanged
-- **And** the Projects header shows that a filter is active
 
 #### Scenario: User groups the sidebar by status or environment
 
@@ -26,10 +42,3 @@ on different hosts in separate sections and MUST show a stable section label.
 - **Then** families are grouped under their semantic status headings
 - **And** choosing `Environment` groups families by execution environment
 - **And** a same-named environment on another host stays in a separate section
-
-#### Scenario: User isolates one project
-
-- **Given** the sidebar shows several projects
-- **When** the user chooses a single project filter
-- **Then** only that project's families remain
-- **And** clearing the filter restores the persisted project order
