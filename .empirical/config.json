@@ -1,4 +1,5 @@
 {
+  "mockupsBeforeCoding": false,
   "schemaVersion": 5,
   "profile": "complex",
   "maxRepairAttempts": 2,
