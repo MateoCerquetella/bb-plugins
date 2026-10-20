@@ -26,6 +26,18 @@ export function createCoordinatorLifecycle(
         ? 'Ticket coordinator belongs to another project. Restore its original project before continuing.'
         : thread.deletedAt || thread.archivedAt
           ? 'Ticket coordinator is archived or deleted. Restore the existing native thread before continuing.' : null;
+      if (!coordinator.error) {
+        if (!thread.environmentId) {
+          coordinator.error = 'Waiting for the ticket coordinator environment to be allocated.';
+        } else {
+          const environment = await sdk.environments.get({ environmentId: thread.environmentId, signal });
+          coordinator.error = environment.projectId !== record.projectId
+            ? 'Ticket coordinator environment belongs to another project. Restore its original environment before continuing.'
+            : environment.status !== 'ready'
+              ? `Ticket coordinator environment is ${environment.status}. Waiting for a ready environment before starting child agents.`
+              : null;
+        }
+      }
     } catch (error) {
       if (signal?.aborted) throw error;
       coordinator.error = `Could not read ticket coordinator: ${nativeError(error)}. Restore its link before continuing.`;
@@ -74,7 +86,7 @@ export function createCoordinatorLifecycle(
       status: 'ready', ...intent, threadId: thread.id, nativeStatus: thread.status, error: null
     };
     // A save failure leaves the starting intent durable; only explicit recovery may link the root.
-    return persist(record);
+    return observe(persist(record));
   }
 
   async function recover(item: WorkItem, record: FactoryRecord, intentId: string, threadId: string) {

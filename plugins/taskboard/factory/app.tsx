@@ -658,7 +658,7 @@ export function FactoryProgress({ item }: { item: WorkItem }) {
       <RunInsights record={record} />
     </TicketTeam>}
     {!run ? (!record || record.admission.kind === 'manual' &&
-      (!record.coordinator || record.coordinator.status === 'pending')) &&
+      (!record.coordinator || record.coordinator.status === 'pending' || record.coordinator.status === 'ready')) &&
       <StartTaskButton item={item} disabled={!loaded || busy || ['done', 'canceled'].includes(item.stateCategory)} /> : <>
       {run.status === 'uncertain' && <div className="my-3 space-y-2">
         <Input aria-label="Recovered native thread ID" placeholder="Native thread ID" value={recoveryId} onChange={e => setRecoveryId(e.target.value)} />

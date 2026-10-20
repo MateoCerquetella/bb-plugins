@@ -509,7 +509,7 @@ export function createFactoryService(
       throw error;
     }
     if (record.coordinator && record.coordinator.status !== 'ready') return record;
-    if (record.coordinator?.error) throw new Error(record.coordinator.error);
+    if (record.coordinator?.error) return record;
     if (input.automaticDispatch && record.admission.kind === 'factory') {
       const policy = store.getProjectPolicy(record.projectId, record.source);
       if (!policy.enabled) return record;
@@ -872,6 +872,15 @@ export function createFactoryService(
                 latest.automationError = message(error);
                 persist(latest);
               }
+            }
+          } else if (item && latest.automatic && !latest.runs.length && !latest.automationError &&
+            latest.coordinator?.status === 'ready' && !latest.coordinator.error && !signal.aborted) {
+            try {
+              if (['done', 'canceled'].includes(item.stateCategory)) throw new Error('Issue was closed or canceled before dispatch.');
+              await dispatch(item, latest, { kind: 'investigate', contextThreadId: null, retry: false, automaticDispatch: true });
+            } catch (error) {
+              latest.automationError = message(error);
+              persist(latest);
             }
           } else await advance(item, latest, signal);
         });

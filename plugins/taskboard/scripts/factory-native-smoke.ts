@@ -38,13 +38,33 @@ try {
     expectedVersion: record.version, kind: 'investigate',
     contextThreadId, retry: false
   });
+  for (let i = 0; !record.runs.length && i < 120; i++) {
+    if (record.coordinator?.status !== 'ready') {
+      throw new Error('Coordinator dispatch did not return a confirmed thread; inspect it before retrying.');
+    }
+    console.log(JSON.stringify({ coordinator: record.coordinator.threadId, waiting: record.coordinator.error }));
+    await new Promise(resolve => setTimeout(resolve, 2500));
+    record = await service.get(item);
+    record = await service.start(item, {
+      expectedVersion: record.version, kind: 'investigate', contextThreadId, retry: false
+    });
+  }
+  if (!record.runs.length) throw new Error('Coordinator environment did not become ready; no child was dispatched.');
   const run = record.runs.at(-1)!;
   console.log(JSON.stringify({ threadId: run.threadId, environmentId: run.environmentId, status: run.status }));
   if (!run.threadId) throw new Error(run.error ?? 'No native thread');
+  if (record.coordinator?.status !== 'ready') throw new Error('Missing confirmed coordinator');
+  const coordinatorId = record.coordinator.threadId;
+  const child = await sdk.threads.get({ threadId: run.threadId });
+  if (child.parentThreadId !== coordinatorId) throw new Error('Native child has the wrong coordinator');
+  console.log(JSON.stringify({ coordinatorId, childId: child.id, parentThreadId: child.parentThreadId }));
   const duplicate = await service.start(item, {
     expectedVersion: 0, kind: 'investigate', contextThreadId, retry: false
   });
-  if (duplicate.runs.length !== record.runs.length) throw new Error('Duplicate dispatch');
+  if (duplicate.runs.length !== record.runs.length || duplicate.runs.at(-1)?.threadId !== run.threadId ||
+    duplicate.coordinator?.status !== 'ready' || duplicate.coordinator.threadId !== coordinatorId) {
+    throw new Error('Duplicate dispatch');
+  }
   for (let i = 0; i < 120; i++) {
     await new Promise(resolve => setTimeout(resolve, 2500));
     record = await service.get(item);

@@ -204,7 +204,7 @@ function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
   const parents = new Map<string, string | null>();
   const titles = new Map<string, string>();
   const createdAt = new Map<string, number>();
-  const threadEnvironments = new Map<string, string>([
+  const threadEnvironments = new Map<string, string | null>([
     ['thr_native', 'env_test'], ['thr_build', 'env_build'], ['thr_review_seed', 'env_test']
   ]);
   const sent: { threadId: string; input: { text: string }[] }[] = [];
@@ -247,7 +247,8 @@ function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
       get: async ({ threadId }: { threadId: string }) => ({
         id: threadId, status: threadStatuses.get(threadId) ?? threadStatus,
         projectId: item.bbProjectId,
-        environmentId: threadId === 'thr_native' ? buildEnvironment : threadEnvironments.get(threadId) ?? 'env_test',
+        environmentId: threadId === 'thr_native' ? buildEnvironment
+          : threadEnvironments.has(threadId) ? threadEnvironments.get(threadId) : 'env_test',
         providerId: 'codex', archivedAt: archived.has(threadId) ? 1 : null, deletedAt: deleted.has(threadId) ? 1 : null,
         parentThreadId: parents.get(threadId) ?? null,
         title: titles.get(threadId) ?? null, createdAt: createdAt.get(threadId) ?? Date.now()
@@ -295,7 +296,7 @@ function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
   }, queue);
   return {
     db, store, service, sdk, events, spawns: () => spawns, spawnInput: () => spawnInput,
-    coordinatorSpawns: () => coordinatorSpawns, spawnInputs, parents, titles, createdAt,
+    coordinatorSpawns: () => coordinatorSpawns, spawnInputs, parents, titles, createdAt, threadEnvironments,
     coordinatorFailure: (value: typeof coordinatorFailure) => { coordinatorFailure = value; },
     onCoordinatorSpawn: (callback: () => void) => { onCoordinatorSpawn = callback; },
     cachedItem: (value: WorkItem | null) => { cachedItem = value; },
@@ -404,6 +405,66 @@ test('lost coordinator response blocks workers and provider writes across restar
   } finally { f.db.close(); }
 });
 
+test('delayed coordinator environment allocation resumes exactly one child after restart', async () => {
+  const queue = { provider: () => item.source, candidates: async () => [item], liveItem: async () => item };
+  const f = fixture(queue);
+  try {
+    f.store.saveProjectPolicy({ ...f.store.getProjectPolicy(item.bbProjectId, item.source), enabled: true });
+    f.onCoordinatorSpawn(() => f.threadEnvironments.set('thr_coordinator_1', null));
+    await f.service.scan(item.bbProjectId);
+    assert.equal(f.coordinatorSpawns(), 1);
+    assert.equal(f.spawns(), 0);
+    assert.equal(f.progressWrites(), 0);
+    const allocating = f.store.all()[0].coordinator;
+    assert.ok(allocating?.status === 'ready');
+    assert.match(allocating.error ?? '', /allocated/);
+    const restarted = createFactoryService(f.sdk, f.store, () => {}, undefined, queue);
+    await restarted.recover();
+    f.threadEnvironments.set('thr_coordinator_1', 'env_test');
+    f.environmentStatus('creating');
+    await restarted.poll(new AbortController().signal);
+    assert.equal(f.spawns(), 0);
+    const creating = f.store.all()[0].coordinator;
+    assert.ok(creating?.status === 'ready');
+    assert.match(creating.error ?? '', /creating/);
+    f.environmentStatus('ready');
+    await restarted.poll(new AbortController().signal);
+    await restarted.poll(new AbortController().signal);
+    const record = f.store.all()[0];
+    assert.equal(f.coordinatorSpawns(), 1);
+    assert.equal(f.spawns(), 1);
+    assert.equal(record.runs.length, 1);
+    assert.equal(f.parents.get(record.runs[0].threadId!), 'thr_coordinator_1');
+    assert.ok(record.coordinator?.status === 'ready');
+    assert.equal(record.coordinator.error, null);
+    assert.equal(record.automationError, null);
+  } finally { f.db.close(); }
+});
+
+test('manual starts retain their coordinator through environment failure and resume without duplicates', async () => {
+  for (const resume of ['button', 'poll'] as const) {
+    const f = fixture();
+    try {
+      f.environmentStatus('error');
+      const blocked = await f.service.startTask(item, null);
+      assert.equal(blocked.runs.length, 0);
+      assert.ok(blocked.coordinator?.status === 'ready');
+      assert.match(blocked.coordinator.error ?? '', /environment is error/);
+      await f.service.startTask(item, null);
+      await f.service.poll(new AbortController().signal);
+      assert.equal(f.coordinatorSpawns(), 1);
+      assert.equal(f.spawns(), 0);
+      f.environmentStatus('ready');
+      if (resume === 'button') await f.service.startTask(item, null);
+      else await f.service.poll(new AbortController().signal);
+      await f.service.startTask(item, null);
+      assert.equal(f.coordinatorSpawns(), 1);
+      assert.equal(f.spawns(), 1);
+      assert.equal(f.store.all()[0].runs.length, 1);
+    } finally { f.db.close(); }
+  }
+});
+
 test('a persisted coordinator starting intent becomes uncertain without another native dispatch', async () => {
   const f = fixture();
   try {
@@ -449,7 +510,7 @@ test('unavailable coordinator blocks new stages while existing worker completion
     assert.equal(observed.runs[0].status, 'finished');
     assert.equal(observed.coordinator?.status, 'ready');
     assert.equal(f.spawns(), 1);
-    assert.match(observed.automationError ?? '', /coordinator is archived or deleted/);
+    assert.match(observed.coordinator?.error ?? '', /coordinator is archived or deleted/);
     f.archived.delete(started.coordinator.threadId);
     await f.service.startTask(item, null);
     assert.equal(f.coordinatorSpawns(), 1);
