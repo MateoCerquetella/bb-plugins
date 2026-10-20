@@ -1,6 +1,7 @@
-import { defineRpcContract } from '@get-bb/plugin-sdk';
+import type { PluginRpcContract } from '@get-bb/plugin-sdk';
 import { z } from 'zod';
 import { workSourceSchema } from '../contract.js';
+import { empiricalHostObservationSchema } from '../empirical/contract.js';
 
 export const id = z.string().regex(/^[a-zA-Z0-9_-]{1,100}$/);
 const text = z.string().max(24_000);
@@ -113,7 +114,7 @@ export type Context = z.infer<typeof contextSchema>;
 export type Brief = z.infer<typeof briefSchema>;
 export type TaskRef = z.infer<typeof taskRefSchema>;
 export const scope = z.object({ id, projectId: id });
-export const preparationRpc = defineRpcContract({
+export const preparationRpc = {
   prepareCreate: {
     input: z.object({ projectId: id, request: text.min(1) }),
     output: preparationSchema
@@ -196,14 +197,18 @@ export const preparationRpc = defineRpcContract({
       json: z.string()
     })
   }
-});
-export const hostContract = defineRpcContract({
+} as const satisfies PluginRpcContract;
+export const hostContract = {
+  observeEmpirical: {
+    input: z.object({ root: z.string().min(1).max(4096), environmentId: z.string().min(1) }).strict(),
+    output: empiricalHostObservationSchema
+  },
   collect: {
     input: z.object({ root: z.string().min(1), request: text }),
     output: contextSchema
   },
   workspace: { input: z.object({ id }), output: z.object({ path: z.string() }) }
-});
+} as const satisfies PluginRpcContract;
 
 export function parseAgentResult(output: string, kind: 'brief' | 'prototype') {
   if (output.length > 200_000)

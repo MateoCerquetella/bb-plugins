@@ -28,9 +28,9 @@ All plugins in this repository are independently installable.
 | <img src="./plugins/action-topbar/assets/icon.svg" width="128" height="128" alt="" /> | [Action Topbar](./plugins/action-topbar) | [Git install](#action-topbar-install) | Adds a compact main-thread topbar with draggable BB Actions and persistent, per-thread workspace panes. |
 | <img src="./plugins/dockside/assets/icon.svg" width="128" height="128" alt="" /> | [Dockside](./plugins/dockside) | [Git release](#dockside-quick-start) | Adds a project-first sidebar plus mobile navigation across active and unread threads, with synchronized project colors and animated status icons. |
 | <img src="./plugins/host-monitor/assets/icon.svg" width="128" height="128" alt="" /> | [Host Monitor](./plugins/host-monitor) | [Git release](#host-monitor-quick-start) | Monitors CPU, RAM, disk, network, host details, and guarded process actions across every machine enrolled in BB. Requires BB 0.40+. |
-| <img src="./plugins/steel-browser/assets/icon.svg" width="128" height="128" alt="" /> | [BB Surf](./plugins/steel-browser) | [Local install](#bb-surf-quick-start) | Operates self-hosted Steel browser sessions from BB with health, session lifecycle, CLI, and agent guidance. Requires BB 0.40+. |
+| <img src="./plugins/steel-browser/assets/icon.svg" width="128" height="128" alt="" /> | [BB Surf](./plugins/steel-browser) | [Git release](#bb-surf-quick-start) | Operates self-hosted Steel browser sessions from BB with health, session lifecycle, CLI, and agent guidance. Requires BB 0.40+. |
 | <img src="./plugins/taskboard/assets/icon.svg" width="128" height="128" alt="" /> | [Taskboard](./plugins/taskboard) | [Git release](#taskboard-quick-start) | Brings each BB project's GitHub, GitLab, Linear, or Jira tasks into one focused List or Kanban board. |
-| <img src="./plugins/aura/assets/icon.svg" width="128" height="128" alt="" /> | [Aura](./plugins/aura) | [Git release](./plugins/aura#install) | Adds custom PNG/JPG backgrounds and softly faded pixel textures to conversations and New thread, with six saved slots and a live preview. |
+| <img src="./plugins/aura/assets/icon.svg" width="128" height="128" alt="" /> | [Aura](./plugins/aura) | [Install](./plugins/aura#install) | Custom PNG/JPG backgrounds, animated pixel textures, six saved slots, and an optional real GitHub activity overview below the centered New thread composer. |
 | <img src="./plugins/touchbar/assets/icon.svg" width="128" height="128" alt="" /> | [Touch Bar Agent Monitor](./plugins/touchbar) | [Git release](#touch-bar-agent-monitor-quick-start) | Adds a native persistent Control Strip badge and fullscreen BB agent panel to Touch Bar Macs. Requires BB 0.40+. |
 | <img src="./plugins/usage-tracker/assets/icon.svg" width="128" height="128" alt="" /> | [Usage Tracker](./plugins/usage-tracker) | [Git release](#usage-tracker-quick-start) | Keeps Codex and Claude Code 5-hour and weekly limits beside BB's sidebar utility icons. |
 | <img src="./plugins/lavender/assets/icon.svg" width="128" height="128" alt="" /> | [Lavender](./plugins/lavender) | [Git release](./plugins/lavender#install) | Adds coordinated pale-lilac light and charcoal-violet dark palettes for conversations and code. |
@@ -132,20 +132,25 @@ BB Surf connects BB to a self-hosted
 [Steel](https://github.com/steel-dev/steel-browser) API. On `dyaus`, the
 service runs as a pinned Docker container on loopback port `3100`.
 
-Install the plugin from this checkout:
+Install from the published Git release range:
 
 ```sh
-bb plugin install ./plugins/steel-browser
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.0 --subdirectory plugins/steel-browser --tag-prefix steel-browser/
 bb plugin reload steel-browser
 ```
+
+BB Surf is also available in BB Community as `steel-browser@bb-community`.
+Release versions can lag the features described on the main branch.
+For a missing local installation, follow [the recovery guide](docs/plugin-recovery.md)
+instead of uninstalling the plugin.
 
 Open **BB Surf** in BB or manage sessions from the CLI:
 
 ```sh
-bb steel-browser status
-bb steel-browser sessions
-bb steel-browser create
-bb steel-browser release <session-id>
+bb surf status
+bb surf sessions
+bb surf create
+bb surf release <session-id>
 ```
 
 The plugin also ships agent guidance for choosing the local Steel service over
@@ -160,12 +165,16 @@ Install the tracking Git release directly from this monorepo:
 bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.4 --subdirectory plugins/taskboard --tag-prefix taskboard/
 ```
 
-After [the BB Community entry](https://github.com/get-bb/marketplace/pull/129)
-is merged and live, the equivalent shorthand is:
+The [BB Community entry](https://github.com/get-bb/marketplace/pull/129)
+is merged. You can also install its configured release range:
 
 ```sh
-bb plugin install taskboard
+bb plugin install taskboard@bb-community
 ```
+
+The main branch includes unreleased 0.3.5 changes. For a missing local
+installation, use [the recovery guide](docs/plugin-recovery.md) to preserve
+your existing configuration without downgrading it.
 
 Then open **Taskboard → Manage**, choose a BB project, and select exactly one
 external tracker for it. Different BB projects can use different providers.

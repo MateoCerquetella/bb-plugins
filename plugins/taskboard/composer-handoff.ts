@@ -41,6 +41,7 @@ function validMentionId(value: unknown): value is string {
   return (
     source === 'github' ||
     source === 'gitlab' ||
+    source === 'gitea' ||
     source === 'linear' ||
     source === 'jira'
   );

@@ -1,3 +1,4 @@
+import { createGiteaAdapter, parseGiteaRef } from './sources/gitea.js';
 import { registerPreparation } from './preparation/server.js';
 import { createTicketImprovementService } from './ticket-improvement-service.js';
 import {
@@ -52,9 +53,7 @@ import {
 } from './credentials.js';
 import {
   createGithubAdapter,
-  githubReposForProject,
-  githubStatusOutputSchema,
-  loadGithubStatus
+  discoverGithubRepositories
 } from './sources/github.js';
 import {
   createGitlabAdapter,
@@ -75,9 +74,13 @@ import { createWorkItemStore } from './store.js';
 import { decodeTicketImage } from './ticket-images-server.js';
 import { createFactoryStore } from './factory/store.js';
 import { createFactoryService } from './factory/service.js';
+import { factoryProjectPolicySchema, type FactoryIdentity } from './factory/contract.js';
+import { factoryKey } from './factory/state.js';
+import { createEmpiricalObservationQueue } from './empirical/serial.js';
+import { hostContract } from './preparation/contract.js';
 import { progressStatus } from './factory/tracker.js';
 
-const SOURCES: readonly WorkSource[] = ['linear', 'github', 'jira', 'gitlab'];
+const SOURCES: readonly WorkSource[] = ['linear', 'github', 'jira', 'gitlab', 'gitea'];
 const CREDENTIAL_SOURCES: readonly CredentialSource[] = ['linear', 'jira'];
 const SYNC_INTERVAL_MS = 5 * 60_000;
 const BOOT_SYNC_DELAY_MS = 2_500;
@@ -93,7 +96,9 @@ const DEFAULT_PROJECT_CONFIG = {
   jiraEmail: '',
   jiraJql:
     'assignee = currentUser() AND resolution = Unresolved ORDER BY updated DESC',
-  gitlabProjectRef: ''
+  gitlabProjectRef: '',
+  giteaLogin: '',
+  giteaProjectRef: ''
 } satisfies Omit<ProjectSourceConfig, 'projectId'>;
 
 function errorMessage(error: unknown): string {
@@ -176,6 +181,8 @@ interface ParsedCliArguments {
   jiraEmail: string | undefined;
   jiraJql: string | undefined;
   gitlabProject: string | undefined;
+  giteaProject: string | undefined;
+  giteaLogin: string | undefined;
   statusId: string | undefined;
   preset: string | undefined;
   fromState: string | undefined;
@@ -185,6 +192,7 @@ interface ParsedCliArguments {
 
 const CLI_OPTIONS_BY_COMMAND = new Map<string, ReadonlySet<string>>([
   ['status', new Set(['--project', '--json'])],
+  ['factory', new Set(['--project', '--json'])],
   [
     'list',
     new Set([
@@ -211,6 +219,8 @@ const CLI_OPTIONS_BY_COMMAND = new Map<string, ReadonlySet<string>>([
       '--jira-email',
       '--jira-jql',
       '--gitlab-project',
+      '--gitea-project',
+      '--gitea-login',
       '--json'
     ])
   ],
@@ -236,6 +246,8 @@ export function parseTaskboardCliArguments(
   let jiraEmail: string | undefined;
   let jiraJql: string | undefined;
   let gitlabProject: string | undefined;
+  let giteaProject: string | undefined;
+  let giteaLogin: string | undefined;
   let statusId: string | undefined;
   let preset: string | undefined;
   let fromState: string | undefined;
@@ -304,6 +316,12 @@ export function parseTaskboardCliArguments(
     } else if (argument === '--jira-jql') {
       jiraJql = valueAfter(argument, index);
       index += 1;
+    } else if (argument === '--gitea-project') {
+      giteaProject = valueAfter(argument, index);
+      index += 1;
+    } else if (argument === '--gitea-login') {
+      giteaLogin = valueAfter(argument, index);
+      index += 1;
     } else if (argument === '--gitlab-project') {
       gitlabProject = valueAfter(argument, index);
       index += 1;
@@ -345,6 +363,8 @@ export function parseTaskboardCliArguments(
     jiraEmail,
     jiraJql,
     gitlabProject,
+    giteaProject,
+    giteaLogin,
     statusId,
     preset,
     fromState,
@@ -397,6 +417,8 @@ function formatProjectConfig(config: ProjectConfigView): string {
     `Jira email\t${config.jiraEmail || 'not configured'}`,
     `Jira credential\t${config.jiraCredentialConfigured ? 'configured' : 'not configured'}`,
     `Jira JQL\t${config.jiraJql}`,
+    `Gitea repository\t${config.giteaProjectRef || 'not configured'}`,
+    `Gitea tea login\t${config.giteaLogin || 'not configured'}`,
     `GitLab project\t${config.gitlabProjectRef || 'not configured'}`,
     `GitLab (glab)\t${config.gitlabConfigured ? 'authenticated' : 'not authenticated'}`
   ].join('\n');
@@ -427,27 +449,6 @@ function refreshedItemCount(
     .reduce((total, entry) => total + entry.itemCount, 0);
 }
 
-function parseGithubRepoFromRemote(
-  value: string | null | undefined
-): string | null {
-  if (!value) return null;
-  const trimmed = value.trim();
-  if (!trimmed) return null;
-  const sshMatch =
-    /^git@github\.com:(?<repo>[^/\s]+\/[^/\s]+?)(?:\.git)?$/iu.exec(trimmed);
-  if (sshMatch?.groups?.repo) return sshMatch.groups.repo;
-  try {
-    const url = new URL(trimmed);
-    if (url.hostname !== 'github.com') return null;
-    const path = url.pathname
-      .replace(/^\/+|\/+$/gu, '')
-      .replace(/\.git$/iu, '');
-    return /^[^/\s]+\/[^/\s]+$/u.test(path) ? path : null;
-  } catch {
-    return null;
-  }
-}
-
 export default async function plugin(bb: BbPluginApi) {
   bb.settings.define({
     showThreadHeaderProgress: {
@@ -462,7 +463,9 @@ export default async function plugin(bb: BbPluginApi) {
     }
   });
   const store = createWorkItemStore(bb);
-  const factory = createFactoryService(bb.sdk, createFactoryStore(bb.storage.database()), projectId =>
+  const factoryStore = createFactoryStore(bb.storage.database());
+  const empiricalHost = bb.hosts.experimental_client({ contract: hostContract });
+  const factory = createFactoryService(bb.sdk, factoryStore, projectId =>
     bb.realtime.publish('taskboard:factory', { projectId }), {
       getItem: identity => store.get(identity.projectId, identity.source, identity.locator) ?? null,
       async markInProgress(item) {
@@ -480,13 +483,120 @@ export default async function plugin(bb: BbPluginApi) {
         if (updated.stateCategory !== 'in_progress') throw new Error('The tracker did not confirm In progress.');
         return { status: 'synced', message: null };
       }
+    }, {
+      provider: projectId => projectConfig(projectId, true).source,
+      async candidates(policy, excludeLocators) {
+        const statuses = await syncAll(policy.projectId, policy.provider, true);
+        const status = statuses.find(candidate => candidate.source === policy.provider);
+        if (!status?.available) throw new Error(status?.message ?? 'Provider is unavailable.');
+        return store.list({
+          projectId: policy.projectId, source: policy.provider, stateCategories: ['todo'],
+          excludeLocators, limit: 500
+        });
+      },
+      liveItem: identity => getLiveItem(identity.projectId, identity.source, identity.locator)
     }
   );
+  const queueEmpiricalObservation = createEmpiricalObservationQueue();
+  function observeFactoryEmpirical(input: FactoryIdentity) {
+    return queueEmpiricalObservation(factoryKey(input), () => readFactoryEmpirical(input));
+  }
+  async function readFactoryEmpirical(input: FactoryIdentity) {
+    const record = factoryStore.get(input);
+    const run = [...(record?.runs ?? [])].reverse().find(candidate =>
+      candidate.threadId && candidate.environmentId);
+    if (!run?.threadId || !run.environmentId) {
+      return { kind: 'unbound' as const, reason: 'Start task to link an agent workspace.' };
+    }
+    const prior = factoryStore.getEmpirical(input);
+    const lastKnown = prior && prior.hostId === run.hostId &&
+      prior.environmentId === run.environmentId &&
+      prior.checkoutRoot === run.checkoutRoot ? prior : null;
+    try {
+      const [thread, environment] = await Promise.all([
+        bb.sdk.threads.get({ threadId: run.threadId }),
+        bb.sdk.environments.get({ environmentId: run.environmentId })
+      ]);
+      if (thread.projectId !== input.projectId || thread.environmentId !== run.environmentId ||
+        environment.projectId !== input.projectId || !environment.hostId || !environment.path ||
+        (run.hostId && run.hostId !== environment.hostId) ||
+        (run.checkoutRoot && run.checkoutRoot !== environment.path)) {
+        return { kind: 'unbound' as const, reason: 'The linked session workspace changed or is unavailable.' };
+      }
+      const response = await empiricalHost.call('observeEmpirical',
+        { root: environment.path, environmentId: environment.id },
+        { hostId: environment.hostId, signal: AbortSignal.timeout(55_000) });
+      if (response.environmentId !== environment.id || response.root !== environment.path) {
+        return { kind: 'unbound' as const, reason: 'Empirical responded from another workspace.' };
+      }
+      const status = response.status;
+      const observedAt = Date.now();
+      if (status.kind === 'feature' || status.kind === 'empty') {
+        factoryStore.saveEmpirical(input, {
+          hostId: environment.hostId, environmentId: environment.id,
+          checkoutRoot: environment.path, observedAt, status
+        });
+      }
+      return {
+        kind: 'observation' as const,
+        hostId: environment.hostId,
+        environmentId: environment.id,
+        checkoutRoot: environment.path,
+        threadId: run.threadId,
+        observedAt,
+        status,
+        lastKnown: status.kind === 'feature' || status.kind === 'empty' ? null : lastKnown
+      };
+    } catch {
+      if (!run.hostId || !run.checkoutRoot) {
+        return { kind: 'unbound' as const, reason: 'The linked session workspace is offline or unavailable.' };
+      }
+      return {
+        kind: 'observation' as const,
+        hostId: run.hostId,
+        environmentId: run.environmentId,
+        checkoutRoot: run.checkoutRoot,
+        threadId: run.threadId,
+        observedAt: Date.now(),
+        status: { kind: 'unavailable' as const, reason: 'The host is offline or Empirical did not respond.' },
+        lastKnown
+      };
+    }
+  }
+  const empiricalState = new Map<string, string>();
+  bb.background.service('taskboard-empirical-reconciliation', {
+    async start(signal) {
+      let offset = 0;
+      while (!signal.aborted) {
+        const records = factoryStore.all().filter(record =>
+          record.runs.some(run => run.threadId && run.environmentId));
+        const batch = records.slice(offset, offset + 32);
+        offset = offset + batch.length >= records.length ? 0 : offset + batch.length;
+        for (let index = 0; index < batch.length && !signal.aborted; index += 4) {
+          await Promise.allSettled(batch.slice(index, index + 4).map(async record => {
+            const key = JSON.stringify([record.projectId, record.source, record.locator]);
+            const observed = await observeFactoryEmpirical(record);
+            const fingerprint = JSON.stringify(observed.kind === 'observation'
+              ? [observed.hostId, observed.environmentId, observed.checkoutRoot, observed.status]
+              : [observed.kind, observed.reason]);
+            if (empiricalState.get(key) !== fingerprint) {
+              empiricalState.set(key, fingerprint);
+              bb.realtime.publish('taskboard:factory', { projectId: record.projectId });
+            }
+          }));
+        }
+        await sleep(8000, signal);
+      }
+    }
+  });
   bb.background.service('taskboard-factory-progress', {
     async start(signal) {
       await factory.recover();
       while (!signal.aborted) {
-        try { await factory.poll(signal); }
+        try {
+          await factory.scan();
+          await factory.poll(signal);
+        }
         catch (error) { if (!signal.aborted) bb.log.warn(`Factory progress: ${errorMessage(error)}`); }
         await sleep(2500, signal);
       }
@@ -647,19 +757,15 @@ export default async function plugin(bb: BbPluginApi) {
     });
   }
 
-  async function fallbackGithubRepos(projectId: string): Promise<string[]> {
-    const project = (await liveProjects()).find(
-      entry => entry.id === projectId
-    );
-    const repo = parseGithubRepoFromRemote(
-      typeof project === 'object' &&
-        project !== null &&
-        'gitRemoteUrl' in project &&
-        typeof project.gitRemoteUrl === 'string'
-        ? project.gitRemoteUrl
-        : null
-    );
-    return repo ? [repo] : [];
+  async function githubReposForProject(projectId: string): Promise<string[]> {
+    const [project, system] = await Promise.all([
+      bb.sdk.projects.get({ projectId }),
+      bb.sdk.system.config()
+    ]);
+    return discoverGithubRepositories({
+      project,
+      primaryHostId: system.primaryHostId
+    });
   }
 
   function projectConfig(
@@ -699,7 +805,8 @@ export default async function plugin(bb: BbPluginApi) {
       linear: currentRevision(projectId, 'linear'),
       github: currentRevision(projectId, 'github'),
       jira: currentRevision(projectId, 'jira'),
-      gitlab: currentRevision(projectId, 'gitlab')
+      gitlab: currentRevision(projectId, 'gitlab'),
+      gitea: currentRevision(projectId, 'gitea')
     };
   }
 
@@ -826,15 +933,7 @@ export default async function plugin(bb: BbPluginApi) {
         // network probe runs in the background and refreshes the view via
         // realtime when it settles.
         glabGlabOkHeuristic(config),
-        bb.sdk.plugins
-          .callRpc({
-            pluginId: 'github',
-            method: 'status',
-            input: null,
-            outputSchema: githubStatusOutputSchema
-          })
-          .then(status => githubReposForProject(status, config.projectId))
-          .catch(() => fallbackGithubRepos(config.projectId))
+        githubReposForProject(config.projectId).catch(() => [])
       ]);
     return {
       ...config,
@@ -903,31 +1002,18 @@ export default async function plugin(bb: BbPluginApi) {
     if (!adapter) throw new Error(`Missing ${config.source} adapter`);
 
     const destinationLabel =
-      config.source === 'github'
+      config.source === 'github' || config.source === 'gitea'
         ? 'Repository'
         : config.source === 'linear'
           ? 'Team'
           : config.source === 'gitlab'
             ? 'GitLab project'
             : 'Project key';
-    let githubMessage: string | null = null;
-    let githubRepos = config.githubRepos;
-    if (config.source === 'github') {
-      try {
-        const status = await loadGithubStatus(bb);
-        githubRepos = githubReposForProject(status, projectId);
-        if (!status.ghOk) {
-          githubMessage = status.ghError ?? 'GitHub is not authenticated.';
-        }
-      } catch {
-        githubRepos = [];
-        githubMessage =
-          'Install and enable BB’s official GitHub plugin before creating GitHub issues.';
-      }
-    }
     const destinationIds =
       config.source === 'github'
-        ? githubRepos
+        ? config.githubRepos
+        : config.source === 'gitea'
+          ? config.giteaProjectRef ? [config.giteaProjectRef] : []
         : config.source === 'linear'
           ? config.linearTeamKey
             ? [config.linearTeamKey]
@@ -939,16 +1025,18 @@ export default async function plugin(bb: BbPluginApi) {
             : jiraProjectKeysFromJql(config.jiraJql);
     const destinations = destinationIds.map(id => ({ id, label: id }));
     const missingDestinationMessage =
-      config.source === 'github' && destinations.length === 0
+      config.source === 'gitea' && destinations.length === 0
+        ? 'Choose a tea login and Gitea repository in Manage.'
+        : config.source === 'github' && destinations.length === 0
         ? 'Map at least one GitHub repository to this BB project.'
         : config.source === 'linear' && destinations.length === 0
           ? 'Choose a Linear team key for this BB project in Manage.'
           : config.source === 'gitlab' && destinations.length === 0
             ? 'Choose a GitLab project (host/path) for this BB project in Manage.'
             : null;
-    const configurationMessage =
-      githubMessage ??
-      (adapter.configured() ? null : adapter.configurationMessage());
+    const configurationMessage = adapter.configured()
+      ? null
+      : adapter.configurationMessage();
 
     return {
       projectId,
@@ -1026,6 +1114,10 @@ export default async function plugin(bb: BbPluginApi) {
         config.source === 'linear' || config.source === 'jira'
           ? await credentials.read(projectId, config.source)
           : undefined;
+      const githubRepos =
+        config.source === 'github'
+          ? await githubReposForProject(projectId)
+          : [];
       const after = revisionSnapshot(projectId);
       if (!SOURCES.every(source => before[source] === after[source])) continue;
       const adapter =
@@ -1046,7 +1138,12 @@ export default async function plugin(bb: BbPluginApi) {
               })
             : config.source === 'gitlab'
               ? createGitlabAdapter(bb, true, projectId, config.gitlabProjectRef)
-              : createGithubAdapter(bb, true, projectId);
+              : config.source === 'gitea'
+                ? createGiteaAdapter({ enabled: true, login: config.giteaLogin, projectRef: config.giteaProjectRef })
+                : createGithubAdapter({
+                    enabled: true,
+                    repositories: githubRepos
+                  });
       return new Map([[config.source, adapter]]);
     }
   }
@@ -1266,6 +1363,8 @@ export default async function plugin(bb: BbPluginApi) {
     ) {
       changed.add('jira');
     }
+    if (previous.giteaLogin !== next.giteaLogin || previous.giteaProjectRef !== next.giteaProjectRef) changed.add('gitea');
+    if (previous.gitlabProjectRef !== next.gitlabProjectRef) changed.add('gitlab');
     return [...changed];
   }
 
@@ -1291,7 +1390,10 @@ export default async function plugin(bb: BbPluginApi) {
       left.linearFinishedDays === right.linearFinishedDays &&
       left.jiraBaseUrl === right.jiraBaseUrl &&
       left.jiraEmail === right.jiraEmail &&
-      left.jiraJql === right.jiraJql
+      left.jiraJql === right.jiraJql &&
+      left.gitlabProjectRef === right.gitlabProjectRef &&
+      left.giteaLogin === right.giteaLogin &&
+      left.giteaProjectRef === right.giteaProjectRef
     );
   }
 
@@ -1367,7 +1469,9 @@ export default async function plugin(bb: BbPluginApi) {
           jiraBaseUrl: input.jiraBaseUrl,
           jiraEmail: input.jiraEmail,
           jiraJql: input.jiraJql,
-          gitlabProjectRef: input.gitlabProjectRef
+          gitlabProjectRef: input.gitlabProjectRef,
+          giteaLogin: input.giteaLogin,
+          giteaProjectRef: input.giteaProjectRef
         });
 
         if (jiraIdentityChanged) {
@@ -1822,6 +1926,26 @@ export default async function plugin(bb: BbPluginApi) {
     }
   });
   const handlers: PluginRpcHandlers<typeof taskboardRpcContract> = {
+    async factoryGetProject(input) {
+      await assertProjectExists(input.projectId);
+      const provider = projectConfig(input.projectId, true).source;
+      return { policy: factoryStore.getProjectPolicy(input.projectId, provider),
+        status: factoryStore.projectStatus(input.projectId, provider) };
+    },
+    async factorySaveProject(input) {
+      await assertProjectExists(input.projectId);
+      assertSelectedSource(input.projectId, input.provider);
+      const policy = factoryStore.saveProjectPolicy(factoryProjectPolicySchema.parse({
+        ...input, updatedAt: new Date().toISOString()
+      }));
+      bb.realtime.publish('taskboard:factory', { projectId: input.projectId });
+      return { policy, status: factoryStore.projectStatus(input.projectId, input.provider) };
+    },
+    async factoryScanProject(input) {
+      await assertProjectExists(input.projectId);
+      await factory.scan(input.projectId);
+      return { status: factoryStore.projectStatus(input.projectId, projectConfig(input.projectId, true).source) };
+    },
     async improveTicket(input) {
       await assertProjectExists(input.projectId);
       return ticketImprovement.start(input);
@@ -1838,6 +1962,10 @@ export default async function plugin(bb: BbPluginApi) {
       await assertProjectExists(input.projectId);
       return factory.diff(input, input.runId, input.path);
     },
+    async factoryEmpirical(input) {
+      await assertProjectExists(input.projectId);
+      return observeFactoryEmpirical(input);
+    },
     async factoryStartTask(input) {
       await assertProjectExists(input.projectId);
       const item = await getLiveItem(input.projectId, input.source, input.locator);
@@ -1852,6 +1980,21 @@ export default async function plugin(bb: BbPluginApi) {
       await assertProjectExists(input.projectId);
       const item = await getLiveItem(input.projectId, input.source, input.locator);
       return { record: await factory.linkRecovered(item, input.expectedVersion, input.threadId) };
+    },
+    async factoryAdoptCoordinator(input) {
+      await assertProjectExists(input.projectId);
+      const item = await getLiveItem(input.projectId, input.source, input.locator);
+      return { record: await factory.adoptCoordinator(item, input.expectedVersion) };
+    },
+    async factoryRetryCoordinator(input) {
+      await assertProjectExists(input.projectId);
+      const item = await getLiveItem(input.projectId, input.source, input.locator);
+      return { record: await factory.retryCoordinator(item, input.expectedVersion, input.intentId) };
+    },
+    async factoryRecoverCoordinator(input) {
+      await assertProjectExists(input.projectId);
+      const item = await getLiveItem(input.projectId, input.source, input.locator);
+      return { record: await factory.recoverCoordinator(item, input.expectedVersion, input.intentId, input.threadId) };
     },
     async factoryGet(input) {
       await assertProjectExists(input.projectId);
@@ -2069,6 +2212,8 @@ export default async function plugin(bb: BbPluginApi) {
     name: 'taskboard',
     summary: 'Browse tasks and inspect durable preparation briefs',
     commands: [
+      { name: 'factory', summary: 'Inspect, enable, pause, or scan the project factory',
+        usage: 'bb taskboard factory status|enable [concurrency]|pause|scan [--project <proj_id>] [--json]' },
       {name: 'prepare', summary: 'List, inspect or export preparation packets without starting implementation', usage: 'bb taskboard prepare list [--project <id>] | show <id> | export <id>'},
       {
         name: 'status',
@@ -2080,38 +2225,38 @@ export default async function plugin(bb: BbPluginApi) {
         summary: 'List cached project work, refreshing first by default',
         usage:
           'bb taskboard list [--project <proj_id>] ' +
-          '[--source linear|github|jira|gitlab] [--query <text>] ' +
+          '[--source linear|github|jira|gitlab|gitea] [--query <text>] ' +
           '[--preset <name>] [--cached] [--json]'
       },
       {
         name: 'show',
         summary: 'Fetch one external issue in a BB project',
         usage:
-          'bb taskboard show <linear|github|jira|gitlab> <locator> [--project <proj_id>] [--json]'
+          'bb taskboard show <linear|github|jira|gitlab|gitea> <locator> [--project <proj_id>] [--json]'
       },
       {
         name: 'transitions',
         summary: 'List valid status targets for one external issue',
         usage:
-          'bb taskboard transitions <linear|github|jira|gitlab> <locator> [--project <proj_id>] [--json]'
+          'bb taskboard transitions <linear|github|jira|gitlab|gitea> <locator> [--project <proj_id>] [--json]'
       },
       {
         name: 'move',
         summary: 'Move one external issue to an exact listed status id',
         usage:
-          'bb taskboard move <linear|github|jira|gitlab> <locator> --status <id> [--project <proj_id>] [--json]'
+          'bb taskboard move <linear|github|jira|gitlab|gitea> <locator> --status <id> [--project <proj_id>] [--json]'
       },
       {
         name: 'refresh',
         summary: "Refresh a BB project's external issue caches",
         usage:
-          'bb taskboard refresh [linear|github|jira|gitlab] [--project <proj_id>] [--json]'
+          'bb taskboard refresh [linear|github|jira|gitlab|gitea] [--project <proj_id>] [--json]'
       },
       {
         name: 'config',
         summary: 'Show or update nonsecret project connector configuration',
         usage:
-          'bb taskboard config [--project <proj_id>] [--source linear|github|jira|gitlab] [--linear-team <key>] [--jira-url <url>] [--jira-email <email>] [--jira-jql <text>] [--gitlab-project <ref>] [--json]'
+          'bb taskboard config [--project <proj_id>] [--source linear|github|jira|gitlab|gitea] [--linear-team <key>] [--jira-url <url>] [--jira-email <email>] [--jira-jql <text>] [--gitlab-project <ref>] [--gitea-login <name>] [--gitea-project <host/owner/repo>] [--json]'
       },
       {
         name: 'credentials',
@@ -2168,6 +2313,29 @@ export default async function plugin(bb: BbPluginApi) {
           return projectById(parsedProject.data);
         };
 
+        if (command === 'factory') {
+          const project = await requireProject();
+          const verb = args.positionals[0] ?? 'status';
+          const snapshot = await handlers.factoryGetProject({ projectId: project.id });
+          let result = snapshot;
+          if (verb === 'enable' || verb === 'pause') {
+            const concurrency = args.positionals[1] === undefined
+              ? factoryProjectPolicySchema.parse(snapshot.policy).maxConcurrent : Number(args.positionals[1]);
+            if (args.positionals.length > (verb === 'enable' ? 2 : 1)) {
+              throw new Error('Use factory enable [concurrency] or factory pause.');
+            }
+            result = await handlers.factorySaveProject({
+              projectId: project.id, provider: projectConfig(project.id, true).source,
+              enabled: verb === 'enable', intake: 'todo', maxConcurrent: concurrency
+            });
+          } else if (verb === 'scan' && args.positionals.length <= 1) {
+            const scanned = await handlers.factoryScanProject({ projectId: project.id });
+            result = { policy: scanned.status.policy, status: scanned.status };
+          } else if (verb !== 'status' || args.positionals.length > 1) {
+            throw new Error('Use factory status, enable [concurrency], pause, or scan.');
+          }
+          return { exitCode: 0, stdout: formatFilterPresetCliJson(result) };
+        }
         if (command === 'status') {
           if (args.positionals.length > 0) {
             throw new Error(
@@ -2194,7 +2362,7 @@ export default async function plugin(bb: BbPluginApi) {
         if (command === 'refresh') {
           if (args.positionals.length > 1) {
             throw new Error(
-              'Usage: bb taskboard refresh [linear|github|jira|gitlab] [--project <proj_id>] [--json]'
+              'Usage: bb taskboard refresh [linear|github|jira|gitlab|gitea] [--project <proj_id>] [--json]'
             );
           }
           const project = await requireProject();
@@ -2203,7 +2371,7 @@ export default async function plugin(bb: BbPluginApi) {
             ? workSourceSchema.safeParse(sourceValue)
             : null;
           if (parsedSource && !parsedSource.success) {
-            throw new Error('Source must be linear, github, jira, or gitlab');
+            throw new Error('Source must be linear, github, jira, gitlab, or gitea');
           }
           const source = parsedSource?.data;
           const sources = await syncAll(project.id, source, true);
@@ -2239,7 +2407,7 @@ export default async function plugin(bb: BbPluginApi) {
           if (args.positionals.length > 0) {
             throw new Error(
               'Usage: bb taskboard list [--project <proj_id>] ' +
-                '[--source linear|github|jira|gitlab] [--query <text>] ' +
+                '[--source linear|github|jira|gitlab|gitea] [--query <text>] ' +
                 '[--preset <name>] [--cached] [--json]'
             );
           }
@@ -2248,7 +2416,7 @@ export default async function plugin(bb: BbPluginApi) {
             ? workSourceSchema.safeParse(sourceValue)
             : null;
           if (parsedSource && !parsedSource.success) {
-            throw new Error('Source must be linear, github, jira, or gitlab');
+            throw new Error('Source must be linear, github, jira, gitlab, or gitea');
           }
           const project = await requireProject();
           // Explicit --source/--query flags beat a --preset's saved values;
@@ -2310,14 +2478,14 @@ export default async function plugin(bb: BbPluginApi) {
         if (command === 'show') {
           if (args.positionals.length !== 2) {
             throw new Error(
-              'Usage: bb taskboard show <linear|github|jira|gitlab> <locator> [--project <proj_id>] [--json]'
+              'Usage: bb taskboard show <linear|github|jira|gitlab|gitea> <locator> [--project <proj_id>] [--json]'
             );
           }
           const project = await requireProject();
           const parsedSource = workSourceSchema.safeParse(args.positionals[0]);
           const locator = args.positionals[1]!;
           if (!parsedSource.success) {
-            throw new Error('Source must be linear, github, jira, or gitlab');
+            throw new Error('Source must be linear, github, jira, gitlab, or gitea');
           }
           const item = await getLiveItem(
             project.id,
@@ -2334,13 +2502,13 @@ export default async function plugin(bb: BbPluginApi) {
         if (command === 'transitions') {
           if (args.positionals.length !== 2) {
             throw new Error(
-              'Usage: bb taskboard transitions <linear|github|jira|gitlab> <locator> [--project <proj_id>] [--json]'
+              'Usage: bb taskboard transitions <linear|github|jira|gitlab|gitea> <locator> [--project <proj_id>] [--json]'
             );
           }
           const project = await requireProject();
           const parsedSource = workSourceSchema.safeParse(args.positionals[0]);
           if (!parsedSource.success) {
-            throw new Error('Source must be linear, github, jira, or gitlab');
+            throw new Error('Source must be linear, github, jira, gitlab, or gitea');
           }
           const locator = args.positionals[1]!;
           const options = await liveStatusOptions(
@@ -2374,13 +2542,13 @@ export default async function plugin(bb: BbPluginApi) {
         if (command === 'move') {
           if (args.positionals.length !== 2 || !args.statusId) {
             throw new Error(
-              'Usage: bb taskboard move <linear|github|jira|gitlab> <locator> --status <id> [--project <proj_id>] [--json]'
+              'Usage: bb taskboard move <linear|github|jira|gitlab|gitea> <locator> --status <id> [--project <proj_id>] [--json]'
             );
           }
           const project = await requireProject();
           const parsedSource = workSourceSchema.safeParse(args.positionals[0]);
           if (!parsedSource.success) {
-            throw new Error('Source must be linear, github, jira, or gitlab');
+            throw new Error('Source must be linear, github, jira, gitlab, or gitea');
           }
           const item = await updateItemStatus(
             project.id,
@@ -2398,14 +2566,14 @@ export default async function plugin(bb: BbPluginApi) {
         if (command === 'config') {
           if (args.positionals.length > 0) {
             throw new Error(
-              'Usage: bb taskboard config [--project <proj_id>] [--source linear|github|jira|gitlab] [--linear-team <key>] [--jira-url <url>] [--jira-email <email>] [--jira-jql <text>] [--gitlab-project <ref>] [--json]'
+              'Usage: bb taskboard config [--project <proj_id>] [--source linear|github|jira|gitlab|gitea] [--linear-team <key>] [--jira-url <url>] [--jira-email <email>] [--jira-jql <text>] [--gitlab-project <ref>] [--gitea-login <name>] [--gitea-project <host/owner/repo>] [--json]'
             );
           }
           const parsedSource = args.source
             ? workSourceSchema.safeParse(args.source)
             : null;
           if (parsedSource && !parsedSource.success) {
-            throw new Error('--source must be linear, github, jira, or gitlab');
+            throw new Error('--source must be linear, github, jira, gitlab, or gitea');
           }
           if (args.jiraJql !== undefined && !args.jiraJql.trim()) {
             throw new Error('--jira-jql requires a non-empty value');
@@ -2419,6 +2587,7 @@ export default async function plugin(bb: BbPluginApi) {
               );
             }
           }
+          if (args.giteaProject !== undefined) parseGiteaRef(args.giteaProject.trim());
           const project = await requireProject();
           const snapshot = await readCredentialFormSnapshot(project.id);
           const previous = snapshot.config;
@@ -2429,7 +2598,9 @@ export default async function plugin(bb: BbPluginApi) {
             args.jiraUrl !== undefined ||
             args.jiraEmail !== undefined ||
             args.jiraJql !== undefined ||
-            args.gitlabProject !== undefined;
+            args.gitlabProject !== undefined ||
+            args.giteaProject !== undefined ||
+            args.giteaLogin !== undefined;
           const config = changed
             ? await persistProjectConfig(
                 {
@@ -2443,6 +2614,8 @@ export default async function plugin(bb: BbPluginApi) {
                   jiraJql: args.jiraJql ?? previous.jiraJql,
                   gitlabProjectRef:
                     args.gitlabProject ?? previous.gitlabProjectRef,
+                  giteaLogin: args.giteaLogin ?? previous.giteaLogin,
+                  giteaProjectRef: args.giteaProject ?? previous.giteaProjectRef,
                   linearCredential: KEEP_SECRET,
                   jiraCredential: KEEP_SECRET
                 },
@@ -2510,6 +2683,8 @@ export default async function plugin(bb: BbPluginApi) {
               jiraEmail: previous.jiraEmail,
               jiraJql: previous.jiraJql,
               gitlabProjectRef: previous.gitlabProjectRef,
+              giteaLogin: previous.giteaLogin,
+              giteaProjectRef: previous.giteaProjectRef,
               linearCredential: response.linearCredential,
               jiraCredential: response.jiraCredential
             },
@@ -2784,6 +2959,6 @@ export default async function plugin(bb: BbPluginApi) {
   });
 
   bb.log.info(
-    'Taskboard registered project-scoped Linear, GitHub, GitLab, and Jira sources'
+    'Taskboard registered project-scoped Linear, GitHub, GitLab, Gitea, and Jira sources'
   );
 }

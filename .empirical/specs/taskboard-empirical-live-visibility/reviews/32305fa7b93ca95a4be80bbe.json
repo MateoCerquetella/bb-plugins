@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:38e16e0d3bbebef480a800d63eae05860db35c5f99e2bc020f9cf2a4b2e60611",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "a16dda0dd942d0bd1a7967329142f4209d5c9231",
+  "headCommit": "3cb143f51bee3f37d06fe9b096e7c255a7c9172b",
+  "diffDigest": "sha256:d00c580635d33533b776269be4e5b6893172a18c19bb960906bc0b99557f3e4e",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "isolated-reviewer-empirical-16",
+  "reviewerInvocationId": "empirical-16-20261014-01",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- PASS AC-1: Native dispatch and run identity remain linked to the resolved environment, host, and checkout.\n- PASS AC-2: The separate Empirical panel derives completion from read-only Empirical state.\n- FAIL AC-3: Concurrent observations can publish and persist an older workflow state as the newest observation.\n- PASS AC-4: Native run activity remains present and the workflow has a separate thread link.\n- PASS AC-5: Verification and durable completion level remain distinct in the displayed facts.\n- PASS AC-6: Host and checkout identity are validated, and retained observations are labeled stale.\n- PASS AC-7: The committed fixture and focused tests cover the requested UI states.\n\n## Security / correctness\n\nNo credential exposure or authorization bypass found. Observation ordering is incorrect under concurrent background and foreground requests: observedAt is assigned when each RPC returns, so a slow read started before a journal change can finish after a newer read and overwrite its snapshot.\n\n## Design / maintainability\n\nThe host-side projection and UI distinction between native and Empirical progress are coherent. Serialize observation per run or attach a source revision/monotonic request generation before persisting and publishing.",
+  "bodyDigest": "sha256:77f98ae1b2b461f8d61a30086c6d42b9a99ff5dc59e79c309f7178a0a854bba4",
+  "findings": [
+    {
+      "id": "F-1",
+      "severity": "medium",
+      "category": "acceptance",
+      "summary": "Concurrent factoryEmpirical and background observations timestamp on return, allowing an older journal snapshot to replace and broadcast a newer workflow revision.",
+      "path": "plugins/taskboard/server.ts"
+    }
+  ],
+  "digest": "sha256:32305fa7b93ca95a4be80bbe8d40bd1dc7432a0e333cdeea1de9bbaa482f420c"
+}

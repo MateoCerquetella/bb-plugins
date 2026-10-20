@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:7063b82584f1608904fee6cca5bbd65d0d46da6df0b116392b2e76fcd886db16",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "00fc12410a1c2f3c959436c6cdcc9a8f6b299bee",
+  "headCommit": "cae0f482a9827062152ef04c2706a17c328a5447",
+  "diffDigest": "sha256:9bc71672bddadf45c7ac5b419f33ebdc5cf01a26d8b72136bcba156f3b6414ce",
+  "verdict": "APPROVED",
+  "reviewerActor": "codex-fresh-isolated-reviewer",
+  "reviewerInvocationId": "review-cae0f48-2026-10-19",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: `bb surf --help` exited 0 and listed all existing browser subcommands.\n- PASS AC-2: The Surf registration dispatches to the existing handlers; the FakePluginHost behavioral contract test passed.\n- PASS AC-3: Instructions, skill, usage strings, runtime messages, and both README surfaces use `bb surf`.\n- PASS AC-4: Internal plugin identity, storage, bindings, UI route, CSS identifiers, and directive remain unchanged.\n- PASS AC-5: Focused package tests, SDK types, TypeScript, build, and diff check passed.\n- PASS AC-6: The running BB instance recognized `bb surf`; help exited 0 and status returned connected=true.\n\n## Security / correctness\n\nPassed. Durable identity, bindings, storage, handoff directive, and browser safety behavior remain intact.\n\n## Design / maintainability\n\nApproved. The implementation reuses the existing dispatch flow, adds a direct help branch, and verifies behavior through FakePluginHost.",
+  "bodyDigest": "sha256:57d50fa5bff2f5da961dfdef75c878c61c5a3d87020976fbfe2ba4f29136f1c0",
+  "findings": [],
+  "digest": "sha256:7f8a6f3e3e0a04d6e67fad2ff01f9d9597c55f1543247ff2f8c9c3d59b44fdc1"
+}

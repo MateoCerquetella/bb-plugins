@@ -16,10 +16,18 @@ export function newRecord(item: WorkItem): FactoryRecord {
     schemaVersion: 1, projectId: item.bbProjectId, source: item.source,
     locator: item.locator, version: 0, stage: 'Intake',
     scopeDigest: scopeDigest(item), plans: [], approvedDigest: null, runs: [],
+    admission: { kind: 'manual' },
+    coordinator: { status: 'pending' },
     automatic: false, automationError: null,
     trackerProgress: { status: 'pending', message: null },
     updatedAt: new Date().toISOString()
   };
+}
+export function legacyRun(record: FactoryRecord, run: FactoryRun) {
+  if (!record.coordinator) return true;
+  if (record.coordinator.status !== 'ready') return false;
+  return record.runs.slice(0, record.coordinator.legacyRunCount).some(prior =>
+    prior.id === run.id || !!run.threadId && prior.threadId === run.threadId);
 }
 export function assertVersion(record: FactoryRecord, expected: number) {
   if (record.version !== expected) throw new Error('Progress changed. Refresh before trying again.');
@@ -81,7 +89,7 @@ export function startRun(record: FactoryRecord, kind: FactoryRunKind, retry: boo
   }
   const run: FactoryRun = {
     id: randomUUID(), kind, status: 'starting' as const, threadId: null,
-    environmentId: null, cursor: 0, turnId: null, pendingCompletion: null,
+    environmentId: null, hostId: null, checkoutRoot: null, cursor: 0, turnId: null, pendingCompletion: null,
     planDigest: record.approvedDigest, scopeDigest: record.scopeDigest, activity: 'Starting native BB session',
     error: null, output: '', reviewResult: null, buildResult: null, repairOf: null,
     continuationOf: null,

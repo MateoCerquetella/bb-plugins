@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-8f127d361040af09aa2f97e5",
+  "criteria": [
+    "AC-1",
+    "AC-4",
+    "AC-5",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Current-head BB Surf actual-component preview passed desktop/panel/mobile checks with zero browser errors. Inspected healthy, paused, awaiting-scan, missing-configuration, provider-error and long-title/blocker layouts. Supplemental keyboard test confirms visible focus and Enter navigation. SDK/RPC/native/provider operations are mocked; screenshots prove operator-visible presentation only, not live factory dispatch. Temporary server stopped.",
+  "passed": true,
+  "startedAt": "2026-10-20T15:17:46.879Z",
+  "completedAt": "2026-10-20T15:17:46.879Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin",
+    "specRevision": 11,
+    "specDigest": "sha256:b1c54351a2cc67dd8586b2f2dad8f34f4f916b3b0656ee17756d3ab2f07fab77",
+    "treeDigest": "sha256:c21606d4f90401a9adf952d8391bd35edfb7010f85196503972a83f792d10f62",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:4a311283957b0625d7b61470e3b0acd96bf6c47e0627f587baed6416b98463c1",
+  "kind": "collected",
+  "collector": "fresh_outcome_qa",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r29/fresh-outcome-browser-check.log",
+      "mediaType": "text/plain",
+      "bytes": 441,
+      "digest": "sha256:52d20a990f761ebf24eb3ecde1d67aa39b85d51eda697b035ec62b2094d70ba9"
+    },
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r29/fresh-outcome-keyboard-focus-1280.png",
+      "mediaType": "image/png",
+      "bytes": 227166,
+      "digest": "sha256:826a668e741f84ce6f5dd3155a286c53f21225b36d2198075f4409b4bab650a9"
+    },
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r29/fresh-outcome-keyboard-focus-390.png",
+      "mediaType": "image/png",
+      "bytes": 211816,
+      "digest": "sha256:07c7326d687da24c75113a7d0e6b6c70e3716513b5001b88bd19bd3a6716c994"
+    },
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r29/fresh-outcome-keyboard.log",
+      "mediaType": "text/plain",
+      "bytes": 666,
+      "digest": "sha256:33c253f73024e77be2c26518941c22b76b108eb12622b872003deef2cfab09ed"
+    },
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r29/fresh-outcome-qa-report.txt",
+      "mediaType": "text/plain",
+      "bytes": 4311,
+      "digest": "sha256:ee8f9e5f40481cb6bdf90ccef27e3189bbb576dc9c25f332333e8e76f6ae457d"
+    },
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r29/taskboard-factory-state-awaiting_scan-1280.png",
+      "mediaType": "image/png",
+      "bytes": 21191,
+      "digest": "sha256:237f055935e12b362fd853d5f7e8f6105ead5fee3bb5fbe5ead7c45493fba857"
+    },
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r29/taskboard-factory-state-awaiting_scan-390.png",
+      "mediaType": "image/png",
+      "bytes": 19886,
+      "digest": "sha256:0544e124543f5ab5f6005cc69a3a7aaeb7cfdfb27675a909f0d24ddcdb0d9bd0"
+    },
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r29/taskboard-factory-state-paused-1280.png",
+      "mediaType": "image/png",
+      "bytes": 24237,
+      "digest": "sha256:042b5d89c7fd0d1eb759528e7bed1f0d46f75444d18237e5a26f95eee9d75df8"
+    },
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r29/taskboard-factory-state-paused-390.png",
+      "mediaType": "image/png",
+      "bytes": 22970,
+      "digest": "sha256:365f646252bb317a9ed37be651a91731aa01b2c7263a55e92508a067d958098b"
+    },
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r29/taskboard-factory-state-provider_error-1280.png",
+      "mediaType": "image/png",
+      "bytes": 25331,
+      "digest": "sha256:f45669aa88bcaf4fdbbe6600ee31316654e29a02fb57a8c5d1d3332f4ececb5d"
+    },
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r29/taskboard-factory-state-provider_error-390.png",
+      "mediaType": "image/png",
+      "bytes": 23541,
+      "digest": "sha256:73fe39c29aa466e4b5d071da98407bff02800480b94dde5ad638d4b8856d7ddb"
+    },
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r29/taskboard-factory-state-running-1280.png",
+      "mediaType": "image/png",
+      "bytes": 24105,
+      "digest": "sha256:da935aab567af6bb57669dcb2b1983dc7c822f3f15829bcec411fade8d2b85d8"
+    },
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r29/taskboard-factory-state-running-390.png",
+      "mediaType": "image/png",
+      "bytes": 22840,
+      "digest": "sha256:1469af5684ea653613e1b91a025ceb09343dd6e676c31f8386717d2fd93fc173"
+    },
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r29/taskboard-factory-state-unconfigured-1280.png",
+      "mediaType": "image/png",
+      "bytes": 24618,
+      "digest": "sha256:79810beed868b8f5b0dc34297ec3660a1043b92efb887b3540f1830a09905ee6"
+    },
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r29/taskboard-factory-state-unconfigured-390.png",
+      "mediaType": "image/png",
+      "bytes": 23345,
+      "digest": "sha256:9651695a9de01688f2a484bdc3f58fcd30ae6b0ef9542628f7e01fe621ffa841"
+    },
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r29/taskboard-team-coordinator-uncertain-390.png",
+      "mediaType": "image/png",
+      "bytes": 54448,
+      "digest": "sha256:e5f1af0f36dd975edfb55c0a5c586a96148bb586a9df06829b1cf5b6bcaa286b"
+    },
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r29/taskboard-team-scope-changed-1280.png",
+      "mediaType": "image/png",
+      "bytes": 57971,
+      "digest": "sha256:33d3aeb051e2a0b0852dffdf64cc3ffb9cbf14a1262c4fabb64f804970556cb5"
+    },
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r29/taskboard-team-stale-eligibility-390.png",
+      "mediaType": "image/png",
+      "bytes": 57383,
+      "digest": "sha256:1497b1c3f246178e43492102b4627b4804534b3c7e4a4f51b2a21d161ed9dbf3"
+    }
+  ]
+}

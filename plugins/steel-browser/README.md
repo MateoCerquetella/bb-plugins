@@ -9,20 +9,20 @@ you choose **Shrink browser panel** or press Escape in BB. Touch devices use
 these explicit controls. Expansion preserves the browser session and viewer,
 without dimming or blocking the remaining conversation.
 
-The interface follows BB's light/dark theme. BB Surf is the display name.
-Existing `steel-browser` plugin IDs, `bb steel-browser` commands,
+The interface follows BB's light/dark theme. BB Surf is the display name and
+`bb surf` is the public CLI command. Existing `steel-browser` plugin IDs,
 `::steel-browser{}` handoffs, project profiles, and saved settings remain
 compatible with existing installations. Steel Browser remains the name of the
 upstream browser engine.
 
 The installed plugin contributes browser instructions to every new BB agent
 session through `bb.agents.contributeInstructions`. Agents must check
-`bb steel-browser project` before claiming browser access is unavailable,
+`bb surf project` before claiming browser access is unavailable,
 including when no dedicated browser tool appears in their tool list.
 Existing live sessions retain their original instructions until BB constructs
 a new provider session. This is agent guidance, not an OS-level browser lock.
 
-`bb steel-browser project`, `bb steel-browser run`, and the selected project's
+`bb surf project`, `bb surf run`, and the selected project's
 operational dashboard/session actions automatically provision and bind a missing
 project browser on the plugin server host. The all-projects overview remains
 read-only. Setup reuses a matching container after interrupted setup, waits for
@@ -176,14 +176,14 @@ are created on demand by the CLI, and existing bindings cannot be silently overw
 another project. Legacy global endpoint settings remain for compatibility but
 are no longer used by the viewer or CLI. Existing global cookies are not copied.
 
-From a thread belonging to the intended project, run `bb steel-browser project`
+From a thread belonging to the intended project, run `bb surf project`
 for automatic setup. The following manual commands are for recovery only:
 
 ```sh
-bb steel-browser project
+bb surf project
 bb connect expose <unused-api-port>
 node plugins/steel-browser/scripts/provision-project.mjs <project-id> <unused-api-port> <unused-cdp-port> <returned-https-origin>
-bb steel-browser bind <loopback-api-url> <loopback-cdp-url> <returned-https-origin>
+bb surf bind <loopback-api-url> <loopback-cdp-url> <returned-https-origin>
 ```
 
 Use exact values returned by these commands. Binding verifies the running
@@ -200,12 +200,12 @@ The CDP address is loopback on the Steel host, not necessarily on the agent's
 machine. For a remote BB thread, use the routed CLI for browser actions:
 
 ```sh
-bb steel-browser run https://example.com
-bb steel-browser inspect
-bb steel-browser click link "More information..."
-bb steel-browser fill textbox "Search" "query"
-bb steel-browser press Enter
-bb steel-browser screenshot | jq -r .base64 | base64 --decode > /tmp/steel-page.png
+bb surf run https://example.com
+bb surf inspect
+bb surf click link "More information..."
+bb surf fill textbox "Search" "query"
+bb surf press Enter
+bb surf screenshot | jq -r .base64 | base64 --decode > /tmp/steel-page.png
 ```
 
 `inspect` returns the current URL, title, and a bounded accessibility snapshot.
@@ -223,9 +223,9 @@ fallback checkbox. Playwright is the default; fallback defaults off. Auto tries
 Jev first. Selecting Jev or Auto does not authorize paid API calls.
 
 ```sh
-bb steel-browser engine auto fallback-on
-bb steel-browser run https://example.com
-bb steel-browser run https://example.com "Read the page heading" --allow-paid
+bb surf engine auto fallback-on
+bb surf run https://example.com
+bb surf run https://example.com "Read the page heading" --allow-paid
 ```
 
 URL-only Playwright runs navigate directly. Natural-language Playwright tasks
@@ -243,17 +243,22 @@ Steel, Docker and the optional Jev runtime must be reachable from the BB server
 on dyaus. This implementation does not dispatch runners to a different host.
 
 ```sh
-bb plugin install ./plugins/steel-browser
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.0 --subdirectory plugins/steel-browser --tag-prefix steel-browser/
 bb plugin reload steel-browser
 ```
+
+You can also install `steel-browser@bb-community`. The published release may
+lag the main-branch features described here. For a missing local installation,
+use [the recovery guide](../../docs/plugin-recovery.md); uninstalling deletes
+plugin settings and secrets.
 
 Open **BB Surf** in BB or use:
 
 ```sh
-bb steel-browser status
-bb steel-browser sessions
-bb steel-browser create
-bb steel-browser release <session-id>
+bb surf status
+bb surf sessions
+bb surf create
+bb surf release <session-id>
 ```
 
 Each project instance supports one active session. Create refuses to replace

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "taskboard-empirical-progress"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:edd7339a93729e25d6e968f6c9d90dbb63e501bef02b98bbcec07afe344a8003"
+}

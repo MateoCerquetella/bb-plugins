@@ -9,13 +9,32 @@ export function backgroundRules(selector: string): string { return `${selector}{
 
 // Center only the full New thread compose layout. Auto margins collapse when
 // the draft grows taller than the viewport, keeping it reachable by scrolling.
-export const COMPOSE_LAYOUT = `
+export const COMPOSE_CENTER = `
 ${NEW_THREAD_TARGET} [class~="@container/page"]:has(> .mx-auto) {
   display:flex; flex-direction:column;
 }
 ${NEW_THREAD_TARGET} [class~="@container/page"] > .mx-auto {
   margin-block:auto; padding-block:28px;
 }
+${NEW_THREAD_TARGET} [data-testid="root-compose-compact-home"] {
+  display:flex; flex-direction:column; overflow-y:auto;
+}
+${NEW_THREAD_TARGET} [data-testid="root-compose-compact-composer"] {
+  position:relative; inset:auto; order:-1; flex:none;
+  display:flex; flex-direction:column; justify-content:center;
+  min-height:min(45dvh,440px); padding-block:28px;
+}
+${NEW_THREAD_TARGET} [data-testid="root-compose-compact-scroll-viewport"] {
+  position:relative; top:auto !important; bottom:auto; flex:none; overflow:visible;
+}
+${NEW_THREAD_TARGET} [data-testid="root-compose-compact-scroll-content"] {
+  min-height:0; justify-content:flex-start;
+}
+${NEW_THREAD_TARGET} :is([data-testid="root-compose-compact-recents-offset"],[data-testid="root-compose-compact-bottom-spacer"],[data-testid="root-compose-compact-fade"]) {
+  display:none;
+}
+`;
+export const COMPOSE_LAYOUT = `${COMPOSE_CENTER}
 @media (min-width:768px) {
   ${NEW_THREAD_TARGET} [data-app-composer-role="primary"] > :last-child {
     position:relative; z-index:0; margin-top:8px; padding:5px 9px;
@@ -159,7 +178,7 @@ export function mountBackground(signal: AbortSignal): () => void {
   function apply(snapshot: Snapshot): void {
     current = snapshot;
     const target = targetsFor(snapshot);
-    const css = snapshot.settings.enabled ? `${backgroundRules(target)}\n${CAPY_CSS}\n${COMPOSE_LAYOUT}\n${snapshot.settings.newThreadOnly ? "" : READING_SURFACE}` : "";
+    const css = snapshot.settings.enabled ? `${backgroundRules(target)}\n${CAPY_CSS}\n${COMPOSE_LAYOUT}\n${snapshot.settings.newThreadOnly ? "" : READING_SURFACE}` : COMPOSE_CENTER;
     if (css !== lastCss) { style.textContent = css; lastCss = css; }
     reconcile();
   }

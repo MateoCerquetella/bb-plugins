@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+- Add a default-off GitHub activity overview inside AURA, using authenticated
+  dated contributions and actual PR/review counts with explicit source limits.
+- Preserve native composer centering with wallpaper/overview disabled and make
+  the compact New thread layout scrollable with the overview below the composer.
+- Keep overview settings global across background slots and resets; add
+  `bb aura overview on|off`. Preserve installed animation speed/quality controls.
+
+## 0.2.3
+
+- Add 15, 30, and 60 FPS animation-speed controls.
+- Add Performance, Balanced, and Sharp WebGL render-quality controls.
+- Preserve conservative defaults for existing backgrounds and saved slots.
+
+## Unreleased
+
 ## 0.2.2
 
 - Add theme-aware reading surfaces to New thread controls and recent threads.

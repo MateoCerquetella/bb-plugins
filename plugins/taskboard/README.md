@@ -4,6 +4,49 @@
 
 <h1 align="center">Taskboard</h1>
 
+## Gitea through tea
+
+Gitea repositories, including self-hosted servers, are supported through
+[tea](https://gitea.com/gitea/tea) 0.16 or newer. Configure a login with
+`tea login add`, then choose **Gitea** in **Taskboard → Manage** and enter
+its login name and repository in `host/owner/repo` form. Non-default ports
+are supported; the repository host must match the selected login's URL.
+Each BB project has one selected tracker and one Gitea repository.
+
+Taskboard invokes `tea api --login <name>` for every authenticated request;
+it never reads a token from tea's config or stores another token. The tea
+login must be configured on the machine running the BB server.
+
+```sh
+bb taskboard config --source gitea --gitea-login my-gitea --gitea-project git.example.com/team/app
+bb taskboard refresh gitea
+bb taskboard list --source gitea --json
+bb taskboard show gitea 'git.example.com/team/app#7'
+bb taskboard transitions gitea 'git.example.com/team/app#7'
+bb taskboard move gitea 'git.example.com/team/app#7' --status __closed__
+```
+
+Lists include open and closed issues, exclude pull requests and paginate,
+including when the server caps pages below the requested size.
+Opening an issue loads current details and comments. The reviewed creation
+form supports available assignees, labels, milestones and due dates.
+Gitea issues have no native priority or issue type; those fields stay hidden.
+
+Open and Closed are always available. Create repository labels such as
+`status/backlog`, `status/todo`, `status/in-progress`, `status/review`,
+`status/done` and `status/canceled` to expose additional Kanban stages.
+Taskboard uses existing workflow labels; it does not create them implicitly.
+Moving stages changes only `status/*` labels, preserving concurrent edits to
+unrelated labels. Done/canceled closes an issue; a nonterminal stage reopens it.
+An externally reopened issue is shown as Open even if it retains a terminal
+workflow label; a terminal category requires the issue to actually be closed.
+Native Open/Closed clears workflow labels to keep the displayed state consistent.
+
+Gitea updates labels and issue state through separate endpoints, so a failed
+move can be partial. Refresh before retrying. Creation with a lost or invalid
+response is treated as uncertain and is never automatically retried.
+Image uploads are not supported by this source.
+
 ## Native Agent Progress (Development)
 
 Create new ticket accepts pasted or selected PNG/JPEG/WebP images (up to five,
@@ -69,6 +112,34 @@ existing Linear details, comments and external link. **Start task** opens
 context once without pinning the panel. Manual pinning remains a separate
 choice in the Taskboard panel.
 
+For tickets started from an initialized Empirical checkout, the progress view
+also shows the selected feature, revision, phase, next action, verification
+and durable completion level. Empirical is read on the native run's exact BB
+host and checkout; this does not start, complete or otherwise change an
+Empirical workflow. Status refreshes serially while the progress view is open.
+The slower repository-wide ownership check runs in the background and fills in
+duplicate-owner or invalid-copy warnings when available. A disconnected host
+keeps the last good observation marked stale, and the native thread remains
+available from **Open session**. Empty, uninitialized, invalid and unavailable
+Empirical states are distinct.
+
+To run the isolated progress demo, build Taskboard and start the fixture server
+from the workspace root:
+
+```sh
+npm run build -w bb-plugin-taskboard
+TASKBOARD_DEMO_PORT=8421 node plugins/taskboard/scripts/factory-browser-check.mjs
+```
+
+The page uses Taskboard's real progress components with in-memory BB responses.
+Click **Start task** on the example card, then use the demo controls to switch
+between awaiting input, blocked, offline, implemented-only and verified states.
+The fixture creates no native agents or external tickets. The panel polls every
+eight seconds while open and marks an observation older than 20 seconds stale;
+it also refreshes immediately on a fixture event. The host-wide ownership
+inventory is slower and cached separately. The demo does not prove host-routed
+delivery; verify that with a locally installed plugin in a connected BB host.
+
 In **Create new ticket**, enter rough text in Title or Description and select
 **Improve title & description**. Taskboard uses a hidden helper with the BB
 project's current provider/model defaults to rewrite only those two fields.
@@ -93,6 +164,47 @@ Independently executed verification bound to workspace
 revision, PR evidence capture, accepted-review and Done gates remain pending.
 Command results are observations, not proof that all required checks passed.
 No factory action merges, deploys or closes a ticket.
+
+### Autonomous intake
+
+Open **Manage → Autonomous factory** to opt a project into automatic intake.
+Taskboard scans the project's configured Linear, Jira, GitHub, GitLab, or
+Gitea provider for `todo` tickets. It claims eligible tickets in the Taskboard
+database before starting the existing investigate, plan, build, and review
+workflow. The setting is disabled by default and the concurrency limit applies
+only to automatically claimed work. Manual **Start task** actions remain
+available.
+
+Each new ticket workflow gets one native coordinator thread. Investigation,
+Plan, Build, and independent Review sessions appear beneath it as stage agents;
+Build retains its managed worktree and repairs continue in the original Build
+session. **Start task** opens the coordinator. Each stage's **Open thread**
+action opens that exact session. The factory service owns dispatch and recovery;
+the coordinator is the ticket's stable conversation and native parent.
+
+Historical workflows show **Legacy sessions**. **Add coordinator** creates a
+parent for future stage sessions while keeping existing history and reused
+Build sessions unchanged and labelled legacy. A confirmed coordinator rejection
+offers **Retry coordinator**. When creation is uncertain, inspect the native
+threads and use **Link coordinator** with the matching existing thread ID.
+Taskboard never automatically replaces an uncertain coordinator. Restoring an
+unavailable coordinator preserves the original hierarchy.
+
+Pausing automatic intake stops new claims and later automatic stages. It does
+not cancel an active native thread. Provider read failures, provider changes,
+ticket closure, and ticket scope changes block later dispatch and remain
+visible in Manage. Claims prevent duplicates only for Taskboard processes that
+share the same plugin database. The factory does not merge, deploy, close a
+ticket, or accept a passed review for the operator.
+
+The same controls are available from the CLI:
+
+```sh
+bb taskboard factory status --project proj_example --json
+bb taskboard factory enable 2 --project proj_example
+bb taskboard factory scan --project proj_example
+bb taskboard factory pause --project proj_example
+```
 
 Run `npm run check --workspace bb-plugin-taskboard` from the workspace root.
 The opt-in native harness uses isolated storage and does not install a plugin
@@ -181,12 +293,16 @@ Git release directly from this monorepo:
 bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.4 --subdirectory plugins/taskboard --tag-prefix taskboard/
 ```
 
-After [the BB Community entry](https://github.com/get-bb/marketplace/pull/129)
-is merged and live, the equivalent shorthand is:
+The [BB Community entry](https://github.com/get-bb/marketplace/pull/129)
+is merged. You can also install its configured release range:
 
 ```sh
-bb plugin install taskboard
+bb plugin install taskboard@bb-community
 ```
+
+The main branch includes unreleased 0.3.5 changes. For a missing local
+installation, use [the recovery guide](../../docs/plugin-recovery.md) to
+preserve your configuration without uninstalling or downgrading.
 
 Open **Taskboard → Manage**, choose a BB project, select its tracker, and save
 the connection. The same page configures that project's filters, default
@@ -206,14 +322,20 @@ bb plugin remove taskboard
 
 ### GitHub
 
-Taskboard reuses BB's official GitHub plugin and the repositories already
-mapped to the BB project. There is no second GitHub token or repository picker.
+Taskboard reads the GitHub remote from the selected BB project's local checkout
+on the current host. It uses the authenticated GitHub CLI directly and does not
+require BB's separate GitHub plugin. Taskboard stores neither a GitHub token nor
+a separate repository selection.
 
 ```sh
-bb plugin install github
-gh auth login
-bb plugin reload github
+gh auth login --hostname github.com
+gh auth status --hostname github.com
 ```
+
+The selected project must have a readable local checkout whose `origin` points
+to `github.com`. If no local checkout is available, Taskboard uses the BB
+project's saved Git remote. A readable non-GitHub `origin` takes precedence over
+stale project metadata and leaves GitHub unconfigured.
 
 ### Linear
 

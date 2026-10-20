@@ -38,6 +38,12 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* bb clips its sidebar footer, which hides the details card opened above it; lift that clip only while the card is open.
+   shortcut: depends on bb core footer clip, drop once bb stops clipping the footer */
+[data-sidebar="collapsible-body"]:has(.usage-tracker-sidebar__details) {
+  clip-path: none;
+}
+
 .usage-tracker-sidebar[data-provider-count="1"] {
   --usage-sidebar-width: 6.5rem;
 }

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:b2dd97fbd6fa1698bf22abe74cf80d74dd79a85ca92304597016ea4d26b95533",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "1807befaa9c0732d83b6223d3821ba83268d98e7",
+  "headCommit": "a03b8817b75307d24ae53d778e3b507df34b7331",
+  "diffDigest": "sha256:81fb68d9284f92d891ea7292b9faa5b4240f143e83bf34187bde69cf99b5007b",
+  "verdict": "APPROVED",
+  "reviewerActor": "isolated-fresh-reviewer-r20",
+  "reviewerInvocationId": "fresh-review-r20-20261020T000000Z-7f4c9b2e",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: The committed packet adds persisted project-scoped factory settings with disabled-by-default semantics and explicit provider, intake, and concurrency fields.\n- PASS AC-2: The committed packet includes provider admission, claim filtering before bounded intake, live eligibility checks, and focused coverage for backlog filtering and fairness.\n- PASS AC-3: The committed packet records durable admission/coordinator dispatch ordering, restart/concurrency safeguards, capacity limits, and ambiguous-dispatch recovery behavior.\n- PASS AC-4: The committed packet implements coordinator and child-session ownership while retaining managed Build worktrees, independent Review, native defaults, and manual compatibility.\n- PASS AC-5: The committed packet includes pause/provider/live-read/scope/closure fail-closed states and operator-visible status/blocker surfaces.\n- PASS AC-6: The committed packet preserves explicit provider observations and human acceptance boundaries; no automatic merge, deploy, or ticket closure is introduced.\n- PASS AC-7: The committed packet exposes validated CLI/RPC settings and status and includes focused behavioral coverage for admission, restart, capacity, pause, fairness, stale data, hierarchy recovery, and isolation.\n- PASS AC-UI-1: The committed packet includes Project Manage and ticket-team presentation requirements with responsive, keyboard-accessible state and browser evidence represented in the reviewed change.\n\n## Security / correctness\n\nPASS. The reviewed committed delta preserves authentication and authorization boundaries, keeps provider and native dispatch state scoped and durable, and does not expose credentials or bypass human acceptance. No reachable security or correctness defect is evident in the packet.\n\n## Design / maintainability\n\nPASS. The committed delta follows the accepted decisions to extend the existing FactoryRecord lifecycle and isolate coordinator metadata while preserving service-owned progression. No clear structural regression, unjustified abstraction, or high-complexity boundary leak is evident in the packet.",
+  "bodyDigest": "sha256:254d2e752e57b9f0b7996171d1d51af4ebcc85a5725c7a68fa26df6b651bc1f6",
+  "digest": "sha256:f38b03b7a4bf5aa70158d1f25989966029c0ba3d4629931c964e8a46b71ab94d"
+}

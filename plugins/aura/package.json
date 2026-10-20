@@ -1,7 +1,7 @@
 {
   "name": "bb-plugin-aura",
-  "version": "0.2.2",
-  "description": "Custom image backgrounds and softly faded pixel patterns for BB threads.",
+  "version": "0.2.3",
+  "description": "Personal backgrounds and an optional authenticated GitHub activity overview for BB.",
   "license": "MIT",
   "type": "module",
   "engines": {
@@ -10,7 +10,7 @@
   },
   "bb": {
     "name": "Aura",
-    "description": "Personal backgrounds, Capy dithering, and six saved slots for your conversations.",
+    "description": "Personal backgrounds, Capy dithering, six saved slots, and an optional activity overview.",
     "branding": {
       "icon": "./assets/icon.svg"
     },
@@ -34,7 +34,7 @@
   "scripts": {
     "build": "env -u BB_CLI bb plugin build .",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test test/*.test.ts",
+    "test": "tsx --test test/*.test.ts",
     "check": "npm run typecheck && npm test && npm run build"
   },
   "dependencies": {
@@ -42,15 +42,17 @@
   },
   "devDependencies": {
     "@get-bb/plugin-sdk": "0.4.21",
+    "@playwright/test": "^1.51.0",
+    "@testing-library/react": "^16.3.3",
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/jsdom": "^21.1.7",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "typescript": "^5.7.0",
-    "@playwright/test": "^1.51.0",
-    "jsdom": "^26.1.0",
-    "@types/jsdom": "^21.1.7",
     "better-sqlite3": "^12.0.0",
-    "@types/better-sqlite3": "^7.6.12"
+    "jsdom": "^26.1.0",
+    "tsx": "^4.23.15",
+    "typescript": "^5.7.0"
   },
   "author": "Mateo Cerquetella",
   "repository": {

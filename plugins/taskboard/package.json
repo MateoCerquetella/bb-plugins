@@ -2,7 +2,7 @@
   "name": "bb-plugin-taskboard",
   "version": "0.3.5",
   "private": true,
-  "description": "Bring each BB project's GitHub, GitLab, Linear, or Jira tasks into one focused taskboard.",
+  "description": "Bring each BB project\u2019s GitHub, GitLab, Gitea, Linear, or Jira issues into one focused taskboard.",
   "type": "module",
   "license": "MIT",
   "author": "Mateo Cerquetella",
@@ -24,7 +24,8 @@
     "linear",
     "jira",
     "kanban",
-    "gitlab"
+    "gitlab",
+    "gitea"
   ],
   "engines": {
     "bb": ">=0.40.0",
@@ -32,7 +33,7 @@
   },
   "bb": {
     "name": "Taskboard",
-    "description": "Bring each BB project's GitHub, GitLab, Linear, or Jira tasks into one focused taskboard.",
+    "description": "Bring each BB project\u2019s GitHub, GitLab, Gitea, Linear, or Jira issues into one focused taskboard.",
     "branding": {
       "icon": "./assets/icon.svg"
     },
@@ -45,6 +46,7 @@
     "@hugeicons/core-free-icons": "^4.1.3",
     "@hugeicons/react": "^1.1.6",
     "@radix-ui/react-slot": "^1.3.0",
+    "empirical-sdd": "0.43.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
@@ -77,11 +79,11 @@
     "vaul": "^1.1.2"
   },
   "scripts": {
-    "build": "env -u BB_CLI bb plugin build .",
+    "build": "node scripts/run-isolated-bb-cli.mjs plugin build .",
     "dev": "bb plugin dev .",
     "typecheck": "tsc --noEmit",
-    "types:check": "env -u BB_CLI bb plugin types --check .",
-    "types:refresh": "env -u BB_CLI bb plugin types .",
+    "types:check": "node scripts/run-isolated-bb-cli.mjs plugin types --check .",
+    "types:refresh": "node scripts/run-isolated-bb-cli.mjs plugin types .",
     "test": "node --test --experimental-strip-types test/*.test.ts",
     "verify:build": "node scripts/verify-build.mjs",
     "check": "npm run types:check && npm run typecheck && npm test && npm run build && npm run verify:build"

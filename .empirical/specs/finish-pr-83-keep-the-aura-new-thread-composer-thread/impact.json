@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "aura-activity-overview"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:a6f584d7071149c058c875e6dbd8bf471b88b77d2dbde00d37ef9c21345f595c"
+}

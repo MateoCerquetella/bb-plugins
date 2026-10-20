@@ -1,27 +1,16 @@
 import type { BbPluginApi } from '@get-bb/plugin-sdk';
 import { posix, win32 } from 'node:path';
 import { formatWorkItemContext, type WorkItem } from '../contract.js';
-import type { FactoryIdentity, FactoryRecord, FactoryRun, FactoryRunKind } from './contract.js';
-import { approvePlan, assertVersion, factoryKey, newRecord, savePlan, scopeDigest, startRun } from './state.js';
+import type { FactoryIdentity, FactoryProjectPolicy, FactoryRecord, FactoryRun, FactoryRunKind } from './contract.js';
+import { approvePlan, assertVersion, factoryKey, legacyRun, newRecord, savePlan, scopeDigest, startRun } from './state.js';
 import type { createFactoryStore } from './store.js';
 import { MAX_REVIEW_REPAIRS, readBuildResult, readReviewResult } from './review.js';
+import { CoordinatorIntentConflict, createCoordinatorLifecycle } from './coordinator.js';
+import { dispatchRejection, nativeError as message } from './native-dispatch.js';
 
 type Store = ReturnType<typeof createFactoryStore>;
 type Sdk = BbPluginApi['sdk'];
 type Event = Awaited<ReturnType<Sdk['threads']['events']['list']>>[number];
-const message = (error: unknown) => (error instanceof Error ? error.message : String(error)).slice(0, 1000);
-function dispatchRejection(value: string) {
-  if (/HTTP 404: Project has no local-path source for (?:host|the primary host)(?:\.|$)/i.test(value)) {
-    return 'BB could not find a project checkout on the selected host. Configure the project source with the Git repository folder on that host, then retry.';
-  }
-  if (/HTTP 400: hostId is required unless workspace\.type is personal/i.test(value)) {
-    return 'BB rejected the environment before starting a session. Retry using the project default environment.';
-  }
-  if (/HTTP 409: This project checkout has no usable git branch\./i.test(value)) {
-    return 'BB could not create a worktree because the project checkout has no usable Git branch. Repair the project checkout, then retry.';
-  }
-  return null;
-}
 class SessionBusyError extends Error {}
 const unavailableSession = 'Native session is unavailable or failed. Open its thread for details.';
 const MAX_AUTOMATIC_BUILD_CONTINUATIONS = 2;
@@ -146,9 +135,15 @@ export function createFactoryService(
   tracker?: {
     getItem: (identity: FactoryIdentity) => WorkItem | null;
     markInProgress: (item: WorkItem) => Promise<FactoryRecord['trackerProgress']>;
+  },
+  queue?: {
+    provider: (projectId: string) => FactoryProjectPolicy['provider'];
+    candidates: (policy: FactoryProjectPolicy, excludeLocators: string[]) => Promise<WorkItem[]>;
+    liveItem: (identity: FactoryIdentity) => Promise<WorkItem>;
   }
 ) {
   const locks = new Map<string, Promise<unknown>>();
+  const lastScanStarted = new Map<string, number>();
   async function locked<T>(identity: FactoryIdentity, operation: () => Promise<T>): Promise<T> {
     const key = factoryKey(identity);
     const prior = locks.get(key) ?? Promise.resolve();
@@ -160,6 +155,12 @@ export function createFactoryService(
     const saved = store.save(record);
     changed(record.projectId);
     return saved;
+  }
+  const coordinators = createCoordinatorLifecycle(sdk, store, persist);
+  function existing(item: WorkItem) {
+    const record = store.get({ projectId: item.bbProjectId, source: item.source, locator: item.locator });
+    if (!record) throw new Error('No existing ticket workflow is available for coordinator recovery.');
+    return record;
   }
   function current(item: WorkItem) {
     const identity = { projectId: item.bbProjectId, source: item.source, locator: item.locator };
@@ -175,6 +176,7 @@ export function createFactoryService(
     return record;
   }
   async function reconcile(record: FactoryRecord, signal?: AbortSignal) {
+    record = await coordinators.observe(record, signal);
     let dirty = false;
     // Only known preflight rejections are safe to expose as retryable.
     for (const run of record.runs) {
@@ -212,6 +214,10 @@ export function createFactoryService(
         }
         const thread = await sdk.threads.get({ threadId: run.threadId, signal });
         if (thread.projectId !== record.projectId) throw new Error('Linked thread belongs to another project.');
+        if (record.coordinator?.status === 'ready' && !legacyRun(record, run) &&
+          thread.parentThreadId !== record.coordinator.threadId) {
+          throw new Error('Linked native session has a different coordinator. Restore its original parent before continuing.');
+        }
         if (run.environmentId && run.environmentId !== thread.environmentId) {
           throw new Error('Linked native session changed workspace. Restore the implementation environment before continuing.');
         }
@@ -223,6 +229,17 @@ export function createFactoryService(
         }
         if (active && started && !run.pendingCompletion) {
           resumedBuild ||= run === record.runs.at(-1) && run.kind === 'build';
+        }
+        if (run.environmentId && (!run.hostId || !run.checkoutRoot)) {
+          try {
+            const workspace = await sdk.environments.get({ environmentId: run.environmentId });
+            if (workspace.projectId === record.projectId && workspace.hostId && workspace.path) {
+              run.hostId = workspace.hostId;
+              run.checkoutRoot = workspace.path;
+            }
+          } catch {
+            // Keep the native session linked while its environment is temporarily unavailable.
+          }
         }
         if (resumedBuild && record.automationError?.startsWith('Automatic work paused: Build ') &&
           run.planDigest === record.approvedDigest && run.scopeDigest === record.scopeDigest) {
@@ -285,13 +302,32 @@ export function createFactoryService(
     }
     return persist(record);
   }
-  async function advance(item: WorkItem, record: FactoryRecord, signal?: AbortSignal, restoreArchived = false) {
-    record = await syncProgress(item, record);
+  async function advance(item: WorkItem | null, record: FactoryRecord, signal?: AbortSignal, restoreArchived = false, automaticDispatch = true) {
+    if (item) record = await syncProgress(item, record);
     const run = record.runs.at(-1);
     if (!record.automatic || record.automationError || !run || run.status !== 'finished' ||
       run.error || signal?.aborted || record.runs.some(candidate =>
         ['starting', 'running', 'uncertain'].includes(candidate.status))) return record;
     if (run.kind === 'review' && run.reviewResult?.verdict !== 'blocked') return record;
+    if (record.admission.kind === 'factory') {
+      const policy = store.getProjectPolicy(record.projectId, record.source);
+      if (automaticDispatch && !policy.enabled) return record;
+      try {
+        if (!queue || policy.provider !== record.source || queue.provider(record.projectId) !== record.source) {
+          throw new Error('Project provider changed. Save factory settings before continuing.');
+        }
+        item = await queue.liveItem(record);
+        if (item.bbProjectId !== record.projectId || item.source !== record.source ||
+          item.locator !== record.locator || ['done', 'canceled'].includes(item.stateCategory) ||
+          scopeDigest(item) !== record.scopeDigest) {
+          throw new Error('Issue scope or status changed. Inspect the ticket before continuing.');
+        }
+      } catch (error) {
+        record.automationError = `Automatic work paused: ${message(error)}`;
+        return persist(record);
+      }
+    }
+    if (!item) return record;
     try {
       if (['done', 'canceled'].includes(item.stateCategory)) {
         throw new Error('Issue was closed or canceled. Reopen it before starting more work.');
@@ -309,7 +345,7 @@ export function createFactoryService(
         record = persist(record);
       }
       if (run.kind === 'review') return run.reviewResult?.verdict === 'blocked'
-        ? await repairReview(item, record, restoreArchived) : record;
+        ? await repairReview(item, record, restoreArchived, automaticDispatch) : record;
       if (run.kind === 'build' && run.buildResult?.verdict === 'blocked') {
         if (!run.buildResult.summary.trim()) throw new Error('Build reported no actionable findings. Inspect its result before continuing.');
         const continuations = record.runs.filter(candidate => candidate.kind === 'build' && candidate.continuationOf &&
@@ -318,7 +354,7 @@ export function createFactoryService(
           record.automationError = `Automatic work paused: Build continuation limit reached (${MAX_AUTOMATIC_BUILD_CONTINUATIONS} attempts). Continue manually in the original Build session.`;
           return persist(record);
         }
-        return await resumeBlockedBuild(item, record, restoreArchived);
+        return await resumeBlockedBuild(item, record, restoreArchived, automaticDispatch);
       }
       if (run.kind === 'build' && run.buildResult?.verdict !== 'implemented') {
         record.automationError = run.buildResult?.verdict === 'needs_input'
@@ -328,7 +364,7 @@ export function createFactoryService(
       }
       return await dispatch(item, record, {
         kind: run.kind === 'investigate' ? 'plan' : run.kind === 'build' ? 'review' : 'build',
-        contextThreadId: null, retry: false
+        contextThreadId: null, retry: false, automaticDispatch
       });
     } catch (error) {
       if (signal?.aborted) throw error;
@@ -339,7 +375,7 @@ export function createFactoryService(
       return persist(record);
     }
   }
-  async function repairReview(item: WorkItem, record: FactoryRecord, restoreArchived = false) {
+  async function repairReview(item: WorkItem, record: FactoryRecord, restoreArchived = false, automaticDispatch = false) {
     const review = record.runs.at(-1);
     if (!review || review.kind !== 'review' || review.status !== 'finished' || !review.output.trim()) {
       throw new Error('Finish review and collect its findings before returning to Build.');
@@ -363,10 +399,10 @@ export function createFactoryService(
     }
     record.automatic = true;
     return dispatch(item, record, {
-      kind: 'build', contextThreadId: null, retry: false, repairOf: review.id, restoreArchived
+      kind: 'build', contextThreadId: null, retry: false, repairOf: review.id, restoreArchived, automaticDispatch
     });
   }
-  async function resumeBlockedBuild(item: WorkItem, record: FactoryRecord, restoreArchived = false) {
+  async function resumeBlockedBuild(item: WorkItem, record: FactoryRecord, restoreArchived = false, automaticDispatch = false) {
     const blocked = record.runs.at(-1)!;
     if (['done', 'canceled'].includes(item.stateCategory)) throw new Error('Reopen the issue before starting more work.');
     if (blocked.planDigest !== record.approvedDigest || blocked.scopeDigest !== record.scopeDigest) {
@@ -375,12 +411,13 @@ export function createFactoryService(
     record.automatic = true;
     record.automationError = null;
     return dispatch(item, record, {
-      kind: 'build', contextThreadId: null, retry: false, continuationOf: blocked.id, restoreArchived
+      kind: 'build', contextThreadId: null, retry: false, continuationOf: blocked.id, restoreArchived, automaticDispatch
     });
   }
   async function dispatch(item: WorkItem, record: FactoryRecord, input: {
     kind: FactoryRunKind; contextThreadId: string | null; retry: boolean; repairOf?: string; continuationOf?: string;
     restoreArchived?: boolean;
+    automaticDispatch?: boolean;
   }) {
     const linked = [...record.runs].reverse().filter(run => run.threadId);
     const build = linked.find(run => run.kind === 'build');
@@ -397,6 +434,10 @@ export function createFactoryService(
     const context = contextId ? await sdk.threads.get({ threadId: contextId }) : null;
     if (context && context.projectId !== item.bbProjectId) throw new Error('Select a thread in this ticket project.');
     if (context?.deletedAt) throw new Error('The original authoring session was deleted. Restore it before continuing.');
+    if (author && record.coordinator?.status === 'ready' && !legacyRun(record, author) &&
+      context?.parentThreadId !== record.coordinator.threadId) {
+      throw new Error('The original stage session has a different coordinator. Restore its parent before continuing.');
+    }
     const restoreArchived = context?.archivedAt && input.restoreArchived && (input.repairOf || input.continuationOf);
     if (context?.archivedAt && !restoreArchived) {
       throw new Error('The original authoring session is archived. Use Return to Build with findings or Start task to resume it.');
@@ -437,6 +478,8 @@ export function createFactoryService(
     if (reuse) {
       draft.threadId = reuse;
       draft.environmentId = context!.environmentId;
+      draft.hostId = environment?.hostId ?? null;
+      draft.checkoutRoot = environment?.path ?? null;
       draft.cursor = events[0]?.seq ?? 0;
     }
     if (restoreArchived) {
@@ -452,7 +495,43 @@ export function createFactoryService(
       if (restored.status !== 'idle') throw new SessionBusyError('Stop or finish the authoring session first.');
     }
     const id = draft.id;
-    record = persist(draftRecord);
+    if (input.automaticDispatch && record.admission.kind === 'factory') {
+      const policy = store.getProjectPolicy(record.projectId, record.source);
+      if (!policy.enabled) return record;
+      if (!queue || policy.provider !== record.source || queue.provider(record.projectId) !== record.source) {
+        throw new Error('Project provider changed before dispatch.');
+      }
+    }
+    try {
+      record = await coordinators.ensure(item, record);
+    } catch (error) {
+      if (error instanceof CoordinatorIntentConflict) return store.get(record)!;
+      throw error;
+    }
+    if (record.coordinator && record.coordinator.status !== 'ready') return record;
+    if (record.coordinator?.error) return record;
+    if (input.automaticDispatch && record.admission.kind === 'factory') {
+      const policy = store.getProjectPolicy(record.projectId, record.source);
+      if (!policy.enabled) return record;
+      if (!queue || policy.provider !== record.source || queue.provider(record.projectId) !== record.source) {
+        throw new Error('Project provider changed before dispatch.');
+      }
+      const live = await queue.liveItem(record);
+      if (live.bbProjectId !== record.projectId || live.source !== record.source || live.locator !== record.locator ||
+        ['done', 'canceled'].includes(live.stateCategory) || scopeDigest(live) !== record.scopeDigest ||
+        !record.runs.length && live.stateCategory !== 'todo') {
+        throw new Error('Issue scope or status changed before stage dispatch.');
+      }
+    }
+    draftRecord.version = record.version;
+    draftRecord.coordinator = record.coordinator;
+    try {
+      record = persist(draftRecord);
+    } catch (error) {
+      const winner = store.get(record);
+      if (winner && winner.version !== record.version) return winner;
+      throw error;
+    }
     const run = record.runs.find(run => run.id === id)!;
     try {
       const prompt = factoryPrompt(item, record, input.kind);
@@ -465,6 +544,7 @@ export function createFactoryService(
           ...defaults,
           ...(context ? { providerId: context.providerId } : {}),
           projectId: item.bbProjectId,
+          ...(record.coordinator?.status === 'ready' ? { parentThreadId: record.coordinator.threadId } : {}),
           environment: (input.kind === 'review' || input.kind === 'plan' || (input.kind === 'build' && build)) && environment
             ? { type: 'reuse', environmentId: environment.id }
             : isolateBuild && environment
@@ -476,6 +556,16 @@ export function createFactoryService(
         });
         run.threadId = thread.id;
         run.environmentId = thread.environmentId;
+        try {
+          const workspace = thread.environmentId
+            ? await sdk.environments.get({ environmentId: thread.environmentId }) : null;
+          if (workspace?.projectId === record.projectId) {
+            run.hostId = workspace.hostId;
+            run.checkoutRoot = workspace.path ?? null;
+          }
+        } catch {
+          // The session was dispatched; a later observation can resolve its workspace.
+        }
       }
       run.status = 'running';
       run.activity = 'Waiting for native agent events';
@@ -495,6 +585,56 @@ export function createFactoryService(
     return syncProgress(item, persist(record));
   }
   return {
+    async scan(projectId?: string): Promise<void> {
+      if (!queue) throw new Error('Factory provider access is unavailable.');
+      for (const policy of store.projectPolicies().filter(candidate =>
+        candidate.enabled && (!projectId || candidate.projectId === projectId))) {
+        const now = Date.now();
+        if (!projectId && now - (lastScanStarted.get(policy.projectId) ?? -Infinity) < 30_000) continue;
+        lastScanStarted.set(policy.projectId, now);
+        try {
+          if (queue.provider(policy.projectId) !== policy.provider) {
+            throw new Error('Project provider changed. Save factory settings before continuing.');
+          }
+          const excludeLocators = store.all().filter(record =>
+            record.projectId === policy.projectId && record.source === policy.provider
+          ).map(record => record.locator);
+          const candidates = await queue.candidates(policy, excludeLocators);
+          const unclaimed = candidates.filter(candidate => candidate.bbProjectId === policy.projectId &&
+            candidate.source === policy.provider && candidate.stateCategory === 'todo' && !store.get({
+              projectId: candidate.bbProjectId, source: candidate.source, locator: candidate.locator
+            }));
+          for (const candidate of unclaimed.slice(0, 500)) {
+            const identity = { projectId: candidate.bbProjectId, source: candidate.source, locator: candidate.locator };
+            const item = await queue.liveItem(identity);
+            if (item.bbProjectId !== policy.projectId || item.source !== policy.provider ||
+              item.locator !== candidate.locator || item.stateCategory !== 'todo') continue;
+            const result = await this.admit(item, policy);
+            if ('kind' in result && (result.kind === 'capacity' || result.kind === 'disabled')) break;
+          }
+          const pendingCandidates = candidates.filter(candidate => !store.get({
+            projectId: candidate.bbProjectId, source: candidate.source, locator: candidate.locator
+          })).length;
+          store.saveScan({ projectId: policy.projectId, observedAt: new Date().toISOString(),
+            kind: 'success', reason: null, candidates: candidates.length, pendingCandidates });
+        } catch (error) {
+          store.saveScan({ projectId: policy.projectId, observedAt: new Date().toISOString(),
+            kind: 'blocked', reason: message(error), candidates: 0, pendingCandidates: null });
+        }
+        changed(policy.projectId);
+      }
+    },
+    async admit(item: WorkItem, policy: FactoryProjectPolicy) {
+      return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () => {
+        const result = store.admit({
+          projectId: item.bbProjectId, source: item.source, locator: item.locator,
+          scopeDigest: scopeDigest(item)
+        }, policy);
+        if (result.kind !== 'admitted') return result;
+        const record = result.record;
+        return dispatch(item, record, { kind: 'investigate', contextThreadId: null, retry: false, automaticDispatch: true });
+      });
+    },
     async diff(identity: FactoryIdentity, runId: string, path: string) {
       const run = store.get(identity)?.runs.find(candidate => candidate.id === runId);
       if (!run || !run.changedFiles.includes(path)) throw new Error('File is not part of this run.');
@@ -530,8 +670,12 @@ export function createFactoryService(
       };
     },
     async get(item: WorkItem, signal?: AbortSignal) {
-      return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () =>
-        advance(item, await reconcile(current(item), signal), signal));
+      const identity = { projectId: item.bbProjectId, source: item.source, locator: item.locator };
+      return locked(identity, async () => {
+        const saved = store.get(identity);
+        const record = saved?.admission.kind === 'factory' ? saved : current(item);
+        return advance(item, await reconcile(record, signal), signal);
+      });
     },
     async startTask(item: WorkItem, contextThreadId: string | null) {
       return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () => {
@@ -548,14 +692,20 @@ export function createFactoryService(
           if ((run.kind === 'review' && run.reviewResult?.verdict === 'blocked') || run.repairOf || run.continuationOf) {
             record.automatic = true;
             record.automationError = null;
-            return advance(item, persist(record), undefined, true);
+            return advance(item, persist(record), undefined, true, false);
           }
           return record;
         }
         if (['done', 'canceled'].includes(item.stateCategory)) throw new Error('Reopen the issue before starting a task.');
         record.automatic = true;
         record.automationError = null;
-        record = persist(record);
+        try {
+          record = persist(record);
+        } catch (error) {
+          const winner = store.get(record);
+          if (winner && winner.version !== record.version) return winner;
+          throw error;
+        }
         if (run?.scopeDigest && run.scopeDigest !== record.scopeDigest) {
           return dispatch(item, record, { kind: 'investigate', contextThreadId, retry: false });
         }
@@ -565,7 +715,7 @@ export function createFactoryService(
         if (run.kind === 'plan' && !run.output.trim()) {
           return dispatch(item, record, { kind: 'plan', contextThreadId, retry: false });
         }
-        return advance(item, record);
+        return advance(item, record, undefined, false, false);
       });
     },
     async retryStatus(item: WorkItem) {
@@ -576,6 +726,36 @@ export function createFactoryService(
       });
     },
     forThread: (threadId: string) => store.forThread(threadId),
+    async adoptCoordinator(item: WorkItem, expectedVersion: number) {
+      return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () => {
+        let record = existing(item);
+        if (record.coordinator?.status === 'ready') return coordinators.observe(record);
+        assertVersion(record, expectedVersion);
+        if (record.coordinator) return record;
+        record.coordinator = { status: 'pending' };
+        record = persist(record);
+        return coordinators.ensure(item, record);
+      });
+    },
+    async retryCoordinator(item: WorkItem, expectedVersion: number, intentId: string) {
+      return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () => {
+        let record = existing(item);
+        assertVersion(record, expectedVersion);
+        if (record.coordinator?.status !== 'failed' || record.coordinator.intentId !== intentId) {
+          throw new Error('Only the current confirmed coordinator rejection can be retried.');
+        }
+        record.coordinator = { status: 'pending' };
+        record = persist(record);
+        return coordinators.ensure(item, record);
+      });
+    },
+    async recoverCoordinator(item: WorkItem, expectedVersion: number, intentId: string, threadId: string) {
+      return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () => {
+        const record = existing(item);
+        assertVersion(record, expectedVersion);
+        return coordinators.recover(item, record, intentId, threadId);
+      });
+    },
     async linkRecovered(item: WorkItem, expectedVersion: number, threadId: string) {
       return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () => {
         const record = current(item);
@@ -587,12 +767,26 @@ export function createFactoryService(
         if (thread.projectId !== record.projectId || thread.deletedAt || thread.archivedAt) {
           throw new Error('Choose an available native thread in this ticket project.');
         }
+        if (record.coordinator?.status === 'ready' && !legacyRun(record, run) &&
+          thread.parentThreadId !== record.coordinator.threadId) {
+          throw new Error('Recovered session must be a child of this ticket coordinator.');
+        }
         if (!run.threadId && (thread.title !== `${item.key}: ${run.kind}` ||
           thread.createdAt < Date.parse(run.startedAt) - 5000)) {
           throw new Error('This thread does not match the uncertain dispatch title and creation time.');
         }
         run.threadId = thread.id;
         run.environmentId = thread.environmentId;
+        try {
+          const workspace = thread.environmentId
+            ? await sdk.environments.get({ environmentId: thread.environmentId }) : null;
+          if (workspace?.projectId === record.projectId) {
+            run.hostId = workspace.hostId;
+            run.checkoutRoot = workspace.path ?? null;
+          }
+        } catch {
+          // The recovered thread is authoritative; its workspace can resolve on the next observation.
+        }
         run.status = 'running';
         run.error = null;
         return reconcile(persist(record));
@@ -619,12 +813,13 @@ export function createFactoryService(
       expectedVersion: number; kind: FactoryRunKind; contextThreadId: string | null; retry: boolean;
     }) {
       return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () => {
-        const record = await reconcile(current(item));
+        const requested = current(item);
+        const record = await reconcile(structuredClone(requested));
         const last = record.runs.at(-1);
         // A stale duplicate button press returns the original dispatch, never spawns.
-        if (last && last.kind === input.kind && input.expectedVersion < record.version &&
+        if (last && last.kind === input.kind && input.expectedVersion < requested.version &&
           last.status !== 'uncertain') return record;
-        assertVersion(record, input.expectedVersion);
+        assertVersion(requested, input.expectedVersion);
         record.automationError = null;
         if (input.kind === 'build' && last?.kind === 'review' && last.status === 'finished') {
           return repairReview(item, record, true);
@@ -637,6 +832,11 @@ export function createFactoryService(
         await locked(record, async () => {
           const latest = store.get(record)!;
           let dirty = false;
+          if (latest.coordinator?.status === 'starting') {
+            latest.coordinator = { ...latest.coordinator, status: 'uncertain',
+              error: 'BB restarted during coordinator dispatch. Inspect native threads and link the matching coordinator; no duplicate was started.' };
+            dirty = true;
+          }
           for (const run of latest.runs) if (run.status === 'starting') {
             run.status = 'uncertain';
             run.error = 'BB restarted during dispatch. Inspect native threads before proceeding; no duplicate was started.';
@@ -650,9 +850,39 @@ export function createFactoryService(
       for (const record of store.all()) {
         if (signal.aborted) return;
         await locked(record, async () => {
-          const item = tracker?.getItem(record);
-          if (item) await advance(item, await reconcile(current(item), signal), signal);
-          else await reconcile(store.get(record)!, signal);
+          const item = tracker?.getItem(record) ?? null;
+          const saved = store.get(record)!;
+          let latest = await reconcile(saved.admission.kind === 'manual' && item ? current(item) : saved, signal);
+          if (latest.admission.kind === 'factory' && latest.runs.length === 0 &&
+            !latest.automationError && !signal.aborted) {
+            const policy = store.getProjectPolicy(latest.projectId, latest.source);
+            if (policy.enabled) {
+              try {
+                if (!queue || policy.provider !== latest.source || queue.provider(latest.projectId) !== latest.source) {
+                  throw new Error('Project provider changed. Save factory settings before continuing.');
+                }
+                const live = await queue.liveItem(latest);
+                if (live.bbProjectId !== latest.projectId || live.source !== latest.source ||
+                  live.locator !== latest.locator || live.stateCategory !== 'todo' ||
+                  scopeDigest(live) !== latest.scopeDigest) {
+                  throw new Error('Reserved issue changed before dispatch.');
+                }
+                latest = await dispatch(live, latest, { kind: 'investigate', contextThreadId: null, retry: false, automaticDispatch: true });
+              } catch (error) {
+                latest.automationError = message(error);
+                persist(latest);
+              }
+            }
+          } else if (item && latest.automatic && !latest.runs.length && !latest.automationError &&
+            latest.coordinator?.status === 'ready' && !latest.coordinator.error && !signal.aborted) {
+            try {
+              if (['done', 'canceled'].includes(item.stateCategory)) throw new Error('Issue was closed or canceled before dispatch.');
+              await dispatch(item, latest, { kind: 'investigate', contextThreadId: null, retry: false, automaticDispatch: true });
+            } catch (error) {
+              latest.automationError = message(error);
+              persist(latest);
+            }
+          } else await advance(item, latest, signal);
         });
       }
     }

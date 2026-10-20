@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "sequence": 12,
+  "previousDigest": "sha256:8b4165847b80d18c69d1abf140d6797eab14a72abf75d5a063e0edf62b31af08",
+  "actor": "codex",
+  "type": "transition",
+  "summary": "Size: keep as one (The durable installation repair and native GitHub change are one user-visible recovery: Taskboard must remain installed from a durable source and refresh its existing GitHub board after the separate GitHub plugin is removed. The runtime change is confined to Taskboard's existing GitHub adapter plus its server wiring, tests, and README, while the earlier distribution edits are already in this feature. Splitting would leave either a durable but broken GitHub board or a native adapter without the requested install/PR completion.)",
+  "createdAt": "2026-10-19T15:23:38.880Z",
+  "stateBeforeDigest": "sha256:a5127112ec571bd4816dc65c019b9c0b5efde0900b93eb691f596fa517d53973",
+  "stateAfterDigest": "sha256:2274465ee5b91fffd030a1fcf6c9cac0cbab3bb5fb3a5a055168de5af76b066e",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 12,
+    "activeFeature": "restore-the-installed-bb-surf-steel-browser-and-taskboard-plugins",
+    "request": "Restore the installed BB Surf (steel-browser) and Taskboard plugins from durable sources that will not disappear with temporary directories or BB thread worktree cleanup. Preserve existing plugin settings, project data, and credentials. Verify both plugins run. Inspect their existing BB Community marketplace publication and create the necessary focused pull requests in MateoCerquetella/bb-plugins so durable installation and current releases are correct and users can add them without relying on local worktree paths.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "design",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Expanded the feature contract to add native Taskboard GitHub ownership. Added observable criteria for refreshing with the GitHub BB plugin absent, preserving the existing github source and cache, direct issue detail/create/status behavior through gh, scoped repository discovery from the BB project remote, boundary validation and failure containment, and documentation that requires only gh authentication. Added the taskboard-native-github capability delta and impact classification.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:9e784032dbfcb23e5cd49db7417e7e676e9968cfd0b0df9b84163059a0019e07",
+    "approvedSpecRevision": 11,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:8640b137a1861c63cc4dfb878c394de93168ec3d87280fce49e97fff199f9519",
+    "impactDigest": "sha256:16316443c38b4fc12ca902984735f39fac24ed24908c8eede0deaf17d35ceaa5",
+    "capabilityClaimId": "restore-the-installed-bb-surf-steel-browser-and-taskboard-plugins-dd428787e890",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-19T15:23:38.880Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 2,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "contractRevision": 9,
+      "riskRequest": "Repository checks pass and each focused repository PR is opened against `main`."
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 11,
+      "capabilities": 2,
+      "reason": "The durable installation repair and native GitHub change are one user-visible recovery: Taskboard must remain installed from a durable source and refresh its existing GitHub board after the separate GitHub plugin is removed. The runtime change is confined to Taskboard's existing GitHub adapter plus its server wiring, tests, and README, while the earlier distribution edits are already in this feature. Splitting would leave either a durable but broken GitHub board or a native adapter without the requested install/PR completion.",
+      "actor": "codex",
+      "revision": 11
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "restore-the-installed-bb-surf-steel-browser-and-taskboard-plugins-dd428787e890",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "restore-the-installed-bb-surf-steel-browser-and-taskboard-plugins",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_ptw9gqichm-1/bb-plugins",
+      "worktreeId": "sha256:c70a40f6d3e38c3f6407819f90f09b4e44f93dbbfdb64973dd6cd8c8a0a048bc",
+      "baseCommit": "00fc12410a1c2f3c959436c6cdcc9a8f6b299bee",
+      "baseTree": "5fe25297af55151470e81e199772e5c59170baa7",
+      "bases": {
+        "plugin-git-distribution": {
+          "capability": "plugin-git-distribution",
+          "digest": "sha256:a32930971c97dd3612b83783fb6bff5cd69102dc6267b6b56640e62cdf684950",
+          "requirements": {
+            "durable user-facing install sources": null,
+            "durable local registration": null
+          }
+        },
+        "taskboard-native-github": {
+          "capability": "taskboard-native-github",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "native github issue source": null,
+            "native github failure containment": null,
+            "github setup documentation": null
+          }
+        }
+      },
+      "capabilities": [
+        "plugin-git-distribution",
+        "taskboard-native-github"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-19T14:47:54.672Z",
+      "heartbeatAt": "2026-10-19T15:23:30.412Z",
+      "digest": "sha256:c7edd00297f69a41fdb39932ff8506d902fcd509402a9092bb5844519e906ee6"
+    },
+    "trackerGeneration": 2,
+    "reviewFirst": true
+  },
+  "digest": "sha256:2e6100f8c14fb7ee8742fc0ff6a5dc9db5b66a448233e8e4479cd0bcdaaaa11b"
+}

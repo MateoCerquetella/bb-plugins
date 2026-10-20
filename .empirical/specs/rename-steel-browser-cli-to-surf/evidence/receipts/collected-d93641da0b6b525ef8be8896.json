@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-d93641da0b6b525ef8be8896",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-10-19T15:34:01.854Z",
+  "completedAt": "2026-10-19T15:34:01.854Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "rename-steel-browser-cli-to-surf",
+    "specRevision": 2,
+    "specDigest": "sha256:63a2560dc67cec6b415c1d0420b2a82381875027ee5a0fcddb609043db1c2e8e",
+    "treeDigest": "sha256:c5707bb6a4f66621be7efa0715c6fd3796d4ae1442ac0fa202d664c6238ea820",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:58cddd2e409577913fb5d2525b4c219f48d12cc53dc6cf88c619246b241b77fd",
+  "kind": "collected",
+  "collector": "empirical-review:codex-fresh-isolated-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/rename-steel-browser-cli-to-surf/reviews/7f8a6f3e3e0a04d6e67fad2f.json",
+      "mediaType": "application/json",
+      "bytes": 1711,
+      "digest": "sha256:458e4ad3e69a5461ac77865e29d5b6fd1138b8cf7339530d2dfa7d3f54544da6"
+    },
+    {
+      "path": ".empirical/specs/rename-steel-browser-cli-to-surf/reviews/7f8a6f3e3e0a04d6e67fad2f.md",
+      "mediaType": "text/markdown",
+      "bytes": 953,
+      "digest": "sha256:7d64ea8aa8e85148dd07cc6cb3510c5d17b65c977d23e35b2c26cf10d2d9d2f1"
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-420a63a3fe3c1a1d4d045636",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Verify the committed Taskboard Empirical progress feature with the selected focused check.",
+  "passed": true,
+  "startedAt": "2026-10-14T15:44:27.700Z",
+  "completedAt": "2026-10-14T15:46:04.547Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "taskboard-empirical-live-visibility",
+    "specRevision": 2,
+    "specDigest": "sha256:23291153874870cc75cc38a787e5cee61cce6d731a247b8f8fd75da66c0b00ce",
+    "treeDigest": "sha256:5d7d42a067424cc903eed3d8b3c8c3e4dff2eb88142e0ee9818fd5c36c4dea2d",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 6,
+    "gitCommit": "ed25a41f889bec270aee223ed8942fb8612f5a2f",
+    "textTreeDigest": "sha256:5d7d42a067424cc903eed3d8b3c8c3e4dff2eb88142e0ee9818fd5c36c4dea2d"
+  },
+  "digest": "sha256:84a577f69401b8ac64dbb74d156f9ca8e4598f07e78d2c71ccc1d5538068c86d",
+  "kind": "qa",
+  "matrixDigest": "sha256:dc803ff91bcfda63e56273b11396209410b8dd81ed133b03c3cb178b2f1690cb",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "x64",
+    "node": "24.21.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Verify the committed Taskboard Empirical progress feature with the selected focused check.",
+      "startedAt": "2026-10-14T15:44:27.700Z",
+      "completedAt": "2026-10-14T15:46:04.547Z",
+      "durationMs": 96847,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:f9b129d8080d6ae249324764ab9bf53ce8ebc569462bb37a19a9d1056d966f66",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-taskboard"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH",
+          "TMPDIR"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:d2150a90055f2d2a0bca548ac94d9d8226cd200ad5e11c241b48d89234a2c07f",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "ms)\n✔ legacy completed planning resumes automatically after restart without another planning turn (7.062914ms)\n✔ review outcomes require a valid result; legacy negative verdicts are recoverable (6.018546ms)\n✔ blocked review automatically resumes the same Build with findings exactly once (15.158062ms)\n✔ repair completion starts independent review of the repaired Build workspace (33.772203ms)\n✔ archived Build results survive polling and explicit review repair restores the same session once (49.63047ms)\n✔ legacy archive-only failure preserves completed evidence and can return to Build (9.326995ms)\n✔ archive recovery rejects deleted, moved, unavailable and busy Build sessions before restoration (43.477816ms)\n✔ archive recovery rechecks identity and idle state and does not dispatch after restoration failures (43.587551ms)\n✔ a lost send after unarchive stays uncertain across restart without another dispatch (6.718977ms)\n✔ Start task restoration failure keeps the review actionable without a phantom Build run (7.293012ms)\n✔ explicit blocked Build continuation restores its archived thread without a replacement (24.769473ms)\n✔ review repair loop stops after two attempts without closing the tracker (50.632978ms)\n✔ manual and unknown reviews remain actionable without an automatic dispatch (11.949488ms)\n✔ busy review completion waits for native idle without consuming a repair attempt (3.79803ms)\n✔ lost repair response is uncertain and cannot dispatch again after restart (6.25374ms)\n✔ review repairs reject scope changes and replacement workspaces (7.944765ms)\n✔ resumed review turns invalidate the previous verdict (0.630223ms)\n✔ repair Build that needs input pauses without requesting another review (25.666555ms)\n✔ Start task resumes a blocked Build in the same managed session exactly once (9.166146ms)\n✔ continued blocked Build starts review only after implementation evidence (12.230384ms)\n✔ a native Build restart clears only its obsolete Build pause (22.549843ms)\n✔ legacy waiting Build and repaired turns without a revision cannot imply implementation (11.5733ms)\n✔ scope changes and an empty plan pause automatic build (10.13077ms)\n✔ only provider-supported In progress transitions are selected (0.922969ms)\n✔ upgrades a retained Work-board migration without rewriting history or losing data (108.274059ms)\n✔ appends only the preset migration and round-trips complete state (131.273309ms)\n✔ isolates names and ids between projects (55.088366ms)\n✔ contains corrupt rows and makes reorder exact and atomic (69.605245ms)\n✔ enforces the per-project preset limit without blocking updates (190.521877ms)\n✔ bounds reads and fails closed when raw rows exceed the preset limit (156.796588ms)\n✔ rejects --from-state on wrong verbs and preserves explicit precedence (20.869771ms)\n✔ keeps maximum aggregate preset JSON compact and under the CLI cap (117.262711ms)\n✔ enforces a transactional aggregate state-byte limit per project (346.235806ms)\n✔ accepts a complete strict project browse preference snapshot (94.056006ms)\n✔ requires a project provider and matching source (14.770246ms)\n✔ bounds names, ids, positions, order size, and state fields (26.375729ms)\n✔ rejects control characters in preset identity and state (4.130496ms)\n✔ rejects oversized adversarial containers before inspecting elements (2.376471ms)\n✔ accepts the maximum valid browse state inside the UTF-8 envelope (158.316631ms)\n✔ normalizes unique names without depending on locale (14.408959ms)\n✔ resolves only exact preset order permutations (18.661094ms)\n✔ Linear sync excludes finished issues when the window is off (193.835417ms)\n✔ Linear sync includes issues finished within the window (5.658862ms)\n✔ finished window is a bounded whole number of days (11.805069ms)\n✔ CLI parses --linear-finished-days as days (2.676668ms)\n✔ store defaults existing projects to no finished window and persists it (81.606239ms)\n✔ preparation references retain support for every Taskboard tracker (12.891771ms)\n✔ repository context excludes credentials, generated content and symlink escapes (1407.682956ms)\n✔ context and generation boundaries reject dangerous and malformed input (69.969108ms)\n✔ real SQLite preparation retains direct edits, project isolation, jobs and settings after reload (66.153465ms)\n✔ job service routes context to the remote host and preserves partial success and immutable retries (10057.058888ms)\n✔ old preparations remain discoverable and every pending record is reconciled beyond presentation limits (196.992547ms)\n✔ deferred preparation responses cannot cross selection identity or undo a mutation (3.53551ms)\n✔ selects the active thread project only when it still exists (4.720553ms)\n✔ treats a different thread in the same project as new context (0.925833ms)\n✔ reads the project and thread from a BB project route (3.03554ms)\n✔ uses only the immediately previous navigation entry as source context (0.691893ms)\n✔ never replaces an explicit Taskboard project selection with route context (0.637301ms)\n✔ writes project credentials atomically with owner-only permissions (100.309084ms)\n✔ deleting a missing credential is harmless (6.377227ms)\n✔ cached summaries never retain provider comments (5.055005ms)\n✔ provider creation results carry strict native assignee confirmation (1.576799ms)\n✔ metadata failures expose only a fixed server-safe message (1.714094ms)\n✔ finds Jira project keys from common configured JQL scopes (28.097197ms)\n✔ binds issue creation to the tracker reviewed in the modal (9.818003ms)\n✔ refreshes authoritative provider data after successful issue creation (0.986994ms)\n✔ refreshes authoritative provider data after ambiguous issue creation failure (8.041232ms)\n✔ gitlab is a registered taskboard source (4.13025ms)\n✔ refs must be host-qualified paths (4.752724ms)\n✔ locators round-trip with ref and iid (1.28143ms)\n✔ status label categories cover the five states (0.836956ms)\n✔ status labels filter out unrelated labels (3.071798ms)\n✔ state category prefers workflow labels over native state (1.829577ms)\n✔ status name shows the workflow column name or the native state (0.895495ms)\n✔ cached summaries never retain provider comments (0.623101ms)\n✔ untriaged issues keep native open/closed choices current-flagged (0.545358ms)\n✔ stripped status names keep facet and dropdown consistent (0.852019ms)\n✔ token line is parsed from glab stderr output (1.147591ms)\n✔ keeps structural headers on neutral host theme surfaces (30.13908ms)\n✔ uses restrained state glyph, focus, and conversation treatments (1.513958ms)\n✔ keeps constrained filter values inside the vertical menu measure (1.252087ms)\n✔ keeps assignee avatars compact with six theme-safe identity tones (2.848461ms)\n✔ shows restrained composer drop feedback and discoverable drag grips (5.050489ms)\n✔ ticket images reject spoofed formats, active content and oversized bytes (47.316858ms)\n✔ Linear uploads use signed storage headers and return the asset URL (406.694942ms)\n✔ improvement asks for concrete concise scope without invented implementation (0.858074ms)\n✔ draft parser accepts JSON or a single fence and rejects missing, extra or oversized fields (25.38394ms)\n✔ concurrent starts spawn once with project defaults and only validated text is returned (4.383648ms)\n✔ cancellation before start prevents dispatch, including after service reload (0.922387ms)\n✔ uncertain spawn cannot become a confirmed cancellation or be dispatched twice (1.226646ms)\n✔ stop failures stay uncertain and cleanup is retried by the sweep (1.590665ms)\n✔ invalid model output never returns a replacement draft (1.557456ms)\nℹ tests 218\nℹ suites 0\nℹ pass 218\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 14497.283303\n\n> bb-plugin-taskboard@0.3.3 build\n> node scripts/run-isolated-bb-cli.mjs plugin build .\n\nDownloading the plugin build toolchain (one time)…\n  esbuild@0.28.1, @tailwindcss/node@4.3.0, @tailwindcss/oxide@4.3.0, tailwindcss@4.3.0\nToolchain ready (5.6s)\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\ndist/host.js\ndist/host.js.map\ndist/host.meta.json\n\n> bb-plugin-taskboard@0.3.3 verify:build\n> node scripts/verify-build.mjs\n\nTaskboard build metadata is valid.\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:5d7d42a067424cc903eed3d8b3c8c3e4dff2eb88142e0ee9818fd5c36c4dea2d",
+      "sourceTreeAfter": "sha256:5d7d42a067424cc903eed3d8b3c8c3e4dff2eb88142e0ee9818fd5c36c4dea2d",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

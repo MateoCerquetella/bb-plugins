@@ -19,12 +19,15 @@ registerHooks({
   }
 });
 
-const [{ createGithubAdapter }, { createJiraAdapter }, { createLinearAdapter }] =
-  await Promise.all([
-    import('../sources/github.ts'),
-    import('../sources/jira.ts'),
-    import('../sources/linear.ts')
-  ]);
+const [
+  { createGithubAdapter, discoverGithubRepositories },
+  { createJiraAdapter },
+  { createLinearAdapter }
+] = await Promise.all([
+  import('../sources/github.ts'),
+  import('../sources/jira.ts'),
+  import('../sources/linear.ts')
+]);
 
 const fullCreateInput = {
   title: 'Native creation fields',
@@ -1139,44 +1142,9 @@ test('Jira exposes only priorities allowed for the selected project and issue ty
 
 test('GitHub loads native metadata and reports partially applied fields', async () => {
   const cliCalls: Array<{ args: string[]; timeoutMs: number | undefined }> = [];
-  const rpcCalls: string[] = [];
-  const bb = {
-    sdk: {
-      plugins: {
-        async callRpc(input: { method: string }) {
-          rpcCalls.push(input.method);
-          if (input.method === 'status') {
-            return {
-              ghOk: true,
-              ghError: null,
-              repos: [{ repo: 'acme/repo', projectId: 'proj_taskboard' }],
-              lastSyncedAt: null
-            };
-          }
-          if (input.method === 'getIssue') {
-            return {
-              issue: {
-                repo: 'acme/repo',
-                number: 42,
-                title: fullCreateInput.title,
-                state: 'OPEN',
-                author: 'mateo',
-                labels: ['bug'],
-                assignees: [],
-                url: 'https://github.com/acme/repo/issues/42',
-                body: fullCreateInput.description,
-                updatedAt: '2026-08-26T12:00:00.000Z',
-                comments: []
-              }
-            };
-          }
-          throw new Error(`Unexpected GitHub RPC: ${input.method}`);
-        }
-      }
-    }
-  };
   const runGithubCli = async (args: string[], timeoutMs?: number) => {
     cliCalls.push({ args, timeoutMs });
+    if (args[0] === 'auth') return '';
     const endpoint = args[args.length - 1] ?? '';
     if (endpoint.includes('/assignees?')) {
       return JSON.stringify([[{ login: 'mateo' }]]);
@@ -1197,18 +1165,22 @@ test('GitHub loads native metadata and reports partially applied fields', async 
     }
     return JSON.stringify({
       number: 42,
+      title: fullCreateInput.title,
+      state: 'open',
+      user: { login: 'mateo' },
       html_url: 'https://github.com/acme/repo/issues/42',
       assignees: [],
       labels: [{ name: 'bug' }],
+      body: fullCreateInput.description,
+      updated_at: '2026-08-26T12:00:00.000Z',
       milestone: null
     });
   };
-  const adapter = createGithubAdapter(
-    bb as never,
-    true,
-    'proj_taskboard',
+  const adapter = createGithubAdapter({
+    enabled: true,
+    repositories: ['acme/repo'],
     runGithubCli
-  );
+  });
 
   const metadata = await adapter.createMetadata({
     destinationId: 'acme/repo',
@@ -1243,15 +1215,14 @@ test('GitHub loads native metadata and reports partially applied fields', async 
     confirmed: true,
     id: null
   });
-  assert.equal(rpcCalls.includes('assignableUsers'), false);
-  assert.equal(rpcCalls.includes('repositoryLabels'), false);
-  assert.equal(rpcCalls.includes('getIssue'), false);
   assert.deepEqual(
     cliCalls.filter(call => call.args.includes('--paginate')),
     [
       {
         args: [
           'api',
+          '--hostname',
+          'github.com',
           '--paginate',
           '--slurp',
           'repos/acme/repo/assignees?per_page=100'
@@ -1261,6 +1232,8 @@ test('GitHub loads native metadata and reports partially applied fields', async 
       {
         args: [
           'api',
+          '--hostname',
+          'github.com',
           '--paginate',
           '--slurp',
           'repos/acme/repo/labels?per_page=100'
@@ -1270,6 +1243,8 @@ test('GitHub loads native metadata and reports partially applied fields', async 
       {
         args: [
           'api',
+          '--hostname',
+          'github.com',
           '--paginate',
           '--slurp',
           'repos/acme/repo/milestones?state=open&per_page=100'
@@ -1281,6 +1256,8 @@ test('GitHub loads native metadata and reports partially applied fields', async 
   assert.deepEqual(cliCalls.find(call => call.args.includes('POST')), {
     args: [
       'api',
+      '--hostname',
+      'github.com',
       '--method',
       'POST',
       'repos/acme/repo/issues',
@@ -1302,38 +1279,26 @@ test('GitHub loads native metadata and reports partially applied fields', async 
 });
 
 test('GitHub confirms the submitted assignee from native response membership', async () => {
-  const bb = {
-    sdk: {
-      plugins: {
-        async callRpc(input: { method: string }) {
-          if (input.method === 'status') {
-            return {
-              ghOk: true,
-              ghError: null,
-              repos: [{ repo: 'acme/repo', projectId: 'proj_taskboard' }],
-              lastSyncedAt: null
-            };
-          }
-          throw new Error(`Unexpected GitHub RPC: ${input.method}`);
-        }
-      }
-    }
-  };
-  const adapter = createGithubAdapter(
-    bb as never,
-    true,
-    'proj_taskboard',
-    async args => {
+  const adapter = createGithubAdapter({
+    enabled: true,
+    repositories: ['acme/repo'],
+    runGithubCli: async args => {
+      if (args[0] === 'auth') return '';
       assert.ok(args.includes('POST'));
       return JSON.stringify({
         number: 42,
+        title: fullCreateInput.title,
+        state: 'open',
+        user: { login: 'mateo' },
         html_url: 'https://github.com/acme/repo/issues/42',
         assignees: [{ login: 'automation' }, { login: 'mateo' }],
         labels: [],
+        body: fullCreateInput.description,
+        updated_at: '2026-08-26T12:00:00.000Z',
         milestone: null
       });
     }
-  );
+  });
 
   const result = await adapter.create({
     ...fullCreateInput,
@@ -1347,18 +1312,24 @@ test('GitHub confirms the submitted assignee from native response membership', a
   });
   assert.deepEqual(result.warnings, []);
 
-  const missingAssigneesAdapter = createGithubAdapter(
-    bb as never,
-    true,
-    'proj_taskboard',
-    async () =>
-      JSON.stringify({
+  const missingAssigneesAdapter = createGithubAdapter({
+    enabled: true,
+    repositories: ['acme/repo'],
+    runGithubCli: async args =>
+      args[0] === 'auth'
+        ? ''
+        : JSON.stringify({
         number: 43,
+        title: fullCreateInput.title,
+        state: 'open',
+        user: { login: 'mateo' },
         html_url: 'https://github.com/acme/repo/issues/43',
         labels: [],
+        body: fullCreateInput.description,
+        updated_at: '2026-08-26T12:00:00.000Z',
         milestone: null
       })
-  );
+  });
   await assert.rejects(
     missingAssigneesAdapter.create({
       ...fullCreateInput,
@@ -1370,25 +1341,9 @@ test('GitHub confirms the submitted assignee from native response membership', a
 
 test('GitHub paginates and deduplicates every create metadata collection', async () => {
   const cliCalls: string[][] = [];
-  const bb = {
-    sdk: {
-      plugins: {
-        async callRpc(input: { method: string }) {
-          if (input.method === 'status') {
-            return {
-              ghOk: true,
-              ghError: null,
-              repos: [{ repo: 'acme/repo', projectId: 'proj_taskboard' }],
-              lastSyncedAt: null
-            };
-          }
-          throw new Error(`Unexpected GitHub RPC: ${input.method}`);
-        }
-      }
-    }
-  };
   const runGithubCli = async (args: string[]) => {
     cliCalls.push(args);
+    if (args[0] === 'auth') return '';
     const endpoint = args[args.length - 1] ?? '';
     if (endpoint.includes('/assignees?')) {
       return JSON.stringify([
@@ -1419,12 +1374,11 @@ test('GitHub paginates and deduplicates every create metadata collection', async
     }
     throw new Error(`Unexpected GitHub CLI call: ${args.join(' ')}`);
   };
-  const adapter = createGithubAdapter(
-    bb as never,
-    true,
-    'proj_taskboard',
+  const adapter = createGithubAdapter({
+    enabled: true,
+    repositories: ['acme/repo'],
     runGithubCli
-  );
+  });
 
   const metadata = await adapter.createMetadata({
     destinationId: 'acme/repo',
@@ -1445,9 +1399,9 @@ test('GitHub paginates and deduplicates every create metadata collection', async
     { id: '7', label: 'September · 2026-09-30' },
     { id: '8', label: 'October' }
   ]);
-  assert.equal(cliCalls.length, 3);
+  assert.equal(cliCalls.length, 4);
   assert.ok(
-    cliCalls.every(
+    cliCalls.filter(args => args[0] === 'api').every(
       args =>
         args[0] === 'api' &&
         args.includes('--paginate') &&
@@ -1457,251 +1411,125 @@ test('GitHub paginates and deduplicates every create metadata collection', async
   );
 });
 
-test('GitHub queues a fresh reconciliation after an overlapping pre-create refresh', async () => {
-  const events: string[] = [];
-  let refreshCount = 0;
-  let resolveFirstRefresh!: (value: { repos: number; items: number }) => void;
-  const firstRefresh = new Promise<{ repos: number; items: number }>(resolve => {
-    resolveFirstRefresh = resolve;
-  });
-  const cachedIssue = {
-    repo: 'acme/repo',
-    number: 42,
-    kind: 'issue' as const,
-    title: 'Created during an older refresh',
-    state: 'OPEN',
-    author: 'mateo',
-    labels: [],
-    assignees: [],
-    url: 'https://github.com/acme/repo/issues/42',
-    body: 'The next provider refresh must include this issue.',
-    updatedAt: '2026-08-26T12:00:00.000Z'
-  };
-  const bb = {
-    sdk: {
-      plugins: {
-        async callRpc(input: { method: string }) {
-          if (input.method === 'refresh') {
-            refreshCount += 1;
-            events.push(`refresh:${refreshCount}`);
-            return refreshCount === 1
-              ? firstRefresh
-              : { repos: 1, items: 1 };
-          }
-          if (input.method === 'status') {
-            return {
-              ghOk: true,
-              ghError: null,
-              repos: [{ repo: 'acme/repo', projectId: 'proj_taskboard' }],
-              lastSyncedAt: null
-            };
-          }
-          if (input.method === 'getIssue') {
-            const { kind: _kind, ...issue } = cachedIssue;
-            return { issue: { ...issue, comments: [] } };
-          }
-          if (input.method === 'listItems') {
-            return { items: refreshCount >= 2 ? [cachedIssue] : [] };
-          }
-          throw new Error(`Unexpected GitHub RPC: ${input.method}`);
-        }
-      }
+test('GitHub discovers only current-host checkout remotes', async () => {
+  const calls: string[] = [];
+  const repos = await discoverGithubRepositories({
+    project: {
+      gitRemoteUrl: 'https://github.com/stale/project.git',
+      sources: [
+        { type: 'local_path', hostId: 'host_current', path: '/current' },
+        { type: 'local_path', hostId: 'host_other', path: '/other' }
+      ]
+    },
+    primaryHostId: 'host_current',
+    runGit: async cwd => {
+      calls.push(cwd);
+      return 'git@github.com:acme/repo.git\n';
     }
-  };
-  const runGithubCli = async (args: string[]) => {
-    if (!args.includes('POST')) {
-      throw new Error(`Unexpected GitHub CLI call: ${args.join(' ')}`);
-    }
-    events.push('create');
-    return JSON.stringify({
-      number: 42,
-      html_url: cachedIssue.url,
-      assignees: [],
-      labels: [],
-      milestone: null
-    });
-  };
-  const adapter = createGithubAdapter(
-    bb as never,
-    true,
-    'proj_taskboard',
-    runGithubCli
-  );
-
-  const preCreateRefresh = adapter.list({ refresh: true });
-  assert.equal(refreshCount, 1);
-  await adapter.create({
-    ...fullCreateInput,
-    destinationId: 'acme/repo'
   });
 
-  const reconciliation = adapter.list({ refresh: true });
-  await Promise.resolve();
-  assert.equal(
-    refreshCount,
-    1,
-    'the fresh reconciliation must wait for the older refresh to settle'
-  );
-
-  resolveFirstRefresh({ repos: 1, items: 0 });
-  const [, reconciledItems] = await Promise.all([
-    preCreateRefresh,
-    reconciliation
-  ]);
-
-  assert.equal(refreshCount, 2);
-  assert.ok(events.indexOf('refresh:2') > events.indexOf('create'));
-  assert.deepEqual(reconciledItems.map(item => item.locator), [
-    'acme/repo#42'
-  ]);
+  assert.deepEqual(calls, ['/current']);
+  assert.deepEqual(repos, ['acme/repo']);
 });
 
-test('GitHub queues a post-write refresh when issue confirmation is ambiguous', async () => {
-  let refreshCount = 0;
-  let resolveFirstRefresh!: (value: { repos: number; items: number }) => void;
-  const firstRefresh = new Promise<{ repos: number; items: number }>(resolve => {
-    resolveFirstRefresh = resolve;
+test('GitHub lists only issues from project-scoped repositories', async () => {
+  const cliCalls: string[][] = [];
+  const adapter = createGithubAdapter({
+    enabled: true,
+    repositories: ['acme/repo'],
+    runGithubCli: async args => {
+      cliCalls.push(args);
+      if (args[0] === 'auth') return '';
+      return JSON.stringify([
+        {
+          number: 42,
+          title: 'Native issue',
+          state: 'open',
+          user: { login: 'mateo' },
+          labels: [{ name: 'bug' }],
+          assignees: [{ login: 'ada' }],
+          html_url: 'https://github.com/acme/repo/issues/42',
+          body: 'Loaded directly through gh.',
+          updated_at: '2026-08-26T12:00:00.000Z'
+        },
+        {
+          number: 43,
+          title: 'Pull request',
+          state: 'open',
+          user: { login: 'mateo' },
+          labels: [],
+          assignees: [],
+          html_url: 'https://github.com/acme/repo/pull/43',
+          body: null,
+          updated_at: '2026-08-26T13:00:00.000Z',
+          pull_request: {}
+        }
+      ]);
+    }
   });
-  const cachedIssue = {
-    repo: 'acme/repo',
-    number: 42,
-    kind: 'issue' as const,
-    title: 'Possibly committed issue',
-    state: 'OPEN',
-    author: 'mateo',
-    labels: [],
-    assignees: [],
-    url: 'https://github.com/acme/repo/issues/42',
-    body: 'The POST committed before its response was lost.',
-    updatedAt: '2026-08-26T12:00:00.000Z'
-  };
-  const bb = {
-    sdk: {
-      plugins: {
-        async callRpc(input: { method: string }) {
-          if (input.method === 'refresh') {
-            refreshCount += 1;
-            return refreshCount === 1
-              ? firstRefresh
-              : { repos: 1, items: 1 };
-          }
-          if (input.method === 'status') {
-            return {
-              ghOk: true,
-              ghError: null,
-              repos: [{ repo: 'acme/repo', projectId: 'proj_taskboard' }],
-              lastSyncedAt: null
-            };
-          }
-          if (input.method === 'listItems') {
-            return { items: refreshCount >= 2 ? [cachedIssue] : [] };
-          }
-          throw new Error(`Unexpected GitHub RPC: ${input.method}`);
-        }
-      }
-    }
-  };
-  const adapter = createGithubAdapter(
-    bb as never,
-    true,
-    'proj_taskboard',
-    async args => {
-      if (args.includes('POST')) return '{response lost after write';
-      throw new Error(`Unexpected GitHub CLI call: ${args.join(' ')}`);
-    }
-  );
-
-  const preCreateRefresh = adapter.list({ refresh: true });
-  assert.equal(refreshCount, 1);
-  await assert.rejects(
-    adapter.create({ ...fullCreateInput, destinationId: 'acme/repo' }),
-    /TASKBOARD_CREATE_OUTCOME_UNCERTAIN/u
-  );
-
-  const reconciliation = adapter.list({ refresh: true });
-  await Promise.resolve();
-  assert.equal(
-    refreshCount,
-    1,
-    'ambiguous writes must wait for the older refresh before forcing a new one'
-  );
-  resolveFirstRefresh({ repos: 1, items: 0 });
-  const [, reconciledItems] = await Promise.all([
-    preCreateRefresh,
-    reconciliation
-  ]);
-
-  assert.equal(refreshCount, 2);
-  assert.deepEqual(reconciledItems.map(item => item.locator), [
-    'acme/repo#42'
-  ]);
-});
-
-test('GitHub forced reconciliation refreshes before listing only project-scoped repos', async () => {
-  const rpcCalls: string[] = [];
-  const bb = {
-    sdk: {
-      plugins: {
-        async callRpc(input: {
-          method: string;
-          input: { repo?: string } | null;
-        }) {
-          if (input.method === 'refresh') {
-            rpcCalls.push('refresh');
-            return { repos: 2, items: 2 };
-          }
-          if (input.method === 'status') {
-            rpcCalls.push('status');
-            return {
-              ghOk: true,
-              ghError: null,
-              repos: [
-                { repo: 'acme/repo', projectId: 'proj_taskboard' },
-                { repo: 'other/repo', projectId: 'proj_other' }
-              ],
-              lastSyncedAt: '2026-08-26T12:00:00.000Z'
-            };
-          }
-          if (input.method === 'listItems') {
-            rpcCalls.push(`listItems:${input.input?.repo}`);
-            return {
-              items: [
-                {
-                  repo: 'acme/repo',
-                  number: 42,
-                  kind: 'issue',
-                  title: 'Freshly created issue',
-                  state: 'OPEN',
-                  author: 'mateo',
-                  labels: [],
-                  assignees: [],
-                  url: 'https://github.com/acme/repo/issues/42',
-                  body: 'Now present in the authoritative cache.',
-                  updatedAt: '2026-08-26T12:00:00.000Z'
-                }
-              ]
-            };
-          }
-          throw new Error(`Unexpected GitHub RPC: ${input.method}`);
-        }
-      }
-    }
-  };
-  const adapter = createGithubAdapter(
-    bb as never,
-    true,
-    'proj_taskboard',
-    async () => {
-      throw new Error('GitHub CLI is not used while reconciling');
-    }
-  );
 
   const items = await adapter.list({ refresh: true });
 
-  assert.deepEqual(rpcCalls, [
-    'refresh',
-    'status',
-    'listItems:acme/repo'
-  ]);
   assert.deepEqual(items.map(item => item.locator), ['acme/repo#42']);
+  assert.ok(
+    cliCalls
+      .filter(args => args[0] === 'api')
+      .every(args => args.some(value => value.includes('repos/acme/repo/')))
+  );
+  await assert.rejects(
+    adapter.get('other/repo#42'),
+    /outside this BB project's repository scope/u
+  );
+});
+
+test('GitHub reads comments and closes an issue through gh', async () => {
+  const cliCalls: string[][] = [];
+  let state: 'open' | 'closed' = 'open';
+  const issue = () => ({
+    number: 42,
+    title: 'Native issue',
+    state,
+    user: { login: 'mateo' },
+    labels: [],
+    assignees: [],
+    html_url: 'https://github.com/acme/repo/issues/42',
+    body: 'Loaded directly through gh.',
+    updated_at: '2026-08-26T12:00:00.000Z'
+  });
+  const adapter = createGithubAdapter({
+    enabled: true,
+    repositories: ['acme/repo'],
+    runGithubCli: async args => {
+      cliCalls.push(args);
+      if (args[0] === 'auth') return '';
+      if (args.some(value => value.includes('/comments?'))) {
+        return JSON.stringify([
+          [
+            {
+              user: { login: 'ada' },
+              body: 'Confirmed.',
+              created_at: '2026-08-26T12:30:00.000Z'
+            }
+          ]
+        ]);
+      }
+      if (args.includes('PATCH')) {
+        state = 'closed';
+      }
+      return JSON.stringify(issue());
+    }
+  });
+
+  const detail = await adapter.get('acme/repo#42');
+  const updated = await adapter.updateStatus('acme/repo#42', 'closed');
+
+  assert.deepEqual(detail.comments, [
+    {
+      author: 'ada',
+      body: 'Confirmed.',
+      createdAt: '2026-08-26T12:30:00.000Z'
+    }
+  ]);
+  assert.equal(updated.status, 'CLOSED');
+  assert.equal(cliCalls.filter(args => args.includes('PATCH')).length, 1);
 });

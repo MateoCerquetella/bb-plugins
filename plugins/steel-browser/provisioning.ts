@@ -210,7 +210,7 @@ async function waitForBrowser(binding: Binding): Promise<void> {
     } catch { /* Chromium is still starting. */ }
     await new Promise(resolve => setTimeout(resolve, 1000));
   }
-  throw new Error("Steel was provisioned but Chromium is not ready. Retry `bb steel-browser project` to resume setup.");
+  throw new Error("Steel was provisioned but Chromium is not ready. Retry `bb surf project` to resume setup.");
 }
 export async function verifyProjectInstance(projectId: string, binding: Binding): Promise<void> {
   const hash = createHash("sha256").update(projectId).digest("hex").slice(0, 24);

@@ -1,12 +1,8 @@
 import { build } from 'esbuild';
 import { readFile, readdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { createServer } from 'node:http';
 import assert from 'node:assert/strict';
-const { chromium } = await import(process.env.PLAYWRIGHT_MODULE ?? 'playwright');
-
-// Attach only to the endpoint returned by this project's Steel binding.
-const endpoint = process.env.STEEL_CDP_URL;
-if (!endpoint || !process.env.BB_THREAD_STORAGE) throw new Error('Requires Steel CDP and thread storage.');
 const plugin = resolve('plugins/taskboard');
 const result = await build({
   entryPoints: [resolve(plugin, 'test/factory-preview.tsx')], bundle: true,
@@ -24,21 +20,17 @@ const result = await build({
     }
   }]
 });
-const metadata = await fetch(endpoint + '/json/version').then(r => r.json());
-const ws = new URL(metadata.webSocketDebuggerUrl);
-ws.host = new URL(endpoint).host;
-const browser = await chromium.connectOverCDP(ws.href);
-const context = browser.contexts()[0];
-const page = await context.newPage();
-const errors = [];
-page.on('pageerror', e => errors.push(e.message));
 const fixture = {
   schemaVersion: 1, projectId: 'proj_test', source: 'github', locator: 'example/repo#42',
   version: 3, scopeDigest: 'scope', approvedDigest: null, plans: [],
+  admission: { kind: 'manual' },
+  coordinator: { status: 'ready', intentId: 'preview-intent', startedAt: new Date().toISOString(),
+    legacyRunCount: 0, threadId: 'thr_coordinator', nativeStatus: 'idle', error: null },
   automatic: false, automationError: null, trackerProgress: { status: 'pending', message: null },
   stage: 'Planning', updatedAt: new Date().toISOString(),
   runs: [{
     id: 'run', kind: 'plan', status: 'finished', threadId: 'thr_test', environmentId: 'env_managed_worktree',
+    hostId: 'host_demo', checkoutRoot: '/demo/empirical',
     cursor: 9, turnId: 'turn', planDigest: null, activity: 'Turn finished; work not accepted',
     error: null, output: 'Preserve filters per project. Add a regression test for switching between two projects.',
     updates: [{ id: 'message', text: 'Found the project-switch race. Checking saved preferences.', at: new Date().toISOString() }],
@@ -58,11 +50,46 @@ const html = `<html><head><meta name="viewport" content="width=device-width,init
 ${hostCss}
 :root{font:16px system-ui;--border:#ddd;--muted:#f2f3f5;--primary:#286bd4;--muted-foreground:#71757e;--canvas:#fff;--ink:#292b31;--timeline-accent:#286bd4;--success:#19714d;--destructive-text:#b13a4b}
 *{box-sizing:border-box}body{margin:0;color:var(--ink);background:var(--canvas);font-size:13px}#preview-detail{width:100%;min-width:0}#preview-manual{padding:20px}pre{font-size:11px}
-${css}</style></head><body><div id="root"></div><script>window.factoryFixture=${JSON.stringify(fixture)}</script><script>${result.outputFiles[0].text.replaceAll('</script>', '<\\/script>')}</script></body></html>`;
+${css}</style></head><body><div id="root"></div><script>window.factoryFixture=${JSON.stringify(fixture)};window.empiricalOffline=false;window.empiricalLastKnown=null;window.empiricalStatus={kind:'feature',feature:'demo-live-work',revision:1,phase:'implement',status:'waiting',nextAction:'Implement the current acceptance criteria',verification:'pending',completionLevel:'none',completionMethod:null};</script><script>${result.outputFiles[0].text.replaceAll('</script>', '<\\/script>')}</script></body></html>`;
+if (process.env.TASKBOARD_DEMO_PORT) {
+  const port = Number(process.env.TASKBOARD_DEMO_PORT);
+  if (!Number.isSafeInteger(port) || port < 1 || port > 65535) throw new Error('Invalid demo port.');
+  createServer((_request, response) => {
+    response.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' });
+    response.end(html);
+  }).listen(port, '0.0.0.0', () => console.log(`Taskboard demo listening on ${port}`));
+} else {
+// Attach only to the endpoint returned by this project's Steel binding.
+const endpoint = process.env.STEEL_CDP_URL;
+if (!endpoint || !process.env.BB_THREAD_STORAGE) throw new Error('Requires Steel CDP and thread storage.');
+const { chromium } = await import(process.env.PLAYWRIGHT_MODULE ?? 'playwright');
+const metadata = await fetch(endpoint + '/json/version').then(r => r.json());
+const ws = new URL(metadata.webSocketDebuggerUrl);
+ws.host = new URL(endpoint).host;
+const browser = await chromium.connectOverCDP(ws.href);
+const context = browser.contexts()[0];
+const page = await context.newPage();
+const errors = [];
+page.on('pageerror', e => errors.push(e.message));
+page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
 try {
   await page.setViewportSize({ width: 1280, height: 1000 });
   await page.route('https://taskboard-preview.test/**', route => route.fulfill({ contentType: 'text/html', body: html }));
   await page.goto('https://taskboard-preview.test/');
+  const factorySettings = page.locator('#preview-factory-settings');
+  await factorySettings.getByRole('checkbox', { name: 'Enable automatic intake' }).check();
+  await factorySettings.getByRole('spinbutton', { name: 'Automatic concurrency' }).fill('2');
+  await factorySettings.getByRole('button', { name: 'Save factory settings' }).click();
+  await factorySettings.getByText('running · github').waitFor();
+  for (const width of [1280, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, `taskboard-factory-settings-${width}.png`) });
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+  }
+  await factorySettings.getByRole('checkbox', { name: 'Enable automatic intake' }).uncheck();
+  await factorySettings.getByRole('button', { name: 'Save factory settings' }).click();
+  await factorySettings.getByText('disabled · github').waitFor();
+  await page.setViewportSize({ width: 1280, height: 1000 });
   const manual = page.locator('#preview-manual');
   await manual.getByRole('heading', { name: 'Agent', exact: true }).waitFor();
   await page.getByRole('button', { name: /^Task progress:/ }).click();
@@ -135,7 +162,7 @@ try {
   });
   assert.equal(await sessionSelect.inputValue(), 'investigate-run');
   assert.equal(await manual.getByRole('button', { name: 'Continue in thread', exact: true }).count(), 1);
-  await manual.getByRole('button', { name: 'Open session', exact: true }).click();
+  await manual.locator('.tb-session-picker').getByRole('button', { name: 'Open session', exact: true }).click();
   assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_investigate']);
   await page.evaluate(() => {
     const record = window.factoryFixture;
@@ -143,9 +170,11 @@ try {
     record.version++;
     window.factoryRefresh();
   });
+  await page.waitForFunction(() =>
+    document.querySelector('#preview-manual .tb-session-picker select')?.value === 'new-build');
   assert.equal(await sessionSelect.inputValue(), 'new-build');
-  assert.equal(await manual.getByRole('button', { name: 'Open session', exact: true }).count(), 1);
-  await manual.getByRole('button', { name: 'Open session', exact: true }).click();
+  assert.equal(await manual.locator('.tb-session-picker').getByRole('button', { name: 'Open session', exact: true }).count(), 1);
+  await manual.locator('.tb-session-picker').getByRole('button', { name: 'Open session', exact: true }).click();
   assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_investigate', 'thr_build']);
   await page.evaluate(() => {
     const record = window.factoryFixture;
@@ -153,6 +182,8 @@ try {
     record.version++;
     window.factoryRefresh();
   });
+  await page.waitForFunction(() =>
+    document.querySelector('#preview-manual .tb-session-picker select')?.value === 'run');
   assert.equal(await sessionSelect.inputValue(), 'run');
   await sessionSelect.selectOption('run');
   await manual.getByText('Implementation plan', { exact: true }).click();
@@ -166,9 +197,30 @@ try {
   await page.locator('#preview-card').getByRole('button', { name: 'Start task', exact: true }).click();
   assert.equal(await page.evaluate(() => window.factoryStarts), 1);
   assert.equal(await page.evaluate(() => localStorage.getItem('bb-taskboard:right-panel-pinned')), null);
-  assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_investigate', 'thr_build', 'thr_started']);
+  assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_investigate', 'thr_build', 'thr_coordinator']);
   await manual.locator('.tb-run[data-live="true"] .tb-live-mark').waitFor();
   assert.equal(await manual.locator('.tb-run[data-live="true"] .tb-live-mark').evaluate(el => getComputedStyle(el).animationName), 'tb-working');
+  const empirical = manual.locator('.tb-empirical-progress');
+  await empirical.getByText('demo-live-work').waitFor();
+  await empirical.getByText('implement · r1').waitFor();
+  await page.getByRole('button', { name: 'Awaiting input' }).click();
+  await empirical.getByText('implement · r2').waitFor();
+  await empirical.getByText('Answer the implementation question').waitFor();
+  await page.getByRole('button', { name: 'Blocked', exact: true }).click();
+  await empirical.getByText('review · r3').waitFor();
+  await empirical.getByText('Resolve review findings').waitFor();
+  await page.getByRole('button', { name: 'Host offline' }).click();
+  await empirical.getByText('Stale').waitFor();
+  await empirical.getByText('The host is offline or Empirical did not respond.', { exact: false }).waitFor();
+  await page.getByRole('button', { name: 'Reconnect' }).click();
+  await empirical.getByText('review · r3').waitFor();
+  await page.getByRole('button', { name: 'Implemented only' }).click();
+  await empirical.getByText('done · r4').waitFor();
+  await empirical.getByText('implemented · workflow').waitFor();
+  await page.getByRole('button', { name: 'Verified', exact: true }).click();
+  await empirical.getByText('done · r5').waitFor();
+  await empirical.getByText('verified · workflow').waitFor();
+  await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, 'taskboard-empirical-demo.png') });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   assert.equal(await manual.locator('.tb-run[data-live="true"] .tb-live-mark').evaluate(el => getComputedStyle(el).animationName), 'none');
   await page.emulateMedia({ reducedMotion: 'no-preference' });
@@ -257,7 +309,7 @@ try {
     assert.equal(await manual.getByRole('button', { name: 'Start build', exact: true }).count(), 0);
     assert.equal(await manual.getByRole('button', { name: 'Continue in thread', exact: true }).count(), 0);
     const startsBeforeOpen = await page.evaluate(() => window.factoryStarts);
-    await manual.getByRole('button', { name: 'Open session', exact: true }).click();
+    await manual.locator('.tb-session-picker').getByRole('button', { name: 'Open session', exact: true }).click();
     assert.equal(await page.evaluate(() => window.factoryStarts), startsBeforeOpen);
   }
   await page.evaluate(() => {
@@ -290,6 +342,145 @@ try {
     document.documentElement.classList.remove('dark');
     document.documentElement.style.cssText = '';
   });
+  await page.getByRole('button', { name: 'Team ready', exact: true }).click();
+  const team = manual.locator('[data-factory-team]');
+  assert.equal(await manual.locator('.tb-run').count(), 1);
+  const disclosure = team.getByRole('button', { expanded: true });
+  await team.getByRole('button', { name: 'Open coordinator thread', exact: true }).click();
+  assert.equal(await page.evaluate(() => window.factoryNavigation.at(-1)), 'thr_coordinator');
+  await team.getByRole('button', { name: 'Open build thread', exact: true }).click();
+  assert.equal(await page.evaluate(() => window.factoryNavigation.at(-1)), 'thr_build');
+  await disclosure.focus();
+  await page.keyboard.press('Enter');
+  assert.equal(await team.getByRole('button', { expanded: false }).count(), 1);
+  await page.evaluate(() => { window.factoryFixture.version++; window.factoryRefresh(); });
+  await page.waitForTimeout(100);
+  assert.equal(await team.getByRole('button', { expanded: false }).count(), 1);
+  await page.keyboard.press('Space');
+  assert.equal(await team.getByRole('button', { expanded: true }).count(), 1);
+  assert.equal(await team.getByRole('button', { expanded: true }).evaluate(el => el === document.activeElement), true);
+  assert.equal(await team.locator('[data-team-role="review"]').getByRole('button').count(), 0);
+  for (const scenario of [
+    ['Factory paused', 'Factory paused. Existing sessions remain available, but no new automatic stage will start.'],
+    ['Provider read failed', 'Provider unavailable. The live provider request failed.'],
+    ['Stale eligibility', 'Provider status stale. Eligibility could not be confirmed. provider-eligibility-request-with-a-long-unbroken-identifier-for-the-configured-project'],
+    ['Scope changed', 'Scope changed. Review the updated ticket before continuing.'],
+    ['Ticket closed', 'Ticket closed. No new automatic stages will start.'],
+    ['Coordinator unavailable', 'The coordinator is archived. Restore the original thread.'],
+    ['Coordinator uncertain', 'The native response was lost.']
+  ]) {
+    await page.getByRole('button', { name: scenario[0], exact: true }).click();
+    await team.locator('[data-team-blocker]').getByText(scenario[1], { exact: true }).waitFor();
+    for (const width of [1280, 390]) {
+      await page.setViewportSize({ width, height: 900 });
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+      await team.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, `taskboard-team-${scenario[0].toLowerCase().replaceAll(' ', '-')}-${width}.png`) });
+    }
+    await team.getByRole('button', { expanded: true }).click();
+    assert.equal(await team.locator('[data-team-blocker]').isVisible(), true);
+    await team.getByRole('button', { expanded: false }).click();
+  }
+  await team.getByRole('textbox', { name: 'Recovered coordinator thread ID' }).fill('thr_recovered_coordinator');
+  await team.getByRole('button', { name: 'Link coordinator', exact: true }).click();
+  await team.getByRole('button', { name: 'Open coordinator thread' }).click();
+  assert.equal(await page.evaluate(() => window.factoryNavigation.at(-1)), 'thr_recovered_coordinator');
+  await page.getByRole('button', { name: 'Coordinator rejected', exact: true }).click();
+  await team.getByRole('button', { name: 'Retry coordinator', exact: true }).click();
+  await team.getByRole('button', { name: 'Open coordinator thread' }).waitFor();
+  await page.getByRole('button', { name: 'Legacy team', exact: true }).click();
+  await team.getByText('Legacy sessions', { exact: true }).last().waitFor();
+  await team.getByRole('button', { name: 'Add coordinator', exact: true }).click();
+  await team.getByText('Legacy session', { exact: true }).waitFor();
+  await page.evaluate(() => {
+    window.factoryFixture.coordinator = { status: 'pending' };
+    window.factoryFixture.runs = [];
+    window.factoryFixture.version++; window.factoryRefresh();
+  });
+  await team.locator('[data-team-role="coordinator"]').getByText('pending', { exact: true }).waitFor();
+  assert.equal(await team.getByRole('button', { name: /^Open .* thread$/ }).count(), 0);
+  assert.equal(await manual.getByRole('button', { name: 'Start task', exact: true }).count(), 0);
+  await page.evaluate(() => {
+    window.factoryFixture.admission = { kind: 'manual' };
+    window.factoryFixture.automationError = null;
+    window.factoryFixture.version++; window.factoryRefresh();
+  });
+  await manual.getByRole('button', { name: 'Start task', exact: true }).waitFor();
+  await page.evaluate(() => {
+    window.factoryFixture.coordinator = null;
+    window.factoryFixture.version++; window.factoryRefresh();
+  });
+  assert.equal(await manual.getByRole('button', { name: 'Start task', exact: true }).isEnabled(), true);
+  for (const state of ['running', 'paused', 'awaiting_scan', 'unconfigured', 'provider_error']) {
+    await page.evaluate(state => { window.factoryProjectState = state; window.factoryRefresh(); }, state);
+    const expected = state === 'unconfigured' || state === 'provider_error' ? 'blocked' : state === 'awaiting_scan' ? 'paused' : state;
+    await factorySettings.getByText(`${expected} · github`, { exact: true }).waitFor();
+    if (state === 'awaiting_scan') {
+      await factorySettings.getByText('Provider queue unknown', { exact: false }).waitFor();
+      await factorySettings.getByText('Automatic intake is enabled and awaiting its first provider scan.').waitFor();
+      assert.equal(await factorySettings.getByText('Factory paused. No new automatic stages will start.').count(), 0);
+    } else if (state === 'running') {
+      await factorySettings.getByText('3 last-known unclaimed todo tickets within the 500-ticket scan window', { exact: false }).waitFor();
+      await factorySettings.getByText('Last scan success at', { exact: false }).waitFor();
+    } else if (state === 'provider_error') {
+      await factorySettings.getByText('Scan reason: Live provider scan failed.').waitFor();
+    }
+    for (const width of [1280, 390]) {
+      await page.setViewportSize({ width, height: 900 });
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+      await factorySettings.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, `taskboard-factory-state-${state}-${width}.png`) });
+    }
+  }
+  await page.evaluate(() => {
+    window.factoryFixture.admission = { kind: 'factory', claimedAt: new Date().toISOString() };
+    window.factoryFixture.automationError = null;
+    window.factoryProjectState = 'paused';
+    window.factoryRefresh();
+  });
+  await team.locator('[data-team-blocker]').getByText('Factory paused.', { exact: false }).waitFor();
+  const readsBefore = await page.evaluate(() => window.factoryProjectReads);
+  await page.evaluate(() => {
+    window.factoryProjectDelay = 250;
+    window.factoryRefresh();
+  });
+  await page.waitForFunction(reads => window.factoryProjectReads > reads, readsBefore);
+  await page.evaluate(() => {
+    window.factoryProjectDelay = 0;
+    window.factoryProjectState = 'running';
+    window.factoryRefresh();
+  });
+  await factorySettings.getByText('running · github', { exact: true }).waitFor();
+  await team.locator('[data-team-blocker]').waitFor({ state: 'hidden' });
+  await page.waitForTimeout(300);
+  assert.equal(await team.locator('[data-team-blocker]').count(), 0);
+  assert.equal(await factorySettings.getByText('paused · github', { exact: true }).count(), 0);
+  await page.evaluate(() => {
+    window.factoryProjectState = 'awaiting_scan';
+    window.factoryRefresh();
+  });
+  await team.locator('[data-team-blocker]')
+    .getByText('Automatic intake is enabled and awaiting its first provider scan.').waitFor();
+  await page.evaluate(() => {
+    window.factoryProjectState = 'paused';
+    window.factoryRefresh();
+  });
+  await team.locator('[data-team-blocker]').getByText('Factory paused.', { exact: false }).waitFor();
+  const readsBeforeSwitch = await page.evaluate(() => window.factoryProjectReads);
+  await page.evaluate(() => {
+    window.factoryProjectDelay = 250;
+    window.factoryRefresh();
+  });
+  await page.waitForFunction(reads => window.factoryProjectReads > reads, readsBeforeSwitch);
+  await page.evaluate(() => {
+    window.factoryProjectDelay = 0;
+    window.factoryProjectState = 'running';
+    window.factoryFixture.projectId = 'proj_other';
+    window.factoryPreviewProject('proj_other');
+  });
+  await factorySettings.getByText('running · github', { exact: true }).waitFor();
+  await team.locator('[data-team-blocker]').waitFor({ state: 'hidden' });
+  await page.waitForTimeout(300);
+  assert.equal(await team.locator('[data-team-blocker]').count(), 0);
+  assert.equal(await factorySettings.getByText('paused · github', { exact: true }).count(), 0);
   for (const start of [false, true]) {
     await page.goto(`https://taskboard-preview.test/?creation=${start}`);
     await page.getByLabel('Title', { exact: true }).fill('Fix screenshot layout');
@@ -316,8 +507,9 @@ try {
     if (!start) assert.equal(await page.evaluate(() => window.factoryNavigation.at(-1)), 'item/proj_test/linear/issue-42');
   }
   assert.deepEqual(errors, []);
-  console.log(JSON.stringify({ desktop: 'passed', panel: 'passed', mobile: 'passed', kanbanStart: 'passed', liveStatus: 'passed', navigation: 'passed', staleApproval: 'passed', automaticActions: 'passed', reviewBlockers: 'passed', returnToBuild: 'passed', repairLimit: 'passed', errors }));
+  console.log(JSON.stringify({ desktop: 'passed', panel: 'passed', mobile: 'passed', kanbanStart: 'passed', liveStatus: 'passed', navigation: 'passed', staleApproval: 'passed', automaticActions: 'passed', reviewBlockers: 'passed', returnToBuild: 'passed', repairLimit: 'passed', coordinatorHierarchy: 'passed', coordinatorRecovery: 'passed', legacyAdoption: 'passed', keyboardDisclosure: 'passed', refreshRetention: 'passed', projectFactoryStates: 'passed', errors }));
 } catch (error) {
   console.error(JSON.stringify({ errors, page: await page.locator('body').innerText() }));
   throw error;
 } finally { await browser.close(); }
+}

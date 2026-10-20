@@ -100,7 +100,7 @@ test('documents only BB Community and direct Git installation for Taskboard', ()
   for (const readme of [rootReadme, taskboardReadme]) {
     assert.match(readme, /bb plugin install taskboard/u);
     assert.ok(readme.includes(directGitInstall));
-    assert.match(readme, /After \[the BB Community entry\]/u);
+    assert.ok(readme.includes('https://github.com/get-bb/marketplace/pull/129'));
   }
   assert.match(rootReadme, /npm install/u);
   assert.match(rootReadme, /npm run check/u);

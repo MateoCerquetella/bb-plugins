@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "sequence": 5,
+  "previousDigest": "sha256:34ecee1d786c0cf76c6c3602a9e88c034cc4789729443a23a4151e9953ab325f",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Renamed the plugin's sole public CLI registration to `surf`; updated injected guidance, bundled skill, README, runtime errors, help usage, and distribution assertions; preserved the steel-browser plugin identity, storage, routes, bindings, CSS identifiers, and viewer directive. Committed and pushed 6410844 after confirming the branch is current with origin/main. Verification remains pending for the Verify phase.",
+  "createdAt": "2026-10-19T15:21:04.107Z",
+  "stateBeforeDigest": "sha256:42ec6edd1f7c9abf7fb04cd93519580549e53d7feee0d4a2ab1b8179b0c3df51",
+  "stateAfterDigest": "sha256:5b46608aee43d3ab458b0540341439edc0cd9c4432c8829a1d2763a557786ec6",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 5,
+    "activeFeature": "rename-steel-browser-cli-to-surf",
+    "request": "Rename the public Steel Browser CLI command from `bb steel-browser` to `bb surf` so the installed BB Surf interface and terminal command use the same name. Preserve the internal plugin ID, persisted configuration, project browser bindings, handoff directive, and upstream Steel engine terminology to avoid data loss or migration. Update agent instructions, skill guidance, help usage, tests, and README examples; verify the focused plugin checks and locally install/reload the plugin so `bb surf --help` works. Create a pull request against main and merge it after checks pass, as explicitly approved by the user.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "review",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Renamed the plugin's sole public CLI registration to `surf`; updated injected guidance, bundled skill, README, runtime errors, help usage, and distribution assertions; preserved the steel-browser plugin identity, storage, routes, bindings, CSS identifiers, and viewer directive. Committed and pushed 6410844 after confirming the branch is current with origin/main. Verification remains pending for the Verify phase.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:63a2560dc67cec6b415c1d0420b2a82381875027ee5a0fcddb609043db1c2e8e",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:9075d69e01815bfc3a9d3b0bc4dbbedace2cd49f2520be61158a701ef35f358f",
+    "impactDigest": "sha256:f6d77a4fed828be597167b4855c2535dd0ed9160c4e323e42ba753b8ad5c0b08",
+    "capabilityClaimId": "rename-steel-browser-cli-to-surf-7fb6bbf4a7dd",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-19T15:21:04.107Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "rename-steel-browser-cli-to-surf-7fb6bbf4a7dd",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "rename-steel-browser-cli-to-surf",
+      "worktree": "/home/dyaus/.bb/worktrees/rename-steel-browser-cli-to-surf",
+      "worktreeId": "sha256:4a755ecd5df8e9e09b5132b95b2393c8896e7a36e2ee9a7234a56bf700734ea5",
+      "baseCommit": "00fc12410a1c2f3c959436c6cdcc9a8f6b299bee",
+      "baseTree": "5fe25297af55151470e81e199772e5c59170baa7",
+      "bases": {
+        "steel-browser-viewer": {
+          "capability": "steel-browser-viewer",
+          "digest": "sha256:6090818f1b6f6aad008d2d778d841cd01ba2e7aee7969dd0265ce00f715afbfe",
+          "requirements": {
+            "surf command identity": null
+          }
+        }
+      },
+      "capabilities": [
+        "steel-browser-viewer"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-19T15:18:11.943Z",
+      "heartbeatAt": "2026-10-19T15:18:11.943Z",
+      "digest": "sha256:231083fa27403fe9d21c10ee0be12bb62d250e47d283c1ec8648a22740850a29"
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:2615890c00370e91cec06746fc6c47d9ee5c9f314715f1298046e13b46e8fab1"
+}

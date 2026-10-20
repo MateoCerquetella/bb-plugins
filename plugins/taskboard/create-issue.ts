@@ -6,6 +6,7 @@ import type {
 const SOURCE_LABELS: Record<WorkSource, string> = {
   github: 'GitHub',
   gitlab: 'GitLab',
+  gitea: 'Gitea',
   jira: 'Jira',
   linear: 'Linear'
 };
