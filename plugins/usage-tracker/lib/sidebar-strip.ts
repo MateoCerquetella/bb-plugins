@@ -1,10 +1,12 @@
 import {
   formatCost,
+  formatCurrencyAmount,
   formatResetCredits,
   formatResetTime,
   formatUsedPercent,
   providerStatusLabel,
   usageLevel,
+  type ProviderBalance,
   type ProviderUsage,
   type UsageSnapshot,
   type UsageWindow,
@@ -24,7 +26,7 @@ import {
   selectSidebarUsagePrimary,
   sidebarUsageDetailRows,
   sidebarUsagePrimaryAccessibleText,
-  sidebarUsagePrimarySelectionSummary,
+  sidebarUsagePrimaryReading,
   type SidebarUsageOverviewItem,
 } from "./sidebar-usage.ts";
 
@@ -194,6 +196,7 @@ function emptyProvider(providerId: SidebarProviderId): ProviderUsage {
     grok: "Grok",
     openCode: "OpenCode",
     antigravity: "Antigravity",
+    deepSeek: "DeepSeek",
   };
   return {
     id: providerId,
@@ -532,7 +535,72 @@ function resetSection(
   return section;
 }
 
+function appendDeepSeekBalanceRow(
+  container: HTMLElement,
+  balance: ProviderBalance,
+): void {
+  const used = balance.usedPercent;
+  const row = element("div", "usage-tracker-sidebar__window");
+  row.dataset.level = usageLevel(used);
+  const heading = element("div", "usage-tracker-sidebar__window-heading");
+  heading.append(
+    element(
+      "span",
+      undefined,
+      used === null ? "Account balance" : "Budget used",
+    ),
+    element(
+      "strong",
+      undefined,
+      used === null
+        ? formatCurrencyAmount(balance.total, balance.currency)
+        : `${formatUsedPercent(used)}%`,
+    ),
+  );
+  row.append(heading);
+  if (used !== null) {
+    row.append(
+      progressRail({
+        label: "Balance budget",
+        usedPercent: used,
+        barPercent: used,
+        resetsAt: null,
+        cost: null,
+      }),
+    );
+  }
+  row.append(
+    element(
+      "span",
+      "usage-tracker-sidebar__cost",
+      used === null
+        ? `Available ${formatCurrencyAmount(balance.total, balance.currency)}`
+        : `${formatCurrencyAmount(balance.total, balance.currency)} left of ${formatCurrencyAmount(balance.budget ?? 0, balance.currency)} topped up`,
+    ),
+    element(
+      "span",
+      "usage-tracker-sidebar__reset",
+      `Granted ${formatCurrencyAmount(balance.granted, balance.currency)} · Topped up ${formatCurrencyAmount(balance.toppedUp, balance.currency)}`,
+    ),
+  );
+  if (!balance.available) {
+    row.append(
+      element(
+        "span",
+        "usage-tracker-sidebar__message",
+        "Balance is insufficient for API calls.",
+      ),
+    );
+  }
+  container.append(row);
+}
+
 function appendDetailRows(container: HTMLElement, provider: ProviderUsage): void {
+  if (provider.id === "deepSeek" && provider.balance !== undefined) {
+    container.dataset.hasFiveHour = "false";
+    appendDeepSeekBalanceRow(container, provider.balance);
+    return;
+  }
   const detailRows = sidebarUsageDetailRows(provider);
   container.dataset.hasFiveHour = String(
     detailRows.some((row) => row.label === "5-hour limit"),
@@ -613,7 +681,9 @@ function detailsCard(
       provider.accounts !== undefined && provider.accounts.length > 0
         ? `Account Pooler · ${provider.accounts.length} account${provider.accounts.length === 1 ? "" : "s"}`
         : provider.status === "ok"
-          ? "Subscription usage"
+          ? provider.id === "deepSeek"
+            ? "API balance"
+            : "Subscription usage"
           : providerStatusLabel(provider.status),
     ),
   );
@@ -739,6 +809,8 @@ function overviewCard(
         item.provider.name,
         compactLimit,
         item.selection,
+        false,
+        item.provider,
       ),
     );
 
@@ -762,9 +834,13 @@ function overviewCard(
     const reading = element(
       "span",
       "usage-tracker-sidebar__reading",
-      sidebarUsagePrimarySelectionSummary(item.selection),
+      sidebarUsagePrimaryReading(item.provider, item.selection),
     );
-    row.append(providerMark, copy, progressRail(item.selection.window), reading);
+    row.append(providerMark, copy);
+    if (!(item.provider.id === "deepSeek" && item.selection.window === null)) {
+      row.append(progressRail(item.selection.window));
+    }
+    row.append(reading);
     row.addEventListener("click", () => onSelect(providerId));
     list.append(row);
   }
@@ -1186,6 +1262,7 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
           compactLimit,
           primary,
           selectedProviderId === providerId,
+          provider,
         );
         const button = element("button", "usage-tracker-sidebar__provider");
         button.type = "button";
@@ -1203,13 +1280,17 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
 
         const mark = element("span", "usage-tracker-sidebar__mark");
         mark.append(providerGlyph(providerId));
-        const primarySummary = sidebarUsagePrimarySelectionSummary(primary);
+        const primarySummary = sidebarUsagePrimaryReading(provider, primary);
         const reading = element(
           "span",
           "usage-tracker-sidebar__reading",
           isLoading && lastKnownSnapshot === null ? "…" : primarySummary,
         );
-        button.append(mark, progressRail(primary.window), reading);
+        button.append(mark);
+        if (!(provider.id === "deepSeek" && primary.window === null)) {
+          button.append(progressRail(primary.window));
+        }
+        button.append(reading);
         button.addEventListener("click", () => {
           if (isConsumingReset) return;
           isOverviewOpen = false;

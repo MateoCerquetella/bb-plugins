@@ -5,6 +5,7 @@ export const PROVIDER_IDS = [
   "grok",
   "openCode",
   "antigravity",
+  "deepSeek",
 ] as const;
 
 export type ProviderId = (typeof PROVIDER_IDS)[number];
@@ -85,6 +86,17 @@ export interface PooledAccountUsage {
   windows: UsageWindow[];
 }
 
+/** Prepaid API balance, as reported by DeepSeek and optionally measured against a budget. */
+export interface ProviderBalance {
+  currency: string;
+  total: number;
+  granted: number;
+  toppedUp: number;
+  available: boolean;
+  budget: number | null;
+  usedPercent: number | null;
+}
+
 export interface ProviderUsage {
   id: ProviderId;
   name: string;
@@ -93,6 +105,7 @@ export interface ProviderUsage {
   planLabel: string | null;
   message: string | null;
   windows: UsageWindow[];
+  balance?: ProviderBalance;
   resetCredits?: UsageResetCredits | null;
   /**
    * Present when the Account Pooler owns this provider's accounts. Provider-level
@@ -345,6 +358,22 @@ export function formatFetchedAt(value: string, locale?: string): string {
     hour: "numeric",
     minute: "2-digit",
   }).format(date)}`;
+}
+
+export function formatCurrencyAmount(
+  amount: number,
+  currency: string,
+  locale?: string,
+): string {
+  if (!Number.isFinite(amount)) return "—";
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency,
+    }).format(amount);
+  } catch {
+    return `${amount.toFixed(2)} ${currency}`;
+  }
 }
 
 export function formatCost(cost: UsageCost, locale?: string): string {

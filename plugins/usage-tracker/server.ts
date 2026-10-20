@@ -5,6 +5,11 @@ import {
   readCodexResetCredits,
 } from "./lib/codex-reset-credits.ts";
 import { readClaudeUsageFromKeychain } from "./lib/claude-keychain-usage.ts";
+import {
+  loadDeepSeekProvider,
+  parseDeepSeekBudget,
+  resolveDeepSeekApiKey,
+} from "./lib/deepseek-balance.ts";
 import { loadUsageSnapshot } from "./lib/load-usage.ts";
 import { getCachedAntigravityUsage } from "./lib/antigravity-probe.ts";
 import { createResetActionGate, type ResetPrepareResult } from "./lib/reset-action-gate.ts";
@@ -47,6 +52,18 @@ const usageWindowSchema = z
 
 const providerStatusSchema = z.enum(["ok", "not_installed", "unauthenticated", "expired", "error"]);
 
+const providerBalanceSchema = z
+  .object({
+    currency: z.string().min(1),
+    total: z.number().finite(),
+    granted: z.number().finite(),
+    toppedUp: z.number().finite(),
+    available: z.boolean(),
+    budget: z.number().finite().nullable(),
+    usedPercent: z.number().finite().min(0).max(100).nullable(),
+  })
+  .strict();
+
 const pooledAccountSchema = z
   .object({
     id: z.string(),
@@ -69,6 +86,7 @@ const providerSchema = z
     planLabel: z.string().nullable(),
     message: z.string().nullable(),
     windows: z.array(usageWindowSchema),
+    balance: providerBalanceSchema.optional(),
     resetCredits: resetCreditsSchema.nullable().optional(),
     accounts: z.array(pooledAccountSchema).optional(),
     currentAccountId: z.string().optional(),
@@ -195,6 +213,27 @@ export default function plugin(bb: BbPluginApi) {
       description: "Show Google Antigravity usage in the sidebar footer.",
       default: false,
     },
+    enableDeepSeek: {
+      type: "boolean",
+      label: "Enable DeepSeek",
+      description: "Show the DeepSeek API balance in the sidebar footer.",
+      default: false,
+    },
+    deepSeekApiKey: {
+      type: "string",
+      label: "DeepSeek API key",
+      description:
+        "Stored in BB's plugin secrets and read only by the plugin server. Leave empty to use DEEPSEEK_API_KEY.",
+      secret: true,
+      default: "",
+    },
+    deepSeekBudget: {
+      type: "string",
+      label: "DeepSeek topped-up balance",
+      description:
+        "The amount you topped up, in the currency DeepSeek reports. The bar reaches 100% when the balance reaches 0. Leave empty to show the balance only.",
+      default: "",
+    },
     compactLimit: {
       type: "select",
       label: "Compact limit",
@@ -220,23 +259,37 @@ export default function plugin(bb: BbPluginApi) {
       const preferences = await settings.get();
       const claudeKeychainService = preferences.claudeKeychainService.trim();
       const routedAccounts = loadPoolAccountRecords();
-      const snapshot = await loadUsageSnapshot(
-        bb.sdk,
-        threadId,
-        new Date(),
-        claudeKeychainService === ""
-          ? Promise.resolve({})
-          : readClaudeUsageFromKeychain(claudeKeychainService).then((usage) => ({
-              "claude-code": usage,
-            })),
-        routedAccounts,
+      const deepSeekKey = resolveDeepSeekApiKey(
+        preferences.deepSeekApiKey,
+        process.env.DEEPSEEK_API_KEY,
       );
-      const providers = preferences.enableAntigravity
-        ? [
-            ...snapshot.providers.filter((provider) => provider.id !== "antigravity"),
-            getCachedAntigravityUsage(),
-          ]
-        : snapshot.providers.filter((provider) => provider.id !== "antigravity");
+      const [snapshot, deepSeek] = await Promise.all([
+        loadUsageSnapshot(
+          bb.sdk,
+          threadId,
+          new Date(),
+          claudeKeychainService === ""
+            ? Promise.resolve({})
+            : readClaudeUsageFromKeychain(claudeKeychainService).then((usage) => ({
+                "claude-code": usage,
+              })),
+          routedAccounts,
+        ),
+        preferences.enableDeepSeek
+          ? loadDeepSeekProvider({
+              apiKey: deepSeekKey,
+              budget: parseDeepSeekBudget(preferences.deepSeekBudget),
+            })
+          : Promise.resolve(null),
+      ]);
+      const providers = [
+        ...snapshot.providers.filter(
+          (provider) =>
+            provider.id !== "antigravity" && provider.id !== "deepSeek",
+        ),
+        ...(preferences.enableAntigravity ? [getCachedAntigravityUsage()] : []),
+        ...(deepSeek === null ? [] : [deepSeek]),
+      ];
       const codexIsAvailable =
         snapshot.providers.some(
           (provider) =>

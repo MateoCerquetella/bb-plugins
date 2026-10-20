@@ -44,6 +44,19 @@ const PROVIDER_MARKS: Readonly<Record<SidebarProviderId, ProviderMark>> = {
       { d: "M180 60H60V240H180V60ZM240 300H0V0H240V300Z" },
     ],
   },
+  deepSeek: {
+    title: "DeepSeek",
+    viewBox: "0 0 24 24",
+    fillRule: "evenodd",
+    paths: [
+      {
+        d: "M12 1.5a10.5 10.5 0 1 0 0 21 10.5 10.5 0 0 0 0-21Z",
+      },
+      {
+        d: "M5.5 12.6c1.5 0 1.5 1.6 3 1.6s1.5-1.6 3-1.6 1.5 1.6 3 1.6 1.5-1.6 3-1.6v2.2c-1.5 0-1.5 1.6-3 1.6s-1.5-1.6-3-1.6-1.5 1.6-3 1.6-1.5-1.6-3-1.6Z",
+      },
+    ],
+  },
   antigravity: {
     title: "Google Antigravity",
     viewBox: "0 0 16 16",

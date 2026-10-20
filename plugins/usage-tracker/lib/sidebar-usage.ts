@@ -1,5 +1,7 @@
 import {
+  formatCurrencyAmount,
   formatUsedPercent,
+  providerStatusLabel,
   type ProviderUsage,
   type UsageWindow,
 } from "./usage.ts";
@@ -143,6 +145,13 @@ export function sidebarUsageDetailRows(
   if (provider.id === "antigravity") {
     return provider.windows.map((window) => ({ label: window.label, window }));
   }
+  if (provider.id === "deepSeek") {
+    if (provider.balance === undefined) return [];
+    return provider.windows.map((window) => ({
+      label: window.label,
+      window,
+    }));
+  }
   const pair = sidebarUsageWindows(provider);
   const selected = new Set<UsageWindow>();
   if (pair.fiveHour !== null) selected.add(pair.fiveHour);
@@ -248,14 +257,45 @@ export function sidebarUsagePrimarySelectionSummary(
     : `${formatUsedPercent(selection.window.usedPercent)}%`;
 }
 
+/** DeepSeek without a budget reads as its balance; every other provider reads as a percentage. */
+export function sidebarUsagePrimaryReading(
+  provider: ProviderUsage,
+  selection: SidebarUsagePrimarySelection,
+): string {
+  if (
+    provider.id === "deepSeek" &&
+    selection.window === null &&
+    provider.balance !== undefined
+  ) {
+    return formatCurrencyAmount(
+      provider.balance.total,
+      provider.balance.currency,
+    );
+  }
+  return sidebarUsagePrimarySelectionSummary(selection);
+}
+
 export function sidebarUsagePrimaryAccessibleText(
   providerName: string,
   compactLimit: CompactLimitOption,
   selection: SidebarUsagePrimarySelection,
   expanded = false,
+  provider?: Pick<ProviderUsage, "id" | "status" | "balance">,
 ): string {
   const prefix = `${providerName} compact usage: ${compactLimit} configured`;
   const action = `${expanded ? "Close" : "Open"} ${providerName} usage details.`;
+  if (provider?.id === "deepSeek") {
+    if (provider.status !== "ok") {
+      return `${providerName}: ${providerStatusLabel(provider.status)}. ${action}`;
+    }
+    if (selection.window !== null) {
+      return `${providerName} balance budget: ${sidebarUsagePrimarySelectionSummary(selection)} used. ${action}`;
+    }
+    if (provider.balance !== undefined) {
+      return `${providerName} balance: ${formatCurrencyAmount(provider.balance.total, provider.balance.currency)} available; no topped-up budget configured. ${action}`;
+    }
+    return `${providerName} balance: no topped-up budget configured. ${action}`;
+  }
   if (selection.window === null || selection.actualKind === null) {
     return `${prefix}; no usage window is available. ${action}`;
   }
@@ -293,7 +333,21 @@ export function mergeLastKnownWindows(
   current: ProviderUsage,
   previous: ProviderUsage | undefined,
 ): ProviderUsage {
-  if (previous === undefined || previous.windows.length === 0) return current;
+  if (previous === undefined) return current;
+  // A healthy DeepSeek reading is complete: an empty window list means no
+  // budget is configured, not that the provider temporarily failed.
+  if (
+    current.id === "deepSeek" &&
+    current.status === "ok" &&
+    current.balance !== undefined
+  ) {
+    return current;
+  }
+  if (previous.windows.length === 0) {
+    return current.balance === undefined && previous.balance !== undefined
+      ? { ...current, balance: previous.balance }
+      : current;
+  }
 
   const currentPair = sidebarUsageWindows(current);
   const previousPair = sidebarUsageWindows(previous);
@@ -325,5 +379,8 @@ export function mergeLastKnownWindows(
     currentLabels.add(window.label);
   }
 
+  if (current.balance === undefined && previous.balance !== undefined) {
+    return { ...current, windows, balance: previous.balance };
+  }
   return { ...current, windows };
 }
