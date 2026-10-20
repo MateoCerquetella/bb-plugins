@@ -50,8 +50,6 @@ and, when a topped-up budget is configured, the share already used.
   dollar amounts exposed by Claude Code usage data.
 - Shows the DeepSeek API total, granted, and topped-up balance when a key is
   configured, with a budget percentage that reaches 100% at a zero balance.
-  Without a manual budget, the first positive topped-up balance becomes the
-  baseline automatically, so spending still shows as a percentage.
 - Works with BB's Account Pooler: when pooled accounts serve Claude Code or
   Codex, the strip shows the currently selected account and the expanded
   details list every pooled account's own limits.

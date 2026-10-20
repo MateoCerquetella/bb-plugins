@@ -304,7 +304,7 @@ export function sidebarUsagePrimaryAccessibleText(
   if (provider?.id === "deepSeek") {
     if (selection.window !== null) {
       const stale = selection.fallback === "last-known" ? "last-known " : "";
-      return `${providerName} ${stale}balance budget: ${sidebarUsagePrimarySelectionSummary(selection)} used. ${action}`;
+      return `${providerName} ${stale}topped-up balance: ${sidebarUsagePrimarySelectionSummary(selection)} used. ${action}`;
     }
     if (provider.status !== "ok") {
       if (provider.balance !== undefined) {

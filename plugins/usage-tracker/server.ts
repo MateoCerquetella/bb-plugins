@@ -6,11 +6,9 @@ import {
 } from "./lib/codex-reset-credits.ts";
 import { readClaudeUsageFromKeychain } from "./lib/claude-keychain-usage.ts";
 import {
-  DEEPSEEK_BASELINE_KEY,
   loadDeepSeekProvider,
   parseDeepSeekBudget,
   resolveDeepSeekApiKey,
-  type DeepSeekBaselineStore,
 } from "./lib/deepseek-balance.ts";
 import { loadUsageSnapshot } from "./lib/load-usage.ts";
 import { getCachedAntigravityUsage } from "./lib/antigravity-probe.ts";
@@ -62,7 +60,6 @@ const providerBalanceSchema = z
     toppedUp: z.number().finite(),
     available: z.boolean(),
     budget: z.number().finite().nullable(),
-    budgetSource: z.enum(["explicit", "toppedUp"]).nullable(),
     usedPercent: z.number().finite().min(0).max(100).nullable(),
   })
   .strict();
@@ -232,9 +229,9 @@ export default function plugin(bb: BbPluginApi) {
     },
     deepSeekBudget: {
       type: "string",
-      label: "DeepSeek topped-up balance",
+      label: "Amount topped up",
       description:
-        "The amount you topped up, in the currency DeepSeek reports. The bar reaches 100% when the balance reaches 0. Leave empty to derive the baseline automatically from the reported topped-up balance.",
+        "How much you paid in, in the currency DeepSeek reports (for example 5). The bar is 0% at that amount and 100% when the balance reaches 0. Leave empty to show the balance only.",
       default: "",
     },
     compactLimit: {
@@ -267,18 +264,6 @@ export default function plugin(bb: BbPluginApi) {
         process.env.DEEPSEEK_API_KEY,
       );
       const deepSeekBudget = parseDeepSeekBudget(preferences.deepSeekBudget);
-      const deepSeekBaselineStore: DeepSeekBaselineStore | undefined =
-        deepSeekBudget === null
-          ? {
-              async read() {
-                const value = await bb.storage.kv.get<number>(DEEPSEEK_BASELINE_KEY);
-                return typeof value === "number" ? value : null;
-              },
-              async write(baseline) {
-                await bb.storage.kv.set(DEEPSEEK_BASELINE_KEY, baseline);
-              },
-            }
-          : undefined;
       const [snapshot, deepSeek] = await Promise.all([
         loadUsageSnapshot(
           bb.sdk,
@@ -295,7 +280,6 @@ export default function plugin(bb: BbPluginApi) {
           ? loadDeepSeekProvider({
               apiKey: deepSeekKey,
               budget: deepSeekBudget,
-              baselineStore: deepSeekBaselineStore,
             })
           : Promise.resolve(null),
       ]);

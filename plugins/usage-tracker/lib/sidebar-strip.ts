@@ -547,7 +547,7 @@ function appendDeepSeekBalanceRow(
     element(
       "span",
       undefined,
-      used === null ? "Account balance" : "Budget used",
+      used === null ? "Account balance" : "Topped up used",
     ),
     element(
       "strong",
@@ -561,7 +561,7 @@ function appendDeepSeekBalanceRow(
   if (used !== null) {
     row.append(
       progressRail({
-        label: "Balance budget",
+        label: "Topped up balance",
         usedPercent: used,
         barPercent: used,
         resetsAt: null,
@@ -575,12 +575,7 @@ function appendDeepSeekBalanceRow(
       "usage-tracker-sidebar__cost",
       used === null
         ? `Available ${formatCurrencyAmount(balance.total, balance.currency)}`
-        : `${formatCurrencyAmount(
-            balance.budgetSource === "toppedUp"
-              ? balance.toppedUp
-              : balance.total,
-            balance.currency,
-          )} left of ${formatCurrencyAmount(balance.budget ?? 0, balance.currency)} topped up`,
+        : `${formatCurrencyAmount(balance.total, balance.currency)} left of ${formatCurrencyAmount(balance.budget ?? 0, balance.currency)} topped up`,
     ),
     element(
       "span",

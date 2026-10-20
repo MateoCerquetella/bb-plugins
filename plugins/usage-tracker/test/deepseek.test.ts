@@ -12,7 +12,6 @@ import {
   parseDeepSeekBalance,
   parseDeepSeekBudget,
   resolveDeepSeekApiKey,
-  type DeepSeekBaselineStore,
   type DeepSeekFetch,
   type DeepSeekHttpResponse,
 } from "../lib/deepseek-balance.ts";
@@ -63,38 +62,6 @@ function httpResponse(
 
 function fetchReturning(body: unknown, status = 200): DeepSeekFetch {
   return async () => httpResponse(status, body);
-}
-
-function balancePayload(total: number, toppedUp = total) {
-  return {
-    is_available: true,
-    balance_infos: [
-      {
-        currency: "USD",
-        total_balance: String(total),
-        granted_balance: String(Math.max(0, total - toppedUp)),
-        topped_up_balance: String(toppedUp),
-      },
-    ],
-  };
-}
-
-function memoryBaselineStore(initial: number | null = null): DeepSeekBaselineStore & {
-  value: number | null;
-  writes: number;
-} {
-  const store = {
-    value: initial,
-    writes: 0,
-    async read() {
-      return store.value;
-    },
-    async write(baseline: number) {
-      store.value = baseline;
-      store.writes += 1;
-    },
-  };
-  return store;
 }
 
 async function provider(
@@ -196,121 +163,23 @@ test("parses the optional budget setting", () => {
   assert.equal(parseDeepSeekBudget(undefined), null);
 });
 
-test("seeds and uses a baseline when no budget is configured", async () => {
-  const store = memoryBaselineStore();
-  const seeded = await loadDeepSeekProvider({
-    apiKey: "sk-test",
-    budget: null,
-    baselineStore: store,
-    fetch: fetchReturning(balancePayload(12)),
-  });
-  assert.equal(seeded.balance?.budget, 12);
-  assert.equal(seeded.balance?.usedPercent, 0);
-  assert.equal(store.value, 12);
-  assert.equal(store.writes, 1);
-
-  const spent = await loadDeepSeekProvider({
-    apiKey: "sk-test",
-    budget: null,
-    baselineStore: store,
-    fetch: fetchReturning(balancePayload(9)),
-  });
-  assert.equal(spent.balance?.budget, 12);
-  assert.equal(spent.balance?.usedPercent, 25);
-  assert.equal(store.value, 12);
-  assert.equal(store.writes, 1);
-
-  const exhausted = await loadDeepSeekProvider({
-    apiKey: "sk-test",
-    budget: null,
-    baselineStore: store,
-    fetch: fetchReturning(balancePayload(0)),
-  });
-  assert.equal(exhausted.balance?.budget, 12);
-  assert.equal(exhausted.balance?.usedPercent, 100);
-});
-
-test("measures the automatic baseline against the topped-up balance", async () => {
-  const store = memoryBaselineStore();
-  const seeded = await loadDeepSeekProvider({
-    apiKey: "sk-test",
-    budget: null,
-    baselineStore: store,
-    fetch: fetchReturning(balancePayload(12, 10)),
-  });
-  assert.equal(seeded.balance?.budget, 10);
-  assert.equal(seeded.balance?.budgetSource, "toppedUp");
-  assert.equal(seeded.balance?.usedPercent, 0);
-
-  const spent = await loadDeepSeekProvider({
-    apiKey: "sk-test",
-    budget: null,
-    baselineStore: store,
-    fetch: fetchReturning(balancePayload(7, 5)),
-  });
-  assert.equal(spent.balance?.budget, 10);
-  assert.equal(spent.balance?.usedPercent, 50);
-});
-
-test("raises the automatic baseline after a top-up", async () => {
-  const store = memoryBaselineStore(12);
-  const result = await loadDeepSeekProvider({
-    apiKey: "sk-test",
-    budget: null,
-    baselineStore: store,
-    fetch: fetchReturning(balancePayload(15)),
-  });
-  assert.equal(result.balance?.budget, 15);
-  assert.equal(result.balance?.usedPercent, 0);
-  assert.equal(store.value, 15);
-  assert.equal(store.writes, 1);
-});
-
-test("keeps an explicit budget ahead of the automatic baseline", async () => {
-  const store = memoryBaselineStore(12);
-  const result = await loadDeepSeekProvider({
-    apiKey: "sk-test",
-    budget: 20,
-    baselineStore: store,
-    fetch: fetchReturning(balancePayload(12)),
-  });
-  assert.equal(result.balance?.budget, 20);
-  assert.equal(result.balance?.usedPercent, 40);
-  assert.equal(store.writes, 0);
-});
-
-test("falls back to the balance amount when no baseline can be derived", async () => {
-  const store = memoryBaselineStore();
-  const result = await loadDeepSeekProvider({
-    apiKey: "sk-test",
-    budget: null,
-    baselineStore: store,
-    fetch: fetchReturning(balancePayload(0)),
-  });
-  assert.equal(result.status, "ok");
-  assert.equal(result.balance?.usedPercent, null);
-  assert.deepEqual(result.windows, []);
-  assert.equal(store.writes, 0);
-});
-
-test("keeps rendering when the baseline store fails", async () => {
-  const store: DeepSeekBaselineStore = {
-    async read() {
-      throw new Error("kv offline");
+test("measures the entered topped-up amount", async () => {
+  const result = await provider(
+    {
+      is_available: true,
+      balance_infos: [
+        {
+          currency: "USD",
+          total_balance: "2.78",
+          granted_balance: "0",
+          topped_up_balance: "2.78",
+        },
+      ],
     },
-    async write() {
-      throw new Error("kv offline");
-    },
-  };
-  const result = await loadDeepSeekProvider({
-    apiKey: "sk-test",
-    budget: null,
-    baselineStore: store,
-    fetch: fetchReturning(balancePayload(12)),
-  });
-  assert.equal(result.status, "ok");
-  assert.equal(result.balance?.budget, 12);
-  assert.equal(result.balance?.usedPercent, 0);
+    5,
+  );
+  assert.equal(result.balance?.budget, 5);
+  assert.equal(Math.round(result.balance?.usedPercent ?? 0), 44);
 });
 
 test("uses the official DeepSeek glyph", () => {
@@ -332,11 +201,10 @@ test("builds an ok provider with a budget window", async () => {
     toppedUp: 10,
     available: true,
     budget: 20,
-    budgetSource: "explicit",
     usedPercent: 40,
   });
   assert.deepEqual(result.windows.map((window) => window.label), [
-    "Balance budget",
+    "Topped up balance",
   ]);
   assert.equal(result.windows[0]?.usedPercent, 40);
   assert.equal(result.windows[0]?.barPercent, 40);
@@ -489,7 +357,7 @@ test("is opt-in and appended after the existing providers", () => {
 test("shows only a balance row and budget-aware accessible text", async () => {
   const result = await provider();
   const rows = sidebarUsageDetailRows(result);
-  assert.deepEqual(rows.map((row) => row.label), ["Balance budget"]);
+  assert.deepEqual(rows.map((row) => row.label), ["Topped up balance"]);
   const selection = selectSidebarUsagePrimary(result, undefined, "Weekly");
   assert.match(
     sidebarUsagePrimaryAccessibleText(
@@ -499,7 +367,7 @@ test("shows only a balance row and budget-aware accessible text", async () => {
       false,
       result,
     ),
-    /balance budget: 40% used/u,
+    /topped-up balance: 40% used/u,
   );
 
   const withoutBudget = await provider(documentedPayload, null);
@@ -542,7 +410,7 @@ test("keeps the last known balance through a failed refresh", async () => {
       false,
       merged,
     ),
-    /last-known balance budget: 40% used/u,
+    /last-known topped-up balance: 40% used/u,
   );
 });
 

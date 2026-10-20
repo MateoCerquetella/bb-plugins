@@ -3,7 +3,6 @@ import type { ProviderUsage, UsageWindow } from "./usage.ts";
 
 export const DEEPSEEK_BALANCE_URL = "https://api.deepseek.com/user/balance";
 export const DEEPSEEK_TIMEOUT_MS = 4_000;
-export const DEEPSEEK_BASELINE_KEY = "deepSeekToppedUpBaseline";
 
 export const DEEPSEEK_MISSING_KEY_MESSAGE =
   "Add a DeepSeek API key in Settings → Plugins → Usage Tracker, or set DEEPSEEK_API_KEY.";
@@ -62,17 +61,10 @@ export type DeepSeekFetch = (
   },
 ) => Promise<DeepSeekHttpResponse>;
 
-export interface DeepSeekBaselineStore {
-  read(): Promise<number | null>;
-  write(baseline: number): Promise<void>;
-}
-
 export interface DeepSeekProviderOptions {
   apiKey: string;
-  /** Explicit user budget; wins over the persisted baseline when positive. */
+  /** Amount the user says they topped up; empty disables the percentage. */
   budget: number | null;
-  /** Persists an automatic baseline when no explicit budget is configured. */
-  baselineStore?: DeepSeekBaselineStore;
   fetch?: DeepSeekFetch;
   signal?: AbortSignal;
   /** Override the network deadline; tests use a small value. */
@@ -112,43 +104,6 @@ export function parseDeepSeekBudget(value: unknown): number | null {
   return Number.isFinite(budget) && budget > 0 ? budget : null;
 }
 
-/**
- * Resolve the budget baseline. An explicit budget always wins; otherwise the
- * first positive topped-up balance is stored and later top-ups raise it. KV
- * failures are non-fatal so a successful balance fetch still renders.
- */
-export async function resolveDeepSeekBudget(
-  toppedUp: number,
-  explicitBudget: number | null,
-  store: DeepSeekBaselineStore | undefined,
-): Promise<number | null> {
-  if (explicitBudget !== null) return explicitBudget;
-  if (store === undefined) return null;
-
-  let stored: number | null = null;
-  try {
-    const value = await store.read();
-    if (typeof value === "number" && Number.isFinite(value) && value > 0) {
-      stored = value;
-    }
-  } catch {
-    stored = null;
-  }
-
-  if (stored === null && !(Number.isFinite(toppedUp) && toppedUp > 0)) {
-    return null;
-  }
-  const baseline = stored === null ? toppedUp : Math.max(stored, toppedUp);
-  if (baseline !== stored) {
-    try {
-      await store.write(baseline);
-    } catch {
-      // A failed write leaves the current reading usable.
-    }
-  }
-  return baseline;
-}
-
 /** Share of the topped-up budget already spent; 100% means the balance reached 0. */
 export function deepSeekBudgetPercent(
   total: number,
@@ -178,16 +133,14 @@ function unavailableProvider(
 function providerFromBalance(
   balance: DeepSeekBalance,
   budget: number | null,
-  metric: number,
-  budgetSource: "explicit" | "toppedUp" | null,
 ): ProviderUsage {
-  const usedPercent = deepSeekBudgetPercent(metric, budget);
+  const usedPercent = deepSeekBudgetPercent(balance.info.total, budget);
   const windows: UsageWindow[] =
     usedPercent === null
       ? []
       : [
           {
-            label: "Balance budget",
+            label: "Topped up balance",
             usedPercent,
             barPercent: usedPercent,
             resetsAt: null,
@@ -211,7 +164,6 @@ function providerFromBalance(
       toppedUp: balance.info.toppedUp,
       available: balance.available,
       budget,
-      budgetSource,
       usedPercent,
     },
   };
@@ -260,21 +212,9 @@ export async function loadDeepSeekProvider(
   }
 
   try {
-    const balance = parseDeepSeekBalance(await response.json());
-    const budget = await resolveDeepSeekBudget(
-      balance.info.toppedUp,
-      options.budget,
-      options.baselineStore,
-    );
     return providerFromBalance(
-      balance,
-      budget,
-      options.budget === null ? balance.info.toppedUp : balance.info.total,
-      budget === null
-        ? null
-        : options.budget === null
-          ? "toppedUp"
-          : "explicit",
+      parseDeepSeekBalance(await response.json()),
+      options.budget,
     );
   } catch {
     return unavailableProvider("error", DEEPSEEK_INVALID_RESPONSE_MESSAGE);
