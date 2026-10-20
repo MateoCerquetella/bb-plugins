@@ -16,6 +16,7 @@ import {
 } from "../lib/deepseek-balance.ts";
 import { enabledSidebarProviderIds } from "../lib/preferences.ts";
 import {
+  cumulativeInUseUsage,
   mergeLastKnownWindows,
   selectSidebarUsagePrimary,
   sidebarUsageDetailRows,
@@ -391,6 +392,35 @@ test("labels a last-known balance when no budget is configured", async () => {
     ),
     /last-known balance: \$12\.00 available/u,
   );
+});
+
+test("keeps a balance provider out of the cumulative agent summary", async () => {
+  const deepSeek = await provider();
+  const codex: ProviderUsage = {
+    id: "codex",
+    name: "Codex",
+    status: "ok",
+    accountEmail: null,
+    planLabel: null,
+    message: null,
+    windows: [
+      {
+        label: "Weekly limit",
+        usedPercent: 17,
+        barPercent: 17,
+        resetsAt: null,
+        cost: null,
+      },
+    ],
+    inUse: true,
+  };
+  const items = [codex, deepSeek].map((provider) => ({
+    provider,
+    selection: selectSidebarUsagePrimary(provider, provider, "Weekly"),
+  }));
+  const cumulative = cumulativeInUseUsage(items);
+  assert.equal(cumulative.percent, 17);
+  assert.deepEqual(cumulative.names, ["Codex"]);
 });
 
 test("does not resurrect a removed budget window", async () => {

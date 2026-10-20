@@ -52,7 +52,8 @@ export function cumulativeInUseUsage(
   items: readonly SidebarUsageOverviewItem[],
 ): CumulativeInUseUsage {
   const active = inUseOverviewItems(items).filter(
-    (item) => item.selection.window !== null,
+    (item) =>
+      item.selection.window !== null && item.provider.balance === undefined,
   );
   if (active.length === 0) {
     return { percent: null, count: 0, names: [] };

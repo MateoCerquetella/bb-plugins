@@ -1217,7 +1217,8 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
 
       const mark = element("span", "usage-tracker-sidebar__summary-mark");
       const active = inUseOverviewItems(items).filter(
-        (item) => item.selection.window !== null,
+        (item) =>
+          item.selection.window !== null && item.provider.balance === undefined,
       );
       if (active.length === 1) {
         const providerId = active[0]!.provider.id as SidebarProviderId;

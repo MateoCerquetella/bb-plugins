@@ -28,7 +28,6 @@ function unavailableUsage(status: "not_installed" | "error", message = NOT_INSTA
     planLabel: null,
     message,
     windows: [],
-    inUse: false,
   };
 }
 
@@ -117,7 +116,6 @@ export function normalizeAntigravityOutput(output: unknown, accountEmail: string
     planLabel: stringValue(root, "plan", "planLabel", "current_tier"),
     message: null,
     windows,
-    inUse: false,
   };
 }
 
