@@ -1,11 +1,12 @@
 {
   "schemaVersion": 1,
-  "status": "draft",
   "classification": "behavioral",
-  "capabilities": [],
+  "capabilities": [
+    "dockside-thread-management"
+  ],
   "surfaces": [
     "workflow"
   ],
   "regressionRationale": null,
-  "digest": "sha256:50cdf659d260b3862fa5d4114b18e620487a9024681daa6489af839cd84aa470"
+  "digest": "sha256:098d8f4282d3aa8aa1199db02f8764b35ce7c00b3b450ece444b4a46892aec3f"
 }

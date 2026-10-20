@@ -86,8 +86,9 @@ bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.0 
   --tag-prefix dockside/
 ```
 
-The range currently resolves [`dockside/v0.1.5`](https://github.com/MateoCerquetella/bb-plugins/tree/dockside/v0.1.5),
-which keeps Snooze, Settle, Restore, and thread age controls visible on touch-only devices.
+The range currently resolves [`dockside/v0.1.8`](https://github.com/MateoCerquetella/bb-plugins/tree/dockside/v0.1.8),
+which adds workspace grouping by Projects, Status, or Environment, the Failed
+filter, and per-project filtering on top of mobile active-thread navigation.
 The [BB Community marketplace entry](https://github.com/get-bb/marketplace/pull/162)
 is live, so you can also install Dockside by name:
 
