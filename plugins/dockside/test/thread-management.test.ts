@@ -16,6 +16,7 @@ import {
   pruneSelectedRootIds,
   resolveFamilyExpanded,
   selectableRootIds,
+  showsProjectGroups,
   THREAD_FILTER_OPTIONS,
   THREAD_FILTER_PRESETS,
   type ThreadFilterPreset,
@@ -448,6 +449,25 @@ describe("resolveFamilyExpanded", () => {
         override: true,
         defaultExpanded: false,
       }),
+      true,
+    );
+  });
+});
+
+describe("project group visibility", () => {
+  it("keeps filtered families visible for every preset except the grouping modes", () => {
+    for (const preset of THREAD_FILTER_PRESETS) {
+      assert.equal(
+        showsProjectGroups({ kind: "preset", preset }),
+        preset !== "status" && preset !== "environment",
+        `${preset} should render matching project groups`,
+      );
+    }
+  });
+
+  it("keeps a single-project filter on the project layout", () => {
+    assert.equal(
+      showsProjectGroups({ kind: "project", projectId: "proj_1" }),
       true,
     );
   });

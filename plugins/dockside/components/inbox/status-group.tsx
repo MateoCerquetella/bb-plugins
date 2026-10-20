@@ -1,5 +1,4 @@
 import { useId, useState } from "react";
-import { FamilyStatusIcon } from "@/components/inbox/family-status";
 import { ThreadCard } from "@/components/inbox/thread-card";
 import { Icon } from "@/components/ui/icon";
 import type { ProviderGlyphInfo } from "@/components/inbox/provider-glyph";

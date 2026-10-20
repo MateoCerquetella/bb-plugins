@@ -15,6 +15,8 @@ import {
   type WorkspaceFilter,
 } from "@/lib/thread-management";
 
+const PROJECT_VALUE_PREFIX = "project:";
+
 const GROUPING_OPTIONS = [
   { preset: "all", label: "Projects" },
   { preset: "status", label: "Status" },
@@ -39,21 +41,43 @@ interface FilterOption {
   label: string;
 }
 
+interface ProjectOption {
+  id: string;
+  name: string;
+}
+
 export function FilterMenu({
   value,
   onChange,
+  projects,
 }: {
   value: WorkspaceFilter;
   onChange: (value: WorkspaceFilter) => void;
+  projects: readonly ProjectOption[];
 }) {
   const selectedPreset = value.kind === "preset" ? value.preset : "all";
-  const label = THREAD_FILTER_LABELS[selectedPreset];
+  const selectedProject =
+    value.kind === "project"
+      ? projects.find((project) => project.id === value.projectId)
+      : undefined;
+  const label = selectedProject?.name ?? THREAD_FILTER_LABELS[selectedPreset];
+  const selectedValue = selectedProject
+    ? `${PROJECT_VALUE_PREFIX}${selectedProject.id}`
+    : selectedPreset;
+  const filtered = value.kind === "project" || selectedPreset !== "all";
 
   return (
     <Select
-      value={selectedPreset}
-      onValueChange={(value) => {
-        const option = FILTER_OPTIONS.find(({ preset }) => preset === value);
+      value={selectedValue}
+      onValueChange={(next) => {
+        if (next.startsWith(PROJECT_VALUE_PREFIX)) {
+          onChange({
+            kind: "project",
+            projectId: next.slice(PROJECT_VALUE_PREFIX.length),
+          });
+          return;
+        }
+        const option = FILTER_OPTIONS.find(({ preset }) => preset === next);
         if (option) onChange({ kind: "preset", preset: option.preset });
       }}
     >
@@ -64,7 +88,7 @@ export function FilterMenu({
         className={cn(
           "size-7 shrink-0 justify-center rounded-md border-0 p-0 text-muted-foreground shadow-none",
           "hover:bg-sidebar-accent hover:text-foreground focus:ring-1 focus:ring-ring",
-          selectedPreset !== "all" && "bg-sidebar-accent text-foreground",
+          filtered && "bg-sidebar-accent text-foreground",
         )}
       >
         <Icon name="Filter" className="size-3.5" aria-hidden />
@@ -76,6 +100,23 @@ export function FilterMenu({
             <FilterOptionItem key={option.preset} option={option} />
           ))}
         </SelectGroup>
+        {projects.length > 0 ? (
+          <>
+            <SelectSeparator />
+            <SelectGroup>
+              <SelectLabel>Projects</SelectLabel>
+              {projects.map((project) => (
+                <SelectItem
+                  key={project.id}
+                  value={`${PROJECT_VALUE_PREFIX}${project.id}`}
+                  className="h-7 py-1 text-xs"
+                >
+                  {project.name}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </>
+        ) : null}
         <SelectSeparator />
         <SelectGroup>
           <SelectLabel>Status</SelectLabel>

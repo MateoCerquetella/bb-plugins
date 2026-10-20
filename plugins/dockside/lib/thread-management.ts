@@ -184,6 +184,11 @@ export function bulkEligibility(
   return { eligible: true };
 }
 
+export function showsProjectGroups(filter: WorkspaceFilter): boolean {
+  if (filter.kind === "project") return true;
+  return filter.preset !== "status" && filter.preset !== "environment";
+}
+
 export function filterProjectThreadGroups(
   groups: readonly ProjectThreadGroup[],
   filter: WorkspaceFilter,

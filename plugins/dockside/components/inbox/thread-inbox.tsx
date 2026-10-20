@@ -48,6 +48,7 @@ import {
   includeSelectedFamilies,
   pruneSelectedRootIds,
   selectableRootIds,
+  showsProjectGroups,
   THREAD_FILTER_PRESETS,
   type RootSelectionIntent,
   type WorkspaceFilter,
@@ -241,6 +242,7 @@ export function ThreadInbox({
 
   const activePreset =
     workspaceFilter.kind === "preset" ? workspaceFilter.preset : null;
+  const showProjectGroups = showsProjectGroups(workspaceFilter);
 
   useEffect(() => {
     if (
@@ -660,6 +662,10 @@ export function ThreadInbox({
               <FilterMenu
                 value={workspaceFilter}
                 onChange={setWorkspaceFilter}
+                projects={unfilteredProjectGroups.map((group) => ({
+                  id: group.project.id,
+                  name: group.project.name,
+                }))}
               />
             )}
             <button
@@ -802,7 +808,7 @@ export function ThreadInbox({
                     projectColorOverrides={projectColorOverrides}
                   />
                 ))}
-            {activePreset === "all" ? projectGroups
+            {showProjectGroups ? projectGroups
               .map((group) => ({ ...group, families: group.families.filter((family) => !familyIsPinned(family)) }))
               .filter((group) => group.families.length > 0)
               .map((group) => (
