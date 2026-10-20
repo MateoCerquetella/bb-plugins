@@ -6,6 +6,8 @@ import {
 import type {
   ExternalWorkItemCreateInput,
   ExternalWorkItemDetail,
+  ExternalWorkItemFieldMutation,
+  ExternalWorkItemInspectorOptions,
   ExternalWorkStatusOption,
   WorkSourceAdapter
 } from './types.js';
@@ -19,12 +21,13 @@ const issueFields = `
   title
   description
   url
+  priority
   priorityLabel
   updatedAt
   state { id name type }
   assignee { id name }
   team { key name }
-  project { name }
+  project { id name }
   labels(first: 100) { nodes { name } }
 `;
 
@@ -103,6 +106,50 @@ const updateIssueStatusMutation = `
   }
 `;
 
+const issueInspectorOptionsQuery = `
+  query TaskboardLinearInspectorOptions(
+    $id: String!
+    $membersAfter: String
+    $projectsAfter: String
+  ) {
+    issue(id: $id) {
+      id
+      priority
+      assignee { id }
+      project { id }
+      team {
+        key
+        members(first: 50, after: $membersAfter) {
+          nodes { id name }
+          pageInfo { hasNextPage endCursor }
+        }
+        projects(first: 50, after: $projectsAfter) {
+          nodes { id name }
+          pageInfo { hasNextPage endCursor }
+        }
+      }
+    }
+  }
+`;
+
+const updateIssueFieldMutation = `
+  mutation TaskboardLinearUpdateField($id: String!, $input: IssueUpdateInput!) {
+    issueUpdate(id: $id, input: $input) {
+      success
+      issue { ${issueFields} }
+    }
+  }
+`;
+
+const createCommentMutation = `
+  mutation TaskboardLinearCreateComment($input: CommentCreateInput!) {
+    commentCreate(input: $input) {
+      success
+      comment { id issue { id team { key } } }
+    }
+  }
+`;
+
 const teamForCreateQuery = `
   query TaskboardLinearCreateTeam($teamKey: String!) {
     teams(filter: { key: { eqIgnoreCase: $teamKey } }, first: 2) {
@@ -150,6 +197,9 @@ const createIssueMutation = `
 `;
 
 const namedSchema = z.object({ name: z.string() }).strict();
+const identifiedNamedSchema = z
+  .object({ id: z.string().min(1), name: z.string() })
+  .strict();
 const assigneeSchema = z
   .object({ id: z.string().min(1), name: z.string() })
   .strict();
@@ -190,12 +240,16 @@ const issueSchema = z
     title: z.string(),
     description: z.string().nullable(),
     url: z.string(),
+    priority: z.number().int().min(0).max(4).optional(),
     priorityLabel: z.string(),
     updatedAt: z.string(),
     state: stateSchema,
     assignee: assigneeSchema.nullable(),
     team: z.object({ key: z.string(), name: z.string() }).strict(),
-    project: namedSchema.nullable(),
+    project: z
+      .object({ id: z.string().min(1).optional(), name: z.string() })
+      .strict()
+      .nullable(),
     labels: z.object({ nodes: z.array(namedSchema) }).strict(),
     comments: z
       .object({
@@ -246,7 +300,7 @@ function toItem(value: z.infer<typeof issueSchema>): ExternalWorkItemDetail {
     stateCategory: stateCategory(value.state.type),
     priority: value.priorityLabel || null,
     assignee: value.assignee?.name ?? null,
-    project: value.project?.name ?? value.team.name,
+    project: value.project?.name ?? null,
     labels: value.labels.nodes.map(label => label.name),
     updatedAt: value.updatedAt,
     comments: (value.comments?.nodes ?? []).map(comment => ({
@@ -365,6 +419,145 @@ export function createLinearAdapter(options: {
       stateCategory: stateCategory(state.type),
       current: state.id === result.state.id
     }));
+  }
+
+  async function inspectorOptions(
+    locator: string
+  ): Promise<ExternalWorkItemInspectorOptions> {
+    const members = new Map<string, z.infer<typeof identifiedNamedSchema>>();
+    const projects = new Map<string, z.infer<typeof identifiedNamedSchema>>();
+    const seenMemberCursors = new Set<string>();
+    const seenProjectCursors = new Set<string>();
+    let membersAfter: string | undefined;
+    let projectsAfter: string | undefined;
+    let loadMembers = true;
+    let loadProjects = true;
+    let currentPriority = 0;
+    let currentAssigneeId: string | null = null;
+    let currentProjectId: string | null = null;
+
+    while (loadMembers || loadProjects) {
+      const data = await requestLinear(apiKey, issueInspectorOptionsQuery, {
+        id: locator,
+        ...(membersAfter ? { membersAfter } : {}),
+        ...(projectsAfter ? { projectsAfter } : {})
+      });
+      const issue = z
+        .object({
+          issue: z
+            .object({
+              id: z.string().min(1),
+              priority: z.number().int().min(0).max(4),
+              assignee: z.object({ id: z.string().min(1) }).strict().nullable(),
+              project: z.object({ id: z.string().min(1) }).strict().nullable(),
+              team: z
+                .object({
+                  key: z.string(),
+                  members: createMetadataConnectionSchema(identifiedNamedSchema),
+                  projects: createMetadataConnectionSchema(identifiedNamedSchema)
+                })
+                .strict()
+            })
+            .strict()
+        })
+        .strict()
+        .parse(data).issue;
+      if (issue.id !== locator) {
+        throw new Error(`Linear returned the wrong issue for ${locator}`);
+      }
+      if (issue.team.key.toLowerCase() !== teamKey.toLowerCase()) {
+        throw new Error(`Linear issue ${locator} is outside the configured scope`);
+      }
+      currentPriority = issue.priority;
+      currentAssigneeId = issue.assignee?.id ?? null;
+      currentProjectId = issue.project?.id ?? null;
+
+      if (loadMembers) {
+        for (const member of issue.team.members.nodes) {
+          members.set(member.id, member);
+        }
+        if (!issue.team.members.pageInfo.hasNextPage) {
+          loadMembers = false;
+        } else {
+          const cursor = issue.team.members.pageInfo.endCursor;
+          if (!cursor || seenMemberCursors.has(cursor)) {
+            throw new Error('Linear returned an invalid members pagination cursor');
+          }
+          seenMemberCursors.add(cursor);
+          membersAfter = cursor;
+        }
+      }
+      if (loadProjects) {
+        for (const project of issue.team.projects.nodes) {
+          projects.set(project.id, project);
+        }
+        if (!issue.team.projects.pageInfo.hasNextPage) {
+          loadProjects = false;
+        } else {
+          const cursor = issue.team.projects.pageInfo.endCursor;
+          if (!cursor || seenProjectCursors.has(cursor)) {
+            throw new Error('Linear returned an invalid projects pagination cursor');
+          }
+          seenProjectCursors.add(cursor);
+          projectsAfter = cursor;
+        }
+      }
+    }
+
+    const priorities = [
+      { id: null, label: 'No priority', value: 0 },
+      { id: '1', label: 'Urgent', value: 1 },
+      { id: '2', label: 'High', value: 2 },
+      { id: '3', label: 'Medium', value: 3 },
+      { id: '4', label: 'Low', value: 4 }
+    ];
+    return {
+      priority: {
+        supported: true,
+        options: priorities.map(option => ({
+          id: option.id,
+          label: option.label,
+          current: option.value === currentPriority
+        }))
+      },
+      assignee: {
+        supported: true,
+        options: [
+          { id: null, label: 'Unassigned', current: currentAssigneeId === null },
+          ...[...members.values()].map(member => ({
+            id: member.id,
+            label: member.name,
+            current: member.id === currentAssigneeId
+          }))
+        ]
+      },
+      project: {
+        supported: true,
+        options: [
+          { id: null, label: 'No project', current: currentProjectId === null },
+          ...[...projects.values()].map(project => ({
+            id: project.id,
+            label: project.name,
+            current: project.id === currentProjectId
+          }))
+        ]
+      },
+      comments: { supported: true }
+    };
+  }
+
+  function issueUpdateInput(mutation: ExternalWorkItemFieldMutation) {
+    if (mutation.field === 'priority') {
+      const priority = mutation.optionId === null ? 0 : Number(mutation.optionId);
+      if (!Number.isInteger(priority) || priority < 0 || priority > 4) {
+        throw new Error('Linear priority is not available for this issue');
+      }
+      return { priority };
+    }
+    if (mutation.field === 'assignee') {
+      return { assigneeId: mutation.optionId };
+    }
+    return { projectId: mutation.optionId };
   }
 
   async function createMetadata() {
@@ -558,6 +751,10 @@ export function createLinearAdapter(options: {
       if (!configured) throw new Error('Linear is not configured');
       return statusOptions(locator);
     },
+    async inspectorOptions(locator) {
+      if (!configured) throw new Error('Linear is not configured');
+      return inspectorOptions(locator);
+    },
     async createMetadata(input) {
       if (!configured) throw new Error('Linear is not configured');
       if (input.destinationId.toLowerCase() !== teamKey.toLowerCase()) {
@@ -702,6 +899,78 @@ export function createLinearAdapter(options: {
         throw new Error('Linear returned an invalid status update result');
       }
       return toItem(update.issue);
+    },
+    async updateField(locator, mutation) {
+      if (!configured) throw new Error('Linear is not configured');
+      const available = await inspectorOptions(locator);
+      const target = available[mutation.field].options.find(
+        option => option.id === mutation.optionId
+      );
+      if (!target) {
+        throw new Error(`Linear ${mutation.field} is not available for this issue`);
+      }
+      if (target.current) return loadIssue(locator);
+      const data = await requestLinear(apiKey, updateIssueFieldMutation, {
+        id: locator,
+        input: issueUpdateInput(mutation)
+      });
+      const update = z
+        .object({
+          issueUpdate: z
+            .object({ success: z.boolean(), issue: issueSchema })
+            .strict()
+        })
+        .strict()
+        .parse(data).issueUpdate;
+      if (!update.success) {
+        throw new Error(`Linear rejected the ${mutation.field} update`);
+      }
+      if (
+        update.issue.id !== locator ||
+        update.issue.team.key.toLowerCase() !== teamKey.toLowerCase()
+      ) {
+        throw new Error(`Linear returned an invalid ${mutation.field} update result`);
+      }
+      return toItem(update.issue);
+    },
+    async addComment(locator, body) {
+      if (!configured) throw new Error('Linear is not configured');
+      const trimmed = body.trim();
+      if (!trimmed) throw new Error('Comment cannot be empty');
+      await loadIssue(locator);
+      const data = await requestLinear(apiKey, createCommentMutation, {
+        input: { issueId: locator, body: trimmed }
+      });
+      const result = z
+        .object({
+          commentCreate: z
+            .object({
+              success: z.boolean(),
+              comment: z
+                .object({
+                  id: z.string().min(1),
+                  issue: z.object({
+                    id: z.string().min(1),
+                    team: z.object({ key: z.string() }).strict()
+                  }).strict()
+                })
+                .strict()
+                .nullable()
+            })
+            .strict()
+        })
+        .strict()
+        .parse(data).commentCreate;
+      if (!result.success || !result.comment) {
+        throw new Error('Linear rejected the comment');
+      }
+      if (
+        result.comment.issue.id !== locator ||
+        result.comment.issue.team.key.toLowerCase() !== teamKey.toLowerCase()
+      ) {
+        throw new Error('Linear returned an invalid comment result');
+      }
+      return loadIssue(locator);
     }
   };
 }

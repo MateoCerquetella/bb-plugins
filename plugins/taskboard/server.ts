@@ -21,6 +21,7 @@ import {
   projectCredentialsInteractionResponseSchema,
   projectSourceConfigSchema,
   sourceName,
+  workItemInspectorSchema,
   workSourceSchema,
   workStatusOptionSchema,
   taskboardRpcContract,
@@ -36,6 +37,8 @@ import {
   type WorkItem,
   type WorkItemDetail,
   type WorkItemFilterField,
+  type WorkItemFieldMutation,
+  type WorkItemInspector,
   type WorkSource,
   type WorkStatusOption,
   type WorkSourceStatus
@@ -68,6 +71,8 @@ import {
   type ExternalWorkItemCreateResult,
   type ExternalWorkItem,
   type ExternalWorkItemDetail,
+  type ExternalWorkItemFieldMutation,
+  type ExternalWorkItemInspectorOptions,
   type WorkSourceAdapter
 } from './sources/types.js';
 import { createWorkItemStore } from './store.js';
@@ -1815,6 +1820,215 @@ export default async function plugin(bb: BbPluginApi) {
     return mutation;
   }
 
+  async function liveInspector(
+    projectId: string,
+    source: WorkSource,
+    locator: string
+  ): Promise<WorkItemInspector> {
+    assertSelectedSource(projectId, source);
+    await waitForMutations(projectId, [source]);
+    assertSelectedSource(projectId, source);
+    if (!store.get(projectId, source, locator)) {
+      throw new Error(
+        `${sourceName(source)} item is not cached for this BB project; refresh the project tracker first`
+      );
+    }
+    const revision = currentRevision(projectId, source);
+    const adapter = (await adapters(projectId)).get(source);
+    if (!adapter) {
+      assertSelectedSource(projectId, source);
+      throw new Error(`Missing ${source} adapter`);
+    }
+    if (!adapter.configured()) {
+      throw new Error(
+        adapter.configurationMessage() ??
+          `${sourceName(source)} is not configured`
+      );
+    }
+    if (!adapter.inspectorOptions) {
+      return {
+        priorityOptions: [],
+        assigneeOptions: [],
+        projectOptions: [],
+        supportsPriority: false,
+        supportsAssignee: false,
+        supportsProject: false,
+        supportsComments: false
+      };
+    }
+    let externalOptions: ExternalWorkItemInspectorOptions;
+    try {
+      externalOptions = await adapter.inspectorOptions(locator);
+    } catch (error) {
+      const message = errorMessage(error);
+      throw new Error(
+        message.includes('outside the configured scope')
+          ? message
+          : `${sourceName(source)} could not load editable fields for this item`
+      );
+    }
+    if (currentRevision(projectId, source) !== revision) {
+      throw new Error(
+        `${sourceName(source)} settings changed while loading editable fields; try again`
+      );
+    }
+    for (const [field, value] of Object.entries({
+      priority: externalOptions.priority,
+      assignee: externalOptions.assignee,
+      project: externalOptions.project
+    })) {
+      if (!value.supported) {
+        if (value.options.length > 0) {
+          throw new Error(`${sourceName(source)} returned options for unsupported ${field}`);
+        }
+        continue;
+      }
+      const ids = value.options.map(option => option.id);
+      if (new Set(ids).size !== ids.length) {
+        throw new Error(`${sourceName(source)} returned duplicate ${field} ids`);
+      }
+      if (value.options.filter(option => option.current).length !== 1) {
+        throw new Error(`${sourceName(source)} did not return one current ${field}`);
+      }
+    }
+    return workItemInspectorSchema.parse({
+      priorityOptions: externalOptions.priority.options.filter(
+        option => option.id !== null
+      ),
+      assigneeOptions: externalOptions.assignee.options.filter(
+        option => option.id !== null
+      ),
+      projectOptions: externalOptions.project.options.filter(
+        option => option.id !== null
+      ),
+      supportsPriority: externalOptions.priority.supported,
+      supportsAssignee: externalOptions.assignee.supported,
+      supportsProject: externalOptions.project.supported,
+      supportsComments: externalOptions.comments.supported
+    });
+  }
+
+  async function mutateLiveItem(
+    projectId: string,
+    source: WorkSource,
+    locator: string,
+    operation: (adapter: WorkSourceAdapter) => Promise<ExternalWorkItemDetail>,
+    description: string
+  ): Promise<WorkItemDetail> {
+    assertSelectedSource(projectId, source);
+    await waitForMutations(projectId, [source]);
+    assertSelectedSource(projectId, source);
+    if (!store.get(projectId, source, locator)) {
+      throw new Error(
+        `${sourceName(source)} item is not cached for this BB project; refresh the project tracker first`
+      );
+    }
+    const revision = currentRevision(projectId, source);
+    const adapter = (await adapters(projectId)).get(source);
+    if (!adapter) {
+      assertSelectedSource(projectId, source);
+      throw new Error(`Missing ${source} adapter`);
+    }
+    if (!adapter.configured()) {
+      throw new Error(
+        adapter.configurationMessage() ??
+          `${sourceName(source)} is not configured`
+      );
+    }
+    const mutation = enqueueMutation(projectId, [source], async () => {
+      if (currentRevision(projectId, source) !== revision) {
+        throw new Error(
+          `${sourceName(source)} settings changed before the ${description}; try again`
+        );
+      }
+      if (!store.get(projectId, source, locator)) {
+        throw new Error(
+          `${sourceName(source)} item is no longer cached for this BB project`
+        );
+      }
+      advanceSourceRevision(projectId, source);
+      let externalItem: ExternalWorkItemDetail;
+      try {
+        externalItem = await operation(adapter);
+      } catch (error) {
+        const detail = errorMessage(error);
+        throw new Error(
+          detail.includes('not available') ||
+            detail.includes('outside the configured scope') ||
+            detail.includes('not supported') ||
+            detail.includes('cannot be empty')
+            ? detail
+            : `${sourceName(source)} could not ${description}: ${detail}`
+        );
+      }
+      if (externalItem.source !== source || externalItem.locator !== locator) {
+        throw new Error(
+          `${sourceName(source)} returned an invalid ${description} result`
+        );
+      }
+      store.upsert(scopedItem(projectId, withoutComments(externalItem)));
+      bb.realtime.publish('taskboard:changed', { projectId, source });
+      return scopedItemDetail(projectId, externalItem);
+    });
+    void mutation
+      .then(
+        () => syncAll(projectId, source, false),
+        () => syncAll(projectId, source, false)
+      )
+      .catch((error: unknown) => {
+        bb.log.warn(
+          `${sourceName(source)} reconciliation failed for ${projectId}: ${errorMessage(error)}`
+        );
+      });
+    return mutation;
+  }
+
+  async function updateItemField(
+    projectId: string,
+    source: WorkSource,
+    locator: string,
+    fieldMutation: WorkItemFieldMutation
+  ): Promise<WorkItemDetail> {
+    return mutateLiveItem(
+      projectId,
+      source,
+      locator,
+      adapter => {
+        if (!adapter.updateField) {
+          throw new Error(`${sourceName(source)} ${fieldMutation.field} editing is not supported`);
+        }
+        return adapter.updateField(
+          locator,
+          {
+            field: fieldMutation.field,
+            optionId: fieldMutation.valueId
+          } as ExternalWorkItemFieldMutation
+        );
+      },
+      `update this item ${fieldMutation.field}`
+    );
+  }
+
+  async function addItemComment(
+    projectId: string,
+    source: WorkSource,
+    locator: string,
+    body: string
+  ): Promise<WorkItemDetail> {
+    return mutateLiveItem(
+      projectId,
+      source,
+      locator,
+      adapter => {
+        if (!adapter.addComment) {
+          throw new Error(`${sourceName(source)} comments are not supported`);
+        }
+        return adapter.addComment(locator, body);
+      },
+      'add this comment'
+    );
+  }
+
   async function createWorkItem(
     input: CreateIssueInput
   ): Promise<{
@@ -2093,6 +2307,38 @@ export default async function plugin(bb: BbPluginApi) {
           input.source,
           input.locator,
           input.statusId
+        )
+      };
+    },
+    async getItemInspector(input) {
+      await assertProjectExists(input.projectId);
+      return {
+        inspector: await liveInspector(
+          input.projectId,
+          input.source,
+          input.locator
+        )
+      };
+    },
+    async updateItemField(input) {
+      await assertProjectExists(input.projectId);
+      return {
+        item: await updateItemField(
+          input.projectId,
+          input.source,
+          input.locator,
+          input.mutation
+        )
+      };
+    },
+    async addItemComment(input) {
+      await assertProjectExists(input.projectId);
+      return {
+        item: await addItemComment(
+          input.projectId,
+          input.source,
+          input.locator,
+          input.body
         )
       };
     },

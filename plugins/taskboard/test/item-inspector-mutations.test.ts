@@ -176,7 +176,7 @@ test('Linear field mutations send provider-native values and return refreshed de
         field: 'project',
         optionId: null
       });
-      assert.equal(noProject.project, 'Bananito');
+      assert.equal(noProject.project, null);
       assert.deepEqual(updateInput, { projectId: null });
     }
   );

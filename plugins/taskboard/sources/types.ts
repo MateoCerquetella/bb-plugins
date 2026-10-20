@@ -35,6 +35,33 @@ export interface ExternalWorkItemCreateResult {
   assigneeConfirmation: AssigneeConfirmation;
 }
 
+export interface ExternalWorkItemSelectionOption {
+  id: string | null;
+  label: string;
+  current: boolean;
+}
+
+export interface ExternalWorkItemInspectorOptions {
+  priority: {
+    supported: boolean;
+    options: ExternalWorkItemSelectionOption[];
+  };
+  assignee: {
+    supported: boolean;
+    options: ExternalWorkItemSelectionOption[];
+  };
+  project: {
+    supported: boolean;
+    options: ExternalWorkItemSelectionOption[];
+  };
+  comments: { supported: boolean };
+}
+
+export type ExternalWorkItemFieldMutation =
+  | { field: 'priority'; optionId: string | null }
+  | { field: 'assignee'; optionId: string | null }
+  | { field: 'project'; optionId: string | null };
+
 export function withoutComments(
   item: ExternalWorkItemDetail
 ): ExternalWorkItem {
@@ -59,5 +86,16 @@ export interface WorkSourceAdapter {
   updateStatus(
     locator: string,
     statusId: string
+  ): Promise<ExternalWorkItemDetail>;
+  inspectorOptions?(
+    locator: string
+  ): Promise<ExternalWorkItemInspectorOptions>;
+  updateField?(
+    locator: string,
+    mutation: ExternalWorkItemFieldMutation
+  ): Promise<ExternalWorkItemDetail>;
+  addComment?(
+    locator: string,
+    body: string
   ): Promise<ExternalWorkItemDetail>;
 }

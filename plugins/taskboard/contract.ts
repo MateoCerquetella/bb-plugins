@@ -195,6 +195,56 @@ export const workStatusOptionSchema = z
   .strict();
 export type WorkStatusOption = z.infer<typeof workStatusOptionSchema>;
 
+export const workItemFieldOptionSchema = z
+  .object({
+    id: z.string().min(1),
+    label: z.string().min(1),
+    current: z.boolean()
+  })
+  .strict();
+export type WorkItemFieldOption = z.infer<
+  typeof workItemFieldOptionSchema
+>;
+
+export const workItemInspectorSchema = z
+  .object({
+    assigneeOptions: z.array(workItemFieldOptionSchema),
+    priorityOptions: z.array(workItemFieldOptionSchema),
+    projectOptions: z.array(workItemFieldOptionSchema),
+    supportsComments: z.boolean(),
+    supportsAssignee: z.boolean(),
+    supportsPriority: z.boolean(),
+    supportsProject: z.boolean()
+  })
+  .strict();
+export type WorkItemInspector = z.infer<
+  typeof workItemInspectorSchema
+>;
+
+export const workItemFieldMutationSchema = z.discriminatedUnion('field', [
+  z
+    .object({
+      field: z.literal('priority'),
+      valueId: z.string().min(1).nullable()
+    })
+    .strict(),
+  z
+    .object({
+      field: z.literal('assignee'),
+      valueId: z.string().min(1).nullable()
+    })
+    .strict(),
+  z
+    .object({
+      field: z.literal('project'),
+      valueId: z.string().min(1).nullable()
+    })
+    .strict()
+]);
+export type WorkItemFieldMutation = z.infer<
+  typeof workItemFieldMutationSchema
+>;
+
 export const workItemSchema = z
   .object({
     bbProjectId: bbProjectIdSchema,
@@ -423,6 +473,38 @@ export const taskboardRpcContract = {
       })
       .strict(),
     output: z.object({ item: workItemSchema }).strict()
+  },
+  getItemInspector: {
+    input: z
+      .object({
+        projectId: bbProjectIdSchema,
+        source: workSourceSchema,
+        locator: z.string().min(1)
+      })
+      .strict(),
+    output: z.object({ inspector: workItemInspectorSchema }).strict()
+  },
+  updateItemField: {
+    input: z
+      .object({
+        projectId: bbProjectIdSchema,
+        source: workSourceSchema,
+        locator: z.string().min(1),
+        mutation: workItemFieldMutationSchema
+      })
+      .strict(),
+    output: z.object({ item: workItemDetailSchema }).strict()
+  },
+  addItemComment: {
+    input: z
+      .object({
+        projectId: bbProjectIdSchema,
+        source: workSourceSchema,
+        locator: z.string().min(1),
+        body: z.string().trim().min(1).max(100_000)
+      })
+      .strict(),
+    output: z.object({ item: workItemDetailSchema }).strict()
   },
   getCreateIssueContext: {
     input: z.object({ projectId: bbProjectIdSchema }).strict(),
