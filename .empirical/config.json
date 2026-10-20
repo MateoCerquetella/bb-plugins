@@ -31,5 +31,6 @@
     "fast": 10080,
     "quick": 10080,
     "complex": 10080
-  }
+  },
+  "defaultMode": "direct"
 }
