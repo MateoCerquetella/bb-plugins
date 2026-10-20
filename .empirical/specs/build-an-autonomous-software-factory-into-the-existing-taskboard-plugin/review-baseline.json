@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "resultPath": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/reviews/f741148e54688affb950f7b1.json",
-  "resultDigest": "sha256:f741148e54688affb950f7b1642e0c6d1fbcce4cda42b5a60ffca48c6c336fea",
-  "contractDigest": "sha256:d7990a8cb415e7b7285c5622e560a272742a9d355b6bbe1f84403ae49be8a9da",
+  "resultPath": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/reviews/4bbcd9f29ef1963bc59c56ae.json",
+  "resultDigest": "sha256:4bbcd9f29ef1963bc59c56aeaa7c3e7417ddfff78abf5fe7f7bc6ff694792fac",
+  "contractDigest": "sha256:18227add7e5ca8b338d7284dfd0bd3f60cb1ff51ffbe0faac1974e6b31484b34",
   "carriedDeferred": []
 }

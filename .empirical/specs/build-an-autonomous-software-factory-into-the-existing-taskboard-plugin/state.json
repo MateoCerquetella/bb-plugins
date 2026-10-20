@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 17,
+  "revision": 35,
   "activeFeature": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin",
   "request": "Build an autonomous software factory into the existing Taskboard plugin, inspired by https://github.com/lpbaril/bb-plugin-factory. Make Linear, Jira, or the configured issue provider the source of truth. The factory should continuously select eligible tickets, start and supervise BB agent work, avoid duplicate dispatch, recover after restart, and reflect progress back through the existing Taskboard provider/status model. Reuse the current taskboard architecture and keep the first implementation focused and operable.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "implement",
+  "phase": "integrate",
   "status": "waiting",
-  "repairAttempts": 0,
-  "message": "Repair fresh review findings: restore manual Start on pending undispatched ticket details; expose last-known queue and last scan observations in project status; show actual paused project policy above queue-owned ticket teams. Also inspect and fix server candidate pre-limit starvation: server candidates currently list limit 500 before service excludes claimed items. Preserve existing coordinator architecture and acceptance criteria.",
+  "repairAttempts": 1,
+  "message": "Final current-head verification passed. Taskboard focused check completed at fdf71d932 with 289 tests, types, build, and build metadata passing. Fresh-context BB Surf QA passed twice with desktop/mobile screenshots, keyboard focus and activation, hierarchy, blocker-state, long-text, no-overflow, refresh retention, and stale-response checks. Live native smoke independently showed one coordinator and one finished child with matching parentThreadId and no duplicate dispatch.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:b1c54351a2cc67dd8586b2f2dad8f34f4f916b3b0656ee17756d3ab2f07fab77",
@@ -20,24 +20,27 @@
   "capabilityClaimId": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin-63a17a591999",
   "authorizationDigest": null,
   "evidence": [],
-  "evidenceReceiptIds": [],
+  "evidenceReceiptIds": [
+    "collected-0820b00043c5c79bac69fa3d",
+    "qa-eca7eee39cac64fccdd7598f",
+    "qa-f5e065ab7a6d7c98c387f5df",
+    "collected-0adcb9d8f9a6f37b9fc01cf6"
+  ],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": false,
-    "verified": false,
+    "implemented": true,
+    "verified": true,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "none",
+    "highest": "verified",
     "reasons": {
-      "implemented": "implemented has not been proven by a durable receipt.",
-      "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-20T14:48:27.958Z",
+  "updatedAt": "2026-10-20T15:43:13.174Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin-63a17a591999",
@@ -77,13 +80,13 @@
     "actor": "agent",
     "revision": 3
   },
-  "trackerGeneration": 3,
+  "trackerGeneration": 5,
   "lifecycle": {
-    "stage": "iteration",
-    "iteration": 3,
+    "stage": "consolidation",
+    "iteration": 5,
     "awaitingFeedback": false,
     "contractRevision": 9
   },
-  "budgetExtensionMinutes": 180,
+  "budgetExtensionMinutes": 240,
   "reviewFirst": true
 }

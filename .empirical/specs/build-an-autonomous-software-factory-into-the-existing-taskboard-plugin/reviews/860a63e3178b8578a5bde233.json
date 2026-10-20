@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:b23b78640ba1634ad2c3e2a4ca36e751c9f2f5ba4d946599b1a2d08fdcea7160",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "1807befaa9c0732d83b6223d3821ba83268d98e7",
+  "headCommit": "96841ba84870eac68ed98435061d73067ae83c3e",
+  "diffDigest": "sha256:0db1f022f3d3784ab758a8dbe757f6fddc1ced9441a0b3b2b7c7a76c8815ce50",
+  "verdict": "APPROVED",
+  "reviewerActor": "fresh-context-reviewer",
+  "reviewerInvocationId": "fresh-review-r24-20261020T000001Z",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: Carried forward from the previously approved review; the delta only updates documented Taskboard install versions and does not change factory defaults or persisted settings.\n- PASS AC-2: Carried forward from the previously approved review; the documentation-only version update does not change provider discovery, filtering, revalidation, or admission.\n- PASS AC-3: Carried forward from the previously approved review; the delta does not affect concurrency, restart recovery, capacity, or ambiguous dispatch behavior.\n- PASS AC-4: Carried forward from the previously approved review; the delta does not alter coordinator or child-thread ownership, worktrees, review independence, defaults, or manual starts.\n- PASS AC-5: Carried forward from the previously approved review; the delta does not alter pause behavior, fail-closed provider handling, status, or blockers.\n- PASS AC-6: Carried forward from the previously approved review; the delta introduces no action that merges, deploys, closes issues, or bypasses human acceptance.\n- PASS AC-7: Carried forward from the previously approved review; the documentation-only update does not change CLI/RPC behavior, status reporting, or behavioral coverage.\n- PASS AC-UI-1: Carried forward from the previously approved review; the delta does not modify Project Manage or ticket progress UI behavior, accessibility, responsiveness, or evidence.\n\n## Security / correctness\n\nPASS. The delta changes only the documented Taskboard release selector in the root and plugin READMEs from ^0.3.4 to ^0.3.5. It introduces no executable behavior, trust-boundary change, credential exposure, authorization bypass, or correctness regression in the previously approved implementation. The two install instructions remain consistent with each other.\n\n## Design / maintainability\n\nPASS. The delta is minimal and keeps the duplicated public install instructions synchronized. It adds no abstraction, branching, state, coupling, file-size concern, or architecture-boundary leak. No structural simplification is warranted for this documentation-only release-version update.",
+  "bodyDigest": "sha256:a2ea91a7ef30722bb699d38ec8cf1c552dd881da80b89c8eb8b6beeae1bb7fe0",
+  "findings": [],
+  "digest": "sha256:860a63e3178b8578a5bde23326561a4255af639108cf0ee0da99ec31912d584b"
+}

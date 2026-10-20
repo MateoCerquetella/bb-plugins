@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-f5e065ab7a6d7c98c387f5df",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "Exact head fdf71d932, revision34: BB Surf actual-component harness passed twice with no browser errors. Desktop/mobile hierarchy, blocker wrapping, factory states, keyboard disclosure and refresh stability passed. Tab/Enter confirmed coordinator action focus-visible with blue ring and correct navigation at 1280/390. Backend criteria assessed using exact-head receipt qa-eca7eee39cac64fccdd7598f: 289 tests plus types/build passed, not rerun here. Native smoke independently records real coordinator thr_pzhs36zx8i, child thr_cfetiyic4s parent linkage and finished status. Browser SDK/RPC/provider/native boundaries are mocked; no live provider admission/write, restart, full Build/Review native lifecycle, installed-plugin smoke, merge, issue closure, publication or deployment claimed. UI receipt collected-0adcb9d8f9a6f37b9fc01cf6. No source edits, code review, workflow advance or temporary server.",
+  "passed": true,
+  "startedAt": "2026-10-20T15:42:44.624Z",
+  "completedAt": "2026-10-20T15:42:44.624Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin",
+    "specRevision": 11,
+    "specDigest": "sha256:b1c54351a2cc67dd8586b2f2dad8f34f4f916b3b0656ee17756d3ab2f07fab77",
+    "treeDigest": "sha256:7babc62355177b450b81f80a2e50ada000dfd3ac37513c9daf2163075cc55402",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 34,
+    "gitCommit": "fdf71d93258984fbb91790defeaf0e65cff5f694",
+    "scope": [
+      "plugins/taskboard/scripts/factory-browser-check.mjs",
+      "plugins/taskboard/test/factory-preview-runtime.tsx",
+      "plugins/taskboard/test/factory-preview.tsx"
+    ],
+    "scopeDigest": "sha256:9f9ada064d579eec61a0c1f960343ce1fc2e75dc074df40aa5b359f5faa0f90a",
+    "textTreeDigest": "sha256:7babc62355177b450b81f80a2e50ada000dfd3ac37513c9daf2163075cc55402"
+  },
+  "digest": "sha256:55bc4581370d72ec27752e4fcb03808b792e8d3a377994679012258da2ae79b8",
+  "kind": "qa",
+  "matrixDigest": "sha256:74e5a824e27d3f8982943f55ccee76813eb8ceec8581389627f92573b57da08e",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Exact head fdf71d932, revision34: BB Surf actual-component harness passed twice with no browser errors. Desktop/mobile hierarchy, blocker wrapping, factory states, keyboard disclosure and refresh stability passed. Tab/Enter confirmed coordinator action focus-visible with blue ring and correct navigation at 1280/390. Backend criteria assessed using exact-head receipt qa-eca7eee39cac64fccdd7598f: 289 tests plus types/build passed, not rerun here. Native smoke independently records real coordinator thr_pzhs36zx8i, child thr_cfetiyic4s parent linkage and finished status. Browser SDK/RPC/provider/native boundaries are mocked; no live provider admission/write, restart, full Build/Review native lifecycle, installed-plugin smoke, merge, issue closure, publication or deployment claimed. UI receipt collected-0adcb9d8f9a6f37b9fc01cf6. No source edits, code review, workflow advance or temporary server.",
+      "startedAt": "2026-10-20T15:42:44.624Z",
+      "completedAt": "2026-10-20T15:42:44.624Z",
+      "durationMs": 0,
+      "collector": "fresh-context outcome QA r34",
+      "command": null,
+      "result": null,
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:7babc62355177b450b81f80a2e50ada000dfd3ac37513c9daf2163075cc55402",
+      "sourceTreeAfter": "sha256:7babc62355177b450b81f80a2e50ada000dfd3ac37513c9daf2163075cc55402",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r34/factory-native-readiness.log",
+          "mediaType": "text/plain",
+          "bytes": 3824,
+          "digest": "sha256:d37d6315935a1511ae8f6f661bc1a93c22c7a019a3fe30ee90173ea94b640844"
+        },
+        {
+          "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r34/fresh-context-r34-browser.log",
+          "mediaType": "text/plain",
+          "bytes": 441,
+          "digest": "sha256:52d20a990f761ebf24eb3ecde1d67aa39b85d51eda697b035ec62b2094d70ba9"
+        },
+        {
+          "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r34/fresh-context-r34-focus-1280.png",
+          "mediaType": "image/png",
+          "bytes": 211964,
+          "digest": "sha256:9fb4255addaf95cd195e08beef8b8986b893461c94f15cb6fc5f35f7c86e6659"
+        },
+        {
+          "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r34/fresh-context-r34-focus-390.png",
+          "mediaType": "image/png",
+          "bytes": 198565,
+          "digest": "sha256:bf33746b0f826c910a8863aa5c472cd28643ad80c66f74a919b9036061383d0e"
+        },
+        {
+          "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r34/fresh-context-r34-focus.log",
+          "mediaType": "text/plain",
+          "bytes": 1080,
+          "digest": "sha256:cc752f45d2533c3aac4fde7f07c5bc83543db03733a0c5d3ffdacb045b428179"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}
