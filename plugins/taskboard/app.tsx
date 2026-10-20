@@ -10,6 +10,7 @@ import {
   useState,
   useSyncExternalStore,
   type DragEvent as ReactDragEvent,
+  type FormEvent,
   type KeyboardEvent as ReactKeyboardEvent,
   type ReactNode
 } from 'react';
@@ -81,6 +82,8 @@ import type {
   TrackerProject,
   WorkItem,
   WorkItemDetail,
+  WorkItemFieldMutation,
+  WorkItemInspector,
   WorkSource,
   WorkStateCategory,
   WorkStatusOption,
@@ -5091,39 +5094,228 @@ function TrackerList({
   );
 }
 
-function DetailMetadata({
+const EMPTY_INSPECTOR_VALUE = '__taskboard_none__';
+
+function InspectorSelect({
+  label,
+  emptyLabel,
+  value,
+  options,
+  disabled,
+  pending,
+  onChange
+}: {
+  label: string;
+  emptyLabel: string;
+  value: string | null;
+  options: WorkItemInspector['assigneeOptions'];
+  disabled: boolean;
+  pending: boolean;
+  onChange: (valueId: string | null) => void;
+}) {
+  const current = options.find(option => option.current)?.id ?? null;
+  return (
+    <div className="tb-inspector-row">
+      <span className="tb-inspector-label">{label}</span>
+      <Select
+        value={current ?? EMPTY_INSPECTOR_VALUE}
+        disabled={disabled || pending}
+        onValueChange={next =>
+          onChange(next === EMPTY_INSPECTOR_VALUE ? null : next)
+        }
+      >
+        <SelectTrigger
+          className="tb-inspector-control h-8 min-w-0 border-0 bg-transparent px-2 shadow-none"
+          aria-label={`${label}: ${value ?? emptyLabel}`}
+        >
+          <SelectValue placeholder={value ?? emptyLabel} />
+        </SelectTrigger>
+        <SelectContent align="end">
+          <SelectItem value={EMPTY_INSPECTOR_VALUE}>{emptyLabel}</SelectItem>
+          {options.flatMap(option =>
+            option.id === null
+              ? []
+              : [
+                  <SelectItem key={option.id} value={option.id}>
+                    {option.label}
+                  </SelectItem>
+                ]
+          )}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
+function TicketInspector({
   item,
+  inspector,
+  loading,
+  pendingField,
+  onMoveStatus,
+  onChangeField,
   className
 }: {
   item: WorkItemDetail;
+  inspector: WorkItemInspector | null | undefined;
+  loading: boolean;
+  pendingField: WorkItemFieldMutation['field'] | null;
+  onMoveStatus: (item: WorkItem, option: WorkStatusOption) => Promise<void>;
+  onChangeField: (
+    field: WorkItemFieldMutation['field'],
+    valueId: string | null
+  ) => void;
   className?: string;
 }) {
-  const priority = visiblePriority(item.priority);
-  const assignee = visibleAssignee(item.assignee);
-  const fields = [
-    { label: 'Source', value: <SourceMark source={item.source} className="tb-detail-source" /> },
-    { label: 'Status', value: <span className="tb-detail-status" data-state-category={item.stateCategory}
-      data-status-tone={workflowStatusTone(item.status, item.stateCategory)}>
-      <WorkStateGlyph category={item.stateCategory} />{item.status}
-    </span> },
-    { label: 'Priority', value: <span className="tb-detail-priority">
-      {priority ? <><PriorityMark priority={priority} />{priority}</> : 'None'}
-    </span> },
-    { label: 'Assignee', value: <span className="tb-detail-assignee">
-      {assignee ? <><AssigneeMark assignee={assignee} /><span>{assignee}</span></> : 'Unassigned'}
-    </span> },
-    { label: 'External project', value: item.project ?? 'None' },
-    { label: 'Updated', value: formatUpdatedAt(item.updatedAt) }
-  ];
   return (
-    <dl className={cn('tb-detail-metadata grid grid-cols-2 gap-x-4 gap-y-3', className)}>
-      {fields.map(field => (
-        <div key={field.label} className="min-w-0">
-          <dt className="text-xs text-muted-foreground">{field.label}</dt>
-          <dd className="tb-detail-value text-sm font-medium">{field.value}</dd>
-        </div>
+    <div className={cn('tb-detail-metadata', className)}>
+      <div className="tb-inspector-row">
+        <span className="tb-inspector-label">Source</span>
+        <span className="tb-inspector-static">
+          <SourceMark source={item.source} className="tb-detail-source" />
+        </span>
+      </div>
+      <div className="tb-inspector-row">
+        <span className="tb-inspector-label">Status</span>
+        <span
+          className="tb-inspector-control tb-detail-status flex justify-end"
+          data-state-category={item.stateCategory}
+          data-status-tone={workflowStatusTone(
+            item.status,
+            item.stateCategory
+          )}
+        >
+          <WorkItemStatusMenu
+            item={item}
+            variant="detail"
+            onMove={onMoveStatus}
+          />
+        </span>
+      </div>
+      <InspectorSelect
+        label="Priority"
+        emptyLabel="None"
+        value={item.priority}
+        options={inspector?.priorityOptions ?? []}
+        disabled={!inspector?.supportsPriority}
+        pending={pendingField === 'priority'}
+        onChange={valueId => onChangeField('priority', valueId)}
+      />
+      <InspectorSelect
+        label="Assignee"
+        emptyLabel="Unassigned"
+        value={item.assignee}
+        options={inspector?.assigneeOptions ?? []}
+        disabled={!inspector?.supportsAssignee}
+        pending={pendingField === 'assignee'}
+        onChange={valueId => onChangeField('assignee', valueId)}
+      />
+      <InspectorSelect
+        label="External project"
+        emptyLabel="None"
+        value={item.project}
+        options={inspector?.projectOptions ?? []}
+        disabled={!inspector?.supportsProject}
+        pending={pendingField === 'project'}
+        onChange={valueId => onChangeField('project', valueId)}
+      />
+      <div className="tb-inspector-row">
+        <span className="tb-inspector-label">Updated</span>
+        <span className="tb-inspector-static">
+          {formatUpdatedAt(item.updatedAt)}
+        </span>
+      </div>
+      {loading ? (
+        <p role="status" className="px-2 pb-2 text-xs text-muted-foreground">
+          Loading provider options…
+        </p>
+      ) : inspector === null ? (
+        <p role="note" className="px-2 pb-2 text-xs text-muted-foreground">
+          Provider fields are unavailable for this ticket.
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function CommentComposer({
+  disabled,
+  submitting,
+  onSubmit
+}: {
+  disabled: boolean;
+  submitting: boolean;
+  onSubmit: (body: string) => Promise<boolean>;
+}) {
+  const [body, setBody] = useState('');
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const next = body.trim();
+    if (!next || disabled || submitting) return;
+    if (await onSubmit(next)) setBody('');
+  };
+  return (
+    <form className="tb-comment-composer mt-4" onSubmit={event => void submit(event)}>
+      <Textarea
+        value={body}
+        disabled={disabled || submitting}
+        maxLength={100_000}
+        rows={3}
+        placeholder={
+          disabled
+            ? 'Comments are not supported by this provider'
+            : 'Leave a comment…'
+        }
+        aria-label="Comment"
+        onChange={event => setBody(event.target.value)}
+        onKeyDown={event => {
+          if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+            event.currentTarget.form?.requestSubmit();
+          }
+        }}
+      />
+      <div className="mt-2 flex items-center justify-between gap-3">
+        <span className="text-xs text-muted-foreground">
+          {disabled ? 'Read-only conversation' : 'Ctrl Enter to send'}
+        </span>
+        <Button
+          type="submit"
+          size="sm"
+          disabled={disabled || submitting || !body.trim()}
+        >
+          {submitting ? (
+            <Icon name="Loading" className="size-3.5 animate-spin" />
+          ) : (
+            <Icon name="MessageCirclePlus" className="size-3.5" />
+          )}
+          {submitting ? 'Sending…' : 'Comment'}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+function CommentConversation({ item }: { item: WorkItemDetail }) {
+  return item.comments.length > 0 ? (
+    <div className="ml-2">
+      {item.comments.map((comment, index) => (
+        <article
+          key={`${comment.author}:${comment.createdAt}:${index}`}
+          className="tb-comment-entry relative py-4 pl-6"
+        >
+          <div className="mb-2 flex items-center justify-between gap-3 text-xs text-muted-foreground">
+            <span className="flex min-w-0 items-center gap-2 font-medium text-foreground">
+              <AssigneeMark assignee={comment.author} />
+              <span className="truncate">{comment.author}</span>
+            </span>
+            <time>{formatUpdatedAt(comment.createdAt)}</time>
+          </div>
+          <Markdown content={comment.body} />
+        </article>
       ))}
-    </dl>
+    </div>
+  ) : (
+    <p className="mt-3 text-sm text-muted-foreground">No comments yet.</p>
   );
 }
 
@@ -5142,6 +5334,13 @@ function TrackerDetail({
   const [item, setItem] = useState<WorkItemDetail | null | undefined>();
   const [error, setError] = useState<string | null>(null);
   const [detailView, setDetailView] = useState<'factory' | 'ticket'>('factory');
+  const [inspector, setInspector] = useState<
+    WorkItemInspector | null | undefined
+  >();
+  const [pendingField, setPendingField] = useState<
+    WorkItemFieldMutation['field'] | null
+  >(null);
+  const [submittingComment, setSubmittingComment] = useState(false);
   const requestRevisionRef = useRef(0);
 
   const load = useCallback(async () => {
@@ -5162,14 +5361,30 @@ function TrackerDetail({
     }
   }, [rpc, route.projectId, route.source, route.locator]);
 
+  const loadInspector = useCallback(async () => {
+    setInspector(undefined);
+    try {
+      const result = await rpc.call('getItemInspector', {
+        projectId: route.projectId,
+        source: route.source,
+        locator: route.locator
+      });
+      setInspector(result.inspector);
+    } catch {
+      setInspector(null);
+    }
+  }, [route.locator, route.projectId, route.source, rpc]);
+
   useEffect(() => {
     setItem(undefined);
+    setInspector(undefined);
     setDetailView('factory');
     void load();
+    void loadInspector();
     return () => {
       requestRevisionRef.current += 1;
     };
-  }, [load, refreshGeneration]);
+  }, [load, loadInspector, refreshGeneration]);
   useRealtime('taskboard:changed', payload => {
     const changedProject = changedProjectId(payload);
     if (changedProject === null || changedProject === route.projectId) {
@@ -5205,6 +5420,72 @@ function TrackerDetail({
       }
     },
     [item, route.locator, route.projectId, route.source, rpc]
+  );
+
+  const changeItemField = useCallback(
+    async (
+      field: WorkItemFieldMutation['field'],
+      valueId: string | null
+    ) => {
+      if (pendingField !== null) return;
+      setPendingField(field);
+      try {
+        const mutation: WorkItemFieldMutation =
+          field === 'assignee'
+            ? { field: 'assignee', valueId }
+            : field === 'priority'
+              ? { field: 'priority', valueId }
+              : { field: 'project', valueId };
+        const result = await rpc.call('updateItemField', {
+          projectId: route.projectId,
+          source: route.source,
+          locator: route.locator,
+          mutation
+        });
+        setItem(result.item);
+        await loadInspector();
+        toast.success(`${field === 'project' ? 'External project' : field} updated`);
+      } catch (nextError) {
+        toast.error(`Could not update ${field}`, {
+          description: describeError(nextError)
+        });
+      } finally {
+        setPendingField(null);
+      }
+    },
+    [
+      loadInspector,
+      pendingField,
+      route.locator,
+      route.projectId,
+      route.source,
+      rpc
+    ]
+  );
+
+  const addComment = useCallback(
+    async (body: string): Promise<boolean> => {
+      setSubmittingComment(true);
+      try {
+        const result = await rpc.call('addItemComment', {
+          projectId: route.projectId,
+          source: route.source,
+          locator: route.locator,
+          body
+        });
+        setItem(result.item);
+        toast.success('Comment added');
+        return true;
+      } catch (nextError) {
+        toast.error('Could not add comment', {
+          description: describeError(nextError)
+        });
+        return false;
+      } finally {
+        setSubmittingComment(false);
+      }
+    },
+    [route.locator, route.projectId, route.source, rpc]
   );
 
   if (item === undefined) {
@@ -5309,7 +5590,17 @@ function TrackerDetail({
               role="tabpanel" aria-labelledby={`${detailTabsId}-ticket-tab`}
               data-active={detailView === 'ticket'}
               aria-label="Ticket context">
-              <DetailMetadata item={item} className="tb-detail-meta border-y py-4" />
+              <TicketInspector
+                item={item}
+                inspector={inspector}
+                loading={inspector === undefined}
+                pendingField={pendingField}
+                onMoveStatus={moveItemStatus}
+                onChangeField={(field, valueId) => {
+                  void changeItemField(field, valueId);
+                }}
+                className="tb-detail-meta border-y py-1"
+              />
               {item.labels.length > 0 ? (
                 <div className="mt-5 flex flex-wrap gap-1.5">
                   {item.labels.map(label => <Badge key={label} variant="secondary">{label}</Badge>)}
@@ -5321,26 +5612,18 @@ function TrackerDetail({
                   : <p className="text-sm text-muted-foreground">No description provided.</p>}
               </section>
               <section className="tb-comment-rail mt-8 border-t pt-5">
-              <h2 className="mb-1 text-sm font-semibold">
-                Comments <span className="text-muted-foreground">{item.comments.length}</span>
-              </h2>
-              {item.comments.length > 0 ? <div className="ml-2">
-                {item.comments.map((comment, index) => (
-                  <article
-                    key={`${comment.author}:${comment.createdAt}:${index}`}
-                    className="tb-comment-entry relative py-4 pl-6"
-                  >
-                    <div className="mb-2 flex items-center justify-between gap-3 text-xs text-muted-foreground">
-                      <span className="flex min-w-0 items-center gap-2 font-medium text-foreground">
-                        <AssigneeMark assignee={comment.author} />
-                        <span className="truncate">{comment.author}</span>
-                      </span>
-                      <time>{formatUpdatedAt(comment.createdAt)}</time>
-                    </div>
-                    <Markdown content={comment.body} />
-                  </article>
-                ))}
-              </div> : <p className="mt-3 text-sm text-muted-foreground">No comments yet.</p>}
+                <h2 className="mb-1 text-sm font-semibold">
+                  Comments{' '}
+                  <span className="text-muted-foreground">
+                    {item.comments.length}
+                  </span>
+                </h2>
+                <CommentConversation item={item} />
+                <CommentComposer
+                  disabled={!inspector?.supportsComments}
+                  submitting={submittingComment}
+                  onSubmit={addComment}
+                />
               </section>
             </section>
           </div>

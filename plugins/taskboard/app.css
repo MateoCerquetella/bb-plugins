@@ -831,6 +831,26 @@
 }
 .tb-detail-value { min-width: 0; margin-top: 3px; overflow-wrap: anywhere; }
 .tb-detail-source .tb-source-mark-name { color: inherit; font-weight: 650; }
+.tb-inspector-row {
+  display: grid; grid-template-columns: minmax(7rem, .8fr) minmax(0, 1.2fr);
+  align-items: center; column-gap: 12px; min-height: 40px; border-bottom: 1px solid var(--border-hairline);
+}
+.tb-inspector-row:last-of-type { border-bottom: 0; }
+.tb-inspector-label { padding-left: 8px; color: var(--muted-foreground); font-size: 12px; }
+.tb-inspector-control, .tb-inspector-static {
+  min-width: 0; justify-self: stretch; text-align: right; font-size: 12px; font-weight: 550;
+}
+.tb-inspector-static {
+  display: flex; align-items: center; justify-content: flex-end; gap: 7px; padding: 7px 8px;
+  overflow-wrap: anywhere;
+}
+.tb-inspector-control:hover:not(:disabled) {
+  background: color-mix(in oklch, var(--foreground) 4%, transparent);
+}
+.tb-inspector-control:disabled { cursor: not-allowed; opacity: .58; }
+.tb-comment-composer textarea {
+  min-height: 76px; resize: vertical; background: color-mix(in oklch, var(--background) 96%, var(--foreground) 4%);
+}
 .tb-detail-status, .tb-detail-priority, .tb-detail-assignee {
   display: inline-flex; min-width: 0; align-items: center; gap: 7px;
 }

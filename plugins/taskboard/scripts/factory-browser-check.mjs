@@ -248,6 +248,27 @@ try {
       assert.equal(await page.locator('#preview-detail .tb-detail-source[data-source="linear"]').count(), 1);
       assert.equal(await page.locator('#preview-detail .tb-detail-status[data-state-category="in_progress"]').count(), 1);
       if (width === 390) {
+        const detail = page.locator('#preview-detail');
+        await detail.getByRole('combobox', { name: 'Priority: Urgent' }).click();
+        await page.getByRole('option', { name: 'High', exact: true }).click();
+        await detail.getByRole('combobox', { name: /Assignee:/ }).click();
+        await page.getByRole('option', { name: 'mateo rodriguez', exact: true }).click();
+        await detail.getByRole('combobox', { name: /External project:/ }).click();
+        await page.getByRole('option', { name: 'Roten Market', exact: true }).click();
+        await detail.getByRole('textbox', { name: 'Comment' }).fill('This comment was posted from the Taskboard inspector.');
+        await detail.getByRole('button', { name: 'Comment', exact: true }).click();
+        await detail.getByText('This comment was posted from the Taskboard inspector.').waitFor();
+        assert.deepEqual(await page.evaluate(() => ({
+          priority: window.factoryItem.priority,
+          assignee: window.factoryItem.assignee,
+          project: window.factoryItem.project,
+          comments: window.factoryItem.comments.length
+        })), {
+          priority: 'High',
+          assignee: 'mateo rodriguez',
+          project: 'Roten Market',
+          comments: 3
+        });
         await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, 'taskboard-ticket-comments-mobile.png'), fullPage: true });
       }
       await page.locator('#preview-detail .tb-detail-switch').getByRole('tab', { name: 'Factory' }).click();

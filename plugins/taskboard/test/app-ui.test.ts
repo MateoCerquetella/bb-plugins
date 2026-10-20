@@ -319,8 +319,20 @@ test('routes detail handoff through native factory with external-content trust b
 test('renders comments as one conversation rail', () => {
   assert.match(app, /tb-comment-rail/u);
   assert.match(app, /tb-comment-entry/u);
+  assert.match(app, /function CommentComposer/u);
+  assert.match(app, /rpc\.call\('addItemComment'/u);
   assert.doesNotMatch(app, /tb-comment-card rounded-lg border/u);
   assert.match(app, /activeItemRoute \? 'overflow-y-auto' : 'overflow-hidden'/u);
+});
+
+test('renders provider-backed Linear-style ticket inspector controls', () => {
+  assert.match(app, /function TicketInspector/u);
+  assert.match(app, /rpc\.call\('getItemInspector'/u);
+  assert.match(app, /rpc\.call\('updateItemField'/u);
+  for (const label of ['Priority', 'Assignee', 'External project']) {
+    assert.match(app, new RegExp(`label="${label}"`, 'u'));
+  }
+  assert.match(app, /Provider fields are unavailable for this ticket/u);
 });
 
 test('reconciles provider identity from the cached-list response', () => {

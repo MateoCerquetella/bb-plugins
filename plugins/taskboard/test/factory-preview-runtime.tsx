@@ -31,7 +31,8 @@ let factoryPolicy = { projectId: 'proj_test', provider: 'github', enabled: false
   maxConcurrent: 1, intake: 'todo', updatedAt: new Date().toISOString() };
 const rpc = {
   async call(method: string, input: { projectId?: string; body?: string; digest?: string; kind?: string; path?: string;
-    enabled?: boolean; maxConcurrent?: number; threadId?: string }) {
+    enabled?: boolean; maxConcurrent?: number; threadId?: string; statusId?: string;
+    mutation?: { field: 'assignee' | 'priority' | 'project'; valueId: string | null } }) {
     const record = window.factoryFixture;
     if (method === 'factoryGetProject' || method === 'factorySaveProject') {
       if (method === 'factorySaveProject') factoryPolicy = { ...factoryPolicy,
@@ -76,6 +77,39 @@ const rpc = {
       message: null, truncated: false
     };
     if (method === 'getItem') return { item: structuredClone(window.factoryItem) };
+    if (method === 'getItemInspector') return { inspector: {
+      assigneeOptions: [
+        { id: 'mateo', label: 'mateo rodriguez', current: window.factoryItem.assignee === 'mateo rodriguez' },
+        { id: 'juan', label: 'Juan Sebastian Salazar Agudelo', current: window.factoryItem.assignee === 'Juan Sebastian Salazar Agudelo' }
+      ],
+      priorityOptions: [
+        { id: 'urgent', label: 'Urgent', current: window.factoryItem.priority === 'Urgent' },
+        { id: 'high', label: 'High', current: window.factoryItem.priority === 'High' },
+        { id: 'medium', label: 'Medium', current: window.factoryItem.priority === 'Medium' },
+        { id: 'low', label: 'Low', current: window.factoryItem.priority === 'Low' }
+      ],
+      projectOptions: [
+        { id: 'empirical', label: 'Empirical SDD', current: window.factoryItem.project === 'Empirical SDD' },
+        { id: 'roten', label: 'Roten Market', current: window.factoryItem.project === 'Roten Market' }
+      ],
+      supportsComments: true, supportsAssignee: true, supportsPriority: true, supportsProject: true
+    } };
+    if (method === 'updateItemField' && input.mutation) {
+      const { field, valueId } = input.mutation;
+      const labels: Record<string, Record<string, string>> = {
+        assignee: { mateo: 'mateo rodriguez', juan: 'Juan Sebastian Salazar Agudelo' },
+        priority: { urgent: 'Urgent', high: 'High', medium: 'Medium', low: 'Low' },
+        project: { empirical: 'Empirical SDD', roten: 'Roten Market' }
+      };
+      window.factoryItem[field] = valueId === null ? null : labels[field]?.[valueId] ?? null;
+      return { item: structuredClone(window.factoryItem) };
+    }
+    if (method === 'addItemComment') {
+      const comments = window.factoryItem.comments as Array<Record<string, unknown>>;
+      comments.push({ author: 'mateo rodriguez', body: input.body,
+        createdAt: new Date().toISOString() });
+      return { item: structuredClone(window.factoryItem) };
+    }
     if (method === 'factoryEmpirical') {
       const run = record.runs.at(-1);
       if (!run?.threadId || !run.environmentId) return { kind: 'unbound', reason: 'Start task to link an agent workspace.' };
