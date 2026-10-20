@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 5,
+  "revision": 2,
+  "activeFeature": "merge-the-dockside-filter-branch-filter-by-bbplugins-thr-q7uptvnbap",
+  "request": "Merge the dockside filter branch filter-by-bbplugins-thr_q7uptvnbap into main and release Dockside v0.1.8: bump version (0.1.7 is already taken by an unrelated tag), update changelog/README if needed, run dockside checks, tag dockside/v0.1.8, push branch/tag, and verify the marketplace install resolves 0.1.8.",
+  "profile": "complex",
+  "workflow": "complex",
+  "mode": "normal",
+  "phase": "specify",
+  "status": "waiting",
+  "repairAttempts": 0,
+  "message": "Approved isolated work started",
+  "implementationActor": null,
+  "workStartedAt": "2026-10-20T20:02:28.896Z",
+  "specDigest": "sha256:b9c898abdfdf01a0aa974e2e8d9a2ba4434f1c50fc8479fcdea4357dfaf5923d",
+  "approvedSpecRevision": null,
+  "capabilityArchiveRequired": true,
+  "capabilityDeltaDigest": null,
+  "impactDigest": null,
+  "capabilityClaimId": null,
+  "authorizationDigest": null,
+  "evidence": [],
+  "evidenceReceiptIds": [],
+  "legacyEvidenceCount": 0,
+  "completion": {
+    "implemented": false,
+    "verified": false,
+    "integrated": false,
+    "delivered": false,
+    "published": false,
+    "highest": "none",
+    "reasons": {
+      "implemented": "implemented has not been proven by a durable receipt.",
+      "verified": "verified has not been proven by a durable receipt.",
+      "integrated": "integrated has not been proven by a durable receipt.",
+      "delivered": "delivered has not been proven by a durable receipt.",
+      "published": "published has not been proven by a durable receipt."
+    }
+  },
+  "updatedAt": "2026-10-20T20:02:28.896Z",
+  "reviewFirst": true
+}
