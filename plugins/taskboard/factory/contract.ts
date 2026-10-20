@@ -91,6 +91,23 @@ export const factoryRunSchema = z.object({
   finishedAt: z.string().nullable()
 }).strict();
 export type FactoryRun = z.infer<typeof factoryRunSchema>;
+const coordinatorIntent = {
+  intentId: z.string().min(1),
+  startedAt: z.string().datetime(),
+  legacyRunCount: z.number().int().nonnegative().default(0)
+};
+export const factoryCoordinatorSchema = z.discriminatedUnion('status', [
+  z.object({ status: z.literal('pending') }).strict(),
+  z.object({ status: z.literal('starting'), ...coordinatorIntent }).strict(),
+  z.object({ status: z.literal('uncertain'), ...coordinatorIntent, error: z.string() }).strict(),
+  z.object({ status: z.literal('failed'), ...coordinatorIntent, error: z.string() }).strict(),
+  z.object({
+    status: z.literal('ready'), ...coordinatorIntent, threadId: z.string().min(1),
+    nativeStatus: z.enum(['active', 'error', 'idle', 'starting', 'stopping']).default('starting'),
+    error: z.string().nullable().default(null)
+  }).strict()
+]);
+export type FactoryCoordinator = z.infer<typeof factoryCoordinatorSchema>;
 export const factoryRecordSchema = factoryIdentitySchema.extend({
   schemaVersion: z.literal(1),
   version: z.number().int().nonnegative(),
@@ -102,6 +119,7 @@ export const factoryRecordSchema = factoryIdentitySchema.extend({
   // Older dispatched items also adopt the automatic investigate -> plan -> build flow.
   automatic: z.boolean().default(true),
   automationError: z.string().nullable().default(null),
+  coordinator: factoryCoordinatorSchema.nullable().default(null),
   trackerProgress: z.object({
     status: z.enum(['pending', 'synced', 'unavailable', 'failed']),
     message: z.string().nullable()
@@ -151,6 +169,20 @@ export const factoryRpcMethods = {
   },
   factoryRecover: {
     input: factoryVersionInputSchema.extend({ threadId: z.string().min(1).max(500) }).strict(),
+    output: z.object({ record: factoryRecordSchema }).strict()
+  },
+  factoryAdoptCoordinator: {
+    input: factoryVersionInputSchema,
+    output: z.object({ record: factoryRecordSchema }).strict()
+  },
+  factoryRetryCoordinator: {
+    input: factoryVersionInputSchema.extend({ intentId: z.string().min(1).max(500) }).strict(),
+    output: z.object({ record: factoryRecordSchema }).strict()
+  },
+  factoryRecoverCoordinator: {
+    input: factoryVersionInputSchema.extend({
+      intentId: z.string().min(1).max(500), threadId: z.string().min(1).max(500)
+    }).strict(),
     output: z.object({ record: factoryRecordSchema }).strict()
   },
   factoryGet: {

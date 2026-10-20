@@ -38,10 +38,10 @@ export function FactoryProjectSettings({ projectId, provider }: { projectId: str
     } catch (error) { setError(String(error)); }
     finally { setSaving(false); }
   }
-  return <section className="space-y-4 border-t border-border py-5" aria-label="Autonomous factory">
+  return <section className="min-w-0 space-y-4 border-t border-border py-5 [overflow-wrap:anywhere]" aria-label="Autonomous factory">
     <div className="flex flex-wrap items-center justify-between gap-2">
       <h3 className="text-sm font-semibold">Autonomous factory</h3>
-      <span className="text-xs text-muted-foreground">{status?.kind ?? 'Loading'} · {provider}</span>
+      <span className="min-w-0 break-words text-xs text-muted-foreground">{status?.kind ?? 'Loading'} · {provider}</span>
     </div>
     <form className="flex flex-wrap items-end gap-4" onSubmit={event => { event.preventDefault(); void save(); }}>
       <label className="flex items-center gap-2 text-sm">
@@ -59,7 +59,9 @@ export function FactoryProjectSettings({ projectId, provider }: { projectId: str
       </Button>
     </form>
     {status && 'active' in status ? <p className="text-xs text-muted-foreground">{status.active} active automatic workflows</p> : null}
-    {status?.kind === 'blocked' ? <p role="alert" className="text-sm text-destructive">{status.reason}</p> : null}
+    {status?.kind === 'running' ? <p role="status" className="text-xs text-muted-foreground">{status.available} automatic slots available · Intake: provider todo tickets</p> : null}
+    {status?.kind === 'paused' ? <p role="status" className="break-words text-sm">Factory paused. No new automatic stages will start.</p> : null}
+    {status?.kind === 'blocked' ? <p role="alert" className="break-words text-sm text-destructive">{status.reason}</p> : null}
     {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}
   </section>;
 }

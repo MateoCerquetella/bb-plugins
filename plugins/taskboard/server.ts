@@ -1978,6 +1978,21 @@ export default async function plugin(bb: BbPluginApi) {
       const item = await getLiveItem(input.projectId, input.source, input.locator);
       return { record: await factory.linkRecovered(item, input.expectedVersion, input.threadId) };
     },
+    async factoryAdoptCoordinator(input) {
+      await assertProjectExists(input.projectId);
+      const item = await getLiveItem(input.projectId, input.source, input.locator);
+      return { record: await factory.adoptCoordinator(item, input.expectedVersion) };
+    },
+    async factoryRetryCoordinator(input) {
+      await assertProjectExists(input.projectId);
+      const item = await getLiveItem(input.projectId, input.source, input.locator);
+      return { record: await factory.retryCoordinator(item, input.expectedVersion, input.intentId) };
+    },
+    async factoryRecoverCoordinator(input) {
+      await assertProjectExists(input.projectId);
+      const item = await getLiveItem(input.projectId, input.source, input.locator);
+      return { record: await factory.recoverCoordinator(item, input.expectedVersion, input.intentId, input.threadId) };
+    },
     async factoryGet(input) {
       await assertProjectExists(input.projectId);
       const item = store.get(input.projectId, input.source, input.locator);

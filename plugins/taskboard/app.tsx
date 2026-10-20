@@ -1,6 +1,6 @@
 import { registerPreparationApp } from './preparation/app.js';
 import { clipboardTicketImages, readTicketImages, type TicketImage } from './ticket-images.js';
-import { originalTicketPath, requestTaskboardOpen } from './factory/navigation.js';
+import { originalTicketPath, requestTaskboardOpen, ticketThreadId } from './factory/navigation.js';
 import {
   useCallback,
   useEffect,
@@ -1056,7 +1056,8 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
           });
           const run = record.runs.at(-1);
           if (record.automationError || run?.error) toast.warning(record.automationError ?? run!.error!);
-          if (run?.threadId) { requestTaskboardOpen(run.threadId); navigate.toThread(run.threadId); return; }
+          const threadId = ticketThreadId(record);
+          if (threadId) { requestTaskboardOpen(threadId); navigate.toThread(threadId); return; }
         }
         navigate.toPluginPanel(PANEL_PATH, { subPath: originalTicketPath(identity) });
       } catch (error) {

@@ -2,26 +2,15 @@ import type { BbPluginApi } from '@get-bb/plugin-sdk';
 import { posix, win32 } from 'node:path';
 import { formatWorkItemContext, type WorkItem } from '../contract.js';
 import type { FactoryIdentity, FactoryProjectPolicy, FactoryRecord, FactoryRun, FactoryRunKind } from './contract.js';
-import { approvePlan, assertVersion, factoryKey, newRecord, savePlan, scopeDigest, startRun } from './state.js';
+import { approvePlan, assertVersion, factoryKey, legacyRun, newRecord, savePlan, scopeDigest, startRun } from './state.js';
 import type { createFactoryStore } from './store.js';
 import { MAX_REVIEW_REPAIRS, readBuildResult, readReviewResult } from './review.js';
+import { CoordinatorIntentConflict, createCoordinatorLifecycle } from './coordinator.js';
+import { dispatchRejection, nativeError as message } from './native-dispatch.js';
 
 type Store = ReturnType<typeof createFactoryStore>;
 type Sdk = BbPluginApi['sdk'];
 type Event = Awaited<ReturnType<Sdk['threads']['events']['list']>>[number];
-const message = (error: unknown) => (error instanceof Error ? error.message : String(error)).slice(0, 1000);
-function dispatchRejection(value: string) {
-  if (/HTTP 404: Project has no local-path source for (?:host|the primary host)(?:\.|$)/i.test(value)) {
-    return 'BB could not find a project checkout on the selected host. Configure the project source with the Git repository folder on that host, then retry.';
-  }
-  if (/HTTP 400: hostId is required unless workspace\.type is personal/i.test(value)) {
-    return 'BB rejected the environment before starting a session. Retry using the project default environment.';
-  }
-  if (/HTTP 409: This project checkout has no usable git branch\./i.test(value)) {
-    return 'BB could not create a worktree because the project checkout has no usable Git branch. Repair the project checkout, then retry.';
-  }
-  return null;
-}
 class SessionBusyError extends Error {}
 const unavailableSession = 'Native session is unavailable or failed. Open its thread for details.';
 const MAX_AUTOMATIC_BUILD_CONTINUATIONS = 2;
@@ -167,6 +156,12 @@ export function createFactoryService(
     changed(record.projectId);
     return saved;
   }
+  const coordinators = createCoordinatorLifecycle(sdk, store, persist);
+  function existing(item: WorkItem) {
+    const record = store.get({ projectId: item.bbProjectId, source: item.source, locator: item.locator });
+    if (!record) throw new Error('No existing ticket workflow is available for coordinator recovery.');
+    return record;
+  }
   function current(item: WorkItem) {
     const identity = { projectId: item.bbProjectId, source: item.source, locator: item.locator };
     const record = store.get(identity) ?? newRecord(item);
@@ -181,6 +176,7 @@ export function createFactoryService(
     return record;
   }
   async function reconcile(record: FactoryRecord, signal?: AbortSignal) {
+    record = await coordinators.observe(record, signal);
     let dirty = false;
     // Only known preflight rejections are safe to expose as retryable.
     for (const run of record.runs) {
@@ -218,6 +214,10 @@ export function createFactoryService(
         }
         const thread = await sdk.threads.get({ threadId: run.threadId, signal });
         if (thread.projectId !== record.projectId) throw new Error('Linked thread belongs to another project.');
+        if (record.coordinator?.status === 'ready' && !legacyRun(record, run) &&
+          thread.parentThreadId !== record.coordinator.threadId) {
+          throw new Error('Linked native session has a different coordinator. Restore its original parent before continuing.');
+        }
         if (run.environmentId && run.environmentId !== thread.environmentId) {
           throw new Error('Linked native session changed workspace. Restore the implementation environment before continuing.');
         }
@@ -434,6 +434,10 @@ export function createFactoryService(
     const context = contextId ? await sdk.threads.get({ threadId: contextId }) : null;
     if (context && context.projectId !== item.bbProjectId) throw new Error('Select a thread in this ticket project.');
     if (context?.deletedAt) throw new Error('The original authoring session was deleted. Restore it before continuing.');
+    if (author && record.coordinator?.status === 'ready' && !legacyRun(record, author) &&
+      context?.parentThreadId !== record.coordinator.threadId) {
+      throw new Error('The original stage session has a different coordinator. Restore its parent before continuing.');
+    }
     const restoreArchived = context?.archivedAt && input.restoreArchived && (input.repairOf || input.continuationOf);
     if (context?.archivedAt && !restoreArchived) {
       throw new Error('The original authoring session is archived. Use Return to Build with findings or Start task to resume it.');
@@ -498,7 +502,36 @@ export function createFactoryService(
         throw new Error('Project provider changed before dispatch.');
       }
     }
-    record = persist(draftRecord);
+    try {
+      record = await coordinators.ensure(item, record);
+    } catch (error) {
+      if (error instanceof CoordinatorIntentConflict) return store.get(record)!;
+      throw error;
+    }
+    if (record.coordinator && record.coordinator.status !== 'ready') return record;
+    if (record.coordinator?.error) throw new Error(record.coordinator.error);
+    if (input.automaticDispatch && record.admission.kind === 'factory') {
+      const policy = store.getProjectPolicy(record.projectId, record.source);
+      if (!policy.enabled) return record;
+      if (!queue || policy.provider !== record.source || queue.provider(record.projectId) !== record.source) {
+        throw new Error('Project provider changed before dispatch.');
+      }
+      const live = await queue.liveItem(record);
+      if (live.bbProjectId !== record.projectId || live.source !== record.source || live.locator !== record.locator ||
+        ['done', 'canceled'].includes(live.stateCategory) || scopeDigest(live) !== record.scopeDigest ||
+        !record.runs.length && live.stateCategory !== 'todo') {
+        throw new Error('Issue scope or status changed before stage dispatch.');
+      }
+    }
+    draftRecord.version = record.version;
+    draftRecord.coordinator = record.coordinator;
+    try {
+      record = persist(draftRecord);
+    } catch (error) {
+      const winner = store.get(record);
+      if (winner && winner.version !== record.version) return winner;
+      throw error;
+    }
     const run = record.runs.find(run => run.id === id)!;
     try {
       const prompt = factoryPrompt(item, record, input.kind);
@@ -511,6 +544,7 @@ export function createFactoryService(
           ...defaults,
           ...(context ? { providerId: context.providerId } : {}),
           projectId: item.bbProjectId,
+          ...(record.coordinator?.status === 'ready' ? { parentThreadId: record.coordinator.threadId } : {}),
           environment: (input.kind === 'review' || input.kind === 'plan' || (input.kind === 'build' && build)) && environment
             ? { type: 'reuse', environmentId: environment.id }
             : isolateBuild && environment
@@ -563,11 +597,12 @@ export function createFactoryService(
             throw new Error('Project provider changed. Save factory settings before continuing.');
           }
           const candidates = await queue.candidates(policy);
-          for (const candidate of candidates.slice(0, 500)) {
-            if (candidate.bbProjectId !== policy.projectId || candidate.source !== policy.provider ||
-              candidate.stateCategory !== 'todo') continue;
+          const unclaimed = candidates.filter(candidate => candidate.bbProjectId === policy.projectId &&
+            candidate.source === policy.provider && candidate.stateCategory === 'todo' && !store.get({
+              projectId: candidate.bbProjectId, source: candidate.source, locator: candidate.locator
+            }));
+          for (const candidate of unclaimed.slice(0, 500)) {
             const identity = { projectId: candidate.bbProjectId, source: candidate.source, locator: candidate.locator };
-            if (store.get(identity)) continue;
             const item = await queue.liveItem(identity);
             if (item.bbProjectId !== policy.projectId || item.source !== policy.provider ||
               item.locator !== candidate.locator || item.stateCategory !== 'todo') continue;
@@ -658,7 +693,13 @@ export function createFactoryService(
         if (['done', 'canceled'].includes(item.stateCategory)) throw new Error('Reopen the issue before starting a task.');
         record.automatic = true;
         record.automationError = null;
-        record = persist(record);
+        try {
+          record = persist(record);
+        } catch (error) {
+          const winner = store.get(record);
+          if (winner && winner.version !== record.version) return winner;
+          throw error;
+        }
         if (run?.scopeDigest && run.scopeDigest !== record.scopeDigest) {
           return dispatch(item, record, { kind: 'investigate', contextThreadId, retry: false });
         }
@@ -679,6 +720,36 @@ export function createFactoryService(
       });
     },
     forThread: (threadId: string) => store.forThread(threadId),
+    async adoptCoordinator(item: WorkItem, expectedVersion: number) {
+      return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () => {
+        let record = existing(item);
+        if (record.coordinator?.status === 'ready') return coordinators.observe(record);
+        assertVersion(record, expectedVersion);
+        if (record.coordinator) return record;
+        record.coordinator = { status: 'pending' };
+        record = persist(record);
+        return coordinators.ensure(item, record);
+      });
+    },
+    async retryCoordinator(item: WorkItem, expectedVersion: number, intentId: string) {
+      return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () => {
+        let record = existing(item);
+        assertVersion(record, expectedVersion);
+        if (record.coordinator?.status !== 'failed' || record.coordinator.intentId !== intentId) {
+          throw new Error('Only the current confirmed coordinator rejection can be retried.');
+        }
+        record.coordinator = { status: 'pending' };
+        record = persist(record);
+        return coordinators.ensure(item, record);
+      });
+    },
+    async recoverCoordinator(item: WorkItem, expectedVersion: number, intentId: string, threadId: string) {
+      return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () => {
+        const record = existing(item);
+        assertVersion(record, expectedVersion);
+        return coordinators.recover(item, record, intentId, threadId);
+      });
+    },
     async linkRecovered(item: WorkItem, expectedVersion: number, threadId: string) {
       return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () => {
         const record = current(item);
@@ -689,6 +760,10 @@ export function createFactoryService(
         const thread = await sdk.threads.get({ threadId });
         if (thread.projectId !== record.projectId || thread.deletedAt || thread.archivedAt) {
           throw new Error('Choose an available native thread in this ticket project.');
+        }
+        if (record.coordinator?.status === 'ready' && !legacyRun(record, run) &&
+          thread.parentThreadId !== record.coordinator.threadId) {
+          throw new Error('Recovered session must be a child of this ticket coordinator.');
         }
         if (!run.threadId && (thread.title !== `${item.key}: ${run.kind}` ||
           thread.createdAt < Date.parse(run.startedAt) - 5000)) {
@@ -751,6 +826,11 @@ export function createFactoryService(
         await locked(record, async () => {
           const latest = store.get(record)!;
           let dirty = false;
+          if (latest.coordinator?.status === 'starting') {
+            latest.coordinator = { ...latest.coordinator, status: 'uncertain',
+              error: 'BB restarted during coordinator dispatch. Inspect native threads and link the matching coordinator; no duplicate was started.' };
+            dirty = true;
+          }
           for (const run of latest.runs) if (run.status === 'starting') {
             run.status = 'uncertain';
             run.error = 'BB restarted during dispatch. Inspect native threads before proceeding; no duplicate was started.';

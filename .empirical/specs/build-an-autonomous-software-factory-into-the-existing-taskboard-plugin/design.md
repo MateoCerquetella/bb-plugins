@@ -7,6 +7,9 @@ automatic concurrency. Taskboard then selects live `todo` tickets from that
 project's configured provider, claims each ticket once, and starts the existing
 factory lifecycle without a person pressing **Start task**. The project Manage
 screen and CLI show whether intake is disabled, running, paused, or blocked.
+Each newly admitted ticket has one native coordinator thread. Investigation,
+planning, Build, and Review are sibling child sessions beneath that coordinator.
+The existing factory service owns all stage dispatch and progress decisions.
 
 ## Existing architecture
 
@@ -21,8 +24,127 @@ Taskboard already has the required execution path:
 - `store.ts` persists the provider-backed board cache and project connection.
 - `factory/app.tsx` and the project Manage view render the existing controls.
 
-The missing behavior is admission. The current background factory service only
-polls records that a user created through **Start task**.
+The current source already contains provider admission, project policies, atomic
+capacity reservation, and live provider reads. The coordinator extension adds a
+native parent without replacing those operations. Two admission corrections
+remain in scope: exclude durable claims before the bounded scan window, and
+include workflow blockers in project status after a successful scan.
+
+## Coordinator design synthesis
+
+Candidate A stores coordinator state separately from stage runs, but adds an
+agent stage-request command and durable wake delivery. Candidate B preserves
+service-driven progression, but inserts the coordinator into `runs` and changes
+stage selectors. Use A's separate state and B's service-driven progression.
+Drop agent stage requests, wake delivery, and automatic legacy reparenting.
+
+This matches the contract's non-goals. The coordinator is a real native thread,
+the stable ticket conversation, and the user entry point. It does not investigate,
+plan, implement, review, or own another workflow state machine.
+
+### Data shape and ownership
+
+Keep `FactoryRunKind` and `record.runs` stage-only. Add coordinator state to the
+existing versioned factory document:
+
+```ts
+type FactoryCoordinator =
+	| { status: 'pending' }
+	| { status: 'starting'; intentId: string; startedAt: string }
+	| { status: 'uncertain'; intentId: string; startedAt: string; error: string }
+	| { status: 'failed'; intentId: string; startedAt: string; error: string }
+	| { status: 'ready'; intentId: string; startedAt: string; threadId: string };
+
+type CoordinatorField = FactoryCoordinator | null;
+```
+
+Implement Zod schemas and derive their TypeScript types. Missing historical
+fields parse as `null`. New manual records and automatic claims explicitly
+initialize `pending`. This additive field does not require a new SQLite table
+or changes to the stage enum. Keep document versioning consistent with the
+actual compatibility parser.
+
+Save coordinator intent, identity, and uncertainty in the existing optimistic
+versioned record. Extend the existing reverse thread index to include the ready
+coordinator in the same save transaction. Reject ownership conflicts.
+`factoryForThread` resolves the same ticket from its root or workers.
+
+The coordinator consumes no additional capacity slot. Its ticket claim already
+reserves capacity. Stage selectors, scope and plan digests, review acceptance,
+and capacity release retain their existing meanings.
+
+### Native creation and child dispatch
+
+One private `ensureCoordinator` operation runs inside the existing ticket lock.
+Persist `starting` with a unique intent ID before `threads.spawn`. Use project
+native execution defaults and the project-default environment. Include the
+ticket key and intent marker in the native title for recovery.
+
+The pinned SDK exposes `spawn`, not a verified empty-thread creation operation.
+Use a nonempty initialization prompt that identifies the ticket and requests
+a short acknowledgement without repository edits, stage dispatch, or provider
+transitions. Persist the returned thread ID before starting a child. A native
+thread remains usable as a parent when its initialization turn finishes, fails,
+or is canceled. Those outcomes are not stage results and never advance work.
+
+Add `parentThreadId: coordinator.threadId` to each new stage spawn. Parentage
+does not replace the existing authoring context or execution defaults. Build
+still creates a managed worktree. Review remains an independent session in that
+worktree. Bounded repairs and continuations still send to the original Build
+child, with no new checkout or nested repair agent.
+
+Validate the native parent before subsequent dispatch. A deleted, archived,
+missing, or wrong-project coordinator blocks new work with a visible reason.
+Observe existing workers even while the parent is unavailable. Detect an
+unexpected parent on a grouped worker before reusing it; do not steal or recreate
+the worker. Coordinator creation alone does not call `markInProgress`.
+
+### Crash recovery and duplicate protection
+
+A known preflight rejection may become `failed` and expose an explicit retry.
+A transport ambiguity or restart with persisted `starting` becomes `uncertain`.
+No child or replacement root starts while that state remains unresolved. A save
+failure after native spawn leaves the durable starting intent as the recovery
+boundary; it does not authorize another spawn.
+
+Coordinator recovery is separate from stage recovery. Bind it to ticket identity,
+expected record version, and the coordinator intent. Validate the proposed native
+thread's project, unique title marker, creation window, availability, and reverse
+index ownership before linking it. An invalid or ambiguous match remains blocked.
+Never select an arbitrary recent thread or replace a known root automatically.
+
+The process-local lock serializes one service's callers. The versioned save is
+also an external-effect guard: only the caller that successfully persists the
+starting intent may spawn. A second service sharing SQLite reloads after losing
+the compare-and-swap and never proceeds with a stale draft. Prove winner-only
+dispatch with two stores and service owners before claiming shared-database
+duplicate protection.
+
+### Legacy compatibility
+
+Reading or polling a historical `coordinator: null` record does not create a
+root or change native parents. Preserve stage evidence and recovery under a
+visible Legacy sessions label. Explicit adoption is idempotent and uses the same
+durable coordinator intent and recovery path.
+
+Historical sessions retain their parents and workspaces. After explicit adoption,
+new spawns use the coordinator parent. Repairs that reuse a historical Build
+session remain visibly legacy. Do not claim those unchanged sessions are native
+children. Adoption changes no scope digest, stage result, approval, or acceptance.
+Completed legacy tickets remain untouched unless the operator chooses adoption.
+
+### Ticket team interface
+
+Show one coordinator entry followed by grouped stages, each with its role, native
+state, and direct thread action. Waiting roles have no fabricated thread link.
+The main Start task action opens the ready coordinator; stage actions retain
+their specific destinations. Legacy records keep a fallback stage link.
+
+Show coordinator uncertainty and all workflow blockers above the group and in
+its collapsed summary. Factory stage remains authoritative after the root turn
+finishes. Key disclosure state by ticket identity to retain expansion on refresh.
+Use existing controls, focus styles, and wrapping rules. The UI/UX consult is
+design evidence, not browser verification.
 
 ## Data model
 
@@ -108,10 +230,11 @@ tick before its record poll:
 2. Verify that the saved provider matches the current project connection.
 3. Refresh or read a complete provider page set through the canonical Taskboard
    source path.
-4. Select `todo` tickets in stable provider order.
+4. Select `todo` tickets in stable provider order, exclude durable claims, then
+   apply the bounded scan window so claimed tickets cannot starve later work.
 5. For each available slot, read the ticket live and recompute its scope digest.
 6. Admit only tickets still in `todo` for the saved provider.
-7. Start the existing investigation flow for each newly admitted record.
+7. Establish the durable coordinator and start investigation as its child.
 8. Poll all records through the current recovery and progression logic.
 
 One project's provider failure records a blocked status for that project and
@@ -137,7 +260,7 @@ actions keep their current behavior.
 ## Provider progress
 
 The existing `markInProgress` boundary remains the only provider mutation.
-Taskboard calls it after native work starts. Failure is visible through
+Taskboard calls it after native stage work starts. Failure is visible through
 `trackerProgress` and does not erase the local claim. This feature adds no
 merge, deployment, issue closure, or human acceptance action.
 
@@ -148,21 +271,28 @@ Add RPC and CLI operations for:
 - Reading a project's policy and computed status.
 - Saving a validated project policy.
 - Running one bounded scan for diagnostics and tests.
+- Recovering an uncertain coordinator or explicitly adopting a legacy ticket.
 
 The Manage screen uses the existing form, switch, numeric input, status badge,
 and error patterns. It shows the configured provider, enable switch, automatic
 concurrency, status, active count, and the last blocked reason. Saving an enable
 choice is explicit.
+A healthy provider scan does not clear ticket-level coordinator, automation,
+or uncertain-stage blockers from project status.
 
 ## File ownership
 
-- `factory/contract.ts` owns policy, admission, status, and RPC schemas.
+- `factory/contract.ts` owns policy, admission, status, coordinator, and RPC schemas.
 - `factory/store.ts` owns policy persistence, scan observations, and atomic
-  admission.
-- `factory/service.ts` owns eligibility, revalidation, and queue admission.
+  admission, plus coordinator reverse indexing in its existing save transaction.
+- `factory/service.ts` owns eligibility, revalidation, admission, native parent
+  validation, coordinator creation, and recovery. A focused coordinator module
+  may hold that lifecycle if it keeps the service cohesive, without adding a
+  second scheduler or generic dispatch framework.
 - `server.ts` provides canonical provider reads and schedules the tick.
 - The existing CLI entry point exposes settings and status.
-- `app.tsx` adds the project Manage section.
+- `app.tsx` owns the project Manage section. `factory/app.tsx` owns the ticket
+  team, coordinator navigation, legacy presentation, and recovery controls.
 - `factory.test.ts` covers store and controller behavior with real SQLite.
 - Existing UI and browser fixtures cover Manage behavior and responsive layout.
 
@@ -170,6 +300,8 @@ choice is explicit.
 
 - **Blocking first steps.** Land schemas and the atomic real-SQLite admission
   test before provider scanning or UI.
+  For the coordinator increment, prove schema compatibility and winner-only
+  intent persistence before wiring native creation.
 - **Independent workstreams.** Contract and store must land first. Service,
   server, CLI, UI, and docs can then use the same contract, but shared files
   serialize.
@@ -192,11 +324,28 @@ Focused tests must execute observable behavior:
 - One provider failure does not block another project.
 - A lost native dispatch remains uncertain after later ticks.
 - Manual **Start task** still creates and advances a manual record.
+- Concurrent starts and automatic ticks create one coordinator and investigation
+  child. Every newly spawned stage has the same actual native parent ID.
+- Restart at each coordinator intent, spawn, and save boundary either preserves
+  the parent or blocks uncertainty. Lost responses do not create replacements.
+- Root turn completion neither advances the ticket nor releases capacity.
+- Recovery rejects wrong-project, wrong-marker, unavailable, or owned threads.
+- Build and Review retain their managed-worktree identities. Repair reuses the
+  original Build child and retains the existing repair limit.
+- Legacy reads cause no native mutation. Explicit adoption is repeatable and
+  preserves historical parents, evidence, and reused Build sessions.
+- Coordinator and worker reverse lookups resolve one ticket. Start opens the
+  root; worker actions open their specific native sessions.
+- Durable claims before the scan window do not starve eligible later tickets.
+- A healthy scan does not hide a queue-owned workflow blocker in project status.
 
 Run the Taskboard package check after focused tests. Install and reload the local
 plugin. Use the existing browser fixture to save, pause, and inspect settings at
-desktop and mobile widths. Run the opt-in native smoke only where BB context is
-available.
+desktop and mobile widths. Verify ticket role labels, real action destinations,
+long-content wrapping, keyboard focus, retained expansion, and recovery states.
+Run the opt-in native smoke only where BB context is available. Inspect real
+parent IDs and worktree IDs without enabling a live provider queue. Record host
+limitations instead of inferring native behavior from mocks.
 
 ## Known limits
 
@@ -205,3 +354,8 @@ available.
   can exceed it.
 - Pausing does not stop an active native turn.
 - Provider completeness depends on the canonical adapter pagination behavior.
+- The native host must prove that the short coordinator initialization turn and
+  actual child parentage work with the pinned SDK. Empty-thread creation is not
+  assumed.
+- Users can change native parentage outside Taskboard. Detect conflicts before
+  further grouped dispatch and expose recovery. Historical sessions remain legacy.

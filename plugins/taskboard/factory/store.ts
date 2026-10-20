@@ -77,12 +77,22 @@ export function createFactoryStore(db: ReturnType<BbPluginApi['storage']['databa
     },
     projectStatus(projectId: string, provider: FactoryProjectPolicy['provider']): FactoryProjectStatus {
       const policy = this.getProjectPolicy(projectId, provider);
-      const active = this.all().filter(record => record.projectId === projectId && consumesFactoryCapacity(record)).length;
+      const records = this.all().filter(record => record.projectId === projectId);
+      const active = records.filter(consumesFactoryCapacity).length;
       const scan = this.getScan(projectId);
       if (!policy.enabled) return active ? { kind: 'paused', policy, active } : { kind: 'disabled', policy };
       if (policy.provider !== provider) return { kind: 'blocked', policy, active,
         reason: 'Project provider changed. Save factory settings before continuing.' };
       if (scan?.kind === 'blocked') return { kind: 'blocked', policy, reason: scan.reason ?? 'Provider scan failed.', active };
+      for (const record of records.filter(candidate => candidate.admission.kind === 'factory')) {
+        const coordinator = record.coordinator;
+        const run = record.runs.at(-1);
+        const reason = record.automationError ??
+          (coordinator && 'error' in coordinator ? coordinator.error : null) ??
+          (run && (['uncertain', 'failed', 'canceled'].includes(run.status) || run.error)
+            ? run.error ?? `Native ${run.kind} session ${run.status}. Inspect its recovery action.` : null);
+        if (reason) return { kind: 'blocked', policy, active, reason: `${record.locator}: ${reason}` };
+      }
       if (policy.enabled && !scan) return { kind: 'paused', policy, active };
       return { kind: 'running', policy, active, available: Math.max(0, policy.maxConcurrent - active) };
     },
@@ -105,6 +115,7 @@ export function createFactoryStore(db: ReturnType<BbPluginApi['storage']['databa
           locator: item.locator, version: 1, stage: 'Intake',
           scopeDigest: item.scopeDigest, plans: [], approvedDigest: null,
           admission: { kind: 'factory', claimedAt }, automatic: true,
+          coordinator: { status: 'pending' },
           automationError: null, trackerProgress: { status: 'pending', message: null },
           runs: [], updatedAt: claimedAt
         });
@@ -161,15 +172,16 @@ export function createFactoryStore(db: ReturnType<BbPluginApi['storage']['databa
             'UPDATE taskboard_factory_v1 SET version = ?, document = ? WHERE identity = ? AND version = ?'
           ).run(next.version, JSON.stringify(next), key, expected);
         if (result.changes !== 1) throw new Error('Progress changed in another request. Refresh and retry.');
-        for (const run of next.runs) {
-          if (!run.threadId) continue;
+        const threadIds = next.runs.flatMap(run => run.threadId ? [run.threadId] : []);
+        if (next.coordinator?.status === 'ready') threadIds.push(next.coordinator.threadId);
+        for (const threadId of new Set(threadIds)) {
           const existing = db.prepare<[string], { identity: string }>(
             'SELECT identity FROM taskboard_factory_threads_v1 WHERE thread_id = ?'
-          ).get(run.threadId);
+          ).get(threadId);
           if (existing && existing.identity !== key) throw new Error('Thread belongs to another work item.');
           db.prepare<[string, string]>(
             'INSERT OR IGNORE INTO taskboard_factory_threads_v1 VALUES (?, ?)'
-          ).run(run.threadId, key);
+          ).run(threadId, key);
         }
       })();
       return next;

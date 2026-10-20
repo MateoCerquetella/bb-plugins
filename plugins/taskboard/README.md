@@ -175,6 +175,21 @@ workflow. The setting is disabled by default and the concurrency limit applies
 only to automatically claimed work. Manual **Start task** actions remain
 available.
 
+Each new ticket workflow gets one native coordinator thread. Investigation,
+Plan, Build, and independent Review sessions appear beneath it as stage agents;
+Build retains its managed worktree and repairs continue in the original Build
+session. **Start task** opens the coordinator. Each stage's **Open thread**
+action opens that exact session. The factory service owns dispatch and recovery;
+the coordinator is the ticket's stable conversation and native parent.
+
+Historical workflows show **Legacy sessions**. **Add coordinator** creates a
+parent for future stage sessions while keeping existing history and reused
+Build sessions unchanged and labelled legacy. A confirmed coordinator rejection
+offers **Retry coordinator**. When creation is uncertain, inspect the native
+threads and use **Link coordinator** with the matching existing thread ID.
+Taskboard never automatically replaces an uncertain coordinator. Restoring an
+unavailable coordinator preserves the original hierarchy.
+
 Pausing automatic intake stops new claims and later automatic stages. It does
 not cancel an active native thread. Provider read failures, provider changes,
 ticket closure, and ticket scope changes block later dispatch and remain

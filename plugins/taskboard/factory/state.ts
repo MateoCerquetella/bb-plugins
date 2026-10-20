@@ -17,10 +17,17 @@ export function newRecord(item: WorkItem): FactoryRecord {
     locator: item.locator, version: 0, stage: 'Intake',
     scopeDigest: scopeDigest(item), plans: [], approvedDigest: null, runs: [],
     admission: { kind: 'manual' },
+    coordinator: { status: 'pending' },
     automatic: false, automationError: null,
     trackerProgress: { status: 'pending', message: null },
     updatedAt: new Date().toISOString()
   };
+}
+export function legacyRun(record: FactoryRecord, run: FactoryRun) {
+  if (!record.coordinator) return true;
+  if (record.coordinator.status !== 'ready') return false;
+  return record.runs.slice(0, record.coordinator.legacyRunCount).some(prior =>
+    prior.id === run.id || !!run.threadId && prior.threadId === run.threadId);
 }
 export function assertVersion(record: FactoryRecord, expected: number) {
   if (record.version !== expected) throw new Error('Progress changed. Refresh before trying again.');

@@ -8,24 +8,27 @@
 
 An explicitly enabled project factory continuously admits eligible tickets from
 the project's configured issue provider and runs the existing investigation,
-planning, isolated build, independent review, and bounded repair workflow without
-requiring a person to press Start task on each ticket.
+planning, isolated build, independent review, and bounded repair workflow. Each
+admitted ticket has one visible coordinator thread. The stage agents appear as
+children of that coordinator, so users can inspect the ticket team as one group
+without requiring a person to press Start task on each ticket.
 
 ## Acceptance Criteria
 
 - [ ] [AC-1] Factories are disabled by default. Project-scoped settings persist an explicit enable choice, provider identity, intake policy, and bounded concurrency.
-- [ ] [AC-2] Enabled factories discover provider todo tickets, revalidate live eligibility before dispatch, and admit eligible tickets without a manual per-ticket action. Backlog, closed, canceled, previously claimed, and wrong-provider tickets are not admitted.
-- [ ] [AC-3] Concurrent ticks and plugin restart cannot duplicate an admitted ticket or exceed the configured autonomous workflow capacity. Ambiguous native dispatch remains blocked rather than retried.
-- [ ] [AC-4] Admitted tickets use the existing investigate, plan, build, review, and bounded repair flow with managed Build worktrees and native execution defaults. Existing manual starts continue to work.
-- [ ] [AC-5] Pausing stops automatic admission and subsequent automatic stage dispatch for queue-owned work while preserving active native threads and observed progress. Provider changes, missing configuration, and failed live reads fail closed with visible status.
+- [ ] [AC-2] Enabled factories discover provider todo tickets, exclude durable claims before applying the bounded scan window, revalidate live eligibility before dispatch, and admit eligible tickets without a manual per-ticket action. Backlog, closed, canceled, previously claimed, and wrong-provider tickets are not admitted.
+- [ ] [AC-3] Concurrent ticks and plugin restart cannot duplicate an admitted ticket, its coordinator, or a stage agent, and cannot exceed the configured autonomous workflow capacity. Ambiguous native dispatch remains blocked rather than retried.
+- [ ] [AC-4] Each automatically admitted ticket has exactly one visible coordinator thread. Investigation, planning, Build, Review, and bounded repair sessions are native child threads of that coordinator. Build still uses a managed worktree, Review stays independent, native execution defaults remain in effect, and existing manual starts continue to work.
+- [ ] [AC-5] Pausing stops automatic admission and subsequent automatic stage dispatch for queue-owned work while preserving active native threads and observed progress. Provider changes, missing configuration, failed live reads, stale eligibility, scope changes, and closure changes fail closed. Project Manage and the affected ticket group show a short operator-readable state and reason; no action dispatches from stale data.
 - [ ] [AC-6] Provider progress updates remain explicit observations. No new action merges, deploys, or closes an issue; a passed review remains awaiting human acceptance. Ticket scope and closure changes prevent subsequent automatic dispatch.
-- [ ] [AC-7] CLI and RPC expose project factory settings and status with validation, and focused behavioral tests cover duplicate ticks, restart, capacity, pause, stale provider data, and failure isolation.
-- [ ] [AC-UI-1] [UI] Project Manage exposes the factory controls and current state using existing Taskboard components, with desktop and mobile browser evidence.
+- [ ] [AC-7] CLI and RPC expose project factory settings and status with validation. Project status includes queue-owned workflow blockers even after a healthy provider scan. Focused behavioral tests cover duplicate ticks, restart, capacity, pause, scan-window fairness, stale provider data, hierarchy recovery, and failure isolation.
+- [ ] [AC-UI-1] [UI] Project Manage exposes persisted enablement, provider identity, intake policy, bounded concurrency, pause/resume, queue and active counts, last scan result, and blockers using existing Taskboard components. Healthy idle, paused, missing-configuration, and provider-error states are distinct. Ticket progress shows the coordinator and grouped stage agents with role, native state, a direct thread action, and operator-readable blockers above the group. Long titles, provider names, and reasons remain readable without horizontal overflow. Disclosure and thread actions are keyboard accessible with visible focus; expanded groups remain stable across data refresh. Desktop and mobile browser evidence covers these states.
 
 ## Scope
 
-Taskboard factory contracts, persistence, orchestration, server integration, CLI,
-project Manage controls, focused tests, browser fixture, and related README.
+Taskboard factory contracts, persistence, native thread hierarchy, orchestration,
+server integration, CLI, project Manage controls, ticket progress, focused
+tests, browser fixture, and related README.
 
 ## Non-goals
 
@@ -33,7 +36,9 @@ No new issue provider, credential system, independent local task tracker,
 unrestricted permission mode, automatic merge/deployment, PR lifecycle, or claim
 of independently verified completion. No automatic enablement of live projects.
 The first version coordinates one BB installation, not distributed claims across
-independent BB servers sharing the same tracker.
+independent BB servers sharing the same tracker. The coordinator does not plan,
+write code, review, or own a second workflow state machine. It is the stable
+native parent and user entry point for the stage agents.
 
 ## Risks
 
@@ -41,15 +46,27 @@ Native dispatch may succeed before its response is lost. Preserve the existing
 uncertain state and human recovery path. Provider reads and local claims are not
 one transaction, so revalidate live input and persist the claim before dispatch.
 An active native thread is not forcibly canceled when intake is paused or ticket
-scope changes. Use the native Stop control for that operation.
+scope changes. Use the native Stop control for that operation. Creating the
+coordinator is also a native dispatch. Persist its starting intent first, and
+never create a replacement after an ambiguous outcome. Existing records without
+a coordinator remain readable and gain one only through an explicit, idempotent
+recovery path.
 
 ## Verification
 
 Run focused controller and store tests with real SQLite and mocked external SDK
 boundaries, then the Taskboard check from the workspace root. Exercise factory
 settings in the existing browser fixture at desktop and mobile sizes and inspect
-screenshots. Run the existing opt-in read-only native smoke where BB context is
-available. Do not enable a live tracker queue as a test.
+screenshots. Prove that one coordinator owns every new stage child, that restart
+does not duplicate either level, and that a missing or ambiguous coordinator
+blocks automatic dispatch. Run the existing opt-in read-only native smoke where
+BB context is available. Do not enable a live tracker queue as a test.
+
+Browser evidence must cover Project Manage in healthy idle, paused, missing
+configuration, and provider-error states, plus ticket groups blocked by stale
+eligibility, scope change, and closure change. Check long titles, provider names,
+and blocker reasons at narrow widths. Exercise keyboard disclosure and thread
+actions, visible focus, and expanded-state retention across data refresh.
 
 ## Capability Deltas
 

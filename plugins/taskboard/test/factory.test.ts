@@ -16,12 +16,13 @@ registerHooks({
     return next(specifier, context);
   }
 });
-const { factoryRecordSchema } = await import('../factory/contract.ts');
+const { factoryCoordinatorSchema, factoryRecordSchema } = await import('../factory/contract.ts');
 const { progressStatus } = await import('../factory/tracker.ts');
 const { newRecord, savePlan, approvePlan, startRun } = await import('../factory/state.ts');
 const { createFactoryStore } = await import('../factory/store.ts');
 const { createFactoryService, applyNativeEvent, factoryPrompt } = await import('../factory/service.ts');
 const { readReviewResult, readBuildResult, readableResultOutput } = await import('../factory/review.ts');
+const { coordinatorTitle } = await import('../factory/coordinator.ts');
 test('readable reports retain surrounding legacy details and malformed evidence', () => {
   assert.equal(readableResultOutput('## Checks\n680 tests passed.\n<taskboard-review>{"verdict":"blocked","findings":"Missing backfill."}</taskboard-review>\nNo deployment.'),
     '## Checks\n680 tests passed.\nMissing backfill.\nNo deployment.');
@@ -175,6 +176,9 @@ function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
   const store = createFactoryStore(db);
   let cachedItem: WorkItem | null = item;
   let spawns = 0;
+  let coordinatorSpawns = 0;
+  let coordinatorFailure: 'lost' | 'rejected' | null = null;
+  let onCoordinatorSpawn = () => {};
   let sends = 0;
   let progressWrites = 0;
   let failProgress = false;
@@ -196,6 +200,10 @@ function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
   let managed = true;
   let spawnInput: unknown;
   let currentThreadId = 'thr_native';
+  const spawnInputs: { title: string; parentThreadId?: string; environment: { type: string; environmentId?: string } }[] = [];
+  const parents = new Map<string, string | null>();
+  const titles = new Map<string, string>();
+  const createdAt = new Map<string, number>();
   const threadEnvironments = new Map<string, string>([
     ['thr_native', 'env_test'], ['thr_build', 'env_build'], ['thr_review_seed', 'env_test']
   ]);
@@ -204,12 +212,25 @@ function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
   const sdk = {
     threads: {
       spawn: async (input: unknown) => {
+        const request = input as typeof spawnInputs[number];
+        spawnInputs.push(request);
+        if (request.title.includes(': coordinator [')) {
+          coordinatorSpawns++;
+          if (coordinatorFailure === 'rejected') throw new Error('HTTP 400: hostId is required unless workspace.type is personal');
+          const id = `thr_coordinator_${coordinatorSpawns}`;
+          parents.set(id, null);
+          titles.set(id, request.title);
+          createdAt.set(id, Date.now());
+          threadEnvironments.set(id, 'env_test');
+          onCoordinatorSpawn();
+          if (coordinatorFailure === 'lost') throw new Error('Coordinator response lost');
+          return { id, environmentId: 'env_test', projectId: item.bbProjectId, status: 'idle' };
+        }
         spawnInput = input;
         spawns++;
         if (rejectSpawn) throw new Error('HTTP 400: hostId is required unless workspace.type is personal');
         if (rejectWorktree) throw new Error('HTTP 409: This project checkout has no usable git branch.');
         if (failSpawn) throw new Error('Response lost');
-        const request = input as { title: string; environment: { type: string; environmentId?: string } };
         const kind = request.title.split(': ').at(-1);
         currentThreadId = kind === 'investigate' && spawns === 1 ? 'thr_native'
           : kind === 'build' ? 'thr_build'
@@ -218,13 +239,18 @@ function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
           ? request.environment.environmentId!
           : request.environment.type === 'host' ? 'env_build' : 'env_test';
         threadEnvironments.set(currentThreadId, environmentId);
+        parents.set(currentThreadId, request.parentThreadId ?? null);
+        titles.set(currentThreadId, request.title);
+        createdAt.set(currentThreadId, Date.now());
         return { id: currentThreadId, environmentId, projectId: item.bbProjectId };
       },
       get: async ({ threadId }: { threadId: string }) => ({
         id: threadId, status: threadStatuses.get(threadId) ?? threadStatus,
         projectId: item.bbProjectId,
         environmentId: threadId === 'thr_native' ? buildEnvironment : threadEnvironments.get(threadId) ?? 'env_test',
-        providerId: 'codex', archivedAt: archived.has(threadId) ? 1 : null, deletedAt: deleted.has(threadId) ? 1 : null
+        providerId: 'codex', archivedAt: archived.has(threadId) ? 1 : null, deletedAt: deleted.has(threadId) ? 1 : null,
+        parentThreadId: parents.get(threadId) ?? null,
+        title: titles.get(threadId) ?? null, createdAt: createdAt.get(threadId) ?? Date.now()
       }),
       unarchive: async ({ threadId }: { threadId: string }) => {
         unarchives++;
@@ -268,7 +294,10 @@ function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
     }
   }, queue);
   return {
-    db, store, service, events, spawns: () => spawns, spawnInput: () => spawnInput,
+    db, store, service, sdk, events, spawns: () => spawns, spawnInput: () => spawnInput,
+    coordinatorSpawns: () => coordinatorSpawns, spawnInputs, parents, titles, createdAt,
+    coordinatorFailure: (value: typeof coordinatorFailure) => { coordinatorFailure = value; },
+    onCoordinatorSpawn: (callback: () => void) => { onCoordinatorSpawn = callback; },
     cachedItem: (value: WorkItem | null) => { cachedItem = value; },
     archived, deleted, unarchives: () => unarchives,
     onUnarchive: (callback: () => void) => { onUnarchive = callback; },
@@ -296,6 +325,351 @@ function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
     rejectWorktree: () => { rejectWorktree = true; }
   };
 }
+
+test('historical records parse without a coordinator and coordinator states validate their payloads', () => {
+  const { coordinator: omitted, ...historical } = newRecord(item);
+  assert.equal(factoryRecordSchema.parse(historical).coordinator, null);
+  assert.equal(omitted?.status, 'pending');
+  const intent = { intentId: 'intent-1', startedAt: new Date().toISOString(), legacyRunCount: 0 };
+  for (const value of [
+    { status: 'pending' }, { status: 'starting', ...intent },
+    { status: 'failed', ...intent, error: 'Rejected before dispatch' },
+    { status: 'uncertain', ...intent, error: 'Response lost' },
+    { status: 'ready', ...intent, threadId: 'thr_root', nativeStatus: 'idle', error: null }
+  ]) {
+    assert.deepEqual(factoryCoordinatorSchema.parse(JSON.parse(JSON.stringify(value))), value);
+  }
+  assert.equal(factoryCoordinatorSchema.safeParse({ status: 'ready', ...intent }).success, false);
+  assert.equal(factoryCoordinatorSchema.safeParse({ status: 'uncertain', ...intent }).success, false);
+});
+
+test('concurrent starts create one coordinator and parent every new stage without changing worktrees', async () => {
+  const f = fixture();
+  try {
+    const [first, duplicate] = await Promise.all([f.service.startTask(item, null), f.service.startTask(item, null)]);
+    assert.equal(f.coordinatorSpawns(), 1);
+    assert.equal(f.spawns(), 1);
+    assert.deepEqual(first.coordinator, duplicate.coordinator);
+    assert.equal(first.coordinator?.status, 'ready');
+    if (first.coordinator?.status !== 'ready') throw new Error('Expected coordinator');
+    const root = first.coordinator.threadId;
+    assert.equal(f.store.forThread(root)?.locator, item.locator);
+    assert.equal(f.store.forThread(first.runs[0].threadId!)?.locator, item.locator);
+    f.complete('Investigation findings');
+    await f.service.get(item);
+    f.complete('Approved implementation plan');
+    await f.service.get(item);
+    const build = f.store.all()[0].runs.at(-1)!;
+    f.complete('::taskboard-result{kind="build" verdict="implemented" revision="abc123"}\nVerified implementation.');
+    const review = await f.service.get(item);
+    assert.deepEqual(f.spawnInputs.filter(input => input.parentThreadId).map(input => input.parentThreadId),
+      [root, root, root, root]);
+    assert.equal(f.coordinatorSpawns(), 1);
+    assert.equal(build.environmentId, 'env_build');
+    assert.equal(review.runs.at(-1)?.environmentId, 'env_build');
+    assert.equal(review.stage, 'Review');
+  } finally { f.db.close(); }
+});
+
+test('lost coordinator response blocks workers and provider writes across restart until exact recovery', async () => {
+  const f = fixture({ provider: () => item.source, candidates: async () => [item], liveItem: async () => item });
+  try {
+    f.store.saveProjectPolicy({ ...f.store.getProjectPolicy(item.bbProjectId, item.source), enabled: true });
+    f.coordinatorFailure('lost');
+    await f.service.scan(item.bbProjectId);
+    let record = f.store.all()[0];
+    assert.equal(record.coordinator?.status, 'uncertain');
+    assert.equal(f.coordinatorSpawns(), 1);
+    assert.equal(f.spawns(), 0);
+    assert.equal(f.progressWrites(), 0);
+    const restarted = createFactoryService(f.sdk, f.store, () => {}, undefined, {
+      provider: () => item.source, candidates: async () => [item], liveItem: async () => item
+    });
+    await restarted.recover();
+    await restarted.poll(new AbortController().signal);
+    assert.equal(f.coordinatorSpawns(), 1);
+    assert.equal(f.spawns(), 0);
+    if (record.coordinator?.status !== 'uncertain') throw new Error('Expected ambiguous coordinator');
+    await assert.rejects(restarted.recoverCoordinator(item, record.version, 'wrong-intent', 'thr_coordinator_1'), /current uncertain/);
+    f.titles.set('thr_coordinator_1', 'Unrelated conversation');
+    await assert.rejects(restarted.recoverCoordinator(item, record.version, record.coordinator.intentId, 'thr_coordinator_1'), /matching this ticket/);
+    f.titles.set('thr_coordinator_1', coordinatorTitle(item, record.coordinator.intentId));
+    const recovered = await restarted.recoverCoordinator(item, record.version, record.coordinator.intentId, 'thr_coordinator_1');
+    assert.equal(recovered.coordinator?.status, 'ready');
+    await restarted.poll(new AbortController().signal);
+    record = f.store.all()[0];
+    assert.equal(record.runs[0].status, 'running');
+    assert.equal(f.parents.get(record.runs[0].threadId!), 'thr_coordinator_1');
+    assert.equal(f.coordinatorSpawns(), 1);
+  } finally { f.db.close(); }
+});
+
+test('a persisted coordinator starting intent becomes uncertain without another native dispatch', async () => {
+  const f = fixture();
+  try {
+    const record = newRecord(item);
+    record.coordinator = { status: 'starting', intentId: 'interrupted', startedAt: new Date().toISOString(), legacyRunCount: 0 };
+    f.store.save(record);
+    await f.service.recover();
+    const observed = await f.service.startTask(item, null);
+    assert.equal(observed.coordinator?.status, 'uncertain');
+    assert.equal(f.coordinatorSpawns(), 0);
+    assert.equal(f.spawns(), 0);
+  } finally { f.db.close(); }
+});
+
+test('confirmed coordinator rejection requires explicit intent-bound retry', async () => {
+  const f = fixture();
+  try {
+    f.coordinatorFailure('rejected');
+    const rejected = await f.service.startTask(item, null);
+    assert.equal(rejected.coordinator?.status, 'failed');
+    assert.equal(f.spawns(), 0);
+    await f.service.startTask(item, null);
+    assert.equal(f.coordinatorSpawns(), 1);
+    if (rejected.coordinator?.status !== 'failed') throw new Error('Expected confirmed rejection');
+    f.coordinatorFailure(null);
+    const current = f.store.all()[0];
+    const retried = await f.service.retryCoordinator(item, current.version, rejected.coordinator.intentId);
+    assert.equal(retried.coordinator?.status, 'ready');
+    await f.service.startTask(item, null);
+    assert.equal(f.coordinatorSpawns(), 2);
+    assert.equal(f.spawns(), 1);
+  } finally { f.db.close(); }
+});
+
+test('unavailable coordinator blocks new stages while existing worker completion remains observed', async () => {
+  const f = fixture();
+  try {
+    const started = await f.service.startTask(item, null);
+    if (started.coordinator?.status !== 'ready') throw new Error('Expected coordinator');
+    f.archived.add(started.coordinator.threadId);
+    f.complete('Investigation findings');
+    const observed = await f.service.get(item);
+    assert.equal(observed.runs[0].status, 'finished');
+    assert.equal(observed.coordinator?.status, 'ready');
+    assert.equal(f.spawns(), 1);
+    assert.match(observed.automationError ?? '', /coordinator is archived or deleted/);
+    f.archived.delete(started.coordinator.threadId);
+    await f.service.startTask(item, null);
+    assert.equal(f.coordinatorSpawns(), 1);
+    assert.equal(f.spawns(), 2);
+  } finally { f.db.close(); }
+});
+
+test('external worker parent changes block further grouped dispatch', async () => {
+  const f = fixture();
+  try {
+    const started = await f.service.startTask(item, null);
+    f.parents.set(started.runs[0].threadId!, 'thr_unrelated');
+    f.complete('Investigation findings');
+    const observed = await f.service.get(item);
+    assert.match(observed.runs[0].error ?? '', /different coordinator/);
+    assert.equal(f.spawns(), 1);
+    assert.equal(f.coordinatorSpawns(), 1);
+  } finally { f.db.close(); }
+});
+
+test('legacy reads and explicit repeatable adoption preserve historical thread parents and evidence', async () => {
+  const f = fixture();
+  try {
+    const record = newRecord(item);
+    record.coordinator = null;
+    const run = startRun(record, 'investigate', false);
+    run.status = 'finished'; run.threadId = 'thr_native'; run.environmentId = 'env_test';
+    run.output = 'Historical investigation';
+    f.parents.set('thr_native', 'thr_historical_parent');
+    const saved = f.store.save(record);
+    const observed = await f.service.get(item);
+    assert.equal(f.coordinatorSpawns(), 0);
+    const adopted = await f.service.adoptCoordinator(item, observed.version);
+    assert.equal(adopted.coordinator?.status, 'ready');
+    assert.equal(adopted.runs[0].output, 'Historical investigation');
+    assert.equal(f.parents.get('thr_native'), 'thr_historical_parent');
+    await f.service.adoptCoordinator(item, saved.version);
+    assert.equal(f.coordinatorSpawns(), 1);
+    await f.service.start(item, { expectedVersion: adopted.version, kind: 'plan', contextThreadId: null, retry: false });
+    const latest = f.store.all()[0];
+    assert.equal(latest.coordinator?.status, 'ready');
+    assert.equal(latest.coordinator?.status === 'ready' && latest.coordinator.legacyRunCount, 1);
+    assert.equal(f.parents.get(latest.runs.at(-1)!.threadId!), 'thr_coordinator_1');
+  } finally { f.db.close(); }
+});
+
+test('only the winning coordinator intent owner may spawn across two SQLite service connections', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'taskboard-coordinator-race-'));
+  const path = join(root, 'factory.sqlite');
+  const dbA = new Database(path);
+  const dbB = new Database(path);
+  const f = fixture();
+  try {
+    const storeA = createFactoryStore(dbA);
+    const storeB = createFactoryStore(dbB);
+    const serviceA = createFactoryService(f.sdk, storeA, () => {});
+    const serviceB = createFactoryService(f.sdk, storeB, () => {});
+    const input = { expectedVersion: 0, kind: 'investigate' as const, contextThreadId: null, retry: false };
+    await Promise.all([serviceA.start(item, input), serviceB.start(item, input)]);
+    assert.equal(f.coordinatorSpawns(), 1);
+    assert.equal(f.spawns(), 1);
+    assert.equal(storeA.all().length, 1);
+    const saved = storeB.all()[0];
+    assert.equal(saved.coordinator?.status, 'ready');
+    if (saved.coordinator?.status !== 'ready') throw new Error('Expected coordinator');
+    assert.equal(storeB.forThread(saved.coordinator.threadId)?.locator, item.locator);
+    assert.equal(storeB.forThread(saved.runs[0].threadId!)?.locator, item.locator);
+    dbA.close(); dbB.close();
+    const reopened = new Database(path);
+    try {
+      const store = createFactoryStore(reopened);
+      assert.equal(store.forThread(saved.coordinator.threadId)?.locator, item.locator);
+      assert.equal(store.forThread(saved.runs[0].threadId!)?.locator, item.locator);
+    } finally { reopened.close(); }
+  } finally {
+    if (dbA.open) dbA.close();
+    if (dbB.open) dbB.close();
+    f.db.close();
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('a post-spawn coordinator save failure leaves only a recoverable starting intent', async () => {
+  const f = fixture();
+  const save = f.store.save.bind(f.store);
+  try {
+    f.store.save = record => {
+      if (record.coordinator?.status === 'ready') throw new Error('Storage write failed');
+      return save(record);
+    };
+    await assert.rejects(f.service.startTask(item, null), /Storage write failed/);
+    assert.equal(f.store.all()[0].coordinator?.status, 'starting');
+    assert.equal(f.coordinatorSpawns(), 1);
+    assert.equal(f.spawns(), 0);
+    f.store.save = save;
+    await f.service.recover();
+    const record = f.store.all()[0];
+    assert.equal(record.coordinator?.status, 'uncertain');
+    await f.service.startTask(item, null);
+    assert.equal(f.coordinatorSpawns(), 1);
+    assert.equal(f.spawns(), 0);
+  } finally { f.db.close(); }
+});
+
+test('coordinator ownership conflicts roll back both document and thread-index writes', () => {
+  const f = fixture();
+  try {
+    const first = newRecord(item);
+    first.coordinator = {
+      status: 'ready', intentId: 'first', startedAt: new Date().toISOString(),
+      legacyRunCount: 0, threadId: 'thr_owned_root', nativeStatus: 'idle', error: null
+    };
+    const saved = f.store.save(first);
+    const second = newRecord({ ...item, locator: 'another-ticket' });
+    second.coordinator = { ...first.coordinator, intentId: 'second' };
+    const worker = startRun(second, 'investigate', false);
+    worker.threadId = 'thr_new_worker';
+    assert.throws(() => f.store.save(second), /Thread belongs to another/);
+    assert.equal(f.store.get(second), null);
+    assert.equal(f.store.forThread('thr_new_worker'), null);
+    assert.equal(f.store.forThread('thr_owned_root')?.locator, item.locator);
+    assert.throws(() => f.store.save(first), /Progress changed/);
+    assert.equal(f.store.get(saved)?.version, saved.version);
+  } finally { f.db.close(); }
+});
+
+test('coordinator initialization outcomes do not complete stages or release workflow capacity', async () => {
+  for (const nativeStatus of ['idle', 'error'] as const) {
+    const f = fixture({ provider: () => item.source, candidates: async () => [item], liveItem: async () => item });
+    try {
+      f.store.saveProjectPolicy({ ...f.store.getProjectPolicy(item.bbProjectId, item.source), enabled: true });
+      await f.service.scan(item.bbProjectId);
+      const record = f.store.all()[0];
+      if (record.coordinator?.status !== 'ready') throw new Error('Expected coordinator');
+      f.threadStatus(nativeStatus, record.coordinator.threadId);
+      const observed = await f.service.get(item);
+      assert.equal(observed.runs[0].status, 'running');
+      assert.equal(observed.stage, 'Triage');
+      assert.equal(f.store.projectStatus(item.bbProjectId, item.source).kind, 'running');
+      const status = f.store.projectStatus(item.bbProjectId, item.source);
+      assert.equal('active' in status && status.active, 1);
+      assert.equal(f.spawns(), 1);
+      assert.equal(f.coordinatorSpawns(), 1);
+    } finally { f.db.close(); }
+  }
+});
+
+test('claimed tickets before the bounded scan window do not starve a later eligible ticket', async () => {
+  const candidates = Array.from({ length: 501 }, (_, index) => ({ ...item, locator: `ticket-${index}` }));
+  const liveReads: string[] = [];
+  const f = fixture({
+    provider: () => item.source, candidates: async () => candidates,
+    liveItem: async identity => {
+      liveReads.push(identity.locator);
+      return candidates.find(candidate => candidate.locator === identity.locator)!;
+    }
+  });
+  try {
+    f.store.saveProjectPolicy({ ...f.store.getProjectPolicy(item.bbProjectId, item.source), enabled: true });
+    for (const candidate of candidates.slice(0, 500)) {
+      const record = newRecord(candidate);
+      record.admission = { kind: 'factory', claimedAt: new Date().toISOString() };
+      record.stage = 'Done';
+      f.store.save(record);
+    }
+    await f.service.scan(item.bbProjectId);
+    assert.deepEqual(liveReads, ['ticket-500', 'ticket-500']);
+    assert.equal(f.spawns(), 1);
+    assert.equal(f.coordinatorSpawns(), 1);
+    assert.equal(f.store.all().find(record => record.locator === 'ticket-500')?.runs[0].status, 'running');
+  } finally { f.db.close(); }
+});
+
+test('healthy scans preserve queue-owned coordinator, stage, and automation blockers in project status', async () => {
+  for (const blocker of ['coordinator', 'stage', 'automation'] as const) {
+    const f = fixture({ provider: () => item.source, candidates: async () => [], liveItem: async () => item });
+    try {
+      f.store.saveProjectPolicy({ ...f.store.getProjectPolicy(item.bbProjectId, item.source), enabled: true });
+      const record = newRecord(item);
+      record.admission = { kind: 'factory', claimedAt: new Date().toISOString() };
+      if (blocker === 'coordinator') record.coordinator = {
+        status: 'uncertain', intentId: 'lost-root', startedAt: new Date().toISOString(),
+        legacyRunCount: 0, error: 'Coordinator response lost; link the original native thread.'
+      };
+      if (blocker === 'stage') {
+        const run = startRun(record, 'investigate', false);
+        run.status = 'uncertain'; run.error = 'Stage response lost; inspect native session.';
+      }
+      if (blocker === 'automation') record.automationError = 'Issue scope changed; inspect the updated ticket.';
+      f.store.save(record);
+      await f.service.scan(item.bbProjectId);
+      assert.equal(f.store.getScan(item.bbProjectId)?.kind, 'success');
+      const status = f.store.projectStatus(item.bbProjectId, item.source);
+      assert.equal(status.kind, 'blocked');
+      assert.match(status.kind === 'blocked' ? status.reason : '', new RegExp(blocker === 'automation' ? 'scope changed' : 'response lost'));
+      assert.equal(f.spawns(), 0);
+      assert.equal(f.coordinatorSpawns(), 0);
+    } finally { f.db.close(); }
+  }
+});
+
+test('pausing or changing live eligibility during coordinator creation prevents the first worker', async () => {
+  for (const change of ['pause', 'closed', 'scope'] as const) {
+    let live = { ...item };
+    const f = fixture({ provider: () => item.source, candidates: async () => [item], liveItem: async () => live });
+    try {
+      const policy = f.store.saveProjectPolicy({ ...f.store.getProjectPolicy(item.bbProjectId, item.source), enabled: true });
+      f.onCoordinatorSpawn(() => {
+        if (change === 'pause') f.store.saveProjectPolicy({ ...policy, enabled: false });
+        else live = change === 'closed' ? { ...item, stateCategory: 'done' } : { ...item, description: 'Changed scope' };
+      });
+      await f.service.scan(item.bbProjectId);
+      assert.equal(f.coordinatorSpawns(), 1);
+      assert.equal(f.spawns(), 0);
+      assert.equal(f.progressWrites(), 0);
+      assert.equal(f.store.all()[0].coordinator?.status, 'ready');
+      assert.equal(f.store.all()[0].runs.length, 0);
+    } finally { f.db.close(); }
+  }
+});
 
 test('background intake is throttled while explicit scans and native observations remain immediate', async t => {
   t.mock.timers.enable({ apis: ['Date'], now: 1_800_000_000_000 });
@@ -343,7 +717,7 @@ test('running and accepted-review observations do not re-read the provider or mu
     assert.equal(observed.scopeDigest, admitted.scopeDigest);
     assert.equal(observed.automatic, true);
     assert.equal(observed.automationError, null);
-    assert.equal(reads, 1);
+    assert.equal(reads, 2);
     const record = f.store.all()[0];
     Object.assign(record.runs[0], {
       kind: 'review', status: 'finished',
@@ -353,7 +727,7 @@ test('running and accepted-review observations do not re-read the provider or mu
     f.store.save(record);
     await f.service.get(item);
     await f.service.poll(new AbortController().signal);
-    assert.equal(reads, 1);
+    assert.equal(reads, 2);
     assert.equal(f.store.all()[0].runs.at(-1)?.reviewResult?.verdict, 'passed');
   } finally { f.db.close(); }
 });
