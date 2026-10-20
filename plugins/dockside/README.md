@@ -132,8 +132,9 @@ disable the plugin.
 
 - **Projects** — drag an existing project header to sort projects, or focus the
   same header and press Alt+Up/Alt+Down. No extra drag icon is added, and the
-  browser-local project order survives reloads. Pinned roots remain first inside
-  each project.
+  browser-local project order survives reloads. Use the workspace filter's
+  Projects section to focus the sidebar on one project. Pinned roots remain
+  first inside each project.
   Drag a family's semantic status icon, or focus it and press Alt+Up/Alt+Down, to move
   a complete root/child family inside its pinned or unpinned partition. The
   family order survives reloads. Clear search, choose the All filter, and

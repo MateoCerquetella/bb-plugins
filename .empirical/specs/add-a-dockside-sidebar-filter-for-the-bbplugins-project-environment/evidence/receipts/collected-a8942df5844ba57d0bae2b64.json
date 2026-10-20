@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-a8942df5844ba57d0bae2b64",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-UI-1",
+    "AC-UI-2"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-10-16T17:04:45.749Z",
+  "completedAt": "2026-10-16T17:04:45.749Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "add-a-dockside-sidebar-filter-for-the-bbplugins-project-environment",
+    "specRevision": 9,
+    "specDigest": "sha256:beaa58261533e0864a7033bfaad46f481e1ed0e46989e3d4c8a50adfd2f022eb",
+    "treeDigest": "sha256:b52ddd62108fcde7da254beec5b66b682881ea231c29d3aa5ce987e329151769",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:13f18d90e7706efb19576d26510d6f543a0d96d15d98063709d0e8be311078d6",
+  "kind": "collected",
+  "collector": "empirical-review:fresh-context-dockside-review",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/add-a-dockside-sidebar-filter-for-the-bbplugins-project-environment/reviews/a5056a9621b75af4116a806e.json",
+      "mediaType": "application/json",
+      "bytes": 1722,
+      "digest": "sha256:23784118a1889a06254afeeb4903bbf0773dbb3a0908015dbeb50f200522513a"
+    },
+    {
+      "path": ".empirical/specs/add-a-dockside-sidebar-filter-for-the-bbplugins-project-environment/reviews/a5056a9621b75af4116a806e.md",
+      "mediaType": "text/markdown",
+      "bytes": 964,
+      "digest": "sha256:778bbf0083812ab02b4bd428fec4ad7dfa859be0dc735feee8baccf5c4b870cc"
+    }
+  ]
+}

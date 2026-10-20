@@ -10,17 +10,27 @@ multiple quiet thread families without endangering active or unread work.
 
 ### Requirement: Dockside filters its project-first hierarchy by intent
 
-Dockside MUST offer compact All, Working, Needs you, Unread, Quiet, Quiet 1d+,
-and Quiet 7d+ presets. Filtering MUST compose with host search while preserving
-project order, root context for matching children, and existing status styling.
+Dockside MUST offer compact All, Status, Working, Needs you, Unread, Quiet,
+Quiet 1d+, and Quiet 7d+ presets. The same filter menu MUST list every project
+represented in the active project groups. Selecting a project MUST keep only
+that complete project group visible. Filtering MUST compose with host search
+while preserving project order, root context for matching children, and
+existing status styling. The filter trigger MUST visibly and accessibly name
+the active preset or project.
 
-#### Scenario: User narrows the sidebar to old quiet work
+#### Scenario: User narrows the sidebar to the bbplugins project
 
-- **Given** projects contain working, unread, recent quiet, and old quiet roots
-- **When** the user chooses `Quiet 7d+`
-- **Then** only quiet families at least seven days old remain
-- **And** their project and child hierarchy is unchanged
-- **And** the Projects header shows that a filter is active
+- **Given** the active inbox contains `bbplugins` and another project
+- **When** the user selects `bbplugins` in the workspace filter
+- **Then** only the `bbplugins` project group remains visible
+- **And** its thread families retain their order and hierarchy
+- **And** the filter trigger displays `bbplugins`
+
+#### Scenario: User restores every project
+
+- **Given** the workspace filter is scoped to one project
+- **When** the user selects All
+- **Then** every active project group is visible again
 
 ### Requirement: Bulk deletion is explicit and state-safe
 
