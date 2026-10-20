@@ -20,14 +20,19 @@ export const factoryScanObservationSchema = z.object({
   observedAt: z.string(),
   kind: z.enum(['success', 'blocked']),
   reason: z.string().nullable(),
-  candidates: z.number().int().nonnegative()
+  candidates: z.number().int().nonnegative(),
+  pendingCandidates: z.number().int().nonnegative().nullable().default(null)
 }).strict();
 export type FactoryScanObservation = z.infer<typeof factoryScanObservationSchema>;
+const factoryProjectObservation = {
+  queue: z.number().int().nonnegative().nullable(),
+  lastScan: factoryScanObservationSchema.nullable()
+};
 export const factoryProjectStatusSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('disabled'), policy: factoryProjectPolicySchema }).strict(),
-  z.object({ kind: z.literal('running'), policy: factoryProjectPolicySchema, active: z.number().int().nonnegative(), available: z.number().int().nonnegative() }).strict(),
-  z.object({ kind: z.literal('paused'), policy: factoryProjectPolicySchema, active: z.number().int().nonnegative() }).strict(),
-  z.object({ kind: z.literal('blocked'), policy: factoryProjectPolicySchema, reason: z.string(), active: z.number().int().nonnegative() }).strict()
+  z.object({ kind: z.literal('disabled'), policy: factoryProjectPolicySchema, ...factoryProjectObservation }).strict(),
+  z.object({ kind: z.literal('running'), policy: factoryProjectPolicySchema, active: z.number().int().nonnegative(), available: z.number().int().nonnegative(), ...factoryProjectObservation }).strict(),
+  z.object({ kind: z.literal('paused'), policy: factoryProjectPolicySchema, active: z.number().int().nonnegative(), ...factoryProjectObservation }).strict(),
+  z.object({ kind: z.literal('blocked'), policy: factoryProjectPolicySchema, reason: z.string(), active: z.number().int().nonnegative(), ...factoryProjectObservation }).strict()
 ]);
 export type FactoryProjectStatus = z.infer<typeof factoryProjectStatusSchema>;
 

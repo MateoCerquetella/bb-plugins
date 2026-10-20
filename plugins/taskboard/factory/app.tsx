@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { Markdown, experimental_Diff as Diff, useBbContext, useBbNavigate, useRealtime, useRpc, useSettings } from '@get-bb/plugin-sdk/app';
 import type { TaskboardRpcContract, WorkItem } from '../contract.js';
-import type { FactoryRecord, FactoryRun, FactoryRunKind } from './contract.js';
+import type { FactoryProjectStatus, FactoryRecord, FactoryRun, FactoryRunKind } from './contract.js';
 import { MAX_REVIEW_REPAIRS, readableResultOutput } from './review.js';
 import type { EmpiricalObservation } from '../empirical/contract.js';
 import { Button } from '../components/ui/button.js';
@@ -249,12 +249,40 @@ function TicketTeam({ record, title, onRecord, children }: {
   const recoveryId = recovery.identity === identity ? recovery.threadId : '';
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [projectSnapshot, setProjectSnapshot] = useState<{ identity: string; status: FactoryProjectStatus } | null>(null);
+  const [policyError, setPolicyError] = useState<{ identity: string; message: string } | null>(null);
+  const projectRequest = useRef(0);
   const pending = useRef(false);
   const currentIdentity = useRef(identity);
   currentIdentity.current = identity;
-  useEffect(() => { setError(null); }, [identity]);
+  const loadProjectStatus = useCallback(async () => {
+    const request = ++projectRequest.current;
+    try {
+      const result = await rpc.call('factoryGetProject', { projectId: record.projectId });
+      if (request !== projectRequest.current || currentIdentity.current !== identity) return;
+      setProjectSnapshot({ identity, status: result.status });
+      setPolicyError(null);
+    } catch (reason) {
+      if (request !== projectRequest.current || currentIdentity.current !== identity) return;
+      setPolicyError({ identity, message: reason instanceof Error ? reason.message : String(reason) });
+    }
+  }, [identity, record.projectId, rpc]);
+  useEffect(() => {
+    setError(null);
+    void loadProjectStatus();
+    return () => { projectRequest.current++; };
+  }, [loadProjectStatus]);
+  useRealtime('taskboard:factory', () => void loadProjectStatus());
+  const projectStatus = projectSnapshot?.identity === identity ? projectSnapshot.status : null;
   const coordinator = record.coordinator;
-  const blocker = record.automationError ?? (coordinator && 'error' in coordinator ? coordinator.error : null);
+  const policyBlocker = record.admission.kind !== 'factory' ? null
+    : projectStatus?.kind === 'disabled' || projectStatus?.kind === 'paused' && !projectStatus.policy.enabled
+      ? 'Factory paused. Existing sessions remain available, but no new automatic stage will start.'
+      : projectStatus?.kind === 'paused' && projectStatus.policy.enabled
+        ? 'Automatic intake is enabled and awaiting its first provider scan.'
+        : null;
+  const blocker = record.automationError ??
+    (coordinator && 'error' in coordinator ? coordinator.error : null) ?? policyBlocker;
   const coordinatorStatus = !coordinator ? 'Legacy sessions' : coordinator.status === 'ready'
     ? coordinator.error ? 'Unavailable' : coordinator.nativeStatus
     : coordinator.status === 'uncertain' ? 'Needs recovery' : coordinator.status;
@@ -285,6 +313,8 @@ function TicketTeam({ record, title, onRecord, children }: {
     {blocker && <p role="status" className="mb-2 break-words text-xs [overflow-wrap:anywhere]" data-team-blocker>{blocker}</p>}
     <div id={contentId} hidden={!expanded}>
       {error && <ErrorNotice title="Coordinator action failed" nextStep="Refresh the ticket and inspect its coordinator before trying again." detail={error} />}
+      {policyError?.identity === identity && <ErrorNotice title="Factory policy unavailable"
+        nextStep="Refresh the ticket before relying on its automatic intake state." detail={policyError.message} />}
       {coordinator ? <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 border-b border-border py-2" data-team-role="coordinator">
         <strong className="min-w-0 break-words text-xs">Coordinator</strong>
         <span className="text-xs text-muted-foreground">{coordinatorStatus}</span>
@@ -627,7 +657,9 @@ export function FactoryProgress({ item }: { item: WorkItem }) {
       <EmpiricalProgress record={record} />
       <RunInsights record={record} />
     </TicketTeam>}
-    {!run ? !record?.coordinator && <StartTaskButton item={item} disabled={!loaded || busy || ['done', 'canceled'].includes(item.stateCategory)} /> : <>
+    {!run ? (!record || record.admission.kind === 'manual' &&
+      (!record.coordinator || record.coordinator.status === 'pending')) &&
+      <StartTaskButton item={item} disabled={!loaded || busy || ['done', 'canceled'].includes(item.stateCategory)} /> : <>
       {run.status === 'uncertain' && <div className="my-3 space-y-2">
         <Input aria-label="Recovered native thread ID" placeholder="Native thread ID" value={recoveryId} onChange={e => setRecoveryId(e.target.value)} />
         <Button size="sm" variant="outline" disabled={busy || !(run.threadId || recoveryId.trim())} onClick={() => void action(() =>

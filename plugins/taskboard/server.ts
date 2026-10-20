@@ -485,11 +485,14 @@ export default async function plugin(bb: BbPluginApi) {
       }
     }, {
       provider: projectId => projectConfig(projectId, true).source,
-      async candidates(policy) {
+      async candidates(policy, excludeLocators) {
         const statuses = await syncAll(policy.projectId, policy.provider, true);
         const status = statuses.find(candidate => candidate.source === policy.provider);
         if (!status?.available) throw new Error(status?.message ?? 'Provider is unavailable.');
-        return store.list({ projectId: policy.projectId, source: policy.provider, stateCategories: ['todo'], limit: 500 });
+        return store.list({
+          projectId: policy.projectId, source: policy.provider, stateCategories: ['todo'],
+          excludeLocators, limit: 500
+        });
       },
       liveItem: identity => getLiveItem(identity.projectId, identity.source, identity.locator)
     }

@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 15,
+  "revision": 17,
   "activeFeature": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin",
   "request": "Build an autonomous software factory into the existing Taskboard plugin, inspired by https://github.com/lpbaril/bb-plugin-factory. Make Linear, Jira, or the configured issue provider the source of truth. The factory should continuously select eligible tickets, start and supervise BB agent work, avoid duplicate dispatch, recover after restart, and reflect progress back through the existing Taskboard provider/status model. Reuse the current taskboard architecture and keep the first implementation focused and operable.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "review",
+  "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "The requested coordinator organization is implemented end to end and the user asked to continue autonomously. Consolidate the implemented iteration for independent review and verification.",
+  "message": "Repair fresh review findings: restore manual Start on pending undispatched ticket details; expose last-known queue and last scan observations in project status; show actual paused project policy above queue-owned ticket teams. Also inspect and fix server candidate pre-limit starvation: server candidates currently list limit 500 before service excludes claimed items. Preserve existing coordinator architecture and acceptance criteria.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:b1c54351a2cc67dd8586b2f2dad8f34f4f916b3b0656ee17756d3ab2f07fab77",
@@ -23,20 +23,21 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": true,
+    "implemented": false,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "implemented",
+    "highest": "none",
     "reasons": {
+      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-20T08:01:25.644Z",
+  "updatedAt": "2026-10-20T14:48:27.958Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin-63a17a591999",
@@ -76,13 +77,13 @@
     "actor": "agent",
     "revision": 3
   },
-  "trackerGeneration": 2,
+  "trackerGeneration": 3,
   "lifecycle": {
-    "stage": "consolidation",
-    "iteration": 2,
+    "stage": "iteration",
+    "iteration": 3,
     "awaitingFeedback": false,
     "contractRevision": 9
   },
-  "budgetExtensionMinutes": 120,
+  "budgetExtensionMinutes": 180,
   "reviewFirst": true
 }

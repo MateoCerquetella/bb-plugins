@@ -25,6 +25,8 @@ window.factoryItem = { ...item, source: 'linear', locator: 'issue-42', key: 'SDD
 const detail = <TrackerDetail route={{ kind: 'item', projectId: 'proj_test', source: 'linear', locator: 'issue-42' }} refreshGeneration={0} />;
 function Preview() {
   const [creating, setCreating] = React.useState(true);
+  const [projectId, setProjectId] = React.useState('proj_test');
+  window.factoryPreviewProject = setProjectId;
   const setTeam = (coordinator: FactoryRecord['coordinator'], blocker: string | null = null) => {
     window.factoryFixture.coordinator = coordinator;
     window.factoryFixture.automationError = blocker;
@@ -43,7 +45,7 @@ function Preview() {
   </TooltipProvider>;
   return <TooltipProvider><div className="tb-linear">
     <div id="preview-factory-settings" style={{ padding: 20 }}>
-      <FactoryProjectSettings projectId="proj_test" provider="github" />
+      <FactoryProjectSettings projectId={projectId} provider="github" />
     </div>
     <div id="preview-result" style={{ padding: 20 }}>
       <TaskboardResultDirective attributes={{ kind: 'review', verdict: 'blocked' }}
@@ -75,7 +77,11 @@ function Preview() {
       <button onClick={() => setTeam({ ...readyCoordinator(),
         error: 'The coordinator is archived. Restore the original thread.' })}>Coordinator unavailable</button>
       <button onClick={() => setTeam(null)}>Legacy team</button>
-      <button onClick={() => setTeam(readyCoordinator(), 'Factory paused. No new automatic stages will start.')}>Factory paused</button>
+      <button onClick={() => {
+        window.factoryProjectState = 'paused';
+        window.factoryFixture.admission = { kind: 'factory', claimedAt: new Date().toISOString() };
+        setTeam(readyCoordinator());
+      }}>Factory paused</button>
       <button onClick={() => setTeam(readyCoordinator(), 'Provider unavailable. The live provider request failed.')}>Provider read failed</button>
       <button onClick={() => setTeam(readyCoordinator(), 'Provider status stale. Eligibility could not be confirmed. provider-eligibility-request-with-a-long-unbroken-identifier-for-the-configured-project')}>Stale eligibility</button>
       <button onClick={() => setTeam(readyCoordinator(), 'Scope changed. Review the updated ticket before continuing.')}>Scope changed</button>
@@ -88,7 +94,7 @@ function Preview() {
         composerDragEnabled={false} onOpen={() => window.factoryNavigation.push('card-open')}
         onPrepare={() => {}} onDragStart={() => {}} onDragEnd={() => {}} onKeyDown={() => {}} />
     </div>
-    <div id="preview-manual"><FactoryProgress item={item} /></div>
+    <div id="preview-manual"><FactoryProgress item={{ ...item, bbProjectId: projectId }} /></div>
   </div></TooltipProvider>;
 }
 createRoot(document.querySelector('#root')!).render(<Preview />);

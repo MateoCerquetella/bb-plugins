@@ -81,7 +81,7 @@ test('factory policy defaults disabled and durable admission is idempotent and c
   }, policy);
   assert.equal(capacity.kind, 'capacity');
   assert.deepEqual(store.projectStatus(item.bbProjectId, item.source), {
-    kind: 'paused', policy, active: 1
+    kind: 'paused', policy, active: 1, queue: null, lastScan: null
   });
 });
 test('two database connections preserve claims, capacity, and policy after reopen', () => {
@@ -600,8 +600,13 @@ test('coordinator initialization outcomes do not complete stages or release work
 test('claimed tickets before the bounded scan window do not starve a later eligible ticket', async () => {
   const candidates = Array.from({ length: 501 }, (_, index) => ({ ...item, locator: `ticket-${index}` }));
   const liveReads: string[] = [];
+  let excluded: string[] = [];
   const f = fixture({
-    provider: () => item.source, candidates: async () => candidates,
+    provider: () => item.source,
+    candidates: async (_policy, excludeLocators) => {
+      excluded = excludeLocators;
+      return candidates.filter(candidate => !excludeLocators.includes(candidate.locator)).slice(0, 500);
+    },
     liveItem: async identity => {
       liveReads.push(identity.locator);
       return candidates.find(candidate => candidate.locator === identity.locator)!;
@@ -616,10 +621,12 @@ test('claimed tickets before the bounded scan window do not starve a later eligi
       f.store.save(record);
     }
     await f.service.scan(item.bbProjectId);
+    assert.equal(excluded.length, 500);
     assert.deepEqual(liveReads, ['ticket-500', 'ticket-500']);
     assert.equal(f.spawns(), 1);
     assert.equal(f.coordinatorSpawns(), 1);
     assert.equal(f.store.all().find(record => record.locator === 'ticket-500')?.runs[0].status, 'running');
+    assert.equal(f.store.getScan(item.bbProjectId)?.pendingCandidates, 0);
   } finally { f.db.close(); }
 });
 

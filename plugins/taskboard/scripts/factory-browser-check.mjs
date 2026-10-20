@@ -361,7 +361,7 @@ try {
   assert.equal(await team.getByRole('button', { expanded: true }).evaluate(el => el === document.activeElement), true);
   assert.equal(await team.locator('[data-team-role="review"]').getByRole('button').count(), 0);
   for (const scenario of [
-    ['Factory paused', 'Factory paused. No new automatic stages will start.'],
+    ['Factory paused', 'Factory paused. Existing sessions remain available, but no new automatic stage will start.'],
     ['Provider read failed', 'Provider unavailable. The live provider request failed.'],
     ['Stale eligibility', 'Provider status stale. Eligibility could not be confirmed. provider-eligibility-request-with-a-long-unbroken-identifier-for-the-configured-project'],
     ['Scope changed', 'Scope changed. Review the updated ticket before continuing.'],
@@ -398,16 +398,89 @@ try {
   });
   await team.locator('[data-team-role="coordinator"]').getByText('pending', { exact: true }).waitFor();
   assert.equal(await team.getByRole('button', { name: /^Open .* thread$/ }).count(), 0);
-  for (const state of ['running', 'paused', 'unconfigured', 'provider_error']) {
+  assert.equal(await manual.getByRole('button', { name: 'Start task', exact: true }).count(), 0);
+  await page.evaluate(() => {
+    window.factoryFixture.admission = { kind: 'manual' };
+    window.factoryFixture.automationError = null;
+    window.factoryFixture.version++; window.factoryRefresh();
+  });
+  await manual.getByRole('button', { name: 'Start task', exact: true }).waitFor();
+  await page.evaluate(() => {
+    window.factoryFixture.coordinator = null;
+    window.factoryFixture.version++; window.factoryRefresh();
+  });
+  assert.equal(await manual.getByRole('button', { name: 'Start task', exact: true }).isEnabled(), true);
+  for (const state of ['running', 'paused', 'awaiting_scan', 'unconfigured', 'provider_error']) {
     await page.evaluate(state => { window.factoryProjectState = state; window.factoryRefresh(); }, state);
-    const expected = state === 'unconfigured' || state === 'provider_error' ? 'blocked' : state;
+    const expected = state === 'unconfigured' || state === 'provider_error' ? 'blocked' : state === 'awaiting_scan' ? 'paused' : state;
     await factorySettings.getByText(`${expected} · github`, { exact: true }).waitFor();
+    if (state === 'awaiting_scan') {
+      await factorySettings.getByText('Provider queue unknown', { exact: false }).waitFor();
+      await factorySettings.getByText('Automatic intake is enabled and awaiting its first provider scan.').waitFor();
+      assert.equal(await factorySettings.getByText('Factory paused. No new automatic stages will start.').count(), 0);
+    } else if (state === 'running') {
+      await factorySettings.getByText('3 last-known unclaimed todo tickets within the 500-ticket scan window', { exact: false }).waitFor();
+      await factorySettings.getByText('Last scan success at', { exact: false }).waitFor();
+    } else if (state === 'provider_error') {
+      await factorySettings.getByText('Scan reason: Live provider scan failed.').waitFor();
+    }
     for (const width of [1280, 390]) {
       await page.setViewportSize({ width, height: 900 });
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
       await factorySettings.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, `taskboard-factory-state-${state}-${width}.png`) });
     }
   }
+  await page.evaluate(() => {
+    window.factoryFixture.admission = { kind: 'factory', claimedAt: new Date().toISOString() };
+    window.factoryFixture.automationError = null;
+    window.factoryProjectState = 'paused';
+    window.factoryRefresh();
+  });
+  await team.locator('[data-team-blocker]').getByText('Factory paused.', { exact: false }).waitFor();
+  const readsBefore = await page.evaluate(() => window.factoryProjectReads);
+  await page.evaluate(() => {
+    window.factoryProjectDelay = 250;
+    window.factoryRefresh();
+  });
+  await page.waitForFunction(reads => window.factoryProjectReads > reads, readsBefore);
+  await page.evaluate(() => {
+    window.factoryProjectDelay = 0;
+    window.factoryProjectState = 'running';
+    window.factoryRefresh();
+  });
+  await factorySettings.getByText('running · github', { exact: true }).waitFor();
+  await team.locator('[data-team-blocker]').waitFor({ state: 'hidden' });
+  await page.waitForTimeout(300);
+  assert.equal(await team.locator('[data-team-blocker]').count(), 0);
+  assert.equal(await factorySettings.getByText('paused · github', { exact: true }).count(), 0);
+  await page.evaluate(() => {
+    window.factoryProjectState = 'awaiting_scan';
+    window.factoryRefresh();
+  });
+  await team.locator('[data-team-blocker]')
+    .getByText('Automatic intake is enabled and awaiting its first provider scan.').waitFor();
+  await page.evaluate(() => {
+    window.factoryProjectState = 'paused';
+    window.factoryRefresh();
+  });
+  await team.locator('[data-team-blocker]').getByText('Factory paused.', { exact: false }).waitFor();
+  const readsBeforeSwitch = await page.evaluate(() => window.factoryProjectReads);
+  await page.evaluate(() => {
+    window.factoryProjectDelay = 250;
+    window.factoryRefresh();
+  });
+  await page.waitForFunction(reads => window.factoryProjectReads > reads, readsBeforeSwitch);
+  await page.evaluate(() => {
+    window.factoryProjectDelay = 0;
+    window.factoryProjectState = 'running';
+    window.factoryFixture.projectId = 'proj_other';
+    window.factoryPreviewProject('proj_other');
+  });
+  await factorySettings.getByText('running · github', { exact: true }).waitFor();
+  await team.locator('[data-team-blocker]').waitFor({ state: 'hidden' });
+  await page.waitForTimeout(300);
+  assert.equal(await team.locator('[data-team-blocker]').count(), 0);
+  assert.equal(await factorySettings.getByText('paused · github', { exact: true }).count(), 0);
   for (const start of [false, true]) {
     await page.goto(`https://taskboard-preview.test/?creation=${start}`);
     await page.getByLabel('Title', { exact: true }).fill('Fix screenshot layout');

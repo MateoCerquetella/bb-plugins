@@ -80,10 +80,15 @@ export function createFactoryStore(db: ReturnType<BbPluginApi['storage']['databa
       const records = this.all().filter(record => record.projectId === projectId);
       const active = records.filter(consumesFactoryCapacity).length;
       const scan = this.getScan(projectId);
-      if (!policy.enabled) return active ? { kind: 'paused', policy, active } : { kind: 'disabled', policy };
+      const observation = { queue: scan?.pendingCandidates ?? null, lastScan: scan };
+      if (!policy.enabled) return active
+        ? { kind: 'paused', policy, active, ...observation }
+        : { kind: 'disabled', policy, ...observation };
       if (policy.provider !== provider) return { kind: 'blocked', policy, active,
-        reason: 'Project provider changed. Save factory settings before continuing.' };
-      if (scan?.kind === 'blocked') return { kind: 'blocked', policy, reason: scan.reason ?? 'Provider scan failed.', active };
+        reason: 'Project provider changed. Save factory settings before continuing.', ...observation };
+      if (scan?.kind === 'blocked') return {
+        kind: 'blocked', policy, reason: scan.reason ?? 'Provider scan failed.', active, ...observation
+      };
       for (const record of records.filter(candidate => candidate.admission.kind === 'factory')) {
         const coordinator = record.coordinator;
         const run = record.runs.at(-1);
@@ -91,10 +96,15 @@ export function createFactoryStore(db: ReturnType<BbPluginApi['storage']['databa
           (coordinator && 'error' in coordinator ? coordinator.error : null) ??
           (run && (['uncertain', 'failed', 'canceled'].includes(run.status) || run.error)
             ? run.error ?? `Native ${run.kind} session ${run.status}. Inspect its recovery action.` : null);
-        if (reason) return { kind: 'blocked', policy, active, reason: `${record.locator}: ${reason}` };
+        if (reason) return {
+          kind: 'blocked', policy, active, reason: `${record.locator}: ${reason}`, ...observation
+        };
       }
-      if (policy.enabled && !scan) return { kind: 'paused', policy, active };
-      return { kind: 'running', policy, active, available: Math.max(0, policy.maxConcurrent - active) };
+      if (policy.enabled && !scan) return { kind: 'paused', policy, active, ...observation };
+      return {
+        kind: 'running', policy, active, available: Math.max(0, policy.maxConcurrent - active),
+        ...observation
+      };
     },
     admit(item: FactoryIdentity & { scopeDigest: string }, policy: FactoryProjectPolicy) {
       const key = factoryKey(item);

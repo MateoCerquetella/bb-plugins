@@ -138,7 +138,7 @@ export function createFactoryService(
   },
   queue?: {
     provider: (projectId: string) => FactoryProjectPolicy['provider'];
-    candidates: (policy: FactoryProjectPolicy) => Promise<WorkItem[]>;
+    candidates: (policy: FactoryProjectPolicy, excludeLocators: string[]) => Promise<WorkItem[]>;
     liveItem: (identity: FactoryIdentity) => Promise<WorkItem>;
   }
 ) {
@@ -596,7 +596,10 @@ export function createFactoryService(
           if (queue.provider(policy.projectId) !== policy.provider) {
             throw new Error('Project provider changed. Save factory settings before continuing.');
           }
-          const candidates = await queue.candidates(policy);
+          const excludeLocators = store.all().filter(record =>
+            record.projectId === policy.projectId && record.source === policy.provider
+          ).map(record => record.locator);
+          const candidates = await queue.candidates(policy, excludeLocators);
           const unclaimed = candidates.filter(candidate => candidate.bbProjectId === policy.projectId &&
             candidate.source === policy.provider && candidate.stateCategory === 'todo' && !store.get({
               projectId: candidate.bbProjectId, source: candidate.source, locator: candidate.locator
@@ -609,11 +612,14 @@ export function createFactoryService(
             const result = await this.admit(item, policy);
             if ('kind' in result && (result.kind === 'capacity' || result.kind === 'disabled')) break;
           }
+          const pendingCandidates = candidates.filter(candidate => !store.get({
+            projectId: candidate.bbProjectId, source: candidate.source, locator: candidate.locator
+          })).length;
           store.saveScan({ projectId: policy.projectId, observedAt: new Date().toISOString(),
-            kind: 'success', reason: null, candidates: candidates.length });
+            kind: 'success', reason: null, candidates: candidates.length, pendingCandidates });
         } catch (error) {
           store.saveScan({ projectId: policy.projectId, observedAt: new Date().toISOString(),
-            kind: 'blocked', reason: message(error), candidates: 0 });
+            kind: 'blocked', reason: message(error), candidates: 0, pendingCandidates: null });
         }
         changed(policy.projectId);
       }
