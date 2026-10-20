@@ -1,5 +1,5 @@
-import type { FactoryRecord, FactoryRun, FactoryRunKind } from './contract.js';
-import { MAX_REVIEW_REPAIRS } from './review.js';
+import type { FactoryRecord, FactoryRun, FactoryRunKind } from './contract.ts';
+import { MAX_REVIEW_REPAIRS } from './review.ts';
 
 export const stageLabels = { investigate: 'Investigate', plan: 'Plan', build: 'Build', review: 'Review' };
 export const stageKinds: FactoryRunKind[] = ['investigate', 'plan', 'build', 'review'];

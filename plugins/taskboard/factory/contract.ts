@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { empiricalObservationSchema } from '../empirical/contract.js';
+import { empiricalObservationSchema } from '../empirical/contract.ts';
 
 export const factoryProjectPolicySchema = z.object({
   projectId: z.string().startsWith('proj_').max(500),

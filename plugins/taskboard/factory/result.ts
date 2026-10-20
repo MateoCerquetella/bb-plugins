@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { factoryBuildResultSchema, factoryReviewResultSchema } from './contract.js';
+import { factoryBuildResultSchema, factoryReviewResultSchema } from './contract.ts';
 
 export const resultHeaderSchema = z.discriminatedUnion('kind', [
   z.object({

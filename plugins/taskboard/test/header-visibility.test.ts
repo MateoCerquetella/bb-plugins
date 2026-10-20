@@ -45,6 +45,8 @@ test('header controls can be hidden independently and restored', async t => {
   const props = { threadId: 'thr_test', projectId: 'proj_test', isCompactViewport: false };
   const record = {
     version: 1, stage: 'Build', automationError: null,
+    plans: [], approvedDigest: null,
+    trackerProgress: { status: 'pending', message: null },
     updatedAt: '2026-01-01T00:00:00Z',
     runs: [{ id: 'run', kind: 'build', status: 'running', steps: [], activity: 'Working' }]
   };

@@ -189,7 +189,10 @@ try {
     document.querySelector('#preview-manual .tb-session-picker select')?.value === 'run');
   assert.equal(await sessionSelect.inputValue(), 'run');
   await manual.locator('.tb-stage-rail').getByRole('button', { name: /Build/ }).click();
-  await sessionSelect.selectOption('run');
+  await manual.getByText('No build attempt recorded.', { exact: true }).waitFor();
+  assert.equal(await sessionSelect.count(), 0);
+  await manual.getByRole('button', { name: 'Follow current', exact: true }).click();
+  assert.equal(await sessionSelect.inputValue(), 'run');
   await manual.getByRole('tab', { name: 'Plan', exact: true }).click();
   await manual.getByText('Edit implementation plan', { exact: true }).click();
   await manual.getByRole('button', { name: 'Save revision' }).click();
@@ -258,7 +261,7 @@ try {
       repairOf: null, planDigest: record.approvedDigest, activity: 'Review found blockers' }];
     window.factoryRefresh();
   });
-  await manual.getByRole('status').getByText('Review found blockers', { exact: true }).waitFor();
+  await manual.getByRole('status').getByText('Review found blockers. Return to Build with the findings to continue.', { exact: true }).waitFor();
   for (const width of [1280, 390]) {
     await page.setViewportSize({ width, height: 900 });
     assert.equal(await manual.getByRole('button', { name: 'Return to Build with findings', exact: true }).isEnabled(), true);
@@ -358,6 +361,8 @@ try {
   });
   await page.getByRole('button', { name: 'Team ready', exact: true }).click();
   const team = manual.locator('[data-factory-team]');
+  await manual.getByRole('tab', { name: 'Activity', exact: true }).click();
+  await manual.locator('.tb-run').waitFor();
   assert.equal(await manual.locator('.tb-run').count(), 1);
   await manual.getByRole('tab', { name: 'Workspace', exact: true }).click();
   await team.getByRole('button', { name: 'Open coordinator thread', exact: true }).click();

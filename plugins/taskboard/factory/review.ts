@@ -1,5 +1,5 @@
-import { factoryBuildResultSchema, factoryReviewResultSchema } from './contract.js';
-import { readResultMessage } from './result.js';
+import { factoryBuildResultSchema, factoryReviewResultSchema } from './contract.ts';
+import { readResultMessage } from './result.ts';
 
 export const MAX_REVIEW_REPAIRS = 2;
 
