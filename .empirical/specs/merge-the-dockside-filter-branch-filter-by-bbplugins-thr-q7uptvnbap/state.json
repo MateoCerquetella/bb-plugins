@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 12,
+  "revision": 13,
   "activeFeature": "merge-the-dockside-filter-branch-filter-by-bbplugins-thr-q7uptvnbap",
   "request": "Merge the dockside filter branch filter-by-bbplugins-thr_q7uptvnbap into main and release Dockside v0.1.8: bump version (0.1.7 is already taken by an unrelated tag), update changelog/README if needed, run dockside checks, tag dockside/v0.1.8, push branch/tag, and verify the marketplace install resolves 0.1.8.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "verify",
+  "phase": "integrate",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Fresh-context review approved all six criteria; the blocking filter-rendering defect was fixed and re-reviewed; six non-blocking findings deferred.",
+  "message": "Dockside unit suite passed (228 tests), fresh-context QA recorded from the approved review, and the security consult found no blocking issue.",
   "implementationActor": "agent",
   "workStartedAt": "2026-10-20T20:02:28.896Z",
   "specDigest": "sha256:face92d19239cbd2edd29d70d45ee3e17a9e78a6e12969f270c03bc5295f21a7",
@@ -21,24 +21,25 @@
   "authorizationDigest": null,
   "evidence": [],
   "evidenceReceiptIds": [
-    "collected-1db75c32d3eda575abe02727"
+    "collected-1db75c32d3eda575abe02727",
+    "qa-2fcfeb2be8a231fbeeb9f18d",
+    "qa-1084879f6169936ffb51df55"
   ],
   "legacyEvidenceCount": 0,
   "completion": {
     "implemented": true,
-    "verified": false,
+    "verified": true,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "implemented",
+    "highest": "verified",
     "reasons": {
-      "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-20T20:13:36.584Z",
+  "updatedAt": "2026-10-20T20:14:49.168Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "merge-the-dockside-filter-branch-filter-by-bbplugins-thr-q7uptvnbap-55654f1ea1c7",
