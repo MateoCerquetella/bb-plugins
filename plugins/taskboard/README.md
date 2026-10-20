@@ -290,7 +290,7 @@ Taskboard is a full-trust BB plugin. Review the source, then install its trackin
 Git release directly from this monorepo:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.4 --subdirectory plugins/taskboard --tag-prefix taskboard/
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.5 --subdirectory plugins/taskboard --tag-prefix taskboard/
 ```
 
 The [BB Community entry](https://github.com/get-bb/marketplace/pull/129)
