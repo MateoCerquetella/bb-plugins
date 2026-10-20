@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:00dcb52c4dfcf601e7c53734fc636b6a9efb348855f95fc95af430bb3b541f99",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "1807befaa9c0732d83b6223d3821ba83268d98e7",
+  "headCommit": "6b58858bbcdc361d6c01eb23604e972d9cdd0eea",
+  "diffDigest": "sha256:f2e84b93049199505e99fe856a53ffb81004fd9af03d51e2c4288541d528c501",
+  "verdict": "APPROVED",
+  "reviewerActor": "fresh-context-dockside-review",
+  "reviewerInvocationId": "dockside-review-20261016-1",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: The filter derives project choices from active project groups rather than a hard-coded bbplugins value.\n- PASS AC-2: Project selection filters complete groups while preserving group and row hierarchy.\n- PASS AC-3: Existing preset filtering remains represented in the shared filter path and focused tests.\n- PASS AC-UI-1: The trigger uses the active project label and accessible naming.\n- PASS AC-UI-2: All remains the restore selection in the existing menu.\n\n## Security / correctness\n\nNo Dockside-specific security or correctness blockers found in the reviewed implementation; project IDs remain internal selection identities and no user-controlled command or credential path was added.\n\n## Design / maintainability\n\nThe project/preset discriminated union and pure group filtering keep the change localized to the existing inbox filter flow. Host metadata is rendered in the existing secondary row for both root and child cards.",
+  "bodyDigest": "sha256:5bd5c5f0b58a57e9a3174a9fb7d2dd4f57566bf8108c8b1667206172b16b46d7",
+  "findings": [],
+  "digest": "sha256:a5056a9621b75af4116a806e7ac0d370aba6de92dd94d8707c99585ec8929fcb"
+}

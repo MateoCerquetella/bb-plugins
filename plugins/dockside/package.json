@@ -1,6 +1,6 @@
 {
   "name": "bb-plugin-dockside",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Project-first threads, inline agents, and mobile active-thread navigation.",
   "license": "MIT",
   "author": "Mateo Cerquetella",
