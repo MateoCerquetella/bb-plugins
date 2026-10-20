@@ -11,6 +11,16 @@ const evidenceViews: { id: EvidenceView; label: string }[] = [
   { id: 'changes', label: 'Changes' }, { id: 'plan', label: 'Plan' }, { id: 'workspace', label: 'Workspace' }
 ];
 
+function stageTone(run: FactoryRun | undefined) {
+  if (!run) return 'waiting';
+  if (run.status === 'running' || run.status === 'starting') return 'active';
+  if (run.status === 'failed') return 'failed';
+  if (run.status === 'uncertain' || run.status === 'canceled' ||
+    run.buildResult?.verdict === 'blocked' || run.buildResult?.verdict === 'needs_input' ||
+    run.kind === 'review' && run.status === 'finished' && run.reviewResult?.verdict !== 'passed') return 'attention';
+  return run.reviewResult?.verdict === 'passed' ? 'success' : 'complete';
+}
+
 export function FactoryConsole({ record, workspace, plan, renderRun }: {
   record: FactoryRecord;
   workspace: ReactNode;
@@ -40,7 +50,7 @@ export function FactoryConsole({ record, workspace, plan, renderRun }: {
         const latest = record.runs.filter(candidate => candidate.kind === kind).at(-1);
         return <button key={kind} type="button" aria-pressed={stage === kind}
           aria-current={current?.kind === kind ? 'step' : undefined}
-          data-observed={!!latest} data-current={current?.kind === kind}
+          data-observed={!!latest} data-current={current?.kind === kind} data-tone={stageTone(latest)}
           onClick={() => { setSelection({ kind: 'attempt', stage: kind, runId: latest?.id ?? null }); setView('activity'); }}>
           <span className="tb-stage-number">{index + 1}</span>
           <span><strong>{stageLabels[kind]}</strong><small>{latest ? runStatus(latest) : 'Waiting'}</small></span>

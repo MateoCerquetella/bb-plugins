@@ -244,6 +244,12 @@ try {
     if (!wide) {
       await page.locator('#preview-detail .tb-detail-switch').getByRole('tab', { name: 'Ticket' }).click();
       assert.equal(await page.locator('#preview-detail .tb-detail-context').isVisible(), true);
+      assert.equal(await page.locator('#preview-detail .tb-comment-entry').count(), 2);
+      assert.equal(await page.locator('#preview-detail .tb-detail-source[data-source="linear"]').count(), 1);
+      assert.equal(await page.locator('#preview-detail .tb-detail-status[data-state-category="in_progress"]').count(), 1);
+      if (width === 390) {
+        await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, 'taskboard-ticket-comments-mobile.png'), fullPage: true });
+      }
       await page.locator('#preview-detail .tb-detail-switch').getByRole('tab', { name: 'Factory' }).click();
     }
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);

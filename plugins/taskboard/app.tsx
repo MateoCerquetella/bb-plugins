@@ -5098,20 +5098,29 @@ function DetailMetadata({
   item: WorkItemDetail;
   className?: string;
 }) {
+  const priority = visiblePriority(item.priority);
+  const assignee = visibleAssignee(item.assignee);
   const fields = [
-    ['Source', sourceName(item.source)],
-    ['Status', item.status],
-    ['Priority', item.priority ?? 'None'],
-    ['Assignee', item.assignee ?? 'Unassigned'],
-    ['External project', item.project ?? 'None'],
-    ['Updated', formatUpdatedAt(item.updatedAt)]
-  ] as const;
+    { label: 'Source', value: <SourceMark source={item.source} className="tb-detail-source" /> },
+    { label: 'Status', value: <span className="tb-detail-status" data-state-category={item.stateCategory}
+      data-status-tone={workflowStatusTone(item.status, item.stateCategory)}>
+      <WorkStateGlyph category={item.stateCategory} />{item.status}
+    </span> },
+    { label: 'Priority', value: <span className="tb-detail-priority">
+      {priority ? <><PriorityMark priority={priority} />{priority}</> : 'None'}
+    </span> },
+    { label: 'Assignee', value: <span className="tb-detail-assignee">
+      {assignee ? <><AssigneeMark assignee={assignee} /><span>{assignee}</span></> : 'Unassigned'}
+    </span> },
+    { label: 'External project', value: item.project ?? 'None' },
+    { label: 'Updated', value: formatUpdatedAt(item.updatedAt) }
+  ];
   return (
     <dl className={cn('tb-detail-metadata grid grid-cols-2 gap-x-4 gap-y-3', className)}>
-      {fields.map(([label, value]) => (
-        <div key={label} className="min-w-0">
-          <dt className="text-xs text-muted-foreground">{label}</dt>
-          <dd className="truncate text-sm font-medium" title={value}>{value}</dd>
+      {fields.map(field => (
+        <div key={field.label} className="min-w-0">
+          <dt className="text-xs text-muted-foreground">{field.label}</dt>
+          <dd className="tb-detail-value text-sm font-medium">{field.value}</dd>
         </div>
       ))}
     </dl>
@@ -5287,7 +5296,9 @@ function TrackerDetail({
                 event.preventDefault();
                 setDetailView('factory');
                 document.getElementById(`${detailTabsId}-factory-tab`)?.focus();
-              }}>Ticket</button>
+              }}>Ticket <span className="tb-detail-tab-count" aria-label={`${item.comments.length} comments`}>
+                <Icon name="MessageCirclePlus" className="size-3" />{item.comments.length}
+              </span></button>
           </div>
           <div className="tb-detail-workbench">
             <section className="tb-detail-factory" id={`${detailTabsId}-factory-panel`}
@@ -5309,29 +5320,28 @@ function TrackerDetail({
                 {item.description.trim() ? <Markdown content={item.description} />
                   : <p className="text-sm text-muted-foreground">No description provided.</p>}
               </section>
-              {item.comments.length > 0 ? (
-                <section className="tb-comment-rail mt-8 border-t pt-5">
+              <section className="tb-comment-rail mt-8 border-t pt-5">
               <h2 className="mb-1 text-sm font-semibold">
                 Comments <span className="text-muted-foreground">{item.comments.length}</span>
               </h2>
-              <div className="ml-2">
+              {item.comments.length > 0 ? <div className="ml-2">
                 {item.comments.map((comment, index) => (
                   <article
                     key={`${comment.author}:${comment.createdAt}:${index}`}
                     className="tb-comment-entry relative py-4 pl-6"
                   >
                     <div className="mb-2 flex items-center justify-between gap-3 text-xs text-muted-foreground">
-                      <span className="font-medium text-foreground">
-                        {comment.author}
+                      <span className="flex min-w-0 items-center gap-2 font-medium text-foreground">
+                        <AssigneeMark assignee={comment.author} />
+                        <span className="truncate">{comment.author}</span>
                       </span>
                       <time>{formatUpdatedAt(comment.createdAt)}</time>
                     </div>
                     <Markdown content={comment.body} />
                   </article>
                 ))}
-              </div>
-                </section>
-              ) : null}
+              </div> : <p className="mt-3 text-sm text-muted-foreground">No comments yet.</p>}
+              </section>
             </section>
           </div>
         </article>

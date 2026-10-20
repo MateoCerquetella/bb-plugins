@@ -20,7 +20,12 @@ window.factoryItem = { ...item, source: 'linear', locator: 'issue-42', key: 'SDD
   title: 'Close already-merged features automatically at session start',
   description: 'Reconcile merged work when a session starts without closing active work by mistake.\n\n## Acceptance criteria\n\n- Detect the exact merged revision.\n- Preserve tickets that still have open work.\n- Report the reconciliation result to the operator.',
   priority: 'Urgent', assignee: 'Juan Sebastian Salazar Agudelo', project: 'Empirical SDD',
-  updatedAt: new Date().toISOString(), comments: []
+  updatedAt: new Date().toISOString(), comments: [
+    { author: 'Mateo Cerquetella', body: 'Keep the reconciliation visible to operators and preserve active work.',
+      createdAt: new Date(Date.now() - 3_600_000).toISOString() },
+    { author: 'Factory coordinator', body: 'The merged revision check is ready for review.',
+      createdAt: new Date().toISOString() }
+  ]
 };
 const detail = <TrackerDetail route={{ kind: 'item', projectId: 'proj_test', source: 'linear', locator: 'issue-42' }} refreshGeneration={0} />;
 function Preview() {
