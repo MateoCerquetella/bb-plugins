@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 5,
+  "revision": 8,
   "activeFeature": "plugin-release-and-aura-titlebar",
   "request": "Fix Taskboard distribution documentation test, verify and release Action Topbar 0.1.2 and Taskboard 0.3.5, fix Aura issue #92 with regression and visual evidence, and merge reviewed changes only with required passing checks. Preserve marketplace PR #621 and its maintainer-only v1-change blocker; leave private plugins unlisted.",
   "profile": "complex",
@@ -9,8 +9,8 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Planned the smallest source and regression changes, focused and root verification, BB Surf visual proof, exact-head review and release creation, separate marketplace contribution, and merge and issue-closure gates.",
-  "implementationActor": null,
+  "message": "Fix review finding F-1 by extending the Aura lifecycle regression so both thread-detail-timeline-panel and root-compose-main-panel are inside a data-framed host and both match the title-bar offset, then remove and restore data-framed to prove unframed panels retain their original behavior. Preserve the existing implementation and all other acceptance criteria.",
+  "implementationActor": "agent",
   "workStartedAt": "2026-10-20T16:02:58.264Z",
   "specDigest": "sha256:9c1ba7f274f7ffdd7be116c37fef22ce95466db4fc1a0500249135ebf4a33e28",
   "approvedSpecRevision": 3,
@@ -37,7 +37,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-20T16:06:43.316Z",
+  "updatedAt": "2026-10-20T16:10:56.073Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "plugin-release-and-aura-titlebar-819c99b2410c",
@@ -74,5 +74,12 @@
     "heartbeatAt": "2026-10-20T16:04:24.888Z",
     "digest": "sha256:bea32dce42b9efc683afac2979883a5401a16a4210fb3f4b96885ba95b7e1ede"
   },
-  "reviewFirst": true
+  "trackerGeneration": 1,
+  "lifecycle": {
+    "stage": "iteration",
+    "iteration": 1,
+    "awaitingFeedback": false
+  },
+  "reviewFirst": true,
+  "budgetExtensionMinutes": 60
 }

@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "sequence": 8,
+  "previousDigest": "sha256:f5429829cfcc4a0c3d4023151882b00a2ffc429fb27df1df695ce2bb75bda030",
+  "actor": "codex",
+  "type": "transition",
+  "summary": "Checkpoint: continue with 60 more minutes",
+  "createdAt": "2026-10-20T16:10:56.073Z",
+  "stateBeforeDigest": "sha256:3ebcfffb58cf03b671c7ed14654954d8bdc7d6c794c33a9975b07a9df960c31d",
+  "stateAfterDigest": "sha256:7ebd61405068859e85dedc064bb56681a52ca22cf7f1fc1a58810716d50c3b0b",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 8,
+    "activeFeature": "plugin-release-and-aura-titlebar",
+    "request": "Fix Taskboard distribution documentation test, verify and release Action Topbar 0.1.2 and Taskboard 0.3.5, fix Aura issue #92 with regression and visual evidence, and merge reviewed changes only with required passing checks. Preserve marketplace PR #621 and its maintainer-only v1-change blocker; leave private plugins unlisted.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Fix review finding F-1 by extending the Aura lifecycle regression so both thread-detail-timeline-panel and root-compose-main-panel are inside a data-framed host and both match the title-bar offset, then remove and restore data-framed to prove unframed panels retain their original behavior. Preserve the existing implementation and all other acceptance criteria.",
+    "implementationActor": "agent",
+    "workStartedAt": "2026-10-20T16:02:58.264Z",
+    "specDigest": "sha256:9c1ba7f274f7ffdd7be116c37fef22ce95466db4fc1a0500249135ebf4a33e28",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:44e75bea23ede5a97db8efd9e38fb114d6505330a7b1455a4ea9e62417d28c3b",
+    "impactDigest": "sha256:76b80b6c3250784c4d631ada05b6bacaf2f14512af5d56271fa3ea4b76b95ebc",
+    "capabilityClaimId": "plugin-release-and-aura-titlebar-819c99b2410c",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-20T16:10:56.073Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "plugin-release-and-aura-titlebar-819c99b2410c",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "plugin-release-and-aura-titlebar",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_g3gqe5f7fh-1/bb-plugins-plugin-release-and-aura-titlebar",
+      "worktreeId": "sha256:0f01ced8ff2555adf303e43443d0cf290e6b6950d443cfd9cedc9fc4ed10071b",
+      "baseCommit": "85d1b0655b9883adf940eab0d82d7bd95c956e28",
+      "baseTree": "a25cd39c6da0e7c195c6eabcdbd1b94b045ee2d4",
+      "bases": {
+        "aura-activity-overview": {
+          "capability": "aura-activity-overview",
+          "digest": "sha256:6332d62dfefabb2b556713c9deb86614f3137f549208c6b1169e408b824010fc",
+          "requirements": {
+            "keep wallpaper below the framed title bar": null
+          }
+        },
+        "plugin-git-distribution": {
+          "capability": "plugin-git-distribution",
+          "digest": "sha256:97483aac37ef8bb1a7b538a24be367c24d65f9216711a67c49238261e655021b",
+          "requirements": {
+            "publish verified action topbar and taskboard releases": null,
+            "respect external release gates": null
+          }
+        }
+      },
+      "capabilities": [
+        "aura-activity-overview",
+        "plugin-git-distribution"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-20T16:04:24.888Z",
+      "heartbeatAt": "2026-10-20T16:04:24.888Z",
+      "digest": "sha256:bea32dce42b9efc683afac2979883a5401a16a4210fb3f4b96885ba95b7e1ede"
+    },
+    "trackerGeneration": 1,
+    "lifecycle": {
+      "stage": "iteration",
+      "iteration": 1,
+      "awaitingFeedback": false
+    },
+    "reviewFirst": true,
+    "budgetExtensionMinutes": 60
+  },
+  "digest": "sha256:cc6c36dd0d5e383004560f78772438ab3868944861d37e6cbc5f148ea4efa676"
+}

@@ -10,7 +10,7 @@
   },
   "isolation": {
     "mode": "ask",
-    "baseBranch": "main",
+    "baseBranch": "origin/main",
     "worktreePath": "../{repo}-{feature}",
     "branchPattern": "{type}/{feature}"
   },
