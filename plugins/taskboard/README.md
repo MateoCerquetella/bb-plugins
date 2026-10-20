@@ -165,6 +165,47 @@ revision, PR evidence capture, accepted-review and Done gates remain pending.
 Command results are observations, not proof that all required checks passed.
 No factory action merges, deploys or closes a ticket.
 
+### Autonomous intake
+
+Open **Manage → Autonomous factory** to opt a project into automatic intake.
+Taskboard scans the project's configured Linear, Jira, GitHub, GitLab, or
+Gitea provider for `todo` tickets. It claims eligible tickets in the Taskboard
+database before starting the existing investigate, plan, build, and review
+workflow. The setting is disabled by default and the concurrency limit applies
+only to automatically claimed work. Manual **Start task** actions remain
+available.
+
+Each new ticket workflow gets one native coordinator thread. Investigation,
+Plan, Build, and independent Review sessions appear beneath it as stage agents;
+Build retains its managed worktree and repairs continue in the original Build
+session. **Start task** opens the coordinator. Each stage's **Open thread**
+action opens that exact session. The factory service owns dispatch and recovery;
+the coordinator is the ticket's stable conversation and native parent.
+
+Historical workflows show **Legacy sessions**. **Add coordinator** creates a
+parent for future stage sessions while keeping existing history and reused
+Build sessions unchanged and labelled legacy. A confirmed coordinator rejection
+offers **Retry coordinator**. When creation is uncertain, inspect the native
+threads and use **Link coordinator** with the matching existing thread ID.
+Taskboard never automatically replaces an uncertain coordinator. Restoring an
+unavailable coordinator preserves the original hierarchy.
+
+Pausing automatic intake stops new claims and later automatic stages. It does
+not cancel an active native thread. Provider read failures, provider changes,
+ticket closure, and ticket scope changes block later dispatch and remain
+visible in Manage. Claims prevent duplicates only for Taskboard processes that
+share the same plugin database. The factory does not merge, deploy, close a
+ticket, or accept a passed review for the operator.
+
+The same controls are available from the CLI:
+
+```sh
+bb taskboard factory status --project proj_example --json
+bb taskboard factory enable 2 --project proj_example
+bb taskboard factory scan --project proj_example
+bb taskboard factory pause --project proj_example
+```
+
 Run `npm run check --workspace bb-plugin-taskboard` from the workspace root.
 The opt-in native harness uses isolated storage and does not install a plugin
 or contact a tracker:

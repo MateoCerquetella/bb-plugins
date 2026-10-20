@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-0adcb9d8f9a6f37b9fc01cf6",
+  "criteria": [
+    "AC-1",
+    "AC-4",
+    "AC-5",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Actual-component fixture browser harness passed on fdf71d932 in this thread's BB Surf project with zero browser errors. Desktop/mobile hierarchy, long blocker wrapping, factory state distinctions, disclosure Enter/Space, focus retention, refresh stability and overflow assertions passed; representative desktop/mobile/blocker screenshots visually inspected. SDK/RPC/provider/native boundaries are mocked, so this is UI-only evidence. Separate parent-provided native smoke log records real coordinator/child parentThreadId linkage and completed child; exact-head backend tests are receipt qa-eca7eee39cac64fccdd7598f. No temporary server started or left running.",
+  "passed": true,
+  "startedAt": "2026-10-20T15:40:45.377Z",
+  "completedAt": "2026-10-20T15:40:45.377Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin",
+    "specRevision": 11,
+    "specDigest": "sha256:b1c54351a2cc67dd8586b2f2dad8f34f4f916b3b0656ee17756d3ab2f07fab77",
+    "treeDigest": "sha256:7babc62355177b450b81f80a2e50ada000dfd3ac37513c9daf2163075cc55402",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:ada761ae149ce99e1cdb8e8c4be9bf8fe233c2b4bc1905a42c46c9b20ce8f96f",
+  "kind": "collected",
+  "collector": "fresh-context outcome QA revision 34",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r34/fresh-context-r34-browser.log",
+      "mediaType": "text/plain",
+      "bytes": 441,
+      "digest": "sha256:52d20a990f761ebf24eb3ecde1d67aa39b85d51eda697b035ec62b2094d70ba9"
+    },
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r34/taskboard-factory-state-provider_error-1280.png",
+      "mediaType": "image/png",
+      "bytes": 25331,
+      "digest": "sha256:f45669aa88bcaf4fdbbe6600ee31316654e29a02fb57a8c5d1d3332f4ececb5d"
+    },
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r34/taskboard-progress-desktop.png",
+      "mediaType": "image/png",
+      "bytes": 206646,
+      "digest": "sha256:8d485285692ee0064a49bac2432c53203004e6be633f69af8927dea7fbd60e72"
+    },
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r34/taskboard-progress-mobile.png",
+      "mediaType": "image/png",
+      "bytes": 192074,
+      "digest": "sha256:9efa7213c6d8aa9db6d1f6a495cb4677a8a22440905dd8a78f57373b9d18a514"
+    },
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r34/taskboard-team-stale-eligibility-390.png",
+      "mediaType": "image/png",
+      "bytes": 57022,
+      "digest": "sha256:59f1ac7d7d0d69dfa32b571a552b3f54e094cb89094a178d98b53ee43c2462a4"
+    }
+  ]
+}

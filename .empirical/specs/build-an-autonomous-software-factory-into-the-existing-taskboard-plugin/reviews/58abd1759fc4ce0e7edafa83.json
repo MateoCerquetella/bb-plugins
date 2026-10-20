@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:47965093a8cf6b1b9c05943141075c7865b5975b3c709818e2c8d9beb5b0764f",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "1807befaa9c0732d83b6223d3821ba83268d98e7",
+  "headCommit": "fdf71d93258984fbb91790defeaf0e65cff5f694",
+  "diffDigest": "sha256:8ae223570a88cce5e55f0c28d6498e4f4c21fbb7288937fb2d58b087d9d696e2",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "fresh-full-reviewer-r33",
+  "reviewerInvocationId": "fresh-full-reviewer-r33-20261020T000001Z",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- PASS AC-1: The committed factory/store changes persist project-scoped enablement, provider identity, intake policy, and concurrency with disabled defaults and focused coverage.\n- PASS AC-2: The committed admission path and factory tests cover bounded discovery, durable-claim exclusion before scan limiting, live eligibility checks, provider scoping, and non-admission of ineligible work.\n- PASS AC-3: The committed coordinator/dispatch state machine and tests cover restart/concurrency deduplication, capacity, and ambiguous native dispatch without automatic retry.\n- FAIL AC-4: The committed implementation and tests establish coordinator ownership and native child stage sessions, but the packet does not include independently captured evidence for every UI-visible hierarchy or managed-worktree/review execution path.\n- FAIL AC-5: The committed service and tests represent pause and fail-closed provider states, but the packet lacks independent runtime evidence that all Project Manage and ticket-group blocker states are surfaced consistently.\n- PASS AC-6: The committed service preserves observation-only progress and human acceptance boundaries and includes tests for failure/isolation paths.\n- FAIL AC-7: The committed RPC/CLI validation and focused behavioral tests cover the listed backend concerns, but no fresh full verification receipt is present in this review packet.\n- FAIL AC-UI-1: The criterion explicitly requires desktop/mobile browser evidence, keyboard/focus behavior, no overflow, and refresh retention; the committed packet contains no such browser evidence receipt or screenshot artifact.\n\n## Security / correctness\n\nNo credential exposure, authentication bypass, or authorization bypass is evident in the committed diff. Provider inputs are parsed and scoped, and external tracker text is treated as untrusted data. Security review passes, subject to the absence of live runtime evidence.\n\n## Design / maintainability\n\nChanges are broad across provider adapters, persistence, service orchestration, CLI/RPC, and UI. The existing FactoryRecord-centered ownership is maintainable, but the packet adds substantial stateful behavior without a fresh-context implementation review or end-to-end browser evidence. The absence of executable verification artifacts for the acceptance surface leaves maintainability and regression risk unresolved.",
+  "bodyDigest": "sha256:fc8b15d133b9d41f0ebef5d8f6846991367bfbac0243d5c92a5840a85e2621c5",
+  "findings": [
+    {
+      "id": "F-1",
+      "severity": "high",
+      "category": "acceptance",
+      "summary": "AC-UI-1 requires desktop/mobile browser evidence for states, accessibility, overflow, and refresh retention, but the committed packet contains no browser verification receipt or screenshot evidence."
+    },
+    {
+      "id": "F-2",
+      "severity": "medium",
+      "category": "tests",
+      "summary": "The packet contains focused unit tests and logged checks but no fresh full-repository verification receipt for the exact reviewed head, so cross-plugin integration regressions remain unproven."
+    },
+    {
+      "id": "F-3",
+      "severity": "medium",
+      "category": "correctness",
+      "summary": "The asynchronous factory dispatch and provider revalidation paths are represented in unit fixtures, but no committed runtime evidence proves policy/provider changes during an in-flight dispatch fail closed without creating a stale coordinator."
+    },
+    {
+      "id": "F-4",
+      "severity": "medium",
+      "category": "maintainability",
+      "summary": "The change spans multiple large orchestration and persistence surfaces while retaining broad service responsibilities; without an end-to-end exercise, ownership boundaries and failure isolation are difficult to validate."
+    }
+  ],
+  "digest": "sha256:58abd1759fc4ce0e7edafa83d1f670042c6d33f765dcf3f81caa80d24be30275"
+}

@@ -74,7 +74,7 @@ import { createWorkItemStore } from './store.js';
 import { decodeTicketImage } from './ticket-images-server.js';
 import { createFactoryStore } from './factory/store.js';
 import { createFactoryService } from './factory/service.js';
-import type { FactoryIdentity } from './factory/contract.js';
+import { factoryProjectPolicySchema, type FactoryIdentity } from './factory/contract.js';
 import { factoryKey } from './factory/state.js';
 import { createEmpiricalObservationQueue } from './empirical/serial.js';
 import { hostContract } from './preparation/contract.js';
@@ -192,6 +192,7 @@ interface ParsedCliArguments {
 
 const CLI_OPTIONS_BY_COMMAND = new Map<string, ReadonlySet<string>>([
   ['status', new Set(['--project', '--json'])],
+  ['factory', new Set(['--project', '--json'])],
   [
     'list',
     new Set([
@@ -482,6 +483,18 @@ export default async function plugin(bb: BbPluginApi) {
         if (updated.stateCategory !== 'in_progress') throw new Error('The tracker did not confirm In progress.');
         return { status: 'synced', message: null };
       }
+    }, {
+      provider: projectId => projectConfig(projectId, true).source,
+      async candidates(policy, excludeLocators) {
+        const statuses = await syncAll(policy.projectId, policy.provider, true);
+        const status = statuses.find(candidate => candidate.source === policy.provider);
+        if (!status?.available) throw new Error(status?.message ?? 'Provider is unavailable.');
+        return store.list({
+          projectId: policy.projectId, source: policy.provider, stateCategories: ['todo'],
+          excludeLocators, limit: 500
+        });
+      },
+      liveItem: identity => getLiveItem(identity.projectId, identity.source, identity.locator)
     }
   );
   const queueEmpiricalObservation = createEmpiricalObservationQueue();
@@ -580,7 +593,10 @@ export default async function plugin(bb: BbPluginApi) {
     async start(signal) {
       await factory.recover();
       while (!signal.aborted) {
-        try { await factory.poll(signal); }
+        try {
+          await factory.scan();
+          await factory.poll(signal);
+        }
         catch (error) { if (!signal.aborted) bb.log.warn(`Factory progress: ${errorMessage(error)}`); }
         await sleep(2500, signal);
       }
@@ -1910,6 +1926,26 @@ export default async function plugin(bb: BbPluginApi) {
     }
   });
   const handlers: PluginRpcHandlers<typeof taskboardRpcContract> = {
+    async factoryGetProject(input) {
+      await assertProjectExists(input.projectId);
+      const provider = projectConfig(input.projectId, true).source;
+      return { policy: factoryStore.getProjectPolicy(input.projectId, provider),
+        status: factoryStore.projectStatus(input.projectId, provider) };
+    },
+    async factorySaveProject(input) {
+      await assertProjectExists(input.projectId);
+      assertSelectedSource(input.projectId, input.provider);
+      const policy = factoryStore.saveProjectPolicy(factoryProjectPolicySchema.parse({
+        ...input, updatedAt: new Date().toISOString()
+      }));
+      bb.realtime.publish('taskboard:factory', { projectId: input.projectId });
+      return { policy, status: factoryStore.projectStatus(input.projectId, input.provider) };
+    },
+    async factoryScanProject(input) {
+      await assertProjectExists(input.projectId);
+      await factory.scan(input.projectId);
+      return { status: factoryStore.projectStatus(input.projectId, projectConfig(input.projectId, true).source) };
+    },
     async improveTicket(input) {
       await assertProjectExists(input.projectId);
       return ticketImprovement.start(input);
@@ -1944,6 +1980,21 @@ export default async function plugin(bb: BbPluginApi) {
       await assertProjectExists(input.projectId);
       const item = await getLiveItem(input.projectId, input.source, input.locator);
       return { record: await factory.linkRecovered(item, input.expectedVersion, input.threadId) };
+    },
+    async factoryAdoptCoordinator(input) {
+      await assertProjectExists(input.projectId);
+      const item = await getLiveItem(input.projectId, input.source, input.locator);
+      return { record: await factory.adoptCoordinator(item, input.expectedVersion) };
+    },
+    async factoryRetryCoordinator(input) {
+      await assertProjectExists(input.projectId);
+      const item = await getLiveItem(input.projectId, input.source, input.locator);
+      return { record: await factory.retryCoordinator(item, input.expectedVersion, input.intentId) };
+    },
+    async factoryRecoverCoordinator(input) {
+      await assertProjectExists(input.projectId);
+      const item = await getLiveItem(input.projectId, input.source, input.locator);
+      return { record: await factory.recoverCoordinator(item, input.expectedVersion, input.intentId, input.threadId) };
     },
     async factoryGet(input) {
       await assertProjectExists(input.projectId);
@@ -2161,6 +2212,8 @@ export default async function plugin(bb: BbPluginApi) {
     name: 'taskboard',
     summary: 'Browse tasks and inspect durable preparation briefs',
     commands: [
+      { name: 'factory', summary: 'Inspect, enable, pause, or scan the project factory',
+        usage: 'bb taskboard factory status|enable [concurrency]|pause|scan [--project <proj_id>] [--json]' },
       {name: 'prepare', summary: 'List, inspect or export preparation packets without starting implementation', usage: 'bb taskboard prepare list [--project <id>] | show <id> | export <id>'},
       {
         name: 'status',
@@ -2260,6 +2313,29 @@ export default async function plugin(bb: BbPluginApi) {
           return projectById(parsedProject.data);
         };
 
+        if (command === 'factory') {
+          const project = await requireProject();
+          const verb = args.positionals[0] ?? 'status';
+          const snapshot = await handlers.factoryGetProject({ projectId: project.id });
+          let result = snapshot;
+          if (verb === 'enable' || verb === 'pause') {
+            const concurrency = args.positionals[1] === undefined
+              ? factoryProjectPolicySchema.parse(snapshot.policy).maxConcurrent : Number(args.positionals[1]);
+            if (args.positionals.length > (verb === 'enable' ? 2 : 1)) {
+              throw new Error('Use factory enable [concurrency] or factory pause.');
+            }
+            result = await handlers.factorySaveProject({
+              projectId: project.id, provider: projectConfig(project.id, true).source,
+              enabled: verb === 'enable', intake: 'todo', maxConcurrent: concurrency
+            });
+          } else if (verb === 'scan' && args.positionals.length <= 1) {
+            const scanned = await handlers.factoryScanProject({ projectId: project.id });
+            result = { policy: scanned.status.policy, status: scanned.status };
+          } else if (verb !== 'status' || args.positionals.length > 1) {
+            throw new Error('Use factory status, enable [concurrency], pause, or scan.');
+          }
+          return { exitCode: 0, stdout: formatFilterPresetCliJson(result) };
+        }
         if (command === 'status') {
           if (args.positionals.length > 0) {
             throw new Error(

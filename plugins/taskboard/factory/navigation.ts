@@ -1,3 +1,11 @@
+import type { FactoryRecord, FactoryRun } from './contract.js';
+
+export function ticketThreadId(record: Pick<FactoryRecord, 'coordinator'> & { runs: Pick<FactoryRun, 'threadId'>[] }) {
+  return record.coordinator?.status === 'ready'
+    ? record.coordinator.threadId
+    : record.coordinator ? null : record.runs.at(-1)?.threadId ?? null;
+}
+
 export const TASKBOARD_OPEN_EVENT = 'taskboard:open-once';
 const OPEN_KEY = 'bb-taskboard:open-once';
 export function requestTaskboardOpen(threadId: string) {

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "mode": "yolo",
+  "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+  "feature": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin",
+  "requestDigest": "sha256:ce3bb79ed4d42bb28d543b30b5cb16dbabe20e68fd4e6c64d6402357c238204b",
+  "ceiling": "integrated",
+  "targetBranch": null,
+  "allowExternalAgent": false,
+  "createdAt": "2026-10-19T18:14:20.478Z",
+  "expiresAt": null,
+  "digest": "sha256:a88dd178cbce9e7e2ef4d72cb7e377cc69c0ec27a2be66a4cf32fdda58886aea"
+}

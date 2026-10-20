@@ -95,6 +95,8 @@ export interface WorkItemFilters {
   source?: WorkSource;
   query?: string;
   stateCategories?: WorkStateCategory[];
+  /** Internal exclusion applied before the result limit. */
+  excludeLocators?: string[];
   limit: number;
 }
 
@@ -845,6 +847,8 @@ export function createWorkItemStore(bb: BbPluginApi) {
         query: query ? `%${escapeLike(query)}%` : '',
         states: JSON.stringify(states),
         stateCount: states.length,
+        excludeLocators: JSON.stringify(filters.excludeLocators ?? []),
+        excludeLocatorCount: filters.excludeLocators?.length ?? 0,
         limit: filters.limit
       };
       return db
@@ -876,6 +880,10 @@ export function createWorkItemStore(bb: BbPluginApi) {
             AND (
               :stateCount = 0 OR
               item.state_category IN (SELECT value FROM json_each(:states))
+            )
+            AND (
+              :excludeLocatorCount = 0 OR
+              item.locator NOT IN (SELECT value FROM json_each(:excludeLocators))
             )
           ORDER BY item.updated_at DESC, item.bb_project_id, item.source, item.locator
           LIMIT :limit
