@@ -58,7 +58,7 @@ const activeContext = await Promise.all([
 ]);
 
 const directGitInstall =
-  'bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.5 --subdirectory plugins/taskboard --tag-prefix taskboard/';
+  'bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.4 --subdirectory plugins/taskboard --tag-prefix taskboard/';
 const usageGitInstall =
   'bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.10 --subdirectory plugins/usage-tracker --tag-prefix usage-tracker/';
 
@@ -100,7 +100,7 @@ test('documents only BB Community and direct Git installation for Taskboard', ()
   for (const readme of [rootReadme, taskboardReadme]) {
     assert.match(readme, /bb plugin install taskboard/u);
     assert.ok(readme.includes(directGitInstall));
-    assert.match(readme, /After \[the BB Community entry\]/u);
+    assert.ok(readme.includes('https://github.com/get-bb/marketplace/pull/129'));
   }
   assert.match(rootReadme, /npm install/u);
   assert.match(rootReadme, /npm run check/u);
