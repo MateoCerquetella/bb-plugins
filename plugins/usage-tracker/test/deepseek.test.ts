@@ -6,6 +6,7 @@ import {
   DEEPSEEK_MISSING_KEY_MESSAGE,
   DEEPSEEK_REJECTED_KEY_MESSAGE,
   DEEPSEEK_REQUEST_FAILED_MESSAGE,
+  DEEPSEEK_TIMEOUT_MS,
   deepSeekBudgetPercent,
   loadDeepSeekProvider,
   parseDeepSeekBalance,
@@ -240,6 +241,25 @@ test("maps other HTTP failures to an error", async () => {
   });
   assert.equal(result.status, "error");
   assert.equal(result.message, "DeepSeek returned HTTP 500.");
+});
+
+test("aborts a hanging balance request at a short deadline", async () => {
+  assert.ok(DEEPSEEK_TIMEOUT_MS <= 5_000);
+  const keepAlive = setTimeout(() => {}, 100);
+  const result = await loadDeepSeekProvider({
+    apiKey: "sk-test",
+    budget: null,
+    timeoutMs: 10,
+    fetch: (_url, init) =>
+      new Promise<DeepSeekHttpResponse>((_resolve, reject) => {
+        init.signal.addEventListener("abort", () =>
+          reject(new Error("aborted")),
+        );
+      }),
+  });
+  clearTimeout(keepAlive);
+  assert.equal(result.status, "error");
+  assert.equal(result.message, DEEPSEEK_REQUEST_FAILED_MESSAGE);
 });
 
 test("maps network and payload failures to an error", async () => {

@@ -48,13 +48,20 @@ export function inUseOverviewItems(
   return items.filter((item) => item.provider.inUse === true);
 }
 
-export function cumulativeInUseUsage(
+/** In-use providers that report an agent usage window rather than a balance. */
+export function inUseAgentUsageItems(
   items: readonly SidebarUsageOverviewItem[],
-): CumulativeInUseUsage {
-  const active = inUseOverviewItems(items).filter(
+): SidebarUsageOverviewItem[] {
+  return inUseOverviewItems(items).filter(
     (item) =>
       item.selection.window !== null && item.provider.balance === undefined,
   );
+}
+
+export function cumulativeInUseUsage(
+  items: readonly SidebarUsageOverviewItem[],
+): CumulativeInUseUsage {
+  const active = inUseAgentUsageItems(items);
   if (active.length === 0) {
     return { percent: null, count: 0, names: [] };
   }

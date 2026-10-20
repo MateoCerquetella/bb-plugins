@@ -21,7 +21,7 @@ import {
 import { providerMark } from "./provider-marks.ts";
 import {
   cumulativeInUseUsage,
-  inUseOverviewItems,
+  inUseAgentUsageItems,
   mergeLastKnownWindows,
   selectSidebarUsagePrimary,
   sidebarUsageDetailRows,
@@ -1216,10 +1216,7 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
       summary.title = accessibleText;
 
       const mark = element("span", "usage-tracker-sidebar__summary-mark");
-      const active = inUseOverviewItems(items).filter(
-        (item) =>
-          item.selection.window !== null && item.provider.balance === undefined,
-      );
+      const active = inUseAgentUsageItems(items);
       if (active.length === 1) {
         const providerId = active[0]!.provider.id as SidebarProviderId;
         mark.dataset.provider = providerId;

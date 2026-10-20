@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { ProviderUsage, UsageWindow } from "./usage.ts";
 
 export const DEEPSEEK_BALANCE_URL = "https://api.deepseek.com/user/balance";
-const DEEPSEEK_TIMEOUT_MS = 15_000;
+export const DEEPSEEK_TIMEOUT_MS = 4_000;
 
 export const DEEPSEEK_MISSING_KEY_MESSAGE =
   "Add a DeepSeek API key in Settings → Plugins → Usage Tracker, or set DEEPSEEK_API_KEY.";
@@ -66,6 +66,8 @@ export interface DeepSeekProviderOptions {
   budget: number | null;
   fetch?: DeepSeekFetch;
   signal?: AbortSignal;
+  /** Override the network deadline; tests use a small value. */
+  timeoutMs?: number;
 }
 
 /** Parse the documented balance payload; the first currency entry is the account's. */
@@ -166,8 +168,11 @@ function providerFromBalance(
   };
 }
 
-function timeoutSignal(signal: AbortSignal | undefined): AbortSignal {
-  const timeout = AbortSignal.timeout(DEEPSEEK_TIMEOUT_MS);
+function timeoutSignal(
+  signal: AbortSignal | undefined,
+  timeoutMs: number,
+): AbortSignal {
+  const timeout = AbortSignal.timeout(timeoutMs);
   return signal === undefined ? timeout : AbortSignal.any([signal, timeout]);
 }
 
@@ -189,7 +194,7 @@ export async function loadDeepSeekProvider(
         Accept: "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
-      signal: timeoutSignal(options.signal),
+      signal: timeoutSignal(options.signal, options.timeoutMs ?? DEEPSEEK_TIMEOUT_MS),
     });
   } catch {
     return unavailableProvider("error", DEEPSEEK_REQUEST_FAILED_MESSAGE);
