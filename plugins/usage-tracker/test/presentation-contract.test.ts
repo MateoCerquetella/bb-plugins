@@ -66,3 +66,7 @@ test("shows reported credits as readable expanded-detail metadata", () => {
   assert.match(styles, /\.usage-tracker-sidebar__cost/u);
   assert.doesNotMatch(source, /claude\s+\/usage/iu);
 });
+
+test("lifts the footer clip so the open details card stays visible", () => {
+  assert.match(styles, /\[data-sidebar="collapsible-body"\]:has\(\.usage-tracker-sidebar__details\) \{\s*clip-path: none;/u);
+});
