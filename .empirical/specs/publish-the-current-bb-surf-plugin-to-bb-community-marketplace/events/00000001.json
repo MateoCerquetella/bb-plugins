@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "sequence": 1,
+  "previousDigest": "sha256:0018a1123152483393c2b8407fddac96c99a9cd0bc93ac20ec32cc2c399c1127",
+  "actor": "empirical-start",
+  "type": "transition",
+  "summary": "Started publish-the-current-bb-surf-plugin-to-bb-community-marketplace",
+  "createdAt": "2026-10-20T15:33:00.749Z",
+  "stateBeforeDigest": "sha256:74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+  "stateAfterDigest": "sha256:de253627b1fc0166b0bb3e56931751d2d129a4c301ba6ca46b5838a30e0ce833",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 1,
+    "activeFeature": "publish-the-current-bb-surf-plugin-to-bb-community-marketplace",
+    "request": "Publish the current BB Surf plugin to BB Community Marketplace, update the new Dockside version into the marketplace, and report every other plugin in this repository that is not currently listed in BB Community Marketplace.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": null,
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:7845f0f9fa760b9eb97fbb408ddece6bdf895c8a2398f42a5157062b41b42ab8",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": null,
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-20T15:33:00.749Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:a12db9ca60f6670c703b2e3dc6bc5c3617cf7e821857e543e948405fa0ac608f"
+}

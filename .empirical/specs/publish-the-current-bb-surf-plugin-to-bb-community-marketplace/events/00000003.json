@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "sequence": 3,
+  "previousDigest": "sha256:28422becdab5a8990bd4941e6399dc83c4d7a119687fd6d88ba4e8e139b4670d",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Size: keep as one (The two release tags, one marketplace pull request, and one catalog comparison form a single small distribution operation; splitting would duplicate validation and leave the registry update without both release sources available.)",
+  "createdAt": "2026-10-20T15:35:30.937Z",
+  "stateBeforeDigest": "sha256:6213fb7099c34cafd9d1f47f807f1532052330b40eff905c2a2e77e0d73d32d1",
+  "stateAfterDigest": "sha256:ee50fa0dbe78483805da69c60febafd56e330f89619d6439b26d10a6c0281cb0",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 3,
+    "activeFeature": "publish-the-current-bb-surf-plugin-to-bb-community-marketplace",
+    "request": "Publish the current BB Surf plugin to BB Community Marketplace, update the new Dockside version into the marketplace, and report every other plugin in this repository that is not currently listed in BB Community Marketplace.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "design",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Specified two immutable Git releases, BB Surf marketplace rebrand, Dockside mobile-navigation metadata, required marketplace validation and v1-change review, and a live catalog diff for unlisted repository plugins.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:0cd0bb5edce94d8814f0acace31e73f8245dedb80e90cc191ae039170f0b9454",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:7732dbf494d7d17226eabdcfdfe0f4f3e722c7ceba44f1dde8d37ee21d837084",
+    "impactDigest": "sha256:0ef2490ec0f0e93898cd2a2844c877df03835199d8011d5476417ab6fdbda821",
+    "capabilityClaimId": "publish-the-current-bb-surf-plugin-to-bb-community-marketplace-f25961039a62",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-20T15:35:30.937Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "riskRequest": "`steel-browser/v0.1.1` is a public GitHub release whose tag peels to the reviewed source commit and whose manifest reports version `0.1.1`."
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "publish-the-current-bb-surf-plugin-to-bb-community-marketplace-f25961039a62",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "publish-the-current-bb-surf-plugin-to-bb-community-marketplace",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_g3gqe5f7fh-1/bb-plugins",
+      "worktreeId": "sha256:8f4b7d81266bdcb95341b63cd558c4e1028a4c366a29a2f40a677b88706c301b",
+      "baseCommit": "85d1b0655b9883adf940eab0d82d7bd95c956e28",
+      "baseTree": "a25cd39c6da0e7c195c6eabcdbd1b94b045ee2d4",
+      "bases": {
+        "plugin-git-distribution": {
+          "capability": "plugin-git-distribution",
+          "digest": "sha256:97483aac37ef8bb1a7b538a24be367c24d65f9216711a67c49238261e655021b",
+          "requirements": {
+            "publish the current bb surf and dockside releases": null,
+            "keep marketplace presentation aligned with released behavior": null,
+            "report repository plugins absent from bb community": null
+          }
+        }
+      },
+      "capabilities": [
+        "plugin-git-distribution"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-20T15:35:25.457Z",
+      "heartbeatAt": "2026-10-20T15:35:25.457Z",
+      "digest": "sha256:60798556ab06b611903e139c6767f0d9dff79bad9e617ef3de1da4e40f7b8b07"
+    },
+    "reviewFirst": true,
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 7,
+      "capabilities": 1,
+      "reason": "The two release tags, one marketplace pull request, and one catalog comparison form a single small distribution operation; splitting would duplicate validation and leave the registry update without both release sources available.",
+      "actor": "agent",
+      "revision": 2
+    }
+  },
+  "digest": "sha256:2de8c0ed8b76261b13694515e253b7dff437552c7abfe7ed4ebef291d6b1eff1"
+}
