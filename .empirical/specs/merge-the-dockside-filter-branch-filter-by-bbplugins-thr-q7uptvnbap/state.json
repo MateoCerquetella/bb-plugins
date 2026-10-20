@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 5,
+  "revision": 9,
   "activeFeature": "merge-the-dockside-filter-branch-filter-by-bbplugins-thr-q7uptvnbap",
   "request": "Merge the dockside filter branch filter-by-bbplugins-thr_q7uptvnbap into main and release Dockside v0.1.8: bump version (0.1.7 is already taken by an unrelated tag), update changelog/README if needed, run dockside checks, tag dockside/v0.1.8, push branch/tag, and verify the marketplace install resolves 0.1.8.",
   "profile": "complex",
@@ -9,13 +9,13 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Executable release plan with affected Dockside tests recorded.",
+  "message": "Plan unchanged; merge, version bump, checks, PR, and post-merge tag steps still apply.",
   "implementationActor": null,
   "workStartedAt": "2026-10-20T20:02:28.896Z",
   "specDigest": "sha256:face92d19239cbd2edd29d70d45ee3e17a9e78a6e12969f270c03bc5295f21a7",
-  "approvedSpecRevision": 3,
+  "approvedSpecRevision": 7,
   "capabilityArchiveRequired": true,
-  "capabilityDeltaDigest": "sha256:368a8f7438858ac608046bb435e2dc7ec5ec33388828335a22dba4aab012e965",
+  "capabilityDeltaDigest": "sha256:2359fdb12468058d4667633f14fe56f988969112891ae17641d4e022b4208700",
   "impactDigest": "sha256:098d8f4282d3aa8aa1199db02f8764b35ce7c00b3b450ece444b4a46892aec3f",
   "capabilityClaimId": "merge-the-dockside-filter-branch-filter-by-bbplugins-thr-q7uptvnbap-55654f1ea1c7",
   "authorizationDigest": null,
@@ -37,7 +37,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-20T20:04:16.633Z",
+  "updatedAt": "2026-10-20T20:07:11.933Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "merge-the-dockside-filter-branch-filter-by-bbplugins-thr-q7uptvnbap-55654f1ea1c7",
@@ -64,6 +64,13 @@
     "createdAt": "2026-10-20T20:03:26.547Z",
     "heartbeatAt": "2026-10-20T20:03:26.547Z",
     "digest": "sha256:58808a1f60cbefc4033fbde50d4acf016c8c0764c697e5b950976718cdd30540"
+  },
+  "trackerGeneration": 1,
+  "lifecycle": {
+    "stage": "development",
+    "iteration": 1,
+    "awaitingFeedback": false,
+    "contractRevision": 5
   },
   "reviewFirst": true
 }
