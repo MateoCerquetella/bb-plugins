@@ -350,6 +350,47 @@ test("keeps the last known balance through a failed refresh", async () => {
   const merged = mergeLastKnownWindows(failed, previous);
   assert.deepEqual(merged.balance, previous.balance);
   assert.deepEqual(merged.windows, previous.windows);
+
+  const selection = selectSidebarUsagePrimary(failed, merged, "Weekly");
+  assert.equal(selection.fallback, "last-known");
+  assert.equal(selection.window?.usedPercent, 40);
+  assert.match(
+    sidebarUsagePrimaryAccessibleText(
+      "DeepSeek",
+      "Weekly",
+      selection,
+      false,
+      merged,
+    ),
+    /last-known balance budget: 40% used/u,
+  );
+});
+
+test("labels a last-known balance when no budget is configured", async () => {
+  const previous = await provider(documentedPayload, null);
+  const failed: ProviderUsage = {
+    id: "deepSeek",
+    name: "DeepSeek",
+    status: "error",
+    accountEmail: null,
+    planLabel: null,
+    message: DEEPSEEK_REQUEST_FAILED_MESSAGE,
+    windows: [],
+  };
+  const merged = mergeLastKnownWindows(failed, previous);
+  const selection = selectSidebarUsagePrimary(failed, merged, "Weekly");
+  assert.equal(selection.window, null);
+  assert.equal(selection.fallback, "unavailable");
+  assert.match(
+    sidebarUsagePrimaryAccessibleText(
+      "DeepSeek",
+      "Weekly",
+      selection,
+      false,
+      merged,
+    ),
+    /last-known balance: \$12\.00 available/u,
+  );
 });
 
 test("does not resurrect a removed budget window", async () => {

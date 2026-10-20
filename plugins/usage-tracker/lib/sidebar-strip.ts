@@ -749,7 +749,9 @@ function detailsCard(
       "usage-tracker-sidebar__message",
       provider.message,
     );
-    if (provider.windows.length > 0) message.prepend("Last known values · ");
+    if (provider.windows.length > 0 || provider.balance !== undefined) {
+      message.prepend("Last known values · ");
+    }
     card.append(message);
   }
 

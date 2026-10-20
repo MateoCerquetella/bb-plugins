@@ -244,6 +244,15 @@ export function selectSidebarUsagePrimary(
         fallback: "last-known",
       };
     }
+
+    const reportedWindow = lastKnownProvider.windows[0] ?? null;
+    if (reportedWindow !== null) {
+      return {
+        window: reportedWindow,
+        actualKind: compactLimit,
+        fallback: "last-known",
+      };
+    }
   }
 
   return { window: null, actualKind: null, fallback: "unavailable" };
@@ -285,11 +294,15 @@ export function sidebarUsagePrimaryAccessibleText(
   const prefix = `${providerName} compact usage: ${compactLimit} configured`;
   const action = `${expanded ? "Close" : "Open"} ${providerName} usage details.`;
   if (provider?.id === "deepSeek") {
-    if (provider.status !== "ok") {
-      return `${providerName}: ${providerStatusLabel(provider.status)}. ${action}`;
-    }
     if (selection.window !== null) {
-      return `${providerName} balance budget: ${sidebarUsagePrimarySelectionSummary(selection)} used. ${action}`;
+      const stale = selection.fallback === "last-known" ? "last-known " : "";
+      return `${providerName} ${stale}balance budget: ${sidebarUsagePrimarySelectionSummary(selection)} used. ${action}`;
+    }
+    if (provider.status !== "ok") {
+      if (provider.balance !== undefined) {
+        return `${providerName} last-known balance: ${formatCurrencyAmount(provider.balance.total, provider.balance.currency)} available. ${action}`;
+      }
+      return `${providerName}: ${providerStatusLabel(provider.status)}. ${action}`;
     }
     if (provider.balance !== undefined) {
       return `${providerName} balance: ${formatCurrencyAmount(provider.balance.total, provider.balance.currency)} available; no topped-up budget configured. ${action}`;
