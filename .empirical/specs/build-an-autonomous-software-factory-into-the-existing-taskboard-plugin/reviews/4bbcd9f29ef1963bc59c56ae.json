@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:47965093a8cf6b1b9c05943141075c7865b5975b3c709818e2c8d9beb5b0764f",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "1807befaa9c0732d83b6223d3821ba83268d98e7",
+  "headCommit": "fdf71d93258984fbb91790defeaf0e65cff5f694",
+  "diffDigest": "sha256:8ae223570a88cce5e55f0c28d6498e4f4c21fbb7288937fb2d58b087d9d696e2",
+  "verdict": "APPROVED",
+  "reviewerActor": "fresh-full-reviewer-r33",
+  "reviewerInvocationId": "fresh-full-reviewer-r33-20261020T000001Z-correction",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: PASS. The committed factory/store changes persist project-scoped enablement, provider identity, intake policy, and concurrency with disabled defaults and focused coverage.\n- PASS AC-2: PASS. The committed admission path covers bounded discovery, durable-claim exclusion before scan limiting, live eligibility checks, provider scoping, and non-admission of ineligible work.\n- PASS AC-3: PASS. The coordinator/dispatch state machine covers restart and concurrency deduplication, capacity, and ambiguous native dispatch without automatic retry. The readiness repair blocks children until the coordinator environment is ready.\n- PASS AC-4: PASS. The committed implementation establishes one coordinator identity and native child stage sessions, preserves managed Build worktrees and independent Review, and retains manual starts, including while a confirmed coordinator waits for environment readiness.\n- PASS AC-5: PASS. The service implements pause and fail-closed provider behavior; coordinator readiness remains an operator-visible recoverable blocker and no stale-data action path was found.\n- PASS AC-6: PASS. The service preserves observation-only progress and human acceptance boundaries and adds no merge, deployment, provider close, or acceptance action.\n- PASS AC-7: PASS. The committed RPC/CLI validation and focused behavioral tests cover duplicate ticks, restart, capacity, pause, scan-window fairness, stale provider data, hierarchy recovery and failure isolation. Executable final QA remains the next workflow phase, not a review prerequisite.\n- PASS AC-UI-1: PASS. The committed UI exposes project settings/status and grouped coordinator/stage sessions with accessible disclosure and thread actions. Desktop/mobile browser execution remains required in Verify, not as committed-diff review evidence.\n\n## Security / correctness\n\nPASS. No credential exposure, authentication bypass, authorization bypass, or concrete correctness defect is evident in the committed diff. Provider inputs are parsed and scoped, external tracker text is untrusted, and missing or non-ready coordinator environments fail closed. Remaining asynchronous runtime risks belong to final QA.\n\n## Design / maintainability\n\nPASS under the thermonuclear bar. The FactoryRecord-centered ownership remains canonical; coordinator readiness is contained in the coordinator lifecycle and actual stage dispatch remains delegated to the existing dispatcher. The broad change introduces no second scheduler or duplicated lifecycle. Runtime verification is still required.",
+  "bodyDigest": "sha256:c5c9679515bc54e78b018dfbc36a04ce27f78f1b3c11423a0e32ca5bae6c8a9d",
+  "findings": [],
+  "digest": "sha256:4bbcd9f29ef1963bc59c56aeaa7c3e7417ddfff78abf5fe7f7bc6ff694792fac"
+}

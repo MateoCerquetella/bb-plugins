@@ -1,7 +1,18 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { readFile } from 'node:fs/promises';
-import { originalTicketPath } from '../factory/navigation.ts';
+import { originalTicketPath, ticketThreadId } from '../factory/navigation.ts';
+
+test('ticket entry opens the coordinator while stage sessions retain their identity', () => {
+  const record: Parameters<typeof ticketThreadId>[0] = { coordinator: null, runs: [{ threadId: 'thr_stage' }] };
+  assert.equal(ticketThreadId(record), 'thr_stage');
+  record.coordinator = { status: 'ready', intentId: 'intent', startedAt: new Date().toISOString(),
+    legacyRunCount: 0, threadId: 'thr_coordinator', nativeStatus: 'idle', error: null };
+  assert.equal(ticketThreadId(record), 'thr_coordinator');
+  record.coordinator = { status: 'uncertain', intentId: 'intent', startedAt: new Date().toISOString(),
+    legacyRunCount: 0, error: 'Response lost' };
+  assert.equal(ticketThreadId(record), null);
+});
 
 test('original provider ticket route round-trips reserved locator characters', () => {
   for (const locator of ['abc-123', 'owner/repo#42', 'literal~2F/% +?']) {
@@ -14,7 +25,8 @@ test('original provider ticket route round-trips reserved locator characters', (
 test('work navigation never changes the persistent pin preference', async () => {
   const source = await readFile(new URL('../factory/app.tsx', import.meta.url), 'utf8');
   assert.doesNotMatch(source, /storeRightPanelPinned|pin\(\)|localStorage/);
-  assert.match(source, /requestTaskboardOpen\(run\.threadId\)/);
+  assert.match(source, /ticketThreadId\(record\)/);
+  assert.match(source, /requestTaskboardOpen\(threadId\)/);
   const app = await readFile(new URL('../app.tsx', import.meta.url), 'utf8');
   assert.doesNotMatch(app, /storeRightPanelPinned\(true\)/);
   assert.match(app, /storeRightPanelPinned\(!pinned\)/);

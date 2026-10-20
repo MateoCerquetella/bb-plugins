@@ -1,6 +1,6 @@
 import { registerPreparationApp } from './preparation/app.js';
 import { clipboardTicketImages, readTicketImages, type TicketImage } from './ticket-images.js';
-import { originalTicketPath, requestTaskboardOpen } from './factory/navigation.js';
+import { originalTicketPath, requestTaskboardOpen, ticketThreadId } from './factory/navigation.js';
 import {
   useCallback,
   useEffect,
@@ -153,6 +153,7 @@ import {
   writeTaskboardComposerDrag
 } from './composer-handoff.js';
 import { FactoryProgress, FactoryThreadProgress, StartTaskButton } from './factory/app.js';
+import { FactoryProjectSettings } from './factory/project-settings.js';
 import { TaskboardResultDirective } from './factory/result-card.js';
 import { consumeTaskboardOpen, TASKBOARD_OPEN_EVENT } from './factory/navigation.js';
 import './app.css';
@@ -1055,7 +1056,8 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
           });
           const run = record.runs.at(-1);
           if (record.automationError || run?.error) toast.warning(record.automationError ?? run!.error!);
-          if (run?.threadId) { requestTaskboardOpen(run.threadId); navigate.toThread(run.threadId); return; }
+          const threadId = ticketThreadId(record);
+          if (threadId) { requestTaskboardOpen(threadId); navigate.toThread(threadId); return; }
         }
         navigate.toPluginPanel(PANEL_PATH, { subPath: originalTicketPath(identity) });
       } catch (error) {
@@ -6767,6 +6769,8 @@ function ManageView({
                 return result.settings;
               }}
             />
+            <FactoryProjectSettings key={`factory:${config.projectId}:${config.source}`}
+              projectId={config.projectId} provider={config.source} />
             <FilterPresetsForm
               key={`presets:${boardSettings.projectId}`}
               projectId={boardSettings.projectId}

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:30dc447c653f802ea656742fd2e2d45ca2645c5b7a1e6be6fc24a543f5af0996",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "1807befaa9c0732d83b6223d3821ba83268d98e7",
+  "headCommit": "371c2a0b9d7ee4bb4f0cf6bacd76cc76c6970aac",
+  "diffDigest": "sha256:9cf36dcf26787de87b9fa458fb79cb118ee9c2cb5e0a4558dd8d772386a015e8",
+  "verdict": "APPROVED",
+  "reviewerActor": "codex-isolated-reviewer",
+  "reviewerInvocationId": "review-release-contract-r28-20261020T000000Z",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: Carried forward from the previous approved review. The delta only changes the documented Taskboard Git release selector and its documentation contract assertion; it does not affect factory defaults or persisted project settings.\n- PASS AC-2: Carried forward from the previous approved review. The delta does not change provider discovery, durable-claim filtering, scan-window ordering, live revalidation, or admission eligibility.\n- PASS AC-3: Carried forward from the previous approved review. No concurrency, restart-recovery, capacity, or ambiguous-dispatch code changes are present.\n- PASS AC-4: Carried forward from the previous approved review. Coordinator visibility, native child-thread hierarchy, managed worktrees, independent review, execution defaults, and manual starts are unchanged.\n- PASS AC-5: Carried forward from the previous approved review. Pause behavior, fail-closed provider handling, stale-data protection, and operator-readable status are unchanged.\n- PASS AC-6: Carried forward from the previous approved review. The delta adds no action that merges, deploys, closes issues, or bypasses human acceptance.\n- PASS AC-7: Carried forward from the previous approved review. CLI/RPC behavior and queue-owned blocker reporting are unchanged. The changed distribution assertion remains a behavioral contract over the public README output and now checks the stable marketplace URL rather than incidental sentence wording.\n- PASS AC-UI-1: Carried forward from the previous approved review. Project Manage and ticket-progress UI behavior, accessibility, responsiveness, refresh stability, and browser evidence are untouched.\n\n## Security / correctness\n\nPASS. The exact delta changes only public installation documentation and its distribution-contract test. Both README locations remain synchronized. The `^0.3.4` selector is a valid broader compatible range than `^0.3.5` under caret semantics, and no executable trust boundary, credential, authorization, persistence, dispatch, or workflow behavior changes. The test change improves contract focus by asserting the marketplace destination URL instead of requiring the incidental phrase `After [the BB Community entry]`.\n\n## Design / maintainability\n\nPASS. The delta is minimal and consistent across the duplicated public install instructions. Replacing prose-shape coupling with a destination assertion reduces test brittleness without reducing the tested distribution contract. It introduces no branching, abstraction, state, coupling, file-size growth, or architecture-boundary leak, and no structural simplification is warranted.",
+  "bodyDigest": "sha256:209b28fbc5014b9426e910c9fd0775005fe917794a8c676b55089b5cc0af9ed9",
+  "findings": [],
+  "digest": "sha256:9fdd2cd3b40f6f9aab4095d154627e0e684de88a60dfd47cb862078dbf698869"
+}

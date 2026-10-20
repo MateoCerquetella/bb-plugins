@@ -1,6 +1,41 @@
 import { z } from 'zod';
 import { empiricalObservationSchema } from '../empirical/contract.js';
 
+export const factoryProjectPolicySchema = z.object({
+  projectId: z.string().startsWith('proj_').max(500),
+  enabled: z.boolean().default(false),
+  provider: z.enum(['github', 'gitlab', 'linear', 'jira', 'gitea']),
+  intake: z.literal('todo').default('todo'),
+  maxConcurrent: z.number().int().min(1).max(20).default(1),
+  updatedAt: z.string()
+}).strict();
+export type FactoryProjectPolicy = z.infer<typeof factoryProjectPolicySchema>;
+export const factoryAdmissionSchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('manual') }).strict(),
+  z.object({ kind: z.literal('factory'), claimedAt: z.string() }).strict()
+]);
+export type FactoryAdmission = z.infer<typeof factoryAdmissionSchema>;
+export const factoryScanObservationSchema = z.object({
+  projectId: z.string().startsWith('proj_').max(500),
+  observedAt: z.string(),
+  kind: z.enum(['success', 'blocked']),
+  reason: z.string().nullable(),
+  candidates: z.number().int().nonnegative(),
+  pendingCandidates: z.number().int().nonnegative().nullable().default(null)
+}).strict();
+export type FactoryScanObservation = z.infer<typeof factoryScanObservationSchema>;
+const factoryProjectObservation = {
+  queue: z.number().int().nonnegative().nullable(),
+  lastScan: factoryScanObservationSchema.nullable()
+};
+export const factoryProjectStatusSchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('disabled'), policy: factoryProjectPolicySchema, ...factoryProjectObservation }).strict(),
+  z.object({ kind: z.literal('running'), policy: factoryProjectPolicySchema, active: z.number().int().nonnegative(), available: z.number().int().nonnegative(), ...factoryProjectObservation }).strict(),
+  z.object({ kind: z.literal('paused'), policy: factoryProjectPolicySchema, active: z.number().int().nonnegative(), ...factoryProjectObservation }).strict(),
+  z.object({ kind: z.literal('blocked'), policy: factoryProjectPolicySchema, reason: z.string(), active: z.number().int().nonnegative(), ...factoryProjectObservation }).strict()
+]);
+export type FactoryProjectStatus = z.infer<typeof factoryProjectStatusSchema>;
+
 export const factoryIdentitySchema = z.object({
   projectId: z.string().startsWith('proj_').max(500),
   source: z.enum(['github', 'gitlab', 'linear', 'jira', 'gitea']),
@@ -61,6 +96,23 @@ export const factoryRunSchema = z.object({
   finishedAt: z.string().nullable()
 }).strict();
 export type FactoryRun = z.infer<typeof factoryRunSchema>;
+const coordinatorIntent = {
+  intentId: z.string().min(1),
+  startedAt: z.string().datetime(),
+  legacyRunCount: z.number().int().nonnegative().default(0)
+};
+export const factoryCoordinatorSchema = z.discriminatedUnion('status', [
+  z.object({ status: z.literal('pending') }).strict(),
+  z.object({ status: z.literal('starting'), ...coordinatorIntent }).strict(),
+  z.object({ status: z.literal('uncertain'), ...coordinatorIntent, error: z.string() }).strict(),
+  z.object({ status: z.literal('failed'), ...coordinatorIntent, error: z.string() }).strict(),
+  z.object({
+    status: z.literal('ready'), ...coordinatorIntent, threadId: z.string().min(1),
+    nativeStatus: z.enum(['active', 'error', 'idle', 'starting', 'stopping']).default('starting'),
+    error: z.string().nullable().default(null)
+  }).strict()
+]);
+export type FactoryCoordinator = z.infer<typeof factoryCoordinatorSchema>;
 export const factoryRecordSchema = factoryIdentitySchema.extend({
   schemaVersion: z.literal(1),
   version: z.number().int().nonnegative(),
@@ -68,9 +120,11 @@ export const factoryRecordSchema = factoryIdentitySchema.extend({
   scopeDigest: z.string(),
   plans: z.array(planSchema),
   approvedDigest: z.string().nullable(),
+  admission: factoryAdmissionSchema.default({ kind: 'manual' }),
   // Older dispatched items also adopt the automatic investigate -> plan -> build flow.
   automatic: z.boolean().default(true),
   automationError: z.string().nullable().default(null),
+  coordinator: factoryCoordinatorSchema.nullable().default(null),
   trackerProgress: z.object({
     status: z.enum(['pending', 'synced', 'unavailable', 'failed']),
     message: z.string().nullable()
@@ -83,6 +137,18 @@ export const factoryVersionInputSchema = factoryIdentitySchema.extend({
   expectedVersion: z.number().int().nonnegative()
 }).strict();
 export const factoryRpcMethods = {
+  factoryGetProject: {
+    input: z.object({ projectId: z.string().startsWith('proj_') }).strict(),
+    output: z.object({ policy: factoryProjectPolicySchema, status: factoryProjectStatusSchema }).strict()
+  },
+  factorySaveProject: {
+    input: factoryProjectPolicySchema.omit({ updatedAt: true }).strict(),
+    output: z.object({ policy: factoryProjectPolicySchema, status: factoryProjectStatusSchema }).strict()
+  },
+  factoryScanProject: {
+    input: z.object({ projectId: z.string().startsWith('proj_') }).strict(),
+    output: z.object({ status: factoryProjectStatusSchema }).strict()
+  },
   factoryEmpirical: {
     input: factoryIdentitySchema,
     output: empiricalObservationSchema
@@ -108,6 +174,20 @@ export const factoryRpcMethods = {
   },
   factoryRecover: {
     input: factoryVersionInputSchema.extend({ threadId: z.string().min(1).max(500) }).strict(),
+    output: z.object({ record: factoryRecordSchema }).strict()
+  },
+  factoryAdoptCoordinator: {
+    input: factoryVersionInputSchema,
+    output: z.object({ record: factoryRecordSchema }).strict()
+  },
+  factoryRetryCoordinator: {
+    input: factoryVersionInputSchema.extend({ intentId: z.string().min(1).max(500) }).strict(),
+    output: z.object({ record: factoryRecordSchema }).strict()
+  },
+  factoryRecoverCoordinator: {
+    input: factoryVersionInputSchema.extend({
+      intentId: z.string().min(1).max(500), threadId: z.string().min(1).max(500)
+    }).strict(),
     output: z.object({ record: factoryRecordSchema }).strict()
   },
   factoryGet: {

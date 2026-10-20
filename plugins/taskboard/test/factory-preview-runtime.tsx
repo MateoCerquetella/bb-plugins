@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import type { FactoryRecord } from '../factory/contract.js';
+import type { FactoryRecord, FactoryScanObservation } from '../factory/contract.js';
 
 declare global {
   interface Window {
@@ -9,6 +9,10 @@ declare global {
     factoryStarts: number;
     factoryStartError?: string | null;
     factoryStartDelay?: number;
+    factoryProjectState?: 'running' | 'paused' | 'awaiting_scan' | 'unconfigured' | 'provider_error';
+    factoryProjectDelay?: number;
+    factoryProjectReads?: number;
+    factoryPreviewProject: (projectId: string) => void;
     empiricalStatus: Record<string, unknown>;
     empiricalOffline: boolean;
     empiricalLastKnown: Record<string, unknown> | null;
@@ -23,9 +27,36 @@ export function useRpc() {
 export function useSettings() {
   return { values: {}, isLoading: false };
 }
+let factoryPolicy = { projectId: 'proj_test', provider: 'github', enabled: false,
+  maxConcurrent: 1, intake: 'todo', updatedAt: new Date().toISOString() };
 const rpc = {
-  async call(method: string, input: { body?: string; digest?: string; kind?: string; path?: string }) {
+  async call(method: string, input: { projectId?: string; body?: string; digest?: string; kind?: string; path?: string;
+    enabled?: boolean; maxConcurrent?: number; threadId?: string }) {
     const record = window.factoryFixture;
+    if (method === 'factoryGetProject' || method === 'factorySaveProject') {
+      if (method === 'factorySaveProject') factoryPolicy = { ...factoryPolicy,
+        enabled: input.enabled ?? false, maxConcurrent: input.maxConcurrent ?? 1 };
+      const kind = window.factoryProjectState;
+      const policy = { ...factoryPolicy, projectId: input.projectId ?? factoryPolicy.projectId,
+        enabled: kind ? kind !== 'paused' : factoryPolicy.enabled };
+      const lastScan: FactoryScanObservation | null = kind === 'awaiting_scan' || !kind ? null : {
+        projectId: policy.projectId, observedAt: '2026-10-20T12:00:00.000Z',
+        kind: kind === 'provider_error' ? 'blocked' : 'success',
+        reason: kind === 'provider_error' ? 'Live provider scan failed.' : null,
+        candidates: 5, pendingCandidates: kind === 'provider_error' ? null : 3
+      };
+      const observation = { queue: lastScan?.pendingCandidates ?? null, lastScan };
+      const result = { policy, status: kind === 'unconfigured' || kind === 'provider_error'
+        ? { kind: 'blocked', policy, active: 0, ...observation, reason: kind === 'unconfigured'
+          ? 'Configure the project issue provider before enabling intake.' : 'Provider unavailable: live eligibility could not be confirmed.' }
+        : kind === 'paused' || kind === 'awaiting_scan' ? { kind: 'paused', policy, active: 1, ...observation }
+        : policy.enabled
+          ? { kind: 'running', policy, active: 0, available: policy.maxConcurrent, ...observation }
+          : { kind: 'disabled', policy, ...observation } };
+      window.factoryProjectReads = (window.factoryProjectReads ?? 0) + 1;
+      if (window.factoryProjectDelay) await new Promise(resolve => setTimeout(resolve, window.factoryProjectDelay));
+      return result;
+    }
     if (method === 'getCreateIssueContext') return { context: {
       projectId: 'proj_test', projectName: 'Preview', source: 'linear', available: true,
       message: null, destinationLabel: 'Team', destinations: [{ id: 'TEST', label: 'Test team' }],
@@ -81,6 +112,8 @@ const rpc = {
         return { record: structuredClone(record) };
       }
       record.automatic = true;
+      record.coordinator = { status: 'ready', intentId: 'preview-intent', startedAt: new Date().toISOString(),
+        legacyRunCount: 0, threadId: 'thr_coordinator', nativeStatus: 'idle', error: null };
       record.stage = 'Triage';
       record.trackerProgress = { status: 'synced', message: null };
       window.factoryItem.status = 'In progress'; window.factoryItem.stateCategory = 'in_progress';
@@ -94,6 +127,13 @@ const rpc = {
       record.version++;
       for (const callback of listeners.get('taskboard:factory') ?? []) callback({ projectId: 'proj_test' });
       for (const callback of listeners.get('taskboard:changed') ?? []) callback({ projectId: 'proj_test' });
+    }
+    if (method === 'factoryAdoptCoordinator' || method === 'factoryRetryCoordinator' || method === 'factoryRecoverCoordinator') {
+      record.coordinator = { status: 'ready', intentId: 'preview-intent', startedAt: new Date().toISOString(),
+        legacyRunCount: method === 'factoryAdoptCoordinator' ? record.runs.length : 0,
+        threadId: input.threadId ?? 'thr_coordinator', nativeStatus: 'idle', error: null };
+      record.version++;
+      window.factoryRefresh();
     }
     if (method === 'factoryStart' && input.kind === 'build') {
       const review = record.runs.at(-1)!;

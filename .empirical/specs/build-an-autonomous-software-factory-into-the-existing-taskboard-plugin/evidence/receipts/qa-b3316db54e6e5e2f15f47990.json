@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-b3316db54e6e5e2f15f47990",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "Fresh-context acceptance assessment at head 371c2a0b9d7ee4bb4f0cf6bacd76cc76c6970aac. Actual-component browser harness ran in this project's BB Surf and all checks passed without browser errors. Inspected desktop/mobile factory states and blockers; supplemental Tab/Enter test and screenshots confirm visible coordinator-action focus and target. Backend criteria assessed with exact-head executable receipt qa-a44e8c06cb4f91647921320c, not rerun. Browser uses mocked SDK/RPC/provider/native boundaries: no real admission, restart, native worktree/agent creation, provider write, installed CLI integration, install, publication or deployment is claimed. Attached report distinguishes direct UI outcomes from existing backend evidence. No code-review judgment used.",
+  "passed": true,
+  "startedAt": "2026-10-20T15:17:17.450Z",
+  "completedAt": "2026-10-20T15:17:17.450Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin",
+    "specRevision": 11,
+    "specDigest": "sha256:b1c54351a2cc67dd8586b2f2dad8f34f4f916b3b0656ee17756d3ab2f07fab77",
+    "treeDigest": "sha256:c21606d4f90401a9adf952d8391bd35edfb7010f85196503972a83f792d10f62",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 29,
+    "gitCommit": "371c2a0b9d7ee4bb4f0cf6bacd76cc76c6970aac",
+    "scope": [
+      "plugins/taskboard/factory/app.tsx",
+      "plugins/taskboard/factory/project-settings.tsx",
+      "plugins/taskboard/scripts/factory-browser-check.mjs",
+      "plugins/taskboard/test/factory-preview-runtime.tsx",
+      "plugins/taskboard/test/factory-preview.tsx"
+    ],
+    "scopeDigest": "sha256:f576b08bf8c9ac497b4dd368c8b2705f6e2cfa521767c83201d6d88c3ca5405d",
+    "textTreeDigest": "sha256:c21606d4f90401a9adf952d8391bd35edfb7010f85196503972a83f792d10f62"
+  },
+  "digest": "sha256:a12c7740d534e0a424c62d343d7efe5213307ae28b57f67d946c4d72e01aea4e",
+  "kind": "qa",
+  "matrixDigest": "sha256:74e5a824e27d3f8982943f55ccee76813eb8ceec8581389627f92573b57da08e",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Fresh-context acceptance assessment at head 371c2a0b9d7ee4bb4f0cf6bacd76cc76c6970aac. Actual-component browser harness ran in this project's BB Surf and all checks passed without browser errors. Inspected desktop/mobile factory states and blockers; supplemental Tab/Enter test and screenshots confirm visible coordinator-action focus and target. Backend criteria assessed with exact-head executable receipt qa-a44e8c06cb4f91647921320c, not rerun. Browser uses mocked SDK/RPC/provider/native boundaries: no real admission, restart, native worktree/agent creation, provider write, installed CLI integration, install, publication or deployment is claimed. Attached report distinguishes direct UI outcomes from existing backend evidence. No code-review judgment used.",
+      "startedAt": "2026-10-20T15:17:17.450Z",
+      "completedAt": "2026-10-20T15:17:17.450Z",
+      "durationMs": 0,
+      "collector": "fresh_outcome_qa",
+      "command": null,
+      "result": null,
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:c21606d4f90401a9adf952d8391bd35edfb7010f85196503972a83f792d10f62",
+      "sourceTreeAfter": "sha256:c21606d4f90401a9adf952d8391bd35edfb7010f85196503972a83f792d10f62",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r29/fresh-outcome-browser-check.log",
+          "mediaType": "text/plain",
+          "bytes": 441,
+          "digest": "sha256:52d20a990f761ebf24eb3ecde1d67aa39b85d51eda697b035ec62b2094d70ba9"
+        },
+        {
+          "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r29/fresh-outcome-keyboard.log",
+          "mediaType": "text/plain",
+          "bytes": 666,
+          "digest": "sha256:33c253f73024e77be2c26518941c22b76b108eb12622b872003deef2cfab09ed"
+        },
+        {
+          "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/evidence/artifacts/fresh-outcome-r29/fresh-outcome-qa-report.txt",
+          "mediaType": "text/plain",
+          "bytes": 4311,
+          "digest": "sha256:ee8f9e5f40481cb6bdf90ccef27e3189bbb576dc9c25f332333e8e76f6ae457d"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}

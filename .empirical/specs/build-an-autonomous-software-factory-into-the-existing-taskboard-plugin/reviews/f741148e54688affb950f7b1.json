@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:18a864ebc5f6b1f857be439f6dae82ecb8d781490060e7b0867cc2b199b82e44",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "1807befaa9c0732d83b6223d3821ba83268d98e7",
+  "headCommit": "9849851ff3552e1887941f93dc86953bc3df37ed",
+  "diffDigest": "sha256:4621e09a1efecf824a87be328fc7d5e660be660918a19b4da976ef4f972182e2",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "fresh-review-agent",
+  "reviewerInvocationId": "fresh_review_9849851ff",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- PASS AC-1: Policy defaults disabled, persists project/provider/intake, and validates concurrency within 1..20.\n- FAIL AC-2: Live todo eligibility and prior-claim checks exist, but the fixed first-500 window can starve later eligible tickets.\n- PASS AC-3: Atomic admission and uncertain dispatch recovery are preserved.\n- PASS AC-4: Existing lifecycle, managed worktrees, review, repair, and manual starts are preserved.\n- FAIL AC-5: Pause and live validation exist, but queue-owned live-read failures can be hidden by later healthy scans.\n- PASS AC-6: No merge, deploy, acceptance, or issue-close action was added.\n- PASS AC-7: CLI/RPC and focused behavioral coverage are present.\n- FAIL AC-UI-1: Controls and browser fixtures exist, but browser evidence was not available to this reviewer.\n\n## Security / correctness\n\nNo new credential or delivery authority issue; two medium correctness issues remain.\n\n## Design / maintainability\n\nReusing FactoryRecord avoids a duplicate queue lifecycle; the main design issues are intake starvation and hidden blocked workflow state.",
+  "bodyDigest": "sha256:24cb8f073584ba424a25a0634c3c6baf55740a14b0e33377fed162848eb41b3f",
+  "findings": [
+    {
+      "id": "F-1",
+      "severity": "medium",
+      "category": "correctness",
+      "summary": "The first-500 todo query can permanently starve eligible tickets after claimed records.",
+      "path": "plugins/taskboard/server.ts:492"
+    },
+    {
+      "id": "F-2",
+      "severity": "medium",
+      "category": "correctness",
+      "summary": "Project status ignores queue-owned automationError values and can report running with no blocked reason.",
+      "path": "plugins/taskboard/factory/store.ts:78"
+    }
+  ],
+  "digest": "sha256:f741148e54688affb950f7b1642e0c6d1fbcce4cda42b5a60ffca48c6c336fea"
+}

@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { Markdown, experimental_Diff as Diff, useBbContext, useBbNavigate, useRealtime, useRpc, useSettings } from '@get-bb/plugin-sdk/app';
 import type { TaskboardRpcContract, WorkItem } from '../contract.js';
-import type { FactoryRecord, FactoryRun, FactoryRunKind } from './contract.js';
+import type { FactoryProjectStatus, FactoryRecord, FactoryRun, FactoryRunKind } from './contract.js';
 import { MAX_REVIEW_REPAIRS, readableResultOutput } from './review.js';
 import type { EmpiricalObservation } from '../empirical/contract.js';
 import { Button } from '../components/ui/button.js';
@@ -9,7 +9,7 @@ import { Icon } from '../components/ui/icon.js';
 import { Textarea } from '../components/ui/textarea.js';
 import { Input } from '../components/ui/input.js';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '../components/ui/dialog.js';
-import { originalTicketPath, requestTaskboardOpen } from './navigation.js';
+import { originalTicketPath, requestTaskboardOpen, ticketThreadId } from './navigation.js';
 import { ErrorNotice } from './error-notice.js';
 import { ResultCard } from './result-card.js';
 
@@ -231,9 +231,139 @@ function RunInsights({ record }: { record: FactoryRecord }) {
       nextStep={run.status === 'uncertain' ? 'Confirm the native session before linking it. Do not start duplicate work.'
         : 'Inspect the latest run and its available recovery action.'}
       detail={run.error} />}
-    {selected && <RunDetail key={selected.id} run={selected} record={record} historical={selected.id !== run.id} />}
-    {canContinueBlockedBuild && <ContinueBuild key={run.id} run={run} record={record} />}
+    {selected && <RunDetail key={`detail-${selected.id}`} run={selected} record={record} historical={selected.id !== run.id} />}
+    {canContinueBlockedBuild && <ContinueBuild key={`continue-${run.id}`} run={run} record={record} />}
   </div>;
+}
+
+function TicketTeam({ record, title, onRecord, children }: {
+  record: FactoryRecord; title: string; onRecord: (record: FactoryRecord) => void; children?: ReactNode;
+}) {
+  const rpc = useRpc<TaskboardRpcContract>();
+  const navigate = useBbNavigate();
+  const contentId = useId();
+  const identity = JSON.stringify([record.projectId, record.source, record.locator]);
+  const [disclosure, setDisclosure] = useState({ identity, expanded: true });
+  const expanded = disclosure.identity !== identity || disclosure.expanded;
+  const [recovery, setRecovery] = useState({ identity, threadId: '' });
+  const recoveryId = recovery.identity === identity ? recovery.threadId : '';
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [projectSnapshot, setProjectSnapshot] = useState<{ identity: string; status: FactoryProjectStatus } | null>(null);
+  const [policyError, setPolicyError] = useState<{ identity: string; message: string } | null>(null);
+  const projectRequest = useRef(0);
+  const pending = useRef(false);
+  const currentIdentity = useRef(identity);
+  currentIdentity.current = identity;
+  const loadProjectStatus = useCallback(async () => {
+    const request = ++projectRequest.current;
+    try {
+      const result = await rpc.call('factoryGetProject', { projectId: record.projectId });
+      if (request !== projectRequest.current || currentIdentity.current !== identity) return;
+      setProjectSnapshot({ identity, status: result.status });
+      setPolicyError(null);
+    } catch (reason) {
+      if (request !== projectRequest.current || currentIdentity.current !== identity) return;
+      setPolicyError({ identity, message: reason instanceof Error ? reason.message : String(reason) });
+    }
+  }, [identity, record.projectId, rpc]);
+  useEffect(() => {
+    setError(null);
+    void loadProjectStatus();
+    return () => { projectRequest.current++; };
+  }, [loadProjectStatus]);
+  useRealtime('taskboard:factory', () => void loadProjectStatus());
+  const projectStatus = projectSnapshot?.identity === identity ? projectSnapshot.status : null;
+  const coordinator = record.coordinator;
+  const policyBlocker = record.admission.kind !== 'factory' ? null
+    : projectStatus?.kind === 'disabled' || projectStatus?.kind === 'paused' && !projectStatus.policy.enabled
+      ? 'Factory paused. Existing sessions remain available, but no new automatic stage will start.'
+      : projectStatus?.kind === 'paused' && projectStatus.policy.enabled
+        ? 'Automatic intake is enabled and awaiting its first provider scan.'
+        : null;
+  const blocker = record.automationError ??
+    (coordinator && 'error' in coordinator ? coordinator.error : null) ?? policyBlocker;
+  const coordinatorStatus = !coordinator ? 'Legacy sessions' : coordinator.status === 'ready'
+    ? coordinator.error ? 'Unavailable' : coordinator.nativeStatus
+    : coordinator.status === 'uncertain' ? 'Needs recovery' : coordinator.status;
+  const input = { projectId: record.projectId, source: record.source, locator: record.locator,
+    expectedVersion: record.version };
+  async function act(operation: () => Promise<{ record: FactoryRecord }>) {
+    if (pending.current) return;
+    pending.current = true; setBusy(true); setError(null);
+    try {
+      const result = await operation();
+      if (currentIdentity.current === identity) onRecord(result.record);
+    } catch (reason) {
+      if (currentIdentity.current === identity) setError(reason instanceof Error ? reason.message : String(reason));
+    } finally { pending.current = false; setBusy(false); }
+  }
+  function openThread(threadId: string) {
+    requestTaskboardOpen(threadId); navigate.toThread(threadId);
+  }
+  const legacyCount = coordinator && 'legacyRunCount' in coordinator ? coordinator.legacyRunCount : record.runs.length;
+  return <section className="min-w-0" aria-label="Ticket team" data-factory-team>
+    <Button variant="ghost" className="h-auto w-full min-w-0 justify-start whitespace-normal px-0 py-2 text-left"
+      aria-expanded={expanded} aria-controls={contentId}
+      onClick={() => setDisclosure({ identity, expanded: !expanded })}>
+      <Icon name={expanded ? 'ChevronDown' : 'ChevronRight'} className="size-4 shrink-0" />
+      <span className="min-w-0 break-words [overflow-wrap:anywhere]">{title}</span>
+      <span className="ml-auto shrink-0 text-xs text-muted-foreground">{coordinatorStatus}</span>
+    </Button>
+    {blocker && <p role="status" className="mb-2 break-words text-xs [overflow-wrap:anywhere]" data-team-blocker>{blocker}</p>}
+    <div id={contentId} hidden={!expanded}>
+      {error && <ErrorNotice title="Coordinator action failed" nextStep="Refresh the ticket and inspect its coordinator before trying again." detail={error} />}
+      {policyError?.identity === identity && <ErrorNotice title="Factory policy unavailable"
+        nextStep="Refresh the ticket before relying on its automatic intake state." detail={policyError.message} />}
+      {coordinator ? <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 border-b border-border py-2" data-team-role="coordinator">
+        <strong className="min-w-0 break-words text-xs">Coordinator</strong>
+        <span className="text-xs text-muted-foreground">{coordinatorStatus}</span>
+        {coordinator.status === 'ready' && <Button variant="ghost" size="sm" className="basis-full justify-start sm:ml-auto sm:basis-auto"
+          aria-label="Open coordinator thread" onClick={() => openThread(coordinator.threadId)}>
+          <Icon name="MessageCirclePlus" className="size-3.5" />Open thread
+        </Button>}
+        {coordinator.status === 'failed' && <Button variant="outline" size="sm" className="basis-full justify-start sm:ml-auto sm:basis-auto" disabled={busy}
+          onClick={() => void act(() => rpc.call('factoryRetryCoordinator', { ...input, intentId: coordinator.intentId }))}>
+          <Icon name="RotateCcw" className="size-3.5" />Retry coordinator
+        </Button>}
+        {coordinator.status === 'uncertain' && <div className="w-full min-w-0 space-y-2">
+          <p className="break-words text-xs">Coordinator creation could not be confirmed. Link the existing thread.</p>
+          <Input aria-label="Recovered coordinator thread ID" value={recoveryId}
+            onChange={event => setRecovery({ identity, threadId: event.target.value })} />
+          <Button variant="outline" size="sm" disabled={busy || !recoveryId.trim()}
+            onClick={() => void act(() => rpc.call('factoryRecoverCoordinator', {
+              ...input, intentId: coordinator.intentId, threadId: recoveryId.trim()
+            }))}><Icon name="ExternalLink" className="size-3.5" />Link coordinator</Button>
+        </div>}
+      </div> : <div className="flex flex-wrap items-center gap-2 border-b border-border py-2">
+        <strong className="text-xs">Legacy sessions</strong>
+        <Button variant="outline" size="sm" disabled={busy}
+          onClick={() => void act(() => rpc.call('factoryAdoptCoordinator', input))}>
+          <Icon name="Plus" className="size-3.5" />Add coordinator
+        </Button>
+      </div>}
+      <ul className="m-0 list-none p-0" aria-label="Stage agents">
+        {runKinds.map(kind => {
+          const runs = record.runs.map((run, index) => ({ run, index })).filter(({ run }) => run.kind === kind);
+          return runs.length ? runs.map(({ run, index }) => <li key={run.id}
+          className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 border-b border-border py-2 pl-3" data-team-role={run.kind}>
+          <span className="min-w-0 break-words text-xs">{run.kind === 'investigate' ? 'Investigation' : labels[run.kind]}{run.repairOf ? ' repair' : run.continuationOf ? ' continuation' : ''}
+            {coordinator && index < legacyCount && <span className="ml-2 text-muted-foreground">Legacy session</span>}</span>
+          <span className="text-xs text-muted-foreground">{runStatus(run)}</span>
+          {run.threadId && <Button variant="ghost" size="sm" className="basis-full justify-start sm:ml-auto sm:basis-auto"
+            aria-label={`Open ${run.kind === 'investigate' ? 'investigation' : labels[run.kind].toLowerCase()} thread`}
+            onClick={() => { if (run.threadId) openThread(run.threadId); }}>
+            <Icon name="MessageCirclePlus" className="size-3.5" />Open thread
+          </Button>}
+          </li>) : coordinator?.status === 'ready' && <li key={kind}
+            className="flex min-w-0 flex-wrap items-center gap-3 border-b border-border py-2 pl-3 text-xs" data-team-role={kind}>
+            <span>{kind === 'investigate' ? 'Investigation' : labels[kind]}</span><span className="text-muted-foreground">Waiting</span>
+          </li>;
+        })}
+      </ul>
+      {children}
+    </div>
+  </section>;
 }
 
 function EmpiricalProgress({ record }: { record: FactoryRecord }) {
@@ -368,24 +498,26 @@ function FactoryThreadProgressContent({ threadId, isCompactViewport }: { threadI
     return () => { canceled = true; window.clearInterval(interval); };
   }, [rpc, threadId]);
   const run = record?.runs.at(-1);
-  if (!record || !run) return null;
-  const completed = run.steps.filter(step => step.status === 'completed').length;
+  if (!record) return null;
+  const completed = run?.steps.filter(step => step.status === 'completed').length ?? 0;
   const headerStatus = error ? 'Refresh failed' : record.automationError ? 'Paused' :
-    run.status === 'running' && run.steps.length ? `${completed}/${run.steps.length}` : runStatus(run);
+    run?.status === 'running' && run.steps.length ? `${completed}/${run.steps.length}` : run ? runStatus(run) : 'Coordinator pending';
+  const role = run ? labels[run.kind] : 'Coordinator';
   return <>
-    <span title={`${labels[run.kind]}: ${error ?? record.automationError ?? run.error ?? run.activity}`}><Button size="sm" variant="ghost" className={`tb-progress-trigger ${isCompactViewport ? 'size-7 p-0' : 'max-w-48'}`}
-      data-tone={error || record.automationError ? 'attention' : tone(run)}
-      aria-label={`Task progress: ${labels[run.kind]}, ${headerStatus}`} onClick={() => setOpen(true)}>
-      <Icon name={error || record.automationError || tone(run) === 'attention' || tone(run) === 'failed' ? 'AlertCircle' : 'AiContentGenerator01'} className="size-3.5 shrink-0" />
-      {!isCompactViewport && <span className="truncate">{labels[run.kind]} · {headerStatus}</span>}
+    <span title={`${role}: ${error ?? record.automationError ?? run?.error ?? run?.activity ?? headerStatus}`}><Button size="sm" variant="ghost" className={`tb-progress-trigger ${isCompactViewport ? 'size-7 p-0' : 'max-w-48'}`}
+      data-tone={error || record.automationError ? 'attention' : run ? tone(run) : 'neutral'}
+      aria-label={`Task progress: ${role}, ${headerStatus}`} onClick={() => setOpen(true)}>
+      <Icon name={error || record.automationError || run && (tone(run) === 'attention' || tone(run) === 'failed') ? 'AlertCircle' : 'AiContentGenerator01'} className="size-3.5 shrink-0" />
+      {!isCompactViewport && <span className="truncate">{role} · {headerStatus}</span>}
     </Button></span>
     <Dialog open={open} onOpenChange={setOpen}><DialogContent className="tb-progress-ui max-h-[80vh] overflow-y-auto">
       <DialogTitle>Task progress</DialogTitle>
       <DialogDescription>{record.stage} · Updated {new Date(record.updatedAt).toLocaleTimeString()}</DialogDescription>
       {error && <ErrorNotice title="Progress could not refresh" nextStep="The last known progress is shown. Refresh will be retried automatically." detail={error} />}
-      {record.automationError && record.automationError !== run.error && <ErrorNotice title="Automatic work paused" nextStep="Inspect the latest run and open the original ticket for available recovery actions." detail={record.automationError} />}
-      <EmpiricalProgress record={record} />
-      <RunInsights record={record} />
+      <TicketTeam record={record} title={record.locator} onRecord={setRecord}>
+        <EmpiricalProgress record={record} />
+        <RunInsights record={record} />
+      </TicketTeam>
       <OriginalTicket record={record} />
     </DialogContent></Dialog>
   </>;
@@ -399,6 +531,7 @@ export function FactoryThreadProgress(props: { threadId: string; isCompactViewpo
 }
 
 const labels = { investigate: 'Investigate', plan: 'Plan', build: 'Build', review: 'Review' };
+const runKinds: FactoryRunKind[] = ['investigate', 'plan', 'build', 'review'];
 const statusLabels = {
   starting: 'Starting', running: 'In progress', finished: 'Turn finished',
   failed: 'Failed', canceled: 'Stopped', uncertain: 'Needs attention'
@@ -433,7 +566,8 @@ export function StartTaskButton({ item, disabled = false }: {
         contextThreadId: context.projectId === item.bbProjectId ? context.threadId : null
       });
       const run = record.runs.at(-1);
-      if (run?.threadId) { requestTaskboardOpen(run.threadId); navigate.toThread(run.threadId); }
+      const threadId = ticketThreadId(record);
+      if (threadId) { requestTaskboardOpen(threadId); navigate.toThread(threadId); }
       setError(record.automationError ?? run?.error ??
         (record.trackerProgress.status === 'failed' ? record.trackerProgress.message : null));
     } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
@@ -511,7 +645,6 @@ export function FactoryProgress({ item }: { item: WorkItem }) {
       <span role="status" className="status">{run ? runStatus(run) : 'Not started'}</span>
     </div>
     {error && error !== run?.error && error !== record?.automationError && <ErrorNotice title="Task action failed" nextStep="Inspect the current progress before trying the action again." detail={error} />}
-    {record?.automationError && record.automationError !== run?.error && <ErrorNotice title="Automatic work paused" nextStep="Inspect the latest run and use its available recovery action." detail={record.automationError} />}
     {record?.trackerProgress.message && <div className="mb-3 text-xs">
       {record.trackerProgress.status === 'failed'
         ? <ErrorNotice title="Tracker status could not update" nextStep="Retry the status update. This does not restart the agent session." detail={record.trackerProgress.message} />
@@ -520,9 +653,13 @@ export function FactoryProgress({ item }: { item: WorkItem }) {
         rpc.call('factoryRetryStatus', identity)
       )}>Retry status update</Button>}
     </div>}
-    {!run ? <StartTaskButton item={item} disabled={!loaded || busy || ['done', 'canceled'].includes(item.stateCategory)} /> : <>
-      {record && <EmpiricalProgress record={record} />}
-      {record && <RunInsights record={record} />}
+    {record && <TicketTeam record={record} title={`${item.key} ${item.title}`} onRecord={setRecord}>
+      <EmpiricalProgress record={record} />
+      <RunInsights record={record} />
+    </TicketTeam>}
+    {!run ? (!record || record.admission.kind === 'manual' &&
+      (!record.coordinator || record.coordinator.status === 'pending' || record.coordinator.status === 'ready')) &&
+      <StartTaskButton item={item} disabled={!loaded || busy || ['done', 'canceled'].includes(item.stateCategory)} /> : <>
       {run.status === 'uncertain' && <div className="my-3 space-y-2">
         <Input aria-label="Recovered native thread ID" placeholder="Native thread ID" value={recoveryId} onChange={e => setRecoveryId(e.target.value)} />
         <Button size="sm" variant="outline" disabled={busy || !(run.threadId || recoveryId.trim())} onClick={() => void action(() =>

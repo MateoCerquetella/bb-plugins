@@ -1,0 +1,68 @@
+Fresh-context outcome QA
+Head: 371c2a0b9d7ee4bb4f0cf6bacd76cc76c6970aac
+Empirical workflow revision: 29; specification revision: 11
+Collector: fresh_outcome_qa
+
+Executed in the current project's BB Surf binding, proj_ykxahiys47:
+STEEL_CDP_URL=http://127.0.0.1:9320 node plugins/taskboard/scripts/factory-browser-check.mjs
+Exit 0. The browser report contains no page or console errors.
+The harness bundles current component source and uses the current built plugin
+stylesheet plus the pinned BB host stylesheet. No live factory was enabled.
+
+Directly observed operator outcomes:
+- Settings enable/save/disable controls update the displayed state. Concurrency
+  value 2, provider identity, fixed todo intake, queue count, active count,
+  availability and last scan information remain readable at 1280 and 390 pixels.
+- Healthy idle, paused, awaiting first scan, unconfigured and provider-error
+  states have distinct text. Provider error retains an unknown queue instead
+  of presenting a successful empty queue.
+- Paused, failed provider read, stale eligibility, changed scope and closed
+  ticket reasons remain visible above the ticket team even when it is collapsed.
+- Ready coordinator and stage thread actions target their expected thread IDs.
+  Uncertain coordinator recovery, rejected coordinator retry and legacy
+  coordinator adoption update the UI through the mocked SDK boundary.
+- Enter and Space toggle disclosure; collapsed state survives refresh.
+  Thread actions are keyboard reachable. A supplemental Tab/Enter check
+  activated the coordinator action and confirmed :focus-visible with a blue
+  1px focus ring at 1280 and 390 pixels. Both screenshots were inspected.
+- Long title and stale-eligibility reason wrap without document overflow.
+  Desktop and mobile screenshots of every project factory state were inspected.
+- The harness also passes stale-plan approval, manual start, review blockers,
+  bounded repair UI, failed continuation feedback, recovery/navigation,
+  delayed-status refresh and cross-project refresh-race checks.
+
+Acceptance evidence boundaries:
+AC-1: direct control/display outcomes passed. Durable backend persistence and
+  disabled defaults rely on the exact current-head unit receipt below.
+AC-2: queue observation UI passed. Real admission/eligibility/scan fairness
+  rely on the exact current-head unit receipt; the browser does not run intake.
+AC-3: ambiguous coordinator recovery UI passed. Durable duplicate prevention,
+  restart and capacity rely on the exact current-head unit receipt.
+AC-4: visible coordinator/stage grouping, manual start and direct thread actions
+  passed. Native ancestry, managed worktree creation, execution defaults and
+  independent Review rely on the focused backend tests, not actual agent runs.
+AC-5: all requested blockers and status refresh-race behavior passed in the UI.
+  Backend dispatch suppression relies on the focused backend tests.
+AC-6: review blocker and repair-limit UI passed; no issue was closed, merged or
+  deployed in this check. Provider writes and review acceptance enforcement
+  were not exercised against a real provider.
+AC-7: current-head suite receipt passed. CLI/RPC production integration was
+  not independently invoked by this browser verification.
+AC-UI-1: passed for the direct component/browser behavior described above.
+
+Existing executable evidence inspected, not rerun:
+qa-a44e8c06cb4f91647921320c, current head and specification, exit 0.
+It records npm run check --workspace bb-plugin-taskboard:
+287 tests passed, zero failed/skipped, type checks, build and metadata check.
+No code-review judgment was used as outcome evidence.
+
+Limitations:
+The browser preview replaces SDK hooks/RPC, navigation and provider data.
+Settings persistence in the browser is in-memory, not a restart of real BB.
+Thread navigation is asserted as a captured destination, not an opened native
+thread. Native dispatch, external trackers and filesystem worktree creation
+remain mocked boundaries of this verification. No native smoke, production
+installation, full repository CI, publication or deployment was performed.
+Provider identifiers are the supported fixed provider names; a fabricated
+arbitrarily long provider identity was not injected.
+The temporary preview server on 4198 was terminated after the focus check.

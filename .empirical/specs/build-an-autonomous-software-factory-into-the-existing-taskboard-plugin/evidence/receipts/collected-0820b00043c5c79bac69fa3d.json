@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-0820b00043c5c79bac69fa3d",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-10-20T15:36:03.679Z",
+  "completedAt": "2026-10-20T15:36:03.679Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin",
+    "specRevision": 11,
+    "specDigest": "sha256:b1c54351a2cc67dd8586b2f2dad8f34f4f916b3b0656ee17756d3ab2f07fab77",
+    "treeDigest": "sha256:7babc62355177b450b81f80a2e50ada000dfd3ac37513c9daf2163075cc55402",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:a083cef588e10cbcb5c161f2d55269fc420803348d46b0cdc20aa40c3443b6a5",
+  "kind": "collected",
+  "collector": "empirical-review:fresh-full-reviewer-r33",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/reviews/4bbcd9f29ef1963bc59c56ae.json",
+      "mediaType": "application/json",
+      "bytes": 3359,
+      "digest": "sha256:913308d269b0005a88bad2a6379c9e4d8b0c6d7489850e4ce7935169ccbe4478"
+    },
+    {
+      "path": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/reviews/4bbcd9f29ef1963bc59c56ae.md",
+      "mediaType": "text/markdown",
+      "bytes": 2579,
+      "digest": "sha256:d385e2519d1216ea88d64f9f0a3b72ee635480166650435b24a9509ca55cf480"
+    }
+  ]
+}
