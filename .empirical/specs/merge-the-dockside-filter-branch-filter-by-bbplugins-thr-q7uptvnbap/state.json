@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 11,
+  "revision": 12,
   "activeFeature": "merge-the-dockside-filter-branch-filter-by-bbplugins-thr-q7uptvnbap",
   "request": "Merge the dockside filter branch filter-by-bbplugins-thr_q7uptvnbap into main and release Dockside v0.1.8: bump version (0.1.7 is already taken by an unrelated tag), update changelog/README if needed, run dockside checks, tag dockside/v0.1.8, push branch/tag, and verify the marketplace install resolves 0.1.8.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "review",
+  "phase": "verify",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Implementation complete: filter merge, version 0.1.8, docs, and all Dockside checks passing.",
+  "message": "Fresh-context review approved all six criteria; the blocking filter-rendering defect was fixed and re-reviewed; six non-blocking findings deferred.",
   "implementationActor": "agent",
   "workStartedAt": "2026-10-20T20:02:28.896Z",
   "specDigest": "sha256:face92d19239cbd2edd29d70d45ee3e17a9e78a6e12969f270c03bc5295f21a7",
@@ -20,7 +20,9 @@
   "capabilityClaimId": "merge-the-dockside-filter-branch-filter-by-bbplugins-thr-q7uptvnbap-55654f1ea1c7",
   "authorizationDigest": null,
   "evidence": [],
-  "evidenceReceiptIds": [],
+  "evidenceReceiptIds": [
+    "collected-1db75c32d3eda575abe02727"
+  ],
   "legacyEvidenceCount": 0,
   "completion": {
     "implemented": true,
@@ -36,7 +38,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-20T20:07:27.478Z",
+  "updatedAt": "2026-10-20T20:13:36.584Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "merge-the-dockside-filter-branch-filter-by-bbplugins-thr-q7uptvnbap-55654f1ea1c7",
