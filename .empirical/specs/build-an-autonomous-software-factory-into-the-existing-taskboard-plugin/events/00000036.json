@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "sequence": 36,
+  "previousDigest": "sha256:192e178b11ebe42a85e26c11e9b934532b0881b5b5d20536ceb5d7c610f0f38c",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Revise contract: Redesign the Taskboard factory UI as a cohesive software-factory operator console. The current ticket detail is an unstructured vertical dump with duplicate status, legacy-session emphasis, weak hierarchy, and excessive scrolling. Create a new whole-page layout that prioritizes ticket identity and controls, a clear coordinator and child-agent team, a compact phase pipeline, current blockers and active work, and drill-down evidence. Preserve existing behavior, accessibility, mobile responsiveness, BB design conventions, factory recovery controls, and provider-backed status. Prototype multiple structurally distinct layouts, choose the strongest through browser evidence, implement it, and verify desktop and mobile in the live BB surface.",
+  "createdAt": "2026-10-20T15:59:23.711Z",
+  "stateBeforeDigest": "sha256:5c3544bca22ff31a9d612837a8c33c7e6c869d33a5b51aa78a869e749e6ac6d4",
+  "stateAfterDigest": "sha256:5c22d2626b2fde7944ad174efa5340257d7fc649ce8de1343757c0f3f110059f",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 36,
+    "activeFeature": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin",
+    "request": "Build an autonomous software factory into the existing Taskboard plugin, inspired by https://github.com/lpbaril/bb-plugin-factory. Make Linear, Jira, or the configured issue provider the source of truth. The factory should continuously select eligible tickets, start and supervise BB agent work, avoid duplicate dispatch, recover after restart, and reflect progress back through the existing Taskboard provider/status model. Reuse the current taskboard architecture and keep the first implementation focused and operable.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 1,
+    "message": "Redesign the Taskboard factory UI as a cohesive software-factory operator console. The current ticket detail is an unstructured vertical dump with duplicate status, legacy-session emphasis, weak hierarchy, and excessive scrolling. Create a new whole-page layout that prioritizes ticket identity and controls, a clear coordinator and child-agent team, a compact phase pipeline, current blockers and active work, and drill-down evidence. Preserve existing behavior, accessibility, mobile responsiveness, BB design conventions, factory recovery controls, and provider-backed status. Prototype multiple structurally distinct layouts, choose the strongest through browser evidence, implement it, and verify desktop and mobile in the live BB surface.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:b1c54351a2cc67dd8586b2f2dad8f34f4f916b3b0656ee17756d3ab2f07fab77",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin-63a17a591999",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-20T15:59:23.711Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin-63a17a591999",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_4crs23q8tu-1/bb-plugins",
+      "worktreeId": "sha256:97b93e0724b7096066b8243160868d9560541df602c0b09b923e7a1473e60397",
+      "baseCommit": "85d1b0655b9883adf940eab0d82d7bd95c956e28",
+      "baseTree": "a25cd39c6da0e7c195c6eabcdbd1b94b045ee2d4",
+      "bases": {
+        "taskboard-autonomous-factory": {
+          "capability": "taskboard-autonomous-factory",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "explicit project factory admission": null,
+            "one coordinator per ticket team": null,
+            "bounded and observable automation": null,
+            "preserve execution and acceptance boundaries": null,
+            "visible ticket team hierarchy": null
+          }
+        }
+      },
+      "capabilities": [
+        "taskboard-autonomous-factory"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-19T18:18:31.861Z",
+      "heartbeatAt": "2026-10-20T07:36:17.648Z",
+      "digest": "sha256:50201afa6b33db528ecda755220577184180c5a864e87801c9e4dce723ddda23"
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 8,
+      "capabilities": 1,
+      "reason": "The eight criteria describe one atomic queue-admission capability: settings, durable claim, scheduler, status, UI, and verification share one project policy and cannot ship independently without either exposing an inert control or allowing uncontrolled admission.",
+      "actor": "agent",
+      "revision": 3
+    },
+    "trackerGeneration": 6,
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 6,
+      "awaitingFeedback": false,
+      "contractRevision": 35
+    },
+    "budgetExtensionMinutes": 240,
+    "reviewFirst": true
+  },
+  "digest": "sha256:76fb36e6769b26cd6e359714b359223c540b78b9d9859612ddb1b62cbe049e0f"
+}

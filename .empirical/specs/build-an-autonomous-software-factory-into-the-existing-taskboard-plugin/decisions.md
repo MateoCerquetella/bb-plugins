@@ -261,3 +261,84 @@ actual parent IDs and workspace IDs without enabling a live queue.
 
 No coordinator implementation, native smoke, executable test, browser check,
 fresh-context implementation review, or delivery gate ran for this design edit.
+
+## D-003: Use one ticket-first operator console
+
+Status: Accepted
+
+### Evidence
+
+- Source inspection found five competing presentations of the same work in
+  ticket detail: the ticket-team disclosure, lifecycle rail, global session
+  picker, selected-run detail, and separate Empirical block.
+- `TrackerDetail` already owns provider ticket identity, metadata, description,
+  comments, and provider actions. `FactoryProgress` already owns factory polling,
+  mutation guards, plan editing, recovery, and native navigation.
+- Three independent interactive prototypes tested materially different
+  compositions. Candidate C put the current action first, used one horizontal
+  stage rail and one selected-run pane, kept ticket context beside factory work
+  on desktop, and used a Factory/Ticket switch at narrow widths.
+- Candidate C's prototype passed Playwright checks at 1280, 800, and 390 px for
+  horizontal overflow, primary-action placement, narrow-view switching, stage
+  selection, and historical-attempt selection. These checks are design evidence
+  only and do not verify production.
+
+### Options
+
+1. Horizontal stage rail, selected-run pane, persistent desktop ticket context,
+   and a mobile context disclosure.
+2. Vertical stage list, tabbed work pane, and responsive ticket-context mode.
+3. Ticket-first console with one horizontal stage rail, stage-scoped attempts,
+   one evidence pane, desktop context rail, and narrow Factory/Ticket switch.
+
+### Chosen approach
+
+Choose option 3. It is the shortest path from ticket intent to current factory
+state and action at every tested width. Adapt option 1's explicit
+`follow-current` versus historical selection model and option 2's separation of
+current state from selected history.
+
+Keep `TrackerDetail` responsible for the page shell and provider ticket context.
+Keep `FactoryProgress` as the only controller for factory records, actions,
+polling, coordinator recovery, and Empirical observations. Derive one console
+view from those existing inputs. Presentation components do not call a second
+scheduler or persist another workflow model.
+
+The current-state band always reflects the latest record. The stage rail is the
+only workflow representation. Attempt controls are scoped to the selected stage.
+The evidence pane shows one run at a time. Plan, coordinator, and Empirical
+detail live in Workspace unless they block the next action. The compact thread
+dialog reuses low-level run evidence without rendering the ticket page again.
+
+### Rejected options
+
+- Keeping the current team tree and restyling it retains duplicate workflow
+  representations and does not fix the read-before-act order.
+- A vertical stage list spends too much width beside ticket context around
+  tablet sizes and needs a different navigation model on mobile.
+- An event timeline exposes reconciliation chronology instead of the current
+  decision and makes action discovery depend on scanning history.
+- Persisting console selection adds product state with no cross-device value.
+  Local explicit selection is sufficient.
+
+### Trade-offs and risks
+
+- Commands, raw output, coordinator details, and Empirical details require an
+  extra click. That is deliberate; blockers and the primary action stay visible.
+- The desktop context rail reduces diff width. It collapses into the
+  Factory/Ticket switch before evidence becomes unreadable.
+- Deriving action precedence can become another conditional tangle. Keep policy
+  in one typed derivation function and reuse the existing guarded action
+  callbacks.
+- `factory/app.tsx` is already large. Extract cohesive presentation into
+  `factory/console.tsx` if the change would push the controller past 1,000 lines.
+
+### Verification
+
+Use the isolated production preview and BB Surf to verify 1280, 800, and 390 px.
+Assert no horizontal overflow, current action above the fold, one workflow
+representation, Factory/Ticket switching, stage and attempt selection, explicit
+history retention after refresh, keyboard tab and disclosure behavior, direct
+thread actions, exact-body plan approval, and all recovery states. Run focused
+factory tests, Taskboard checks, install and reload the local plugin, and retain
+the existing native smoke boundary.

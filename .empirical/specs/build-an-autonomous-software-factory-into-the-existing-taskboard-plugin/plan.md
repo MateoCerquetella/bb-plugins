@@ -99,28 +99,48 @@ every new worker has that native parent, while ambiguity remains blocked.
 Observable check: claimed early tickets cannot starve later tickets, a healthy
 scan cannot hide a blocked team, and stale or paused work dispatches no new agent.
 
-## 4. Render grouped ticket teams and correct navigation
+## 4. Replace duplicate factory detail with one operator console
 
-- In `plugins/taskboard/factory/app.tsx`, render coordinator and role-labelled
-  worker rows with native state and direct actions. Waiting roles have no fake
-  links. Show blockers above the group and in its collapsed summary.
-- Update `plugins/taskboard/factory/navigation.ts` and
-  `plugins/taskboard/app.tsx` so Start opens the ready root, worker actions open
-  their own native thread, and legacy records keep their fallback destination.
-- Add explicit adoption/retry/recovery controls and accurate legacy labels.
-  Key disclosure state by ticket identity to retain expansion across refresh.
-- Reuse `plugins/taskboard/app.css` conventions and
-  `plugins/taskboard/factory/project-settings.tsx` for readable project blockers.
-  Keep keyboard focus, wrapping, and narrow-screen behavior accessible.
-- Extend `plugins/taskboard/test/factory-preview.tsx` and
-  `plugins/taskboard/test/factory-preview-runtime.tsx` with ready, pending,
-  uncertain, unavailable, adopted-legacy, paused, scope-changed, and closed teams.
-  Record actual root/worker navigation destinations in the fixture.
+- Extract cohesive console presentation from
+  `plugins/taskboard/factory/app.tsx` into
+  `plugins/taskboard/factory/console.tsx` if needed to keep the controller below
+  1,000 lines. Keep polling, stale-response protection, busy guards, plan state,
+  coordinator recovery, Empirical observation, and RPC mutations in
+  `FactoryProgress`.
+- Add one typed view derivation for the latest state, blocker, primary action,
+  four stage summaries, stage-scoped attempts, selected run, plan, coordinator,
+  and Empirical workspace state. Reuse current mutation callbacks rather than
+  adding another dispatcher or record shape.
+- Replace `TicketTeam` plus `RunInsights` with one current-state/action band,
+  one selectable stage rail, one attempt control for the selected stage, one
+  selected-run evidence pane, and one workspace/plan surface. Keep the latest
+  state visible while inspecting history.
+- Model local selection as `follow-current` or an explicit stage/run ID. Retain
+  explicit history through polling while the run exists; otherwise fall back to
+  that stage's newest attempt. Do not persist this UI state.
+- In `plugins/taskboard/app.tsx`, retain the canonical ticket heading and
+  provider controls. Compose factory work beside metadata, description,
+  acceptance criteria, and comments on wide screens. Add one
+  keyboard-accessible Factory/Ticket switch on narrow screens.
+- Preserve coordinator open/retry/link/add, exact worker navigation, legacy
+  labels, uncertain-stage recovery, tracker retry, plan save/approve guards,
+  blocked-Build continuation, review repair limits, native diff, bounded output,
+  and compact thread progress. Move non-blocking coordinator and Empirical
+  detail into Workspace; promote only blockers into the summary.
+- Reuse `plugins/taskboard/app.css` tokens and existing components. Add stable
+  responsive tracks, wrapping, visible focus, tab semantics, native disclosure
+  semantics, and reduced-motion handling. No new dependency.
+- Isolate the preview into project-settings, ticket-console, and compact-thread
+  surfaces. Extend fixture states for current, historical, running, blocked
+  Build, plan approval, review findings, repair limit, coordinator recovery,
+  provider stale/scope/closure, tracker error, and Empirical conflict.
 - Extend `plugins/taskboard/test/factory-navigation.test.ts` and
-  `plugins/taskboard/test/app-ui.test.ts` for changed navigation/UI contracts.
+  `plugins/taskboard/test/app-ui.test.ts` for current action precedence, exact
+  thread destination, and selection behavior.
 
-Observable check: keyboard users can expand a group and open the root or a
-specific worker; refresh retains expansion and blocked groups retain a reason.
+Observable check: ticket detail shows one workflow representation, the primary
+action is visible in the first viewport, stage and attempt selection work, and
+explicit history survives a simulated refresh without hiding current state.
 
 ## 5. Verify the installed behavior and obtain independent review
 
@@ -133,11 +153,15 @@ specific worker; refresh retains expansion and blocked groups retain a reason.
 - Install `./plugins/taskboard`, reload `taskboard`, and inspect factory CLI
   status without enabling a live provider queue.
 - Extend `plugins/taskboard/scripts/factory-browser-check.mjs` and run through
-  BB Surf's bound project browser. Capture desktop/mobile evidence for healthy
-  idle, paused, missing configuration, provider error, uncertain coordinator,
-  scope change, and closure change. Assert role labels, direct destinations,
-  retained disclosure after refresh, keyboard focus, and no horizontal overflow
-  with long ticket titles, provider names, and reasons. Inspect screenshots.
+  BB Surf's bound project browser. Capture 1280, 800, and 390 px evidence for
+  ticket console, project settings, and compact thread progress. Cover healthy
+  idle, paused, missing configuration, provider error, blocked Build, plan
+  approval, review findings, repair limit, uncertain coordinator, scope change,
+  and closure change. Assert one workflow representation, primary action above
+  the fold, Factory/Ticket switching, stage and attempt selection, explicit
+  history retention across refresh, exact thread destinations, keyboard focus,
+  disclosure semantics, and no horizontal overflow with long content. Inspect
+  every screenshot.
 - Extend `plugins/taskboard/scripts/factory-native-smoke.ts` using an isolated
   database and synthetic ticket. Where BB context permits, inspect actual native
   root/child parent IDs and execution environment IDs. Prove nonempty root

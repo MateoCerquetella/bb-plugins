@@ -5129,8 +5129,10 @@ function TrackerDetail({
 }) {
   const rpc = useRpc<TaskboardRpcContract>();
   const navigate = useBbNavigate();
+  const detailTabsId = useId();
   const [item, setItem] = useState<WorkItemDetail | null | undefined>();
   const [error, setError] = useState<string | null>(null);
+  const [detailView, setDetailView] = useState<'factory' | 'ticket'>('factory');
   const requestRevisionRef = useRef(0);
 
   const load = useCallback(async () => {
@@ -5153,6 +5155,7 @@ function TrackerDetail({
 
   useEffect(() => {
     setItem(undefined);
+    setDetailView('factory');
     void load();
     return () => {
       requestRevisionRef.current += 1;
@@ -5229,7 +5232,7 @@ function TrackerDetail({
   return (
     <div className="tb-issue-detail @container flex min-h-full flex-col">
       <div className="tb-detail-frame flex flex-1 items-stretch">
-        <article className="mx-auto w-full min-w-0 max-w-[52rem] flex-1 px-5 pb-16 pt-7 @3xl:px-10 @3xl:pt-10">
+        <article className="mx-auto w-full min-w-0 max-w-[92rem] flex-1 px-5 pb-16 pt-7 @3xl:px-10 @3xl:pt-10">
           <div className="mb-3 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
             <span className="font-medium tabular-nums">{item.key}</span>
             <WorkItemStatusMenu
@@ -5264,36 +5267,50 @@ function TrackerDetail({
             </div>
           </div>
 
-          <FactoryProgress item={item} />
-
-          <DetailMetadata
-            item={item}
-            className="tb-detail-meta mt-5 border-y py-4"
-          />
-
-          {item.labels.length > 0 ? (
-            <div className="mt-5 flex flex-wrap gap-1.5">
-              {item.labels.map(label => (
-                <Badge key={label} variant="secondary">
-                  {label}
-                </Badge>
-              ))}
-            </div>
-          ) : null}
-
-          <section className="mt-7">
-            <h2 className="mb-3 text-sm font-semibold">Description</h2>
-            {item.description.trim() ? (
-              <Markdown content={item.description} />
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                No description provided.
-              </p>
-            )}
-          </section>
-
-          {item.comments.length > 0 ? (
-            <section className="tb-comment-rail mt-8 border-t pt-5">
+          <div className="tb-detail-switch" role="tablist" aria-label="Ticket detail view">
+            <button type="button" role="tab" aria-selected={detailView === 'factory'}
+              id={`${detailTabsId}-factory-tab`} aria-controls={`${detailTabsId}-factory-panel`}
+              tabIndex={detailView === 'factory' ? 0 : -1}
+              onClick={() => setDetailView('factory')}
+              onKeyDown={event => {
+                if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+                event.preventDefault();
+                setDetailView('ticket');
+                document.getElementById(`${detailTabsId}-ticket-tab`)?.focus();
+              }}>Factory</button>
+            <button type="button" role="tab" aria-selected={detailView === 'ticket'}
+              id={`${detailTabsId}-ticket-tab`} aria-controls={`${detailTabsId}-ticket-panel`}
+              tabIndex={detailView === 'ticket' ? 0 : -1}
+              onClick={() => setDetailView('ticket')}
+              onKeyDown={event => {
+                if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+                event.preventDefault();
+                setDetailView('factory');
+                document.getElementById(`${detailTabsId}-factory-tab`)?.focus();
+              }}>Ticket</button>
+          </div>
+          <div className="tb-detail-workbench">
+            <section className="tb-detail-factory" id={`${detailTabsId}-factory-panel`}
+              role="tabpanel" aria-labelledby={`${detailTabsId}-factory-tab`}
+              data-active={detailView === 'factory'}
+              aria-label="Factory console"><FactoryProgress item={item} /></section>
+            <section className="tb-detail-context" id={`${detailTabsId}-ticket-panel`}
+              role="tabpanel" aria-labelledby={`${detailTabsId}-ticket-tab`}
+              data-active={detailView === 'ticket'}
+              aria-label="Ticket context">
+              <DetailMetadata item={item} className="tb-detail-meta border-y py-4" />
+              {item.labels.length > 0 ? (
+                <div className="mt-5 flex flex-wrap gap-1.5">
+                  {item.labels.map(label => <Badge key={label} variant="secondary">{label}</Badge>)}
+                </div>
+              ) : null}
+              <section className="mt-7">
+                <h2 className="mb-3 text-sm font-semibold">Description</h2>
+                {item.description.trim() ? <Markdown content={item.description} />
+                  : <p className="text-sm text-muted-foreground">No description provided.</p>}
+              </section>
+              {item.comments.length > 0 ? (
+                <section className="tb-comment-rail mt-8 border-t pt-5">
               <h2 className="mb-1 text-sm font-semibold">
                 Comments <span className="text-muted-foreground">{item.comments.length}</span>
               </h2>
@@ -5313,13 +5330,11 @@ function TrackerDetail({
                   </article>
                 ))}
               </div>
+                </section>
+              ) : null}
             </section>
-          ) : null}
+          </div>
         </article>
-
-        <aside className="tb-detail-aside hidden w-56 shrink-0 border-l border-border-hairline py-10 pl-4 pr-6">
-          <DetailMetadata item={item} className="grid-cols-1" />
-        </aside>
       </div>
     </div>
   );

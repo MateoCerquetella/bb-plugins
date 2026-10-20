@@ -5,15 +5,20 @@
 
 ## Review Scope
 
-Reviewed `spec.md` and every file under `mockups/`, with the previous consult
-as context. This is a specification and mockup review. No implementation,
-browser interaction, or screenshot verification was performed.
+Reviewed `spec.md`, every file under `mockups/`, and three independent
+operator-console prototypes against the production factory-state and action
+inventory. Candidate C's ticket-first console was verified in its prototype at
+1280, 800, and 390 px. This consult does not verify the production
+implementation.
 
 ## Assessment
 
-The updated artifacts sufficiently specify the required operator experience
-for AC-UI-1 and the visible fail-closed behavior in AC-5. No blocking design
-findings remain.
+The revised contract now specifies the operator experience missing from the
+earlier grouped-team mockup. Candidate C is the selected base. Its current-state
+band and primary action lead the page, one stage rail replaces the team tree
+plus lifecycle rail, attempts are scoped to their stage, and one evidence pane
+owns run detail. Ticket context stays visible in a desktop rail and becomes a
+Factory/Ticket switch at narrow widths.
 
 `mockups/project-manage-factory.md` now covers saved enablement, provider
 identity, the todo intake policy, bounded concurrency, queue and active counts,
@@ -24,18 +29,17 @@ never-enabled, missing-configuration, provider-error, and provider-change states
 have explicit text. Unknown and cached queue counts do not imply current
 eligibility, and successful discovery does not hide blocked workflows.
 
-`mockups/grouped-ticket-team.md` preserves one coordinator followed by stage
-children, with role, native state, and a direct thread action. Waiting roles do
-not expose nonexistent threads. Provider failure, stale eligibility, scope
-change, closure change, pause, and uncertain coordinator creation have readable
-reasons above the group and in its collapsed summary. Recovery links an
-existing coordinator rather than creating a replacement. Legacy sessions are
-identified without claiming a hierarchy they do not have.
+The current production layout repeats the same state through a team disclosure,
+phase rail, global session selector, run detail, and separate Empirical block.
+That duplication makes the operator reconcile several partial views and pushes
+ticket intent below factory history. The selected console removes those
+parallel representations. Coordinator recovery and Empirical observations move
+to Workspace and are promoted into the summary only when they prevent work.
 
-Both mockups specify wrapping and stacked narrow layouts for long content,
-textual state labels, visible focus, and accessible controls. The ticket
-disclosure explicitly supports Enter/Space and `aria-expanded`; expansion is
-keyed by ticket identity and retained across refresh.
+Prototype checks at 1280, 800, and 390 px established no horizontal overflow,
+the primary action above the fold, and working narrow-view switching, stage
+selection, and historical-attempt selection. These are prototype observations,
+not production acceptance evidence.
 
 ## Prior Findings
 
@@ -47,6 +51,10 @@ keyed by ticket identity and retained across refresh.
   and reasons, plus stacked narrow layouts that preserve readable actions.
 - UI-UX-4 resolved by the keyboard disclosure contract, visible action focus,
   and expansion retention across data refresh.
+- UI-UX-5 resolved by replacing duplicate workflow presentations with one stage
+  rail, one selected-run pane, and a distinct current-state summary.
+- UI-UX-6 resolved by keeping ticket intent alongside factory evidence on wide
+  screens and one keyboard-accessible view switch away on narrow screens.
 
 ## Remaining Findings
 
@@ -54,8 +62,9 @@ None at specification and mockup scope.
 
 ## Implementation Verification
 
-The spec still requires desktop and mobile browser evidence for the described
-Manage and blocked-ticket states. Verify long content without horizontal
-overflow, visible keyboard focus, disclosure and thread actions, failed-save
-behavior, and expansion retention during refresh against the implemented UI.
-This consult does not establish that those runtime acceptance checks passed.
+The production implementation must still prove all preserved action states,
+desktop and mobile composition, exact plan-approval guards, long-content
+wrapping, visible keyboard focus, selection retention during refresh, and
+thread navigation. It must also demonstrate that ticket detail has only one
+workflow representation and that thread-dialog progress remains compact. This
+consult does not establish those runtime acceptance checks.

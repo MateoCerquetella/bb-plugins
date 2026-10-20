@@ -91,19 +91,21 @@ try {
   await factorySettings.getByText('disabled · github').waitFor();
   await page.setViewportSize({ width: 1280, height: 1000 });
   const manual = page.locator('#preview-manual');
-  await manual.getByRole('heading', { name: 'Agent', exact: true }).waitFor();
+  await manual.locator('.tb-factory-summary').waitFor();
   await page.getByRole('button', { name: /^Task progress:/ }).click();
   await page.getByRole('dialog').locator('summary').filter({ hasText: 'Agent updates' }).waitFor();
   assert.equal(await page.getByRole('dialog').locator('.tb-command-group').getAttribute('open'), null);
   await page.getByRole('dialog').locator('.tb-command-group > summary').click();
   await page.getByRole('dialog').getByText('npm test', { exact: true }).waitFor();
   await page.getByRole('dialog').locator('.tb-command-group > summary').click();
+  await page.getByRole('dialog').getByRole('tab', { name: /Changes/ }).click();
   await page.getByRole('dialog').locator('summary').filter({ hasText: 'Changed files' }).click();
   await page.getByRole('dialog').locator('[data-native-diff-preview]').waitFor();
   await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, 'taskboard-diff-preview.png') });
   assert.match(await page.getByRole('dialog').locator('[data-native-diff-preview]').innerText(), /\+const saved/);
   await page.getByRole('dialog').getByRole('button', { name: 'Refresh diff' }).click();
   await page.getByRole('dialog').locator('[data-native-diff-preview]').waitFor();
+  await page.getByRole('dialog').getByRole('tab', { name: 'Activity', exact: true }).click();
   await page.emulateMedia({ reducedMotion: 'reduce' });
   assert.equal(await page.getByRole('dialog').locator('.tb-live-mark').evaluate(el => getComputedStyle(el).animationName), 'none');
   await page.emulateMedia({ reducedMotion: 'no-preference' });
@@ -147,10 +149,11 @@ try {
     window.factoryFixture.version++;
     window.factoryRefresh();
   });
+  await manual.locator('.tb-stage-rail').getByRole('button', { name: /Investigate/ }).click();
   await sessionSelect.selectOption('investigate-run');
   await page.evaluate(() => window.factoryRefresh());
   assert.equal(await sessionSelect.inputValue(), 'investigate-run');
-  await manual.getByText('Stage result', { exact: true }).click();
+  await manual.getByRole('tab', { name: 'Result', exact: true }).click();
   await manual.getByText('Bounded investigation findings.', { exact: true }).waitFor();
   assert.equal(await manual.getByText('Preserve filters per project.', { exact: true }).count(), 0);
   await page.evaluate(() => {
@@ -185,8 +188,10 @@ try {
   await page.waitForFunction(() =>
     document.querySelector('#preview-manual .tb-session-picker select')?.value === 'run');
   assert.equal(await sessionSelect.inputValue(), 'run');
+  await manual.locator('.tb-stage-rail').getByRole('button', { name: /Build/ }).click();
   await sessionSelect.selectOption('run');
-  await manual.getByText('Implementation plan', { exact: true }).click();
+  await manual.getByRole('tab', { name: 'Plan', exact: true }).click();
+  await manual.getByText('Edit implementation plan', { exact: true }).click();
   await manual.getByRole('button', { name: 'Save revision' }).click();
   await manual.getByRole('button', { name: 'Approve revision 1' }).click();
   assert.equal(await page.evaluate(() => window.factoryFixture.approvedDigest), 'preview-plan');
@@ -198,8 +203,10 @@ try {
   assert.equal(await page.evaluate(() => window.factoryStarts), 1);
   assert.equal(await page.evaluate(() => localStorage.getItem('bb-taskboard:right-panel-pinned')), null);
   assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_investigate', 'thr_build', 'thr_coordinator']);
+  await manual.getByRole('tab', { name: 'Activity', exact: true }).click();
   await manual.locator('.tb-run[data-live="true"] .tb-live-mark').waitFor();
   assert.equal(await manual.locator('.tb-run[data-live="true"] .tb-live-mark').evaluate(el => getComputedStyle(el).animationName), 'tb-working');
+  await manual.getByRole('tab', { name: 'Workspace', exact: true }).click();
   const empirical = manual.locator('.tb-empirical-progress');
   await empirical.getByText('demo-live-work').waitFor();
   await empirical.getByText('implement · r1').waitFor();
@@ -221,6 +228,7 @@ try {
   await empirical.getByText('done · r5').waitFor();
   await empirical.getByText('verified · workflow').waitFor();
   await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, 'taskboard-empirical-demo.png') });
+  await manual.getByRole('tab', { name: 'Activity', exact: true }).click();
   await page.emulateMedia({ reducedMotion: 'reduce' });
   assert.equal(await manual.locator('.tb-run[data-live="true"] .tb-live-mark').evaluate(el => getComputedStyle(el).animationName), 'none');
   await page.emulateMedia({ reducedMotion: 'no-preference' });
@@ -228,8 +236,13 @@ try {
   for (const width of [1280, 800, 390]) {
     await page.setViewportSize({ width, height: 900 });
     const wide = width >= 960;
-    assert.equal(await page.locator('#preview-detail .tb-detail-aside').isVisible(), wide);
-    assert.equal(await page.locator('#preview-detail .tb-detail-meta').isVisible(), !wide);
+    assert.equal(await page.locator('#preview-detail .tb-detail-context').isVisible(), wide ? true : false);
+    assert.equal(await page.locator('#preview-detail .tb-detail-switch').isVisible(), !wide);
+    if (!wide) {
+      await page.locator('#preview-detail .tb-detail-switch').getByRole('tab', { name: 'Ticket' }).click();
+      assert.equal(await page.locator('#preview-detail .tb-detail-context').isVisible(), true);
+      await page.locator('#preview-detail .tb-detail-switch').getByRole('tab', { name: 'Factory' }).click();
+    }
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     const name = width === 1280 ? 'desktop' : width === 800 ? 'panel' : 'mobile';
     await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, `taskboard-progress-${name}.png`), fullPage: true });
@@ -267,8 +280,9 @@ try {
   });
   await manual.getByText('Review still found blockers after two repair attempts. Inspect the findings and revise the plan.').waitFor();
   assert.equal(await manual.getByRole('button', { name: 'Return to Build with findings', exact: true }).isDisabled(), true);
+  await manual.getByRole('tab', { name: 'Plan', exact: true }).click();
   if (!await manual.getByRole('textbox', { name: 'Implementation plan' }).isVisible()) {
-    await manual.getByText('Implementation plan', { exact: true }).click();
+    await manual.getByText('Edit implementation plan', { exact: true }).click();
   }
   await manual.getByRole('textbox', { name: 'Implementation plan' }).waitFor();
   await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, 'taskboard-review-repair-limit.png'), fullPage: true });
@@ -345,21 +359,17 @@ try {
   await page.getByRole('button', { name: 'Team ready', exact: true }).click();
   const team = manual.locator('[data-factory-team]');
   assert.equal(await manual.locator('.tb-run').count(), 1);
-  const disclosure = team.getByRole('button', { expanded: true });
+  await manual.getByRole('tab', { name: 'Workspace', exact: true }).click();
   await team.getByRole('button', { name: 'Open coordinator thread', exact: true }).click();
   assert.equal(await page.evaluate(() => window.factoryNavigation.at(-1)), 'thr_coordinator');
-  await team.getByRole('button', { name: 'Open build thread', exact: true }).click();
+  await manual.locator('.tb-stage-rail').getByRole('button', { name: /Build/ }).click();
+  await team.locator('.tb-session-picker').getByRole('button', { name: 'Open session', exact: true }).click();
   assert.equal(await page.evaluate(() => window.factoryNavigation.at(-1)), 'thr_build');
-  await disclosure.focus();
+  await manual.getByRole('tab', { name: 'Workspace', exact: true }).focus();
   await page.keyboard.press('Enter');
-  assert.equal(await team.getByRole('button', { expanded: false }).count(), 1);
   await page.evaluate(() => { window.factoryFixture.version++; window.factoryRefresh(); });
   await page.waitForTimeout(100);
-  assert.equal(await team.getByRole('button', { expanded: false }).count(), 1);
-  await page.keyboard.press('Space');
-  assert.equal(await team.getByRole('button', { expanded: true }).count(), 1);
-  assert.equal(await team.getByRole('button', { expanded: true }).evaluate(el => el === document.activeElement), true);
-  assert.equal(await team.locator('[data-team-role="review"]').getByRole('button').count(), 0);
+  assert.equal(await manual.getByRole('tab', { name: 'Workspace', exact: true }).getAttribute('aria-selected'), 'true');
   for (const scenario of [
     ['Factory paused', 'Factory paused. Existing sessions remain available, but no new automatic stage will start.'],
     ['Provider read failed', 'Provider unavailable. The live provider request failed.'],
@@ -376,9 +386,7 @@ try {
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
       await team.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, `taskboard-team-${scenario[0].toLowerCase().replaceAll(' ', '-')}-${width}.png`) });
     }
-    await team.getByRole('button', { expanded: true }).click();
     assert.equal(await team.locator('[data-team-blocker]').isVisible(), true);
-    await team.getByRole('button', { expanded: false }).click();
   }
   await team.getByRole('textbox', { name: 'Recovered coordinator thread ID' }).fill('thr_recovered_coordinator');
   await team.getByRole('button', { name: 'Link coordinator', exact: true }).click();
@@ -396,7 +404,7 @@ try {
     window.factoryFixture.runs = [];
     window.factoryFixture.version++; window.factoryRefresh();
   });
-  await team.locator('[data-team-role="coordinator"]').getByText('pending', { exact: true }).waitFor();
+  await team.getByText('pending', { exact: true }).waitFor();
   assert.equal(await team.getByRole('button', { name: /^Open .* thread$/ }).count(), 0);
   assert.equal(await manual.getByRole('button', { name: 'Start task', exact: true }).count(), 0);
   await page.evaluate(() => {

@@ -22,7 +22,7 @@ without requiring a person to press Start task on each ticket.
 - [ ] [AC-5] Pausing stops automatic admission and subsequent automatic stage dispatch for queue-owned work while preserving active native threads and observed progress. Provider changes, missing configuration, failed live reads, stale eligibility, scope changes, and closure changes fail closed. Project Manage and the affected ticket group show a short operator-readable state and reason; no action dispatches from stale data.
 - [ ] [AC-6] Provider progress updates remain explicit observations. No new action merges, deploys, or closes an issue; a passed review remains awaiting human acceptance. Ticket scope and closure changes prevent subsequent automatic dispatch.
 - [ ] [AC-7] CLI and RPC expose project factory settings and status with validation. Project status includes queue-owned workflow blockers even after a healthy provider scan. Focused behavioral tests cover duplicate ticks, restart, capacity, pause, scan-window fairness, stale provider data, hierarchy recovery, and failure isolation.
-- [ ] [AC-UI-1] [UI] Project Manage exposes persisted enablement, provider identity, intake policy, bounded concurrency, pause/resume, queue and active counts, last scan result, and blockers using existing Taskboard components. Healthy idle, paused, missing-configuration, and provider-error states are distinct. Ticket progress shows the coordinator and grouped stage agents with role, native state, a direct thread action, and operator-readable blockers above the group. Long titles, provider names, and reasons remain readable without horizontal overflow. Disclosure and thread actions are keyboard accessible with visible focus; expanded groups remain stable across data refresh. Desktop and mobile browser evidence covers these states.
+- [ ] [AC-UI-1] [UI] Project Manage exposes persisted enablement, provider identity, intake policy, bounded concurrency, pause/resume, queue and active counts, last scan result, and blockers using existing Taskboard components. Healthy idle, paused, missing-configuration, and provider-error states are distinct. Ticket detail presents one operator console with the current state and primary action first, one selectable stage rail, stage-scoped attempts, one selected-run evidence pane, and ticket context beside it on wide screens or one view switch away on narrow screens. Coordinator recovery and Empirical status live in the workspace pane and are promoted to the summary only when they block work. The ticket title, workflow, and session selection are not repeated in parallel representations. Explicit historical selection remains stable across refresh while the default selection follows current work. Long titles, provider names, blocker reasons, stage labels, and actions remain readable without horizontal overflow. Tabs, disclosures, stage controls, and thread actions are keyboard accessible with visible focus. Desktop and mobile browser evidence covers these states.
 
 ## Scope
 
@@ -65,8 +65,11 @@ BB context is available. Do not enable a live tracker queue as a test.
 Browser evidence must cover Project Manage in healthy idle, paused, missing
 configuration, and provider-error states, plus ticket groups blocked by stale
 eligibility, scope change, and closure change. Check long titles, provider names,
-and blocker reasons at narrow widths. Exercise keyboard disclosure and thread
-actions, visible focus, and expanded-state retention across data refresh.
+and blocker reasons at narrow widths. Exercise the ticket-context switch, stage
+and attempt selection, evidence tabs and disclosures, thread actions, visible
+focus, and explicit historical-selection retention across data refresh. Confirm
+that the primary action is visible in the first viewport and that ticket detail
+contains only one workflow representation.
 
 ## Capability Deltas
 

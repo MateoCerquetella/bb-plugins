@@ -133,18 +133,50 @@ session remain visibly legacy. Do not claim those unchanged sessions are native
 children. Adoption changes no scope digest, stage result, approval, or acceptance.
 Completed legacy tickets remain untouched unless the operator chooses adoption.
 
-### Ticket team interface
+### Ticket-first operator console
 
-Show one coordinator entry followed by grouped stages, each with its role, native
-state, and direct thread action. Waiting roles have no fabricated thread link.
-The main Start task action opens the ready coordinator; stage actions retain
-their specific destinations. Legacy records keep a fallback stage link.
+Replace the parallel ticket-team disclosure, lifecycle rail, global session
+picker, run detail, and separate Empirical presentation with one console derived
+from the existing `FactoryRecord`. The console has four responsibilities:
 
-Show coordinator uncertainty and all workflow blockers above the group and in
-its collapsed summary. Factory stage remains authoritative after the root turn
-finishes. Key disclosure state by ticket identity to retain expansion on refresh.
-Use existing controls, focus styles, and wrapping rules. The UI/UX consult is
-design evidence, not browser verification.
+1. A current-state band shows the authoritative stage, concise status or
+   blocker, and exactly one relevant primary action.
+2. One stage rail shows Investigation, Plan, Build, and Review. Selecting a
+   stage reveals only that stage's attempts.
+3. One selected-run pane owns activity, verdict, commands, agent updates,
+   changed files, bounded output, and direct native-thread navigation.
+4. One workspace pane owns the plan, coordinator, and Empirical observations.
+   A coordinator, provider, or Empirical condition moves into the current-state
+   band only when it prevents the next action.
+
+`TrackerDetail` keeps the canonical ticket heading, provider actions, metadata,
+description, acceptance criteria, and comments. At wide widths it places that
+context beside the console. At narrow widths one keyboard-accessible
+Factory/Ticket switch selects the visible surface without repeating the heading.
+The compact thread dialog reuses the selected-run and workspace presentation,
+not the full ticket shell.
+
+View state distinguishes following current work from explicit historical
+selection:
+
+```ts
+type RunSelection =
+  | { kind: 'follow-current' }
+  | { kind: 'attempt'; stage: FactoryRunKind; runId: string };
+
+type EvidenceView = 'activity' | 'result' | 'changes' | 'plan' | 'workspace';
+```
+
+Polling advances only `follow-current`. An explicit run remains selected while
+it still exists; if it disappears, selection falls back to that stage's newest
+attempt. The current-state band remains visible while history is inspected, so
+historical evidence cannot hide a live blocker.
+
+Keep action precedence and mutation guards inside `FactoryProgress`. Presentation
+receives one derived state and the existing guarded action callbacks. Do not add
+a persisted view setting, a second factory record, or a new backend contract.
+Reuse `ResultCard`, `ErrorNotice`, native `details`, current focus styles, BB
+tokens, and the existing diff renderer.
 
 ## Data model
 
@@ -291,8 +323,13 @@ or uncertain-stage blockers from project status.
   second scheduler or generic dispatch framework.
 - `server.ts` provides canonical provider reads and schedules the tick.
 - The existing CLI entry point exposes settings and status.
-- `app.tsx` owns the project Manage section. `factory/app.tsx` owns the ticket
-  team, coordinator navigation, legacy presentation, and recovery controls.
+- `app.tsx` owns the project Manage section, ticket header, responsive
+  console/context composition, narrow Factory/Ticket switch, and provider
+  ticket context.
+- `factory/app.tsx` remains the controller for polling, mutation guards,
+  coordinator navigation, Empirical observation, selection, and recovery.
+  Focused presentation components may move to `factory/console.tsx` if that
+  keeps the controller below the existing file-size boundary.
 - `factory.test.ts` covers store and controller behavior with real SQLite.
 - Existing UI and browser fixtures cover Manage behavior and responsive layout.
 
@@ -338,11 +375,17 @@ Focused tests must execute observable behavior:
   root; worker actions open their specific native sessions.
 - Durable claims before the scan window do not starve eligible later tickets.
 - A healthy scan does not hide a queue-owned workflow blocker in project status.
+- Ticket detail renders one workflow representation, keeps the primary action in
+  the first viewport, and preserves explicit historical selection across
+  realtime refresh.
 
 Run the Taskboard package check after focused tests. Install and reload the local
-plugin. Use the existing browser fixture to save, pause, and inspect settings at
-desktop and mobile widths. Verify ticket role labels, real action destinations,
-long-content wrapping, keyboard focus, retained expansion, and recovery states.
+plugin. Use isolated browser-fixture routes for project settings, ticket detail,
+and compact thread progress instead of mounting every surface in one screenshot.
+Verify ticket detail at 1280, 800, and 390 px, including the Factory/Ticket
+switch, stage and attempt selection, evidence tabs and disclosures, direct
+thread actions, current action above the fold, long-content wrapping, keyboard
+focus, selection retention, and recovery states.
 Run the opt-in native smoke only where BB context is available. Inspect real
 parent IDs and worktree IDs without enabling a live provider queue. Record host
 limitations instead of inferring native behavior from mocks.

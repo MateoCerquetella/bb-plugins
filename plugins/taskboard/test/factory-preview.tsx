@@ -18,7 +18,7 @@ window.factoryNavigation = []; window.factoryStarts = 0;
 window.createdInputs = [];
 window.factoryItem = { ...item, source: 'linear', locator: 'issue-42', key: 'SDD-134',
   title: 'Close already-merged features automatically at session start',
-  description: 'Investigate and implement the issue, then report verification and changes.',
+  description: 'Reconcile merged work when a session starts without closing active work by mistake.\n\n## Acceptance criteria\n\n- Detect the exact merged revision.\n- Preserve tickets that still have open work.\n- Report the reconciliation result to the operator.',
   priority: 'Urgent', assignee: 'Juan Sebastian Salazar Agudelo', project: 'Empirical SDD',
   updatedAt: new Date().toISOString(), comments: []
 };

@@ -2,6 +2,9 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { readFile } from 'node:fs/promises';
 import { originalTicketPath, ticketThreadId } from '../factory/navigation.ts';
+import { consoleState, selectedRun, type RunSelection } from '../factory/console-state.ts';
+import { newRecord, startRun } from '../factory/state.ts';
+import type { WorkItem } from '../contract.ts';
 
 test('ticket entry opens the coordinator while stage sessions retain their identity', () => {
   const record: Parameters<typeof ticketThreadId>[0] = { coordinator: null, runs: [{ threadId: 'thr_stage' }] };
@@ -20,6 +23,30 @@ test('original provider ticket route round-trips reserved locator characters', (
     assert.equal(path.split('/').length, 4);
     assert.equal(decodeURIComponent(path.split('/')[3]!.replaceAll('~', '%')), locator);
   }
+});
+
+test('console follows current work until the operator selects an explicit attempt', () => {
+  const item: WorkItem = {
+    bbProjectId: 'proj_test', source: 'linear', locator: 'issue-42', key: 'BAN-42',
+    title: 'Keep the console selection stable', description: '', url: '', status: 'Todo',
+    stateCategory: 'todo', priority: null, assignee: null, project: null, labels: [], updatedAt: ''
+  };
+  const record = newRecord(item);
+  startRun(record, 'investigate', false);
+  const investigation = record.runs[0]!;
+  investigation.status = 'finished';
+  investigation.output = 'Investigation complete.';
+  const follow: RunSelection = { kind: 'follow-current' };
+  assert.equal(selectedRun(record, follow)?.id, investigation.id);
+  assert.equal(consoleState(record).action, 'generate-plan');
+
+  startRun(record, 'plan', false);
+  const plan = record.runs.at(-1)!;
+  assert.equal(selectedRun(record, follow)?.id, plan.id);
+  const explicit: RunSelection = { kind: 'attempt', stage: 'investigate', runId: investigation.id };
+  assert.equal(selectedRun(record, explicit)?.id, investigation.id);
+  record.version++;
+  assert.equal(selectedRun(record, explicit)?.id, investigation.id);
 });
 
 test('work navigation never changes the persistent pin preference', async () => {

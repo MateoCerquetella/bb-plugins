@@ -6,7 +6,7 @@ Admit ready provider tickets into Taskboard's durable native-agent workflow
 without per-ticket manual starts, while keeping capacity, recovery, and human
 acceptance boundaries explicit.
 
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: Explicit project factory admission
 
@@ -139,25 +139,67 @@ workflow. Automatic processing MUST NOT merge, deploy, or close tracker tickets.
 - AND existing native threads remain openable
 - AND no recovery action authorizes dispatch from cached eligibility.
 
-### Requirement: Visible ticket team hierarchy
+## ADDED Requirements
 
-Taskboard MUST show the coordinator and its stage children as one ticket team.
-Each row MUST show the role, current native state, and an action that opens the
-native thread. The grouping MUST remain readable on desktop and mobile.
+### Requirement: Software factory operator console
 
-#### Scenario: Inspect an active ticket
+Taskboard MUST present ticket factory work as one operator console rather than
+parallel team, phase, and global-session representations. The console MUST put
+the current state, blocker, and primary action before evidence; expose one stage
+rail with stage-scoped attempts; show one selected-run evidence pane; and keep
+provider ticket context visible beside factory work on wide screens or one view
+switch away on narrow screens. Coordinator recovery and Empirical status MUST
+remain available in the workspace pane and move into the summary only when they
+block work.
 
-- GIVEN a ticket with a coordinator and three stage sessions
+#### Scenario: Inspect active factory work
+
+- GIVEN a ticket with a coordinator and multiple stage sessions
 - WHEN the user opens factory progress
-- THEN one coordinator row contains the Investigation, Plan, and Build rows
-- AND each row opens its exact native thread.
+- THEN the first viewport shows the current stage, state, blocker, and primary
+  action
+- AND one stage rail shows Investigation, Plan, Build, and Review
+- AND selecting a stage exposes only that stage's attempts
+- AND selecting an attempt shows its activity, result, commands, updates,
+  changed files, and full output in one evidence pane
+- AND the selected native session has a direct thread action.
+
+#### Scenario: Inspect ticket intent while diagnosing work
+
+- GIVEN a factory ticket with provider metadata, description, acceptance
+  criteria, and comments
+- WHEN the user inspects factory evidence on a wide viewport
+- THEN ticket context remains visible beside the operator console
+- AND on a narrow viewport a keyboard-accessible Factory/Ticket switch keeps
+  both surfaces reachable without duplicating the ticket heading.
+
+#### Scenario: Refresh during historical inspection
+
+- GIVEN the user explicitly selected a historical stage attempt
+- WHEN factory polling returns a newer record
+- THEN the historical selection remains selected while its run still exists
+- AND an operator who did not explicitly choose history continues to follow the
+  current run
+- AND the current-state summary remains visible while history is inspected.
+
+#### Scenario: Blocking workspace state
+
+- GIVEN coordinator recovery, provider truth, or Empirical ownership prevents
+  the next action
+- WHEN the operator opens the ticket
+- THEN the blocking reason and relevant recovery action appear in the summary
+- AND non-blocking coordinator, plan, and Empirical detail remains in the
+  workspace pane
+- AND no duplicate lifecycle rail or team tree is rendered.
 
 #### Scenario: Inspect on a narrow viewport
 
 - GIVEN a mobile viewport
 - WHEN the user opens factory progress
-- THEN role and state remain visible
-- AND actions remain reachable
+- THEN current stage and state remain visible
+- AND the primary action remains above the evidence
+- AND stage, attempt, Factory/Ticket, evidence, and thread actions remain
+  reachable
 - AND the page has no horizontal overflow.
 
 #### Scenario: Long operator-facing content
@@ -166,15 +208,17 @@ native thread. The grouping MUST remain readable on desktop and mobile.
 - WHEN Project Manage or factory progress is viewed on a narrow viewport
 - THEN titles and reasons wrap to readable lines
 - AND provider identity wraps without obscuring controls
-- AND role, native state, and actions retain readable rows
+- AND stage labels, attempt controls, and actions retain readable rows
 - AND the page has no horizontal overflow.
 
 #### Scenario: Keyboard and refresh behavior
 
 - GIVEN a user navigates factory progress by keyboard
-- WHEN focus reaches a ticket disclosure or `Open thread` action
+- WHEN focus reaches a stage, attempt, evidence tab, disclosure, Factory/Ticket
+  switch, or `Open thread` action
 - THEN the control has a visible focus indicator and activates with its
   platform-standard keyboard action
-- AND the disclosure exposes its expanded state to assistive technology
-- AND a user-expanded or collapsed group retains that state across data refresh
-  while that ticket remains present.
+- AND tabs and disclosures expose their selected or expanded state to assistive
+  technology
+- AND explicit historical selection and disclosure state remain stable across
+  data refresh while their underlying records remain present.
