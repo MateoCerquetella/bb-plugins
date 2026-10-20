@@ -6,9 +6,11 @@ import {
 } from "./lib/codex-reset-credits.ts";
 import { readClaudeUsageFromKeychain } from "./lib/claude-keychain-usage.ts";
 import {
+  DEEPSEEK_BASELINE_KEY,
   loadDeepSeekProvider,
   parseDeepSeekBudget,
   resolveDeepSeekApiKey,
+  type DeepSeekBaselineStore,
 } from "./lib/deepseek-balance.ts";
 import { loadUsageSnapshot } from "./lib/load-usage.ts";
 import { getCachedAntigravityUsage } from "./lib/antigravity-probe.ts";
@@ -231,7 +233,7 @@ export default function plugin(bb: BbPluginApi) {
       type: "string",
       label: "DeepSeek topped-up balance",
       description:
-        "The amount you topped up, in the currency DeepSeek reports. The bar reaches 100% when the balance reaches 0. Leave empty to show the balance only.",
+        "The amount you topped up, in the currency DeepSeek reports. The bar reaches 100% when the balance reaches 0. Leave empty to derive the baseline automatically from the reported topped-up balance.",
       default: "",
     },
     compactLimit: {
@@ -263,6 +265,19 @@ export default function plugin(bb: BbPluginApi) {
         preferences.deepSeekApiKey,
         process.env.DEEPSEEK_API_KEY,
       );
+      const deepSeekBudget = parseDeepSeekBudget(preferences.deepSeekBudget);
+      const deepSeekBaselineStore: DeepSeekBaselineStore | undefined =
+        deepSeekBudget === null
+          ? {
+              async read() {
+                const value = await bb.storage.kv.get<number>(DEEPSEEK_BASELINE_KEY);
+                return typeof value === "number" ? value : null;
+              },
+              async write(baseline) {
+                await bb.storage.kv.set(DEEPSEEK_BASELINE_KEY, baseline);
+              },
+            }
+          : undefined;
       const [snapshot, deepSeek] = await Promise.all([
         loadUsageSnapshot(
           bb.sdk,
@@ -278,7 +293,8 @@ export default function plugin(bb: BbPluginApi) {
         preferences.enableDeepSeek
           ? loadDeepSeekProvider({
               apiKey: deepSeekKey,
-              budget: parseDeepSeekBudget(preferences.deepSeekBudget),
+              budget: deepSeekBudget,
+              baselineStore: deepSeekBaselineStore,
             })
           : Promise.resolve(null),
       ]);
