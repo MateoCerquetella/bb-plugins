@@ -27,7 +27,7 @@ test("selected FPS limits the next draw after an immediate frame", () => {
 });
 
 test("applies scoped backgrounds, disables cleanly and ignores a late fetch after disposal", async () => {
-  const dom = new JSDOM('<html><head></head><body><div id="thread-detail-timeline-panel"></div><div id="root-compose-main-panel"></div><aside>Sidebar</aside></body></html>', { pretendToBeVisual: true });
+  const dom = new JSDOM('<html><head></head><body><main data-framed><div id="thread-detail-timeline-panel"></div></main><div id="root-compose-main-panel"></div><aside>Sidebar</aside></body></html>', { pretendToBeVisual: true });
   const saved = { window: globalThis.window, document: globalThis.document, CustomEvent: globalThis.CustomEvent, fetch: globalThis.fetch, Element: globalThis.Element, HTMLElement: globalThis.HTMLElement, MutationObserver: globalThis.MutationObserver };
   Object.assign(globalThis, { window: dom.window, document: dom.window.document, CustomEvent: dom.window.CustomEvent, Element: dom.window.Element, HTMLElement: dom.window.HTMLElement, MutationObserver: dom.window.MutationObserver });
   dom.window.HTMLCanvasElement.prototype.getContext = (() => null) as typeof dom.window.HTMLCanvasElement.prototype.getContext;
@@ -46,6 +46,14 @@ test("applies scoped backgrounds, disables cleanly and ignores a late fetch afte
     assert.match(document.head.textContent!, /\.dark.*data-root-compose-mobile-recents.*background:color-mix\(in oklab,var\(--background\) 30%,transparent\)/s);
     assert.ok(!document.head.textContent!.includes("aside"));
     assert.equal(document.querySelectorAll('.aura-capy-layer').length, 2);
+    const framedLayer = document.querySelector<HTMLElement>('[data-framed] #thread-detail-timeline-panel > .aura-capy-layer')!;
+    const unframedLayer = document.querySelector<HTMLElement>('#root-compose-main-panel > .aura-capy-layer')!;
+    assert.equal(framedLayer.matches('[data-framed] :is(#thread-detail-timeline-panel, #root-compose-main-panel) > .aura-capy-layer'), true);
+    assert.equal(unframedLayer.matches('[data-framed] :is(#thread-detail-timeline-panel, #root-compose-main-panel) > .aura-capy-layer'), false);
+    const framedRule = [...document.styleSheets[0].cssRules]
+      .find(rule => rule instanceof dom.window.CSSStyleRule && rule.selectorText.startsWith('[data-framed]'));
+    assert.ok(framedRule instanceof dom.window.CSSStyleRule);
+    assert.equal(framedRule.style.top, 'var(--bb-window-title-bar-height)');
     notifyChange({ settings: { ...defaults, newThreadOnly: true }, image: null, slots: [], activeSlot: null });
     assert.equal(document.querySelector('#thread-detail-timeline-panel .aura-capy-layer'), null);
     assert.equal(document.querySelectorAll('#root-compose-main-panel .aura-capy-layer').length, 1);

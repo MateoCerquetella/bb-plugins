@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "aura-activity-overview",
+    "plugin-git-distribution"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:76b80b6c3250784c4d631ada05b6bacaf2f14512af5d56271fa3ea4b76b95ebc"
+}

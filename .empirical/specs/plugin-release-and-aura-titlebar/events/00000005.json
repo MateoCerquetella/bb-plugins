@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "sequence": 5,
+  "previousDigest": "sha256:0e22d78e12bcc3111cb0d49b9e4d4532e28b58f8660e713fd0cc7fb7f0d0b802",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Planned the smallest source and regression changes, focused and root verification, BB Surf visual proof, exact-head review and release creation, separate marketplace contribution, and merge and issue-closure gates.",
+  "createdAt": "2026-10-20T16:06:43.316Z",
+  "stateBeforeDigest": "sha256:99dc680cd84c6d8b87ad618fe583f574f7f150f229109f29d903ee4c38c433a3",
+  "stateAfterDigest": "sha256:1662cacdbfd3c0ba0ac3a33207b41e2281f6ecaa6c971d24f82584169291e7da",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 5,
+    "activeFeature": "plugin-release-and-aura-titlebar",
+    "request": "Fix Taskboard distribution documentation test, verify and release Action Topbar 0.1.2 and Taskboard 0.3.5, fix Aura issue #92 with regression and visual evidence, and merge reviewed changes only with required passing checks. Preserve marketplace PR #621 and its maintainer-only v1-change blocker; leave private plugins unlisted.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Planned the smallest source and regression changes, focused and root verification, BB Surf visual proof, exact-head review and release creation, separate marketplace contribution, and merge and issue-closure gates.",
+    "implementationActor": null,
+    "workStartedAt": "2026-10-20T16:02:58.264Z",
+    "specDigest": "sha256:9c1ba7f274f7ffdd7be116c37fef22ce95466db4fc1a0500249135ebf4a33e28",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:44e75bea23ede5a97db8efd9e38fb114d6505330a7b1455a4ea9e62417d28c3b",
+    "impactDigest": "sha256:76b80b6c3250784c4d631ada05b6bacaf2f14512af5d56271fa3ea4b76b95ebc",
+    "capabilityClaimId": "plugin-release-and-aura-titlebar-819c99b2410c",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-20T16:06:43.316Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "plugin-release-and-aura-titlebar-819c99b2410c",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "plugin-release-and-aura-titlebar",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_g3gqe5f7fh-1/bb-plugins-plugin-release-and-aura-titlebar",
+      "worktreeId": "sha256:0f01ced8ff2555adf303e43443d0cf290e6b6950d443cfd9cedc9fc4ed10071b",
+      "baseCommit": "85d1b0655b9883adf940eab0d82d7bd95c956e28",
+      "baseTree": "a25cd39c6da0e7c195c6eabcdbd1b94b045ee2d4",
+      "bases": {
+        "aura-activity-overview": {
+          "capability": "aura-activity-overview",
+          "digest": "sha256:6332d62dfefabb2b556713c9deb86614f3137f549208c6b1169e408b824010fc",
+          "requirements": {
+            "keep wallpaper below the framed title bar": null
+          }
+        },
+        "plugin-git-distribution": {
+          "capability": "plugin-git-distribution",
+          "digest": "sha256:97483aac37ef8bb1a7b538a24be367c24d65f9216711a67c49238261e655021b",
+          "requirements": {
+            "publish verified action topbar and taskboard releases": null,
+            "respect external release gates": null
+          }
+        }
+      },
+      "capabilities": [
+        "aura-activity-overview",
+        "plugin-git-distribution"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-20T16:04:24.888Z",
+      "heartbeatAt": "2026-10-20T16:04:24.888Z",
+      "digest": "sha256:bea32dce42b9efc683afac2979883a5401a16a4210fb3f4b96885ba95b7e1ede"
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:470744b4b168ee46bd1ebfab8b5e31a668826b9133f0c8260658650194069c42"
+}

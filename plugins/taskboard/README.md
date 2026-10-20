@@ -179,13 +179,13 @@ Steel project's `STEEL_CDP_URL` and an installed `PLAYWRIGHT_MODULE`; mocked BB
 hooks exercise the real progress component, not the live panel host.
 
 <p align="center">
-  GitHub, GitLab, Linear, or Jira tasks inside BB—one focused tracker for every project.
+  GitHub, GitLab, Gitea, Linear, or Jira tasks inside BB—one focused tracker for every project.
 </p>
 
 <p align="center">
   <a href="https://github.com/MateoCerquetella/bb-plugins/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/MateoCerquetella/bb-plugins/ci.yml?branch=main&style=flat-square&label=CI" alt="CI status" /></a>
   <img src="https://img.shields.io/badge/BB-%E2%89%A5%200.38-7c3aed?style=flat-square" alt="BB 0.38 or newer" />
-  <img src="https://img.shields.io/badge/GitHub%20%C2%B7%20GitLab%20%C2%B7%20Linear%20%C2%B7%20Jira-supported-2563eb?style=flat-square" alt="GitHub, GitLab, Linear, and Jira supported" />
+  <img src="https://img.shields.io/badge/GitHub%20%C2%B7%20GitLab%20%C2%B7%20Gitea%20%C2%B7%20Linear%20%C2%B7%20Jira-supported-2563eb?style=flat-square" alt="GitHub, GitLab, Gitea, Linear, and Jira supported" />
   <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-16a34a?style=flat-square" alt="MIT license" /></a>
 </p>
 
@@ -198,8 +198,8 @@ task to an agent without rebuilding context by hand.
 
 ## What it does
 
-- **Project-first tasks** — each BB project selects GitHub, GitLab, Linear, or
-  Jira; different projects can use different providers.
+- **Project-first tasks** — each BB project selects GitHub, GitLab, Gitea,
+  Linear, or Jira; different projects can use different providers.
 - **List and Kanban** — compact rows plus Linear-style Status, State group,
   Assignee, Priority, Project, and Labels filters. Filter values within one
   field match either value; different fields combine to narrow the view.
@@ -249,7 +249,7 @@ Taskboard is a full-trust BB plugin. Review the source, then install its trackin
 Git release directly from this monorepo:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.4 --subdirectory plugins/taskboard --tag-prefix taskboard/
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.5 --subdirectory plugins/taskboard --tag-prefix taskboard/
 ```
 
 The [BB Community entry](https://github.com/get-bb/marketplace/pull/129)
@@ -259,9 +259,9 @@ is merged. You can also install its configured release range:
 bb plugin install taskboard@bb-community
 ```
 
-The main branch includes unreleased 0.3.5 changes. For a missing local
-installation, use [the recovery guide](../../docs/plugin-recovery.md) to
-preserve your configuration without uninstalling or downgrading.
+For a missing local installation, use
+[the recovery guide](../../docs/plugin-recovery.md) to preserve your
+configuration without uninstalling or downgrading.
 
 Open **Taskboard → Manage**, choose a BB project, select its tracker, and save
 the connection. The same page configures that project's filters, default

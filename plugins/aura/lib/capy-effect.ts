@@ -4,6 +4,7 @@ import type { BackgroundSettings } from "./model.ts";
 
 export const CAPY_CSS = `
 .aura-capy-layer { position:absolute; inset:0; z-index:-1; pointer-events:none; overflow:hidden; border-radius:inherit; }
+[data-framed] :is([id="thread-detail-timeline-panel"], [id="root-compose-main-panel"]) > .aura-capy-layer { top:var(--bb-window-title-bar-height); }
 .aura-capy-air, .aura-capy-ink, .aura-capy-fade { position:absolute; inset:0; pointer-events:none; }
 .aura-capy-air { background:linear-gradient(180deg in oklab, var(--aura-panel, #f9fafc) 0%, var(--background, #fff) 100%); }
 .aura-capy-ink { background-position:center; background-repeat:no-repeat; background-size:var(--aura-fit, cover); }
