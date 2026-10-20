@@ -5,7 +5,7 @@
 - Add an opt-in DeepSeek provider that reads the DeepSeek API balance with a
   secret API key or `DEEPSEEK_API_KEY`, and shows budget consumption against a
   user-set topped-up balance or an automatic baseline derived from the first
-  reported topped-up balance. The provider uses the official DeepSeek glyph.
+  reported topped-up balance, measured against that topped-up balance. The provider uses the official DeepSeek glyph.
 
 ## 0.1.15 - 2026-10-07
 

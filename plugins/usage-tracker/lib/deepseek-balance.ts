@@ -3,7 +3,7 @@ import type { ProviderUsage, UsageWindow } from "./usage.ts";
 
 export const DEEPSEEK_BALANCE_URL = "https://api.deepseek.com/user/balance";
 export const DEEPSEEK_TIMEOUT_MS = 4_000;
-export const DEEPSEEK_BASELINE_KEY = "deepSeekBudgetBaseline";
+export const DEEPSEEK_BASELINE_KEY = "deepSeekToppedUpBaseline";
 
 export const DEEPSEEK_MISSING_KEY_MESSAGE =
   "Add a DeepSeek API key in Settings → Plugins → Usage Tracker, or set DEEPSEEK_API_KEY.";
@@ -114,11 +114,11 @@ export function parseDeepSeekBudget(value: unknown): number | null {
 
 /**
  * Resolve the budget baseline. An explicit budget always wins; otherwise the
- * first positive balance is stored and later top-ups raise it. KV failures are
- * non-fatal so a successful balance fetch still renders.
+ * first positive topped-up balance is stored and later top-ups raise it. KV
+ * failures are non-fatal so a successful balance fetch still renders.
  */
 export async function resolveDeepSeekBudget(
-  total: number,
+  toppedUp: number,
   explicitBudget: number | null,
   store: DeepSeekBaselineStore | undefined,
 ): Promise<number | null> {
@@ -135,8 +135,10 @@ export async function resolveDeepSeekBudget(
     stored = null;
   }
 
-  if (stored === null && !(Number.isFinite(total) && total > 0)) return null;
-  const baseline = stored === null ? total : Math.max(stored, total);
+  if (stored === null && !(Number.isFinite(toppedUp) && toppedUp > 0)) {
+    return null;
+  }
+  const baseline = stored === null ? toppedUp : Math.max(stored, toppedUp);
   if (baseline !== stored) {
     try {
       await store.write(baseline);
@@ -176,8 +178,10 @@ function unavailableProvider(
 function providerFromBalance(
   balance: DeepSeekBalance,
   budget: number | null,
+  metric: number,
+  budgetSource: "explicit" | "toppedUp" | null,
 ): ProviderUsage {
-  const usedPercent = deepSeekBudgetPercent(balance.info.total, budget);
+  const usedPercent = deepSeekBudgetPercent(metric, budget);
   const windows: UsageWindow[] =
     usedPercent === null
       ? []
@@ -207,6 +211,7 @@ function providerFromBalance(
       toppedUp: balance.info.toppedUp,
       available: balance.available,
       budget,
+      budgetSource,
       usedPercent,
     },
   };
@@ -257,11 +262,20 @@ export async function loadDeepSeekProvider(
   try {
     const balance = parseDeepSeekBalance(await response.json());
     const budget = await resolveDeepSeekBudget(
-      balance.info.total,
+      balance.info.toppedUp,
       options.budget,
       options.baselineStore,
     );
-    return providerFromBalance(balance, budget);
+    return providerFromBalance(
+      balance,
+      budget,
+      options.budget === null ? balance.info.toppedUp : balance.info.total,
+      budget === null
+        ? null
+        : options.budget === null
+          ? "toppedUp"
+          : "explicit",
+    );
   } catch {
     return unavailableProvider("error", DEEPSEEK_INVALID_RESPONSE_MESSAGE);
   }

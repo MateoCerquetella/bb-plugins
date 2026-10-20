@@ -50,8 +50,8 @@ and, when a topped-up budget is configured, the share already used.
   dollar amounts exposed by Claude Code usage data.
 - Shows the DeepSeek API total, granted, and topped-up balance when a key is
   configured, with a budget percentage that reaches 100% at a zero balance.
-  Without a manual budget, the first positive balance becomes the baseline
-  automatically, so spending still shows as a percentage.
+  Without a manual budget, the first positive topped-up balance becomes the
+  baseline automatically, so spending still shows as a percentage.
 - Works with BB's Account Pooler: when pooled accounts serve Claude Code or
   Codex, the strip shows the currently selected account and the expanded
   details list every pooled account's own limits.
@@ -110,8 +110,8 @@ balance** to the amount you paid in, in the currency DeepSeek reports (for
 example `20`). The strip then shows the share of that budget already used, and
 reads 100% when the balance reaches zero. Leave the budget empty to derive the
 baseline automatically from the reported topped-up balance: the first positive
-balance becomes the baseline, spending raises the percentage, and a later
-top-up raises the baseline and resets the percentage. If no positive balance has
+topped-up balance becomes the baseline, spending from it raises the percentage,
+and a later top-up raises the baseline and resets the percentage. If no positive balance has
 been observed yet, the strip shows the raw balance instead. The key is stored in
 BB's plugin secrets and is read only by the plugin server.
 

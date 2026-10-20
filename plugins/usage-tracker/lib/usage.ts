@@ -94,6 +94,7 @@ export interface ProviderBalance {
   toppedUp: number;
   available: boolean;
   budget: number | null;
+  budgetSource: "explicit" | "toppedUp" | null;
   usedPercent: number | null;
 }
 

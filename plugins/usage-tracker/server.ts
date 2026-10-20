@@ -62,6 +62,7 @@ const providerBalanceSchema = z
     toppedUp: z.number().finite(),
     available: z.boolean(),
     budget: z.number().finite().nullable(),
+    budgetSource: z.enum(["explicit", "toppedUp"]).nullable(),
     usedPercent: z.number().finite().min(0).max(100).nullable(),
   })
   .strict();

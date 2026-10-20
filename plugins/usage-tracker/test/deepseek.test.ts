@@ -65,15 +65,15 @@ function fetchReturning(body: unknown, status = 200): DeepSeekFetch {
   return async () => httpResponse(status, body);
 }
 
-function balancePayload(total: number) {
+function balancePayload(total: number, toppedUp = total) {
   return {
     is_available: true,
     balance_infos: [
       {
         currency: "USD",
         total_balance: String(total),
-        granted_balance: "2.00",
-        topped_up_balance: String(total),
+        granted_balance: String(Math.max(0, total - toppedUp)),
+        topped_up_balance: String(toppedUp),
       },
     ],
   };
@@ -230,6 +230,28 @@ test("seeds and uses a baseline when no budget is configured", async () => {
   assert.equal(exhausted.balance?.usedPercent, 100);
 });
 
+test("measures the automatic baseline against the topped-up balance", async () => {
+  const store = memoryBaselineStore();
+  const seeded = await loadDeepSeekProvider({
+    apiKey: "sk-test",
+    budget: null,
+    baselineStore: store,
+    fetch: fetchReturning(balancePayload(12, 10)),
+  });
+  assert.equal(seeded.balance?.budget, 10);
+  assert.equal(seeded.balance?.budgetSource, "toppedUp");
+  assert.equal(seeded.balance?.usedPercent, 0);
+
+  const spent = await loadDeepSeekProvider({
+    apiKey: "sk-test",
+    budget: null,
+    baselineStore: store,
+    fetch: fetchReturning(balancePayload(7, 5)),
+  });
+  assert.equal(spent.balance?.budget, 10);
+  assert.equal(spent.balance?.usedPercent, 50);
+});
+
 test("raises the automatic baseline after a top-up", async () => {
   const store = memoryBaselineStore(12);
   const result = await loadDeepSeekProvider({
@@ -310,6 +332,7 @@ test("builds an ok provider with a budget window", async () => {
     toppedUp: 10,
     available: true,
     budget: 20,
+    budgetSource: "explicit",
     usedPercent: 40,
   });
   assert.deepEqual(result.windows.map((window) => window.label), [
