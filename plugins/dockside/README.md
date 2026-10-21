@@ -86,8 +86,9 @@ bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.0 
   --tag-prefix dockside/
 ```
 
-The range currently resolves [`dockside/v0.1.5`](https://github.com/MateoCerquetella/bb-plugins/tree/dockside/v0.1.5),
-which keeps Snooze, Settle, Restore, and thread age controls visible on touch-only devices.
+The range currently resolves [`dockside/v0.1.8`](https://github.com/MateoCerquetella/bb-plugins/tree/dockside/v0.1.8),
+which adds workspace grouping by Projects, Status, or Environment, the Failed
+filter, and per-project filtering on top of mobile active-thread navigation.
 The [BB Community marketplace entry](https://github.com/get-bb/marketplace/pull/162)
 is live, so you can also install Dockside by name:
 
@@ -132,8 +133,9 @@ disable the plugin.
 
 - **Projects** — drag an existing project header to sort projects, or focus the
   same header and press Alt+Up/Alt+Down. No extra drag icon is added, and the
-  browser-local project order survives reloads. Pinned roots remain first inside
-  each project.
+  browser-local project order survives reloads. Use the workspace filter's
+  Projects section to focus the sidebar on one project. Pinned roots remain
+  first inside each project.
   Drag a family's semantic status icon, or focus it and press Alt+Up/Alt+Down, to move
   a complete root/child family inside its pinned or unpinned partition. The
   family order survives reloads. Clear search, choose the All filter, and

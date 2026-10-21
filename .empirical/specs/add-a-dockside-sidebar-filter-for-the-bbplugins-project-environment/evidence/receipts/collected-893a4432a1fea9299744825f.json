@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-893a4432a1fea9299744825f",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-UI-1",
+    "AC-UI-2"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-10-16T16:51:38.663Z",
+  "completedAt": "2026-10-16T16:51:38.663Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "add-a-dockside-sidebar-filter-for-the-bbplugins-project-environment",
+    "specRevision": 2,
+    "specDigest": "sha256:beaa58261533e0864a7033bfaad46f481e1ed0e46989e3d4c8a50adfd2f022eb",
+    "treeDigest": "sha256:e6dc13ef65d7b09110181994433a65940430c233f83b8eab1bdd49f8aceab229",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:05c55e2f9b5820cbf1b7ee88d09fe8ce2e1340a44726302de184f74469377e9d",
+  "kind": "collected",
+  "collector": "empirical-review:isolated-codex-subagent",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/add-a-dockside-sidebar-filter-for-the-bbplugins-project-environment/reviews/36421d2c36a202c3c5ae48d2.json",
+      "mediaType": "application/json",
+      "bytes": 1889,
+      "digest": "sha256:af398860dd8c19f679142b2ec9a19e616088dbc3a77ba4f02cb49135cd423014"
+    },
+    {
+      "path": ".empirical/specs/add-a-dockside-sidebar-filter-for-the-bbplugins-project-environment/reviews/36421d2c36a202c3c5ae48d2.md",
+      "mediaType": "text/markdown",
+      "bytes": 1145,
+      "digest": "sha256:c56040d8422c2ff8e9ce321d279dc06edc34e311ddd6e97d3b4489cf5853967d"
+    }
+  ]
+}

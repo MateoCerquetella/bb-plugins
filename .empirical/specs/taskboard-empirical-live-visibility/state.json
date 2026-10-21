@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 18,
+  "revision": 19,
   "activeFeature": "taskboard-empirical-live-visibility",
   "request": "Implement live Empirical work visibility inside Taskboard from Start work through agent progress and durable completion, with a runnable end-to-end demo and UI tests. Preserve existing tracker workflows and display stale/offline state honestly.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "implement",
-  "status": "waiting",
-  "repairAttempts": 1,
-  "message": "User approved one additional repair lap for review AC-3 / F-1. Serialize or generation-order the Taskboard Empirical observations so a slower older RPC cannot overwrite or broadcast newer progress; add deterministic focused regression coverage, rerun affected checks, then obtain independent re-review.",
+  "phase": "done",
+  "status": "done",
+  "repairAttempts": 0,
+  "message": "Closed as merged-externally: Merged in pull request #85 as 873a12c2f829d8607f2e4b8ecf0c905cc59a1c54 into main; closed when the merge was observed.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:23291153874870cc75cc38a787e5cee61cce6d731a247b8f8fd75da66c0b00ce",
@@ -37,7 +37,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-15T01:00:13.115Z",
+  "updatedAt": "2026-10-16T16:18:02.140Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "taskboard-empirical-live-visibility-d3c61d975b15",
@@ -81,5 +81,39 @@
     "iteration": 2,
     "awaitingFeedback": false
   },
-  "reviewFirst": true
+  "reviewFirst": true,
+  "closure": {
+    "schemaVersion": 1,
+    "outcome": "merged-externally",
+    "reason": "Merged in pull request #85 as 873a12c2f829d8607f2e4b8ecf0c905cc59a1c54 into main; closed when the merge was observed.",
+    "actor": "empirical",
+    "confirmation": "merge-observed",
+    "closedAtPhase": "implement",
+    "completionAtClosure": "none",
+    "externalMerge": {
+      "pullRequest": 85,
+      "url": "https://github.com/MateoCerquetella/bb-plugins/pull/85",
+      "state": "MERGED",
+      "mergeCommit": "873a12c2f829d8607f2e4b8ecf0c905cc59a1c54",
+      "targetBranch": "main",
+      "ancestorOfTarget": true,
+      "observedAt": "2026-10-16T16:17:48.769Z"
+    },
+    "closedAt": "2026-10-16T16:18:01.889Z",
+    "digest": "sha256:ccc031c4f268f3985effdebc6a948af4d175523d6049834bbb394877208cc494"
+  },
+  "completionRecord": {
+    "schemaVersion": 1,
+    "implementedBy": "agent",
+    "completedBy": "empirical",
+    "decisionBy": null,
+    "method": "merged-externally",
+    "reason": "Merged in pull request #85 as 873a12c2f829d8607f2e4b8ecf0c905cc59a1c54 into main; closed when the merge was observed.",
+    "at": "2026-10-16T16:18:02.140Z",
+    "revision": 19,
+    "completion": "none",
+    "sourceTreeDigest": "sha256:1d8f57459ea33efa799e3e453deed0f6b2e40c1d0c181a37d27a8427e38defaa",
+    "artifactTreeDigest": "sha256:555b484193dfbdeb20186c06b6efd659d56e6dcbf14bf9c37cec5afba469b007",
+    "digest": "sha256:383e76e74d4840976175a67417dae2301c3d8b255dc3eef67fea85ff0d1b6778"
+  }
 }

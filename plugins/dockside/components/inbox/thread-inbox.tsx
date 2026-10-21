@@ -42,13 +42,16 @@ import {
   visibleInboxThreads,
 } from "@/lib/inbox";
 import {
+  ALL_WORKSPACES_FILTER,
   applyRootSelection,
   filterProjectThreadGroups,
   includeSelectedFamilies,
   pruneSelectedRootIds,
   selectableRootIds,
-  type ThreadFilterPreset,
+  showsProjectGroups,
+  THREAD_FILTER_PRESETS,
   type RootSelectionIntent,
+  type WorkspaceFilter,
 } from "@/lib/thread-management";
 import {
   docksidePreferenceStyle,
@@ -71,7 +74,8 @@ import {
   writeProjectOrder,
   type ProjectMoveResult,
 } from "@/lib/project-order";
-import { groupFamiliesByStatus } from "@/lib/status-groups";
+import { familyIsPinned, groupFamiliesByStatus } from "@/lib/status-groups";
+import { groupSidebarFamilies } from "@/lib/sidebar-sections";
 
 const EMPTY_STATE_CLASS = "px-2 py-6 text-center text-xs text-muted-foreground";
 
@@ -119,8 +123,22 @@ export function ThreadInbox({
   const lifecycle = useLifecycle(threads);
   const [showSnoozed, setShowSnoozed] = useState(false);
   const [showSettled, setShowSettled] = useState(false);
-  const [filterPreset, setFilterPreset] =
-    useState<ThreadFilterPreset>("all");
+  const [workspaceFilter, setWorkspaceFilter] =
+    useState<WorkspaceFilter>(() => {
+      try {
+        const preset = localStorage.getItem("dockside:group-by");
+        const savedPreset = THREAD_FILTER_PRESETS.find(
+          (candidate) => candidate === preset,
+        );
+        if (savedPreset) return { kind: "preset", preset: savedPreset };
+      } catch { /* Storage can be unavailable in embedded contexts. */ }
+      return { kind: "preset", preset: "status" };
+    });
+  useEffect(() => {
+    if (workspaceFilter.kind !== "preset") return;
+    try { localStorage.setItem("dockside:group-by", workspaceFilter.preset); }
+    catch { /* Grouping remains usable without persistence. */ }
+  }, [workspaceFilter]);
   const [selectionMode, setSelectionMode] = useState(false);
   const [familyOrder, setFamilyOrder] = useState(readFamilyOrder);
   const [projectOrder, setProjectOrder] = useState(readProjectOrder);
@@ -178,7 +196,7 @@ export function ThreadInbox({
     );
     const filteredProjectGroups = filterProjectThreadGroups(
       unfilteredProjectGroups,
-      filterPreset,
+      workspaceFilter,
       now,
     );
 
@@ -210,7 +228,7 @@ export function ThreadInbox({
       ),
     };
   }, [
-    filterPreset,
+    workspaceFilter,
     familyOrder,
     lifecycle,
     now,
@@ -221,6 +239,22 @@ export function ThreadInbox({
     selectionMode,
     threads,
   ]);
+
+  const activePreset =
+    workspaceFilter.kind === "preset" ? workspaceFilter.preset : null;
+  const showProjectGroups = showsProjectGroups(workspaceFilter);
+
+  useEffect(() => {
+    if (
+      status === "ready" &&
+      workspaceFilter.kind === "project" &&
+      !unfilteredProjectGroups.some(
+        (group) => group.project.id === workspaceFilter.projectId,
+      )
+    ) {
+      setWorkspaceFilter(ALL_WORKSPACES_FILTER);
+    }
+  }, [status, unfilteredProjectGroups, workspaceFilter]);
 
   useEffect(() => {
     setSelectedRootIds((current) => {
@@ -233,7 +267,6 @@ export function ThreadInbox({
   // the collapsed Settled count truthful during that one round trip.
   const pendingSettled = useMemo(() => {
     if (
-      filterPreset !== "all" ||
       selectionMode ||
       !settledRowsPending ||
       searchQuery.trim().length > 0
@@ -247,7 +280,7 @@ export function ThreadInbox({
     );
   }, [
     lifecycle.parkedRows,
-    filterPreset,
+    activePreset,
     now,
     searchQuery,
     selectionMode,
@@ -265,21 +298,25 @@ export function ThreadInbox({
     0,
   );
   const statusGroups = useMemo(
-    () =>
-      groupFamiliesByStatus(
-        projectGroups.flatMap((group) => group.families),
-        now,
-      ),
-    [now, projectGroups],
+    () => {
+      const families = projectGroups.flatMap((group) => group.families);
+      if (activePreset === "environment") {
+        return groupSidebarFamilies(families);
+      }
+      const groups = groupFamiliesByStatus(families, now);
+      return activePreset === "status" ? groups : groups.filter((group) => group.kind === "pinned");
+    },
+    [activePreset, now, projectGroups],
   );
-  const showParkedShelves = filterPreset === "all" && !selectionMode;
+  const projectNames = useMemo(() => new Map(projects.map((project) => [project.id, project.name])), [projects]);
+  const showParkedShelves = !selectionMode;
   const visibleTotal = showParkedShelves
     ? activeVisibleCount + snoozed.length + settled.length + pendingSettled
     : activeVisibleCount;
   const searching = searchQuery.trim().length > 0;
   const reorderDisabledReason = selectionMode
     ? "Exit bulk selection to reorder thread families."
-    : filterPreset !== "all"
+    : activePreset !== "all"
       ? "Choose the All filter to reorder the complete project."
       : searching
         ? "Clear search to reorder the complete project."
@@ -313,7 +350,7 @@ export function ThreadInbox({
 
   useEffect(() => {
     selectionAnchorRootId.current = null;
-  }, [filterPreset, searchQuery, selectionMode, visibleRootOrderKey]);
+  }, [workspaceFilter, searchQuery, selectionMode, visibleRootOrderKey]);
 
   const changeSelectedRoot = (
     threadId: string,
@@ -615,14 +652,21 @@ export function ThreadInbox({
         <div className="flex h-8 items-center gap-2 px-2.5 pb-1 text-muted-foreground">
           <Icon name="Folder" className="size-3.5" aria-hidden />
           <span className="text-2xs font-semibold uppercase tracking-wider">
-            Workspaces
+            Chats
           </span>
           <span className="tabular-nums text-2xs text-muted-foreground/70">
             {projectGroups.length}
           </span>
           <span className="ml-auto flex items-center gap-0.5">
             {selectionMode ? null : (
-              <FilterMenu value={filterPreset} onChange={setFilterPreset} />
+              <FilterMenu
+                value={workspaceFilter}
+                onChange={setWorkspaceFilter}
+                projects={unfilteredProjectGroups.map((group) => ({
+                  id: group.project.id,
+                  name: group.project.name,
+                }))}
+              />
             )}
             <button
               type="button"
@@ -647,7 +691,6 @@ export function ThreadInbox({
             </button>
           </span>
         </div>
-
         {selectionMode ? (
           <div className="flex h-8 items-center gap-1 border-y border-sidebar-border/70 px-2 text-2xs">
             <span id={selectionHintId} className="sr-only">
@@ -746,8 +789,7 @@ export function ThreadInbox({
           </p>
         ) : (
           <>
-            {filterPreset === "status"
-              ? statusGroups.map((group) => (
+            {statusGroups.map((group) => (
                   <StatusGroup
                     key={group.kind}
                     group={group}
@@ -762,9 +804,14 @@ export function ThreadInbox({
                     selectionHintId={selectionHintId}
                     onToggleRoot={changeSelectedRoot}
                     preferences={preferences}
+                    projectNames={projectNames}
+                    projectColorOverrides={projectColorOverrides}
                   />
-                ))
-              : projectGroups.map((group) => (
+                ))}
+            {showProjectGroups ? projectGroups
+              .map((group) => ({ ...group, families: group.families.filter((family) => !familyIsPinned(family)) }))
+              .filter((group) => group.families.length > 0)
+              .map((group) => (
               <ProjectGroup
                 key={group.project.id}
                 group={group}
@@ -789,7 +836,7 @@ export function ThreadInbox({
                 preferences={preferences}
                 projectColorOverrides={projectColorOverrides}
               />
-            ))}
+            )) : null}
             {showParkedShelves ? (
               <>
                 <ParkedShelf

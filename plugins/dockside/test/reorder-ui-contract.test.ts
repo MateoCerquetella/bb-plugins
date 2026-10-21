@@ -32,7 +32,7 @@ describe("family reorder UI contract", () => {
 
   it("disables reorder for selection, filters, and host search", () => {
     assert.match(inbox, /selectionMode\s*\? "Exit bulk selection/);
-    assert.match(inbox, /filterPreset !== "all"/);
+    assert.match(inbox, /activePreset !== "all"/);
     assert.match(inbox, /searching\s*\? "Clear search/);
     assert.match(inbox, /reorderEnabled=\{reorderEnabled\}/);
   });

@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-1db75c32d3eda575abe02727",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-10-20T20:13:17.921Z",
+  "completedAt": "2026-10-20T20:13:17.921Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "merge-the-dockside-filter-branch-filter-by-bbplugins-thr-q7uptvnbap",
+    "specRevision": 7,
+    "specDigest": "sha256:face92d19239cbd2edd29d70d45ee3e17a9e78a6e12969f270c03bc5295f21a7",
+    "treeDigest": "sha256:cbf9ce60fa248174943fbb84decf3325d93492a8563e5525e7f60470e8b5fe7d",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:09a5ba1df6b68fa13be19c884c9025a537b8b93a350f1449cd0fc34e17563ad7",
+  "kind": "collected",
+  "collector": "empirical-review:fresh-context-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/merge-the-dockside-filter-branch-filter-by-bbplugins-thr-q7uptvnbap/reviews/6dcc66cea39837c13b9ec299.json",
+      "mediaType": "application/json",
+      "bytes": 3591,
+      "digest": "sha256:46e161ee25f00605243cd4a325abe413fe29947e296f06cede6b4dd7bb01cd0b"
+    },
+    {
+      "path": ".empirical/specs/merge-the-dockside-filter-branch-filter-by-bbplugins-thr-q7uptvnbap/reviews/6dcc66cea39837c13b9ec299.md",
+      "mediaType": "text/markdown",
+      "bytes": 1506,
+      "digest": "sha256:95edcffb48ff46d3a8e171cefba1474dea4f066363060ac8374bc35fe4579259"
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "sequence": 17,
+  "previousDigest": "sha256:92fb70404d74f19ce3727d52c0aae8cd2799754e41fa2016946453c3c5a887ba",
+  "actor": "root",
+  "type": "transition",
+  "summary": "Pause: direct mode",
+  "createdAt": "2026-10-16T17:19:51.021Z",
+  "stateBeforeDigest": "sha256:de57af3e355c24c912d635e690399af4cb3d257e8b1f424be99d82cc3b0fbfe6",
+  "stateAfterDigest": "sha256:8d2739991f4a500237f60f1d09b940df782e25d2146c0e3692b7ce4531d45eba",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 17,
+    "activeFeature": "add-a-dockside-sidebar-filter-for-the-bbplugins-project-environment",
+    "request": "Add a Dockside sidebar filter for the bbplugins project/environment, matching Cursor-style project filtering and the grouped sidebar shown in the supplied screenshots. Preserve existing status and inactivity filters. The filter must narrow visible thread groups to the selected project, expose the active selection in the filter control, and include behavioral tests for filtering and UI contract coverage.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "blocked",
+    "repairAttempts": 0,
+    "message": "Local Dockside installed and reloaded successfully; 224 tests and separate typecheck pass, and live browser confirmed bb-plugins project filtering. Host-alongside-branch is NOT implemented. Specify completion refused new capability requirement because original uncommitted capability baseline cannot prove it; requires separate work. Earlier author-submitted review receipt was premature and must not be used as independent proof; actual /root/fresh_review result covers project filtering only.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:a8619b205158b009ce02531fefbde1db119917aa58253e83f2c88187fd05c256",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": "add-a-dockside-sidebar-filter-for-the-bbplugins-project-environment-32ea5aca5849",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-16T17:19:51.021Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 2,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "contractRevision": 14
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "add-a-dockside-sidebar-filter-for-the-bbplugins-project-environment-32ea5aca5849",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "add-a-dockside-sidebar-filter-for-the-bbplugins-project-environment",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_q7uptvnbap-1/bb-plugins",
+      "worktreeId": "sha256:272151cf078ed867557bef05c58a3f6a9d83552740727e4a5728e8cf3d0e811b",
+      "baseCommit": "00fc12410a1c2f3c959436c6cdcc9a8f6b299bee",
+      "baseTree": "5fe25297af55151470e81e199772e5c59170baa7",
+      "bases": {
+        "dockside-thread-management": {
+          "capability": "dockside-thread-management",
+          "digest": "sha256:aced6d6e0dd574682f42143477cb0a8d6da4253702573628e354b827c20f906f",
+          "requirements": {
+            "dockside filters its project-first hierarchy by intent": "sha256:e56462ec90f3541291ccf73f6fb833e06fa783d9d9df853982c5a541a9ffc257"
+          }
+        }
+      },
+      "capabilities": [
+        "dockside-thread-management"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-16T16:19:30.898Z",
+      "heartbeatAt": "2026-10-16T16:19:30.898Z",
+      "digest": "sha256:620080314a0e7e83e963b2f53bc66ed5a9137d0e993ca82290c53f195f46445f"
+    },
+    "trackerGeneration": 2,
+    "reviewFirst": true,
+    "pause": {
+      "since": "2026-10-16T17:19:50.977Z",
+      "baseCommit": "6b58858bbcdc361d6c01eb23604e972d9cdd0eea"
+    }
+  },
+  "digest": "sha256:a38e0314186c6a9fb416a427c2345dae78259a40005db74d094784cb90bf251f"
+}
