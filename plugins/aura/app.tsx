@@ -1,12 +1,20 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { definePluginApp, useRealtime, useRpc } from "@get-bb/plugin-sdk/app";
 import type { rpcContract } from "./server.ts";
-import { CHANGED, defaults, imageUrl, SLOT_COUNT, type BackgroundSettings, type Snapshot } from "./lib/model.ts";
+import { CHANGED, defaults, imageUrl, isAnimatedImage, SLOT_COUNT, type BackgroundSettings, type Snapshot } from "./lib/model.ts";
 import { backgroundRules, mountBackground, notifyChange } from "./lib/background.ts";
 import { CAPY_CSS, mountCapyEffect, type CapyEffect } from "./lib/capy-effect.ts";
 import { readImage } from "./lib/upload.ts";
 import { ActivityOverview } from "./lib/activity-view.tsx";
 import "./app.css";
+
+const PATTERN_LABELS: Record<BackgroundSettings["pattern"], string> = {
+  noise: "Drifting noise", warp: "Warp", dots: "Falling dots", wave: "Sine wave", ripple: "Ripple", swirl: "Swirl", sphere: "Lit sphere",
+};
+const MOTION_LABELS: Record<BackgroundSettings["photoMotion"], string> = {
+  wave: "Wave", ripple: "Ripple", drift: "Diagonal drift", shimmer: "Shimmer", still: "Still",
+};
+const DITHER_OPTIONS = [["random", "Grain"], ["2x2", "2×2"], ["4x4", "4×4"], ["8x8", "8×8"]] as const;
 
 function message(cause: unknown): string { return cause instanceof Error ? cause.message : String(cause); }
 
@@ -60,7 +68,7 @@ export function BackgroundEditor() {
       const { dataUrl, resized } = await readImage(file);
       if (!mounted.current || generation !== picking.current) return;
       setUpload({ name: file.name.slice(0, 160), dataUrl }); setRemove(false);
-      dirty.current = true; setStatus(resized ? "Image resized and ready — apply to save" : "Image ready — apply to save");
+      dirty.current = true; setStatus(resized ? "Image resized and ready — apply to save" : isAnimatedImage(dataUrl) ? "Animated GIF ready — apply to save" : "Image ready — apply to save");
     } catch (cause) { if (mounted.current) setError(message(cause)); }
     finally { saving.current = false; if (mounted.current) setBusy(false); }
   }
@@ -145,15 +153,19 @@ export function BackgroundEditor() {
             <button type="button" className="aura-upload" onClick={() => fileInput.current?.click()} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); void choose(e.dataTransfer.files[0]); }}>
               <span className="aura-upload-icon" aria-hidden="true">↥</span>
               <strong>{imageName ? "Replace image" : "Choose an image"}</strong>
-              <span>or drop a PNG / JPG · up to 32 MB · resized automatically</span>
+              <span>or drop a PNG / JPG (up to 32 MB, resized automatically) or an animated GIF (up to 8 MB)</span>
             </button>
-            <input ref={fileInput} type="file" accept="image/png,image/jpeg" aria-label="Upload background image" className="aura-sr-only" onChange={e => { void choose(e.target.files?.[0]); e.target.value = ""; }} />
+            <input ref={fileInput} type="file" accept="image/png,image/jpeg,image/gif" aria-label="Upload background image" className="aura-sr-only" onChange={e => { void choose(e.target.files?.[0]); e.target.value = ""; }} />
             {imageName && <div className="aura-file"><span title={imageName}>{imageName}</span><button type="button" onClick={() => { setUpload(null); setRemove(true); dirty.current = true; setStatus("Unsaved changes"); }}>Remove</button></div>}
           </div>
           <div className="aura-field"><label className="aura-field-title" htmlFor={`${id}-effect`}>Texture</label><select id={`${id}-effect`} value={draft.effect} onChange={e => change("effect", e.target.value as BackgroundSettings["effect"])}><option value="pixels">Capy dithering</option><option value="none">No texture</option></select></div>
           {draft.effect === "pixels" && <>
             <SegmentedControl id={`${id}-fps`} label="Animation speed" help="Higher FPS uses more GPU." value={String(draft.fps)} options={[["15", "15 FPS"], ["30", "30 FPS"], ["60", "60 FPS"]]} onChange={value => change("fps", Number(value) as BackgroundSettings["fps"])} />
             <SegmentedControl id={`${id}-quality`} label="Render quality" help="Sharp uses a denser drawing buffer." value={draft.quality} options={[["performance", "Performance"], ["balanced", "Balanced"], ["sharp", "Sharp"]]} onChange={value => change("quality", value as BackgroundSettings["quality"])} />
+            {currentImage
+              ? <div className="aura-field"><label className="aura-field-title" htmlFor={`${id}-motion`}>Texture motion</label><select id={`${id}-motion`} value={draft.photoMotion} onChange={e => change("photoMotion", e.target.value as BackgroundSettings["photoMotion"])}>{Object.entries(MOTION_LABELS).map(([value, text]) => <option key={value} value={value}>{text}</option>)}</select></div>
+              : <div className="aura-field"><label className="aura-field-title" htmlFor={`${id}-pattern`}>Pattern</label><select id={`${id}-pattern`} value={draft.pattern} onChange={e => change("pattern", e.target.value as BackgroundSettings["pattern"])}>{Object.entries(PATTERN_LABELS).map(([value, text]) => <option key={value} value={value}>{text}</option>)}</select></div>}
+            <SegmentedControl id={`${id}-dither`} label="Dither" help="Grain is random noise; larger grids look more ordered." value={draft.dither} options={DITHER_OPTIONS} onChange={value => change("dither", value as BackgroundSettings["dither"])} />
           </>}
           {draft.effect === "pixels" && !currentImage && <><div className="aura-field"><label className="aura-field-title" htmlFor={`${id}-tint`}>Pixel color</label><select id={`${id}-tint`} value={draft.tint} onChange={e => change("tint", e.target.value as BackgroundSettings["tint"])}><option value="lavender">Lavender</option><option value="theme">Follow BB theme</option></select></div>
           <Slider id={`${id}-strength`} label="Texture strength" value={draft.intensity} onChange={v => change("intensity", v)} /></>}

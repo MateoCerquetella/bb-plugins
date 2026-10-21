@@ -8,6 +8,11 @@
   the compact New thread layout scrollable with the overview below the composer.
 - Keep overview settings global across background slots and resets; add
   `bb aura overview on|off`. Preserve installed animation speed/quality controls.
+- Accept animated GIF backgrounds up to 8 MB, stored as uploaded. Capy dithering
+  plays them frame by frame with their own frame timing.
+- Add texture choices: seven patterns for the image-free effect, five motions for
+  photo dithering (including Still), and four dither styles. Existing backgrounds
+  and saved slots keep their current look.
 
 ## 0.2.3
 

@@ -1,6 +1,6 @@
 # Aura
 
-Personal PNG/JPG backgrounds, Capy's animated dithering effect, six saved
+Personal PNG/JPG and animated GIF backgrounds, Capy's animated dithering effect, six saved
 slots, and an optional GitHub activity overview for BB. Open **Settings → Aura**,
 or **+ → Actions → Aura** in a thread panel.
 
@@ -57,8 +57,15 @@ Select **Apply background** to save the setting.
 
 - Choose or drop a PNG/JPG (up to 32 MB). Large images are resized automatically
   to fit the 2 MB stored-image limit. The preview shows the result before saving.
+- Or choose an animated GIF (up to 8 MB and 4,096 px per side). GIFs are stored as uploaded — resizing
+  would drop their animation — and play frame by frame through Capy dithering.
+  With **No texture**, the browser plays the GIF directly.
 - Adjust image visibility (0–100%), half-wallpaper mode, fit, and Capy dithering.
   The half-wallpaper setting affects New thread only. Photo dithering now animates with a gentle threshold wave.
+- Without an image, choose a **Pattern**: Drifting noise (the default), Warp,
+  Falling dots, Sine wave, Ripple, Swirl or Lit sphere. With an image, choose its
+  **Texture motion**: Wave (the default), Ripple, Diagonal drift, Shimmer or Still.
+- Choose a **Dither**: Grain, or a 2×2, 4×4 or 8×8 (the default) ordered grid.
 - Choose **Animation speed** (15/30/60 FPS) and **Render quality**
   (Performance/Balanced/Sharp). Higher settings use more GPU; saved slots retain them.
 - Select **Apply background** to apply the current draft.
@@ -141,7 +148,8 @@ Aura decorates BB's `root-compose-main-panel` and `thread-detail-timeline-panel`
 DOM containers. Recheck these host names when upgrading BB. Canvas/GL resources,
 observers and listeners are disposed when disabling or reloading. Noise and photo animation
 run at the chosen FPS and pause off-screen, when hidden, and for reduced motion.
-The image/gradient remains if WebGL is unavailable.
+GIF frames keep their own timing and are decoded with WebCodecs' `ImageDecoder`;
+without it, the shader shows the first frame. The image/gradient remains if WebGL is unavailable.
 
 ```sh
 npm run check --workspace bb-plugin-aura
