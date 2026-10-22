@@ -185,13 +185,25 @@ final class AgentStore {
                 status: status(for: thread)
             )
         }
-        let usage = (payload.usage ?? []).map {
+        var usage = (payload.usage ?? []).map {
             UsageEntry(
                 id: $0.id,
                 name: $0.name,
                 status: $0.status,
                 usedPercent: $0.usedPercent,
                 windowLabel: $0.windowLabel
+            )
+        }
+        // BB exposes no DeepSeek quota yet, so keep the requested icon visible as unavailable.
+        if !usage.contains(where: { $0.id == "deepseek" }) {
+            usage.append(
+                UsageEntry(
+                    id: "deepseek",
+                    name: "DeepSeek",
+                    status: "not_installed",
+                    usedPercent: nil,
+                    windowLabel: nil
+                )
             )
         }
         return AgentSnapshot(

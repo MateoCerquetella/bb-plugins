@@ -130,6 +130,12 @@ test("snapshot includes bounded weekly subscription percentages", async (t) => {
             ],
           },
           "claude-code": { status: "unauthenticated" as const },
+          deepseek: {
+            status: "ok" as const,
+            accountEmail: null,
+            planLabel: "Pro",
+            windows: [{ label: "Weekly", usedPercent: 12, resetsAt: null }],
+          },
         }),
       },
     },
@@ -163,6 +169,13 @@ test("snapshot includes bounded weekly subscription percentages", async (t) => {
       status: "error",
       usedPercent: null,
       windowLabel: null,
+    },
+    {
+      id: "deepseek",
+      name: "DeepSeek",
+      status: "ok",
+      usedPercent: 12,
+      windowLabel: "Weekly",
     },
   ]);
 });

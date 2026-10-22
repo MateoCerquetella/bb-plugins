@@ -11,8 +11,8 @@ Swift/AppKit background app owns the physical Touch Bar:
 - one outlined two-line card per thread with provider, project, status colour,
   badge and activity spinner;
 - tap a card to open that exact BB thread;
-- optional right-side circular ChatGPT, Claude Code, and Cursor icons with usage
-  progress rings instead of percentage text;
+- optional right-side circular ChatGPT, Claude Code, Cursor, and DeepSeek icons
+  with usage progress rings instead of percentage text;
 - an optional icon-only Host Monitor button that swaps the thread lane for bounded
   host cards containing compact circular CPU, RAM, disk, download, and upload
   gauges for every enrolled host;

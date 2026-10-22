@@ -18,6 +18,7 @@ extension NSTouchBarItem.Identifier {
     static let bbCodexToggle = NSTouchBarItem.Identifier("app.getbb.touchbar.codex-toggle")
     static let bbClaudeToggle = NSTouchBarItem.Identifier("app.getbb.touchbar.claude-toggle")
     static let bbCursorToggle = NSTouchBarItem.Identifier("app.getbb.touchbar.cursor-toggle")
+    static let bbDeepseekToggle = NSTouchBarItem.Identifier("app.getbb.touchbar.deepseek-toggle")
     static let bbClose = NSTouchBarItem.Identifier("app.getbb.touchbar.close")
 }
 
@@ -961,6 +962,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
     private let codexToggleItem = NSCustomTouchBarItem(identifier: .bbCodexToggle)
     private let claudeToggleItem = NSCustomTouchBarItem(identifier: .bbClaudeToggle)
     private let cursorToggleItem = NSCustomTouchBarItem(identifier: .bbCursorToggle)
+    private let deepseekToggleItem = NSCustomTouchBarItem(identifier: .bbDeepseekToggle)
     private let closeItem = NSCustomTouchBarItem(identifier: .bbClose)
     private let settingsButton = CompactNativeButton(title: "", width: 34)
     private let priorityButton = SettingsControlButton(title: "PRIORITY", width: 52)
@@ -976,6 +978,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
     private let codexToggleButton = SettingsControlButton(title: "", width: 25)
     private let claudeToggleButton = SettingsControlButton(title: "", width: 25)
     private let cursorToggleButton = SettingsControlButton(title: "", width: 25)
+    private let deepseekToggleButton = SettingsControlButton(title: "", width: 25)
     private let closeButton = CompactNativeButton(title: "✕", width: 34)
     private var panelTouchBar: NSTouchBar?
     private weak var panelScrollView: TouchBarScrollView?
@@ -998,6 +1001,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         "codex": UserDefaults.standard.object(forKey: "BBTouchBarUsageCodex") as? Bool ?? true,
         "claudeCode": UserDefaults.standard.object(forKey: "BBTouchBarUsageClaude") as? Bool ?? true,
         "cursor": UserDefaults.standard.object(forKey: "BBTouchBarUsageCursor") as? Bool ?? true,
+        "deepseek": UserDefaults.standard.object(forKey: "BBTouchBarUsageDeepseek") as? Bool ?? true,
     ]
     private var selectedProject = UserDefaults.standard.string(
         forKey: "BBTouchBarSelectedProject"
@@ -1052,6 +1056,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
             "codex": "BBTouchBarUsageCodex",
             "claudeCode": "BBTouchBarUsageClaude",
             "cursor": "BBTouchBarUsageCursor",
+            "deepseek": "BBTouchBarUsageDeepseek",
         ]
         guard let defaultsKey = keys[id] else { return }
         usageProviderVisibility[id] = visible
@@ -1144,7 +1149,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         }
         for button in [
             usageToggleButton, hostToggleButton, codexToggleButton,
-            claudeToggleButton, cursorToggleButton,
+            claudeToggleButton, cursorToggleButton, deepseekToggleButton,
         ] {
             button.font = .monospacedSystemFont(ofSize: 5.8, weight: .bold)
         }
@@ -1158,10 +1163,13 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         claudeToggleButton.action = #selector(claudeVisibilityTapped(_:))
         cursorToggleButton.target = self
         cursorToggleButton.action = #selector(cursorVisibilityTapped(_:))
+        deepseekToggleButton.target = self
+        deepseekToggleButton.action = #selector(deepseekVisibilityTapped(_:))
         codexToggleButton.image = ProviderIcon.image(for: "codex")
         claudeToggleButton.image = ProviderIcon.image(for: "claude-code")
         cursorToggleButton.image = ProviderIcon.image(for: "cursor")
-        for button in [codexToggleButton, claudeToggleButton, cursorToggleButton] {
+        deepseekToggleButton.image = ProviderIcon.image(for: "deepseek")
+        for button in [codexToggleButton, claudeToggleButton, cursorToggleButton, deepseekToggleButton] {
             button.imagePosition = .imageOnly
             button.imageScaling = .scaleProportionallyDown
         }
@@ -1211,6 +1219,8 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
             ? .systemOrange : NSColor(white: 0.18, alpha: 1)
         cursorToggleButton.bezelColor = usageProviderVisibility["cursor"] == true
             ? .systemPurple : NSColor(white: 0.18, alpha: 1)
+        deepseekToggleButton.bezelColor = usageProviderVisibility["deepseek"] == true
+            ? .systemBlue : NSColor(white: 0.18, alpha: 1)
         hostMonitorButton.bezelColor = hostViewVisible
             ? .systemGreen : NSColor(white: 0.18, alpha: 1)
     }
@@ -1442,6 +1452,10 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         toggleUsageProvider("cursor")
     }
 
+    @objc private func deepseekVisibilityTapped(_ sender: NSButton) {
+        toggleUsageProvider("deepseek")
+    }
+
     private func toggleUsageProvider(_ id: String) {
         let next = usageProviderVisibility[id] != true
         setProviderVisibilityFromMenu(id, visible: next)
@@ -1518,6 +1532,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         case .bbCodexToggle: return codexToggleItem
         case .bbClaudeToggle: return claudeToggleItem
         case .bbCursorToggle: return cursorToggleItem
+        case .bbDeepseekToggle: return deepseekToggleItem
         case .bbClose: return closeItem
         default: return nil
         }
@@ -1637,6 +1652,11 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
             selected: usageProviderVisibility["cursor"] == true,
             color: .systemPurple
         )
+        let deepseek = providerSettingControl(
+            provider: "deepseek", action: #selector(deepseekVisibilityTapped(_:)),
+            selected: usageProviderVisibility["deepseek"] == true,
+            color: .systemBlue
+        )
         let host = settingControl(
             title: showHostMonitor ? "ON" : "OFF", width: 42,
             action: #selector(hostVisibilityTapped(_:)),
@@ -1649,7 +1669,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
             ),
             SettingsGroupView(
                 title: "SUBSCRIPTIONS",
-                controls: [usage, codex, claude, cursor]
+                controls: [usage, codex, claude, cursor, deepseek]
             ),
             SettingsGroupView(
                 title: "HOST MONITOR",

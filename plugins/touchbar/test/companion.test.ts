@@ -305,6 +305,10 @@ test("native app owns the Control Strip and fullscreen panel without physical st
     assert.match(support, new RegExp(`"${provider}"`, "u"));
   }
   assert.match(support, /"codex": "openai"/u);
+  assert.match(support, /"acp-opencode": "opencode"/u);
+  assert.match(controller, /BBTouchBarUsageDeepseek/u);
+  assert.match(controller, /case \.bbDeepseekToggle: return deepseekToggleItem/u);
+  assert.match(model, /id: "deepseek"/u);
   assert.match(support, /circularChatGPT/u);
   assert.match(main, /setActivationPolicy\(\.accessory\)/u);
   assert.match(main, /MenuBarController/u);

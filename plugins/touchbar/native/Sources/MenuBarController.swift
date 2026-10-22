@@ -132,6 +132,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
             ("Codex / ChatGPT", "codex", "codex"),
             ("Claude Code", "claudeCode", "claude-code"),
             ("Cursor", "cursor", "cursor"),
+            ("DeepSeek", "deepseek", "deepseek"),
         ] {
             let row = item(provider.0, action: #selector(toggleProvider))
             row.representedObject = provider.1

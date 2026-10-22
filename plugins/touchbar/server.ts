@@ -44,6 +44,7 @@ const USAGE_PROVIDERS = [
     wireIds: ["claudeCode", "claude-code"],
   },
   { id: "cursor", name: "Cursor", wireIds: ["cursor", "acp-cursor"] },
+  { id: "deepseek", name: "DeepSeek", wireIds: ["deepseek"] },
 ] as const;
 
 export function projectTouchBarUsage(limits: UsageLimits): TouchBarUsage[] {
