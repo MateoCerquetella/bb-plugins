@@ -5,7 +5,7 @@
 <h1 align="center">Usage Tracker for BB</h1>
 
 <p align="center">
-  Codex, Claude Code, Cursor, Grok, OpenCode, and Antigravity limits in BB's sidebar footer.
+  Codex, Claude Code, Cursor, Grok, OpenCode, Antigravity, and DeepSeek usage in BB's sidebar footer.
 </p>
 
 <p align="center">
@@ -14,9 +14,10 @@
 </p>
 
 Usage Tracker adds one compact, live strip beside BB's existing sidebar
-utility icons. Claude Code, Codex, Grok, OpenCode, and Antigravity each show a progress bar
-and their current usage reading, without adding a navigation item or a separate
-plugin page.
+utility icons. Claude Code, Codex, Grok, OpenCode, and Antigravity each show a
+progress bar and their current usage reading, without adding a navigation item
+or a separate plugin page. The opt-in DeepSeek provider shows the API balance
+and, when a topped-up budget is configured, the share already used.
 
 <p align="center">
   <img src="./assets/usage-tracker-summary.png" width="248" alt="Compact Usage Tracker summary showing usage across providers currently in use and three additional providers" />
@@ -32,7 +33,7 @@ plugin page.
 
 ## Features
 
-- Shows Codex, Claude Code, Cursor, Grok, OpenCode, and Antigravity usage in BB's sidebar footer.
+- Shows Codex, Claude Code, Cursor, Grok, OpenCode, Antigravity, and DeepSeek usage in BB's sidebar footer.
 - Lets you show or hide every provider independently; the strip compacts for
   one or two providers and summarizes larger sets with cumulative usage across
   providers currently in use plus an additional-provider count. Idle providers
@@ -47,6 +48,8 @@ plugin page.
   provider-defined percentages.
 - Shows reported USD credit usage and limits in expanded details, including the
   dollar amounts exposed by Claude Code usage data.
+- Shows the DeepSeek API total, granted, and topped-up balance when a key is
+  configured, with a budget percentage that reaches 100% at a zero balance.
 - Works with BB's Account Pooler: when pooled accounts serve Claude Code or
   Codex, the strip shows the currently selected account and the expanded
   details list every pooled account's own limits.
@@ -79,9 +82,10 @@ bb plugin install usage-tracker
 ```
 
 The strip appears in the bottom of the sidebar as soon as the plugin loads.
-The BB-backed providers are enabled by default; Antigravity is opt-in. Change them independently under
-**Settings → Plugins → Usage Tracker**. The same page lets you choose
-between the weekly and five-hour limit for the compact reading.
+The BB-backed providers are enabled by default; Antigravity and DeepSeek are
+opt-in. Change them independently under **Settings → Plugins → Usage Tracker**.
+The same page lets you choose between the weekly and five-hour limit for the
+compact reading.
 
 The provider CLIs must be installed and signed in for BB to report their usage:
 
@@ -94,6 +98,20 @@ opencode auth login
 
 Antigravity quota probing runs in the background from a cached snapshot, so it
 does not add its 3–4 second CLI startup time to the sidebar RPC response.
+
+### DeepSeek
+
+DeepSeek reports an account balance rather than subscription windows. Enable
+**DeepSeek** and either paste a key into **DeepSeek API key** or set
+`DEEPSEEK_API_KEY` in the environment that runs BB. Set **DeepSeek topped-up
+balance** to the amount you paid in, in the currency DeepSeek reports (for
+example `20`). The strip then shows the share of that budget already used, and
+reads 100% when the balance reaches zero. Leave the budget empty to derive the
+baseline automatically from the reported topped-up balance: the first positive
+topped-up balance becomes the baseline, spending from it raises the percentage,
+and a later top-up raises the baseline and resets the percentage. If no positive balance has
+been observed yet, the strip shows the raw balance instead. The key is stored in
+BB's plugin secrets and is read only by the plugin server.
 
 If a CLI is missing, signed out, or expired, expand that provider in the strip
 to see the recovery instruction reported by BB.
@@ -167,7 +185,9 @@ bb plugin remove usage-tracker
 The plugin reads BB's local `system.usageLimits` data for provider windows.
 When the Account Pooler plugin is enabled, it also reads that plugin's cached
 per-account usage through its `provider-usage.v1` RPC; for providers the pool
-serves, that replaces the host-local reading. It also uses the installed `codex app-server` with the existing local Codex
+serves, that replaces the host-local reading. For DeepSeek, it sends the
+configured API key only to `https://api.deepseek.com/user/balance` and never
+returns the key to the browser. It also uses the installed `codex app-server` with the existing local Codex
 session to read the available reset count and, only after the explicit
 confirmation above, request one reset. When **Claude Keychain service** is set,
 it reads that macOS Keychain item with `security` and sends its Claude Code
