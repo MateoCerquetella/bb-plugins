@@ -226,6 +226,8 @@ test("native app owns the Control Strip and fullscreen panel without physical st
   assert.match(controller, /override func draw\(_ dirtyRect: NSRect\)/u);
   assert.match(controller, /sectionTitle as NSString/u);
   assert.match(controller, /drawsLightImageTile = provider == "cursor"/u);
+  assert.match(controller, /needsLightTile = provider == "cursor"/u);
+  assert.match(controller, /provider == "acp-opencode"/u);
   assert.match(controller, /private final class CompactNativeButton/u);
   assert.match(controller, /CompactNativeButton\(title: "", width: 34\)/u);
   assert.match(controller, /CompactNativeButton\(title: "✕", width: 34\)/u);

@@ -910,6 +910,7 @@ private final class AgentButton: NSButton {
         iconView.image = ProviderIcon.image(for: entry.provider)
         let provider = entry.provider.lowercased()
         let needsLightTile = provider == "cursor" || provider == "acp-cursor"
+            || provider == "opencode" || provider == "acp-opencode"
         iconView.layer?.cornerRadius = 12
         iconView.layer?.masksToBounds = true
         iconView.layer?.backgroundColor = needsLightTile
