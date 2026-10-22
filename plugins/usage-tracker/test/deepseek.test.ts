@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
   DEEPSEEK_INVALID_RESPONSE_MESSAGE,
@@ -27,12 +26,6 @@ import {
   sidebarUsagePrimarySelectionSummary,
 } from "../lib/sidebar-usage.ts";
 import type { ProviderUsage } from "../lib/usage.ts";
-
-const source = readFileSync(
-  new URL("../server.ts", import.meta.url),
-  "utf8",
-);
-const styles = readFileSync(new URL("../app.css", import.meta.url), "utf8");
 
 const documentedPayload = {
   is_available: true,
@@ -484,9 +477,28 @@ test("resolves the key from settings before the environment", () => {
   assert.equal(resolveDeepSeekApiKey("   ", undefined), "");
 });
 
-test("declares the key as a secret setting and styles the provider", () => {
-  assert.match(source, /deepSeekApiKey:\s*\{[^}]*secret: true[^}]*\}/u);
-  assert.match(source, /process\.env\.DEEPSEEK_API_KEY/u);
-  assert.match(styles, /data-provider="deepSeek"/u);
-  assert.match(styles, /--usage-sidebar-deepseek/u);
+test("sends the key only as a bearer header to the balance endpoint", async () => {
+  const calls: Array<{
+    url: string;
+    headers: Record<string, string>;
+  }> = [];
+  const providerFromSpy = await loadDeepSeekProvider({
+    apiKey: "sk-secret",
+    budget: 20,
+    fetch: async (url, init) => {
+      calls.push({ url, headers: init.headers });
+      return httpResponse(200, documentedPayload);
+    },
+  });
+
+  assert.deepEqual(calls, [
+    {
+      url: "https://api.deepseek.com/user/balance",
+      headers: {
+        Accept: "application/json",
+        Authorization: "Bearer sk-secret",
+      },
+    },
+  ]);
+  assert.doesNotMatch(JSON.stringify(providerFromSpy), /sk-secret/u);
 });
