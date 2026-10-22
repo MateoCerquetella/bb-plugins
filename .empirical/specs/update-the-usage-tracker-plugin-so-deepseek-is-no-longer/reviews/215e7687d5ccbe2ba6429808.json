@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:7ceb555bd14d7cd0f75f963efa17c8d07df55704bf00ec4ffa97f46a8e0e8d90",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "1807befaa9c0732d83b6223d3821ba83268d98e7",
+  "headCommit": "6f31c4f832571298a7329c448e2bff5170b6dbc1",
+  "diffDigest": "sha256:82230f389b97c7619c7d5b8a338d52a95af6d03bae27d4bf83b992e36c5fe2ed",
+  "verdict": "APPROVED",
+  "reviewerActor": "fresh-context-usage-tracker-deepseek-reviewer",
+  "reviewerInvocationId": "deepseek-usage-review-20261022-2",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: deepSeek is in both provider sets with an independent enableDeepSeek setting defaulting off.\n- PASS AC-2: The server resolves the secret setting or DEEPSEEK_API_KEY and sends it only as a bearer header; the provider record never contains the key.\n- PASS AC-3: Balance metadata carries total, granted, and topped-up amounts; a configured amount yields a clamped 0-100% reading and an empty amount yields balance only.\n- PASS AC-4: Missing, rejected, non-OK, network, timeout, and malformed payloads map to unauthenticated or error states with recovery messages.\n- PASS AC-5: A dedicated DeepSeek mark and colour are present, and balance providers are filtered out of the cumulative agent summary.\n- PASS AC-UI-1: The live sidebar overview and expanded card rendered the DeepSeek mark, 26.4% topped-up reading, balance amounts, and recovery message without layout breakage.\n- PASS AC-6: Focused check passed typecheck, 102 tests, and the plugin build; the workspace check also passed.\n- PASS AC-7: README, CHANGELOG, package metadata, and third-party notices describe the opt-in DeepSeek provider and its data flow.\n\n## Security / correctness\n\nPass: no security or correctness blockers. The key stays server-side and is never returned or logged; the balance parser validates the documented payload and bounds the request.\n\n## Design / maintainability\n\nPass with non-blocking follow-ups: the provider model, balance client, and sidebar rendering follow the existing provider pattern. F-1 medium (design): balance-row rendering is duplicated between the strip renderer and the detail helper. F-2 low (tests): the strip DOM lacks a focused behavioral test.",
+  "bodyDigest": "sha256:417d4751b6cc944807df10e8fe927660527f7f1c0b6b73a59f7cdc0bbe75601c",
+  "findings": [
+    {
+      "id": "F-1",
+      "severity": "medium",
+      "category": "design",
+      "summary": "DeepSeek balance row logic is duplicated between the sidebar strip renderer and the sidebar usage detail helper, and the renderer bypasses the helper.",
+      "path": "plugins/usage-tracker/lib/sidebar-strip.ts"
+    },
+    {
+      "id": "F-2",
+      "severity": "low",
+      "category": "tests",
+      "summary": "DeepSeek sidebar strip DOM rendering is not behaviorally covered by the focused diff tests.",
+      "path": "plugins/usage-tracker/test/deepseek.test.ts"
+    }
+  ],
+  "digest": "sha256:215e7687d5ccbe2ba642980824f3633646f3fcf168a997406e324343d2895b4b"
+}

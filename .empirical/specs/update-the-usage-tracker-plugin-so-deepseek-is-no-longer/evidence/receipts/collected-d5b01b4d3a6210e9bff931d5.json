@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-d5b01b4d3a6210e9bff931d5",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-10-22T16:02:49.103Z",
+  "completedAt": "2026-10-22T16:02:49.103Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "update-the-usage-tracker-plugin-so-deepseek-is-no-longer",
+    "specRevision": 2,
+    "specDigest": "sha256:3607c1e3c88e7fd90a49b309cdd73133ff9a9f44382fa105afbc359bcf85029c",
+    "treeDigest": "sha256:bf2fcd36eb236077c3a6d27880566a153a31607c22629917109911dd1bff4352",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:9f86136ecb354e755380540ffc31d807936ef2bf74257ca951eb5b687d5efa9d",
+  "kind": "collected",
+  "collector": "empirical-review:fresh-context-usage-tracker-deepseek-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/update-the-usage-tracker-plugin-so-deepseek-is-no-longer/reviews/215e7687d5ccbe2ba6429808.json",
+      "mediaType": "application/json",
+      "bytes": 3045,
+      "digest": "sha256:728b61cedf455924a81446e11c0348b0ea321ea01d2070f5c342693cf98e68d5"
+    },
+    {
+      "path": ".empirical/specs/update-the-usage-tracker-plugin-so-deepseek-is-no-longer/reviews/215e7687d5ccbe2ba6429808.md",
+      "mediaType": "text/markdown",
+      "bytes": 1686,
+      "digest": "sha256:a756ce1e4501dd47dc8cc4dbe35431351db75dd11a1b02d252f7f1af0b91ce7b"
+    }
+  ]
+}

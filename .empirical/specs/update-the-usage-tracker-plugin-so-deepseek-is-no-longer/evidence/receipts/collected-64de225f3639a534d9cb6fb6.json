@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-64de225f3639a534d9cb6fb6",
+  "criteria": [
+    "AC-3",
+    "AC-5",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "browser"
+  ],
+  "summary": "Live BB sidebar inspection showed DeepSeek as the sixth enabled provider with its own mark, a 26.4% topped-up reading, the balance amounts, the missing-key recovery message, and no contribution to the 100% Codex agent summary.",
+  "passed": true,
+  "startedAt": "2026-10-22T16:05:42.261Z",
+  "completedAt": "2026-10-22T16:05:42.261Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "update-the-usage-tracker-plugin-so-deepseek-is-no-longer",
+    "specRevision": 2,
+    "specDigest": "sha256:3607c1e3c88e7fd90a49b309cdd73133ff9a9f44382fa105afbc359bcf85029c",
+    "treeDigest": "sha256:bf2fcd36eb236077c3a6d27880566a153a31607c22629917109911dd1bff4352",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:da78d031c2b7299ff56ab96264bd1209f0d3618c717004f18bad6014a5029be4",
+  "kind": "collected",
+  "collector": "BB Surf live Usage Tracker verification",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/update-the-usage-tracker-plugin-so-deepseek-is-no-longer/evidence/browser-verification.md",
+      "mediaType": "text/markdown",
+      "bytes": 1354,
+      "digest": "sha256:f74f4640d177dac6bc912727ea135e096f21e6b3379ab8dcfcc81af79e4aea06"
+    }
+  ]
+}
