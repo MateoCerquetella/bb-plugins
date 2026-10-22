@@ -7,6 +7,8 @@ declare global {
     factoryNavigation: string[];
     factoryItem: Record<string, unknown>;
     factoryStarts: number;
+    factoryStartExecution?: unknown;
+    ticketImprovementInputs: Record<string, unknown>[];
     factoryStartError?: string | null;
     factoryStartDelay?: number;
     factoryProjectState?: 'running' | 'paused' | 'awaiting_scan' | 'unconfigured' | 'provider_error';
@@ -21,22 +23,70 @@ declare global {
     createdInputs: Record<string, unknown>[];
   }
 }
+const previewLogo = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Crect width='16' height='16' rx='4' fill='%23286bd4'/%3E%3C/svg%3E";
+const previewModels: Record<string, { providerId: string; model: string; label: string; reasoning: string }> = {
+  'claude:claude-sonnet': { providerId: 'claude', model: 'claude-sonnet', label: 'Claude Code · Claude Sonnet', reasoning: 'high' },
+  'codex:gpt-5': { providerId: 'codex', model: 'gpt-5', label: 'Codex · GPT-5', reasoning: 'medium' }
+};
+export function experimental_ProviderModelPicker({ value, onChange, disabled }: any) {
+  const key = `${value.providerId}:${value.model}`;
+  return <div className="flex min-w-0 items-center gap-2">
+    <img src={previewLogo} alt="" aria-hidden className="size-4 shrink-0 rounded-sm" />
+    <select aria-label="AI provider" className="min-w-0 rounded-md border border-border bg-background px-2 py-1.5 text-xs"
+      value={previewModels[key] ? key : 'claude:claude-sonnet'} disabled={disabled}
+      onChange={event => {
+        const next = previewModels[event.target.value]!;
+        onChange({ ...value, providerId: next.providerId, model: next.model,
+          reasoningLevel: next.reasoning, serviceTier: 'default' });
+      }}>
+      {Object.entries(previewModels).map(([id, model]) => <option key={id} value={id}>{model.label}</option>)}
+    </select>
+  </div>;
+}
+export function experimental_PermissionModePicker({ value, onChange, disabled }: any) {
+  return <select aria-label="Permissions" className="rounded-md border border-border bg-background px-2 py-1.5 text-xs"
+    value={value} disabled={disabled} onChange={event => onChange(event.target.value)}>
+    <option value="auto">Auto</option>
+    <option value="accept-edits">Accept edits</option>
+    <option value="full">Full access</option>
+  </select>;
+}
+window.ticketImprovementInputs ??= [];
 export function useRpc() {
   return rpc;
 }
 export function useSettings() {
   return { values: {}, isLoading: false };
 }
-let factoryPolicy = { projectId: 'proj_test', provider: 'github', enabled: false,
-  maxConcurrent: 1, intake: 'todo', updatedAt: new Date().toISOString() };
+let factoryPolicy: {
+  projectId: string; provider: string; enabled: boolean; maxConcurrent: number; intake: 'todo';
+  execution: null | { providerId: string; model: string; permissionMode: string;
+    reasoningLevel: string; serviceTier: string }; updatedAt: string;
+} = { projectId: 'proj_test', provider: 'github', enabled: false,
+  maxConcurrent: 1, intake: 'todo', execution: null, updatedAt: new Date().toISOString() };
 const rpc = {
   async call(method: string, input: { projectId?: string; body?: string; digest?: string; kind?: string; path?: string;
     enabled?: boolean; maxConcurrent?: number; threadId?: string; statusId?: string;
+    providerId?: string | null; contextThreadId?: string | null;
+    execution?: typeof factoryPolicy.execution;
     mutation?: { field: 'assignee' | 'priority' | 'project'; valueId: string | null } }) {
     const record = window.factoryFixture;
+    if (method === 'factoryExecutionOptions') {
+      const threadDefault = input.threadId !== null && input.threadId !== undefined;
+      return {
+        defaults: threadDefault
+          ? { providerId: 'claude', model: 'claude-sonnet', permissionMode: 'auto',
+              reasoningLevel: 'high', serviceTier: 'default' }
+          : { providerId: 'codex', model: 'gpt-5', permissionMode: 'auto',
+              reasoningLevel: 'medium', serviceTier: 'default' },
+        selected: factoryPolicy.execution,
+        routing: { kind: 'environment', environmentId: 'env_test' }
+      };
+    }
     if (method === 'factoryGetProject' || method === 'factorySaveProject') {
       if (method === 'factorySaveProject') factoryPolicy = { ...factoryPolicy,
-        enabled: input.enabled ?? false, maxConcurrent: input.maxConcurrent ?? 1 };
+        enabled: input.enabled ?? false, maxConcurrent: input.maxConcurrent ?? 1,
+        execution: input.execution ?? null };
       const kind = window.factoryProjectState;
       const policy = { ...factoryPolicy, projectId: input.projectId ?? factoryPolicy.projectId,
         enabled: kind ? kind !== 'paused' : factoryPolicy.enabled };
@@ -132,7 +182,14 @@ const rpc = {
         lastKnown: window.empiricalOffline ? lastKnown : null
       };
     }
+    if (method === 'improveTicket') {
+      window.ticketImprovementInputs.push(structuredClone(input));
+      return { status: 'completed', draft: { title: 'Improved title', description: 'Improved description' }, error: null };
+    }
+    if (method === 'ticketImprovement') return { status: 'completed', draft: { title: 'Improved title', description: 'Improved description' }, error: null };
+    if (method === 'cancelTicketImprovement') return { status: 'canceled', draft: null, error: null };
     if (method === 'factoryStartTask') {
+      window.factoryStartExecution = input.execution ?? null;
       window.factoryStarts++;
       if (window.factoryStartDelay) await new Promise(resolve => setTimeout(resolve, window.factoryStartDelay));
       if (window.factoryStartError) throw new Error(window.factoryStartError);

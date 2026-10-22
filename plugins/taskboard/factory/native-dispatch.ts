@@ -13,3 +13,30 @@ export function dispatchRejection(value: string) {
   }
   return null;
 }
+
+export function executionForDispatch(
+  selected: import('./contract.js').FactoryExecution | null,
+  defaults: import('./contract.js').FactoryExecution | null
+) {
+  if (selected) {
+    return {
+      ...selected,
+      executionInputSources: {
+        providerId: 'explicit' as const, model: 'explicit' as const, permissionMode: 'explicit' as const,
+        reasoningLevel: 'explicit' as const, serviceTier: 'explicit' as const
+      }
+    };
+  }
+  if (defaults) return defaults;
+  throw new Error('Choose a provider and model in factory settings before starting work.');
+}
+
+type ThreadDefaults = Pick<import('./contract.js').FactoryExecution,
+  'model' | 'permissionMode' | 'reasoningLevel' | 'serviceTier'>;
+
+export function threadExecution(providerId: string, defaults: ThreadDefaults) {
+  return {
+    providerId, model: defaults.model, permissionMode: defaults.permissionMode,
+    reasoningLevel: defaults.reasoningLevel, serviceTier: defaults.serviceTier
+  };
+}

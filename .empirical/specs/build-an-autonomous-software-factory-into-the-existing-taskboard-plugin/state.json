@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 39,
+  "revision": 83,
   "activeFeature": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin",
   "request": "Build an autonomous software factory into the existing Taskboard plugin, inspired by https://github.com/lpbaril/bb-plugin-factory. Make Linear, Jira, or the configured issue provider the source of truth. The factory should continuously select eligible tickets, start and supervise BB agent work, avoid duplicate dispatch, recover after restart, and reflect progress back through the existing Taskboard provider/status model. Reuse the current taskboard architecture and keep the first implementation focused and operable.",
   "profile": "complex",
@@ -9,13 +9,13 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 1,
-  "message": "Updated the executable plan to replace duplicate ticket-team and run-insight views with one operator console, preserve all current actions and recovery boundaries, add explicit current-versus-history selection, compose responsive ticket context in TrackerDetail, isolate browser fixtures, and verify the production UI at 1280, 800, and 390 px. Retained the affected behavioral test inventory.",
+  "message": "Upgraded the factory progress to a node-and-rail stepper with check markers and a current Review ring. Turned Review evidence into a compact host-theme card: Checks / Failed / Files / Plan metric strip, a checks meter with a red failed segment, and icon disclosure rows for Validation evidence, Commands executed, changed files, plan and Coordinator and workspace. The workspace now sits inside the stage card. Verified live at 1280/390; no horizontal overflow; typecheck and build pass. Suite not rerun; branch remains uncommitted and 22 behind main.",
   "implementationActor": "agent",
   "workStartedAt": null,
-  "specDigest": "sha256:ffa71df4a976c5664295390845763420c955273fb6af10de4d8b46b0d598a9e4",
-  "approvedSpecRevision": 37,
+  "specDigest": "sha256:29022ace2db69cef386e04b1a884c33733cd71a84b435ca92f89f57496c74a0e",
+  "approvedSpecRevision": 55,
   "capabilityArchiveRequired": true,
-  "capabilityDeltaDigest": "sha256:56a8fbbc5e530e46a783300b0bb845b6080b96f134269ce30128e528c0b77a5c",
+  "capabilityDeltaDigest": "sha256:ba4619b85d824ad76e8bf14b30a8776166eca52930cf71ede8a469b92e360f0f",
   "impactDigest": "sha256:3b1f1bda9a9699c5aed42506511efb1ee8f26c95c985cda5ebaed43154a5b479",
   "capabilityClaimId": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin-63a17a591999",
   "authorizationDigest": null,
@@ -23,21 +23,20 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": false,
+    "implemented": true,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "none",
+    "highest": "implemented",
     "reasons": {
-      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-20T16:15:41.553Z",
+  "updatedAt": "2026-10-22T03:49:57.876Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin-63a17a591999",
@@ -56,7 +55,9 @@
           "one coordinator per ticket team": null,
           "bounded and observable automation": null,
           "preserve execution and acceptance boundaries": null,
-          "software factory operator console": null
+          "explicit ai selection": null,
+          "software factory operator console": null,
+          "ticket drafting uses the selected ai and detail": null
         }
       }
     },
@@ -66,23 +67,24 @@
     "status": "active",
     "integrationReceiptDigest": null,
     "createdAt": "2026-10-19T18:18:31.861Z",
-    "heartbeatAt": "2026-10-20T16:14:03.943Z",
-    "digest": "sha256:5dcdade216044863d89d63735a7790223a1b319bbc0aaf8a3f6bdd6fdd771199"
+    "heartbeatAt": "2026-10-20T20:42:35.884Z",
+    "digest": "sha256:3514b7811f86b13050ae7fb732038b4235275e37c3f6d4028c4bf7c4892a11b2"
   },
   "sizeDecision": {
     "choice": "keep",
-    "criteria": 8,
+    "criteria": 10,
     "capabilities": 1,
-    "reason": "The eight criteria describe one atomic queue-admission capability: settings, durable claim, scheduler, status, UI, and verification share one project policy and cannot ship independently without either exposing an inert control or allowing uncontrolled admission.",
+    "reason": "The picker, per-task execution, and draft-rewrite mode share the same AI resolution path and new-task surface. Splitting them would ship a picker that cannot affect the task it belongs to, or a helper whose model differs from the visible choice.",
     "actor": "agent",
-    "revision": 3
+    "revision": 55
   },
-  "trackerGeneration": 6,
+  "trackerGeneration": 24,
   "lifecycle": {
-    "stage": "development",
-    "iteration": 6,
-    "awaitingFeedback": false,
-    "contractRevision": 35
+    "stage": "iteration",
+    "iteration": 24,
+    "awaitingFeedback": true,
+    "contractRevision": 53,
+    "riskRequest": "Let users choose which AI (provider and model, plus reasoning, permission mode, and service tier) the Taskboard factory uses for its coordinator and stage sessions. Persist the choice in the project factory policy, expose it in project Manage and the CLI, and use it for manual Start task and automatic intake, falling back to the project native execution defaults only when no explicit choice exists. Today Start task from Taskboard fails with 'Choose native BB model and execution settings for this project first' when a project has no defaults and offers no way to choose."
   },
   "budgetExtensionMinutes": 240,
   "reviewFirst": true

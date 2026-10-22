@@ -76,8 +76,8 @@ and capacity release retain their existing meanings.
 ### Native creation and child dispatch
 
 One private `ensureCoordinator` operation runs inside the existing ticket lock.
-Persist `starting` with a unique intent ID before `threads.spawn`. Use project
-native execution defaults and the project-default environment. Include the
+Persist `starting` with a unique intent ID before `threads.spawn`. Resolve one
+execution choice (below) and use the project-default environment. Include the
 ticket key and intent marker in the native title for recovery.
 
 The pinned SDK exposes `spawn`, not a verified empty-thread creation operation.
@@ -98,6 +98,55 @@ missing, or wrong-project coordinator blocks new work with a visible reason.
 Observe existing workers even while the parent is unavailable. Detect an
 unexpected parent on a grouped worker before reusing it; do not steal or recreate
 the worker. Coordinator creation alone does not call `markInProgress`.
+
+### Execution choice
+
+Store an optional full execution choice in the project policy:
+
+```ts
+type FactoryExecution = {
+  providerId: string;
+  model: string;
+  reasoningLevel: ReasoningLevel;
+  permissionMode: PermissionMode;
+  serviceTier: ServiceTier;
+};
+```
+
+`service.ts` and `coordinator.ts` resolve dispatch execution as
+`record.execution ?? policy.execution ?? projectDefaultExecutionOptions`. When the policy choice is
+present, pass it to `threads.spawn` with `executionInputSources` marking all five
+fields `explicit`, matching the preparation flow; without that provenance the
+host re-derives the project defaults and silently ignores the choice. When the
+choice is absent, keep passing the resolved defaults exactly as today. When both
+are absent, fail before dispatch with "Choose a provider and model in factory
+settings before starting work."
+
+A new RPC lists providers and the selected provider's models plus project
+defaults and the saved choice. It maps the host model entry's `model` field (not
+its catalog `id`) into the saved model. Reasoning options come from the model's
+`supportedReasoningEfforts`; service tier is offered only when the provider
+supports it. Saving a choice does not mutate existing native sessions; those keep
+their original provider and model.
+
+One shared `ExecutionPicker` component renders provider logo, model name, and
+the execution selects for both Project Manage and the new-task dialog. It loads
+the provider catalog through the same read-only RPC; when the dialog passes the
+current thread id, the RPC prefers that thread's resolved execution for the
+displayed defaults. Provider options render `logoUrl` and fall back to the
+display name when the image is missing. Selecting a provider loads that
+provider's models before the shared change callback receives a complete value.
+
+A new task persists an optional `record.execution`. `factoryStartTask` accepts
+an optional execution and writes it before dispatch. The service resolves task
+first, then policy, then native defaults, so a task-scoped choice never leaks
+into another ticket. Automatic admissions leave the task choice null.
+
+Improve title & description accepts a detail mode and optional explicit
+execution plus the current thread id. It resolves the helper execution from the
+dialog choice, then the thread's resolved execution, then project defaults. The
+prompt has one concise contract and one detailed contract; neither can use
+tools or mutate the repository.
 
 ### Crash recovery and duplicate protection
 
@@ -191,13 +240,15 @@ type FactoryProjectPolicy = {
   provider: WorkSource;
   intake: 'todo';
   maxConcurrent: number;
+  execution: FactoryExecution | null;
   updatedAt: string;
 };
 ```
 
 The schema validates external RPC, CLI, and database input. `enabled` defaults
 to `false`. `intake` is fixed to `todo` in the first release. `maxConcurrent`
-has a small bounded range.
+has a small bounded range. `execution` defaults to `null`, which preserves the
+existing native-default behavior for stored policies and admission fingerprints.
 
 The stored provider is part of the policy fingerprint. A mismatch with the
 current project provider blocks intake until the operator saves a new policy.
@@ -301,14 +352,17 @@ merge, deployment, issue closure, or human acceptance action.
 Add RPC and CLI operations for:
 
 - Reading a project's policy and computed status.
-- Saving a validated project policy.
+- Saving a validated project policy, including the optional execution choice.
+- Listing providers, models, and project defaults for the AI picker.
 - Running one bounded scan for diagnostics and tests.
 - Recovering an uncertain coordinator or explicitly adopting a legacy ticket.
 
-The Manage screen uses the existing form, switch, numeric input, status badge,
-and error patterns. It shows the configured provider, enable switch, automatic
-concurrency, status, active count, and the last blocked reason. Saving an enable
-choice is explicit.
+The Manage screen uses the existing form, switch, numeric input, select, status
+badge, and error patterns. It shows the configured provider, AI provider, model,
+reasoning, permissions, service tier, enable switch, automatic concurrency,
+status, active count, and the last blocked reason. Saving an enable choice is
+explicit. The CLI `factory enable|pause` path preserves the saved execution
+choice instead of clearing it.
 A healthy provider scan does not clear ticket-level coordinator, automation,
 or uncertain-stage blockers from project status.
 
@@ -374,6 +428,10 @@ Focused tests must execute observable behavior:
 - Coordinator and worker reverse lookups resolve one ticket. Start opens the
   root; worker actions open their specific native sessions.
 - Durable claims before the scan window do not starve eligible later tickets.
+- A saved execution choice reaches coordinator and stage spawns as explicit
+  `executionInputSources`; an unset choice falls back to project defaults; both
+  missing returns the actionable settings error before any native call.
+- A changed execution choice affects only new sessions.
 - A healthy scan does not hide a queue-owned workflow blocker in project status.
 - Ticket detail renders one workflow representation, keeps the primary action in
   the first viewport, and preserves explicit historical selection across

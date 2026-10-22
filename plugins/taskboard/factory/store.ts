@@ -113,6 +113,7 @@ export function createFactoryStore(db: ReturnType<BbPluginApi['storage']['databa
         const stored = this.getProjectPolicy(policy.projectId, policy.provider);
         if (!stored.enabled || stored.provider !== policy.provider ||
           stored.intake !== policy.intake || stored.maxConcurrent !== policy.maxConcurrent ||
+          JSON.stringify(stored.execution) !== JSON.stringify(policy.execution) ||
           stored.updatedAt !== policy.updatedAt || item.source !== policy.provider ||
           item.projectId !== policy.projectId) return { kind: 'disabled' as const };
         const existing = this.get(item);
@@ -124,7 +125,7 @@ export function createFactoryStore(db: ReturnType<BbPluginApi['storage']['databa
           schemaVersion: 1, projectId: item.projectId, source: item.source,
           locator: item.locator, version: 1, stage: 'Intake',
           scopeDigest: item.scopeDigest, plans: [], approvedDigest: null,
-          admission: { kind: 'factory', claimedAt }, automatic: true,
+          admission: { kind: 'factory', claimedAt }, execution: null, automatic: true,
           coordinator: { status: 'pending' },
           automationError: null, trackerProgress: { status: 'pending', message: null },
           runs: [], updatedAt: claimedAt

@@ -342,3 +342,98 @@ history retention after refresh, keyboard tab and disclosure behavior, direct
 thread actions, exact-body plan approval, and all recovery states. Run focused
 factory tests, Taskboard checks, install and reload the local plugin, and retain
 the existing native smoke boundary.
+
+## D-004 Explicit factory AI selection
+
+### Context
+
+Start task from Taskboard dispatches with the project's native execution defaults
+and fails with an opaque settings error when the project has none. Operators can
+choose an AI in the New thread composer but have no equivalent control for the
+factory or its manual Start task path.
+
+### Options
+
+1. Keep only native project defaults and improve the error message.
+2. Store a complete explicit execution choice in the project factory policy and
+   fall back to native defaults when it is unset.
+3. Ask for an AI on every Start task through a new per-ticket dialog.
+
+### Chosen approach
+
+Choose option 2. It fixes both the failing manual path and autonomous intake with
+one persisted control, and it matches how BB already resolves provider, model,
+reasoning, permission mode, and service tier. Option 1 leaves the operator with
+no in-product recovery; option 3 adds a per-ticket choice that autonomous intake
+cannot answer.
+
+Resolve dispatch execution as `policy.execution ?? projectDefaults`. Pass an
+explicit choice with `executionInputSources` marking the five fields as explicit
+so the host cannot silently re-derive project defaults. List providers and models
+through one read-only RPC and store the host model entry's `model` value rather
+than its catalog `id`. Preserve the saved choice in the CLI enable/pause path.
+
+### Trade-offs and risks
+
+- A saved choice can become unavailable when a provider is uninstalled or a model
+  is retired. The spawn then fails visibly; the settings page reports the host's
+  model load error and keeps the saved values so the operator can change them.
+- Changing the choice mid-workflow creates mixed-provider teams. Existing
+  sessions keep their original execution and the panel states that new choices
+  apply to new sessions only.
+- The policy fingerprint must include `execution` so automatic admission cannot
+  dispatch with a stale choice.
+
+### Verification
+
+Focused tests assert explicit execution inputs on coordinator and stage spawns,
+native-default fallback, the actionable error when neither exists, policy
+round-trip through SQLite, and CLI preservation. The browser fixture selects a
+provider and model, saves, and verifies narrow and wide layout without overflow.
+
+## D-005 One shared AI picker with task-scoped execution
+
+### Context
+
+The factory policy picker fixes Start task, but creating a new task still opens a
+separate dialog with no AI choice, and Improve title & description always uses
+project defaults. Operators expect the AI they see in the new-task flow to be
+the AI that runs the task and rewrites its draft.
+
+### Options
+
+1. Keep the picker only in Project Manage and document that new tasks inherit it.
+2. Duplicate a second picker in the new-task dialog with its own behavior.
+3. Extract one shared picker, persist an optional task-scoped execution, and let
+   draft improvement use the task or thread selection.
+
+### Chosen approach
+
+Choose option 3. Task execution resolves as task choice, project policy choice,
+then native defaults. The new-task picker is seeded from the current thread's
+execution, so the visible model matches the new thread. Provider logos come from
+the same catalog response already used for models, with a text fallback.
+
+Draft improvement gains a `concise` or `detailed` prompt contract and resolves
+its hidden helper from the dialog choice, then the thread execution, then project
+defaults. The helper remains text-only and never mutates the factory policy.
+
+### Trade-offs and risks
+
+- A task can now diverge from the project policy. The task detail should show
+  the active model so the divergence is discoverable; the settings summary is
+  not enough.
+- The current thread may not exist when a dialog is opened from a blank composer.
+  In that case the picker uses project defaults and the task still persists an
+  explicit choice when the operator picks one.
+- Provider logos may be unavailable or fail to load. Always render the provider
+  name alongside the logo and fall back to an icon.
+- The improvement helper now reads thread execution. If the thread is deleted or
+  archived, fall back to project defaults instead of failing the draft.
+
+### Verification
+
+Focused tests assert task-over-policy precedence, explicit spawn inputs, thread
+execution for improvement, and distinct Concise/Detailed prompts. The preview
+and Steel browser check cover provider logos, the shared new-task picker, the
+detail control, and no horizontal overflow at 1280 and 390 px.

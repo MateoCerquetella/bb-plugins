@@ -1,12 +1,24 @@
 import { z } from 'zod';
 import { empiricalObservationSchema } from '../empirical/contract.ts';
 
+export const factoryExecutionSchema = z.object({
+  providerId: z.string().min(1).max(200),
+  model: z.string().min(1).max(500),
+  permissionMode: z.enum(['full', 'auto', 'accept-edits']),
+  reasoningLevel: z.enum([
+    'none', 'low', 'medium', 'high', 'xhigh', 'max', 'ultra', 'ultracode'
+  ]),
+  serviceTier: z.enum(['default', 'fast'])
+}).strict();
+export type FactoryExecution = z.infer<typeof factoryExecutionSchema>;
+
 export const factoryProjectPolicySchema = z.object({
   projectId: z.string().startsWith('proj_').max(500),
   enabled: z.boolean().default(false),
   provider: z.enum(['github', 'gitlab', 'linear', 'jira', 'gitea']),
   intake: z.literal('todo').default('todo'),
   maxConcurrent: z.number().int().min(1).max(20).default(1),
+  execution: factoryExecutionSchema.nullable().default(null),
   updatedAt: z.string()
 }).strict();
 export type FactoryProjectPolicy = z.infer<typeof factoryProjectPolicySchema>;
@@ -121,6 +133,7 @@ export const factoryRecordSchema = factoryIdentitySchema.extend({
   plans: z.array(planSchema),
   approvedDigest: z.string().nullable(),
   admission: factoryAdmissionSchema.default({ kind: 'manual' }),
+  execution: factoryExecutionSchema.nullable().default(null),
   // Older dispatched items also adopt the automatic investigate -> plan -> build flow.
   automatic: z.boolean().default(true),
   automationError: z.string().nullable().default(null),
@@ -136,10 +149,29 @@ export type FactoryRecord = z.infer<typeof factoryRecordSchema>;
 export const factoryVersionInputSchema = factoryIdentitySchema.extend({
   expectedVersion: z.number().int().nonnegative()
 }).strict();
+export const factoryPickerRoutingSchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('host'), hostId: z.string().min(1).max(500) }).strict(),
+  z.object({ kind: z.literal('environment'), environmentId: z.string().min(1).max(500) }).strict()
+]);
+export type FactoryPickerRouting = z.infer<typeof factoryPickerRoutingSchema>;
+export const factoryExecutionOptionsSchema = z.object({
+  defaults: factoryExecutionSchema.nullable(),
+  selected: factoryExecutionSchema.nullable(),
+  routing: factoryPickerRoutingSchema.nullable()
+}).strict();
+export type FactoryExecutionOptions = z.infer<typeof factoryExecutionOptionsSchema>;
 export const factoryRpcMethods = {
   factoryGetProject: {
     input: z.object({ projectId: z.string().startsWith('proj_') }).strict(),
     output: z.object({ policy: factoryProjectPolicySchema, status: factoryProjectStatusSchema }).strict()
+  },
+  factoryExecutionOptions: {
+    input: z.object({
+      projectId: z.string().startsWith('proj_'),
+      providerId: z.string().min(1).max(200).nullable().default(null),
+      threadId: z.string().min(1).max(500).nullable().default(null)
+    }).strict(),
+    output: factoryExecutionOptionsSchema
   },
   factorySaveProject: {
     input: factoryProjectPolicySchema.omit({ updatedAt: true }).strict(),
@@ -164,7 +196,8 @@ export const factoryRpcMethods = {
   },
   factoryStartTask: {
     input: factoryIdentitySchema.extend({
-      contextThreadId: z.string().min(1).nullable()
+      contextThreadId: z.string().min(1).nullable(),
+      execution: factoryExecutionSchema.nullable().optional()
     }).strict(),
     output: z.object({ record: factoryRecordSchema }).strict()
   },
@@ -203,6 +236,12 @@ export const factoryRpcMethods = {
       kind: factoryRunKindSchema,
       contextThreadId: z.string().min(1).nullable(),
       retry: z.boolean().default(false)
+    }).strict(),
+    output: z.object({ record: factoryRecordSchema }).strict()
+  },
+  factorySetExecution: {
+    input: factoryVersionInputSchema.extend({
+      execution: factoryExecutionSchema.nullable()
     }).strict(),
     output: z.object({ record: factoryRecordSchema }).strict()
   },

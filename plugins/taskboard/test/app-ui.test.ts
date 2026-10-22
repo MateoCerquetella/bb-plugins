@@ -339,3 +339,12 @@ test('reconciles provider identity from the cached-list response', () => {
   assert.match(app, /const provider = result\.provider/u);
   assert.doesNotMatch(app, /rpc\.call\('status', \{ projectId \}\)/u);
 });
+
+
+test('ticket context divider is keyboard operable and remembers its width', () => {
+  assert.match(app, /className="tb-detail-splitter"/u);
+  assert.match(app, /aria-orientation="vertical"/u);
+  assert.match(app, /taskboard:detail-context-width/u);
+  assert.match(app, /ArrowLeft/u);
+  assert.match(app, /ArrowRight/u);
+});

@@ -80,6 +80,7 @@ import { decodeTicketImage } from './ticket-images-server.js';
 import { createFactoryStore } from './factory/store.js';
 import { createFactoryService } from './factory/service.js';
 import { factoryProjectPolicySchema, type FactoryIdentity } from './factory/contract.js';
+import { threadExecution } from './factory/native-dispatch.js';
 import { factoryKey } from './factory/state.js';
 import { createEmpiricalObservationQueue } from './empirical/serial.js';
 import { hostContract } from './preparation/contract.js';
@@ -2155,6 +2156,29 @@ export default async function plugin(bb: BbPluginApi) {
       bb.realtime.publish('taskboard:factory', { projectId: input.projectId });
       return { policy, status: factoryStore.projectStatus(input.projectId, input.provider) };
     },
+    async factoryExecutionOptions(input) {
+      await assertProjectExists(input.projectId);
+      const provider = projectConfig(input.projectId, true).source;
+      const policy = factoryStore.getProjectPolicy(input.projectId, provider);
+      const context = input.threadId
+        ? await bb.sdk.threads.get({ threadId: input.threadId }).catch(() => null)
+        : null;
+      const routing = context?.environmentId
+        ? { kind: 'environment' as const, environmentId: context.environmentId }
+        : null;
+      const [projectDefaults, threadDefaults] = await Promise.all([
+        bb.sdk.projects.defaultExecutionOptions({ projectId: input.projectId }).catch(() => null),
+        context && context.projectId === input.projectId && !context.deletedAt && !context.archivedAt
+          ? bb.sdk.threads.defaultExecutionOptions({ threadId: context.id }).then(value =>
+              value ? threadExecution(context.providerId, value) : null).catch(() => null)
+          : Promise.resolve(null)
+      ]);
+      return {
+        defaults: threadDefaults ?? projectDefaults ?? null,
+        selected: policy.execution ?? null,
+        routing
+      };
+    },
     async factoryScanProject(input) {
       await assertProjectExists(input.projectId);
       await factory.scan(input.projectId);
@@ -2183,7 +2207,7 @@ export default async function plugin(bb: BbPluginApi) {
     async factoryStartTask(input) {
       await assertProjectExists(input.projectId);
       const item = await getLiveItem(input.projectId, input.source, input.locator);
-      return { record: await factory.startTask(item, input.contextThreadId) };
+      return { record: await factory.startTask(item, input.contextThreadId, input.execution) };
     },
     async factoryRetryStatus(input) {
       await assertProjectExists(input.projectId);
@@ -2226,6 +2250,11 @@ export default async function plugin(bb: BbPluginApi) {
       await assertProjectExists(input.projectId);
       const item = await getLiveItem(input.projectId, input.source, input.locator);
       return { record: await factory.start(item, input) };
+    },
+    async factorySetExecution(input) {
+      await assertProjectExists(input.projectId);
+      const item = await getLiveItem(input.projectId, input.source, input.locator);
+      return { record: await factory.setExecution(item, input.expectedVersion, input.execution) };
     },
     async factorySavePlan(input) {
       await assertProjectExists(input.projectId);
@@ -2572,7 +2601,8 @@ export default async function plugin(bb: BbPluginApi) {
             }
             result = await handlers.factorySaveProject({
               projectId: project.id, provider: projectConfig(project.id, true).source,
-              enabled: verb === 'enable', intake: 'todo', maxConcurrent: concurrency
+              enabled: verb === 'enable', intake: 'todo', maxConcurrent: concurrency,
+              execution: snapshot.policy.execution ?? null
             });
           } else if (verb === 'scan' && args.positionals.length <= 1) {
             const scanned = await handlers.factoryScanProject({ projectId: project.id });

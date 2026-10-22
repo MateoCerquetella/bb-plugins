@@ -59,6 +59,11 @@ test('improvement asks for concrete concise scope without invented implementatio
   assert.match(prompt, /imperative verb/);
   assert.match(prompt, /Do not invent root causes/);
   assert.match(prompt, /ceiling, not a target/);
+  const detailed = ticketImprovementPrompt(input, 'detailed');
+  assert.match(detailed, /detailed ticket/);
+  assert.match(detailed, /acceptance criteria/i);
+  assert.match(detailed, /220-400 words/);
+  assert.notEqual(detailed, prompt);
 });
 
 function fixture() {
@@ -68,7 +73,11 @@ function fixture() {
   const archives: string[] = [];
   const threads = {
     spawn: async (args: any) => { spawns.push(args); return { id: 'helper' }; },
-    get: async () => ({ projectId: identity.projectId, status: 'idle' }),
+    get: async ({ threadId }: any) => ({ id: threadId, projectId: identity.projectId,
+      providerId: 'claude', status: 'idle', deletedAt: null, archivedAt: null }),
+    defaultExecutionOptions: async () => ({
+      model: 'thread-model', permissionMode: 'auto', reasoningLevel: 'high', serviceTier: 'default'
+    }),
     output: async () => ({ output: '{"title":"Fix save","description":"Repair the save button."}' }),
     stop: async ({ threadId }: any) => { stops.push(threadId); },
     archive: async ({ threadId }: any) => { archives.push(threadId); }
@@ -116,6 +125,18 @@ test('concurrent starts spawn once with project defaults and only validated text
   assert.equal(result.status, 'completed');
   assert.deepEqual(result.draft, { title: 'Fix save', description: 'Repair the save button.' });
   assert.deepEqual(f.archives, ['helper']);
+});
+
+test('improvement uses the selected thread model and forwards the detail mode', async () => {
+  const f = fixture();
+  await f.service.start({
+    ...input, detail: 'detailed', contextThreadId: 'thr_new'
+  });
+  assert.equal(f.spawns.length, 1);
+  assert.equal(f.spawns[0].providerId, 'claude');
+  assert.equal(f.spawns[0].model, 'thread-model');
+  assert.equal(f.spawns[0].executionInputSources.model, 'explicit');
+  assert.match(f.spawns[0].prompt, /detailed ticket/);
 });
 
 test('cancellation before start prevents dispatch, including after service reload', async () => {

@@ -141,6 +141,58 @@ workflow. Automatic processing MUST NOT merge, deploy, or close tracker tickets.
 
 ## ADDED Requirements
 
+### Requirement: Explicit AI selection
+
+The factory MUST expose one AI picker in project settings and the new-task
+dialog. The picker MUST show provider logos and model names. A project policy
+and a task MAY each persist an explicit AI choice: provider, model, reasoning
+level, permission mode, and service tier. Manual Start task, coordinator
+creation, and every new stage session MUST resolve execution as task choice,
+then project policy choice, then native project defaults, and MUST pass an
+explicit choice as caller-explicit inputs. The factory MUST fail with an
+actionable picker message when no choice or default exists.
+
+#### Scenario: Operator chooses the factory AI
+
+- GIVEN a project factory with available BB providers
+- WHEN the operator selects a provider, model, reasoning level, permission mode,
+  and service tier and saves
+- THEN Taskboard persists that choice for the project
+- AND the next coordinator, Investigation, Plan, Build, or Review session is
+  spawned with that exact execution and caller-explicit sources.
+
+#### Scenario: New task overrides the project AI
+
+- GIVEN a project policy with one AI choice
+- WHEN the operator picks a different AI in the new-task dialog and chooses
+  Start now
+- THEN Taskboard persists the task-scoped choice
+- AND that task's coordinator and stages use the task choice
+- AND another ticket still uses the project policy choice.
+
+#### Scenario: Provider and model presentation
+
+- GIVEN a project with several available providers
+- WHEN the picker opens in settings or the new-task dialog
+- THEN each provider option shows its logo and display name
+- AND the selected provider and model are summarized together
+- AND a provider with no logo still has a readable fallback label.
+
+#### Scenario: No explicit choice
+
+- GIVEN no task choice and no saved factory policy choice
+- WHEN a project has native execution defaults
+- THEN a new session uses those defaults as before
+- AND when the project has no defaults the action fails with a message that
+  tells the operator to choose an AI in the picker.
+
+#### Scenario: Changing the choice mid-workflow
+
+- GIVEN an existing coordinator or stage session
+- WHEN the operator saves a different project or task AI choice
+- THEN the existing native session keeps its original execution
+- AND only new sessions use the updated choice.
+
 ### Requirement: Software factory operator console
 
 Taskboard MUST present ticket factory work as one operator console rather than
@@ -222,3 +274,27 @@ block work.
   technology
 - AND explicit historical selection and disclosure state remain stable across
   data refresh while their underlying records remain present.
+
+
+### Requirement: Ticket drafting uses the selected AI and detail
+
+Improve title & description MUST offer Concise and Detailed rewriting. The
+hidden helper MUST use the AI selected in the new-task dialog, then the current
+thread's execution, then project defaults. It MUST rewrite text only and MUST
+NOT change the factory policy or the task's saved AI choice.
+
+#### Scenario: Concise or detailed rewrite
+
+- GIVEN a rough title and description and an available AI
+- WHEN the operator chooses Concise or Detailed and selects Improve
+- THEN the helper runs with the selected AI
+- AND Concise returns a short actionable draft
+- AND Detailed returns problem, outcome, scope, acceptance criteria, and risks
+- AND the helper does not modify the repository or create a ticket.
+
+#### Scenario: No task or thread choice
+
+- GIVEN the new-task picker is empty and the current thread has no execution
+- WHEN the operator improves the draft
+- THEN the helper falls back to the project's native execution defaults
+- AND when none exists it fails with an actionable model message.

@@ -174,12 +174,72 @@ explicit history survives a simulated refresh without hiding current state.
   when configured prerequisites and the authorized delivery ceiling permit it.
   Never infer native behavior from mocks or claim a gate before it runs.
 
+## 6. Add explicit project AI selection
+
+- In `plugins/taskboard/factory/contract.ts`, add the optional full execution
+  choice to the project policy and one read-only RPC input/output for providers,
+  models, permission modes, service tiers, project defaults, and the saved
+  choice. Keep `execution` nullable with a null default so stored policies parse.
+- In `plugins/taskboard/factory/service.ts` and
+  `plugins/taskboard/factory/coordinator.ts`, resolve `policy.execution ??
+  projectDefaults` in one helper. Pass a saved choice to every new
+  `threads.spawn` with explicit `executionInputSources`; keep the existing
+  defaults path unchanged and return the actionable settings error before native
+  calls when both are absent. Reuse the same resolved execution for the
+  coordinator and all child stages. Do not mutate existing sessions.
+- In `plugins/taskboard/factory/store.ts`, include `execution` in the admission
+  policy fingerprint so a stale choice cannot drive intake.
+- In `plugins/taskboard/server.ts`, implement the picker RPC with
+  `sdk.providers.list`, `sdk.providers.models`, and
+  `sdk.projects.defaultExecutionOptions`, and preserve the saved choice in the
+  CLI `factory enable|pause` path.
+- In `plugins/taskboard/factory/project-settings.tsx`, add provider, model,
+  reasoning, permission-mode, and service-tier selects with a
+  `Use project defaults` clear action. Reload models when the provider changes,
+  hide unsupported reasoning/service-tier controls, and show the host model-load
+  error without discarding the saved choice. Keep narrow rows stacked.
+- Update `plugins/taskboard/test/factory-preview-runtime.tsx` and
+  `plugins/taskboard/scripts/factory-browser-check.mjs` with picker responses,
+  selection, save, and desktop/mobile assertions.
+- Add focused tests for policy round-trip, admission fingerprint, explicit
+  spawn inputs, native-default fallback, missing-both failure, and CLI
+  preservation.
+
+Observable check: selecting a provider and model in Project Manage makes Start
+task and automatic stages spawn with that AI, and a project with neither a saved
+choice nor native defaults shows the settings guidance instead of an opaque
+dispatch failure.
+
+## 7. Share the AI picker and improve the new-task flow
+
+- Extract the AI controls from `factory/project-settings.tsx` into
+  `factory/execution-picker.tsx`. Render provider `logoUrl` images with a text
+  fallback and show provider plus model in the summary.
+- Extend `factoryExecutionOptions` with an optional `threadId` and prefer the
+  thread's resolved execution for its defaults. Keep the project policy choice
+  as `selected` and the project defaults as the fallback.
+- Use the shared picker in `CreateIssueDialog` with the current thread id. Add
+  a task-scoped choice to `FactoryRecord`, `factoryStartTask`, and the service;
+  resolve `record.execution ?? policy.execution ?? projectDefaults`.
+- Add Concise/Detailed to `ticket-improvement.ts`, the RPC, and the helper
+  service. Resolve helper execution from the task choice, then the thread
+  execution, then project defaults.
+- Add the Concise/Detailed control beside **Improve title & description** and
+  pass the dialog's AI choice and thread id. Do not mutate the factory policy.
+- Update the preview fixture and browser check for provider logos, the new-task
+  picker, Concise/Detailed, and desktop/mobile layout.
+
+Observable check: the same picker appears in settings and the new-task dialog,
+provider logos are visible, a task-scoped AI runs that task, and the improvement
+helper uses the selected model with the chosen detail level.
+
 ## Affected tests
 
 - plugins/taskboard/test/factory.test.ts
 - plugins/taskboard/test/contract.test.ts
 - plugins/taskboard/test/factory-navigation.test.ts
 - plugins/taskboard/test/settings.test.ts
+- plugins/taskboard/test/ticket-improvement.test.ts
 - plugins/taskboard/test/app-ui.test.ts
 - plugins/taskboard/scripts/factory-browser-check.mjs
 - plugins/taskboard/scripts/factory-native-smoke.ts

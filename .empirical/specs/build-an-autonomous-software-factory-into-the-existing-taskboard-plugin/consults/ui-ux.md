@@ -1,70 +1,103 @@
-# UI/UX Specialist Consult
+# UI/UX consult: explicit factory AI selection
 
-- specialist: `ui-ux`
-- verdict: `advisory`
+Specialist: ui-ux
+Verdict: advisory
+Scope read: spec.md, mockups/project-manage-factory.md, grouped-ticket-team.md
 
-## Review Scope
+## Findings
 
-Reviewed `spec.md`, every file under `mockups/`, and three independent
-operator-console prototypes against the production factory-state and action
-inventory. Candidate C's ticket-first console was verified in its prototype at
-1280, 800, and 390 px. This consult does not verify the production
-implementation.
+- severity: medium
+  category: discoverability
+  location: mockups/project-manage-factory.md, Configured factory
+  recommendation: Keep the AI choice inside the existing Project Manage factory
+  block instead of a separate page. The operator already saves enablement and
+  concurrency there; splitting execution into another surface would hide the
+  setting that unblocks a failed Start task.
 
-## Assessment
+- severity: medium
+  category: failure recovery
+  location: spec.md AC-8 and AC-UI-1
+  recommendation: Distinguish "No AI selected / using project defaults" from
+  "No project defaults". The first is a valid state, the second is the failure
+  the operator hit. Show the second beside the picker with the same actionable
+  wording shown on a failed Start task.
 
-The revised contract now specifies the operator experience missing from the
-earlier grouped-team mockup. Candidate C is the selected base. Its current-state
-band and primary action lead the page, one stage rail replaces the team tree
-plus lifecycle rail, attempts are scoped to their stage, and one evidence pane
-owns run detail. Ticket context stays visible in a desktop rail and becomes a
-Factory/Ticket switch at narrow widths.
+- severity: low
+  category: conditional controls
+  location: mockups/project-manage-factory.md, narrow viewport
+  recommendation: Hide reasoning when the model reports no supported efforts and
+  hide service tier when the provider capabilities exclude it. Do not leave
+  disabled empty selects that look broken.
 
-`mockups/project-manage-factory.md` now covers saved enablement, provider
-identity, the todo intake policy, bounded concurrency, queue and active counts,
-last scan results, and workflow blockers. Saving the enable switch implements
-pause and resume without introducing a second setting. Unsaved and failed-save
-states remain distinct from the persisted running state. Healthy idle, paused,
-never-enabled, missing-configuration, provider-error, and provider-change states
-have explicit text. Unknown and cached queue counts do not imply current
-eligibility, and successful discovery does not hide blocked workflows.
+- severity: low
+  category: change semantics
+  location: spec.md AC-8
+  recommendation: State in the panel that a new AI choice applies to new
+  sessions only. Operators otherwise expect an in-flight stage to switch models.
 
-The current production layout repeats the same state through a team disclosure,
-phase rail, global session selector, run detail, and separate Empirical block.
-That duplication makes the operator reconcile several partial views and pushes
-ticket intent below factory history. The selected console removes those
-parallel representations. Coordinator recovery and Empirical observations move
-to Workspace and are promoted into the summary only when they prevent work.
+- severity: low
+  category: responsive layout
+  location: mockups/project-manage-factory.md, Narrow viewport
+  recommendation: Stack label and control rows for the picker at narrow widths
+  and let long model display names wrap; the existing labeled-row pattern is
+  sufficient and no new modal is needed.
 
-Prototype checks at 1280, 800, and 390 px established no horizontal overflow,
-the primary action above the fold, and working narrow-view switching, stage
-selection, and historical-attempt selection. These are prototype observations,
-not production acceptance evidence.
+## Missing from the criteria before this pass
 
-## Prior Findings
+- The spec did not say what happens when the operator has no explicit choice and
+  the project also has no native defaults. Added to AC-8.
+- The spec did not say whether changing the picker rewrites running sessions.
+  Added to AC-8 and the mockup copy.
+- The project Manage criteria did not mention the AI controls at all. Added to
+  AC-UI-1 and the mockup.
 
-- UI-UX-1 resolved by the new Project Manage factory surface and its distinct
-  saved, paused, configuration, and failure states.
-- UI-UX-2 resolved by explicit provider-read, stale-eligibility, scope-change,
-  and closure-change presentations above each affected ticket group.
-- UI-UX-3 resolved by wrapping rules for titles, identifiers, provider names,
-  and reasons, plus stacked narrow layouts that preserve readable actions.
-- UI-UX-4 resolved by the keyboard disclosure contract, visible action focus,
-  and expansion retention across data refresh.
-- UI-UX-5 resolved by replacing duplicate workflow presentations with one stage
-  rail, one selected-run pane, and a distinct current-state summary.
-- UI-UX-6 resolved by keeping ticket intent alongside factory evidence on wide
-  screens and one keyboard-accessible view switch away on narrow screens.
+## Second pass: shared picker and new-task flow
 
-## Remaining Findings
+Specialist: ui-ux
+Verdict: advisory
+Scope read: spec.md, mockups/project-manage-factory.md, mockups/new-task-ai.md
 
-None at specification and mockup scope.
+### Findings
 
-## Implementation Verification
+- severity: medium
+  category: recognition
+  location: spec.md AC-8 and mockups/new-task-ai.md
+  recommendation: Show provider logos in both the closed select and the summary.
+  Operators recognize the logo faster than a provider name, and a missing image
+  must degrade to the readable name rather than an empty tile.
 
-The production implementation must still prove all preserved action states,
-desktop and mobile composition, exact plan-approval guards, long-content
-wrapping, visible keyboard focus, selection retention during refresh, and
-thread navigation. It must also demonstrate that ticket detail has only one
-workflow representation and that thread-dialog progress remains compact. This
-consult does not establish those runtime acceptance checks.
+- severity: medium
+  category: consistency
+  location: spec.md AC-UI-1
+  recommendation: Reuse one picker component instead of two copies. Two surfaces
+  that drift in provider support or reset semantics are worse than one surface
+  with a slightly longer dialog.
+
+- severity: medium
+  category: precedence
+  location: spec.md AC-8 and AC-9
+  recommendation: State the resolution order in the dialog: task choice, then
+  project policy, then native defaults. Without that, a project-level change
+  silently surprising an already-created task is hard to diagnose.
+
+- severity: low
+  category: control clarity
+  location: mockups/new-task-ai.md
+  recommendation: Keep Concise/Detailed as a two-option select directly beside
+  Improve, not a separate settings switch. The choice belongs to the action, not
+  to the ticket.
+
+- severity: low
+  category: feedback
+  location: mockups/new-task-ai.md
+  recommendation: While the helper runs, show that it is using the task/thread AI
+  in the status line. The operation is slow enough that the model choice should
+  remain visible.
+
+### Missing from the criteria before this pass
+
+- The spec did not say the new-task dialog shares the picker. Added to AC-8 and
+  AC-UI-1.
+- The spec did not define task-over-policy precedence. Added to AC-8.
+- The spec did not define Concise versus Detailed output. Added to AC-9.
+- The improvement helper had no execution-resolution rule. Added to AC-9.

@@ -33,5 +33,6 @@
     "quick": 10080,
     "complex": 10080
   },
-  "engineeringSkills": []
+  "engineeringSkills": [],
+  "defaultMode": "direct"
 }

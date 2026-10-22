@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "sequence": 49,
+  "previousDigest": "sha256:43ff398c2fd1817d819f3625ee8209da76d0e3ecacbb97212c4f95588ad1110a",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Designed optional persisted factory execution selection with explicit executionInputSources, native-default fallback, provider/model listing RPC, Manage controls, CLI preservation, and focused verification. Recorded D-004.",
+  "createdAt": "2026-10-20T20:06:46.206Z",
+  "stateBeforeDigest": "sha256:9899f4c5e63511318de7fad649355ea250e693547ae559580e118b0f483dc69a",
+  "stateAfterDigest": "sha256:7dda057281c785f889b594c0073bcddfc9331938eec70af4dfaca2d3d7c54d62",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 49,
+    "activeFeature": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin",
+    "request": "Build an autonomous software factory into the existing Taskboard plugin, inspired by https://github.com/lpbaril/bb-plugin-factory. Make Linear, Jira, or the configured issue provider the source of truth. The factory should continuously select eligible tickets, start and supervise BB agent work, avoid duplicate dispatch, recover after restart, and reflect progress back through the existing Taskboard provider/status model. Reuse the current taskboard architecture and keep the first implementation focused and operable.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "plan",
+    "status": "waiting",
+    "repairAttempts": 1,
+    "message": "Designed optional persisted factory execution selection with explicit executionInputSources, native-default fallback, provider/model listing RPC, Manage controls, CLI preservation, and focused verification. Recorded D-004.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:24374eb1ff93a669e3b0f15a0e8a1dc784a1e02e1aae777b027e43e4a9221e3f",
+    "approvedSpecRevision": 47,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:6c495cf036405b8b8712861db2c9bd837a9223552b88837b4fbb240418c8e909",
+    "impactDigest": "sha256:3b1f1bda9a9699c5aed42506511efb1ee8f26c95c985cda5ebaed43154a5b479",
+    "capabilityClaimId": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin-63a17a591999",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-20T20:06:46.206Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin-63a17a591999",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_4crs23q8tu-1/bb-plugins",
+      "worktreeId": "sha256:97b93e0724b7096066b8243160868d9560541df602c0b09b923e7a1473e60397",
+      "baseCommit": "85d1b0655b9883adf940eab0d82d7bd95c956e28",
+      "baseTree": "a25cd39c6da0e7c195c6eabcdbd1b94b045ee2d4",
+      "bases": {
+        "taskboard-autonomous-factory": {
+          "capability": "taskboard-autonomous-factory",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "explicit project factory admission": null,
+            "one coordinator per ticket team": null,
+            "bounded and observable automation": null,
+            "preserve execution and acceptance boundaries": null,
+            "explicit ai selection": null,
+            "software factory operator console": null
+          }
+        }
+      },
+      "capabilities": [
+        "taskboard-autonomous-factory"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-19T18:18:31.861Z",
+      "heartbeatAt": "2026-10-20T20:06:19.566Z",
+      "digest": "sha256:e09946060a1718aab51fc0e78cbd12ad9618781a9eab786e5f7d6c18450385ca"
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 9,
+      "capabilities": 1,
+      "reason": "The new AI selection is part of the same atomic factory capability: policy schema, persistence, dispatch, CLI, Manage UI, and verification share one execution path. Splitting it would ship either an inert picker or a dispatch change without an operator surface.",
+      "actor": "agent",
+      "revision": 47
+    },
+    "trackerGeneration": 10,
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 10,
+      "awaitingFeedback": false,
+      "contractRevision": 45,
+      "riskRequest": "Let users choose which AI (provider and model, plus reasoning, permission mode, and service tier) the Taskboard factory uses for its coordinator and stage sessions. Persist the choice in the project factory policy, expose it in project Manage and the CLI, and use it for manual Start task and automatic intake, falling back to the project native execution defaults only when no explicit choice exists. Today Start task from Taskboard fails with 'Choose native BB model and execution settings for this project first' when a project has no defaults and offers no way to choose."
+    },
+    "budgetExtensionMinutes": 240,
+    "reviewFirst": true
+  },
+  "digest": "sha256:b2c2360b369447654eca111f14d9067232f94635f965ba6725aae858688e916b"
+}

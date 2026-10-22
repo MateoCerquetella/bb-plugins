@@ -84,6 +84,116 @@ test('factory policy defaults disabled and durable admission is idempotent and c
     kind: 'paused', policy, active: 1, queue: null, lastScan: null
   });
 });
+test('explicit factory AI choice round-trips and changes the admission fingerprint', () => {
+  const store = createFactoryStore(new Database(':memory:'));
+  const execution = {
+    providerId: 'claude', model: 'claude-sonnet', permissionMode: 'accept-edits' as const,
+    reasoningLevel: 'high' as const, serviceTier: 'fast' as const
+  };
+  const initial = store.getProjectPolicy(item.bbProjectId, item.source);
+  assert.equal(initial.execution, null);
+  const policy = store.saveProjectPolicy({ ...initial, enabled: true, maxConcurrent: 5, execution });
+  assert.deepEqual(store.getProjectPolicy(item.bbProjectId, item.source).execution, execution);
+  assert.equal(store.admit({
+    projectId: item.bbProjectId, source: item.source, locator: item.locator, scopeDigest: 'scope'
+  }, policy).kind, 'admitted');
+  const changed = store.saveProjectPolicy({ ...policy, execution: { ...execution, model: 'claude-opus' } });
+  assert.equal(store.admit({
+    projectId: item.bbProjectId, source: item.source, locator: 'second', scopeDigest: 'scope'
+  }, policy).kind, 'disabled');
+  assert.equal(store.admit({
+    projectId: item.bbProjectId, source: item.source, locator: 'third', scopeDigest: 'scope'
+  }, changed).kind, 'admitted');
+});
+
+test('saved factory AI reaches coordinator and stage spawns as explicit execution', async () => {
+  const f = fixture();
+  f.projectDefaults(null);
+  const execution = {
+    providerId: 'claude', model: 'claude-sonnet', permissionMode: 'accept-edits' as const,
+    reasoningLevel: 'high' as const, serviceTier: 'fast' as const
+  };
+  f.store.saveProjectPolicy({
+    ...f.store.getProjectPolicy(item.bbProjectId, item.source), enabled: true, execution
+  });
+  await f.service.startTask(item, null);
+  assert.equal(f.spawnInputs.length, 2);
+  for (const spawn of f.spawnInputs) {
+    assert.equal(spawn.providerId, 'claude');
+    assert.equal(spawn.model, 'claude-sonnet');
+    assert.deepEqual(spawn.executionInputSources, {
+      providerId: 'explicit', model: 'explicit', permissionMode: 'explicit',
+      reasoningLevel: 'explicit', serviceTier: 'explicit'
+    });
+  }
+});
+
+test('unset factory AI falls back to project defaults and both missing blocks dispatch', async () => {
+  const fallback = fixture();
+  fallback.projectDefaults({
+    providerId: 'codex', model: 'gpt-5', permissionMode: 'auto',
+    reasoningLevel: 'low', serviceTier: 'default'
+  });
+  fallback.store.saveProjectPolicy({
+    ...fallback.store.getProjectPolicy(item.bbProjectId, item.source), enabled: true
+  });
+  await fallback.service.startTask(item, null);
+  assert.equal(fallback.spawnInputs.length, 2);
+  for (const spawn of fallback.spawnInputs) {
+    assert.equal(spawn.providerId, 'codex');
+    assert.equal(spawn.model, 'gpt-5');
+    assert.equal(spawn.executionInputSources, undefined);
+  }
+  const missing = fixture();
+  missing.projectDefaults(null);
+  missing.store.saveProjectPolicy({
+    ...missing.store.getProjectPolicy(item.bbProjectId, item.source), enabled: true
+  });
+  await assert.rejects(missing.service.startTask(item, null),
+    /Choose a provider and model in factory settings before starting work/);
+  assert.equal(missing.spawnInputs.length, 0);
+});
+
+test('a task-scoped AI overrides the project policy for its coordinator and stage', async () => {
+  const f = fixture();
+  f.projectDefaults(null);
+  const policyExecution = {
+    providerId: 'codex', model: 'gpt-5', permissionMode: 'auto' as const,
+    reasoningLevel: 'low' as const, serviceTier: 'default' as const
+  };
+  f.store.saveProjectPolicy({
+    ...f.store.getProjectPolicy(item.bbProjectId, item.source), enabled: true, execution: policyExecution
+  });
+  const taskExecution = {
+    providerId: 'claude', model: 'claude-sonnet', permissionMode: 'accept-edits' as const,
+    reasoningLevel: 'high' as const, serviceTier: 'fast' as const
+  };
+  const record = await f.service.startTask(item, null, taskExecution);
+  assert.deepEqual(record.execution, taskExecution);
+  assert.equal(f.spawnInputs.length, 2);
+  for (const spawn of f.spawnInputs) {
+    assert.equal(spawn.providerId, 'claude');
+    assert.equal(spawn.model, 'claude-sonnet');
+  }
+});
+
+test('a null task choice falls back to the current thread execution', async () => {
+  const f = fixture();
+  f.projectDefaults(null);
+  (f.sdk.threads as any).defaultExecutionOptions = async () => ({
+    model: 'thread-model', permissionMode: 'auto', reasoningLevel: 'high', serviceTier: 'default'
+  });
+  (f.sdk.threads as any).get = async ({ threadId }: { threadId: string }) => ({
+    id: threadId, status: 'idle', projectId: item.bbProjectId, environmentId: 'env_test',
+    providerId: 'claude', archivedAt: null, deletedAt: null, parentThreadId: null,
+    title: null, createdAt: Date.now()
+  });
+  const record = await f.service.startTask(item, 'thr_new', null);
+  assert.equal(record.execution?.providerId, 'claude');
+  assert.equal(record.execution?.model, 'thread-model');
+  assert.equal(f.spawnInputs[0]?.providerId, 'claude');
+});
+
 test('two database connections preserve claims, capacity, and policy after reopen', () => {
   const root = mkdtempSync(join(tmpdir(), 'taskboard-admission-'));
   const path = join(root, 'factory.sqlite');
@@ -183,6 +293,11 @@ function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
   let progressWrites = 0;
   let failProgress = false;
   let output = 'Observed repository findings';
+  let projectDefaults: {
+    providerId: string; model: string; permissionMode: string;
+    reasoningLevel: string; serviceTier: string;
+  } | null = { providerId: 'codex', model: 'test', permissionMode: 'accept-edits',
+    reasoningLevel: 'medium', serviceTier: 'default' };
   let threadStatus = 'idle';
   const threadStatuses = new Map<string, string>();
   const archived = new Set<string>();
@@ -200,7 +315,8 @@ function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
   let managed = true;
   let spawnInput: unknown;
   let currentThreadId = 'thr_native';
-  const spawnInputs: { title: string; parentThreadId?: string; environment: { type: string; environmentId?: string } }[] = [];
+  const spawnInputs: { title: string; parentThreadId?: string; providerId?: string; model?: string;
+    executionInputSources?: Record<string, string>; environment: { type: string; environmentId?: string } }[] = [];
   const parents = new Map<string, string | null>();
   const titles = new Map<string, string>();
   const createdAt = new Map<string, number>();
@@ -276,7 +392,7 @@ function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
       } },
       output: async () => ({ output })
     },
-    projects: { defaultExecutionOptions: async () => ({ model: 'test', providerId: 'codex' }) },
+    projects: { defaultExecutionOptions: async () => projectDefaults },
     environments: { get: async ({ environmentId }: { environmentId: string }) => {
       if (failEnvironmentGet) throw new Error('Workspace lookup temporarily unavailable');
       return {
@@ -303,6 +419,7 @@ function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
     archived, deleted, unarchives: () => unarchives,
     onUnarchive: (callback: () => void) => { onUnarchive = callback; },
     onExecutionOptions: (callback: () => void) => { onExecutionOptions = callback; },
+    projectDefaults: (value: typeof projectDefaults) => { projectDefaults = value; },
     environmentStatus: (value: string) => { environmentStatus = value; },
     failEnvironmentGet: (value = true) => { failEnvironmentGet = value; },
     buildEnvironment: (value: string) => { buildEnvironment = value; },

@@ -9,8 +9,10 @@ import {
   useRef,
   useState,
   useSyncExternalStore,
+  type CSSProperties,
   type DragEvent as ReactDragEvent,
   type FormEvent,
+  type PointerEvent as ReactPointerEvent,
   type KeyboardEvent as ReactKeyboardEvent,
   type ReactNode
 } from 'react';
@@ -157,6 +159,8 @@ import {
 } from './composer-handoff.js';
 import { FactoryProgress, FactoryThreadProgress, StartTaskButton } from './factory/app.js';
 import { FactoryProjectSettings } from './factory/project-settings.js';
+import { ExecutionPicker } from './factory/execution-picker.js';
+import type { FactoryExecution } from './factory/contract.js';
 import { TaskboardResultDirective } from './factory/result-card.js';
 import { consumeTaskboardOpen, TASKBOARD_OPEN_EVENT } from './factory/navigation.js';
 import './app.css';
@@ -727,6 +731,9 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
   const [improving, setImproving] = useState(false);
   const [improvementError, setImprovementError] = useState<string | null>(null);
   const [improvementUncertain, setImprovementUncertain] = useState(false);
+  const [improveDetail, setImproveDetail] = useState<'concise' | 'detailed'>('concise');
+  const [taskExecution, setTaskExecution] = useState<FactoryExecution | null>(null);
+  const executionTouched = useRef(false);
   const [originalDraft, setOriginalDraft] = useState<{ title: string; description: string } | null>(null);
   const improvementRef = useRef<{ projectId: string; requestId: string } | null>(null);
   const improvementEpoch = useRef(0);
@@ -758,6 +765,11 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
   }
 
   useEffect(() => {
+    if (open) {
+      executionTouched.current = false;
+      setTaskExecution(null);
+      setImproveDetail('concise');
+    }
     setImproving(false);
     setImprovementError(null);
     setImprovementUncertain(false);
@@ -800,7 +812,11 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
     setImprovementError(null);
     setOriginalDraft(null);
     try {
-      let result = await rpc.call('improveTicket', { ...request, ...before });
+      let result = await rpc.call('improveTicket', {
+        ...request, ...before, detail: improveDetail,
+        contextThreadId: bbContext.projectId === projectId ? bbContext.threadId : null,
+        execution: taskExecution
+      });
       const deadline = Date.now() + 5 * 60_000;
       while (result.status === 'running' && improvementRef.current === request) {
         if (Date.now() >= deadline) {
@@ -1055,7 +1071,9 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
       try {
         if (startNow) {
           const { record } = await rpc.call('factoryStartTask', {
-            ...identity, contextThreadId: bbContext.projectId === identity.projectId ? bbContext.threadId : null
+            ...identity,
+            contextThreadId: bbContext.projectId === identity.projectId ? bbContext.threadId : null,
+            execution: taskExecution
           });
           const run = record.runs.at(-1);
           if (record.automationError || run?.error) toast.warning(record.automationError ?? run!.error!);
@@ -1142,7 +1160,7 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
         <Textarea
           id={`${formId}-description`}
           value={description}
-          rows={9}
+          rows={5}
           maxLength={100_000}
           placeholder="Add context, acceptance criteria, or links…"
           disabled={creating || improving}
@@ -1157,6 +1175,24 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
           text.
         </p>
       </div>
+      {projectId ? <div className="rounded-lg border border-border bg-[color-mix(in_oklch,var(--canvas)_97%,var(--ink)_3%)] p-3">
+        <ExecutionPicker
+          projectId={projectId}
+          value={taskExecution}
+          onChange={next => { executionTouched.current = true; setTaskExecution(next); }}
+          threadId={bbContext.projectId === projectId ? bbContext.threadId : null}
+          disabled={creating || improving}
+          showSummary
+          summaryTitle="AI for this task"
+          compact
+          defaultsLabel={bbContext.projectId === projectId ? 'Thread default' : 'Project default'}
+          resetLabel="Use thread defaults"
+          onDefaults={defaults => { if (!executionTouched.current) setTaskExecution(defaults); }}
+        />
+        <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
+          Used by Improve title &amp; description and by Start now.
+        </p>
+      </div> : null}
       <div className="grid gap-2">
         <div className="flex items-center gap-2">
           <Button type="button" size="sm" variant="ghost" disabled={creating || improving || readingImages}
@@ -1181,6 +1217,16 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
         {imageError && <p role="alert" className="text-xs text-destructive">{imageError}</p>}
       </div>
       <div className="flex flex-wrap items-center gap-2" aria-busy={improving}>
+        <span className="text-xs text-muted-foreground">Rewrite</span>
+        <Select value={improveDetail} onValueChange={value => setImproveDetail(value as 'concise' | 'detailed')}>
+          <SelectTrigger className="h-8 w-28" aria-label="Improvement detail" disabled={creating || improving}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="concise">Concise</SelectItem>
+            <SelectItem value="detailed">Detailed</SelectItem>
+          </SelectContent>
+        </Select>
         <Button type="button" size="sm" variant="ghost"
           disabled={!improving && (creating || createOutcomeUncertain || improvementUncertain ||
             !projectId || !(title.trim() || description.trim()))}
@@ -1472,7 +1518,7 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
               </p>
             ) : null}
 
-            <DialogFooter className="border-t border-border-hairline pt-4">
+            <DialogFooter className="sticky bottom-0 z-10 -mx-4 -mb-[max(1rem,env(safe-area-inset-bottom))] border-t border-border-hairline bg-background px-4 py-3 sm:-mx-6 sm:-mb-6 sm:px-6">
               <Button
                 type="button"
                 variant="ghost"
@@ -5341,6 +5387,11 @@ function TrackerDetail({
     WorkItemFieldMutation['field'] | null
   >(null);
   const [submittingComment, setSubmittingComment] = useState(false);
+  const [contextWidth, setContextWidth] = useState(340);
+  const [resizingContext, setResizingContext] = useState(false);
+  const contextWidthRef = useRef(340);
+  const resizingContextRef = useRef(false);
+  const workbenchRef = useRef<HTMLDivElement>(null);
   const requestRevisionRef = useRef(0);
 
   const load = useCallback(async () => {
@@ -5385,6 +5436,52 @@ function TrackerDetail({
       requestRevisionRef.current += 1;
     };
   }, [load, loadInspector, refreshGeneration]);
+  useEffect(() => {
+    let saved = 340;
+    try {
+      const stored = Number(window.localStorage.getItem(`taskboard:detail-context-width:${route.projectId}`));
+      if (Number.isFinite(stored)) saved = Math.min(Math.max(stored, 260), 760);
+    } catch { /* Storage can be unavailable; keep the default. */ }
+    contextWidthRef.current = saved;
+    setContextWidth(saved);
+  }, [route.projectId]);
+  function resizeContext(next: number) {
+    const workbench = workbenchRef.current;
+    const width = workbench?.getBoundingClientRect().width ?? 0;
+    const max = width > 0 ? Math.max(260, width - 332) : 760;
+    const clamped = Math.round(Math.min(Math.max(next, 260), max));
+    contextWidthRef.current = clamped;
+    setContextWidth(clamped);
+    return clamped;
+  }
+  function persistContextWidth(width: number) {
+    try { window.localStorage.setItem(`taskboard:detail-context-width:${route.projectId}`, String(width)); } catch { /* Non-persistent is fine. */ }
+  }
+  function startContextResize(event: ReactPointerEvent<HTMLDivElement>) {
+    event.preventDefault();
+    resizingContextRef.current = true;
+    setResizingContext(true);
+    event.currentTarget.setPointerCapture(event.pointerId);
+  }
+  function moveContextResize(event: ReactPointerEvent<HTMLDivElement>) {
+    if (!resizingContextRef.current) return;
+    const workbench = workbenchRef.current;
+    if (!workbench) return;
+    resizeContext(workbench.getBoundingClientRect().right - event.clientX);
+  }
+  function finishContextResize(event: ReactPointerEvent<HTMLDivElement>) {
+    if (!resizingContextRef.current) return;
+    resizingContextRef.current = false;
+    setResizingContext(false);
+    persistContextWidth(contextWidthRef.current);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  }
+  function nudgeContextResize(delta: number) {
+    const next = resizeContext(contextWidthRef.current + delta);
+    persistContextWidth(next);
+  }
   useRealtime('taskboard:changed', payload => {
     const changedProject = changedProjectId(payload);
     if (changedProject === null || changedProject === route.projectId) {
@@ -5581,11 +5678,24 @@ function TrackerDetail({
                 <Icon name="MessageCirclePlus" className="size-3" />{item.comments.length}
               </span></button>
           </div>
-          <div className="tb-detail-workbench">
+          <div className="tb-detail-workbench" ref={workbenchRef}
+            style={{ '--tb-context-width': `${contextWidth}px` } as CSSProperties}>
             <section className="tb-detail-factory" id={`${detailTabsId}-factory-panel`}
               role="tabpanel" aria-labelledby={`${detailTabsId}-factory-tab`}
               data-active={detailView === 'factory'}
               aria-label="Factory console"><FactoryProgress item={item} /></section>
+            <div className="tb-detail-splitter" role="separator" aria-orientation="vertical"
+              aria-label="Resize ticket context" aria-valuemin={260} aria-valuemax={760}
+              aria-valuenow={contextWidth} tabIndex={0} data-resizing={resizingContext ? 'true' : undefined}
+              onPointerDown={startContextResize} onPointerMove={moveContextResize}
+              onPointerUp={finishContextResize} onPointerCancel={finishContextResize}
+              onDoubleClick={() => { persistContextWidth(resizeContext(340)); }}
+              onKeyDown={event => {
+                if (event.key === 'ArrowLeft') { event.preventDefault(); nudgeContextResize(20); }
+                else if (event.key === 'ArrowRight') { event.preventDefault(); nudgeContextResize(-20); }
+              }}>
+              <span className="tb-detail-splitter-grip" aria-hidden="true" />
+            </div>
             <section className="tb-detail-context" id={`${detailTabsId}-ticket-panel`}
               role="tabpanel" aria-labelledby={`${detailTabsId}-ticket-tab`}
               data-active={detailView === 'ticket'}

@@ -50,7 +50,7 @@ const html = `<html><head><meta name="viewport" content="width=device-width,init
 ${hostCss}
 :root{font:16px system-ui;--border:#ddd;--muted:#f2f3f5;--primary:#286bd4;--muted-foreground:#71757e;--canvas:#fff;--ink:#292b31;--timeline-accent:#286bd4;--success:#19714d;--destructive-text:#b13a4b}
 *{box-sizing:border-box}body{margin:0;color:var(--ink);background:var(--canvas);font-size:13px}#preview-detail{width:100%;min-width:0}#preview-manual{padding:20px}pre{font-size:11px}
-${css}</style></head><body><div id="root"></div><script>window.factoryFixture=${JSON.stringify(fixture)};window.empiricalOffline=false;window.empiricalLastKnown=null;window.empiricalStatus={kind:'feature',feature:'demo-live-work',revision:1,phase:'implement',status:'waiting',nextAction:'Implement the current acceptance criteria',verification:'pending',completionLevel:'none',completionMethod:null};</script><script>${result.outputFiles[0].text.replaceAll('</script>', '<\\/script>')}</script></body></html>`;
+${css}</style></head><body><div id="root" data-bb-plugin="taskboard"></div><script>window.factoryFixture=${JSON.stringify(fixture)};window.empiricalOffline=false;window.empiricalLastKnown=null;window.empiricalStatus={kind:'feature',feature:'demo-live-work',revision:1,phase:'implement',status:'waiting',nextAction:'Implement the current acceptance criteria',verification:'pending',completionLevel:'none',completionMethod:null};</script><script>${result.outputFiles[0].text.replaceAll('</script>', '<\\/script>')}</script></body></html>`;
 if (process.env.TASKBOARD_DEMO_PORT) {
   const port = Number(process.env.TASKBOARD_DEMO_PORT);
   if (!Number.isSafeInteger(port) || port < 1 || port > 65535) throw new Error('Invalid demo port.');
@@ -79,16 +79,18 @@ try {
   const factorySettings = page.locator('#preview-factory-settings');
   await factorySettings.getByRole('checkbox', { name: 'Enable automatic intake' }).check();
   await factorySettings.getByRole('spinbutton', { name: 'Automatic concurrency' }).fill('2');
-  await factorySettings.getByRole('button', { name: 'Save factory settings' }).click();
-  await factorySettings.getByText('running · github').waitFor();
+  await factorySettings.getByRole('combobox', { name: 'AI provider' }).selectOption('claude:claude-sonnet');
+  await factorySettings.getByRole('button', { name: /^Save (settings|changes)$/ }).click();
+  await factorySettings.getByText('Running', { exact: true }).waitFor();
+  await factorySettings.getByText('Applies to new coordinator and stage sessions. Existing sessions keep their original model.').waitFor();
   for (const width of [1280, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, `taskboard-factory-settings-${width}.png`) });
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
   }
   await factorySettings.getByRole('checkbox', { name: 'Enable automatic intake' }).uncheck();
-  await factorySettings.getByRole('button', { name: 'Save factory settings' }).click();
-  await factorySettings.getByText('disabled · github').waitFor();
+  await factorySettings.getByRole('button', { name: /^Save (settings|changes)$/ }).click();
+  await factorySettings.getByText('Disabled', { exact: true }).waitFor();
   await page.setViewportSize({ width: 1280, height: 1000 });
   const manual = page.locator('#preview-manual');
   await manual.locator('.tb-factory-summary').waitFor();
@@ -452,17 +454,19 @@ try {
   assert.equal(await manual.getByRole('button', { name: 'Start task', exact: true }).isEnabled(), true);
   for (const state of ['running', 'paused', 'awaiting_scan', 'unconfigured', 'provider_error']) {
     await page.evaluate(state => { window.factoryProjectState = state; window.factoryRefresh(); }, state);
-    const expected = state === 'unconfigured' || state === 'provider_error' ? 'blocked' : state === 'awaiting_scan' ? 'paused' : state;
-    await factorySettings.getByText(`${expected} · github`, { exact: true }).waitFor();
+    const expected = state === 'unconfigured' || state === 'provider_error' ? 'Blocked'
+      : state === 'awaiting_scan' || state === 'paused' ? 'Paused'
+      : state === 'running' ? 'Running' : 'Disabled';
+    await factorySettings.getByText(expected, { exact: true }).first().waitFor();
     if (state === 'awaiting_scan') {
-      await factorySettings.getByText('Provider queue unknown', { exact: false }).waitFor();
+      await factorySettings.getByText('Queue size is unknown until a successful provider scan.', { exact: false }).waitFor();
       await factorySettings.getByText('Automatic intake is enabled and awaiting its first provider scan.').waitFor();
       assert.equal(await factorySettings.getByText('Factory paused. No new automatic stages will start.').count(), 0);
     } else if (state === 'running') {
       await factorySettings.getByText('3 last-known unclaimed todo tickets within the 500-ticket scan window', { exact: false }).waitFor();
-      await factorySettings.getByText('Last scan success at', { exact: false }).waitFor();
+      await factorySettings.getByText('Healthy', { exact: true }).waitFor();
     } else if (state === 'provider_error') {
-      await factorySettings.getByText('Scan reason: Live provider scan failed.').waitFor();
+      await factorySettings.getByText('Live provider scan failed.', { exact: false }).waitFor();
     }
     for (const width of [1280, 390]) {
       await page.setViewportSize({ width, height: 900 });
@@ -488,11 +492,11 @@ try {
     window.factoryProjectState = 'running';
     window.factoryRefresh();
   });
-  await factorySettings.getByText('running · github', { exact: true }).waitFor();
+  await factorySettings.getByText('Running', { exact: true }).waitFor();
   await team.locator('[data-team-blocker]').waitFor({ state: 'hidden' });
   await page.waitForTimeout(300);
   assert.equal(await team.locator('[data-team-blocker]').count(), 0);
-  assert.equal(await factorySettings.getByText('paused · github', { exact: true }).count(), 0);
+  assert.equal(await factorySettings.getByText('Paused', { exact: true }).count(), 0);
   await page.evaluate(() => {
     window.factoryProjectState = 'awaiting_scan';
     window.factoryRefresh();
@@ -516,16 +520,33 @@ try {
     window.factoryFixture.projectId = 'proj_other';
     window.factoryPreviewProject('proj_other');
   });
-  await factorySettings.getByText('running · github', { exact: true }).waitFor();
+  await factorySettings.getByText('Running', { exact: true }).waitFor();
   await team.locator('[data-team-blocker]').waitFor({ state: 'hidden' });
   await page.waitForTimeout(300);
   assert.equal(await team.locator('[data-team-blocker]').count(), 0);
-  assert.equal(await factorySettings.getByText('paused · github', { exact: true }).count(), 0);
+  assert.equal(await factorySettings.getByText('Paused', { exact: true }).count(), 0);
   for (const start of [false, true]) {
     await page.goto(`https://taskboard-preview.test/?creation=${start}`);
     await page.getByLabel('Title', { exact: true }).fill('Fix screenshot layout');
     await page.getByLabel('Description', { exact: true }).fill('Match the attached screenshot.');
     await page.getByRole('button', { name: 'Create only', exact: true }).waitFor();
+    const dialog = page.getByRole('dialog');
+    await dialog.getByText('AI for this task').first().waitFor();
+    const aiProvider = dialog.getByRole('combobox', { name: 'AI provider' });
+    assert.equal(await aiProvider.inputValue(), 'claude:claude-sonnet');
+    await dialog.locator('img[src^="data:image/svg"]').first().waitFor();
+    assert.equal(await dialog.getByRole('combobox', { name: 'Improvement detail' }).innerText(), 'Concise');
+    if (start) {
+      await aiProvider.selectOption('codex:gpt-5');
+      assert.equal(await aiProvider.inputValue(), 'codex:gpt-5');
+    }
+    await dialog.getByRole('combobox', { name: 'Improvement detail' }).click();
+    await page.getByRole('option', { name: 'Detailed' }).click();
+    await dialog.getByRole('button', { name: 'Improve title & description' }).click();
+    await page.waitForFunction(() => document.querySelector('input[id$="-title"]')?.value === 'Improved title');
+    const improvement = await page.evaluate(() => window.ticketImprovementInputs.at(-1));
+    assert.equal(improvement.detail, 'detailed');
+    assert.equal(improvement.execution.providerId, start ? 'codex' : 'claude');
     await page.locator('form').evaluate(form => {
       const bytes = Uint8Array.from(atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII='), c => c.charCodeAt(0));
       const transfer = new DataTransfer();
@@ -539,11 +560,13 @@ try {
       await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, `taskboard-create-images-${width}.png`) });
     }
     if (start) await page.getByRole('button', { name: 'Remove image 1' }).click();
+    if (start) assert.equal(await aiProvider.inputValue(), 'codex:gpt-5');
     await page.getByRole('button', { name: start ? 'Start now' : 'Create only', exact: true }).click();
     await page.getByRole('dialog').waitFor({ state: 'hidden' });
     assert.equal(await page.evaluate(() => window.createdInputs.length), 1);
     assert.equal(await page.evaluate(() => window.factoryStarts), start ? 1 : 0);
     assert.equal(await page.evaluate(() => window.createdInputs[0].images.length), start ? 0 : 1);
+    if (start) assert.equal(await page.evaluate(() => window.factoryStartExecution?.providerId), 'codex');
     if (!start) assert.equal(await page.evaluate(() => window.factoryNavigation.at(-1)), 'item/proj_test/linear/issue-42');
   }
   assert.deepEqual(errors, []);

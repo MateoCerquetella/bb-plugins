@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-5f40c9119ff9c7abf879ad9b",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Taskboard verification after resolving source import loading and updating the header fixture for console record fields.",
+  "passed": true,
+  "startedAt": "2026-10-20T16:38:30.069Z",
+  "completedAt": "2026-10-20T16:39:23.042Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin",
+    "specRevision": 37,
+    "specDigest": "sha256:ffa71df4a976c5664295390845763420c955273fb6af10de4d8b46b0d598a9e4",
+    "treeDigest": "sha256:2aa3bfd113a9cf1765c6c1a40bdb18b11f3e131b6d0e3b2039904f8ba2670523",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 41,
+    "gitCommit": "5810f1c61c5db5dec2a270e1951b2c59cd6bb04f",
+    "textTreeDigest": "sha256:2aa3bfd113a9cf1765c6c1a40bdb18b11f3e131b6d0e3b2039904f8ba2670523"
+  },
+  "digest": "sha256:e5a1f88fc29a9f7b6dacf3467310ef64c59a1a5b379ff81740141bcf84a825e3",
+  "kind": "qa",
+  "matrixDigest": "sha256:815607378e6900be048a509544d54959f5adf4d844bed8640673bfb7351563ba",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Taskboard verification after resolving source import loading and updating the header fixture for console record fields.",
+      "startedAt": "2026-10-20T16:38:30.069Z",
+      "completedAt": "2026-10-20T16:39:23.042Z",
+      "durationMs": 52973,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:3102e0660c5a28fb09072a92af73601c0704a8badb5519082e7545d1f876aa50",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-taskboard"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:b179d10d2cce8b305e51b6ad3df327bccc1d67467f0c3613bbf0f85578ea0e0c",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "52 - server-capped pages include every issue, comment and creation metadata option\n  ---\n  duration_ms: 5.234961\n  type: 'test'\n  ...\n# Subtest: pagination fails explicitly rather than truncating a server that never exhausts\nok 253 - pagination fails explicitly rather than truncating a server that never exhausts\n  ---\n  duration_ms: 24.595775\n  type: 'test'\n  ...\n# Subtest: terminal and resumed workflow moves preserve unrelated labels\nok 254 - terminal and resumed workflow moves preserve unrelated labels\n  ---\n  duration_ms: 20.790901\n  type: 'test'\n  ...\n# Subtest: native Open clears workflow labels and retains ordinary labels\nok 255 - native Open clears workflow labels and retains ordinary labels\n  ---\n  duration_ms: 5.397016\n  type: 'test'\n  ...\n# Subtest: workflow moves preserve concurrent ordinary label additions and removals\nok 256 - workflow moves preserve concurrent ordinary label additions and removals\n  ---\n  duration_ms: 22.305992\n  type: 'test'\n  ...\n# Subtest: reopened issue with status/done is open until explicitly closed again\nok 257 - reopened issue with status/done is open until explicitly closed again\n  ---\n  duration_ms: 4.166874\n  type: 'test'\n  ...\n# Subtest: reopened issue with status/canceled is open until explicitly closed again\nok 258 - reopened issue with status/canceled is open until explicitly closed again\n  ---\n  duration_ms: 1.727859\n  type: 'test'\n  ...\n# Subtest: failed label removal stops further writes and reports a partial outcome\nok 259 - failed label removal stops further writes and reports a partial outcome\n  ---\n  duration_ms: 1.041889\n  type: 'test'\n  ...\n# Subtest: partial state write is reported without retries\nok 260 - partial state write is reported without retries\n  ---\n  duration_ms: 1.280283\n  type: 'test'\n  ...\n# Subtest: unknown status is rejected without any write\nok 261 - unknown status is rejected without any write\n  ---\n  duration_ms: 0.736302\n  type: 'test'\n  ...\n# Subtest: creation uses stdin JSON and confirms the requested assignee\nok 262 - creation uses stdin JSON and confirms the requested assignee\n  ---\n  duration_ms: 14.294211\n  type: 'test'\n  ...\n# Subtest: ambiguous creation is not retried and uses the shared uncertainty marker\nok 263 - ambiguous creation is not retried and uses the shared uncertainty marker\n  ---\n  duration_ms: 1.100776\n  type: 'test'\n  ...\n# Subtest: metadata and creation reject foreign destinations before invoking tea\nok 264 - metadata and creation reject foreign destinations before invoking tea\n  ---\n  duration_ms: 0.382197\n  type: 'test'\n  ...\n# Subtest: workflow taxonomy covers review and terminal stages\nok 265 - workflow taxonomy covers review and terminal stages\n  ---\n  duration_ms: 1.418284\n  type: 'test'\n  ...\n# Subtest: gitlab is a registered taskboard source\nok 266 - gitlab is a registered taskboard source\n  ---\n  duration_ms: 18.555557\n  type: 'test'\n  ...\n# Subtest: refs must be host-qualified paths\nok 267 - refs must be host-qualified paths\n  ---\n  duration_ms: 10.861575\n  type: 'test'\n  ...\n# Subtest: locators round-trip with ref and iid\nok 268 - locators round-trip with ref and iid\n  ---\n  duration_ms: 0.497837\n  type: 'test'\n  ...\n# Subtest: status label categories cover the five states\nok 269 - status label categories cover the five states\n  ---\n  duration_ms: 0.216705\n  type: 'test'\n  ...\n# Subtest: status labels filter out unrelated labels\nok 270 - status labels filter out unrelated labels\n  ---\n  duration_ms: 2.821873\n  type: 'test'\n  ...\n# Subtest: state category prefers workflow labels over native state\nok 271 - state category prefers workflow labels over native state\n  ---\n  duration_ms: 0.368462\n  type: 'test'\n  ...\n# Subtest: status name shows the workflow column name or the native state\nok 272 - status name shows the workflow column name or the native state\n  ---\n  duration_ms: 0.310215\n  type: 'test'\n  ...\n# Subtest: cached summaries never retain provider comments\nok 273 - cached summaries never retain provider comments\n  ---\n  duration_ms: 0.215803\n  type: 'test'\n  ...\n# Subtest: untriaged issues keep native open/closed choices current-flagged\nok 274 - untriaged issues keep native open/closed choices current-flagged\n  ---\n  duration_ms: 0.41724\n  type: 'test'\n  ...\n# Subtest: stripped status names keep facet and dropdown consistent\nok 275 - stripped status names keep facet and dropdown consistent\n  ---\n  duration_ms: 0.520578\n  type: 'test'\n  ...\n# Subtest: token line is parsed from glab stderr output\nok 276 - token line is parsed from glab stderr output\n  ---\n  duration_ms: 2.528297\n  type: 'test'\n  ...\n# Subtest: keeps structural headers on neutral host theme surfaces\nok 277 - keeps structural headers on neutral host theme surfaces\n  ---\n  duration_ms: 1.524839\n  type: 'test'\n  ...\n# Subtest: uses restrained state glyph, focus, and conversation treatments\nok 278 - uses restrained state glyph, focus, and conversation treatments\n  ---\n  duration_ms: 0.470588\n  type: 'test'\n  ...\n# Subtest: keeps constrained filter values inside the vertical menu measure\nok 279 - keeps constrained filter values inside the vertical menu measure\n  ---\n  duration_ms: 0.311758\n  type: 'test'\n  ...\n# Subtest: keeps assignee avatars compact with six theme-safe identity tones\nok 280 - keeps assignee avatars compact with six theme-safe identity tones\n  ---\n  duration_ms: 0.617095\n  type: 'test'\n  ...\n# Subtest: shows restrained composer drop feedback and discoverable drag grips\nok 281 - shows restrained composer drop feedback and discoverable drag grips\n  ---\n  duration_ms: 0.593512\n  type: 'test'\n  ...\n# Subtest: ticket images reject spoofed formats, active content and oversized bytes\nok 282 - ticket images reject spoofed formats, active content and oversized bytes\n  ---\n  duration_ms: 41.058859\n  type: 'test'\n  ...\n# Subtest: Linear uploads use signed storage headers and return the asset URL\nok 283 - Linear uploads use signed storage headers and return the asset URL\n  ---\n  duration_ms: 327.773516\n  type: 'test'\n  ...\n# Subtest: improvement asks for concrete concise scope without invented implementation\nok 284 - improvement asks for concrete concise scope without invented implementation\n  ---\n  duration_ms: 5.050365\n  type: 'test'\n  ...\n# Subtest: draft parser accepts JSON or a single fence and rejects missing, extra or oversized fields\nok 285 - draft parser accepts JSON or a single fence and rejects missing, extra or oversized fields\n  ---\n  duration_ms: 52.366979\n  type: 'test'\n  ...\n# Subtest: concurrent starts spawn once with project defaults and only validated text is returned\nok 286 - concurrent starts spawn once with project defaults and only validated text is returned\n  ---\n  duration_ms: 21.629529\n  type: 'test'\n  ...\n# Subtest: cancellation before start prevents dispatch, including after service reload\nok 287 - cancellation before start prevents dispatch, including after service reload\n  ---\n  duration_ms: 0.491686\n  type: 'test'\n  ...\n# Subtest: uncertain spawn cannot become a confirmed cancellation or be dispatched twice\nok 288 - uncertain spawn cannot become a confirmed cancellation or be dispatched twice\n  ---\n  duration_ms: 0.57576\n  type: 'test'\n  ...\n# Subtest: stop failures stay uncertain and cleanup is retried by the sweep\nok 289 - stop failures stay uncertain and cleanup is retried by the sweep\n  ---\n  duration_ms: 14.74898\n  type: 'test'\n  ...\n# Subtest: invalid model output never returns a replacement draft\nok 290 - invalid model output never returns a replacement draft\n  ---\n  duration_ms: 47.545462\n  type: 'test'\n  ...\n1..290\n# tests 290\n# suites 0\n# pass 290\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 12398.32832\n\n> bb-plugin-taskboard@0.3.5 build\n> node scripts/run-isolated-bb-cli.mjs plugin build .\n\nDownloading the plugin build toolchain (one time)…\n  esbuild@0.28.1, @tailwindcss/node@4.3.0, @tailwindcss/oxide@4.3.0, tailwindcss@4.3.0\nToolchain ready (2.8s)\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\ndist/host.js\ndist/host.js.map\ndist/host.meta.json\n\n> bb-plugin-taskboard@0.3.5 verify:build\n> node scripts/verify-build.mjs\n\nTaskboard build metadata is valid.\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:2aa3bfd113a9cf1765c6c1a40bdb18b11f3e131b6d0e3b2039904f8ba2670523",
+      "sourceTreeAfter": "sha256:2aa3bfd113a9cf1765c6c1a40bdb18b11f3e131b6d0e3b2039904f8ba2670523",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

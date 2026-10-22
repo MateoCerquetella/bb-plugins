@@ -17,6 +17,7 @@ export function newRecord(item: WorkItem): FactoryRecord {
     locator: item.locator, version: 0, stage: 'Intake',
     scopeDigest: scopeDigest(item), plans: [], approvedDigest: null, runs: [],
     admission: { kind: 'manual' },
+    execution: null,
     coordinator: { status: 'pending' },
     automatic: false, automationError: null,
     trackerProgress: { status: 'pending', message: null },

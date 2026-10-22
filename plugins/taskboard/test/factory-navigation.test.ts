@@ -59,24 +59,33 @@ test('work navigation never changes the persistent pin preference', async () => 
   assert.match(app, /storeRightPanelPinned\(!pinned\)/);
 });
 
-test('command history uses closed disclosures by default', async () => {
-  const source = await readFile(new URL('../factory/app.tsx', import.meta.url), 'utf8');
-  assert.match(source, /<details className="tb-run-disclosure tb-command-group">/);
-  assert.match(source, /<details key=\{check\.id\} className="tb-command">/);
-  assert.match(source, /\{passed\} passed/);
-  assert.match(source, /\{failed\} failed/);
-  assert.match(source, /\{unknown\} unknown/);
+test('commands stay in closed disclosures by default', async () => {
+  const source = await readFile(new URL('../factory/room.tsx', import.meta.url), 'utf8');
+  assert.match(source, /<details className="tb-room-details tb-room-commands">\s*<summary>[\s\S]*?Commands executed/);
+  assert.match(source, /run\.checks\.map/);
+  assert.match(source, /tb-room-command/);
+  assert.match(source, /checks\.passed/);
+  assert.match(source, /checks\.failed/);
+  assert.match(source, /checks\.unknown/);
 });
 
-test('progress uses native diffs and live-only reduced-motion-safe animation', async () => {
-  const source = await readFile(new URL('../factory/app.tsx', import.meta.url), 'utf8');
+test('the room uses native diffs and keeps the validation evidence in the review card', async () => {
+  const source = await readFile(new URL('../factory/room.tsx', import.meta.url), 'utf8');
   assert.match(source, /experimental_Diff as Diff/);
   assert.match(source, /rpc\.call\('factoryDiff'/);
   assert.match(source, /Current workspace diff/);
   assert.match(source, /view="unified"/);
-  assert.doesNotMatch(source, /tb-latest-command/);
-  assert.doesNotMatch(source, /className="tb-run-disclosure" open/);
-  const css = await readFile(new URL('../app.css', import.meta.url), 'utf8');
-  assert.match(css, /prefers-reduced-motion: no-preference/);
-  assert.match(css, /\.tb-run\[data-live='true'\] \.tb-live-mark/);
+  assert.match(source, /Validation evidence/);
+  assert.doesNotMatch(source, /className="tb-room-details" open/);
+});
+
+
+test('the room shows a full progress with every stage clickable', async () => {
+  const source = await readFile(new URL('../factory/room.tsx', import.meta.url), 'utf8');
+  assert.match(source, /className="tb-room-progress"/u);
+  assert.match(source, /className="tb-room-progress-steps"/u);
+  assert.match(source, /stageKinds\.map/u);
+  assert.match(source, /className="tb-room-step"/u);
+  assert.match(source, /data-state=\{state\}/u);
+  assert.doesNotMatch(source, /tb-room-agents/u);
 });

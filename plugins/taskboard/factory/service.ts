@@ -6,7 +6,7 @@ import { approvePlan, assertVersion, factoryKey, legacyRun, newRecord, savePlan,
 import type { createFactoryStore } from './store.js';
 import { MAX_REVIEW_REPAIRS, readBuildResult, readReviewResult } from './review.js';
 import { CoordinatorIntentConflict, createCoordinatorLifecycle } from './coordinator.js';
-import { dispatchRejection, nativeError as message } from './native-dispatch.js';
+import { dispatchRejection, executionForDispatch, nativeError as message, threadExecution } from './native-dispatch.js';
 
 type Store = ReturnType<typeof createFactoryStore>;
 type Sdk = BbPluginApi['sdk'];
@@ -443,10 +443,13 @@ export function createFactoryService(
       throw new Error('The original authoring session is archived. Use Return to Build with findings or Start task to resume it.');
     }
     if (author && context?.status !== 'idle') throw new SessionBusyError('Stop or finish the preceding session first.');
-    const defaults = context
-      ? await sdk.threads.defaultExecutionOptions({ threadId: context.id })
+    const policy = store.getProjectPolicy(item.bbProjectId, item.source);
+    const selected = record.execution ?? policy.execution;
+    const defaults = selected ? null : context
+      ? await sdk.threads.defaultExecutionOptions({ threadId: context.id }).then(value =>
+          value ? threadExecution(context.providerId, value) : null)
       : await sdk.projects.defaultExecutionOptions({ projectId: item.bbProjectId });
-    if (!defaults) throw new Error('Choose native BB model and execution settings for this project first.');
+    const executionArgs = executionForDispatch(selected, defaults);
     const environment = context?.environmentId
       ? await sdk.environments.get({ environmentId: context.environmentId }) : null;
     const recovery = !!(input.repairOf || input.continuationOf);
@@ -541,8 +544,7 @@ export function createFactoryService(
         });
       } else {
         const thread = await sdk.threads.spawn({
-          ...defaults,
-          ...(context ? { providerId: context.providerId } : {}),
+          ...executionArgs,
           projectId: item.bbProjectId,
           ...(record.coordinator?.status === 'ready' ? { parentThreadId: record.coordinator.threadId } : {}),
           environment: (input.kind === 'review' || input.kind === 'plan' || (input.kind === 'build' && build)) && environment
@@ -677,9 +679,20 @@ export function createFactoryService(
         return advance(item, await reconcile(record, signal), signal);
       });
     },
-    async startTask(item: WorkItem, contextThreadId: string | null) {
+    async startTask(item: WorkItem, contextThreadId: string | null, execution?: FactoryRecord['execution']) {
       return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () => {
         let record = await reconcile(current(item));
+        if (execution === null && contextThreadId) {
+          try {
+            const context = await sdk.threads.get({ threadId: contextThreadId });
+            const defaults = context.projectId === item.bbProjectId && !context.deletedAt && !context.archivedAt
+              ? await sdk.threads.defaultExecutionOptions({ threadId: context.id })
+              : null;
+            record.execution = defaults ? threadExecution(context.providerId, defaults) : null;
+          } catch {
+            record.execution = null;
+          }
+        } else if (execution !== undefined) record.execution = execution;
         const run = record.runs.at(-1);
         if (record.runs.some(candidate => ['starting', 'running', 'uncertain'].includes(candidate.status))) {
           return syncProgress(item, record);
@@ -790,6 +803,14 @@ export function createFactoryService(
         run.status = 'running';
         run.error = null;
         return reconcile(persist(record));
+      });
+    },
+    async setExecution(item: WorkItem, expectedVersion: number, execution: FactoryRecord['execution']) {
+      return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () => {
+        const record = current(item);
+        assertVersion(record, expectedVersion);
+        record.execution = execution;
+        return persist(record);
       });
     },
     async savePlan(item: WorkItem, expectedVersion: number, body: string) {

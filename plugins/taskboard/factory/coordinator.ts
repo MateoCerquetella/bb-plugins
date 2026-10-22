@@ -4,7 +4,7 @@ import { formatWorkItemContext, type WorkItem } from '../contract.js';
 import type { FactoryRecord } from './contract.js';
 import { factoryKey } from './state.js';
 import type { createFactoryStore } from './store.js';
-import { dispatchRejection, nativeError } from './native-dispatch.js';
+import { dispatchRejection, executionForDispatch, nativeError } from './native-dispatch.js';
 
 export class CoordinatorIntentConflict extends Error {}
 
@@ -48,8 +48,11 @@ export function createCoordinatorLifecycle(
   async function ensure(item: WorkItem, record: FactoryRecord) {
     record = await observe(record);
     if (!record.coordinator || record.coordinator.status !== 'pending') return record;
-    const defaults = await sdk.projects.defaultExecutionOptions({ projectId: record.projectId });
-    if (!defaults) throw new Error('Choose native BB model and execution settings for this project first.');
+    const policy = store.getProjectPolicy(record.projectId, record.source);
+    const selected = record.execution ?? policy.execution;
+    const defaults = selected
+      ? null : await sdk.projects.defaultExecutionOptions({ projectId: record.projectId });
+    const executionArgs = executionForDispatch(selected, defaults);
     const intent = {
       intentId: randomUUID(), startedAt: new Date().toISOString(), legacyRunCount: record.runs.length
     };
@@ -64,7 +67,7 @@ export function createCoordinatorLifecycle(
     let thread: Awaited<ReturnType<typeof sdk.threads.spawn>>;
     try {
       thread = await sdk.threads.spawn({
-        ...defaults, projectId: record.projectId, environment: { type: 'project-default' },
+        ...executionArgs, projectId: record.projectId, environment: { type: 'project-default' },
         title: coordinatorTitle(item, intent.intentId),
         prompt: [
           'This is the stable ticket coordinator conversation for the Taskboard factory.',

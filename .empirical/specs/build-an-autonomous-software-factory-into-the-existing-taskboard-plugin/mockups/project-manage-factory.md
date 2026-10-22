@@ -9,6 +9,11 @@ Software factory                               Running
 
 Factory enabled                               [on]
 Provider             Linear / Engineering
+AI provider          [logo] Anthropic
+Model                Claude Sonnet
+Reasoning            High
+Permissions          Accept edits
+Service tier         Default
 Intake policy        Todo tickets
 Concurrent workflows [ - ]  3  [ + ]
                                            [Save]
@@ -22,7 +27,16 @@ Blockers             None
 Use the existing Project Manage form and status components, without a nested
 card. Provider identity and intake policy are read-only summaries of the saved
 configuration; intake is the existing todo-category policy, not a new rule
-editor. Concurrency uses a numeric input or stepper bounded by the RPC schema.
+editor. The AI controls list the providers and models the local BB host reports
+for this project. Each provider option carries its logo; a missing logo falls
+back to a readable provider name. Provider, model, reasoning, permissions, and
+service tier are one saved execution choice; `Use project defaults` clears it so
+native defaults apply. The same picker component is reused in the new-task
+dialog so the two surfaces cannot drift. The model list reloads when the provider changes, and reasoning or service
+tier controls are hidden when the chosen model or provider does not support
+them. A provider that reports no models shows the returned load error and keeps
+the last saved choice visible. Concurrency uses a numeric input or stepper
+bounded by the RPC schema.
 The labeled enable switch and Save persist configuration. Turning the switch
 off and saving pauses automatic admission and subsequent automatic stages.
 Turning it on and saving resumes only after the existing eligibility checks.
@@ -131,6 +145,21 @@ Factory enabled         [on]
 Provider
 Jira / Payments Platform
 Customer Operations
+
+AI provider
+Anthropic
+
+Model
+Claude Sonnet
+
+Reasoning
+High
+
+Permissions
+Accept edits
+
+Service tier
+Default
 
 Intake policy
 Todo tickets

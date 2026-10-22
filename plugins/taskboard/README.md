@@ -141,12 +141,14 @@ inventory is slower and cached separately. The demo does not prove host-routed
 delivery; verify that with a locally installed plugin in a connected BB host.
 
 In **Create new ticket**, enter rough text in Title or Description and select
-**Improve title & description**. Taskboard uses a hidden helper with the BB
-project's current provider/model defaults to rewrite only those two fields.
-Cancel keeps the draft unchanged; Undo restores the draft after a successful
-rewrite. Invalid output and errors preserve your text, and an uncertain helper
-start blocks automatic retry. Labels, assignee, destination and other metadata
-are not rewritten. Creating the ticket still requires selecting Create.
+**Improve title & description**. Choose **Concise** for a short actionable draft
+or **Detailed** for problem, outcome, scope, acceptance criteria, and risks.
+Taskboard uses a hidden helper with the task or current-thread AI selection,
+falling back to project defaults, and rewrites only those two fields. Cancel
+keeps the draft unchanged; Undo restores the draft after a successful rewrite.
+Invalid output and errors preserve your text, and an uncertain helper start
+blocks automatic retry. Labels, assignee, destination and other metadata are
+not rewritten. Creating the ticket still requires selecting Create.
 
 After a confirmed agent dispatch, Taskboard moves the provider issue to its
 available In progress status. Providers without that transition retain their
@@ -175,12 +177,46 @@ workflow. The setting is disabled by default and the concurrency limit applies
 only to automatically claimed work. Manual **Start task** actions remain
 available.
 
+The same block selects the AI for the coordinator and every new stage session:
+provider, model, reasoning level, permission mode, and service tier. The picker
+is BB's own provider/model picker, with provider logos, live model search, and
+the native reasoning and service-tier controls. The choice is stored on the
+project factory policy and
+applies to manual **Start task** and automatic intake. **Use project defaults**
+clears it and falls back to the project's native execution defaults. When neither
+is available, Start task fails with a settings prompt instead of dispatching.
+Changing the choice affects new sessions; existing native sessions keep the
+provider and model they were created with.
+
+**Create new ticket** shows the same AI picker for that task. It starts from the
+current thread's execution, and a changed choice is saved only on that ticket's
+factory record. Its coordinator and stages use the task choice first, then the
+project policy, then native defaults. **Use thread defaults** clears the task
+override.
+
 Each new ticket workflow gets one native coordinator thread. Investigation,
 Plan, Build, and independent Review sessions appear beneath it as stage agents;
 Build retains its managed worktree and repairs continue in the original Build
 session. **Start task** opens the coordinator. Each stage's **Open thread**
 action opens that exact session. The factory service owns dispatch and recovery;
 the coordinator is the ticket's stable conversation and native parent.
+
+The ticket's **Factory** tab follows the host light/dark theme. A four-step
+**Progress** rail keeps every stage visible with a marker: completed steps are
+filled, the awaiting-acceptance Review is outlined in the accent, and the current
+stage is marked. Select any step to inspect that stage; the attempt picker keeps
+earlier runs available. The selected stage is a compact card: the Review card
+shows Checks, Failed, Files and Plan as a metric strip, a checks meter with a
+failed segment, then icon disclosure rows for Validation evidence, Commands
+executed, changed files, the plan and Coordinator and workspace. The stage
+summary is short, and all detail stays closed until opened. Screenshots included
+in the review output render inside Validation evidence; when the review has no
+capture attached, the disclosure says so.
+
+On wide screens the ticket context sits beside the control room. Drag the divider, or
+focus it and use the left and right arrow keys, to resize the context; double
+click resets it. The width is remembered per project. Narrow screens keep the
+**Factory / Ticket** switch instead.
 
 Historical workflows show **Legacy sessions**. **Add coordinator** creates a
 parent for future stage sessions while keeping existing history and reused

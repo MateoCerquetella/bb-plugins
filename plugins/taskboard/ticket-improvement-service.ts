@@ -1,5 +1,7 @@
 import type { BbPluginApi } from '@get-bb/plugin-sdk';
 import type { z } from 'zod';
+import type { FactoryExecution } from './factory/contract.js';
+import { threadExecution } from './factory/native-dispatch.js';
 import {
   improvementResultSchema, parseTicketImprovement, ticketImprovementPrompt
 } from './ticket-improvement.js';
@@ -38,13 +40,51 @@ export function createTicketImprovementService(bb: Pick<BbPluginApi, 'sdk' | 'st
       return false;
     }
   }
+  async function resolveExecution(input: {
+    projectId: string; contextThreadId?: string | null; execution?: FactoryExecution | null;
+  }) {
+    if (input.execution) {
+      return {
+        ...input.execution,
+        executionInputSources: {
+          providerId: 'explicit' as const, model: 'explicit' as const, permissionMode: 'explicit' as const,
+          reasoningLevel: 'explicit' as const, serviceTier: 'explicit' as const
+        }
+      };
+    }
+    if (input.contextThreadId) {
+      try {
+        const context = await bb.sdk.threads.get({ threadId: input.contextThreadId });
+        if (context.projectId === input.projectId && !context.deletedAt && !context.archivedAt) {
+          const threadDefaults = await bb.sdk.threads.defaultExecutionOptions({ threadId: context.id });
+          if (threadDefaults) {
+            return {
+              ...threadExecution(context.providerId, threadDefaults),
+              executionInputSources: {
+                providerId: 'explicit' as const, model: 'explicit' as const, permissionMode: 'explicit' as const,
+                reasoningLevel: 'explicit' as const, serviceTier: 'explicit' as const
+              }
+            };
+          }
+        }
+      } catch {
+        // Fall through to project defaults when the thread settings are unavailable.
+      }
+    }
+    return bb.sdk.projects.defaultExecutionOptions({ projectId: input.projectId });
+  }
   return {
-    start(input: Identity & { title: string; description: string }) {
+    start(input: Identity & {
+      title: string; description: string;
+      detail?: 'concise' | 'detailed';
+      contextThreadId?: string | null;
+      execution?: FactoryExecution | null;
+    }) {
       return locked(input, async () => {
         const prior = await read(input);
         if (prior) return save(input, prior);
-        const defaults = await bb.sdk.projects.defaultExecutionOptions({ projectId: input.projectId });
-        if (!defaults) throw new Error('Choose a default BB provider and model for this project first.');
+        const execution = await resolveExecution(input);
+        if (!execution) throw new Error('Choose an AI provider and model for this task or project first.');
         const record: Record = {
           status: 'uncertain', draft: null,
           error: 'Helper startup is unconfirmed. Do not retry this request automatically.',
@@ -53,12 +93,15 @@ export function createTicketImprovementService(bb: Pick<BbPluginApi, 'sdk' | 'st
         await save(input, record);
         try {
           const thread = await bb.sdk.threads.spawn({
-            ...defaults,
+            ...execution,
             projectId: input.projectId,
             environment: { type: 'project-default' },
             visibility: 'hidden',
             title: 'Improve ticket draft',
-            prompt: ticketImprovementPrompt({ title: input.title, description: input.description })
+            prompt: ticketImprovementPrompt(
+              { title: input.title, description: input.description },
+              input.detail ?? 'concise'
+            )
           });
           record.threadId = thread.id;
           record.status = 'running';

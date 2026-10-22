@@ -1,9 +1,8 @@
 {
   "schemaVersion": 1,
   "page": ".empirical/context/design-language.md",
-  "head": "5d2f087b9483df21549e68d2c61b29c62601732a",
+  "head": "fdf71d93258984fbb91790defeaf0e65cff5f694",
   "units": [
-    "plugins/aura",
     "plugins/taskboard"
   ],
   "pending": {}
