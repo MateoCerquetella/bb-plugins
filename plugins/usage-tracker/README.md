@@ -103,15 +103,12 @@ does not add its 3–4 second CLI startup time to the sidebar RPC response.
 
 DeepSeek reports an account balance rather than subscription windows. Enable
 **DeepSeek** and either paste a key into **DeepSeek API key** or set
-`DEEPSEEK_API_KEY` in the environment that runs BB. Set **DeepSeek topped-up
-balance** to the amount you paid in, in the currency DeepSeek reports (for
-example `20`). The strip then shows the share of that budget already used, and
-reads 100% when the balance reaches zero. Leave the budget empty to derive the
-baseline automatically from the reported topped-up balance: the first positive
-topped-up balance becomes the baseline, spending from it raises the percentage,
-and a later top-up raises the baseline and resets the percentage. If no positive balance has
-been observed yet, the strip shows the raw balance instead. The key is stored in
-BB's plugin secrets and is read only by the plugin server.
+`DEEPSEEK_API_KEY` in the environment that runs BB. Set **Amount topped up** to
+the amount you paid in, in the currency DeepSeek reports (for example `20`). The
+strip then shows the share of that budget already used, and reads 100% when the
+balance reaches zero. Leave it empty to show the reported balance without a
+percentage. The key is stored in BB's plugin secrets and is read only by the
+plugin server.
 
 If a CLI is missing, signed out, or expired, expand that provider in the strip
 to see the recovery instruction reported by BB.
