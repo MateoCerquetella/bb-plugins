@@ -70,6 +70,7 @@ enum ProviderIcon {
         "claude-code": "claudecode-color",
         "codex": "openai",
         "opencode": "opencode",
+        "acp-opencode": "opencode",
         "gemini": "gemini-color",
         "geminicli": "geminicli-color",
         "gemini-cli": "geminicli-color",
@@ -79,6 +80,7 @@ enum ProviderIcon {
         "githubcopilot": "githubcopilot",
         "github-copilot": "githubcopilot",
         "grok": "grok",
+        "acp-grok": "grok",
         "kimi": "kimi-color",
         "kimi-cli": "kimi-color",
         "qwen": "qwen-color",
@@ -99,12 +101,15 @@ enum ProviderIcon {
         switch provider.lowercased() {
         case "claude-code": return "CLAUDE"
         case "acp-cursor": return "CURSOR"
+        case "acp-opencode", "opencode": return "OPENCODE"
+        case "acp-grok": return "GROK"
         case "geminicli", "gemini-cli": return "GEMINI CLI"
         case "githubcopilot", "github-copilot": return "COPILOT"
         case "roocode", "roo-code": return "ROO CODE"
         case "kimi-cli": return "KIMI"
         case "codex": return "CODEX"
         case "gemini": return "GEMINI"
+        case "deepseek": return "DEEPSEEK"
         default: return provider.uppercased()
         }
     }

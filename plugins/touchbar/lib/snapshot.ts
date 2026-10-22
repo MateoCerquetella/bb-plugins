@@ -63,7 +63,7 @@ export interface TouchBarSnapshot {
 }
 
 export interface TouchBarUsage {
-  id: "codex" | "claudeCode" | "cursor";
+  id: "codex" | "claudeCode" | "cursor" | "deepseek";
   name: string;
   status: "ok" | "not_installed" | "unauthenticated" | "expired" | "error";
   usedPercent: number | null;
