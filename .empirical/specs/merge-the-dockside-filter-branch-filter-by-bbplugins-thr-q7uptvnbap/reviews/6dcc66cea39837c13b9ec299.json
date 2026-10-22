@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:ed5c0e73a0a6cf7e1e4192239901ce08f428af9d449de7b58ac7c894c13d097e",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "1807befaa9c0732d83b6223d3821ba83268d98e7",
+  "headCommit": "2985ab51ede19d16d1601d3d7e781a9deeb26dd2",
+  "diffDigest": "sha256:9e799c24b077c72db7508acef58edf1d5283a5bccbd5412b25e91ee2f13ad9fb",
+  "verdict": "APPROVED",
+  "reviewerActor": "fresh-context-reviewer",
+  "reviewerInvocationId": "review-2985ab51e-1",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: sidebar-sections.ts and the release-prep 0.1.8 sit on the merged branch content; merge ancestry is not representable in a patch.\n- PASS AC-2: package.json and the lock entry both report 0.1.8, matching the prepared dockside/v0.1.8 tag.\n- PASS AC-3: Reported build/typecheck/228 tests are green and the diff shows no type or import contradiction.\n- PASS AC-4: GROUPING_OPTIONS contains Projects/Status/Environment and STATUS_OPTIONS contains Failed, which feed the built bundle.\n- PASS AC-5: Version 0.1.8, tag prefix dockside/, and the @^0.1.0 README form allow 0.1.8 to win over 0.1.7.\n- PASS AC-6: No tag, ref, or history rewrite is present; earlier Dockside tags remain at their original commits.\n\n## Security / correctness\n\nNo security concerns: storage access is try/catch-wrapped, project and environment labels render as text, and environment keys are used only as React keys. The fix correctly renders matching families for every non-grouping preset and keeps the Pinned hoist consistent. Remaining edges are medium/low: parked shelves are not scoped to a project filter, and environment labels omit the project name.\n\n## Design / maintainability\n\nThe fix is small with a predicate-level unit test and project-filter coverage. Medium concerns: default grouping is now status, and parked shelves can show other projects' threads under a project scope. Low concerns: duplicated filter labels, README pinned wording, and an index-based source slice in a layout test.",
+  "bodyDigest": "sha256:4cce5f4a9e30016e195d0e4d853e8ba702c1197b1d6a876adcdf78b362c584ab",
+  "findings": [
+    {
+      "id": "F-1",
+      "severity": "medium",
+      "category": "design",
+      "summary": "Default workspace grouping silently changes from Projects to status for users without a stored preference."
+    },
+    {
+      "id": "F-2",
+      "severity": "medium",
+      "category": "correctness",
+      "summary": "Snoozed/Settled rows come from unfiltered lifecycle lists, so a project-scoped view can show other projects' parked threads."
+    },
+    {
+      "id": "F-3",
+      "severity": "low",
+      "category": "correctness",
+      "summary": "Environment sections key on project id but omit it from the label, producing identical titles and repeated No environment headings."
+    },
+    {
+      "id": "F-4",
+      "severity": "low",
+      "category": "docs",
+      "summary": "README says pinned roots remain first inside each project, but pinned families are now lifted into a global Pinned section."
+    },
+    {
+      "id": "F-5",
+      "severity": "low",
+      "category": "design",
+      "summary": "Filter labels are duplicated and inconsistent between the menu and THREAD_FILTER_LABELS."
+    },
+    {
+      "id": "F-6",
+      "severity": "low",
+      "category": "tests",
+      "summary": "thread-card-layout.test.ts slices source by indexOf(\"function ThreadLocation\"); a rename would silently narrow assertions."
+    }
+  ],
+  "digest": "sha256:6dcc66cea39837c13b9ec29913f07c4f40249ea2ebf620a4f882dd120d43a1af"
+}

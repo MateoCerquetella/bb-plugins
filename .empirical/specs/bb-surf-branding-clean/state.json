@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 12,
+  "revision": 13,
   "activeFeature": "bb-surf-branding-clean",
   "request": "Rebuild the already implemented BB Surf branding and responsiveness follow-up from current main so review contains only this feature. Preserve compatibility identifiers and upstream Steel attribution. Update the root and plugin READMEs and icon accessibility title to BB Surf, suspend automatic hover sampling while panel expansion is pinned, preserve compact and hover behavior, add the browser behavior assertion, then run independent review and focused plugin/browser verification. Do not publish or rename the compatibility protocol.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "integrate",
-  "status": "waiting",
+  "phase": "done",
+  "status": "done",
   "repairAttempts": 0,
-  "message": "Verified the clean BB Surf revision. Empirical's selected automated check passed cleanly, fresh-context artifact QA passed, and the Steel browser panel fixture passed desktop dark/light, mobile touch light, and desktop touch dark with screenshot evidence. The focused BB Surf workspace check also passed SDK types, TypeScript, 51 tests, and build, though it is outside the current policy command map.",
+  "message": "Closed as merged-externally: Merged in pull request #89 as 598e23b3e74c55ba4749614e76d462c428087c1c into main; closed when the merge was observed.",
   "implementationActor": "root",
   "workStartedAt": "2026-10-15T14:52:21.877Z",
   "specDigest": "sha256:0223d0f9df88d4c7e80fe501f02c9e90c1f09e418f3841a6c9a4a8a1459aed72",
@@ -30,17 +30,16 @@
   "completion": {
     "implemented": true,
     "verified": true,
-    "integrated": false,
+    "integrated": true,
     "delivered": false,
     "published": false,
-    "highest": "verified",
+    "highest": "integrated",
     "reasons": {
-      "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-15T15:08:38.271Z",
+  "updatedAt": "2026-10-16T16:17:59.896Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "bb-surf-branding-clean-126e96e64c00",
@@ -74,5 +73,39 @@
     "iteration": 1,
     "awaitingFeedback": false
   },
-  "reviewFirst": true
+  "reviewFirst": true,
+  "closure": {
+    "schemaVersion": 1,
+    "outcome": "merged-externally",
+    "reason": "Merged in pull request #89 as 598e23b3e74c55ba4749614e76d462c428087c1c into main; closed when the merge was observed.",
+    "actor": "empirical",
+    "confirmation": "merge-observed",
+    "closedAtPhase": "integrate",
+    "completionAtClosure": "integrated",
+    "externalMerge": {
+      "pullRequest": 89,
+      "url": "https://github.com/MateoCerquetella/bb-plugins/pull/89",
+      "state": "MERGED",
+      "mergeCommit": "598e23b3e74c55ba4749614e76d462c428087c1c",
+      "targetBranch": "main",
+      "ancestorOfTarget": true,
+      "observedAt": "2026-10-16T16:17:48.769Z"
+    },
+    "closedAt": "2026-10-16T16:17:59.646Z",
+    "digest": "sha256:8c5c057450cf1b0cbb172b44cf762db0716e43f26d32e696e7cdd5af200fb3de"
+  },
+  "completionRecord": {
+    "schemaVersion": 1,
+    "implementedBy": "root",
+    "completedBy": "empirical",
+    "decisionBy": null,
+    "method": "merged-externally",
+    "reason": "Merged in pull request #89 as 598e23b3e74c55ba4749614e76d462c428087c1c into main; closed when the merge was observed.",
+    "at": "2026-10-16T16:17:59.896Z",
+    "revision": 13,
+    "completion": "integrated",
+    "sourceTreeDigest": "sha256:1d8f57459ea33efa799e3e453deed0f6b2e40c1d0c181a37d27a8427e38defaa",
+    "artifactTreeDigest": "sha256:219993e7d12cb4c3c3bc19dbc045d6f9dd3e75b94b898e3c7ac143e953193c3a",
+    "digest": "sha256:b205dcadc5b08e16be28052a03e2cd530eb96594dc5c4a43f63e974715d860b0"
+  }
 }

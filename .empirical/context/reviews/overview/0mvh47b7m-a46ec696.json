@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "page": ".empirical/context/overview.md",
+<<<<<<<< HEAD:.empirical/context/reviews/overview/0mvgtjazw-92db164f.json
+  "head": "371c2a0b9d7ee4bb4f0cf6bacd76cc76c6970aac",
+========
+  "head": "882bb2bf296d5aabf0cc56698ed8180542dc3365",
+>>>>>>>> origin/main:.empirical/context/reviews/overview/0mvh47b7m-a46ec696.json
+  "units": [
+    "README.md"
+  ],
+  "pending": {}
+}

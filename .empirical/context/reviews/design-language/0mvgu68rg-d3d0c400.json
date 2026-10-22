@@ -1,9 +1,14 @@
 {
   "schemaVersion": 1,
   "page": ".empirical/context/design-language.md",
+<<<<<<<< HEAD:.empirical/context/reviews/design-language/0mvgu68rg-d3d0c400.json
   "head": "fdf71d93258984fbb91790defeaf0e65cff5f694",
+========
+  "head": "882bb2bf296d5aabf0cc56698ed8180542dc3365",
+>>>>>>>> origin/main:.empirical/context/reviews/design-language/0mvh47bb9-c6769def.json
   "units": [
-    "plugins/taskboard"
+    "plugins/taskboard",
+    "plugins/usage-tracker"
   ],
   "pending": {}
 }
