@@ -5,6 +5,7 @@ export const SIDEBAR_PROVIDER_IDS = [
   "grok",
   "openCode",
   "antigravity",
+  "deepSeek",
 ] as const;
 export const COMPACT_LIMIT_OPTIONS = ["Weekly", "Five-hour"] as const;
 
@@ -24,6 +25,7 @@ export interface UsageTrackerPreferences {
   enableGrok: boolean;
   enableOpenCode: boolean;
   enableAntigravity?: boolean;
+  enableDeepSeek?: boolean;
   compactLimit: CompactLimitOption;
 }
 
@@ -35,6 +37,7 @@ type ProviderPreferenceKey = keyof Pick<
   | "enableGrok"
   | "enableOpenCode"
   | "enableAntigravity"
+  | "enableDeepSeek"
 >;
 
 const PROVIDER_PREFERENCE_KEYS: Readonly<
@@ -46,6 +49,7 @@ const PROVIDER_PREFERENCE_KEYS: Readonly<
   grok: "enableGrok",
   openCode: "enableOpenCode",
   antigravity: "enableAntigravity",
+  deepSeek: "enableDeepSeek",
 };
 
 export function enabledSidebarProviderIds(
@@ -57,6 +61,7 @@ export function enabledSidebarProviderIds(
     | "enableGrok"
     | "enableOpenCode"
     | "enableAntigravity"
+    | "enableDeepSeek"
   >,
 ): SidebarProviderId[] {
   return SIDEBAR_PROVIDER_IDS.filter(

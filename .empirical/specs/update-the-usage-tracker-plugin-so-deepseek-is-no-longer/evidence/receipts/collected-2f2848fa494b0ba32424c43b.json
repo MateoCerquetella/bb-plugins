@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-2f2848fa494b0ba32424c43b",
+  "criteria": [
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "screenshot"
+  ],
+  "summary": "Screenshot of the live BB sidebar shows the DeepSeek mark, 26.4% topped-up reading, $14.72 left of $20.00 topped up, granted and topped-up amounts, progress rail, and recovery message inside the usage card.",
+  "passed": true,
+  "startedAt": "2026-10-22T16:05:43.319Z",
+  "completedAt": "2026-10-22T16:05:43.319Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "update-the-usage-tracker-plugin-so-deepseek-is-no-longer",
+    "specRevision": 2,
+    "specDigest": "sha256:3607c1e3c88e7fd90a49b309cdd73133ff9a9f44382fa105afbc359bcf85029c",
+    "treeDigest": "sha256:bf2fcd36eb236077c3a6d27880566a153a31607c22629917109911dd1bff4352",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:087c4d5c4a0879e5be4e4c09c151332f6cd2f9a48e4f5fb26a532ad9e76c1f99",
+  "kind": "collected",
+  "collector": "BB Surf live Usage Tracker screenshot",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/update-the-usage-tracker-plugin-so-deepseek-is-no-longer/evidence/deepseek-sidebar.png",
+      "mediaType": "image/png",
+      "bytes": 266038,
+      "digest": "sha256:25a5f2330b7b0f1a96839353581e48199c8ee994666a02df04f550461548a5c8"
+    }
+  ]
+}

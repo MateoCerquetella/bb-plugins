@@ -1,0 +1,6 @@
+{
+  "checkId": "qa-unit",
+  "commandId": "workspace-check",
+  "criteria": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6", "AC-7", "AC-UI-1"],
+  "summary": "Run the workspace check, which includes Usage Tracker typecheck, 102 tests, and the plugin build."
+}

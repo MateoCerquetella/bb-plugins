@@ -1,0 +1,12 @@
+{
+  "criteria": ["AC-UI-1"],
+  "evidenceKinds": ["screenshot"],
+  "summary": "Screenshot of the live BB sidebar shows the DeepSeek mark, 26.4% topped-up reading, $14.72 left of $20.00 topped up, granted and topped-up amounts, progress rail, and recovery message inside the usage card.",
+  "collector": "BB Surf live Usage Tracker screenshot",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/update-the-usage-tracker-plugin-so-deepseek-is-no-longer/evidence/deepseek-sidebar.png",
+      "mediaType": "image/png"
+    }
+  ]
+}

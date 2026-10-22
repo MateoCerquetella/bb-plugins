@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "usage-tracker-deepseek"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:2db381d82c7b4282208a50192e50fa23736651f149928221185154692e3574dd"
+}

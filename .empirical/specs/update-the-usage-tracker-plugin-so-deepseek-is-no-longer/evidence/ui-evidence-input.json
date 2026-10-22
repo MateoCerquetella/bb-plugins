@@ -1,0 +1,12 @@
+{
+  "criteria": ["AC-UI-1"],
+  "evidenceKinds": ["browser", "screenshot"],
+  "summary": "Live BB sidebar showed the DeepSeek provider with its brand mark, 26.4% topped-up reading, $14.72 left of $20.00 topped up, progress rail, and missing-key recovery message; the card fit the sidebar and DeepSeek did not enter the agent-usage summary.",
+  "collector": "BB Surf live Usage Tracker verification",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/update-the-usage-tracker-plugin-so-deepseek-is-no-longer/evidence/deepseek-sidebar.png",
+      "mediaType": "image/png"
+    }
+  ]
+}

@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Add an opt-in DeepSeek provider that reads the DeepSeek API balance with a
+  secret API key or `DEEPSEEK_API_KEY`, and shows budget consumption against a
+  user-set topped-up amount. The provider uses the official DeepSeek glyph.
+
 ## 0.1.15 - 2026-10-07
 
 - Omit unknown provider activity from RPC responses instead of returning an
