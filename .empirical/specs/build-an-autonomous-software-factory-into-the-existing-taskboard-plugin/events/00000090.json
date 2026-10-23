@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "sequence": 90,
+  "previousDigest": "sha256:c2f08fb305783357fd4a4a4107fa85accba08c9a02da428ca59a14358a5d8271",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Iterate: Redesign the Taskboard Autonomous factory project settings UI to be minimalist. Keep all existing controls and behavior, but remove the heavy nested AI card, reduce helper copy and status chrome, present the AI selection as one quiet compact row, and make enablement, concurrency, and save feel like one simple settings line. Preserve accessibility, responsive layout, and the existing ExecutionPicker data flow.",
+  "createdAt": "2026-10-23T17:37:20.825Z",
+  "stateBeforeDigest": "sha256:1416d07e54103127150f97431ce0ec8ec2e4508acbb6824e93b881146deeda73",
+  "stateAfterDigest": "sha256:23f3fb844c0bbc80d057521b143f334974aab1c8eefc023db1fca9dd0352df6d",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 90,
+    "activeFeature": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin",
+    "request": "Build an autonomous software factory into the existing Taskboard plugin, inspired by https://github.com/lpbaril/bb-plugin-factory. Make Linear, Jira, or the configured issue provider the source of truth. The factory should continuously select eligible tickets, start and supervise BB agent work, avoid duplicate dispatch, recover after restart, and reflect progress back through the existing Taskboard provider/status model. Reuse the current taskboard architecture and keep the first implementation focused and operable.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 1,
+    "message": "Redesign the Taskboard Autonomous factory project settings UI to be minimalist. Keep all existing controls and behavior, but remove the heavy nested AI card, reduce helper copy and status chrome, present the AI selection as one quiet compact row, and make enablement, concurrency, and save feel like one simple settings line. Preserve accessibility, responsive layout, and the existing ExecutionPicker data flow.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:29022ace2db69cef386e04b1a884c33733cd71a84b435ca92f89f57496c74a0e",
+    "approvedSpecRevision": 55,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:ba4619b85d824ad76e8bf14b30a8776166eca52930cf71ede8a469b92e360f0f",
+    "impactDigest": "sha256:3b1f1bda9a9699c5aed42506511efb1ee8f26c95c985cda5ebaed43154a5b479",
+    "capabilityClaimId": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin-63a17a591999",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-23T17:37:20.825Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin-63a17a591999",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_4crs23q8tu-1/bb-plugins",
+      "worktreeId": "sha256:97b93e0724b7096066b8243160868d9560541df602c0b09b923e7a1473e60397",
+      "baseCommit": "85d1b0655b9883adf940eab0d82d7bd95c956e28",
+      "baseTree": "a25cd39c6da0e7c195c6eabcdbd1b94b045ee2d4",
+      "bases": {
+        "taskboard-autonomous-factory": {
+          "capability": "taskboard-autonomous-factory",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "explicit project factory admission": null,
+            "one coordinator per ticket team": null,
+            "bounded and observable automation": null,
+            "preserve execution and acceptance boundaries": null,
+            "explicit ai selection": null,
+            "software factory operator console": null,
+            "ticket drafting uses the selected ai and detail": null
+          }
+        }
+      },
+      "capabilities": [
+        "taskboard-autonomous-factory"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-19T18:18:31.861Z",
+      "heartbeatAt": "2026-10-20T20:42:35.884Z",
+      "digest": "sha256:3514b7811f86b13050ae7fb732038b4235275e37c3f6d4028c4bf7c4892a11b2"
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 10,
+      "capabilities": 1,
+      "reason": "The picker, per-task execution, and draft-rewrite mode share the same AI resolution path and new-task surface. Splitting them would ship a picker that cannot affect the task it belongs to, or a helper whose model differs from the visible choice.",
+      "actor": "agent",
+      "revision": 55
+    },
+    "trackerGeneration": 28,
+    "lifecycle": {
+      "riskRequest": "Let users choose which AI (provider and model, plus reasoning, permission mode, and service tier) the Taskboard factory uses for its coordinator and stage sessions. Persist the choice in the project factory policy, expose it in project Manage and the CLI, and use it for manual Start task and automatic intake, falling back to the project native execution defaults only when no explicit choice exists. Today Start task from Taskboard fails with 'Choose native BB model and execution settings for this project first' when a project has no defaults and offers no way to choose.",
+      "stage": "iteration",
+      "iteration": 28,
+      "awaitingFeedback": false,
+      "contractRevision": 53
+    },
+    "budgetExtensionMinutes": 240,
+    "reviewFirst": true
+  },
+  "digest": "sha256:cc149576e505d78ed92eba69a11dbd9768813b2ec29196247a35083fffdb60b6"
+}

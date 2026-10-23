@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 89,
+  "revision": 91,
   "activeFeature": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin",
   "request": "Build an autonomous software factory into the existing Taskboard plugin, inspired by https://github.com/lpbaril/bb-plugin-factory. Make Linear, Jira, or the configured issue provider the source of truth. The factory should continuously select eligible tickets, start and supervise BB agent work, avoid duplicate dispatch, recover after restart, and reflect progress back through the existing Taskboard provider/status model. Reuse the current taskboard architecture and keep the first implementation focused and operable.",
   "profile": "complex",
@@ -9,8 +9,8 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 1,
-  "message": "Start task now opens a compact native execution picker before dispatch. The dialog seeds the current thread or project execution, requires an actual provider/model selection, passes the exact FactoryExecution to factoryStartTask only after confirmation, and preserves cancel, duplicate-submit, error, and navigation behavior. Browser assertions were added for no pre-confirm dispatch, cancellation, exact selected execution, navigation, responsive overflow, and screenshots. The inherited autonomous tracker status and read-only factoryGet fixes were preserved, committed, and merged with current main without conflicts. Verification remains pending and was not claimed.",
-  "implementationActor": "agent",
+  "message": "Redesigned Autonomous factory project settings as a minimalist layout. Removed the nested AI card and decorative icon, presented ExecutionPicker in one labeled quiet row, condensed activity metrics to an inline status line, and combined enablement, concurrency, and save into one compact settings row. Preserved all existing controls, accessibility labels, status branches, and RPC/data flow. No tests or browser checks run per task instructions.",
+  "implementationActor": "codex",
   "workStartedAt": null,
   "specDigest": "sha256:29022ace2db69cef386e04b1a884c33733cd71a84b435ca92f89f57496c74a0e",
   "approvedSpecRevision": 55,
@@ -36,7 +36,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-23T16:44:07.688Z",
+  "updatedAt": "2026-10-23T17:38:34.828Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin-63a17a591999",
@@ -78,10 +78,10 @@
     "actor": "agent",
     "revision": 55
   },
-  "trackerGeneration": 27,
+  "trackerGeneration": 28,
   "lifecycle": {
     "stage": "iteration",
-    "iteration": 27,
+    "iteration": 28,
     "awaitingFeedback": true,
     "contractRevision": 53,
     "riskRequest": "Let users choose which AI (provider and model, plus reasoning, permission mode, and service tier) the Taskboard factory uses for its coordinator and stage sessions. Persist the choice in the project factory policy, expose it in project Manage and the CLI, and use it for manual Start task and automatic intake, falling back to the project native execution defaults only when no explicit choice exists. Today Start task from Taskboard fails with 'Choose native BB model and execution settings for this project first' when a project has no defaults and offers no way to choose."

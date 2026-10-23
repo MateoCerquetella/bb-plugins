@@ -85,18 +85,10 @@ function ProjectSettings({ projectId, provider }: { projectId: string; provider:
   const scanLabel = lastScan ? new Date(lastScan.observedAt).toLocaleTimeString([], {
     hour: '2-digit', minute: '2-digit'
   }) : 'Never';
-  return <form onSubmit={event => { event.preventDefault(); void save(); }} className="tb-settings-card min-w-0 space-y-5 rounded-lg border p-4 [overflow-wrap:anywhere] @lg:p-5" aria-label="Autonomous factory">
+  return <form onSubmit={event => { event.preventDefault(); void save(); }} className="tb-settings-card min-w-0 space-y-4 rounded-lg border p-4 [overflow-wrap:anywhere] @lg:p-5" aria-label="Autonomous factory">
     <div className="flex flex-wrap items-start justify-between gap-3">
       <div className="min-w-0 space-y-1">
-        <h3 className="flex items-center gap-2 text-sm font-semibold">
-          <span className="flex size-7 shrink-0 items-center justify-center rounded-md border border-border bg-[color-mix(in_oklch,var(--canvas)_96%,var(--ink)_4%)] text-muted-foreground">
-            <Icon name="AiContentGenerator01" className="size-4" />
-          </span>
-          Autonomous factory
-        </h3>
-        <p className="max-w-2xl text-xs leading-relaxed text-muted-foreground">
-          Let Taskboard pick eligible tickets and run them with the AI you choose.
-        </p>
+        <h3 className="text-sm font-semibold">Autonomous factory</h3>
       </div>
       <div className="flex flex-wrap items-center gap-2">
         {dirty ? <Badge variant="outline" className="border-border text-muted-foreground">Unsaved</Badge> : null}
@@ -104,56 +96,35 @@ function ProjectSettings({ projectId, provider }: { projectId: string; provider:
       </div>
     </div>
 
-    <div className="rounded-lg border border-border bg-[color-mix(in_oklch,var(--canvas)_97%,var(--ink)_3%)] p-3 @lg:p-4">
-      <ExecutionPicker
-        projectId={projectId}
-        value={execution}
-        onChange={next => { setExecution(next); setDirty(true); }}
-        disabled={saving || !status}
-        showSummary
-        defaultsLabel="Project default"
-      />
-      <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
-        Applies to new coordinator and stage sessions. Existing sessions keep their original model.
-      </p>
+    <div className="flex flex-wrap items-center gap-3 border-y border-border py-3">
+      <span className="text-xs font-medium text-muted-foreground">AI for new sessions</span>
+      <div className="min-w-0 flex-1">
+        <ExecutionPicker
+          projectId={projectId}
+          value={execution}
+          onChange={next => { setExecution(next); setDirty(true); }}
+          disabled={saving || !status}
+        />
+      </div>
+      <Button type="button" variant="ghost" size="sm" disabled={saving || !status || !execution}
+        onClick={() => { setExecution(null); setDirty(true); }}>
+        Use project defaults
+      </Button>
     </div>
 
-    <div className="grid gap-2 sm:grid-cols-3">
-      <div className="rounded-md border border-border px-3 py-2">
-        <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Active</p>
-        <p className="mt-0.5 text-sm font-semibold tabular-nums">{active} <span className="font-normal text-muted-foreground">/ {limit}</span></p>
-        <p className="mt-0.5 text-[10px] text-muted-foreground">automatic workflows</p>
-      </div>
-      <div className="rounded-md border border-border px-3 py-2">
-        <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Queue</p>
-        <p className="mt-0.5 text-sm font-semibold tabular-nums">{queue ?? 'Unknown'}</p>
-        <p className="mt-0.5 text-[10px] text-muted-foreground">last-known todo tickets</p>
-      </div>
-      <div className="rounded-md border border-border px-3 py-2">
-        <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Last scan</p>
-        <p className="mt-0.5 text-sm font-semibold">{scanLabel}</p>
-        <p className="mt-0.5 text-[10px] text-muted-foreground">{lastScan ? (lastScan.kind === 'success' ? 'Healthy' : 'Blocked') : 'Not yet scanned'}</p>
-      </div>
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground" aria-label="Factory activity">
+      <span>Active <strong className="font-medium text-foreground tabular-nums">{active}/{limit}</strong></span>
+      <span>Queue <strong className="font-medium text-foreground tabular-nums">{queue ?? 'Unknown'}</strong></span>
+      <span>Last scan <strong className="font-medium text-foreground">{scanLabel}</strong></span>
     </div>
-    <p className="text-[11px] leading-relaxed text-muted-foreground">
-      {queue === null
-        ? 'Queue size is unknown until a successful provider scan.'
-        : `${queue} last-known unclaimed todo tickets within the 500-ticket scan window.`}
-    </p>
-
-    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
-      <label className="flex min-w-0 cursor-pointer items-start gap-3 text-sm">
+    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3">
+      <label className="flex min-w-0 cursor-pointer items-center gap-2 text-sm">
         <input type="checkbox" className="mt-0.5 size-4 shrink-0" checked={enabled} disabled={saving || !status}
           onChange={event => { setEnabled(event.target.checked); setDirty(true); }} />
-        <span className="min-w-0">
-          <span className="block font-medium">Enable automatic intake</span>
-          <span className="block text-xs leading-relaxed text-muted-foreground">
-            Claim eligible todo tickets and run the stage workflow.
-          </span>
-        </span>
+        <span className="font-medium">Enable automatic intake</span>
       </label>
-      <div className="flex items-end gap-2">
-        <label className="flex flex-col gap-1.5 text-xs font-medium text-muted-foreground">
+      <div className="flex items-center gap-2">
+        <label className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
           Concurrency
           <Input className="tb-field h-9 w-20 tabular-nums" type="number" min={1} max={20}
             aria-label="Automatic concurrency"
