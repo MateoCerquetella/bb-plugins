@@ -112,7 +112,7 @@ try {
   await factorySettings.getByRole('combobox', { name: 'AI provider' }).selectOption('claude:claude-sonnet');
   await factorySettings.getByRole('button', { name: /^Save (settings|changes)$/ }).click();
   await factorySettings.getByText('Running', { exact: true }).waitFor();
-  await factorySettings.getByText('Applies to new coordinator and stage sessions. Existing sessions keep their original model.').waitFor();
+  assert.equal(await factorySettings.getByRole('combobox', { name: 'AI provider' }).inputValue(), 'claude:claude-sonnet');
   for (const width of [1280, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, `taskboard-factory-settings-${width}.png`) });
@@ -499,12 +499,11 @@ try {
       : state === 'running' ? 'Running' : 'Disabled';
     await factorySettings.getByText(expected, { exact: true }).first().waitFor();
     if (state === 'awaiting_scan') {
-      await factorySettings.getByText('Queue size is unknown until a successful provider scan.', { exact: false }).waitFor();
+      await factorySettings.getByText('Queue Unknown', { exact: true }).waitFor();
       await factorySettings.getByText('Automatic intake is enabled and awaiting its first provider scan.').waitFor();
       assert.equal(await factorySettings.getByText('Factory paused. No new automatic stages will start.').count(), 0);
     } else if (state === 'running') {
-      await factorySettings.getByText('3 last-known unclaimed todo tickets within the 500-ticket scan window', { exact: false }).waitFor();
-      await factorySettings.getByText('Healthy', { exact: true }).waitFor();
+      await factorySettings.getByText('Queue 3', { exact: true }).waitFor();
     } else if (state === 'provider_error') {
       await factorySettings.getByText('Live provider scan failed.', { exact: false }).waitFor();
     }

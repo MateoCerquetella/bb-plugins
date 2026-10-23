@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 92,
+  "revision": 94,
   "activeFeature": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin",
   "request": "Build an autonomous software factory into the existing Taskboard plugin, inspired by https://github.com/lpbaril/bb-plugin-factory. Make Linear, Jira, or the configured issue provider the source of truth. The factory should continuously select eligible tickets, start and supervise BB agent work, avoid duplicate dispatch, recover after restart, and reflect progress back through the existing Taskboard provider/status model. Reuse the current taskboard architecture and keep the first implementation focused and operable.",
   "profile": "complex",
@@ -9,8 +9,8 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 1,
-  "message": "Finish the minimalist settings pass by removing the duplicate ExecutionPicker summary inside the AI row. Show only the provider/model and permission controls plus a small Use project defaults action; remove the redundant queue helper sentence while preserving queue count and all behavior.",
-  "implementationActor": "codex",
+  "message": "Polish the Taskboard Autonomous factory project settings into a truly minimalist configuration surface and provide fresh desktop and mobile screenshots. Remove remaining unnecessary panel chrome and repeated status copy where the real preview shows it is still visually heavy, preserve every existing control and behavior, and update the focused browser assertions to the simplified copy and layout.",
+  "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:29022ace2db69cef386e04b1a884c33733cd71a84b435ca92f89f57496c74a0e",
   "approvedSpecRevision": 55,
@@ -37,7 +37,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-23T17:39:51.260Z",
+  "updatedAt": "2026-10-23T17:42:13.843Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin-63a17a591999",
@@ -79,11 +79,11 @@
     "actor": "agent",
     "revision": 55
   },
-  "trackerGeneration": 29,
+  "trackerGeneration": 30,
   "lifecycle": {
     "riskRequest": "Let users choose which AI (provider and model, plus reasoning, permission mode, and service tier) the Taskboard factory uses for its coordinator and stage sessions. Persist the choice in the project factory policy, expose it in project Manage and the CLI, and use it for manual Start task and automatic intake, falling back to the project native execution defaults only when no explicit choice exists. Today Start task from Taskboard fails with 'Choose native BB model and execution settings for this project first' when a project has no defaults and offers no way to choose.",
     "stage": "iteration",
-    "iteration": 29,
+    "iteration": 30,
     "awaitingFeedback": false,
     "contractRevision": 53
   },

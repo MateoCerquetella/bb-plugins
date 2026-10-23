@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRealtime, useRpc } from '@get-bb/plugin-sdk/app';
 import type { TaskboardRpcContract, WorkSource } from '../contract.js';
 import type { FactoryExecution, FactoryProjectStatus } from './contract.js';
-import { Badge } from '../components/ui/badge.js';
 import { Button } from '../components/ui/button.js';
 import { Icon } from '../components/ui/icon.js';
 import { Input } from '../components/ui/input.js';
@@ -75,30 +74,29 @@ function ProjectSettings({ projectId, provider }: { projectId: string; provider:
     : status.kind === 'paused' ? 'Paused'
     : status.kind === 'blocked' ? 'Blocked' : 'Disabled';
   const stateClass = status?.kind === 'running'
-    ? 'border-[color-mix(in_oklch,var(--success)_40%,transparent)] text-[var(--success)]'
-    : status?.kind === 'blocked' ? 'border-destructive/40 text-destructive'
-    : status?.kind === 'paused' ? 'border-border text-muted-foreground'
-    : 'border-border text-foreground';
+    ? 'text-[var(--success)]'
+    : status?.kind === 'blocked' ? 'text-destructive'
+    : 'text-muted-foreground';
   const active = status && 'active' in status ? status.active : 0;
   const queue = status?.queue ?? null;
   const lastScan = status?.lastScan;
   const scanLabel = lastScan ? new Date(lastScan.observedAt).toLocaleTimeString([], {
     hour: '2-digit', minute: '2-digit'
   }) : 'Never';
-  return <form onSubmit={event => { event.preventDefault(); void save(); }} className="tb-settings-card min-w-0 space-y-4 rounded-lg border p-4 [overflow-wrap:anywhere] @lg:p-5" aria-label="Autonomous factory">
+  return <form onSubmit={event => { event.preventDefault(); void save(); }} className="min-w-0 space-y-4 [overflow-wrap:anywhere]" aria-label="Autonomous factory">
     <div className="flex flex-wrap items-start justify-between gap-3">
       <div className="min-w-0 space-y-1">
         <h3 className="text-sm font-semibold">Autonomous factory</h3>
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        {dirty ? <Badge variant="outline" className="border-border text-muted-foreground">Unsaved</Badge> : null}
-        <Badge variant="outline" className={stateClass}>{stateLabel}</Badge>
+        {dirty ? <span className="text-xs text-muted-foreground">Unsaved</span> : null}
+        <span role="status" className={`text-xs ${stateClass}`}>{stateLabel}</span>
       </div>
     </div>
 
-    <div className="flex flex-wrap items-center gap-3 border-y border-border py-3">
+    <div className="flex flex-wrap items-center gap-3">
       <span className="text-xs font-medium text-muted-foreground">AI for new sessions</span>
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 flex-1" style={{ flexBasis: 280 }}>
         <ExecutionPicker
           projectId={projectId}
           value={execution}
@@ -112,12 +110,7 @@ function ProjectSettings({ projectId, provider }: { projectId: string; provider:
       </Button>
     </div>
 
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground" aria-label="Factory activity">
-      <span>Active <strong className="font-medium text-foreground tabular-nums">{active}/{limit}</strong></span>
-      <span>Queue <strong className="font-medium text-foreground tabular-nums">{queue ?? 'Unknown'}</strong></span>
-      <span>Last scan <strong className="font-medium text-foreground">{scanLabel}</strong></span>
-    </div>
-    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3">
+    <div className="flex flex-wrap items-center justify-between gap-3">
       <label className="flex min-w-0 cursor-pointer items-center gap-2 text-sm">
         <input type="checkbox" className="mt-0.5 size-4 shrink-0" checked={enabled} disabled={saving || !status}
           onChange={event => { setEnabled(event.target.checked); setDirty(true); }} />
@@ -137,14 +130,12 @@ function ProjectSettings({ projectId, provider }: { projectId: string; provider:
       </div>
     </div>
 
-    {status?.kind === 'running' ? <p role="status" className="flex items-center gap-2 text-xs text-muted-foreground">
-      <Icon name="CircleCheck" className="size-3.5 shrink-0 text-[var(--success)]" />
-      {status.available} automatic {status.available === 1 ? 'slot' : 'slots'} available · Intake: provider todo tickets
-    </p> : null}
-    {status?.kind === 'disabled' ? <p role="status" className="flex items-center gap-2 text-xs text-muted-foreground">
-      <Icon name="Pause" className="size-3.5 shrink-0" />
-      Automatic intake is off. Manual Start task still uses the AI above.
-    </p> : null}
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground" aria-label="Factory activity">
+      <span>Active <strong className="font-medium text-foreground tabular-nums">{active}/{limit}</strong></span>
+      <span>Queue <strong className="font-medium text-foreground tabular-nums">{queue ?? 'Unknown'}</strong></span>
+      <span>Last scan <strong className="font-medium text-foreground">{scanLabel}</strong></span>
+      <span>Intake: {provider} todo tickets</span>
+    </div>
     {status?.kind === 'paused' ? <p role="status" className="flex items-center gap-2 text-xs text-muted-foreground">
       <Icon name="Pause" className="size-3.5 shrink-0" />
       {status.policy.enabled
