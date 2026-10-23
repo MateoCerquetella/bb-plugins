@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 88,
+  "revision": 89,
   "activeFeature": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin",
   "request": "Build an autonomous software factory into the existing Taskboard plugin, inspired by https://github.com/lpbaril/bb-plugin-factory. Make Linear, Jira, or the configured issue provider the source of truth. The factory should continuously select eligible tickets, start and supervise BB agent work, avoid duplicate dispatch, recover after restart, and reflect progress back through the existing Taskboard provider/status model. Reuse the current taskboard architecture and keep the first implementation focused and operable.",
   "profile": "complex",
@@ -9,7 +9,7 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 1,
-  "message": "Inside Taskboard, when the user chooses Start task, let them pick the AI model before the task starts. Reuse the existing native provider/model execution picker and apply the selected execution to that task start without changing already-running sessions.",
+  "message": "Start task now opens a compact native execution picker before dispatch. The dialog seeds the current thread or project execution, requires an actual provider/model selection, passes the exact FactoryExecution to factoryStartTask only after confirmation, and preserves cancel, duplicate-submit, error, and navigation behavior. Browser assertions were added for no pre-confirm dispatch, cancellation, exact selected execution, navigation, responsive overflow, and screenshots. The inherited autonomous tracker status and read-only factoryGet fixes were preserved, committed, and merged with current main without conflicts. Verification remains pending and was not claimed.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:29022ace2db69cef386e04b1a884c33733cd71a84b435ca92f89f57496c74a0e",
@@ -23,21 +23,20 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": false,
+    "implemented": true,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "none",
+    "highest": "implemented",
     "reasons": {
-      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-23T16:38:11.995Z",
+  "updatedAt": "2026-10-23T16:44:07.688Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin-63a17a591999",
@@ -81,11 +80,11 @@
   },
   "trackerGeneration": 27,
   "lifecycle": {
-    "riskRequest": "Let users choose which AI (provider and model, plus reasoning, permission mode, and service tier) the Taskboard factory uses for its coordinator and stage sessions. Persist the choice in the project factory policy, expose it in project Manage and the CLI, and use it for manual Start task and automatic intake, falling back to the project native execution defaults only when no explicit choice exists. Today Start task from Taskboard fails with 'Choose native BB model and execution settings for this project first' when a project has no defaults and offers no way to choose.",
     "stage": "iteration",
     "iteration": 27,
-    "awaitingFeedback": false,
-    "contractRevision": 53
+    "awaitingFeedback": true,
+    "contractRevision": 53,
+    "riskRequest": "Let users choose which AI (provider and model, plus reasoning, permission mode, and service tier) the Taskboard factory uses for its coordinator and stage sessions. Persist the choice in the project factory policy, expose it in project Manage and the CLI, and use it for manual Start task and automatic intake, falling back to the project native execution defaults only when no explicit choice exists. Today Start task from Taskboard fails with 'Choose native BB model and execution settings for this project first' when a project has no defaults and offers no way to choose."
   },
   "budgetExtensionMinutes": 240,
   "reviewFirst": true
