@@ -76,6 +76,36 @@ try {
   await page.setViewportSize({ width: 1280, height: 1000 });
   await page.route('https://taskboard-preview.test/**', route => route.fulfill({ contentType: 'text/html', body: html }));
   await page.goto('https://taskboard-preview.test/');
+  if (process.env.TASKBOARD_START_TASK_ONLY) {
+    for (const width of [1280, 390]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.locator('#preview-card').getByRole('button', { name: 'Start task', exact: true }).click();
+      const dialog = page.getByRole('dialog', { name: 'Start task' });
+      await dialog.getByRole('button', { name: 'Start task', exact: true }).waitFor();
+      await page.waitForFunction(() => !document.querySelector('[role="dialog"] [role="status"]'));
+      assert.equal(await dialog.getByRole('combobox', { name: 'AI provider' }).inputValue(), 'claude:claude-sonnet');
+      assert.equal(await page.evaluate(() => window.factoryStarts), 0);
+      await dialog.getByRole('combobox', { name: 'AI provider' }).selectOption('codex:gpt-5');
+      assert.equal(await page.evaluate(() => window.factoryStarts), 0);
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+      await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, `taskboard-start-task-${width}.png`) });
+      await dialog.getByRole('button', { name: 'Cancel', exact: true }).click();
+      assert.equal(await page.evaluate(() => window.factoryStarts), 0);
+    }
+    await page.locator('#preview-card').getByRole('button', { name: 'Start task', exact: true }).click();
+    const dialog = page.getByRole('dialog', { name: 'Start task' });
+    await dialog.getByRole('combobox', { name: 'AI provider' }).selectOption('codex:gpt-5');
+    await dialog.getByRole('button', { name: 'Start task', exact: true }).click();
+    await dialog.waitFor({ state: 'hidden' });
+    assert.equal(await page.evaluate(() => window.factoryStarts), 1);
+    assert.deepEqual(await page.evaluate(() => window.factoryStartExecution), {
+      providerId: 'codex', model: 'gpt-5', permissionMode: 'auto',
+      reasoningLevel: 'medium', serviceTier: 'default'
+    });
+    assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_coordinator']);
+    assert.deepEqual(errors, []);
+    console.log(JSON.stringify({ startTaskConfirmation: 'passed', selectedModel: 'passed', cancel: 'passed', navigation: 'passed', desktop: 'passed', mobile: 'passed', errors }));
+  } else {
   const factorySettings = page.locator('#preview-factory-settings');
   await factorySettings.getByRole('checkbox', { name: 'Enable automatic intake' }).check();
   await factorySettings.getByRole('spinbutton', { name: 'Automatic concurrency' }).fill('2');
@@ -205,7 +235,17 @@ try {
   await manual.getByRole('button', { name: 'Approve revision 2' }).waitFor();
   assert.equal(await manual.getByRole('button', { name: 'Start build' }).count(), 0);
   await page.locator('#preview-card').getByRole('button', { name: 'Start task', exact: true }).click();
+  assert.equal(await page.evaluate(() => window.factoryStarts), 0);
+  const startDialog = page.getByRole('dialog', { name: 'Start task' });
+  await startDialog.getByRole('combobox', { name: 'AI provider' }).selectOption('codex:gpt-5');
+  await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, 'taskboard-start-task-model.png') });
+  assert.equal(await page.evaluate(() => window.factoryStarts), 0);
+  await startDialog.getByRole('button', { name: 'Start task', exact: true }).click();
   assert.equal(await page.evaluate(() => window.factoryStarts), 1);
+  assert.deepEqual(await page.evaluate(() => window.factoryStartExecution), {
+    providerId: 'codex', model: 'gpt-5', permissionMode: 'auto',
+    reasoningLevel: 'medium', serviceTier: 'default'
+  });
   assert.equal(await page.evaluate(() => localStorage.getItem('bb-taskboard:right-panel-pinned')), null);
   assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_investigate', 'thr_build', 'thr_coordinator']);
   await manual.getByRole('tab', { name: 'Activity', exact: true }).click();
@@ -571,6 +611,7 @@ try {
   }
   assert.deepEqual(errors, []);
   console.log(JSON.stringify({ desktop: 'passed', panel: 'passed', mobile: 'passed', kanbanStart: 'passed', liveStatus: 'passed', navigation: 'passed', staleApproval: 'passed', automaticActions: 'passed', reviewBlockers: 'passed', returnToBuild: 'passed', repairLimit: 'passed', coordinatorHierarchy: 'passed', coordinatorRecovery: 'passed', legacyAdoption: 'passed', keyboardDisclosure: 'passed', refreshRetention: 'passed', projectFactoryStates: 'passed', errors }));
+  }
 } catch (error) {
   console.error(JSON.stringify({ errors, page: await page.locator('body').innerText() }));
   throw error;

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Markdown, useBbContext, useBbNavigate, useRealtime, useRpc, useSettings } from '@get-bb/plugin-sdk/app';
 import type { TaskboardRpcContract, WorkItem } from '../contract.js';
-import type { FactoryProjectStatus, FactoryRecord, FactoryRun, FactoryRunKind } from './contract.js';
+import type { FactoryExecution, FactoryProjectStatus, FactoryRecord, FactoryRun, FactoryRunKind } from './contract.js';
 import type { EmpiricalObservation } from '../empirical/contract.js';
 import { Button } from '../components/ui/button.js';
 import { Icon } from '../components/ui/icon.js';
@@ -400,11 +400,11 @@ export function StartTaskButton({ item, disabled = false }: {
   const rpc = useRpc<TaskboardRpcContract>();
   const navigate = useBbNavigate();
   const context = useBbContext();
+  const [open, setOpen] = useState(false);
+  const [execution, setExecution] = useState<FactoryExecution | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [aiBusy, setAiBusy] = useState(false);
-  const [aiError, setAiError] = useState<string | null>(null);
-  const [aiNote, setAiNote] = useState<string | null>(null);
+  const executionTouched = useRef(false);
   const pending = useRef(false);
   async function start() {
     if (pending.current) return;
@@ -412,8 +412,10 @@ export function StartTaskButton({ item, disabled = false }: {
     try {
       const { record } = await rpc.call('factoryStartTask', {
         projectId: item.bbProjectId, source: item.source, locator: item.locator,
-        contextThreadId: context.projectId === item.bbProjectId ? context.threadId : null
+        contextThreadId: context.projectId === item.bbProjectId ? context.threadId : null,
+        execution
       });
+      setOpen(false);
       const run = record.runs.at(-1);
       const threadId = ticketThreadId(record);
       if (threadId) { requestTaskboardOpen(threadId); navigate.toThread(threadId); }
@@ -424,10 +426,45 @@ export function StartTaskButton({ item, disabled = false }: {
   }
   return <div className="tb-start-task">
     <Button size="sm" variant="outline" disabled={disabled || busy}
-      onClick={event => { event.stopPropagation(); void start(); }}>
+      onClick={event => {
+        event.stopPropagation();
+        executionTouched.current = false;
+        setExecution(null);
+        setOpen(true);
+      }}>
       <Icon name="AiContentGenerator01" className="size-3.5" />{busy ? 'Starting...' : 'Start task'}
     </Button>
-    {error && <ErrorNotice title="Task needs attention" nextStep="Inspect Agent progress before starting again; a session may already exist." detail={error} />}
+    <Dialog open={open} onOpenChange={next => { if (!busy) setOpen(next); }}>
+      <DialogContent className="max-w-md" onClick={event => event.stopPropagation()}>
+        <DialogTitle>Start task</DialogTitle>
+        <DialogDescription>Choose the AI for this task before starting work.</DialogDescription>
+        <ExecutionPicker
+          projectId={item.bbProjectId}
+          value={execution}
+          onChange={next => { executionTouched.current = true; setExecution(next); }}
+          threadId={context.projectId === item.bbProjectId ? context.threadId : null}
+          disabled={busy}
+          showSummary
+          summaryTitle="AI for this task"
+          compact
+          defaultsLabel={context.projectId === item.bbProjectId ? 'Thread default' : 'Project default'}
+          resetLabel={context.projectId === item.bbProjectId ? 'Use thread defaults' : 'Use project defaults'}
+          onDefaults={defaults => {
+            if (!executionTouched.current) setExecution(defaults);
+          }}
+        />
+        {error && <ErrorNotice title="Task needs attention" nextStep="Inspect Agent progress before starting again; a session may already exist." detail={error} />}
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <Button type="button" variant="ghost" disabled={busy} onClick={() => setOpen(false)}>Cancel</Button>
+          <Button type="button" disabled={disabled || busy || !execution} aria-busy={busy}
+            onClick={() => void start()}>
+            <Icon name={busy ? 'Loading' : 'AiContentGenerator01'} className="size-3.5" />
+            {busy ? 'Starting...' : 'Start task'}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+    {!open && error && <ErrorNotice title="Task needs attention" nextStep="Inspect Agent progress before starting again; a session may already exist." detail={error} />}
   </div>;
 }
 export function FactoryProgress({ item }: { item: WorkItem }) {

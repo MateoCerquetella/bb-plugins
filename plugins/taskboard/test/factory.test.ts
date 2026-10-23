@@ -17,7 +17,7 @@ registerHooks({
   }
 });
 const { factoryCoordinatorSchema, factoryRecordSchema } = await import('../factory/contract.ts');
-const { progressStatus } = await import('../factory/tracker.ts');
+const { progressStatus, reviewStatus } = await import('../factory/tracker.ts');
 const { newRecord, savePlan, approvePlan, startRun } = await import('../factory/state.ts');
 const { createFactoryStore } = await import('../factory/store.ts');
 const { createFactoryService, applyNativeEvent, factoryPrompt } = await import('../factory/service.ts');
@@ -291,6 +291,7 @@ function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
   let onCoordinatorSpawn = () => {};
   let sends = 0;
   let progressWrites = 0;
+  const progressTargets: string[] = [];
   let failProgress = false;
   let output = 'Observed repository findings';
   let projectDefaults: {
@@ -404,10 +405,12 @@ function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
   } as unknown as Parameters<typeof createFactoryService>[0];
   const service = createFactoryService(sdk, store, () => {}, {
     getItem: () => cachedItem,
-    async markInProgress() {
+    async markStatus(_item, target) {
       progressWrites++;
+      progressTargets.push(target);
       if (failProgress) throw new Error('Provider permission denied');
-      return { status: 'synced', message: null };
+      return { status: 'synced', message: null, target,
+        statusName: target === 'review' ? 'In Review' : target === 'done' ? 'Done' : 'In Progress' };
     }
   }, queue);
   return {
@@ -426,6 +429,7 @@ function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
     fail: () => { failSpawn = true; },
     failSend: () => { failSend = true; },
     sends: () => sends, sent, progressWrites: () => progressWrites,
+    progressTargets: () => progressTargets,
     threadStatus: (value: string, threadId?: string) => {
       if (threadId) threadStatuses.set(threadId, value); else threadStatus = value;
     },
@@ -1505,7 +1509,10 @@ test('Start task hands four stages to fresh sessions and preserves the exact app
     assert.equal(new Set(record.runs.map(run => run.threadId)).size, 4);
     assert.equal(f.spawns(), 4);
     assert.equal(f.sends(), 0);
-    assert.equal(f.progressWrites(), 1);
+    assert.equal(f.progressWrites(), 2);
+    assert.deepEqual(f.progressTargets(), ['in_progress', 'review']);
+    assert.equal(record.trackerProgress.target, 'review');
+    assert.equal(record.trackerProgress.statusName, 'In Review');
   } finally { f.db.close(); }
 });
 
@@ -1791,6 +1798,20 @@ test('review outcomes require a valid result; legacy negative verdicts are recov
   assert.equal(readReviewResult('<taskboard-review>{"verdict":"passed","findings":"Verified abc123"}</taskboard-review>').verdict, 'passed');
 });
 
+test('opening a ticket does not write provider status; the background poll does', async () => {
+  const f = fixture();
+  try {
+    seedReview(f, '::taskboard-result{kind="review" verdict="passed"}\nVerified implementation');
+    await f.service.get(item);
+    assert.equal(f.progressWrites(), 0);
+    assert.equal(f.store.all()[0].trackerProgress.target, undefined);
+    await f.service.poll(new AbortController().signal);
+    assert.equal(f.progressWrites(), 1);
+    assert.deepEqual(f.progressTargets(), ['review']);
+    assert.equal(f.store.all()[0].trackerProgress.target, 'review');
+  } finally { f.db.close(); }
+});
+
 test('blocked review automatically resumes the same Build with findings exactly once', async () => {
   const f = fixture();
   try {
@@ -1811,7 +1832,9 @@ test('blocked review automatically resumes the same Build with findings exactly 
     assert.match(f.sent[0].input[0].text, /requested implementation is missing/);
     assert.match(f.sent[0].input[0].text, /same implementation worktree and revision/);
     assert.match(f.sent[0].input[0].text, /Keep the ticket In Progress/);
-    assert.equal(f.progressWrites(), 0);
+    assert.equal(f.progressWrites(), 1);
+    assert.deepEqual(f.progressTargets(), ['in_progress']);
+    assert.equal(record.trackerProgress.target, 'in_progress');
     await f.service.recover();
     await f.service.get(item);
     assert.equal(f.sends(), 1);
@@ -1839,7 +1862,9 @@ test('repair completion starts independent review of the repaired Build workspac
     assert.equal(record.stage, 'Review');
     assert.equal(f.sends(), 1);
     assert.equal(f.spawns(), 1);
-    assert.equal(f.progressWrites(), 0);
+    assert.equal(f.progressWrites(), 2);
+    assert.deepEqual(f.progressTargets(), ['in_progress', 'review']);
+    assert.equal(record.trackerProgress.target, 'review');
   } finally { f.db.close(); }
 });
 
@@ -2081,7 +2106,11 @@ test('review repair loop stops after two attempts without closing the tracker', 
     assert.equal(f.spawns(), 2);
     await f.service.startTask(item, null);
     assert.equal(f.sends(), 2);
-    assert.equal(f.progressWrites(), 0);
+    await f.service.poll(new AbortController().signal);
+    assert.equal(f.progressWrites(), 5);
+    assert.deepEqual(f.progressTargets(), ['in_progress', 'review', 'in_progress', 'review', 'in_progress']);
+    assert.equal(f.store.all()[0].trackerProgress.target, 'in_progress');
+    assert.ok(!f.progressTargets().includes('done'));
   } finally { f.db.close(); }
 });
 
@@ -2349,12 +2378,18 @@ test('scope changes and an empty plan pause automatic build', async () => {
   } finally { f.db.close(); }
 });
 
-test('only provider-supported In progress transitions are selected', () => {
+test('only provider-supported In progress and In review transitions are selected', () => {
   const option = (id: string, name: string, stateCategory: 'todo' | 'in_progress') => ({
     id, name, stateCategory, current: false
   });
   assert.equal(progressStatus([option('open', 'Open', 'todo')]), undefined);
+  assert.equal(progressStatus([option('review', 'In review', 'in_progress')]), undefined);
   assert.equal(progressStatus([
     option('review', 'In review', 'in_progress'), option('work', 'In Progress', 'in_progress')
   ])?.id, 'work');
+  assert.equal(reviewStatus([
+    option('work', 'In Progress', 'in_progress'), option('review', 'In Review', 'in_progress')
+  ])?.id, 'review');
+  assert.equal(reviewStatus([option('qa', 'QA', 'in_progress')])?.id, 'qa');
+  assert.equal(reviewStatus([option('work', 'In Progress', 'in_progress')]), undefined);
 });

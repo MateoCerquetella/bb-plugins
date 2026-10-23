@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 83,
+  "revision": 88,
   "activeFeature": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin",
   "request": "Build an autonomous software factory into the existing Taskboard plugin, inspired by https://github.com/lpbaril/bb-plugin-factory. Make Linear, Jira, or the configured issue provider the source of truth. The factory should continuously select eligible tickets, start and supervise BB agent work, avoid duplicate dispatch, recover after restart, and reflect progress back through the existing Taskboard provider/status model. Reuse the current taskboard architecture and keep the first implementation focused and operable.",
   "profile": "complex",
@@ -9,7 +9,7 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 1,
-  "message": "Upgraded the factory progress to a node-and-rail stepper with check markers and a current Review ring. Turned Review evidence into a compact host-theme card: Checks / Failed / Files / Plan metric strip, a checks meter with a red failed segment, and icon disclosure rows for Validation evidence, Commands executed, changed files, plan and Coordinator and workspace. The workspace now sits inside the stage card. Verified live at 1280/390; no horizontal overflow; typecheck and build pass. Suite not rerun; branch remains uncommitted and 22 behind main.",
+  "message": "Inside Taskboard, when the user chooses Start task, let them pick the AI model before the task starts. Reuse the existing native provider/model execution picker and apply the selected execution to that task start without changing already-running sessions.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:29022ace2db69cef386e04b1a884c33733cd71a84b435ca92f89f57496c74a0e",
@@ -23,20 +23,21 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": true,
+    "implemented": false,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "implemented",
+    "highest": "none",
     "reasons": {
+      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-22T03:49:57.876Z",
+  "updatedAt": "2026-10-23T16:38:11.995Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin-63a17a591999",
@@ -78,13 +79,13 @@
     "actor": "agent",
     "revision": 55
   },
-  "trackerGeneration": 24,
+  "trackerGeneration": 27,
   "lifecycle": {
+    "riskRequest": "Let users choose which AI (provider and model, plus reasoning, permission mode, and service tier) the Taskboard factory uses for its coordinator and stage sessions. Persist the choice in the project factory policy, expose it in project Manage and the CLI, and use it for manual Start task and automatic intake, falling back to the project native execution defaults only when no explicit choice exists. Today Start task from Taskboard fails with 'Choose native BB model and execution settings for this project first' when a project has no defaults and offers no way to choose.",
     "stage": "iteration",
-    "iteration": 24,
-    "awaitingFeedback": true,
-    "contractRevision": 53,
-    "riskRequest": "Let users choose which AI (provider and model, plus reasoning, permission mode, and service tier) the Taskboard factory uses for its coordinator and stage sessions. Persist the choice in the project factory policy, expose it in project Manage and the CLI, and use it for manual Start task and automatic intake, falling back to the project native execution defaults only when no explicit choice exists. Today Start task from Taskboard fails with 'Choose native BB model and execution settings for this project first' when a project has no defaults and offers no way to choose."
+    "iteration": 27,
+    "awaitingFeedback": false,
+    "contractRevision": 53
   },
   "budgetExtensionMinutes": 240,
   "reviewFirst": true

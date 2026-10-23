@@ -79,12 +79,12 @@ import { createWorkItemStore } from './store.js';
 import { decodeTicketImage } from './ticket-images-server.js';
 import { createFactoryStore } from './factory/store.js';
 import { createFactoryService } from './factory/service.js';
-import { factoryProjectPolicySchema, type FactoryIdentity } from './factory/contract.js';
+import { factoryProjectPolicySchema, type FactoryIdentity, type FactoryStatusTarget } from './factory/contract.js';
 import { threadExecution } from './factory/native-dispatch.js';
 import { factoryKey } from './factory/state.js';
 import { createEmpiricalObservationQueue } from './empirical/serial.js';
 import { hostContract } from './preparation/contract.js';
-import { progressStatus } from './factory/tracker.js';
+import { doneStatus, progressStatus, reviewStatus, statusTargetLabel } from './factory/tracker.js';
 
 const SOURCES: readonly WorkSource[] = ['linear', 'github', 'jira', 'gitlab', 'gitea'];
 const CREDENTIAL_SOURCES: readonly CredentialSource[] = ['linear', 'jira'];
@@ -474,20 +474,35 @@ export default async function plugin(bb: BbPluginApi) {
   const factory = createFactoryService(bb.sdk, factoryStore, projectId =>
     bb.realtime.publish('taskboard:factory', { projectId }), {
       getItem: identity => store.get(identity.projectId, identity.source, identity.locator) ?? null,
-      async markInProgress(item) {
+      async markStatus(item, target: FactoryStatusTarget) {
         const live = await getLiveItem(item.bbProjectId, item.source, item.locator);
-        if (live.stateCategory === 'in_progress') return { status: 'synced', message: null };
-        if (['done', 'canceled'].includes(live.stateCategory)) {
-          return { status: 'unavailable', message: 'Issue is closed or canceled. Reopen it to update its status.' };
+        if (target !== 'done' && ['done', 'canceled'].includes(live.stateCategory)) {
+          return {
+            status: 'unavailable', target,
+            message: 'Issue is closed or canceled. Reopen it to update its status.'
+          };
         }
-        const option = progressStatus(await liveStatusOptions(item.bbProjectId, item.source, item.locator));
-        if (!option) return {
-          status: 'unavailable',
-          message: `${sourceName(item.source)} has no In progress transition for this issue. Agent work is tracked here.`
-        };
+        if (target === 'done' && live.stateCategory === 'done') {
+          return { status: 'synced', message: null, target, statusName: live.status };
+        }
+        const options = await liveStatusOptions(item.bbProjectId, item.source, item.locator);
+        const option = target === 'review' ? reviewStatus(options)
+          : target === 'done' ? doneStatus(options)
+          : progressStatus(options);
+        if (!option) {
+          return {
+            status: 'unavailable', target,
+            message: `${sourceName(item.source)} has no ${statusTargetLabel(target)} transition for this issue. Agent work is tracked here.`
+          };
+        }
+        if (option.current) {
+          return { status: 'synced', message: null, target, statusName: option.name };
+        }
         const updated = await updateItemStatus(item.bbProjectId, item.source, item.locator, option.id);
-        if (updated.stateCategory !== 'in_progress') throw new Error('The tracker did not confirm In progress.');
-        return { status: 'synced', message: null };
+        if (updated.stateCategory !== option.stateCategory) {
+          throw new Error(`The tracker did not confirm ${statusTargetLabel(target)}.`);
+        }
+        return { status: 'synced', message: null, target, statusName: option.name };
       }
     }, {
       provider: projectId => projectConfig(projectId, true).source,

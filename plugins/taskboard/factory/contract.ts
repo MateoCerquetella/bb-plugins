@@ -125,6 +125,8 @@ export const factoryCoordinatorSchema = z.discriminatedUnion('status', [
   }).strict()
 ]);
 export type FactoryCoordinator = z.infer<typeof factoryCoordinatorSchema>;
+export const factoryStatusTargetSchema = z.enum(['in_progress', 'review', 'done']);
+export type FactoryStatusTarget = z.infer<typeof factoryStatusTargetSchema>;
 export const factoryRecordSchema = factoryIdentitySchema.extend({
   schemaVersion: z.literal(1),
   version: z.number().int().nonnegative(),
@@ -140,7 +142,9 @@ export const factoryRecordSchema = factoryIdentitySchema.extend({
   coordinator: factoryCoordinatorSchema.nullable().default(null),
   trackerProgress: z.object({
     status: z.enum(['pending', 'synced', 'unavailable', 'failed']),
-    message: z.string().nullable()
+    message: z.string().nullable(),
+    target: factoryStatusTargetSchema.nullable().optional(),
+    statusName: z.string().max(500).nullable().optional()
   }).strict().default({ status: 'pending', message: null }),
   runs: z.array(factoryRunSchema),
   updatedAt: z.string()

@@ -1,19 +1,30 @@
 import type { BbPluginApi } from '@get-bb/plugin-sdk';
 import { posix, win32 } from 'node:path';
 import { formatWorkItemContext, type WorkItem } from '../contract.js';
-import type { FactoryIdentity, FactoryProjectPolicy, FactoryRecord, FactoryRun, FactoryRunKind } from './contract.js';
+import type { FactoryIdentity, FactoryProjectPolicy, FactoryRecord, FactoryRun, FactoryRunKind, FactoryStatusTarget } from './contract.js';
 import { approvePlan, assertVersion, factoryKey, legacyRun, newRecord, savePlan, scopeDigest, startRun } from './state.js';
 import type { createFactoryStore } from './store.js';
 import { MAX_REVIEW_REPAIRS, readBuildResult, readReviewResult } from './review.js';
 import { CoordinatorIntentConflict, createCoordinatorLifecycle } from './coordinator.js';
 import { dispatchRejection, executionForDispatch, nativeError as message, threadExecution } from './native-dispatch.js';
+import { statusTargetLabel, trackerTarget } from './tracker.js';
 
 type Store = ReturnType<typeof createFactoryStore>;
 type Sdk = BbPluginApi['sdk'];
 type Event = Awaited<ReturnType<Sdk['threads']['events']['list']>>[number];
 class SessionBusyError extends Error {}
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, label: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`${label} timed out after ${Math.round(timeoutMs / 1000)}s. Refresh and retry.`)), timeoutMs);
+    promise.then(
+      value => { clearTimeout(timer); resolve(value); },
+      error => { clearTimeout(timer); reject(error); }
+    );
+  });
+}
 const unavailableSession = 'Native session is unavailable or failed. Open its thread for details.';
 const MAX_AUTOMATIC_BUILD_CONTINUATIONS = 2;
+const STATUS_SYNC_TIMEOUT_MS = 6_000;
 const boundedEvidence = (value: string, limit = 20_000) =>
   value.length <= limit ? value : `${value.slice(0, limit)}\n\n[Taskboard truncated earlier agent output.]`;
 
@@ -134,7 +145,7 @@ export function createFactoryService(
   sdk: Sdk, store: Store, changed: (projectId: string) => void,
   tracker?: {
     getItem: (identity: FactoryIdentity) => WorkItem | null;
-    markInProgress: (item: WorkItem) => Promise<FactoryRecord['trackerProgress']>;
+    markStatus: (item: WorkItem, target: FactoryStatusTarget) => Promise<FactoryRecord['trackerProgress']>;
   },
   queue?: {
     provider: (projectId: string) => FactoryProjectPolicy['provider'];
@@ -293,17 +304,22 @@ export function createFactoryService(
     return dirty ? persist(record) : record;
   }
   async function syncProgress(item: WorkItem, record: FactoryRecord) {
-    if (!tracker || record.trackerProgress.status !== 'pending' ||
-      !record.runs.some(run => run.threadId && ['running', 'finished'].includes(run.status))) return record;
+    if (!tracker || !record.runs.some(run => run.threadId && ['running', 'finished'].includes(run.status))) return record;
+    const target = trackerTarget(record);
+    if (record.trackerProgress.target === target && record.trackerProgress.status !== 'pending') return record;
     try {
-      record.trackerProgress = await tracker.markInProgress(item);
+      record.trackerProgress = await withTimeout(tracker.markStatus(item, target), STATUS_SYNC_TIMEOUT_MS, 'Tracker status update');
     } catch (error) {
-      record.trackerProgress = { status: 'failed', message: `Could not move issue to In progress: ${message(error)}` };
+      record.trackerProgress = {
+        status: 'failed',
+        message: `Could not move issue to ${statusTargetLabel(target)}: ${message(error)}`,
+        target
+      };
     }
     return persist(record);
   }
-  async function advance(item: WorkItem | null, record: FactoryRecord, signal?: AbortSignal, restoreArchived = false, automaticDispatch = true) {
-    if (item) record = await syncProgress(item, record);
+  async function advance(item: WorkItem | null, record: FactoryRecord, signal?: AbortSignal, restoreArchived = false, automaticDispatch = true, syncProvider = true) {
+    if (item && syncProvider) record = await syncProgress(item, record);
     const run = record.runs.at(-1);
     if (!record.automatic || record.automationError || !run || run.status !== 'finished' ||
       run.error || signal?.aborted || record.runs.some(candidate =>
@@ -676,7 +692,9 @@ export function createFactoryService(
       return locked(identity, async () => {
         const saved = store.get(identity);
         const record = saved?.admission.kind === 'factory' ? saved : current(item);
-        return advance(item, await reconcile(record, signal), signal);
+        // Keep the detail read fast. Provider writes happen in the background poll,
+        // stage dispatch, or an explicit status retry, not while opening a ticket.
+        return advance(item, await reconcile(record, signal), signal, false, true, false);
       });
     },
     async startTask(item: WorkItem, contextThreadId: string | null, execution?: FactoryRecord['execution']) {
@@ -734,7 +752,7 @@ export function createFactoryService(
     async retryStatus(item: WorkItem) {
       return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () => {
         const record = current(item);
-        record.trackerProgress = { status: 'pending', message: null };
+        record.trackerProgress = { ...record.trackerProgress, status: 'pending', message: null };
         return syncProgress(item, persist(record));
       });
     },

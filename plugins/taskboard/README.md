@@ -151,10 +151,15 @@ blocks automatic retry. Labels, assignee, destination and other metadata are
 not rewritten. Creating the ticket still requires selecting Create.
 
 After a confirmed agent dispatch, Taskboard moves the provider issue to its
-available In progress status. Providers without that transition retain their
-status with an explanation in the panel. Permission or connection failures
-are shown with a separate status-update retry; retrying never launches another
-agent. A finished turn is **not** accepted work and never closes an issue.
+available In progress status. When Review starts, it moves to the provider's
+available In review status; a blocked review returns the issue to In progress
+for the repair Build. A passed review stays In review until human acceptance
+and never closes an issue. Providers without the matching transition retain
+their status with an explanation in the panel. Permission or connection
+failures are shown with a separate status-update retry; retrying never launches
+another agent. Status updates run from stage dispatch and the background factory
+poll, not from opening a ticket, and a slow tracker write times out without
+blocking the panel. A finished turn is **not** accepted work.
 
 Dispatch intent is saved before calling BB. Duplicate starts reuse the original
 dispatch. Confirmed failed/stopped attempts have bounded retries; ambiguous
