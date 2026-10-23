@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-cf91d3b42bb7d325954e3f6d",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-10-23T17:58:11.160Z",
+  "completedAt": "2026-10-23T17:58:11.160Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "implement-the-researched-jev-ultrafast-integration-in-bb-surf-natural",
+    "specRevision": 2,
+    "specDigest": "sha256:bcfd107779f6a12760c845e879f6d5f770b9786f523c209c4a47b41ba0ef1191",
+    "treeDigest": "sha256:23a595200af08278f69942de58c7d02bd17849f6862d71ff0d93805143fed030",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:b96b019d0df5f7bd5ffb302142cc36b7c75620080011b4a8f27c76bd7726f476",
+  "kind": "collected",
+  "collector": "empirical-review:fresh-context-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/implement-the-researched-jev-ultrafast-integration-in-bb-surf-natural/reviews/9d1451928fdfd42a995ab500.json",
+      "mediaType": "application/json",
+      "bytes": 1894,
+      "digest": "sha256:9adaa5d80585e4c32bec236320bf97cfeb2adbad627552c62da9f66ece97c498"
+    },
+    {
+      "path": ".empirical/specs/implement-the-researched-jev-ultrafast-integration-in-bb-surf-natural/reviews/9d1451928fdfd42a995ab500.md",
+      "mediaType": "text/markdown",
+      "bytes": 1139,
+      "digest": "sha256:a21ddf245e756955d0e8989545f682430c744478baf31562da803ae18c460472"
+    }
+  ]
+}

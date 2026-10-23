@@ -222,6 +222,14 @@ BB Tools / BB Surf has project-scoped engine selection and a separate
 fallback checkbox. Playwright is the default; fallback defaults off. Auto tries
 Jev first. Selecting Jev or Auto does not authorize paid API calls.
 
+Configure **Jev API key (TypeSafe)** and **Text-model API key** in BB Tools /
+BB Surf, alongside the checkout path and text-model identifier. Both key fields
+use BB's secret storage and are excluded from frontend setting values.
+The credentials-file path is optional. If set, it must still be a private
+(0600) dotenv file; saved keys override its corresponding keys, and an empty
+saved key falls back to the file. Provider options in the file remain supported.
+Saving credentials does not authorize a paid run.
+
 ```sh
 bb surf engine auto fallback-on
 bb surf run https://example.com
@@ -233,9 +241,14 @@ return `agent-handoff` with the project's CDP endpoint so the BB agent can carry
 out the task; they are not falsely marked completed. Jev needs a goal, configured
 runtime/keys and explicit `--allow-paid`. A fallback is chosen only if preflight
 fails, never after browser execution begins. A Jev `done` result is the model's
-claim and still needs outcome verification. Failures and cancellation after
-dispatch require inspection before retrying. Do not run multiple controllers
-against the same project's page.
+claim and still needs outcome verification. The JSON result therefore reports
+`verification: "required"` together with a validated `done` or `blocked`
+status, a nonnegative action count, and `timing.totalMs` plus
+`timing.agentLoopMs`. Total time includes preflight, attachment and navigation;
+agent-loop time covers the upstream Jev loop only. Preflight failures name the
+safe corrective action without returning credential contents or Python stderr.
+Failures and cancellation after dispatch require inspection before retrying.
+Do not run multiple controllers against the same project's page.
 
 ## Install
 

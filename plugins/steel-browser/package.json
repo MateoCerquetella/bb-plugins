@@ -59,6 +59,7 @@
     "use-follow-viewer.ts",
     "use-panel-expansion.ts",
     "engines.ts",
+    "jev-runtime.ts",
     "actions.ts",
     "navigation.ts",
     "viewer-protocol.ts",

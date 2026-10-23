@@ -268,7 +268,6 @@ function ProjectControls({ scope }: { scope: Scope }) {
 
 function ScopedProjectControls({ scope }: { scope: Scope }) {
   const rpc = useSteelRpc();
-  const { values } = useSettings();
   const [project, setProject] = useState<ProjectState | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -307,8 +306,6 @@ function ScopedProjectControls({ scope }: { scope: Scope }) {
       aria-label="Retry project settings" onClick={() => setAttempt(value => value + 1)}>
       <RefreshCw aria-hidden="true" />
     </button>}
-    {project?.policy.engine !== "playwright" && project && !values?.jevEnvFile &&
-      <p role="status">Jev: credentials not configured</p>}
   </div>;
 }
 
@@ -326,10 +323,10 @@ export function SteelAgentSettings() {
       <dl>
         <dt>Container DNS</dt><dd>{isLoading ? "Loading..." : String(values?.dnsServers || "1.1.1.1,8.8.8.8")}</dd>
         <dt>Checkout</dt><dd>{isLoading ? "Loading..." : String(values?.jevCheckout || "Not configured")}</dd>
-        <dt>Credentials file</dt><dd>{isLoading ? "Loading..." : String(values?.jevEnvFile || "Not configured")}</dd>
+        <dt>Credentials file</dt><dd>{isLoading ? "Loading..." : String(values?.jevEnvFile || "Not set (optional)")}</dd>
         <dt>Text model</dt><dd>{isLoading ? "Loading..." : String(values?.jevTextModel || "Not configured")}</dd>
       </dl>
-      <p>Configuration: BB Tools / BB Surf. Credentials stay on the host.
+      <p>API keys: BB Tools / BB Surf. Saved keys stay in BB's plugin secrets.
         Live Jev runs use potentially billable TypeSafe and text-model APIs. DNS changes apply when a project browser is next provisioned or repaired.</p>
     </section>
   );

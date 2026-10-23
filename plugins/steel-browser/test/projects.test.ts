@@ -164,7 +164,7 @@ test("fallback is opt-in and only selects an engine during preflight", async () 
   assert.deepEqual(calls, ["jev"]);
   const selected = await chooseEngine({ engine: "auto", fallback: true }, preflight);
   assert.equal(selected.engine, "playwright");
-  assert.equal(selected.fallbackReason, "jev unavailable before execution");
+  assert.equal(selected.fallbackReason, "no key");
 });
 
 test("cancellation during preflight never dispatches fallback", async () => {

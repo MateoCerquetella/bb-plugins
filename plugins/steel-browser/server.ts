@@ -29,7 +29,7 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
     "Before visible browser work, emit ::steel-browser{} on its own line in this thread. Whenever you ask the user to enter credentials, sign in, complete MFA, approve consent, or perform any other manual browser action, repeat ::steel-browser{} on its own line in that same assistant message; never refer to an embedded browser 'above' unless that response contains the directive. Keep navigation in that same Steel session so the user can watch. Never open Safari, local Chrome, an external window, or an external viewer link.",
     "Let the user enter website credentials and MFA directly into the embedded browser, never chat. If viewer authentication is blocked, report it without an external-browser fallback.",
     "The browser UI and CLI are named BB Surf. Its Monitor icon and Open browser panel button show the agent's project browser on the right. Hover for two seconds to expand; leaving shrinks the hover view. Explicit Expand pins the wider view until Shrink or Escape in BB. The internal steel-browser plugin ID and ::steel-browser{} directive remain unchanged.",
-    "Do not use --allow-paid without explicit permission. Inspect and verify results; an agent-handoff response is not task completion.",
+    "Do not use --allow-paid without explicit permission. Inspect and verify results; neither agent-handoff nor a Jev done status is task completion.",
     "If the project CDP loopback is on another host, use bb surf tabs/inspect/click/fill/press/screenshot. Routed actions default to the newest tab; use --tab <index> to target an older one. Do not enter credentials in CLI arguments.",
   ].join("\n"));
   const projects = new ProjectBrowsers(bb.storage.kv);
@@ -45,7 +45,21 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
     jevEnvFile: {
       type: "string",
       label: "jev-ultrafast credentials file",
-      description: "Private (0600) host dotenv file containing TYPESAFE_API_KEY and TEXT_MODEL_API_KEY. Enter a path, never a key.",
+      description: "Optional private (0600) dotenv file for missing API keys and advanced provider options. Keys saved below take precedence.",
+      default: "",
+    },
+    jevApiKey: {
+      type: "string",
+      label: "Jev API key (TypeSafe)",
+      description: "Stored in BB's plugin secrets. Leave empty to use TYPESAFE_API_KEY from the optional credentials file.",
+      secret: true,
+      default: "",
+    },
+    jevTextModelApiKey: {
+      type: "string",
+      label: "Text-model API key",
+      description: "Stored in BB's plugin secrets. Leave empty to use TEXT_MODEL_API_KEY from the optional credentials file.",
+      secret: true,
       default: "",
     },
     jevTextModel: {

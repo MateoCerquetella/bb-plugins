@@ -82,11 +82,18 @@ For tasks, use `bb surf run <url> [goal] [--allow-paid]`. Never pass
 `--allow-paid` without explicit user authorization for external model calls.
 Auto prefers Jev; fallback applies only to preflight failures before execution.
 
+Set Jev and text-model API keys in BB Tools / BB Surf's native secret fields.
+Never request keys in chat or pass them through CLI arguments. Saved keys take
+precedence over the optional private dotenv file; both saved keys allow the
+file path to remain empty. Secret values are excluded from frontend settings.
+
 URL-only Playwright runs navigate directly. For natural-language tasks,
 `agent-handoff` means this BB agent must perform the task via Playwright using
 the returned project's CDP endpoint, then verify the result. It does NOT mean
-the goal was completed. Jev's `done` likewise requires independent verification.
-Do not replay actions after an uncertain execution error, cancellation or timeout.
+the goal was completed. Jev returns only validated `done` or `blocked` states,
+an action count, total and agent-loop timing, and `verification: "required"`.
+Its `done` state likewise requires independent verification. Do not replay
+actions after an uncertain execution error, cancellation or timeout.
 
 ## Session workflow
 
