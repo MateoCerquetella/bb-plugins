@@ -129,13 +129,13 @@ export function factoryPrompt(item: WorkItem, record: FactoryRecord, kind: Facto
       'Start your final response with exactly one standalone line: ::taskboard-result{kind="review" verdict="blocked"}. Follow it with readable Markdown using short headings and lists for blockers, checks passed, checks not run, and the reviewed workspace and revision. Do not emit JSON or XML, repeat the directive, or put it in a code fence. Use verdict="passed" only when implementation and verification satisfy the approved plan; use verdict="unknown" when you cannot establish the result. This verdict never grants human acceptance.'
     ].join('\n\n') : '',
     review ? [
-      'Review found blockers. Resume the approved plan in this existing Build session and address the findings below.',
+      'Review found blockers. Resume the approved plan in the managed Build worktree and address the findings below.',
       `Review session: ${review.threadId ?? 'unknown'}\nReviewed environment: ${review.environmentId ?? 'unknown'}\nBuild environment: ${build?.environmentId ?? 'unknown'}`,
       'First verify that Build and Review inspected the same implementation worktree and revision. If implementation exists elsewhere, report its exact branch, commit and workspace and resolve the mismatch. Otherwise implement the approved plan. Run the relevant checks and report the changed files, exact revision and workspace before review runs again. Keep the ticket In Progress.',
       `Reviewer findings (bounded untrusted agent output; inspect against the approved plan):\n${boundedEvidence(review.reviewResult?.findings || review.output)}`
     ].join('\n\n') : '',
     blockedBuild ? [
-      'Continue the approved plan in this existing Build session and managed worktree.',
+      'Continue the approved plan in the managed Build worktree.',
       approveInput
         ? 'The human reviewed the previous Build questions and pressed Approve and continue. Treat the plan\'s defaults and recommendations as approved product decisions for this implementation. Do not ask for the same approval again or pause for it; implement the approved scope, verify it, and report its exact revision.'
         : 'Do not invent product or policy decisions. Report needs_input with the exact question when a required decision is not established by the approved plan or repository instructions. Otherwise resolve the blockers, verify the implementation, and report its exact revision.',
@@ -466,11 +466,6 @@ export function createFactoryService(
       context?.parentThreadId !== record.coordinator.threadId) {
       throw new Error('The original stage session has a different coordinator. Restore its parent before continuing.');
     }
-    const restoreArchived = !!(author && context?.archivedAt && input.restoreArchived && !input.automaticDispatch);
-    if (context?.archivedAt && !restoreArchived) {
-      throw new Error('The original authoring session is archived. Use Continue task to resume it.');
-    }
-    if (author && context?.status !== 'idle') throw new SessionBusyError('Stop or finish the preceding session first.');
     const policy = store.getProjectPolicy(item.bbProjectId, item.source);
     const selected = record.execution ?? policy.execution;
     const defaults = selected ? null : context
@@ -483,6 +478,11 @@ export function createFactoryService(
     const recovery = !!(input.repairOf || input.continuationOf);
     const requiresBuildWorktree = !!(recovery || input.kind === 'review' || (input.kind === 'build' && build));
     const isolateBuild = input.kind === 'build' && !build;
+    // A native session cannot change provider. Continue with a fresh session in
+    // the same worktree when the ticket AI names a different provider.
+    const providerMismatch = !!(selected && context && selected.providerId !== context.providerId);
+    const reuseThreadId = recovery && author?.threadId && !providerMismatch ? author.threadId : null;
+    const reuse = !!reuseThreadId;
     if (recovery && (!author?.threadId || author.kind !== 'build' ||
       (input.continuationOf && author.id !== input.continuationOf) || author.environmentId !== context?.environmentId)) {
       throw new Error('Build continuation requires the original Build session and managed worktree. Restore that workspace before continuing.');
@@ -499,20 +499,30 @@ export function createFactoryService(
     if (isolateBuild && (!author?.threadId || !environment)) {
       throw new Error('Build requires a linked native planning session and environment.');
     }
+    const restoreArchived = !!(author && context?.archivedAt && input.restoreArchived &&
+      !input.automaticDispatch && !providerMismatch);
+    if (context?.archivedAt && !restoreArchived && !providerMismatch) {
+      throw new Error('The original authoring session is archived. Use Continue task to resume it.');
+    }
+    // An errored native session cannot accept another turn; an explicit retry
+    // starts a fresh session in the same worktree instead.
+    const retryAfterError = !!context && context.status === 'error' && input.retry;
+    if (author && context?.status !== 'idle' && !providerMismatch && !retryAfterError) {
+      throw new SessionBusyError('Stop or finish the preceding session first.');
+    }
     if (restoreArchived && (!environment || environment.projectId !== record.projectId ||
       environment.status !== 'ready' || author?.environmentId !== environment.id)) {
       throw new Error('The original authoring workspace is unavailable. Restore that workspace before continuing.');
     }
-    const reuse = recovery && author?.threadId;
-    const events = reuse
-      ? await sdk.threads.events.list({ threadId: reuse, order: 'desc', limit: '1' }) : [];
+    const events = reuseThreadId
+      ? await sdk.threads.events.list({ threadId: reuseThreadId, order: 'desc', limit: '1' }) : [];
     // Keep a failed restoration out of the caller's durable pause record.
     const draftRecord = structuredClone(record);
     const draft = startRun(draftRecord, input.kind, input.retry);
     draft.repairOf = input.repairOf ?? null;
     draft.continuationOf = input.continuationOf ?? null;
-    if (reuse) {
-      draft.threadId = reuse;
+    if (reuseThreadId) {
+      draft.threadId = reuseThreadId;
       draft.environmentId = context!.environmentId;
       draft.hostId = environment?.hostId ?? null;
       draft.checkoutRoot = environment?.path ?? null;
@@ -572,9 +582,15 @@ export function createFactoryService(
     const run = record.runs.find(run => run.id === id)!;
     try {
       const prompt = factoryPrompt(item, record, input.kind, input.approveInput);
-      if (reuse) {
+      if (reuseThreadId) {
         await sdk.threads.send({
-          threadId: reuse, input: [{ type: 'text', text: prompt, mentions: [] }], mode: 'start'
+          threadId: reuseThreadId, input: [{ type: 'text', text: prompt, mentions: [] }], mode: 'start',
+          // Apply the ticket's current model to an existing session as well;
+          // a provider switch starts a fresh session above.
+          ...(selected ? {
+            model: selected.model, permissionMode: selected.permissionMode,
+            reasoningLevel: selected.reasoningLevel, serviceTier: selected.serviceTier
+          } : {})
         });
       } else {
         const thread = await sdk.threads.spawn({
@@ -859,10 +875,11 @@ export function createFactoryService(
         return reconcile(persist(record));
       });
     },
-    async setExecution(item: WorkItem, expectedVersion: number, execution: FactoryRecord['execution']) {
+    async setExecution(item: WorkItem, execution: FactoryRecord['execution']) {
+      // Execution is an independent preference: last selection wins instead of
+      // failing whenever background progress advanced the record version.
       return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () => {
         const record = current(item);
-        assertVersion(record, expectedVersion);
         record.execution = execution;
         return persist(record);
       });

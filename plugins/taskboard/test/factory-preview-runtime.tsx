@@ -245,6 +245,11 @@ const rpc = {
         activity: 'Addressing review findings', updates: [], checks: [], steps: [], changedFiles: [] });
       window.factoryRefresh();
     }
+    if (method === 'factorySetExecution') {
+      record.execution = (input.execution ?? null) as FactoryRecord['execution'];
+      record.version++;
+      window.factoryRefresh();
+    }
     if (method === 'factorySavePlan') {
       record.plans.push({
         revision: record.plans.length + 1, body: input.body!, digest: 'preview-plan',

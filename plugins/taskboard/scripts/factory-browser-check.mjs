@@ -76,6 +76,29 @@ try {
   await page.setViewportSize({ width: 1280, height: 1000 });
   await page.route('https://taskboard-preview.test/**', route => route.fulfill({ contentType: 'text/html', body: html }));
   await page.goto('https://taskboard-preview.test/');
+  if (process.env.TASKBOARD_AI_ONLY) {
+    for (const width of [1280, 390]) {
+      await page.setViewportSize({ width, height: 1000 });
+      await page.evaluate(() => {
+        window.factoryFixture.execution = { providerId: 'codex', model: 'gpt-5', permissionMode: 'auto',
+          reasoningLevel: 'medium', serviceTier: 'default' };
+        window.factoryRefresh();
+      });
+      const detail = page.locator('#preview-detail');
+      const picker = detail.getByRole('combobox', { name: 'AI provider' });
+      await picker.waitFor();
+      assert.equal(await picker.inputValue(), 'codex:gpt-5');
+      await picker.selectOption('claude:claude-sonnet');
+      await page.waitForFunction(() => window.factoryFixture.execution?.providerId === 'claude');
+      await page.waitForFunction(() =>
+        document.querySelector('#preview-detail select[aria-label="AI provider"]')?.value === 'claude:claude-sonnet');
+      assert.equal(await detail.getByText('Saving AI…', { exact: true }).count(), 0);
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+      await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, `taskboard-ai-${width}.png`) });
+    }
+    assert.deepEqual(errors, []);
+    console.log(JSON.stringify({ modelSelection: 'passed', desktop: 'passed', mobile: 'passed', errors }));
+  } else
   if (process.env.TASKBOARD_APPROVE_ONLY) {
     for (const width of [1280, 390]) {
       await page.setViewportSize({ width, height: 900 });

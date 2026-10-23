@@ -15,7 +15,8 @@ import { Button } from '../components/ui/button.js';
 export function ExecutionPicker({
   projectId, value, onChange, threadId = null, disabled = false,
   showSummary = false, summaryTitle = 'AI for coordinator and stage sessions',
-  defaultsLabel, resetLabel = 'Use project defaults', fallback = null, onDefaults
+  defaultsLabel, resetLabel = 'Use project defaults', fallback = null,
+  onDefaults, preferFactoryAI = false
 }: {
   projectId: string;
   value: FactoryExecution | null;
@@ -29,6 +30,8 @@ export function ExecutionPicker({
   resetLabel?: string;
   fallback?: FactoryExecution | null;
   onDefaults?: (value: FactoryExecution | null) => void;
+  /** Prefer the factory settings AI over BB's thread defaults. */
+  preferFactoryAI?: boolean;
 }) {
   const rpc = useRpc<TaskboardRpcContract>();
   const [options, setOptions] = useState<FactoryExecutionOptions | null>(null);
@@ -67,9 +70,13 @@ export function ExecutionPicker({
     reportedDefaults.current = false;
     void load();
   }, [load]);
-  const effective = value ?? fallback ?? options?.defaults ?? null;
-  const displayDefault = fallback ?? options?.defaults ?? null;
-  const defaultLabel = defaultsLabel ?? (threadId ? 'Thread default' : 'Project default');
+  const preferred = preferFactoryAI ? options?.selected : null;
+  // A factory task inherits the factory settings AI before BB's thread
+  // defaults, so Jev routing cannot silently override the saved model.
+  const effective = value ?? fallback ?? preferred ?? options?.defaults ?? null;
+  const displayDefault = fallback ?? preferred ?? options?.defaults ?? null;
+  const defaultLabel = defaultsLabel ?? (preferFactoryAI && options?.selected
+    ? 'Factory AI' : threadId ? 'Thread default' : 'Project default');
   const usingDefaults = !value || (displayDefault
     ? JSON.stringify(value) === JSON.stringify(displayDefault) : false);
   const pickerValue: ExperimentalProviderModelPickerValue = effective

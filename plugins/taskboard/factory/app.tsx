@@ -96,6 +96,7 @@ function FactoryWorkbench({ record, onRecord, actions, plan, item }: {
   const [aiBusy, setAiBusy] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [aiNote, setAiNote] = useState<string | null>(null);
+  const [pendingExecution, setPendingExecution] = useState<{ value: FactoryRecord['execution'] } | null>(null);
   const [projectSnapshot, setProjectSnapshot] = useState<{ identity: string; status: FactoryProjectStatus } | null>(null);
   const [policyError, setPolicyError] = useState<{ identity: string; message: string } | null>(null);
   const projectRequest = useRef(0);
@@ -154,18 +155,20 @@ function FactoryWorkbench({ record, onRecord, actions, plan, item }: {
   async function saveExecution(execution: FactoryRecord['execution']) {
     if (aiBusy) return;
     setAiBusy(true);
+    setPendingExecution({ value: execution });
     setAiError(null);
     setAiNote(null);
     try {
-      const result = await rpc.call('factorySetExecution', {
+      const result = await withDeadline(rpc.call('factorySetExecution', {
         projectId: record.projectId, source: record.source, locator: record.locator,
         expectedVersion: record.version, execution
-      });
+      }), 20_000, 'Saving the ticket AI');
       onRecord(result.record);
       setAiNote(execution ? 'AI saved for this ticket.' : 'Using the project default AI.');
     } catch (reason) {
       setAiError(reason instanceof Error ? reason.message : String(reason));
     } finally {
+      setPendingExecution(null);
       setAiBusy(false);
     }
   }
@@ -173,7 +176,7 @@ function FactoryWorkbench({ record, onRecord, actions, plan, item }: {
     <span className="tb-room-ai-label">AI for this ticket</span>
     <ExecutionPicker
       projectId={record.projectId}
-      value={record.execution}
+      value={pendingExecution ? pendingExecution.value : record.execution}
       fallback={policyExecution}
       onChange={saveExecution}
       disabled={aiBusy}
@@ -349,6 +352,16 @@ function EmpiricalProgress({ record }: { record: FactoryRecord }) {
   </section>;
 }
 
+function withDeadline<T>(promise: Promise<T>, ms: number, operation: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = window.setTimeout(() => reject(new Error(`${operation} timed out. Refresh and try again.`)), ms);
+    promise.then(
+      value => { window.clearTimeout(timer); resolve(value); },
+      error => { window.clearTimeout(timer); reject(error); }
+    );
+  });
+}
+
 function awaitsApproval(run: FactoryRun | null | undefined) {
   return run?.kind === 'build' && run.buildResult?.verdict === 'needs_input';
 }
@@ -416,7 +429,6 @@ export function StartTaskButton({ item, disabled = false }: {
   const [execution, setExecution] = useState<FactoryExecution | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const executionTouched = useRef(false);
   const pending = useRef(false);
   const planNeedsApproval = !!error && /Approve (the|exact) current plan/i.test(error);
   const openTask = () => {
@@ -432,7 +444,9 @@ export function StartTaskButton({ item, disabled = false }: {
       const { record } = await rpc.call('factoryStartTask', {
         projectId: item.bbProjectId, source: item.source, locator: item.locator,
         contextThreadId: context.projectId === item.bbProjectId ? context.threadId : null,
-        execution
+        // Only an explicit ticket choice is persisted. Avoiding BB's project
+        // default keeps Jev routing from overriding the factory settings AI.
+        ...(execution ? { execution } : {})
       });
       setOpen(false);
       const run = record.runs.at(-1);
@@ -447,7 +461,6 @@ export function StartTaskButton({ item, disabled = false }: {
     <Button size="sm" variant="outline" disabled={disabled || busy}
       onClick={event => {
         event.stopPropagation();
-        executionTouched.current = false;
         setExecution(null);
         setError(null);
         setOpen(true);
@@ -461,17 +474,14 @@ export function StartTaskButton({ item, disabled = false }: {
         <ExecutionPicker
           projectId={item.bbProjectId}
           value={execution}
-          onChange={next => { executionTouched.current = true; setExecution(next); }}
+          onChange={setExecution}
           threadId={context.projectId === item.bbProjectId ? context.threadId : null}
           disabled={busy}
           showSummary
           summaryTitle="AI for this task"
           compact
-          defaultsLabel={context.projectId === item.bbProjectId ? 'Thread default' : 'Project default'}
-          resetLabel={context.projectId === item.bbProjectId ? 'Use thread defaults' : 'Use project defaults'}
-          onDefaults={defaults => {
-            if (!executionTouched.current) setExecution(defaults);
-          }}
+          resetLabel="Use factory AI"
+          preferFactoryAI
         />
         {error && <ErrorNotice title="Task needs attention"
           nextStep={planNeedsApproval
@@ -484,7 +494,7 @@ export function StartTaskButton({ item, disabled = false }: {
             ? <Button type="button" onClick={openTask}>
               <Icon name="FileText" className="size-3.5" />Review plan
             </Button>
-            : <Button type="button" disabled={disabled || busy || !execution} aria-busy={busy}
+            : <Button type="button" disabled={disabled || busy} aria-busy={busy}
               onClick={() => void start()}>
               <Icon name={busy ? 'Loading' : 'AiContentGenerator01'} className="size-3.5" />
               {busy ? 'Starting...' : 'Start task'}

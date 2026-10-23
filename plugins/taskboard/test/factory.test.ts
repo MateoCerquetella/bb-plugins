@@ -326,7 +326,8 @@ function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
   const threadEnvironments = new Map<string, string | null>([
     ['thr_native', 'env_test'], ['thr_build', 'env_build'], ['thr_review_seed', 'env_test']
   ]);
-  const sent: { threadId: string; input: { text: string }[] }[] = [];
+  const sent: { threadId: string; input: { text: string }[];
+    model?: string; reasoningLevel?: string; permissionMode?: string }[] = [];
   const events: Parameters<typeof applyNativeEvent>[1][] = [];
   const sdk = {
     threads: {
@@ -2409,6 +2410,94 @@ test('repair Build that needs input pauses without requesting another review', a
     assert.match(f.sent.at(-1)!.input[0].text, /Approve and continue/);
     assert.match(f.sent.at(-1)!.input[0].text, /approved product decisions/);
     assert.doesNotMatch(f.sent.at(-1)!.input[0].text, /Do not invent product or policy decisions/);
+  } finally { f.db.close(); }
+});
+
+function pausedBuild(execution: NonNullable<ReturnType<typeof newRecord>['execution']>) {
+  const record = newRecord(item);
+  savePlan(record, 'Implement current scope and run the relevant checks');
+  approvePlan(record, record.plans[0].digest);
+  const build = startRun(record, 'build', false);
+  build.status = 'finished';
+  build.threadId = 'thr_native';
+  build.environmentId = 'env_test';
+  build.buildResult = { verdict: 'needs_input', summary: 'Choose retention and limits.', revision: null };
+  record.execution = execution;
+  record.automatic = true;
+  record.automationError = 'Automatic work paused: Build needs your approval to continue.';
+  return record;
+}
+
+test('the ticket AI model is applied to a continued Build session', async () => {
+  const f = fixture();
+  try {
+    f.store.save(pausedBuild({
+      providerId: 'codex', model: 'gpt-5.1', permissionMode: 'auto',
+      reasoningLevel: 'high', serviceTier: 'default'
+    }));
+    const record = await f.service.startTask(item, null);
+    assert.equal(record.runs.at(-1)?.threadId, 'thr_native');
+    assert.equal(f.spawns(), 0);
+    assert.equal(f.sends(), 1);
+    assert.equal(f.sent[0].model, 'gpt-5.1');
+    assert.equal(f.sent[0].reasoningLevel, 'high');
+    assert.equal(f.sent[0].permissionMode, 'auto');
+  } finally { f.db.close(); }
+});
+
+test('switching the ticket AI provider starts a fresh Build session in the same worktree', async () => {
+  const f = fixture();
+  try {
+    f.store.save(pausedBuild({
+      providerId: 'claude', model: 'claude-sonnet', permissionMode: 'auto',
+      reasoningLevel: 'high', serviceTier: 'default'
+    }));
+    const record = await f.service.startTask(item, null);
+    const continued = record.runs.at(-1)!;
+    assert.equal(continued.kind, 'build');
+    assert.equal(continued.status, 'running');
+    assert.equal(continued.continuationOf, record.runs.at(-2)!.id);
+    assert.equal(f.sends(), 0);
+    assert.equal(f.spawns(), 1);
+    assert.equal(continued.threadId, 'thr_build');
+    assert.equal(continued.environmentId, 'env_test');
+    assert.equal(f.spawnInputs.at(-1)!.providerId, 'claude');
+    assert.equal(f.spawnInputs.at(-1)!.model, 'claude-sonnet');
+    assert.equal(f.spawnInputs.at(-1)!.environment.type, 'reuse');
+    assert.equal(f.spawnInputs.at(-1)!.environment.environmentId, 'env_test');
+  } finally { f.db.close(); }
+});
+
+test('retrying a failed Build starts a fresh session in the Build worktree', async () => {
+  const f = fixture();
+  try {
+    const record = newRecord(item);
+    savePlan(record, 'Implement current scope');
+    approvePlan(record, record.plans[0].digest);
+    const build = startRun(record, 'build', false);
+    build.status = 'failed';
+    build.threadId = 'thr_native';
+    build.environmentId = 'env_test';
+    build.error = 'Native session is unavailable or failed.';
+    record.execution = {
+      providerId: 'claude', model: 'claude-sonnet', permissionMode: 'auto',
+      reasoningLevel: 'high', serviceTier: 'default'
+    };
+    const saved = f.store.save(record);
+    f.threadStatus('error', 'thr_native');
+
+    const retried = await f.service.start(item, {
+      expectedVersion: saved.version, kind: 'build', contextThreadId: null, retry: true
+    });
+    const fresh = retried.runs.at(-1)!;
+    assert.equal(fresh.status, 'running');
+    assert.notEqual(fresh.threadId, 'thr_native');
+    assert.equal(fresh.environmentId, 'env_test');
+    assert.equal(f.sends(), 0);
+    assert.equal(f.spawns(), 1);
+    assert.equal(f.spawnInputs.at(-1)!.providerId, 'claude');
+    assert.equal(f.spawnInputs.at(-1)!.environment.type, 'reuse');
+    assert.equal(f.spawnInputs.at(-1)!.environment.environmentId, 'env_test');
   } finally { f.db.close(); }
 });
 
