@@ -19,6 +19,18 @@ Source: <https://github.com/get-bb/bb>
 
 ---
 
+## Simple Icons — DeepSeek
+
+CC0 1.0 Universal (public domain dedication).
+
+The DeepSeek brand-mark geometry in `lib/provider-marks.ts` comes from Simple
+Icons. CC0 applies to the project's artwork; the mark remains a DeepSeek
+trademark.
+
+Source: <https://github.com/simple-icons/simple-icons>
+
+---
+
 ## Hugeicons Free Icons
 
 MIT License, Copyright (c) 2025 Hugeicons.
@@ -49,8 +61,8 @@ bundled in this package.
 
 ## Trademarks and brand marks
 
-The glyphs in `lib/provider-marks.ts` depict OpenAI, Claude, Grok Build, and
-OpenCode. Each mark belongs to its owner. No software licence grants trademark
+The glyphs in `lib/provider-marks.ts` depict OpenAI, Claude, Grok Build,
+OpenCode, and DeepSeek. Each mark belongs to its owner. No software licence grants trademark
 rights; the marks are used only to identify the agent whose limits are shown.
 
 ---

@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "sequence": 6,
+  "previousDigest": "sha256:73d146884f23af716c2fc5a008205193a7427a3d26b9973e3f11ed95d727d47a",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Merged the existing DeepSeek balance implementation, corrected stale docs, and verified focused checks, workspace checks, and the live sidebar.",
+  "createdAt": "2026-10-22T15:46:55.182Z",
+  "stateBeforeDigest": "sha256:278bf55dc0b3c0e80234af33a254b9185ccac6d22d4dc0201dafd14583102b5f",
+  "stateAfterDigest": "sha256:5531f5a97c9f2bcc8bf036288301c69394581c684d2355a35cc00be92b14f1a4",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 6,
+    "activeFeature": "update-the-usage-tracker-plugin-so-deepseek-is-no-longer",
+    "request": "Update the Usage Tracker plugin so DeepSeek is no longer missing: show DeepSeek usage in the sidebar strip with an independent enable setting, brand mark, tests, and docs, matching the existing provider pattern.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "review",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Merged the existing DeepSeek balance implementation, corrected stale docs, and verified focused checks, workspace checks, and the live sidebar.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:3607c1e3c88e7fd90a49b309cdd73133ff9a9f44382fa105afbc359bcf85029c",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:7bb79058784908c94f3cbdb156707e7b8bba7dcfd3eca8750ae78530e67fb089",
+    "impactDigest": "sha256:2db381d82c7b4282208a50192e50fa23736651f149928221185154692e3574dd",
+    "capabilityClaimId": "update-the-usage-tracker-plugin-so-deepseek-is-no-longer-1476ab922818",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-22T15:46:55.182Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "update-the-usage-tracker-plugin-so-deepseek-is-no-longer-1476ab922818",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "update-the-usage-tracker-plugin-so-deepseek-is-no-longer",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_9tf5eqq2er-1/bb-plugins",
+      "worktreeId": "sha256:3577c8cbbb990198586822f83fadb7e17fdd720558aff00aa55f9f0c6786cbad",
+      "baseCommit": "0f40a5d0871ae6929f57b6c8c6016def1c4dfe93",
+      "baseTree": "5e9325a5e1aeb7e253ee2275c16922660de76cd3",
+      "bases": {
+        "usage-tracker-deepseek": {
+          "capability": "usage-tracker-deepseek",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "deepseek balance provider": null,
+            "provider metadata and docs": null
+          }
+        }
+      },
+      "capabilities": [
+        "usage-tracker-deepseek"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-22T15:41:42.278Z",
+      "heartbeatAt": "2026-10-22T15:41:42.278Z",
+      "digest": "sha256:3b3633d901a0053b937aa738d93332cb30c2690de348903cb214e8803a47ee88"
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 8,
+      "capabilities": 1,
+      "reason": "The DeepSeek provider is one cohesive, independently shippable change: provider model, server fetch, and sidebar rendering must land together to show any value.",
+      "actor": "agent",
+      "revision": 2
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:15068f904c018fdd25626df88353c88c57024574e38fd4ae12f03731da5a18c5"
+}

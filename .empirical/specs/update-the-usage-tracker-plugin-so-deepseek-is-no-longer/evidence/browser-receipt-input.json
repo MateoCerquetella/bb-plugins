@@ -1,0 +1,16 @@
+{
+  "criteria": ["AC-UI-1", "AC-3", "AC-5"],
+  "evidenceKinds": ["browser", "screenshot"],
+  "summary": "A live BB browser showed DeepSeek as the sixth enabled provider with its own mark, a 26.4% topped-up reading, the $14.72 of $20.00 balance details, the missing-key recovery message, and no contribution to the 100% Codex agent summary. The expanded card fit the sidebar width.",
+  "collector": "BB Surf live Usage Tracker verification",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/update-the-usage-tracker-plugin-so-deepseek-is-no-longer/evidence/deepseek-sidebar.png",
+      "mediaType": "image/png"
+    },
+    {
+      "path": ".empirical/specs/update-the-usage-tracker-plugin-so-deepseek-is-no-longer/evidence/browser-verification.md",
+      "mediaType": "text/markdown"
+    }
+  ]
+}

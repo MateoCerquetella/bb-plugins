@@ -1,0 +1,11 @@
+{
+  "checkId": "qa-fresh-context",
+  "criteria": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6", "AC-7", "AC-UI-1"],
+  "outcome": "passed",
+  "summary": "Independent outcome check against the committed diff and a live BB sidebar capture: DeepSeek appears as an opt-in sixth provider with its own mark, a 26.4% topped-up reading, the balance amounts, the recovery message, and no contribution to the agent-usage summary. Focused and workspace checks passed separately.",
+  "collector": "fresh-context usage tracker DeepSeek outcome audit",
+  "artifacts": [
+    {"path": ".empirical/specs/update-the-usage-tracker-plugin-so-deepseek-is-no-longer/evidence/deepseek-sidebar.png", "mediaType": "image/png"},
+    {"path": ".empirical/specs/update-the-usage-tracker-plugin-so-deepseek-is-no-longer/evidence/browser-verification.md", "mediaType": "text/markdown"}
+  ]
+}

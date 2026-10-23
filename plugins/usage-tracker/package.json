@@ -2,7 +2,7 @@
   "name": "bb-plugin-usage-tracker",
   "version": "0.1.15",
   "private": true,
-  "description": "Compact Codex, Claude, Cursor, Grok, OpenCode, and Antigravity usage limits in bb's sidebar footer.",
+  "description": "Compact Codex, Claude, Cursor, Grok, OpenCode, Antigravity, and DeepSeek usage in bb's sidebar footer.",
   "license": "MIT",
   "author": "Mateo Cerquetella",
   "homepage": "https://github.com/MateoCerquetella/bb-plugins/tree/main/plugins/usage-tracker#readme",
@@ -25,7 +25,8 @@
     "cursor",
     "grok",
     "opencode",
-    "antigravity"
+    "antigravity",
+    "deepseek"
   ],
   "type": "module",
   "engines": {
@@ -34,7 +35,7 @@
   },
   "bb": {
     "name": "Usage Tracker",
-    "description": "Compact Codex, Claude, Cursor, Grok, OpenCode, and Antigravity usage limits in the sidebar footer.",
+    "description": "Compact Codex, Claude, Cursor, Grok, OpenCode, Antigravity, and DeepSeek usage in the sidebar footer.",
     "branding": {
       "icon": "./assets/icon.svg",
       "logo": {

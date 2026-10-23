@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-c8005f4854fd36ad22aa8ec3",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Run the workspace check, which includes Usage Tracker typecheck, 102 tests, and the plugin build.",
+  "passed": true,
+  "startedAt": "2026-10-22T16:03:39.346Z",
+  "completedAt": "2026-10-22T16:05:02.498Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "update-the-usage-tracker-plugin-so-deepseek-is-no-longer",
+    "specRevision": 2,
+    "specDigest": "sha256:3607c1e3c88e7fd90a49b309cdd73133ff9a9f44382fa105afbc359bcf85029c",
+    "treeDigest": "sha256:bf2fcd36eb236077c3a6d27880566a153a31607c22629917109911dd1bff4352",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 7,
+    "gitCommit": "6f31c4f832571298a7329c448e2bff5170b6dbc1",
+    "textTreeDigest": "sha256:bf2fcd36eb236077c3a6d27880566a153a31607c22629917109911dd1bff4352"
+  },
+  "digest": "sha256:a087467ee3191d8534896114816176a895e8e7761893849d0a51627b8ff11407",
+  "kind": "qa",
+  "matrixDigest": "sha256:9b6188c1b39210c8228c7d94c2a948f61a36c2c1090cdb68a623a68298dc34e1",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Run the workspace check, which includes Usage Tracker typecheck, 102 tests, and the plugin build.",
+      "startedAt": "2026-10-22T16:03:39.346Z",
+      "completedAt": "2026-10-22T16:05:02.498Z",
+      "durationMs": 83152,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:3102e0660c5a28fb09072a92af73601c0704a8badb5519082e7545d1f876aa50",
+        "argv": [
+          "npm",
+          "run",
+          "check"
+        ],
+        "cwd": ".",
+        "timeoutMs": 900000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:843c98faa4cdfa981f566924ace1e297b297efdc76a6a1b94853b4c56b43393f",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "      duration_ms: 0.173216\n      type: 'test'\n      ...\n    # Subtest: reads a payload that is not an array as a miss\n    ok 4 - reads a payload that is not an array as a miss\n      ---\n      duration_ms: 0.12549\n      type: 'test'\n      ...\n    # Subtest: keeps a hit with no rows apart from a miss\n    ok 5 - keeps a hit with no rows apart from a miss\n      ---\n      duration_ms: 0.134536\n      type: 'test'\n      ...\n    # Subtest: rejects a row without a usable thread id\n    ok 6 - rejects a row without a usable thread id\n      ---\n      duration_ms: 0.100273\n      type: 'test'\n      ...\n    # Subtest: rejects an entry that is not an object\n    ok 7 - rejects an entry that is not an object\n      ---\n      duration_ms: 0.158069\n      type: 'test'\n      ...\n    # Subtest: rejects a timestamp the wire could not have produced\n    ok 8 - rejects a timestamp the wire could not have produced\n      ---\n      duration_ms: 0.175611\n      type: 'test'\n      ...\n    # Subtest: rejects a non-finite timestamp\n    ok 9 - rejects a non-finite timestamp\n      ---\n      duration_ms: 0.19191\n      type: 'test'\n      ...\n    # Subtest: reads an absent timestamp as null\n    ok 10 - reads an absent timestamp as null\n      ---\n      duration_ms: 0.403247\n      type: 'test'\n      ...\n    # Subtest: rejects the whole payload when one row is bad\n    ok 11 - rejects the whole payload when one row is bad\n      ---\n      duration_ms: 0.110161\n      type: 'test'\n      ...\n    # Subtest: rejects more rows than the encoder would ever write\n    ok 12 - rejects more rows than the encoder would ever write\n      ---\n      duration_ms: 0.427521\n      type: 'test'\n      ...\n    # Subtest: rejects an entry too long to be worth parsing\n    ok 13 - rejects an entry too long to be worth parsing\n      ---\n      duration_ms: 0.112095\n      type: 'test'\n      ...\n    1..13\nok 64 - decodeWarmStartRows\n  ---\n  duration_ms: 4.737027\n  type: 'suite'\n  ...\n# Subtest: encodeWarmStartRows\n    # Subtest: writes an array, which is the only shape that survives the trip\n    ok 1 - writes an array, which is the only shape that survives the trip\n      ---\n      duration_ms: 0.138453\n      type: 'test'\n      ...\n    # Subtest: carries only the four fields a row is made of\n    ok 2 - carries only the four fields a row is made of\n      ---\n      duration_ms: 0.088312\n      type: 'test'\n      ...\n    # Subtest: caps the entry and keeps the newest parks\n    ok 3 - caps the entry and keeps the newest parks\n      ---\n      duration_ms: 0.351532\n      type: 'test'\n      ...\n    # Subtest: ranks a park by when it was made, not by when a snooze ends\n    ok 4 - ranks a park by when it was made, not by when a snooze ends\n      ---\n      duration_ms: 0.263992\n      type: 'test'\n      ...\n    # Subtest: keeps a fresh settle over a full cap of long snoozes\n    ok 5 - keeps a fresh settle over a full cap of long snoozes\n      ---\n      duration_ms: 0.999577\n      type: 'test'\n      ...\n    1..5\nok 65 - encodeWarmStartRows\n  ---\n  duration_ms: 2.010975\n  type: 'suite'\n  ...\n# Subtest: readWarmStartRows\n    # Subtest: serves what was stored\n    ok 1 - serves what was stored\n      ---\n      duration_ms: 0.279651\n      type: 'test'\n      ...\n    # Subtest: does not throw when the store does\n    ok 2 - does not throw when the store does\n      ---\n      duration_ms: 0.102207\n      type: 'test'\n      ...\n    # Subtest: still serves from memory after the store failed\n    ok 3 - still serves from memory after the store failed\n      ---\n      duration_ms: 0.182664\n      type: 'test'\n      ...\n    # Subtest: prefers the memory tier over what the store holds\n    ok 4 - prefers the memory tier over what the store holds\n      ---\n      duration_ms: 0.304937\n      type: 'test'\n      ...\n    # Subtest: drops an entry that did not decode\n    ok 5 - drops an entry that did not decode\n      ---\n      duration_ms: 0.222316\n      type: 'test'\n      ...\n    # Subtest: ignores an entry written under another version's key\n    ok 6 - ignores an entry written under another version's key\n      ---\n      duration_ms: 0.168638\n      type: 'test'\n      ...\n    1..6\nok 66 - readWarmStartRows\n  ---\n  duration_ms: 1.458435\n  type: 'suite'\n  ...\n# Subtest: writeWarmStartRows\n    # Subtest: does not throw when the store does\n    ok 1 - does not throw when the store does\n      ---\n      duration_ms: 0.205325\n      type: 'test'\n      ...\n    # Subtest: writes under the versioned key\n    ok 2 - writes under the versioned key\n      ---\n      duration_ms: 0.144684\n      type: 'test'\n      ...\n    # Subtest: offers a refused value to the store again\n    ok 3 - offers a refused value to the store again\n      ---\n      duration_ms: 0.210795\n      type: 'test'\n      ...\n    1..3\nok 67 - writeWarmStartRows\n  ---\n  duration_ms: 0.713403\n  type: 'suite'\n  ...\n# Subtest: decodeWarmStartProviders\n    # Subtest: round-trips providers\n    ok 1 - round-trips providers\n      ---\n      duration_ms: 0.313854\n      type: 'test'\n      ...\n    # Subtest: reads a miss as null\n    ok 2 - reads a miss as null\n      ---\n      duration_ms: 0.176222\n      type: 'test'\n      ...\n    # Subtest: rejects a provider with no name to fall back to\n    ok 3 - rejects a provider with no name to fall back to\n      ---\n      duration_ms: 0.117625\n      type: 'test'\n      ...\n    # Subtest: rejects a provider whose name is blank\n    ok 4 - rejects a provider whose name is blank\n      ---\n      duration_ms: 0.082631\n      type: 'test'\n      ...\n    # Subtest: drops a logo that is not a same-origin path\n    ok 5 - drops a logo that is not a same-origin path\n      ---\n      duration_ms: 0.226513\n      type: 'test'\n      ...\n    # Subtest: drops a path that resolves onto another host\n    ok 6 - drops a path that resolves onto another host\n      ---\n      duration_ms: 0.228668\n      type: 'test'\n      ...\n    # Subtest: drops a path carrying the characters that end a CSS token\n    ok 7 - drops a path carrying the characters that end a CSS token\n      ---\n      duration_ms: 0.150355\n      type: 'test'\n      ...\n    # Subtest: rejects an entry too long to be worth parsing\n    ok 8 - rejects an entry too long to be worth parsing\n      ---\n      duration_ms: 0.202169\n      type: 'test'\n      ...\n    1..8\nok 68 - decodeWarmStartProviders\n  ---\n  duration_ms: 1.76784\n  type: 'suite'\n  ...\n# Subtest: encodeWarmStartProviders\n    # Subtest: carries only the three fields the glyph reads\n    ok 1 - carries only the three fields the glyph reads\n      ---\n      duration_ms: 1.210943\n      type: 'test'\n      ...\n    1..1\nok 69 - encodeWarmStartProviders\n  ---\n  duration_ms: 1.522031\n  type: 'suite'\n  ...\n# Subtest: readWarmStartProviders\n    # Subtest: serves what was stored\n    ok 1 - serves what was stored\n      ---\n      duration_ms: 0.250728\n      type: 'test'\n      ...\n    # Subtest: survives a store that throws on every call\n    ok 2 - survives a store that throws on every call\n      ---\n      duration_ms: 0.165973\n      type: 'test'\n      ...\n    # Subtest: drops an entry that did not decode\n    ok 3 - drops an entry that did not decode\n      ---\n      duration_ms: 0.124127\n      type: 'test'\n      ...\n    # Subtest: ignores an entry written under another version's key\n    ok 4 - ignores an entry written under another version's key\n      ---\n      duration_ms: 0.183114\n      type: 'test'\n      ...\n    1..4\nok 70 - readWarmStartProviders\n  ---\n  duration_ms: 0.884617\n  type: 'suite'\n  ...\n# Subtest: writeWarmStartProviders\n    # Subtest: does not throw when the store does\n    ok 1 - does not throw when the store does\n      ---\n      duration_ms: 0.161234\n      type: 'test'\n      ...\n    # Subtest: keeps its own versioned key\n    ok 2 - keeps its own versioned key\n      ---\n      duration_ms: 0.194075\n      type: 'test'\n      ...\n    1..2\nok 71 - writeWarmStartProviders\n  ---\n  duration_ms: 0.499934\n  type: 'suite'\n  ...\n1..71\n# tests 228\n# suites 60\n# pass 228\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 397.448743\n\n> bb-plugin-dockside@0.1.8 build\n> env -u BB_CLI bb plugin build .\n\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:bf2fcd36eb236077c3a6d27880566a153a31607c22629917109911dd1bff4352",
+      "sourceTreeAfter": "sha256:bf2fcd36eb236077c3a6d27880566a153a31607c22629917109911dd1bff4352",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

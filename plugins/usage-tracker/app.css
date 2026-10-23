@@ -8,6 +8,7 @@
   --usage-sidebar-hover: var(--sidebar-accent, var(--muted));
   --usage-sidebar-focus: var(--sidebar-ring, var(--ring));
   --usage-sidebar-claude: #d97757;
+  --usage-sidebar-deepseek: #4d6bfe;
   --usage-sidebar-warning: color-mix(
     in srgb,
     #eab308 72%,
@@ -172,6 +173,13 @@
 .usage-tracker-sidebar__summary-mark[data-provider="claudeCode"],
 .usage-tracker-sidebar__details-mark[data-provider="claudeCode"] {
   color: var(--usage-sidebar-claude);
+}
+
+.usage-tracker-sidebar__provider[data-provider="deepSeek"]
+  .usage-tracker-sidebar__mark,
+.usage-tracker-sidebar__summary-mark[data-provider="deepSeek"],
+.usage-tracker-sidebar__details-mark[data-provider="deepSeek"] {
+  color: var(--usage-sidebar-deepseek);
 }
 
 .usage-tracker-sidebar__mark svg,
