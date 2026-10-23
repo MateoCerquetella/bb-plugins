@@ -30,18 +30,20 @@ function OriginalTicket({ record }: { record: FactoryRecord }) {
   }><Icon name="FileText" className="size-3.5" />Original ticket</Button>;
 }
 
-function ContinueBuild({ run, record }: { run: FactoryRun; record: FactoryRecord }) {
+function ContinueTask({ record, onRecord, onError, label = 'Continue task' }: {
+  record: FactoryRecord; onRecord: (record: FactoryRecord) => void;
+  onError: (error: string | null) => void; label?: string;
+}) {
   const rpc = useRpc<TaskboardRpcContract>();
   const navigate = useBbNavigate();
   const context = useBbContext();
   const [continuing, setContinuing] = useState(false);
-  const [continueError, setContinueError] = useState<string | null>(null);
   const continuePending = useRef(false);
-  async function continueBlockedBuild() {
+  async function continueTask() {
     if (continuePending.current) return;
     continuePending.current = true;
     setContinuing(true);
-    setContinueError(null);
+    onError(null);
     try {
       const result = await rpc.call('factoryStartTask', {
         projectId: record.projectId,
@@ -49,31 +51,34 @@ function ContinueBuild({ run, record }: { run: FactoryRun; record: FactoryRecord
         locator: record.locator,
         contextThreadId: context.projectId === record.projectId ? context.threadId : null
       });
+      onRecord(result.record);
       const resumed = result.record.runs.at(-1);
-      const failure = result.record.automationError ?? resumed?.error;
+      const coordinator = result.record.coordinator;
+      const failure = result.record.automationError ??
+        (coordinator && 'error' in coordinator ? coordinator.error : null) ?? resumed?.error;
       if (failure) {
-        setContinueError(failure);
+        onError(failure);
         return;
       }
       if (!resumed?.threadId || !['starting', 'running'].includes(resumed.status)) {
-        setContinueError('The Build session did not resume. Refresh progress and try again.');
+        onError('The task could not continue. Inspect the current workflow and session status.');
         return;
       }
-      navigate.toThread(resumed.threadId);
+      const threadId = ticketThreadId(result.record) ?? resumed.threadId;
+      requestTaskboardOpen(threadId);
+      navigate.toThread(threadId);
     } catch (reason) {
-      setContinueError(reason instanceof Error ? reason.message : String(reason));
+      onError(reason instanceof Error ? reason.message : String(reason));
     } finally {
       continuePending.current = false;
       setContinuing(false);
     }
   }
-  return <div className="tb-current-recovery" aria-label="Current Build recovery">
-    <Button size="sm" variant="outline" disabled={continuing} aria-busy={continuing} onClick={() => void continueBlockedBuild()}>
+  return <div className="tb-current-recovery" aria-label="Continue existing task">
+    <Button size="sm" variant="outline" disabled={continuing} aria-busy={continuing} onClick={() => void continueTask()}>
       <Icon name={continuing ? 'Loading' : 'MessageCirclePlus'} className="size-3.5" />
-      {continuing ? 'Continuing...' : 'Continue in thread'}
+      {continuing ? 'Continuing...' : label}
     </Button>
-    {continueError && continueError !== run.error && continueError !== record.automationError &&
-      <ErrorNotice title="Build could not continue" nextStep="Inspect the technical details, then try Continue in thread again." detail={continueError} />}
   </div>;
 }
 
@@ -380,7 +385,8 @@ function FactoryThreadProgressContent({ threadId, isCompactViewport }: { threadI
       <DialogDescription>{record.stage} · Updated {new Date(record.updatedAt).toLocaleTimeString()}</DialogDescription>
       {error && <ErrorNotice title="Progress could not refresh" nextStep="The last known progress is shown. Refresh will be retried automatically." detail={error} />}
       <FactoryWorkbench record={record} onRecord={setRecord}
-        actions={run && consoleState(record).action === 'continue-build' ? <ContinueBuild run={run} record={record} /> : null}
+        actions={['continue-build', 'continue-task'].includes(consoleState(record).action ?? '')
+          ? <ContinueTask record={record} onRecord={setRecord} onError={setError} /> : null}
         plan={record.plans.at(-1) ? <Markdown content={record.plans.at(-1)!.body} /> : undefined} />
       <OriginalTicket record={record} />
     </DialogContent></Dialog>
@@ -406,6 +412,13 @@ export function StartTaskButton({ item, disabled = false }: {
   const [error, setError] = useState<string | null>(null);
   const executionTouched = useRef(false);
   const pending = useRef(false);
+  const planNeedsApproval = !!error && /Approve (the|exact) current plan/i.test(error);
+  const openTask = () => {
+    setOpen(false);
+    navigate.toPluginPanel('tasks', { subPath: originalTicketPath({
+      projectId: item.bbProjectId, source: item.source, locator: item.locator
+    }) });
+  };
   async function start() {
     if (pending.current) return;
     pending.current = true; setBusy(true); setError(null);
@@ -430,6 +443,7 @@ export function StartTaskButton({ item, disabled = false }: {
         event.stopPropagation();
         executionTouched.current = false;
         setExecution(null);
+        setError(null);
         setOpen(true);
       }}>
       <Icon name="AiContentGenerator01" className="size-3.5" />{busy ? 'Starting...' : 'Start task'}
@@ -453,14 +467,22 @@ export function StartTaskButton({ item, disabled = false }: {
             if (!executionTouched.current) setExecution(defaults);
           }}
         />
-        {error && <ErrorNotice title="Task needs attention" nextStep="Inspect Agent progress before starting again; a session may already exist." detail={error} />}
+        {error && <ErrorNotice title="Task needs attention"
+          nextStep={planNeedsApproval
+            ? 'Review and approve the current plan before starting Build.'
+            : 'Inspect Agent progress before starting again; a session may already exist.'}
+          detail={error} />}
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button type="button" variant="ghost" disabled={busy} onClick={() => setOpen(false)}>Cancel</Button>
-          <Button type="button" disabled={disabled || busy || !execution} aria-busy={busy}
-            onClick={() => void start()}>
-            <Icon name={busy ? 'Loading' : 'AiContentGenerator01'} className="size-3.5" />
-            {busy ? 'Starting...' : 'Start task'}
-          </Button>
+          {planNeedsApproval
+            ? <Button type="button" onClick={openTask}>
+              <Icon name="FileText" className="size-3.5" />Review plan
+            </Button>
+            : <Button type="button" disabled={disabled || busy || !execution} aria-busy={busy}
+              onClick={() => void start()}>
+              <Icon name={busy ? 'Loading' : 'AiContentGenerator01'} className="size-3.5" />
+              {busy ? 'Starting...' : 'Start task'}
+            </Button>}
         </div>
       </DialogContent>
     </Dialog>
@@ -533,7 +555,9 @@ export function FactoryProgress({ item }: { item: WorkItem }) {
       rpc.call('factoryRetryStatus', identity)
     )}><Icon name="RotateCcw" className="size-3.5" />Retry status update</Button>}
     {primaryAction === 'start-task' && <StartTaskButton item={item} disabled={!loaded || busy || ['done', 'canceled'].includes(item.stateCategory)} />}
-    {primaryAction === 'continue-build' && run && record && <ContinueBuild key={run.id} run={run} record={record} />}
+    {(primaryAction === 'continue-build' || primaryAction === 'continue-task') && record &&
+      <ContinueTask key={run?.id} record={record} onRecord={setRecord} onError={setError}
+        label={primaryAction === 'continue-build' ? 'Continue Build' : 'Continue task'} />}
     {primaryAction === 'retry' && run && <Button size="sm" disabled={busy} onClick={() => void start(run.kind, true)}>
       <Icon name="RotateCcw" className="size-3.5" />Retry {labels[run.kind].toLowerCase()}
     </Button>}

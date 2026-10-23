@@ -76,6 +76,56 @@ try {
   await page.setViewportSize({ width: 1280, height: 1000 });
   await page.route('https://taskboard-preview.test/**', route => route.fulfill({ contentType: 'text/html', body: html }));
   await page.goto('https://taskboard-preview.test/');
+  if (process.env.TASKBOARD_CONTINUE_ONLY) {
+    for (const width of [1280, 390]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.evaluate(() => {
+        const record = window.factoryFixture;
+        record.automatic = true;
+        record.plans = [{ revision: 1, body: 'Implement the approved plan', digest: 'approved',
+          scopeDigest: record.scopeDigest, createdAt: new Date().toISOString() }];
+        record.approvedDigest = 'approved';
+        record.automationError = 'Automatic work paused: The original authoring session is archived. Use Continue task to resume it.';
+        window.factoryRefresh();
+      });
+      const detail = page.locator('#preview-detail');
+      await detail.getByRole('button', { name: 'Continue task', exact: true }).waitFor();
+      await detail.getByRole('button', { name: 'Continue task', exact: true }).scrollIntoViewIfNeeded();
+      assert.equal(await detail.getByRole('button', { name: 'Start task', exact: true }).count(), 0);
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+      await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, `taskboard-continue-${width}.png`) });
+    }
+    assert.equal(await page.evaluate(() => window.factoryStarts), 0);
+    await page.evaluate(() => {
+      window.factoryStartDelay = 200;
+      window.factoryStartError = 'Automatic work paused: The original Build worktree is unavailable. Restore that workspace before continuing.';
+    });
+    await page.locator('#preview-detail').getByRole('button', { name: 'Continue task', exact: true }).click();
+    await page.locator('#preview-detail').getByText('Task action failed', { exact: true }).waitFor();
+    assert.equal(await page.evaluate(() => window.factoryStarts), 1);
+    assert.equal(await page.getByRole('dialog', { name: 'Start task' }).count(), 0);
+    assert.equal(await page.evaluate(() => window.factoryFixture.runs.length), 1);
+    for (const width of [1280, 768, 520, 390]) {
+      await page.setViewportSize({ width, height: 900 });
+      const detail = page.locator('#preview-detail');
+      await detail.locator('.tb-error-notice details').evaluate(element => { element.open = true; });
+      const state = await detail.locator('.tb-room-state').boundingBox();
+      const head = await detail.locator('.tb-room-head').boundingBox();
+      assert.ok(state.width >= 200, `Summary squeezed at ${width}: ${state.width}`);
+      assert.ok(head.height < 180, `Header expanded at ${width}: ${head.height}`);
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+      await detail.locator('.tb-room-head').scrollIntoViewIfNeeded();
+      await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, `taskboard-continue-error-${width}.png`) });
+    }
+    await page.evaluate(() => { window.factoryStartError = null; });
+    await page.locator('#preview-detail').getByRole('button', { name: 'Continue task', exact: true }).click();
+    await page.waitForFunction(() => window.factoryFixture.runs.at(-1)?.kind === 'build');
+    assert.equal(await page.evaluate(() => window.factoryFixture.runs.length), 2);
+    assert.equal(await page.evaluate(() => window.factoryStarts), 2);
+    assert.equal(await page.getByRole('dialog', { name: 'Start task' }).count(), 0);
+    assert.deepEqual(errors, []);
+    console.log(JSON.stringify({ archivedPlanAction: 'passed', noNewTaskAction: 'passed', desktop: 'passed', mobile: 'passed', errors }));
+  } else
   if (process.env.TASKBOARD_START_TASK_ONLY) {
     for (const width of [1280, 390]) {
       await page.setViewportSize({ width, height: 900 });
@@ -92,6 +142,21 @@ try {
       await dialog.getByRole('button', { name: 'Cancel', exact: true }).click();
       assert.equal(await page.evaluate(() => window.factoryStarts), 0);
     }
+    await page.evaluate(() => {
+      window.factoryStartError = 'Build blockers are stale. Approve the current plan before continuing.';
+    });
+    await page.locator('#preview-card').getByRole('button', { name: 'Start task', exact: true }).click();
+    const blockedDialog = page.getByRole('dialog', { name: 'Start task' });
+    await blockedDialog.getByRole('button', { name: 'Start task', exact: true }).click();
+    await blockedDialog.getByRole('button', { name: 'Review plan', exact: true }).waitFor();
+    assert.equal(await blockedDialog.getByRole('button', { name: 'Start task', exact: true }).count(), 0);
+    await blockedDialog.getByRole('button', { name: 'Review plan', exact: true }).click();
+    assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['item/proj_test/linear/issue-42']);
+    await page.evaluate(() => {
+      window.factoryStartError = null;
+      window.factoryStarts = 0;
+      window.factoryNavigation = [];
+    });
     await page.locator('#preview-card').getByRole('button', { name: 'Start task', exact: true }).click();
     const dialog = page.getByRole('dialog', { name: 'Start task' });
     await dialog.getByRole('combobox', { name: 'AI provider' }).selectOption('codex:gpt-5');
@@ -104,7 +169,7 @@ try {
     });
     assert.deepEqual(await page.evaluate(() => window.factoryNavigation), ['thr_coordinator']);
     assert.deepEqual(errors, []);
-    console.log(JSON.stringify({ startTaskConfirmation: 'passed', selectedModel: 'passed', cancel: 'passed', navigation: 'passed', desktop: 'passed', mobile: 'passed', errors }));
+    console.log(JSON.stringify({ startTaskConfirmation: 'passed', stalePlanRecovery: 'passed', selectedModel: 'passed', cancel: 'passed', navigation: 'passed', desktop: 'passed', mobile: 'passed', errors }));
   } else {
   const factorySettings = page.locator('#preview-factory-settings');
   await factorySettings.getByRole('checkbox', { name: 'Enable automatic intake' }).check();
@@ -117,6 +182,11 @@ try {
     await page.setViewportSize({ width, height: 900 });
     await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, `taskboard-factory-settings-${width}.png`) });
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+  }
+  if (process.env.TASKBOARD_SETTINGS_ONLY) {
+    assert.deepEqual(errors, []);
+    console.log(JSON.stringify({ settings: 'passed', desktop: 'passed', mobile: 'passed', errors }));
+    process.exit(0);
   }
   await factorySettings.getByRole('checkbox', { name: 'Enable automatic intake' }).uncheck();
   await factorySettings.getByRole('button', { name: /^Save (settings|changes)$/ }).click();

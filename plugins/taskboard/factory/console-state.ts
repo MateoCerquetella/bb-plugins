@@ -7,7 +7,7 @@ export type RunSelection =
   | { kind: 'follow-current' }
   | { kind: 'attempt'; stage: FactoryRunKind; runId: string | null };
 export type EvidenceView = 'activity' | 'result' | 'changes' | 'plan' | 'workspace';
-export type FactoryAction = 'start-task' | 'retry-status' | 'recover' | 'retry' | 'continue-build' |
+export type FactoryAction = 'start-task' | 'continue-task' | 'retry-status' | 'recover' | 'retry' | 'continue-build' |
   'return-build' | 'generate-plan' | 'start-build' | 'start-review' | 'approve-plan' | null;
 
 export function selectedRun(record: FactoryRecord, selection: RunSelection): FactoryRun | null {
@@ -44,13 +44,17 @@ export function consoleState(record: FactoryRecord) {
       (!record.coordinator || ['pending', 'ready'].includes(record.coordinator.status))) action = 'start-task';
   } else if (run.status === 'uncertain') action = 'recover';
   else if (!active) {
-    if (run.status === 'failed' || run.status === 'canceled') action = 'retry';
+    if (run.scopeDigest && run.scopeDigest !== record.scopeDigest) action = 'continue-task';
+    else if (plan && plan.scopeDigest === record.scopeDigest && !approved) action = 'approve-plan';
+    else if (approved && run.status === 'finished' && ['build', 'review'].includes(run.kind) &&
+      run.planDigest !== record.approvedDigest) action = 'start-build';
+    else if (run.status === 'failed' || run.status === 'canceled') action = 'retry';
     else if (run.kind === 'build' && run.status === 'finished' &&
+      approved && run.planDigest === record.approvedDigest &&
       run.buildResult?.verdict === 'blocked' && run.threadId) action = 'continue-build';
     else if (approved && run.kind === 'review' && run.status === 'finished' &&
       run.reviewResult?.verdict !== 'passed') action = 'return-build';
-    else if (record.automationError && run.kind !== 'review') action = 'start-task';
-    else if (!record.automatic && plan && !approved) action = 'approve-plan';
+    else if (record.automationError && run.kind !== 'review') action = 'continue-task';
     else if (!record.automatic && !record.automationError && run.status === 'finished' && run.kind === 'investigate') action = 'generate-plan';
     else if (approved && run.status === 'finished' && run.kind !== 'review' &&
       (!record.automatic || run.kind === 'build') && !['needs_input', 'blocked'].includes(run.buildResult?.verdict ?? '')) {

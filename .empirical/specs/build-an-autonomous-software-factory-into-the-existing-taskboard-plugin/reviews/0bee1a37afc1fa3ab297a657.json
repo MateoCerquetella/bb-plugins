@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:41bff6a86d74c423df1bb28787ec44bcf9cea172db59a61e477e69e14baded24",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "1807befaa9c0732d83b6223d3821ba83268d98e7",
+  "headCommit": "b66f35f18529d0b9fbbf57140800b9cb78d83838",
+  "diffDigest": "sha256:ea95622f1f0a74c90f0fb0f723211c74c90aa61fb5ac8aff16eb8c2bb2974262",
+  "verdict": "APPROVED",
+  "reviewerActor": "codex-fresh-context",
+  "reviewerInvocationId": "/root/fresh_review_minimal_settings",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: PASS: Explicit enablement, provider, todo intake, bounded concurrency, and AI persist through the existing save contract.\n- PASS AC-2: PASS: Presentation changes do not alter discovery or eligibility.\n- PASS AC-3: PASS: Claims, capacity, and dispatch recovery are unaffected.\n- PASS AC-4: PASS: Coordinator hierarchy and stage execution remain intact; manual Start task retains separate model-selection confirmation.\n- PASS AC-5: PASS: Paused, awaiting-scan, and blocked explanations remain visible.\n- PASS AC-6: PASS: No acceptance, merge, deployment, or issue-closing action was added.\n- PASS AC-7: PASS: Validated RPC and CLI contracts and behavioral coverage remain intact; browser assertions match the compact presentation.\n- PASS AC-8: PASS: Settings retain the shared provider/model picker, permission controls, project-default reset, and manual start confirmation.\n- PASS AC-9: PASS: The settings cleanup does not change the improvement helper or selected execution.\n- PASS AC-UI-1: PASS: The form is flatter while retaining selection, enablement, concurrency, save, activity, provider intake, blockers, and responsive checks.\n\n## Security / correctness\n\nPASS. No new security boundary, dispatch action, or persistence change is introduced by the minimalist cleanup. Explicit pre-start selection remains present.\n\n## Design / maintainability\n\nPASS. The cleanup deletes redundant framing and copy, reuses the existing picker, and adds no abstraction or orchestration complexity.",
+  "bodyDigest": "sha256:2dc2eed243687f13ec5a53966b19139162cd7ba96bf66919fcf4cb2c57e88eb8",
+  "findings": [],
+  "digest": "sha256:0bee1a37afc1fa3ab297a657417fefdb904eb47c6b74d2b5fba9fdc0fb052765"
+}

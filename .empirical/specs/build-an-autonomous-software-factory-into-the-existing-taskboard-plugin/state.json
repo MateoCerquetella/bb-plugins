@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 95,
+  "revision": 103,
   "activeFeature": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin",
   "request": "Build an autonomous software factory into the existing Taskboard plugin, inspired by https://github.com/lpbaril/bb-plugin-factory. Make Linear, Jira, or the configured issue provider the source of truth. The factory should continuously select eligible tickets, start and supervise BB agent work, avoid duplicate dispatch, recover after restart, and reflect progress back through the existing Taskboard provider/status model. Reuse the current taskboard architecture and keep the first implementation focused and operable.",
   "profile": "complex",
@@ -9,7 +9,7 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 1,
-  "message": "Implemented minimalist factory configuration presentation: removed outer card and redundant internal rules, changed status badges to plain text, grouped controls in compact rows, moved activity and provider intake into one quiet footer, and preserved error/paused explanations. Added a mobile picker wrap basis after inspecting the initial screenshot so model names remain readable. Updated outdated browser-script copy assertions. Captured and visually inspected actual component preview screenshots at 1000, 768, and 390 pixels with the project-bound BB Surf browser; no horizontal overflow observed. Preview uses mocked RPC/native-picker fixtures, not live production integration. Automated tests, full review, No Mistakes, and deployment were not run. Branch is current with origin/main; source committed locally as 78734f4af. No publication claimed.",
+  "message": "Make coordinator-first orchestration explicit for every manual Start task and Continue task: ensure the existing coordinator is ready before dispatching any investigate, plan, build, review, or repair session; if coordinator creation/recovery is pending or uncertain, do not dispatch a sub-agent. Preserve one coordinator per ticket and add regression tests that prove coordinator creation occurs before the first stage spawn and that continuation never bypasses it. Run focused tests, typecheck/build, reinstall and reload Taskboard.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:29022ace2db69cef386e04b1a884c33733cd71a84b435ca92f89f57496c74a0e",
@@ -23,20 +23,21 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": true,
+    "implemented": false,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "implemented",
+    "highest": "none",
     "reasons": {
+      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-23T17:45:54.474Z",
+  "updatedAt": "2026-10-23T19:36:56.875Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin-63a17a591999",
@@ -78,13 +79,13 @@
     "actor": "agent",
     "revision": 55
   },
-  "trackerGeneration": 30,
+  "trackerGeneration": 34,
   "lifecycle": {
+    "riskRequest": "Let users choose which AI (provider and model, plus reasoning, permission mode, and service tier) the Taskboard factory uses for its coordinator and stage sessions. Persist the choice in the project factory policy, expose it in project Manage and the CLI, and use it for manual Start task and automatic intake, falling back to the project native execution defaults only when no explicit choice exists. Today Start task from Taskboard fails with 'Choose native BB model and execution settings for this project first' when a project has no defaults and offers no way to choose.",
     "stage": "iteration",
-    "iteration": 30,
-    "awaitingFeedback": true,
-    "contractRevision": 53,
-    "riskRequest": "Let users choose which AI (provider and model, plus reasoning, permission mode, and service tier) the Taskboard factory uses for its coordinator and stage sessions. Persist the choice in the project factory policy, expose it in project Manage and the CLI, and use it for manual Start task and automatic intake, falling back to the project native execution defaults only when no explicit choice exists. Today Start task from Taskboard fails with 'Choose native BB model and execution settings for this project first' when a project has no defaults and offers no way to choose."
+    "iteration": 34,
+    "awaitingFeedback": false,
+    "contractRevision": 53
   },
   "budgetExtensionMinutes": 240,
   "reviewFirst": true

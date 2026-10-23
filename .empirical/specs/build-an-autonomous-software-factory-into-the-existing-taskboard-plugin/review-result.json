@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "packetDigest": "sha256:47965093a8cf6b1b9c05943141075c7865b5975b3c709818e2c8d9beb5b0764f",
-  "resultPath": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/reviews/4bbcd9f29ef1963bc59c56ae.json",
-  "resultDigest": "sha256:4bbcd9f29ef1963bc59c56aeaa7c3e7417ddfff78abf5fe7f7bc6ff694792fac",
-  "receiptId": "collected-0820b00043c5c79bac69fa3d"
+  "packetDigest": "sha256:41bff6a86d74c423df1bb28787ec44bcf9cea172db59a61e477e69e14baded24",
+  "resultPath": ".empirical/specs/build-an-autonomous-software-factory-into-the-existing-taskboard-plugin/reviews/0bee1a37afc1fa3ab297a657.json",
+  "resultDigest": "sha256:0bee1a37afc1fa3ab297a657417fefdb904eb47c6b74d2b5fba9fdc0fb052765",
+  "receiptId": "collected-b401dff1be906398cda2f024"
 }

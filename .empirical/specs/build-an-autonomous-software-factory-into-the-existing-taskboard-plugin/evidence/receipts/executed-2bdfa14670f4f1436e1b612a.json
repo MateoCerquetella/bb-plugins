@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "id": "executed-2bdfa14670f4f1436e1b612a",
+  "criteria": [
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Run actual Taskboard browser interaction checks separately from the passed package checks.",
+  "passed": false,
+  "startedAt": "2026-10-23T17:51:12.638Z",
+  "completedAt": "2026-10-23T17:51:31.218Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "build-an-autonomous-software-factory-into-the-existing-taskboard-plugin",
+    "specRevision": 55,
+    "specDigest": "sha256:29022ace2db69cef386e04b1a884c33733cd71a84b435ca92f89f57496c74a0e",
+    "treeDigest": "sha256:cbbed95dc4ff55050dc09531fb4d90c4a31018bfdbc1c0cf9c7d3b90e06823d5",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:a35f8b3dbd9294d0c5c1d7f43219ad2bba460e2a7cb44c43e24c87106f4c7418",
+  "kind": "executed",
+  "command": {
+    "argv": [
+      "node",
+      ".empirical/specs/taskboard-new-thread-drag-to-composer/qa/browser.mjs"
+    ],
+    "cwd": ".",
+    "timeoutMs": 120000,
+    "maxOutputBytes": 262144,
+    "environmentKeys": [
+      "PATH"
+    ]
+  },
+  "result": {
+    "exitCode": 1,
+    "signal": null,
+    "timedOut": false,
+    "stdoutDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrDigest": "sha256:18ffd4cbb280aebc1c851a212be7d83618852a05f56532a7406e2251d9827d6d",
+    "stdoutTail": "",
+    "stderrTail": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nlocator.waitFor: Timeout 15000ms exceeded.\nCall log:\n  - waiting for locator('button[aria-label^=\"Open new tab\"]')\n\n    at openPreview (/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_4crs23q8tu-1/bb-plugins/.empirical/specs/taskboard-new-thread-drag-to-composer/qa/browser.mjs:23:16)\n    at /home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_4crs23q8tu-1/bb-plugins/.empirical/specs/taskboard-new-thread-drag-to-composer/qa/browser.mjs:81:32 {\n  log: [ `  - waiting for locator('button[aria-label^=\"Open new tab\"]')` ],\n  name: 'TimeoutError'\n}\n\nNode.js v22.23.1\n",
+    "stdoutTruncated": false,
+    "stderrTruncated": false
+  }
+}
