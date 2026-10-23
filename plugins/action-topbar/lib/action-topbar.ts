@@ -206,6 +206,13 @@ function actionIconNode(action: ActionDescriptor): Node {
 }
 
 function fallbackTabIcon(summary: TabSummary): Node {
+  const actionIconName =
+    summary.relaunchActionId === null
+      ? ""
+      : actionKind({
+          id: summary.relaunchActionId,
+          label: summary.label,
+        });
   const iconName =
     summary.kind === "workspace-file-preview" ||
     summary.kind === "host-file-preview" ||
@@ -218,7 +225,7 @@ function fallbackTabIcon(summary: TabSummary): Node {
           : summary.kind === "git-diff"
             ? "diff"
             : summary.kind === "plugin-panel"
-              ? ""
+              ? actionIconName
               : summary.kind;
   return (
     createLineIcon(iconName, "action-topbar__line-icon") ??

@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "sequence": 7,
+  "previousDigest": "sha256:6f54fb4cfb216666fe45e356167756f6fecbfd0a31d4f4299e1709e5cfd3be8e",
+  "actor": "root",
+  "type": "transition",
+  "summary": "Checkpoint: continue with 30 more minutes",
+  "createdAt": "2026-10-23T18:11:53.674Z",
+  "stateBeforeDigest": "sha256:38a98383c713fc79517c70624afc011e0b2295d65f3c5c9e873a46d5d31ebfef",
+  "stateAfterDigest": "sha256:ba1886cca27d57630a215df96ff461f3b2781aa100d3ba4e363f0a48db81cf06",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 7,
+    "activeFeature": "change-the-taskboard-icon-in-the-topbar-to-use-the",
+    "request": "Change the Taskboard icon in the topbar to use the actual Taskboard icon already used by the “Open in sidebar” action. Keep the change simple and localized.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 1,
+    "message": "Fresh-context review found AC-1 and F-1: Taskboard action icons use the new glyph, but fallback plugin tabs still render the label initial. The repair derives known plugin fallback icons from the relaunch action identity.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:490ee0c33d87a5b032a3eb6456fa2a15602a40becdb7adcc6281265d524b9ff2",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:16899df94cb1ddfe6cc3fdec196c0abdd9cf4ff9aa8596dd5386a5cf96b72547",
+    "impactDigest": "sha256:85301a984d544de1be373d9de7810f21688a49cd079d15e5e57eb7537295d9bb",
+    "capabilityClaimId": "change-the-taskboard-icon-in-the-topbar-to-use-the-333acdd656ef",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-23T18:11:53.674Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "change-the-taskboard-icon-in-the-topbar-to-use-the-333acdd656ef",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "change-the-taskboard-icon-in-the-topbar-to-use-the",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_q52npwydec-1/bb-plugins",
+      "worktreeId": "sha256:fb3017caca94a5b0d5af19820943434235aa9234dda5666c6096c665364d2456",
+      "baseCommit": "1d84e329e69ddbcfe4832fb6441bf35d73635751",
+      "baseTree": "d0d047f25f5b6e24adee206d5143a7357acf810b",
+      "bases": {
+        "action-topbar-taskboard-icon": {
+          "capability": "action-topbar-taskboard-icon",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "taskboard uses its product icon in action topbar": null
+          }
+        }
+      },
+      "capabilities": [
+        "action-topbar-taskboard-icon"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-23T17:47:01.520Z",
+      "heartbeatAt": "2026-10-23T17:47:01.520Z",
+      "digest": "sha256:099d2c2b0481593fdb0eb2d9c9c67378725312228c18bfa837de86d96c8166a8"
+    },
+    "reviewFirst": true,
+    "budgetExtensionMinutes": 30
+  },
+  "digest": "sha256:535eff05b3c88b3154da2190dc7f8503ddaff8811770a5b1ab16df454597d4c3"
+}
