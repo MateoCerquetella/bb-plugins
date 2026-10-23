@@ -2391,11 +2391,24 @@ test('repair Build that needs input pauses without requesting another review', a
     const record = await f.service.get(item);
     assert.equal(record.stage, 'Build');
     assert.equal(record.runs.at(-1)?.buildResult?.verdict, 'needs_input');
-    assert.match(record.automationError!, /Build needs input: Choose the media retention policy/);
+    assert.equal(record.automationError, 'Automatic work paused: Build needs your approval to continue.');
+    assert.match(record.runs.at(-1)?.buildResult?.summary ?? '', /Choose the media retention policy/);
     assert.equal(f.spawns(), 0);
     await assert.rejects(f.service.start(item, {
       expectedVersion: record.version, kind: 'review', contextThreadId: null, retry: false
     }), /unresolved blockers or needs input/);
+
+    const resumed = await f.service.startTask(item, null);
+    const continued = resumed.runs.at(-1)!;
+    assert.equal(continued.kind, 'build');
+    assert.equal(continued.status, 'running');
+    assert.equal(continued.threadId, 'thr_native');
+    assert.equal(continued.continuationOf, record.runs.at(-1)!.id);
+    assert.equal(resumed.automationError, null);
+    assert.equal(f.sends(), 2);
+    assert.match(f.sent.at(-1)!.input[0].text, /Approve and continue/);
+    assert.match(f.sent.at(-1)!.input[0].text, /approved product decisions/);
+    assert.doesNotMatch(f.sent.at(-1)!.input[0].text, /Do not invent product or policy decisions/);
   } finally { f.db.close(); }
 });
 

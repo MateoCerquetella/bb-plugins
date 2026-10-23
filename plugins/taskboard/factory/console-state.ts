@@ -18,7 +18,7 @@ export function selectedRun(record: FactoryRecord, selection: RunSelection): Fac
 
 export function runStatus(run: FactoryRun): string {
   if (run.kind === 'build' && run.status === 'finished') {
-    if (run.buildResult?.verdict === 'needs_input') return 'Build needs input';
+    if (run.buildResult?.verdict === 'needs_input') return 'Needs approval';
     if (run.buildResult?.verdict === 'blocked') return 'Build found blockers';
   }
   if (run.kind === 'review' && run.status === 'finished') {
@@ -51,7 +51,7 @@ export function consoleState(record: FactoryRecord) {
     else if (run.status === 'failed' || run.status === 'canceled') action = 'retry';
     else if (run.kind === 'build' && run.status === 'finished' &&
       approved && run.planDigest === record.approvedDigest &&
-      run.buildResult?.verdict === 'blocked' && run.threadId) action = 'continue-build';
+      ['blocked', 'needs_input'].includes(run.buildResult?.verdict ?? '') && run.threadId) action = 'continue-build';
     else if (approved && run.kind === 'review' && run.status === 'finished' &&
       run.reviewResult?.verdict !== 'passed') action = 'return-build';
     else if (record.automationError && run.kind !== 'review') action = 'continue-task';
@@ -67,6 +67,7 @@ export function consoleState(record: FactoryRecord) {
         : repairLimitReached ? 'Review still found blockers after two repair attempts. Inspect the findings and revise the plan.'
         : record.automatic && !record.automationError ? 'Review found blockers. Returning to Build with the findings automatically.'
         : 'Review found blockers. Return to Build with the findings to continue.'
+      : run.buildResult?.verdict === 'needs_input' ? 'Review the Build questions, then approve to continue.'
       : run.repairOf && ['starting', 'running'].includes(run.status)
         ? 'Addressing review findings in the Build workspace. Review will run again automatically.'
         : run.activity || 'Waiting for the next observation.';

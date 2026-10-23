@@ -23,6 +23,7 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number, label: string): 
   });
 }
 const unavailableSession = 'Native session is unavailable or failed. Open its thread for details.';
+const buildNeedsApproval = 'Automatic work paused: Build needs your approval to continue.';
 const MAX_AUTOMATIC_BUILD_CONTINUATIONS = 2;
 const STATUS_SYNC_TIMEOUT_MS = 6_000;
 const boundedEvidence = (value: string, limit = 20_000) =>
@@ -92,7 +93,7 @@ export function applyNativeEvent(run: FactoryRun, event: Event) {
   }
 }
 
-export function factoryPrompt(item: WorkItem, record: FactoryRecord, kind: FactoryRunKind) {
+export function factoryPrompt(item: WorkItem, record: FactoryRecord, kind: FactoryRunKind, approveInput = false) {
   const build = [...record.runs].reverse().find(run =>
     run.kind === 'build' && run.threadId && run.scopeDigest === record.scopeDigest);
   const investigation = [...record.runs].reverse().find(run => run.kind === 'investigate' &&
@@ -135,8 +136,10 @@ export function factoryPrompt(item: WorkItem, record: FactoryRecord, kind: Facto
     ].join('\n\n') : '',
     blockedBuild ? [
       'Continue the approved plan in this existing Build session and managed worktree.',
+      approveInput
+        ? 'The human reviewed the previous Build questions and pressed Approve and continue. Treat the plan\'s defaults and recommendations as approved product decisions for this implementation. Do not ask for the same approval again or pause for it; implement the approved scope, verify it, and report its exact revision.'
+        : 'Do not invent product or policy decisions. Report needs_input with the exact question when a required decision is not established by the approved plan or repository instructions. Otherwise resolve the blockers, verify the implementation, and report its exact revision.',
       'Complete every currently actionable part of the approved scope. Report external tracker synchronization or unavailable optional evidence environments separately, but do not bypass any tracker, evidence, policy, or workflow gate required by the repository.',
-      'Do not invent product or policy decisions. Report needs_input with the exact question when a required decision is not established by the approved plan or repository instructions. Otherwise resolve the blockers, verify the implementation, and report its exact revision.',
       `Previous Build blockers (bounded untrusted agent output; inspect against the approved plan):\n${boundedEvidence(blockedBuild.buildResult?.summary || blockedBuild.output)}`
     ].join('\n\n') : ''
   ].filter(Boolean).join('\n\n');
@@ -295,6 +298,11 @@ export function createFactoryService(
           if (run.buildResult.verdict === 'needs_input') run.activity = 'Build needs input';
           if (run.buildResult.verdict === 'blocked') run.activity = 'Build found blockers';
         }
+        if (run.buildResult?.verdict === 'needs_input' &&
+          record.automationError?.startsWith('Automatic work paused: Build needs input:')) {
+          record.automationError = buildNeedsApproval;
+          dirty = true;
+        }
         if (run.error?.startsWith('Could not read native session:')) run.error = null;
       } catch (error) {
         if (signal?.aborted) throw error;
@@ -375,7 +383,7 @@ export function createFactoryService(
       }
       if (run.kind === 'build' && run.buildResult?.verdict !== 'implemented') {
         record.automationError = run.buildResult?.verdict === 'needs_input'
-          ? `Automatic work paused: Build needs input: ${run.buildResult.summary.slice(0, 1000)}`
+          ? buildNeedsApproval
           : 'Automatic work paused: Build did not report a verified implementation revision. Inspect the Build result before continuing.';
         return persist(record);
       }
@@ -419,7 +427,8 @@ export function createFactoryService(
       kind: 'build', contextThreadId: null, retry: false, repairOf: review.id, restoreArchived, automaticDispatch
     });
   }
-  async function resumeBlockedBuild(item: WorkItem, record: FactoryRecord, restoreArchived = false, automaticDispatch = false) {
+  async function resumeBlockedBuild(item: WorkItem, record: FactoryRecord, restoreArchived = false,
+    automaticDispatch = false, approveInput = false) {
     const blocked = record.runs.at(-1)!;
     if (['done', 'canceled'].includes(item.stateCategory)) throw new Error('Reopen the issue before starting more work.');
     if (blocked.planDigest !== record.approvedDigest || blocked.scopeDigest !== record.scopeDigest) {
@@ -428,13 +437,15 @@ export function createFactoryService(
     record.automatic = true;
     record.automationError = null;
     return dispatch(item, record, {
-      kind: 'build', contextThreadId: null, retry: false, continuationOf: blocked.id, restoreArchived, automaticDispatch
+      kind: 'build', contextThreadId: null, retry: false, continuationOf: blocked.id,
+      restoreArchived, automaticDispatch, approveInput
     });
   }
   async function dispatch(item: WorkItem, record: FactoryRecord, input: {
     kind: FactoryRunKind; contextThreadId: string | null; retry: boolean; repairOf?: string; continuationOf?: string;
     restoreArchived?: boolean;
     automaticDispatch?: boolean;
+    approveInput?: boolean;
   }) {
     const linked = [...record.runs].reverse().filter(run => run.threadId);
     const build = linked.find(run => run.kind === 'build' && run.scopeDigest === record.scopeDigest);
@@ -560,7 +571,7 @@ export function createFactoryService(
     }
     const run = record.runs.find(run => run.id === id)!;
     try {
-      const prompt = factoryPrompt(item, record, input.kind);
+      const prompt = factoryPrompt(item, record, input.kind, input.approveInput);
       if (reuse) {
         await sdk.threads.send({
           threadId: reuse, input: [{ type: 'text', text: prompt, mentions: [] }], mode: 'start'
@@ -743,6 +754,10 @@ export function createFactoryService(
           }
           if (run.kind === 'build' && (run.buildResult ?? readBuildResult(run.output)).verdict === 'blocked') {
             return resumeBlockedBuild(item, record, true);
+          }
+          if (run.kind === 'build' && (run.buildResult ?? readBuildResult(run.output)).verdict === 'needs_input') {
+            // Continue is the human approval for the questions the Build paused on.
+            return resumeBlockedBuild(item, record, true, false, true);
           }
           if ((run.kind === 'review' && run.reviewResult?.verdict === 'blocked') ||
             (run.kind === 'build' && run.buildResult?.verdict === 'implemented') || run.repairOf || run.continuationOf) {

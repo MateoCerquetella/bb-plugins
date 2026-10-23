@@ -30,9 +30,9 @@ function OriginalTicket({ record }: { record: FactoryRecord }) {
   }><Icon name="FileText" className="size-3.5" />Original ticket</Button>;
 }
 
-function ContinueTask({ record, onRecord, onError, label = 'Continue task' }: {
+function ContinueTask({ record, onRecord, onError, label = 'Continue task', primary = false }: {
   record: FactoryRecord; onRecord: (record: FactoryRecord) => void;
-  onError: (error: string | null) => void; label?: string;
+  onError: (error: string | null) => void; label?: string; primary?: boolean;
 }) {
   const rpc = useRpc<TaskboardRpcContract>();
   const navigate = useBbNavigate();
@@ -75,7 +75,7 @@ function ContinueTask({ record, onRecord, onError, label = 'Continue task' }: {
     }
   }
   return <div className="tb-current-recovery" aria-label="Continue existing task">
-    <Button size="sm" variant="outline" disabled={continuing} aria-busy={continuing} onClick={() => void continueTask()}>
+    <Button size="sm" variant={primary ? 'default' : 'outline'} disabled={continuing} aria-busy={continuing} onClick={() => void continueTask()}>
       <Icon name={continuing ? 'Loading' : 'MessageCirclePlus'} className="size-3.5" />
       {continuing ? 'Continuing...' : label}
     </Button>
@@ -349,6 +349,10 @@ function EmpiricalProgress({ record }: { record: FactoryRecord }) {
   </section>;
 }
 
+function awaitsApproval(run: FactoryRun | null | undefined) {
+  return run?.kind === 'build' && run.buildResult?.verdict === 'needs_input';
+}
+
 function FactoryThreadProgressContent({ threadId, isCompactViewport }: { threadId: string; isCompactViewport: boolean }) {
   const rpc = useRpc<TaskboardRpcContract>();
   const [record, setRecord] = useState<FactoryRecord | null>(null);
@@ -386,7 +390,9 @@ function FactoryThreadProgressContent({ threadId, isCompactViewport }: { threadI
       {error && <ErrorNotice title="Progress could not refresh" nextStep="The last known progress is shown. Refresh will be retried automatically." detail={error} />}
       <FactoryWorkbench record={record} onRecord={setRecord}
         actions={['continue-build', 'continue-task'].includes(consoleState(record).action ?? '')
-          ? <ContinueTask record={record} onRecord={setRecord} onError={setError} /> : null}
+          ? <ContinueTask record={record} onRecord={setRecord} onError={setError}
+            label={awaitsApproval(record.runs.at(-1)) ? 'Approve and continue' : undefined}
+            primary={awaitsApproval(record.runs.at(-1))} /> : null}
         plan={record.plans.at(-1) ? <Markdown content={record.plans.at(-1)!.body} /> : undefined} />
       <OriginalTicket record={record} />
     </DialogContent></Dialog>
@@ -557,7 +563,9 @@ export function FactoryProgress({ item }: { item: WorkItem }) {
     {primaryAction === 'start-task' && <StartTaskButton item={item} disabled={!loaded || busy || ['done', 'canceled'].includes(item.stateCategory)} />}
     {(primaryAction === 'continue-build' || primaryAction === 'continue-task') && record &&
       <ContinueTask key={run?.id} record={record} onRecord={setRecord} onError={setError}
-        label={primaryAction === 'continue-build' ? 'Continue Build' : 'Continue task'} />}
+        label={awaitsApproval(run) ? 'Approve and continue'
+          : primaryAction === 'continue-build' ? 'Continue Build' : 'Continue task'}
+        primary={awaitsApproval(run)} />}
     {primaryAction === 'retry' && run && <Button size="sm" disabled={busy} onClick={() => void start(run.kind, true)}>
       <Icon name="RotateCcw" className="size-3.5" />Retry {labels[run.kind].toLowerCase()}
     </Button>}

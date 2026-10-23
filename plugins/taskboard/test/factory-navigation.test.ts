@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { readFile } from 'node:fs/promises';
 import { originalTicketPath, ticketThreadId } from '../factory/navigation.ts';
-import { consoleState, selectedRun, type RunSelection } from '../factory/console-state.ts';
+import { consoleState, runStatus, selectedRun, type RunSelection } from '../factory/console-state.ts';
 import { approvePlan, newRecord, savePlan, startRun } from '../factory/state.ts';
 import type { WorkItem } from '../contract.ts';
 
@@ -82,6 +82,26 @@ test('stale Build blockers require current plan approval then a new Build', () =
   assert.equal(consoleState(record).action, null);
   build.status = 'uncertain';
   assert.equal(consoleState(record).action, 'recover');
+});
+
+test('Build needing approval offers one approve-and-continue action', () => {
+  const item: WorkItem = {
+    bbProjectId: 'proj_test', source: 'linear', locator: 'issue-42', key: 'BAN-42',
+    title: 'Approve pending decisions', description: '', url: '', status: 'Todo',
+    stateCategory: 'todo', priority: null, assignee: null, project: null, labels: [], updatedAt: ''
+  };
+  const record = newRecord(item);
+  savePlan(record, 'Implement the approved scope');
+  approvePlan(record, record.plans[0]!.digest);
+  const build = startRun(record, 'build', false);
+  build.status = 'finished';
+  build.threadId = 'thr_build';
+  build.buildResult = { verdict: 'needs_input', summary: 'Choose retention and limits.', revision: null };
+  record.automatic = true;
+  record.automationError = 'Automatic work paused: Build needs your approval to continue.';
+  assert.equal(consoleState(record).action, 'continue-build');
+  assert.match(consoleState(record).summary, /approve to continue/);
+  assert.equal(runStatus(build), 'Needs approval');
 });
 
 test('an archived completed Plan offers continuation without starting a new task', () => {

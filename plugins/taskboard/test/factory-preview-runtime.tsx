@@ -204,7 +204,8 @@ const rpc = {
         window.factoryRefresh();
         return { record: structuredClone(record) };
       }
-      if (previous?.kind === 'build' && previous.status === 'finished' && previous.buildResult?.verdict === 'blocked') {
+      if (previous?.kind === 'build' && previous.status === 'finished' &&
+        ['blocked', 'needs_input'].includes(previous.buildResult?.verdict ?? '')) {
         record.automationError = null;
         record.version++;
         record.runs.push({ ...previous, id: 'continued', status: 'running', error: null,
