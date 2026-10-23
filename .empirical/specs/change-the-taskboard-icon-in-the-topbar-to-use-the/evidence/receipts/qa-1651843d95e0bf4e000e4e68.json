@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-1651843d95e0bf4e000e4e68",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Run Action Topbar-specific checks after installing existing workspace dependencies. No plugin registration or setting changes.",
+  "passed": true,
+  "startedAt": "2026-10-23T18:18:52.575Z",
+  "completedAt": "2026-10-23T18:18:52.919Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "change-the-taskboard-icon-in-the-topbar-to-use-the",
+    "specRevision": 2,
+    "specDigest": "sha256:490ee0c33d87a5b032a3eb6456fa2a15602a40becdb7adcc6281265d524b9ff2",
+    "treeDigest": "sha256:3139665502b4eb692aeb5b0b3e2c72ddf87df32d3044c605dec1a0bf9ce4c6fe",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 11,
+    "gitCommit": "1f125add53ff24873eb9494ee6c80bef0ac49f35",
+    "textTreeDigest": "sha256:3139665502b4eb692aeb5b0b3e2c72ddf87df32d3044c605dec1a0bf9ce4c6fe"
+  },
+  "digest": "sha256:20ea225d30e6cd4560e555370e2ef11716d102eb633496631a18450d1d82309a",
+  "kind": "qa",
+  "matrixDigest": "sha256:8d5790f627a2f2618d18a11d4e3442a2e9dd54817deaf0dbd694b2518ad7ed29",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Run Action Topbar-specific checks after installing existing workspace dependencies. No plugin registration or setting changes.",
+      "startedAt": "2026-10-23T18:18:52.575Z",
+      "completedAt": "2026-10-23T18:18:52.919Z",
+      "durationMs": 344,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:3102e0660c5a28fb09072a92af73601c0704a8badb5519082e7545d1f876aa50",
+        "argv": [
+          "npm",
+          "run",
+          "test",
+          "--workspace=bb-plugin-action-topbar"
+        ],
+        "cwd": ".",
+        "timeoutMs": 60000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:8827787841bcece5ab9698fd9dfd0637a1bfce5878118001db300d93b811cb36",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "\n> bb-plugin-action-topbar@0.1.2 test\n> node --test --experimental-strip-types test/*.test.ts\n\nTAP version 13\n# Subtest: starts with the action set shown in the BB right-panel launcher\nok 1 - starts with the action set shown in the BB right-panel launcher\n  ---\n  duration_ms: 1.178771\n  type: 'test'\n  ...\n# Subtest: normalizes, bounds, and deduplicates a discovered action catalog\nok 2 - normalizes, bounds, and deduplicates a discovered action catalog\n  ---\n  duration_ms: 0.248964\n  type: 'test'\n  ...\n# Subtest: round-trips valid storage and rejects unknown storage versions\nok 3 - round-trips valid storage and rejects unknown storage versions\n  ---\n  duration_ms: 0.291301\n  type: 'test'\n  ...\n# Subtest: a visible launcher replaces the seed while an absent launcher preserves it\nok 4 - a visible launcher replaces the seed while an absent launcher preserves it\n  ---\n  duration_ms: 0.1425\n  type: 'test'\n  ...\n# Subtest: classifies known and third-party action labels for compact glyphs\nok 5 - classifies known and third-party action labels for compact glyphs\n  ---\n  duration_ms: 0.23035\n  type: 'test'\n  ...\n# Subtest: mounts the owned strip in the thread-header center and leaves native plus alone\nok 6 - mounts the owned strip in the thread-header center and leaves native plus alone\n  ---\n  duration_ms: 1.536663\n  type: 'test'\n  ...\n# Subtest: keeps Action lookup scoped to BB's native launcher\nok 7 - keeps Action lookup scoped to BB's native launcher\n  ---\n  duration_ms: 0.214682\n  type: 'test'\n  ...\n# Subtest: keeps lifecycle and drag work event-driven and reversible\nok 8 - keeps lifecycle and drag work event-driven and reversible\n  ---\n  duration_ms: 0.247441\n  type: 'test'\n  ...\n# Subtest: retains and releases the initiating pointer for topbar tab drags\nok 9 - retains and releases the initiating pointer for topbar tab drags\n  ---\n  duration_ms: 0.317379\n  type: 'test'\n  ...\n# Subtest: keeps every Action Topbar surface above host application chrome\nok 10 - keeps every Action Topbar surface above host application chrome\n  ---\n  duration_ms: 0.759074\n  type: 'test'\n  ...\n# Subtest: preserves keyboard focus and the bounded cross-pane relaunch path\nok 11 - preserves keyboard focus and the bounded cross-pane relaunch path\n  ---\n  duration_ms: 0.182944\n  type: 'test'\n  ...\n# Subtest: focuses main Action panes without opening the right panel\nok 12 - focuses main Action panes without opening the right panel\n  ---\n  duration_ms: 0.20819\n  type: 'test'\n  ...\n# Subtest: places close controls on the left and closes through persisted tab state\nok 13 - places close controls on the left and closes through persisted tab state\n  ---\n  duration_ms: 0.329491\n  type: 'test'\n  ...\n# Subtest: makes Actions drag-only instead of opening them from click or Enter\nok 14 - makes Actions drag-only instead of opening them from click or Enter\n  ---\n  duration_ms: 1.376\n  type: 'test'\n  ...\n# Subtest: projects BB tab state into the compact frontend RPC model\nok 15 - projects BB tab state into the compact frontend RPC model\n  ---\n  duration_ms: 5.111004\n  type: 'test'\n  ...\n# Subtest: persists a topbar drag reorder through BB's tab revision API\nok 16 - persists a topbar drag reorder through BB's tab revision API\n  ---\n  duration_ms: 1.578039\n  type: 'test'\n  ...\n# Subtest: closes a topbar tab through BB's tab revision API\nok 17 - closes a topbar tab through BB's tab revision API\n  ---\n  duration_ms: 1.371051\n  type: 'test'\n  ...\n# Subtest: closes a main-pane terminal without a persisted panel tab\nok 18 - closes a main-pane terminal without a persisted panel tab\n  ---\n  duration_ms: 0.859808\n  type: 'test'\n  ...\n# Subtest: does not close a main-pane terminal owned by another thread\nok 19 - does not close a main-pane terminal owned by another thread\n  ---\n  duration_ms: 1.109384\n  type: 'test'\n  ...\n# Subtest: bounds host-provided tab labels before returning the RPC projection\nok 20 - bounds host-provided tab labels before returning the RPC projection\n  ---\n  duration_ms: 0.736825\n  type: 'test'\n  ...\n# Subtest: shows only real content tabs in the mirrored strip\nok 21 - shows only real content tabs in the mirrored strip\n  ---\n  duration_ms: 1.04168\n  type: 'test'\n  ...\n# Subtest: keeps the empty combobox action-only and ranks open tabs while searching\nok 22 - keeps the empty combobox action-only and ranks open tabs while searching\n  ---\n  duration_ms: 0.437368\n  type: 'test'\n  ...\n# Subtest: ranks an equivalent open tab before its Action even when titles differ\nok 23 - ranks an equivalent open tab before its Action even when titles differ\n  ---\n  duration_ms: 0.176212\n  type: 'test'\n  ...\n# Subtest: never positionally pairs a stale New Tab snapshot with a new Action tab\nok 24 - never positionally pairs a stale New Tab snapshot with a new Action tab\n  ---\n  duration_ms: 0.154802\n  type: 'test'\n  ...\n# Subtest: uses one bounded normalization for server and native tab identities\nok 25 - uses one bounded normalization for server and native tab identities\n  ---\n  duration_ms: 0.132622\n  type: 'test'\n  ...\n# Subtest: validates RPC snapshots before the content script renders them\nok 26 - validates RPC snapshots before the content script renders them\n  ---\n  duration_ms: 0.281303\n  type: 'test'\n  ...\n1..26\n# tests 26\n# suites 0\n# pass 26\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 194.289328\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:3139665502b4eb692aeb5b0b3e2c72ddf87df32d3044c605dec1a0bf9ce4c6fe",
+      "sourceTreeAfter": "sha256:3139665502b4eb692aeb5b0b3e2c72ddf87df32d3044c605dec1a0bf9ce4c6fe",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

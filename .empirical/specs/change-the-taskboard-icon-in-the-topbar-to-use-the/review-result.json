@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:8624b0c4fe10a5a5f72230cce59660784912e81714afb036fb7b888d25c6d51e",
+  "resultPath": ".empirical/specs/change-the-taskboard-icon-in-the-topbar-to-use-the/reviews/fc60fff3818d6e55501a9add.json",
+  "resultDigest": "sha256:fc60fff3818d6e55501a9add46a7a3dcd47ab5bba98a15ac24422226b6fbc907",
+  "receiptId": "collected-54a07a20831ba518be2a2f71",
+  "reReview": {
+    "previousResultDigest": "sha256:d0015f22cfeaf3b836c597540bb5fbdb7df7f1e83be9186110966a4b0a0e18f6",
+    "previousBaseCommit": "1807befaa9c0732d83b6223d3821ba83268d98e7",
+    "previousHeadCommit": "58dc28efda2e88d171d52ef58db8ac3c322eb53a",
+    "previousVerdict": "CHANGES_REQUESTED",
+    "previousReview": "# Verdict: CHANGES_REQUESTED\n\n- FAIL AC-1: The Taskboard launcher action uses the new target/dart paths, but fallback Taskboard tabs do not because plugin-panel falls back to its label initial.\n- PASS AC-UI-1: The action icon retains the existing 24x24 viewBox, currentColor stroke, round joins/caps, and existing CSS sizing.\n- PASS AC-2: The committed Action Topbar delta does not change opening, selection, dragging, closing, event listeners, tab models, or RPC behavior.\n\n## Security / correctness\n\nThe icon-only Action Topbar delta introduces no executable input, credential handling, or authorization changes. The fallback-path defect is a correctness issue limited to acceptance behavior.\n\n## Design / maintainability\n\nReplacing path data in the existing icon registry is appropriately direct, but the fallback consumer does not request the task registry entry. Derive known plugin fallback icons from the relaunch action identity while preserving the generic fallback for unknown plugins.",
+    "openFindings": [
+      {
+        "id": "F-1",
+        "severity": "medium",
+        "category": "acceptance",
+        "summary": "Taskboard fallback tabs still render the label initial because plugin-panel does not select the task icon registry entry.",
+        "path": "plugins/action-topbar/lib/action-topbar.ts"
+      }
+    ],
+    "deferredFindings": []
+  }
+}

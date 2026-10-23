@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "sequence": 9,
+  "previousDigest": "sha256:608954ac84a6d90d680b66af85684c7465e40a98887fc1b0ce8a9cf61e9c4895",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Fresh-context re-review approved AC-1, AC-UI-1, and AC-2. The prior F-1 fallback-tab finding is fixed; no findings remain.",
+  "createdAt": "2026-10-23T18:13:25.457Z",
+  "stateBeforeDigest": "sha256:bb8fd1471e33ec211c6006e9459da38feb1fe4141c47e2cc5184f3ab42083845",
+  "stateAfterDigest": "sha256:86d0fa525620660fa26b5c85da1ecf897da3102d454c27d86eea1d2c770349b1",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 9,
+    "activeFeature": "change-the-taskboard-icon-in-the-topbar-to-use-the",
+    "request": "Change the Taskboard icon in the topbar to use the actual Taskboard icon already used by the “Open in sidebar” action. Keep the change simple and localized.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "verify",
+    "status": "waiting",
+    "repairAttempts": 1,
+    "message": "Fresh-context re-review approved AC-1, AC-UI-1, and AC-2. The prior F-1 fallback-tab finding is fixed; no findings remain.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:490ee0c33d87a5b032a3eb6456fa2a15602a40becdb7adcc6281265d524b9ff2",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:16899df94cb1ddfe6cc3fdec196c0abdd9cf4ff9aa8596dd5386a5cf96b72547",
+    "impactDigest": "sha256:85301a984d544de1be373d9de7810f21688a49cd079d15e5e57eb7537295d9bb",
+    "capabilityClaimId": "change-the-taskboard-icon-in-the-topbar-to-use-the-333acdd656ef",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "collected-54a07a20831ba518be2a2f71"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-23T18:13:25.457Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "change-the-taskboard-icon-in-the-topbar-to-use-the-333acdd656ef",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "change-the-taskboard-icon-in-the-topbar-to-use-the",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_q52npwydec-1/bb-plugins",
+      "worktreeId": "sha256:fb3017caca94a5b0d5af19820943434235aa9234dda5666c6096c665364d2456",
+      "baseCommit": "1d84e329e69ddbcfe4832fb6441bf35d73635751",
+      "baseTree": "d0d047f25f5b6e24adee206d5143a7357acf810b",
+      "bases": {
+        "action-topbar-taskboard-icon": {
+          "capability": "action-topbar-taskboard-icon",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "taskboard uses its product icon in action topbar": null
+          }
+        }
+      },
+      "capabilities": [
+        "action-topbar-taskboard-icon"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-23T17:47:01.520Z",
+      "heartbeatAt": "2026-10-23T17:47:01.520Z",
+      "digest": "sha256:099d2c2b0481593fdb0eb2d9c9c67378725312228c18bfa837de86d96c8166a8"
+    },
+    "budgetExtensionMinutes": 30,
+    "reviewFirst": true
+  },
+  "digest": "sha256:05fe8906171af8226c28d21723ad0fe32fe16d39d2abc2009dd48f3ee5cfcd88"
+}

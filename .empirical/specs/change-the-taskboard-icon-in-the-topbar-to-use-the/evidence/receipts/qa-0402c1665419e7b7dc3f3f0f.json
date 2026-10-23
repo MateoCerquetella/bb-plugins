@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-0402c1665419e7b7dc3f3f0f",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "Live verification of the repaired plugin could not run: BB refused installing the local checkout over the existing Git-managed action-topbar installation. No installed source was removed or replaced. BB Surf connected, but no screenshot of the repaired live interface was captured. An attempted standalone render also failed before execution because Playwright is not installed locally; a standalone render would not establish live integration behavior.",
+  "passed": false,
+  "startedAt": "2026-10-23T18:14:55.504Z",
+  "completedAt": "2026-10-23T18:14:55.504Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "change-the-taskboard-icon-in-the-topbar-to-use-the",
+    "specRevision": 2,
+    "specDigest": "sha256:490ee0c33d87a5b032a3eb6456fa2a15602a40becdb7adcc6281265d524b9ff2",
+    "treeDigest": "sha256:18a475bf84351ea3049f34ff4219b7acf2d9738d8ecef66449c57cb142cbcd29",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 9,
+    "gitCommit": "1f125add53ff24873eb9494ee6c80bef0ac49f35",
+    "textTreeDigest": "sha256:18a475bf84351ea3049f34ff4219b7acf2d9738d8ecef66449c57cb142cbcd29"
+  },
+  "digest": "sha256:2de19b605b78aa15e8cda1a582acc9e204d26c65f4592a0d2daae663679729c3",
+  "kind": "qa",
+  "matrixDigest": "sha256:8d5790f627a2f2618d18a11d4e3442a2e9dd54817deaf0dbd694b2518ad7ed29",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "missing-environment",
+      "summary": "Live verification of the repaired plugin could not run: BB refused installing the local checkout over the existing Git-managed action-topbar installation. No installed source was removed or replaced. BB Surf connected, but no screenshot of the repaired live interface was captured. An attempted standalone render also failed before execution because Playwright is not installed locally; a standalone render would not establish live integration behavior.",
+      "startedAt": "2026-10-23T18:14:55.504Z",
+      "completedAt": "2026-10-23T18:14:55.504Z",
+      "durationMs": 0,
+      "collector": "root",
+      "command": null,
+      "result": null,
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:18a475bf84351ea3049f34ff4219b7acf2d9738d8ecef66449c57cb142cbcd29",
+      "sourceTreeAfter": "sha256:18a475bf84351ea3049f34ff4219b7acf2d9738d8ecef66449c57cb142cbcd29",
+      "artifacts": []
+    }
+  ],
+  "anomalies": [
+    "outcome-missing-environment"
+  ]
+}

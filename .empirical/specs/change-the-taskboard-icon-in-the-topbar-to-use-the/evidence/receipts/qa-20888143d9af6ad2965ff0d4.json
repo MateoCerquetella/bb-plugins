@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-20888143d9af6ad2965ff0d4",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Run the explicitly requested Action Topbar-specific checks without touching the installed plugin source or settings.",
+  "passed": false,
+  "startedAt": "2026-10-23T18:17:56.107Z",
+  "completedAt": "2026-10-23T18:17:56.535Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "change-the-taskboard-icon-in-the-topbar-to-use-the",
+    "specRevision": 2,
+    "specDigest": "sha256:490ee0c33d87a5b032a3eb6456fa2a15602a40becdb7adcc6281265d524b9ff2",
+    "treeDigest": "sha256:18a475bf84351ea3049f34ff4219b7acf2d9738d8ecef66449c57cb142cbcd29",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 11,
+    "gitCommit": "1f125add53ff24873eb9494ee6c80bef0ac49f35",
+    "textTreeDigest": "sha256:18a475bf84351ea3049f34ff4219b7acf2d9738d8ecef66449c57cb142cbcd29"
+  },
+  "digest": "sha256:78f00d9c0cd352fd118a503f46f568dd97714168cb66395154f85d261dc4012d",
+  "kind": "qa",
+  "matrixDigest": "sha256:8d5790f627a2f2618d18a11d4e3442a2e9dd54817deaf0dbd694b2518ad7ed29",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "failed",
+      "summary": "Run the explicitly requested Action Topbar-specific checks without touching the installed plugin source or settings.",
+      "startedAt": "2026-10-23T18:17:56.107Z",
+      "completedAt": "2026-10-23T18:17:56.535Z",
+      "durationMs": 428,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:3102e0660c5a28fb09072a92af73601c0704a8badb5519082e7545d1f876aa50",
+        "argv": [
+          "npm",
+          "run",
+          "test",
+          "--workspace=bb-plugin-action-topbar"
+        ],
+        "cwd": ".",
+        "timeoutMs": 60000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 1,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:119f55f465d2d7178cf6ec423fde736301a313bd899ac0b802a064f09b0f55a7",
+        "stderrDigest": "sha256:5dab924a309bc6fb677b7197ba75ffd5c8fccdc989604a5f48e25330b73a1d98",
+        "stdoutTail": "\n> bb-plugin-action-topbar@0.1.2 test\n> node --test --experimental-strip-types test/*.test.ts\n\nTAP version 13\n# Subtest: starts with the action set shown in the BB right-panel launcher\nok 1 - starts with the action set shown in the BB right-panel launcher\n  ---\n  duration_ms: 3.021222\n  type: 'test'\n  ...\n# Subtest: normalizes, bounds, and deduplicates a discovered action catalog\nok 2 - normalizes, bounds, and deduplicates a discovered action catalog\n  ---\n  duration_ms: 0.540586\n  type: 'test'\n  ...\n# Subtest: round-trips valid storage and rejects unknown storage versions\nok 3 - round-trips valid storage and rejects unknown storage versions\n  ---\n  duration_ms: 1.04649\n  type: 'test'\n  ...\n# Subtest: a visible launcher replaces the seed while an absent launcher preserves it\nok 4 - a visible launcher replaces the seed while an absent launcher preserves it\n  ---\n  duration_ms: 0.364234\n  type: 'test'\n  ...\n# Subtest: classifies known and third-party action labels for compact glyphs\nok 5 - classifies known and third-party action labels for compact glyphs\n  ---\n  duration_ms: 1.389494\n  type: 'test'\n  ...\n# Subtest: mounts the owned strip in the thread-header center and leaves native plus alone\nok 6 - mounts the owned strip in the thread-header center and leaves native plus alone\n  ---\n  duration_ms: 1.373025\n  type: 'test'\n  ...\n# Subtest: keeps Action lookup scoped to BB's native launcher\nok 7 - keeps Action lookup scoped to BB's native launcher\n  ---\n  duration_ms: 0.376286\n  type: 'test'\n  ...\n# Subtest: keeps lifecycle and drag work event-driven and reversible\nok 8 - keeps lifecycle and drag work event-driven and reversible\n  ---\n  duration_ms: 0.533693\n  type: 'test'\n  ...\n# Subtest: retains and releases the initiating pointer for topbar tab drags\nok 9 - retains and releases the initiating pointer for topbar tab drags\n  ---\n  duration_ms: 0.457965\n  type: 'test'\n  ...\n# Subtest: keeps every Action Topbar surface above host application chrome\nok 10 - keeps every Action Topbar surface above host application chrome\n  ---\n  duration_ms: 1.223612\n  type: 'test'\n  ...\n# Subtest: preserves keyboard focus and the bounded cross-pane relaunch path\nok 11 - preserves keyboard focus and the bounded cross-pane relaunch path\n  ---\n  duration_ms: 0.357873\n  type: 'test'\n  ...\n# Subtest: focuses main Action panes without opening the right panel\nok 12 - focuses main Action panes without opening the right panel\n  ---\n  duration_ms: 0.458096\n  type: 'test'\n  ...\n# Subtest: places close controls on the left and closes through persisted tab state\nok 13 - places close controls on the left and closes through persisted tab state\n  ---\n  duration_ms: 0.638365\n  type: 'test'\n  ...\n# Subtest: makes Actions drag-only instead of opening them from click or Enter\nok 14 - makes Actions drag-only instead of opening them from click or Enter\n  ---\n  duration_ms: 0.525619\n  type: 'test'\n  ...\n# node:internal/modules/package_json_reader:314\n#   throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);\n#         ^\n# Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@get-bb/plugin-sdk' imported from /home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_q52npwydec-1/bb-plugins/plugins/action-topbar/test/server.test.ts\n#     at Object.getPackageJSONURL (node:internal/modules/package_json_reader:314:9)\n#     at packageResolve (node:internal/modules/esm/resolve:768:81)\n#     at moduleResolve (node:internal/modules/esm/resolve:855:18)\n#     at defaultResolve (node:internal/modules/esm/resolve:985:11)\n#     at \\#cachedDefaultResolve (node:internal/modules/esm/loader:747:20)\n#     at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)\n#     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)\n#     at ModuleJob._link (node:internal/modules/esm/module_job:182:49) {\n#   code: 'ERR_MODULE_NOT_FOUND'\n# }\n# Node.js v22.23.1\n# Subtest: test/server.test.ts\nnot ok 3 - test/server.test.ts\n  ---\n  duration_ms: 125.777407\n  type: 'test'\n  location: '/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_q52npwydec-1/bb-plugins/plugins/action-topbar/test/server.test.ts:1:1'\n  failureType: 'testCodeFailure'\n  exitCode: 1\n  signal: ~\n  error: 'test failed'\n  code: 'ERR_TEST_FAILURE'\n  ...\n# Subtest: shows only real content tabs in the mirrored strip\nok 16 - shows only real content tabs in the mirrored strip\n  ---\n  duration_ms: 2.402763\n  type: 'test'\n  ...\n# Subtest: keeps the empty combobox action-only and ranks open tabs while searching\nok 17 - keeps the empty combobox action-only and ranks open tabs while searching\n  ---\n  duration_ms: 0.698073\n  type: 'test'\n  ...\n# Subtest: ranks an equivalent open tab before its Action even when titles differ\nok 18 - ranks an equivalent open tab before its Action even when titles differ\n  ---\n  duration_ms: 0.267628\n  type: 'test'\n  ...\n# Subtest: never positionally pairs a stale New Tab snapshot with a new Action tab\nok 19 - never positionally pairs a stale New Tab snapshot with a new Action tab\n  ---\n  duration_ms: 0.2084\n  type: 'test'\n  ...\n# Subtest: uses one bounded normalization for server and native tab identities\nok 20 - uses one bounded normalization for server and native tab identities\n  ---\n  duration_ms: 0.22455\n  type: 'test'\n  ...\n# Subtest: validates RPC snapshots before the content script renders them\nok 21 - validates RPC snapshots before the content script renders them\n  ---\n  duration_ms: 0.423783\n  type: 'test'\n  ...\n1..21\n# tests 21\n# suites 0\n# pass 20\n# fail 1\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 154.905348\n",
+        "stderrTail": "npm error Lifecycle script `test` failed with error:\nnpm error code 1\nnpm error path /home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_q52npwydec-1/bb-plugins/plugins/action-topbar\nnpm error workspace bb-plugin-action-topbar@0.1.2\nnpm error location /home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_q52npwydec-1/bb-plugins/plugins/action-topbar\nnpm error command failed\nnpm error command sh -c node --test --experimental-strip-types test/*.test.ts\n",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:18a475bf84351ea3049f34ff4219b7acf2d9738d8ecef66449c57cb142cbcd29",
+      "sourceTreeAfter": "sha256:18a475bf84351ea3049f34ff4219b7acf2d9738d8ecef66449c57cb142cbcd29",
+      "artifacts": []
+    }
+  ],
+  "anomalies": [
+    "outcome-failed"
+  ]
+}
