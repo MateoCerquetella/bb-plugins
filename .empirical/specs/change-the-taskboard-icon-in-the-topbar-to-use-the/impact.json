@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "action-topbar-taskboard-icon"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:85301a984d544de1be373d9de7810f21688a49cd079d15e5e57eb7537295d9bb"
+}
