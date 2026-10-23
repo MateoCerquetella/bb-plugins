@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-853811bd1f0f4adca39f312e",
+  "criteria": [
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Authenticated BB Surf live inspection of the locally installed Action Topbar plugin. Taskboard launcher row visibly renders the target/dart glyph at 14x14 with currentColor; screenshot captured.",
+  "passed": true,
+  "startedAt": "2026-10-23T19:41:47.450Z",
+  "completedAt": "2026-10-23T19:41:47.450Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "change-the-taskboard-icon-in-the-topbar-to-use-the",
+    "specRevision": 2,
+    "specDigest": "sha256:490ee0c33d87a5b032a3eb6456fa2a15602a40becdb7adcc6281265d524b9ff2",
+    "treeDigest": "sha256:4c16eb02b5f75e456dc57f7279ed4fd8a9a68b81e03716d3942cc5335329284c",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:6b1075f4047fb81cdea54a07561769fb574689b26d4f8d6c74dcdc19ca466142",
+  "kind": "collected",
+  "collector": "root via BB Surf authenticated browser",
+  "artifacts": [
+    {
+      "path": "docs/media/action-topbar-taskboard-live.png",
+      "mediaType": "image/png",
+      "bytes": 314701,
+      "digest": "sha256:cff466005513902704921daca58e31851900fe341f8deb5ff1a30e603577d688"
+    }
+  ]
+}

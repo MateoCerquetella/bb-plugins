@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-54a07a20831ba518be2a2f71",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-10-23T18:13:07.254Z",
+  "completedAt": "2026-10-23T18:13:07.254Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "change-the-taskboard-icon-in-the-topbar-to-use-the",
+    "specRevision": 2,
+    "specDigest": "sha256:490ee0c33d87a5b032a3eb6456fa2a15602a40becdb7adcc6281265d524b9ff2",
+    "treeDigest": "sha256:18a475bf84351ea3049f34ff4219b7acf2d9738d8ecef66449c57cb142cbcd29",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:d16406007ff85e2ab16fe9a4f0c578a7852dfb7ec786b755424d399bc25ecec0",
+  "kind": "collected",
+  "collector": "empirical-review:codex-fresh-review",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/change-the-taskboard-icon-in-the-topbar-to-use-the/reviews/fc60fff3818d6e55501a9add.json",
+      "mediaType": "application/json",
+      "bytes": 2227,
+      "digest": "sha256:d9ae9028e849485d5041087cffe4dd484ca316e1f854206ecd0a62983caef0e8"
+    },
+    {
+      "path": ".empirical/specs/change-the-taskboard-icon-in-the-topbar-to-use-the/reviews/fc60fff3818d6e55501a9add.md",
+      "mediaType": "text/markdown",
+      "bytes": 1483,
+      "digest": "sha256:247cfd27c64d831a38e918a20deac3f30e216ac0afffe3e7661c5466336f6b7d"
+    }
+  ]
+}

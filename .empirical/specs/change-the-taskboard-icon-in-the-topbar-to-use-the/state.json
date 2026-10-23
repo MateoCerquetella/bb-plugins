@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 7,
+  "revision": 12,
   "activeFeature": "change-the-taskboard-icon-in-the-topbar-to-use-the",
   "request": "Change the Taskboard icon in the topbar to use the actual Taskboard icon already used by the “Open in sidebar” action. Keep the change simple and localized.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "implement",
+  "phase": "integrate",
   "status": "waiting",
   "repairAttempts": 1,
-  "message": "Fresh-context review found AC-1 and F-1: Taskboard action icons use the new glyph, but fallback plugin tabs still render the label initial. The repair derives known plugin fallback icons from the relaunch action identity.",
+  "message": "Exact-tree verification passed. Action Topbar focused suite passed 26/26; authenticated BB Surf confirmed the installed local plugin renders the Taskboard target/dart at 14x14 with currentColor; browser screenshot captured in docs/media.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:490ee0c33d87a5b032a3eb6456fa2a15602a40becdb7adcc6281265d524b9ff2",
@@ -20,23 +20,27 @@
   "capabilityClaimId": "change-the-taskboard-icon-in-the-topbar-to-use-the-333acdd656ef",
   "authorizationDigest": null,
   "evidence": [],
-  "evidenceReceiptIds": [],
+  "evidenceReceiptIds": [
+    "collected-54a07a20831ba518be2a2f71",
+    "qa-f5b018bb02c6cf59c76d0c9a",
+    "qa-ef50b10f6b61da4ee636e6c0",
+    "collected-853811bd1f0f4adca39f312e"
+  ],
   "legacyEvidenceCount": 0,
   "completion": {
     "implemented": true,
-    "verified": false,
+    "verified": true,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "implemented",
+    "highest": "verified",
     "reasons": {
-      "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-23T18:11:53.674Z",
+  "updatedAt": "2026-10-23T19:42:03.750Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "change-the-taskboard-icon-in-the-topbar-to-use-the-333acdd656ef",
@@ -64,6 +68,6 @@
     "heartbeatAt": "2026-10-23T17:47:01.520Z",
     "digest": "sha256:099d2c2b0481593fdb0eb2d9c9c67378725312228c18bfa837de86d96c8166a8"
   },
-  "reviewFirst": true,
-  "budgetExtensionMinutes": 30
+  "budgetExtensionMinutes": 30,
+  "reviewFirst": true
 }
