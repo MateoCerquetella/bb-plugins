@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 13,
+  "revision": 14,
   "activeFeature": "implement-the-researched-jev-ultrafast-integration-in-bb-surf-natural",
   "request": "Implement the researched Jev Ultrafast integration in BB Surf. Natural-language browser tasks must be able to execute through the upstream Jev indexed-action loop against the project's existing Steel browser, while Playwright remains available for deterministic navigation, explicit inspect/click/fill/press actions, and safe preflight-only fallback. Preserve project isolation, human-control handoff, explicit per-run paid-call authorization, no replay after uncertain mutation, and independent outcome verification. First identify what is missing or incomplete in the existing adapter, capture a Playwright-versus-Jev behavioral and latency baseline on representative supported local tasks without paid calls unless separately authorized, make the smallest complete code change, add behavior-level tests, update accurate docs, run focused and root verification, install/reload the local plugin, and verify the real BB Surf CLI/browser surface. Do not remove Playwright or change the default engine without evidence that Jev wins on both completion and latency.",
   "profile": "complex",
@@ -9,7 +9,7 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Planned the smallest complete settings adjustment across native secret registration, runtime precedence, frontend safe-state handling, behavior tests, documentation, installed UI verification, and separately authorized live execution.",
+  "message": "Implemented and committed native Jev and text-model API key settings, per-key saved-setting precedence over optional private dotenv values, safe frontend behavior, docs, and behavioral tests. The steel-browser check passed (SDK types, typecheck, 62 tests, build), reload and real settings UI inspection passed, and an explicitly authorized live Jev run completed on example.com in 2839ms total / 295ms agent loop with independent page inspection confirming the expected page. Commit 8e9f26ac was pushed to the feature branch. Target sync was attempted and refused solely because unrelated pre-existing Empirical archive changes keep the shared worktree dirty; those changes were preserved and excluded.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:628d16f38739473908ef7b5459d5cc47f5626175eec93f0772715f443bdb58b0",
@@ -23,27 +23,27 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": false,
+    "implemented": true,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "none",
+    "highest": "implemented",
     "reasons": {
-      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-23T19:28:31.979Z",
+  "updatedAt": "2026-10-23T19:29:43.312Z",
   "lifecycle": {
-    "stage": "development",
+    "stage": "iteration",
     "iteration": 2,
-    "awaitingFeedback": false,
+    "awaitingFeedback": true,
     "iterative": true,
-    "contractRevision": 9
+    "contractRevision": 9,
+    "contractBaseline": 14
   },
   "capabilityBase": {
     "schemaVersion": 1,
