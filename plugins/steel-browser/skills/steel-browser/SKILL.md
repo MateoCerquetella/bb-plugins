@@ -85,8 +85,10 @@ Auto prefers Jev; fallback applies only to preflight failures before execution.
 URL-only Playwright runs navigate directly. For natural-language tasks,
 `agent-handoff` means this BB agent must perform the task via Playwright using
 the returned project's CDP endpoint, then verify the result. It does NOT mean
-the goal was completed. Jev's `done` likewise requires independent verification.
-Do not replay actions after an uncertain execution error, cancellation or timeout.
+the goal was completed. Jev returns only validated `done` or `blocked` states,
+an action count, total and agent-loop timing, and `verification: "required"`.
+Its `done` state likewise requires independent verification. Do not replay
+actions after an uncertain execution error, cancellation or timeout.
 
 ## Session workflow
 

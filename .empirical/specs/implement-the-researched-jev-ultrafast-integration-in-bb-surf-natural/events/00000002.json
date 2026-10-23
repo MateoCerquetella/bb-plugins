@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "sequence": 2,
+  "previousDigest": "sha256:f889b104e657d45bf2688501365f17d246bbb2a07648050efe04becd8203feac",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Specified selectable Jev execution with validated outcomes/timing, safe diagnostics, no replay, offline behavioral evidence, and unchanged defaults pending live paid evidence.",
+  "createdAt": "2026-10-23T17:48:21.794Z",
+  "stateBeforeDigest": "sha256:1ff9b5a69ab9da928c4d03604acfb3efbd54da837b59e263ee029f73c0b09415",
+  "stateAfterDigest": "sha256:e66f2ad116ab1f95d4dfafcf93be746a47a295a156869f76a3af652e0417ffd6",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 2,
+    "activeFeature": "implement-the-researched-jev-ultrafast-integration-in-bb-surf-natural",
+    "request": "Implement the researched Jev Ultrafast integration in BB Surf. Natural-language browser tasks must be able to execute through the upstream Jev indexed-action loop against the project's existing Steel browser, while Playwright remains available for deterministic navigation, explicit inspect/click/fill/press actions, and safe preflight-only fallback. Preserve project isolation, human-control handoff, explicit per-run paid-call authorization, no replay after uncertain mutation, and independent outcome verification. First identify what is missing or incomplete in the existing adapter, capture a Playwright-versus-Jev behavioral and latency baseline on representative supported local tasks without paid calls unless separately authorized, make the smallest complete code change, add behavior-level tests, update accurate docs, run focused and root verification, install/reload the local plugin, and verify the real BB Surf CLI/browser surface. Do not remove Playwright or change the default engine without evidence that Jev wins on both completion and latency.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "design",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Specified selectable Jev execution with validated outcomes/timing, safe diagnostics, no replay, offline behavioral evidence, and unchanged defaults pending live paid evidence.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:bcfd107779f6a12760c845e879f6d5f770b9786f523c209c4a47b41ba0ef1191",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:38df9a2a6b3e48a0bbb8d314bf0e774084d0488039124af7fa329f72746ac7a6",
+    "impactDigest": "sha256:f6d77a4fed828be597167b4855c2535dd0ed9160c4e323e42ba753b8ad5c0b08",
+    "capabilityClaimId": "implement-the-researched-jev-ultrafast-integration-in-bb-surf-natural-bc3db827a26a",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-23T17:48:21.794Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 0,
+      "awaitingFeedback": false,
+      "iterative": true
+    },
+    "reviewFirst": true,
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "implement-the-researched-jev-ultrafast-integration-in-bb-surf-natural-bc3db827a26a",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "implement-the-researched-jev-ultrafast-integration-in-bb-surf-natural",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_tepmq99rky-1/bb-plugins",
+      "worktreeId": "sha256:42c9a8227d8de5ae5331477f0effff9ebef2973ab42050240e7ccda05a62beff",
+      "baseCommit": "1d84e329e69ddbcfe4832fb6441bf35d73635751",
+      "baseTree": "d0d047f25f5b6e24adee206d5143a7357acf810b",
+      "bases": {
+        "steel-browser-viewer": {
+          "capability": "steel-browser-viewer",
+          "digest": "sha256:c24325d17c6fe2c2c11426e4654997ddaa63fac9d8580e1c1d16569c4420ed00",
+          "requirements": {
+            "selectable verified-boundary jev execution": null,
+            "fail closed at the execution boundary": null
+          }
+        }
+      },
+      "capabilities": [
+        "steel-browser-viewer"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-23T17:48:21.788Z",
+      "heartbeatAt": "2026-10-23T17:48:21.788Z",
+      "digest": "sha256:7dfe5c5d00234463bddca5777532400ccca2fad4b8e7c52f96ebb4faa978e0bc"
+    }
+  },
+  "digest": "sha256:7a826d2a2bbc25e78eb9eb727ecae7cca9cac0682e8d628019254bef5831d09e"
+}

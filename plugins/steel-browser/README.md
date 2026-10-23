@@ -233,9 +233,14 @@ return `agent-handoff` with the project's CDP endpoint so the BB agent can carry
 out the task; they are not falsely marked completed. Jev needs a goal, configured
 runtime/keys and explicit `--allow-paid`. A fallback is chosen only if preflight
 fails, never after browser execution begins. A Jev `done` result is the model's
-claim and still needs outcome verification. Failures and cancellation after
-dispatch require inspection before retrying. Do not run multiple controllers
-against the same project's page.
+claim and still needs outcome verification. The JSON result therefore reports
+`verification: "required"` together with a validated `done` or `blocked`
+status, a nonnegative action count, and `timing.totalMs` plus
+`timing.agentLoopMs`. Total time includes preflight, attachment and navigation;
+agent-loop time covers the upstream Jev loop only. Preflight failures name the
+safe corrective action without returning credential contents or Python stderr.
+Failures and cancellation after dispatch require inspection before retrying.
+Do not run multiple controllers against the same project's page.
 
 ## Install
 

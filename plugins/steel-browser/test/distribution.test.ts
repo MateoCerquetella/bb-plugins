@@ -14,6 +14,7 @@ test("declares an independent BB app, server, CLI skill, and pinned SDK", async 
   assert.equal(packageJson.devDependencies["@get-bb/plugin-sdk"], "0.4.21");
   assert.equal(packageJson.devDependencies["bb-app"], "0.40.0");
   assert.match(packageJson.scripts.build, /^env -u BB_CLI /u);
+  assert.ok(packageJson.files.includes("jev-runtime.ts"));
 });
 
 test("registers the public surf CLI contract", async () => {
