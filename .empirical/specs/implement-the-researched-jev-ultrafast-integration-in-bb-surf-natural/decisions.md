@@ -1,5 +1,40 @@
 # Decisions
 
+## D-002: Configure API keys through native protected settings
+
+Status: Accepted
+
+### Evidence
+
+The user requested UI setup for Jev and text-model APIs. Use BB's existing
+secret setting fields. BB excludes secret settings from frontend values.
+
+### Options
+
+- A custom credential RPC or frontend store would duplicate BB's secret
+  infrastructure and increase exposure risk.
+- Requiring only a dotenv file would not satisfy the requested settings UI.
+
+### Chosen approach
+
+Use native secret settings, not custom credential RPCs or frontend storage.
+Saved keys override file keys individually. A blank saved key uses the optional
+private dotenv file; a configured file remains subject to existing validation.
+The text-model identifier remains a non-secret setting. Saving credentials
+does not authorize paid calls.
+
+### Trade-offs and risks
+
+The frontend cannot report whether a key exists because secret values are
+intentionally absent. Runtime preflight remains the source of truth and returns
+only fixed safe diagnostics.
+
+### Verification
+
+Exercise saved-key precedence, blank-key fallback, missing credentials, and
+paid authorization in behavioral tests. Inspect the reloaded BB settings page
+to confirm both fields render as secrets without exposing their values.
+
 ## D-001: Harden the existing Jev execution boundary
 
 Status: Accepted

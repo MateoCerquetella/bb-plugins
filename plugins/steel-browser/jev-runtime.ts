@@ -15,6 +15,8 @@ export type JevConfig = {
   jevCheckout: string;
   jevEnvFile: string;
   jevTextModel: string;
+  jevApiKey?: string;
+  jevTextModelApiKey?: string;
 };
 
 export type JevEnvironment = {
@@ -126,33 +128,37 @@ export async function prepareJevEnvironment(
   if (!allowPaid) {
     throw new Error("Jev requires explicit per-run --allow-paid authorization.");
   }
-  if (!isAbsolute(config.jevCheckout) || !isAbsolute(config.jevEnvFile)) {
+  if (!isAbsolute(config.jevCheckout) || (config.jevEnvFile && !isAbsolute(config.jevEnvFile))) {
     throw new Error("Configure absolute Jev checkout and credentials-file paths.");
   }
   if (!config.jevTextModel.trim()) {
     throw new Error("Configure a Jev text model.");
   }
-  let file: Awaited<ReturnType<typeof stat>>;
-  try {
-    file = await stat(config.jevEnvFile);
-  } catch {
-    throw new Error("Jev credentials file is unavailable. Check the configured path.");
+  let values: Record<string, string> = {};
+  if (config.jevEnvFile) {
+    let file: Awaited<ReturnType<typeof stat>>;
+    try {
+      file = await stat(config.jevEnvFile);
+    } catch {
+      throw new Error("Jev credentials file is unavailable. Check the configured path.");
+    }
+    if (!file.isFile() || file.size > 65_536 || (file.mode & 0o077) !== 0) {
+      throw new Error("Jev credentials file must be private (0600) and at most 64KiB.");
+    }
+    try {
+      const parsed = parseEnv(await readFile(config.jevEnvFile, { encoding: "utf8", signal }));
+      values = Object.fromEntries(
+        Object.entries(parsed).filter((entry): entry is [string, string] => typeof entry[1] === "string"),
+      );
+    } catch {
+      signal?.throwIfAborted();
+      throw new Error("Jev credentials file is invalid.");
+    }
   }
-  if (!file.isFile() || file.size > 65_536 || (file.mode & 0o077) !== 0) {
-    throw new Error("Jev credentials file must be private (0600) and at most 64KiB.");
-  }
-  let values: Record<string, string>;
-  try {
-    const parsed = parseEnv(await readFile(config.jevEnvFile, { encoding: "utf8", signal }));
-    values = Object.fromEntries(
-      Object.entries(parsed).filter((entry): entry is [string, string] => typeof entry[1] === "string"),
-    );
-  } catch {
-    signal?.throwIfAborted();
-    throw new Error("Jev credentials file is invalid.");
-  }
+  values.TYPESAFE_API_KEY = config.jevApiKey?.trim() || values.TYPESAFE_API_KEY || "";
+  values.TEXT_MODEL_API_KEY = config.jevTextModelApiKey?.trim() || values.TEXT_MODEL_API_KEY || "";
   if (!values.TYPESAFE_API_KEY?.trim() || !values.TEXT_MODEL_API_KEY?.trim()) {
-    throw new Error("Jev credentials are missing.");
+    throw new Error("Jev credentials are missing. Set both API keys in BB Surf settings or the optional credentials file.");
   }
   const python = join(config.jevCheckout, ".venv/bin/python");
   try {

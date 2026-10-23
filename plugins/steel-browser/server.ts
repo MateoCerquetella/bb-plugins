@@ -45,7 +45,21 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
     jevEnvFile: {
       type: "string",
       label: "jev-ultrafast credentials file",
-      description: "Private (0600) host dotenv file containing TYPESAFE_API_KEY and TEXT_MODEL_API_KEY. Enter a path, never a key.",
+      description: "Optional private (0600) dotenv file for missing API keys and advanced provider options. Keys saved below take precedence.",
+      default: "",
+    },
+    jevApiKey: {
+      type: "string",
+      label: "Jev API key (TypeSafe)",
+      description: "Stored in BB's plugin secrets. Leave empty to use TYPESAFE_API_KEY from the optional credentials file.",
+      secret: true,
+      default: "",
+    },
+    jevTextModelApiKey: {
+      type: "string",
+      label: "Text-model API key",
+      description: "Stored in BB's plugin secrets. Leave empty to use TEXT_MODEL_API_KEY from the optional credentials file.",
+      secret: true,
       default: "",
     },
     jevTextModel: {

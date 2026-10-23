@@ -101,3 +101,48 @@ test("Jev preflight maps unsafe filesystem failures to fixed diagnostics", async
     await fixture.cleanup();
   }
 });
+
+test("saved API keys work without a dotenv file and still require paid authorization", async () => {
+  const fixture = await preflightFixture();
+  try {
+    const config = { ...fixture.config, jevEnvFile: "", jevApiKey: " saved-action ", jevTextModelApiKey: " saved-text " };
+    await assert.rejects(prepareJevEnvironment(config, false), /explicit per-run/u);
+    const runtime = await prepareJevEnvironment(config, true);
+    assert.equal(runtime.env.TYPESAFE_API_KEY, "saved-action");
+    assert.equal(runtime.env.TEXT_MODEL_API_KEY, "saved-text");
+    for (const incomplete of [
+      { ...config, jevApiKey: "" },
+      { ...config, jevTextModelApiKey: " " },
+    ]) {
+      await assert.rejects(prepareJevEnvironment(incomplete, true), error => {
+        assert.match(String(error), /credentials are missing/u);
+        assert.doesNotMatch(String(error), /saved-action|saved-text/u);
+        return true;
+      });
+    }
+  } finally {
+    await fixture.cleanup();
+  }
+});
+
+test("saved keys override file keys individually and blank settings fall back", async () => {
+  const fixture = await preflightFixture();
+  try {
+    const runtime = await prepareJevEnvironment({
+      ...fixture.config, jevApiKey: "saved-action", jevTextModelApiKey: " ",
+    }, true);
+    assert.equal(runtime.env.TYPESAFE_API_KEY, "saved-action");
+    assert.equal(runtime.env.TEXT_MODEL_API_KEY, "text-secret");
+    const textOverride = await prepareJevEnvironment({
+      ...fixture.config, jevTextModelApiKey: "saved-text",
+    }, true);
+    assert.equal(textOverride.env.TYPESAFE_API_KEY, "typesafe-secret");
+    assert.equal(textOverride.env.TEXT_MODEL_API_KEY, "saved-text");
+    await chmod(fixture.config.jevEnvFile, 0o644);
+    await assert.rejects(prepareJevEnvironment({
+      ...fixture.config, jevApiKey: "saved-action", jevTextModelApiKey: "saved-text",
+    }, true), /credentials file must be private/u);
+  } finally {
+    await fixture.cleanup();
+  }
+});

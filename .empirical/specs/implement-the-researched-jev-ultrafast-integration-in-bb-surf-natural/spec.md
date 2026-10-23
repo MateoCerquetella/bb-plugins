@@ -21,6 +21,9 @@ missing boundaries before claiming a speed improvement.
 - [ ] [AC-3] Missing paid authorization, invalid credentials/path/runtime and
   cancellation stop before dispatch or select only an opted-in preflight
   fallback. Safe diagnostics identify the setup issue without leaking secrets.
+  Jev and text-model API keys can be saved through native BB secret settings;
+  saved keys override optional private dotenv keys individually. Both saved
+  keys permit operation without a dotenv file; incomplete credentials fail closed.
 - [ ] [AC-4] No execution failure triggers fallback or replay. Bridge access
   stays authenticated, loopback-only, bounded, and limited to supported CDP
   methods; malformed runtime results cannot be reported as success.
@@ -30,6 +33,8 @@ missing boundaries before claiming a speed improvement.
 - [ ] [AC-6] Docs and CLI guidance explain engine choice, paid-call opt-in,
   limitations, verification, and timing boundaries. Focused checks and local
   install/reload plus real Surf CLI/browser checks are recorded.
+  Native settings expose two secret key inputs and the text-model identifier.
+  Frontend setting values never include the saved keys.
 
 ## Scope
 
@@ -39,7 +44,7 @@ package inclusion for extracted runtime files, and corresponding documentation.
 ## Non-goals
 
 Removing Playwright; merging the unrelated Jev model-routing plugin; changing
-the default without live comparative evidence; new UI; paid calls without
+the default without live comparative evidence; custom credential storage; paid calls without
 separate authorization; altering existing profiles; unrelated state changes.
 
 ## Verification

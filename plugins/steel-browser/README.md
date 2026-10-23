@@ -222,6 +222,14 @@ BB Tools / BB Surf has project-scoped engine selection and a separate
 fallback checkbox. Playwright is the default; fallback defaults off. Auto tries
 Jev first. Selecting Jev or Auto does not authorize paid API calls.
 
+Configure **Jev API key (TypeSafe)** and **Text-model API key** in BB Tools /
+BB Surf, alongside the checkout path and text-model identifier. Both key fields
+use BB's secret storage and are excluded from frontend setting values.
+The credentials-file path is optional. If set, it must still be a private
+(0600) dotenv file; saved keys override its corresponding keys, and an empty
+saved key falls back to the file. Provider options in the file remain supported.
+Saving credentials does not authorize a paid run.
+
 ```sh
 bb surf engine auto fallback-on
 bb surf run https://example.com

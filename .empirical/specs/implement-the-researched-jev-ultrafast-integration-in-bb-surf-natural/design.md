@@ -16,6 +16,10 @@ run another controller.
 Preflight diagnostics expose fixed safe messages for missing configuration,
 credentials, interpreter and imports. Do not forward Python stderr or dotenv
 contents. Always validate per-run authorization and credential permissions.
+Register the TypeSafe and text-model keys as BB secret settings, then merge
+them into the child-process environment after loading the optional private
+dotenv file so each nonblank saved value wins independently. The frontend
+reads only non-secret settings and never infers whether a secret is configured.
 The bridge validates method and params shapes, authentication, request size,
 and bounded request lifetime; resources are released even when execution fails.
 

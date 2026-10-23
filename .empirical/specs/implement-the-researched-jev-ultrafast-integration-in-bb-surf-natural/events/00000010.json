@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "sequence": 10,
+  "previousDigest": "sha256:6aaa7ffd835b8a74c12d836bc321da79406f062225905509e10a25ba2239470e",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Revise contract: Revise the contract to include the user-approved BB Surf UI setup for the Jev TypeSafe action-model API key and text-model API key as native secret settings. Preserve optional private dotenv fallback with per-key saved-setting precedence and explicit per-run paid authorization. Expose only safe configured state, update docs, and cover credential precedence and missing-key behavior.",
+  "createdAt": "2026-10-23T19:27:03.584Z",
+  "stateBeforeDigest": "sha256:046afc43234ef3b05288c67b7f9e02f7867675ac7a101f86c20b47b3c1110ce8",
+  "stateAfterDigest": "sha256:c6f42f51bfa74518b5c28f939cb21c9fffda5256b54cc56d25c0e333bf6c0ee0",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 10,
+    "activeFeature": "implement-the-researched-jev-ultrafast-integration-in-bb-surf-natural",
+    "request": "Implement the researched Jev Ultrafast integration in BB Surf. Natural-language browser tasks must be able to execute through the upstream Jev indexed-action loop against the project's existing Steel browser, while Playwright remains available for deterministic navigation, explicit inspect/click/fill/press actions, and safe preflight-only fallback. Preserve project isolation, human-control handoff, explicit per-run paid-call authorization, no replay after uncertain mutation, and independent outcome verification. First identify what is missing or incomplete in the existing adapter, capture a Playwright-versus-Jev behavioral and latency baseline on representative supported local tasks without paid calls unless separately authorized, make the smallest complete code change, add behavior-level tests, update accurate docs, run focused and root verification, install/reload the local plugin, and verify the real BB Surf CLI/browser surface. Do not remove Playwright or change the default engine without evidence that Jev wins on both completion and latency.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "specify",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Revise the contract to include the user-approved BB Surf UI setup for the Jev TypeSafe action-model API key and text-model API key as native secret settings. Preserve optional private dotenv fallback with per-key saved-setting precedence and explicit per-run paid authorization. Expose only safe configured state, update docs, and cover credential precedence and missing-key behavior.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:bcfd107779f6a12760c845e879f6d5f770b9786f523c209c4a47b41ba0ef1191",
+    "approvedSpecRevision": null,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": null,
+    "impactDigest": null,
+    "capabilityClaimId": "implement-the-researched-jev-ultrafast-integration-in-bb-surf-natural-bc3db827a26a",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-23T19:27:03.584Z",
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 2,
+      "awaitingFeedback": false,
+      "iterative": true,
+      "contractRevision": 9
+    },
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "implement-the-researched-jev-ultrafast-integration-in-bb-surf-natural-bc3db827a26a",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "implement-the-researched-jev-ultrafast-integration-in-bb-surf-natural",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_tepmq99rky-1/bb-plugins",
+      "worktreeId": "sha256:42c9a8227d8de5ae5331477f0effff9ebef2973ab42050240e7ccda05a62beff",
+      "baseCommit": "1d84e329e69ddbcfe4832fb6441bf35d73635751",
+      "baseTree": "d0d047f25f5b6e24adee206d5143a7357acf810b",
+      "bases": {
+        "steel-browser-viewer": {
+          "capability": "steel-browser-viewer",
+          "digest": "sha256:c24325d17c6fe2c2c11426e4654997ddaa63fac9d8580e1c1d16569c4420ed00",
+          "requirements": {
+            "selectable verified-boundary jev execution": null,
+            "fail closed at the execution boundary": null
+          }
+        }
+      },
+      "capabilities": [
+        "steel-browser-viewer"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-23T17:48:21.788Z",
+      "heartbeatAt": "2026-10-23T17:48:21.788Z",
+      "digest": "sha256:7dfe5c5d00234463bddca5777532400ccca2fad4b8e7c52f96ebb4faa978e0bc"
+    },
+    "trackerGeneration": 2,
+    "reviewFirst": true
+  },
+  "digest": "sha256:ca2c7804204b329cf8a5d3eb8c71aea7572847bdb25acb625332bb7e7166c6ea"
+}
