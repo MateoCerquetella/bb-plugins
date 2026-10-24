@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 7,
+  "revision": 8,
   "activeFeature": "fix-all-plugin-and-marketplace-icons-to-violet-remove-the",
   "request": "Fix all plugin and marketplace icons to violet, remove the Agent Canvas plugin, and update the BB Surf marketplace entry.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "integrate",
+  "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Focused Aura verification passed; fresh-context review covers the remaining check.",
+  "message": "The icon contact sheet showed several icons as solid blobs because inline <style> selectors leaked across icons. Remove all inline style blocks, set explicit violet fills/strokes per element, verify the rendered icons, and refresh the marketplace icon copies and hashes.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:5fdb098c8bc7d8a860b673f90101df78305400ab73b4464a4c2821160a566f35",
@@ -20,25 +20,24 @@
   "capabilityClaimId": "fix-all-plugin-and-marketplace-icons-to-violet-remove-the-eb00f77155eb",
   "authorizationDigest": null,
   "evidence": [],
-  "evidenceReceiptIds": [
-    "collected-dcfc455acfe820ee733f1fbc",
-    "qa-25722237a1e0acf9503f4766"
-  ],
+  "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": true,
-    "verified": true,
+    "implemented": false,
+    "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "verified",
+    "highest": "none",
     "reasons": {
+      "implemented": "implemented has not been proven by a durable receipt.",
+      "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-24T00:27:49.965Z",
+  "updatedAt": "2026-10-24T18:29:28.313Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "fix-all-plugin-and-marketplace-icons-to-violet-remove-the-eb00f77155eb",
@@ -77,12 +76,10 @@
     "digest": "sha256:6242695d314a54ff4a14236b440f19dd8239437192c108c23bbf1150231f4ae4"
   },
   "reviewFirst": true,
-  "verificationCoverage": {
-    "kind": "review-derived",
-    "checkId": "qa-fresh-context",
-    "receiptId": "collected-dcfc455acfe820ee733f1fbc",
-    "matrixDigest": "sha256:4feef68e40fc79bcb6e88b909c37bb4d71301432185dc6b9a95b42dfc29b96e3",
-    "specDigest": "sha256:5fdb098c8bc7d8a860b673f90101df78305400ab73b4464a4c2821160a566f35",
-    "revision": 7
+  "trackerGeneration": 1,
+  "lifecycle": {
+    "stage": "iteration",
+    "iteration": 1,
+    "awaitingFeedback": false
   }
 }
