@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "sequence": 10,
+  "previousDigest": "sha256:eaefee129f51baac9c70abb0e609aeb13eb352e1e5bdea36f8d0ba77e7e0c6f4",
+  "actor": "empirical-merge-observed",
+  "type": "compaction-boundary",
+  "summary": "Compacted through journal event 9",
+  "createdAt": "2026-10-24T00:14:19.499Z",
+  "stateBeforeDigest": "sha256:e5409d2e2a2323e536cd780f7b4757044a439d4a6c2a7711dc23a882b8cdd885",
+  "stateAfterDigest": "sha256:e5409d2e2a2323e536cd780f7b4757044a439d4a6c2a7711dc23a882b8cdd885",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 9,
+    "activeFeature": "update-the-usage-tracker-plugin-so-deepseek-is-no-longer",
+    "request": "Update the Usage Tracker plugin so DeepSeek is no longer missing: show DeepSeek usage in the sidebar strip with an independent enable setting, brand mark, tests, and docs, matching the existing provider pattern.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "done",
+    "status": "done",
+    "repairAttempts": 0,
+    "message": "Closed as merged-externally: Merged in pull request #101 as 1d84e329e69ddbcfe4832fb6441bf35d73635751 into main; closed when the merge was observed.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:3607c1e3c88e7fd90a49b309cdd73133ff9a9f44382fa105afbc359bcf85029c",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:7bb79058784908c94f3cbdb156707e7b8bba7dcfd3eca8750ae78530e67fb089",
+    "impactDigest": "sha256:2db381d82c7b4282208a50192e50fa23736651f149928221185154692e3574dd",
+    "capabilityClaimId": "update-the-usage-tracker-plugin-so-deepseek-is-no-longer-1476ab922818",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "collected-d5b01b4d3a6210e9bff931d5",
+      "qa-c8005f4854fd36ad22aa8ec3",
+      "qa-3ee6f35522bf6bfcd2b359a1",
+      "collected-94314d8341c0edb254a2e576"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": true,
+      "integrated": true,
+      "delivered": false,
+      "published": false,
+      "highest": "integrated",
+      "reasons": {
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-24T00:14:18.731Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "update-the-usage-tracker-plugin-so-deepseek-is-no-longer-1476ab922818",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "update-the-usage-tracker-plugin-so-deepseek-is-no-longer",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_9tf5eqq2er-1/bb-plugins",
+      "worktreeId": "sha256:3577c8cbbb990198586822f83fadb7e17fdd720558aff00aa55f9f0c6786cbad",
+      "baseCommit": "0f40a5d0871ae6929f57b6c8c6016def1c4dfe93",
+      "baseTree": "5e9325a5e1aeb7e253ee2275c16922660de76cd3",
+      "bases": {
+        "usage-tracker-deepseek": {
+          "capability": "usage-tracker-deepseek",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "deepseek balance provider": null,
+            "provider metadata and docs": null
+          }
+        }
+      },
+      "capabilities": [
+        "usage-tracker-deepseek"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-22T15:41:42.278Z",
+      "heartbeatAt": "2026-10-22T15:41:42.278Z",
+      "digest": "sha256:3b3633d901a0053b937aa738d93332cb30c2690de348903cb214e8803a47ee88"
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 8,
+      "capabilities": 1,
+      "reason": "The DeepSeek provider is one cohesive, independently shippable change: provider model, server fetch, and sidebar rendering must land together to show any value.",
+      "actor": "agent",
+      "revision": 2
+    },
+    "reviewFirst": true,
+    "closure": {
+      "schemaVersion": 1,
+      "outcome": "merged-externally",
+      "reason": "Merged in pull request #101 as 1d84e329e69ddbcfe4832fb6441bf35d73635751 into main; closed when the merge was observed.",
+      "actor": "empirical",
+      "confirmation": "merge-observed",
+      "closedAtPhase": "integrate",
+      "completionAtClosure": "integrated",
+      "externalMerge": {
+        "pullRequest": 101,
+        "url": "https://github.com/MateoCerquetella/bb-plugins/pull/101",
+        "state": "MERGED",
+        "mergeCommit": "1d84e329e69ddbcfe4832fb6441bf35d73635751",
+        "targetBranch": "main",
+        "ancestorOfTarget": true,
+        "observedAt": "2026-10-24T00:13:59.436Z"
+      },
+      "closedAt": "2026-10-24T00:14:18.486Z",
+      "digest": "sha256:bfaf96df3070b8dc89ef217b0dae20e99e82d8408e7475634dcdb434cb91f96f"
+    },
+    "completionRecord": {
+      "schemaVersion": 1,
+      "implementedBy": "agent",
+      "completedBy": "empirical",
+      "decisionBy": null,
+      "method": "merged-externally",
+      "reason": "Merged in pull request #101 as 1d84e329e69ddbcfe4832fb6441bf35d73635751 into main; closed when the merge was observed.",
+      "at": "2026-10-24T00:14:18.731Z",
+      "revision": 9,
+      "completion": "integrated",
+      "sourceTreeDigest": "sha256:9632abb41dfde7c668aaa84694cd4597a31f82003c9cd782ac34bd2b514fc14d",
+      "artifactTreeDigest": "sha256:23e8744ef8b361a4696556d2670e03a50240ba31478bc7f1f92e22bde21e4281",
+      "digest": "sha256:75ceb0eb6743a9dc21e8a7cb7c9d861b81d2c49963825688f85e1fe3d56b25e5"
+    }
+  },
+  "digest": "sha256:b66383a99922c574625aedca4521fbafd232f2258a13fdad408a26111fe94c2a"
+}

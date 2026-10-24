@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "bb-surf-marketplace-listing",
+    "plugin-icon-branding"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:b37a29cb6f62eb1a34c0da1ee52e5b951e605b2dd135c58b4a535468b6cf2a73"
+}

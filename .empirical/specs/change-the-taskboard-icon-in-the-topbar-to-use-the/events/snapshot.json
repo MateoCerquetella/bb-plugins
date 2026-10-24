@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "feature": "change-the-taskboard-icon-in-the-topbar-to-use-the",
+  "lastSequence": 13,
+  "lastEventDigest": "sha256:83417169230198fcd7a416126df49d09ad3ed9bb566450a50421911ef909765f",
+  "stateDigest": "sha256:ed80471964a6add522662a9bd54b16cad76329f89b821bada054be9812b2fe30",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 13,
+    "activeFeature": "change-the-taskboard-icon-in-the-topbar-to-use-the",
+    "request": "Change the Taskboard icon in the topbar to use the actual Taskboard icon already used by the “Open in sidebar” action. Keep the change simple and localized.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "done",
+    "status": "done",
+    "repairAttempts": 0,
+    "message": "Closed as merged-externally: Merged in pull request #103 as 0004611f54e025d90892d66731ffad0f411672b8 into main; closed when the merge was observed.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:490ee0c33d87a5b032a3eb6456fa2a15602a40becdb7adcc6281265d524b9ff2",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:16899df94cb1ddfe6cc3fdec196c0abdd9cf4ff9aa8596dd5386a5cf96b72547",
+    "impactDigest": "sha256:85301a984d544de1be373d9de7810f21688a49cd079d15e5e57eb7537295d9bb",
+    "capabilityClaimId": "change-the-taskboard-icon-in-the-topbar-to-use-the-333acdd656ef",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "collected-54a07a20831ba518be2a2f71",
+      "qa-f5b018bb02c6cf59c76d0c9a",
+      "qa-ef50b10f6b61da4ee636e6c0",
+      "collected-853811bd1f0f4adca39f312e"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": true,
+      "integrated": true,
+      "delivered": false,
+      "published": false,
+      "highest": "integrated",
+      "reasons": {
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-24T00:14:13.303Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "change-the-taskboard-icon-in-the-topbar-to-use-the-333acdd656ef",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "change-the-taskboard-icon-in-the-topbar-to-use-the",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_q52npwydec-1/bb-plugins",
+      "worktreeId": "sha256:fb3017caca94a5b0d5af19820943434235aa9234dda5666c6096c665364d2456",
+      "baseCommit": "1d84e329e69ddbcfe4832fb6441bf35d73635751",
+      "baseTree": "d0d047f25f5b6e24adee206d5143a7357acf810b",
+      "bases": {
+        "action-topbar-taskboard-icon": {
+          "capability": "action-topbar-taskboard-icon",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "taskboard uses its product icon in action topbar": null
+          }
+        }
+      },
+      "capabilities": [
+        "action-topbar-taskboard-icon"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-23T17:47:01.520Z",
+      "heartbeatAt": "2026-10-23T17:47:01.520Z",
+      "digest": "sha256:099d2c2b0481593fdb0eb2d9c9c67378725312228c18bfa837de86d96c8166a8"
+    },
+    "budgetExtensionMinutes": 30,
+    "reviewFirst": true,
+    "closure": {
+      "schemaVersion": 1,
+      "outcome": "merged-externally",
+      "reason": "Merged in pull request #103 as 0004611f54e025d90892d66731ffad0f411672b8 into main; closed when the merge was observed.",
+      "actor": "empirical",
+      "confirmation": "merge-observed",
+      "closedAtPhase": "integrate",
+      "completionAtClosure": "integrated",
+      "externalMerge": {
+        "pullRequest": 103,
+        "url": "https://github.com/MateoCerquetella/bb-plugins/pull/103",
+        "state": "MERGED",
+        "mergeCommit": "0004611f54e025d90892d66731ffad0f411672b8",
+        "targetBranch": "main",
+        "ancestorOfTarget": true,
+        "observedAt": "2026-10-24T00:13:59.436Z"
+      },
+      "closedAt": "2026-10-24T00:14:13.071Z",
+      "digest": "sha256:b9ef530bd0ca734814bd14a60cce9d122dabe6467b3d3e0ac2d2450afeda928b"
+    },
+    "completionRecord": {
+      "schemaVersion": 1,
+      "implementedBy": "agent",
+      "completedBy": "empirical",
+      "decisionBy": null,
+      "method": "merged-externally",
+      "reason": "Merged in pull request #103 as 0004611f54e025d90892d66731ffad0f411672b8 into main; closed when the merge was observed.",
+      "at": "2026-10-24T00:14:13.303Z",
+      "revision": 13,
+      "completion": "integrated",
+      "sourceTreeDigest": "sha256:9632abb41dfde7c668aaa84694cd4597a31f82003c9cd782ac34bd2b514fc14d",
+      "artifactTreeDigest": "sha256:cad62051e4f42036eb3e4e1f9ae145094e2707df80952e21245ea86d7d806640",
+      "digest": "sha256:56e3cd7fa3dd3ed1b8896c065b1fcf8768d51bca45ea12e96b3924cacf82f8be"
+    }
+  },
+  "compactedAt": "2026-10-24T00:14:14.184Z",
+  "digest": "sha256:f96692f9f0799eb6e05c7b396250408be67e132ea596fcb5d206ff8ad4f92454"
+}
