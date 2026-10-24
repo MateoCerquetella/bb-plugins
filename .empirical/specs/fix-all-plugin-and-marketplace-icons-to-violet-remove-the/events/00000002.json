@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "sequence": 2,
+  "previousDigest": "sha256:5f477a14d8d9b79eecf24071f2f8f5a430adc4dccb4f24b38c6328de26b85075",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Specified violet icon branding, Agent Canvas removal, and BB Surf marketplace listing alignment.",
+  "createdAt": "2026-10-24T00:14:47.894Z",
+  "stateBeforeDigest": "sha256:76da8860668827b79b96918095f3e1faf39116db3d62205380d84a20bc6dcdd6",
+  "stateAfterDigest": "sha256:1e61d016dbc837a1f1550c0f8b68f726e5d6192aa842c5a87e549f8c909d6d96",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 2,
+    "activeFeature": "fix-all-plugin-and-marketplace-icons-to-violet-remove-the",
+    "request": "Fix all plugin and marketplace icons to violet, remove the Agent Canvas plugin, and update the BB Surf marketplace entry.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "design",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Specified violet icon branding, Agent Canvas removal, and BB Surf marketplace listing alignment.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:5fdb098c8bc7d8a860b673f90101df78305400ab73b4464a4c2821160a566f35",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:0d9bffe9d347287f81c1f76e1dccce0f9d91452e261d8f2a6ae401fda7d0622f",
+    "impactDigest": "sha256:b37a29cb6f62eb1a34c0da1ee52e5b951e605b2dd135c58b4a535468b6cf2a73",
+    "capabilityClaimId": "fix-all-plugin-and-marketplace-icons-to-violet-remove-the-eb00f77155eb",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-24T00:14:47.894Z",
+    "reviewFirst": true,
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "fix-all-plugin-and-marketplace-icons-to-violet-remove-the-eb00f77155eb",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "fix-all-plugin-and-marketplace-icons-to-violet-remove-the",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_aie67pc673-1/bb-plugins",
+      "worktreeId": "sha256:5449c03e3c68da1e346eeccbbe60a96cc2efa8fd79d1cfca805417f89e5f94fd",
+      "baseCommit": "9867a696a80032ba7ab86051bfcfe5210786c55e",
+      "baseTree": "19509b09d18a68983d19826db2e710f416cc8e33",
+      "bases": {
+        "bb-surf-marketplace-listing": {
+          "capability": "bb-surf-marketplace-listing",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "bb surf marketplace entry": null
+          }
+        },
+        "plugin-icon-branding": {
+          "capability": "plugin-icon-branding",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "plugin icons use the violet brand color explicitly": null,
+            "the workspace no longer ships agent canvas": null,
+            "the local catalog offers no agent canvas source": null
+          }
+        }
+      },
+      "capabilities": [
+        "bb-surf-marketplace-listing",
+        "plugin-icon-branding"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-24T00:14:47.889Z",
+      "heartbeatAt": "2026-10-24T00:14:47.889Z",
+      "digest": "sha256:6242695d314a54ff4a14236b440f19dd8239437192c108c23bbf1150231f4ae4"
+    }
+  },
+  "digest": "sha256:28df592c4a2a239c408bea015bb6b6a5f4a24231f786b27c3ffd251acab3ebd3"
+}

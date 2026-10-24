@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 6,
+  "revision": 7,
   "activeFeature": "pr85-repair",
   "request": "Repair existing PR #85 in a fresh temporary worktree, rebase onto current origin/main preserving Taskboard behavior, run focused and root checks plus installed browser verification, push existing PR branch and mark ready, do not merge.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "review",
-  "status": "waiting",
+  "phase": "done",
+  "status": "done",
   "repairAttempts": 0,
-  "message": "Rebased PR85, preserved native progress and metadata retry semantics, merged current main icon correction; focused tests/build/browser fixture pass.",
+  "message": "Closed as merged-externally: Merged in pull request #85 as 873a12c2f829d8607f2e4b8ecf0c905cc59a1c54 into main; closed when the merge was observed.",
   "implementationActor": "agent",
   "workStartedAt": "2026-10-16T02:12:56.159Z",
   "specDigest": "sha256:f09fe70305423a4a86e431f80b1a14d455d5a33e28a51140383cdbe1bb38f707",
@@ -36,7 +36,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-16T02:29:08.286Z",
+  "updatedAt": "2026-10-24T00:14:15.518Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "pr85-repair-4b7fcb0bec06",
@@ -64,5 +64,39 @@
     "heartbeatAt": "2026-10-16T02:19:45.722Z",
     "digest": "sha256:d0c826f53201159ab075970837742abadeed9f88843b6cb5cf7d5a71a33ee4c6"
   },
-  "reviewFirst": true
+  "reviewFirst": true,
+  "closure": {
+    "schemaVersion": 1,
+    "outcome": "merged-externally",
+    "reason": "Merged in pull request #85 as 873a12c2f829d8607f2e4b8ecf0c905cc59a1c54 into main; closed when the merge was observed.",
+    "actor": "empirical",
+    "confirmation": "merge-observed",
+    "closedAtPhase": "review",
+    "completionAtClosure": "implemented",
+    "externalMerge": {
+      "pullRequest": 85,
+      "url": "https://github.com/MateoCerquetella/bb-plugins/pull/85",
+      "state": "MERGED",
+      "mergeCommit": "873a12c2f829d8607f2e4b8ecf0c905cc59a1c54",
+      "targetBranch": "main",
+      "ancestorOfTarget": true,
+      "observedAt": "2026-10-24T00:13:59.436Z"
+    },
+    "closedAt": "2026-10-24T00:14:15.275Z",
+    "digest": "sha256:dcf28a8f264ed27b909ed5d850e77441376d034c6718979fcbfbef215dd0fb47"
+  },
+  "completionRecord": {
+    "schemaVersion": 1,
+    "implementedBy": "agent",
+    "completedBy": "empirical",
+    "decisionBy": null,
+    "method": "merged-externally",
+    "reason": "Merged in pull request #85 as 873a12c2f829d8607f2e4b8ecf0c905cc59a1c54 into main; closed when the merge was observed.",
+    "at": "2026-10-24T00:14:15.518Z",
+    "revision": 7,
+    "completion": "implemented",
+    "sourceTreeDigest": "sha256:9632abb41dfde7c668aaa84694cd4597a31f82003c9cd782ac34bd2b514fc14d",
+    "artifactTreeDigest": "sha256:d11603537082f0545c97ca7e101392a0289e712822291d6a60e19851dcf76a77",
+    "digest": "sha256:d36a97b3a8b3ca8982f79ecf50153ee010c48bc7d86a31b8045d20a50e471131"
+  }
 }

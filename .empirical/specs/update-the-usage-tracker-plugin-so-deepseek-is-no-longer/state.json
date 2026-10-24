@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 8,
+  "revision": 9,
   "activeFeature": "update-the-usage-tracker-plugin-so-deepseek-is-no-longer",
   "request": "Update the Usage Tracker plugin so DeepSeek is no longer missing: show DeepSeek usage in the sidebar strip with an independent enable setting, brand mark, tests, and docs, matching the existing provider pattern.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "integrate",
-  "status": "waiting",
+  "phase": "done",
+  "status": "done",
   "repairAttempts": 0,
-  "message": "Workspace check passed with 102 Usage Tracker tests, typecheck, and build; live sidebar browser and screenshot verified DeepSeek.",
+  "message": "Closed as merged-externally: Merged in pull request #101 as 1d84e329e69ddbcfe4832fb6441bf35d73635751 into main; closed when the merge was observed.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:3607c1e3c88e7fd90a49b309cdd73133ff9a9f44382fa105afbc359bcf85029c",
@@ -30,17 +30,16 @@
   "completion": {
     "implemented": true,
     "verified": true,
-    "integrated": false,
+    "integrated": true,
     "delivered": false,
     "published": false,
-    "highest": "verified",
+    "highest": "integrated",
     "reasons": {
-      "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-22T16:06:48.139Z",
+  "updatedAt": "2026-10-24T00:14:18.731Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "update-the-usage-tracker-plugin-so-deepseek-is-no-longer-1476ab922818",
@@ -77,5 +76,39 @@
     "actor": "agent",
     "revision": 2
   },
-  "reviewFirst": true
+  "reviewFirst": true,
+  "closure": {
+    "schemaVersion": 1,
+    "outcome": "merged-externally",
+    "reason": "Merged in pull request #101 as 1d84e329e69ddbcfe4832fb6441bf35d73635751 into main; closed when the merge was observed.",
+    "actor": "empirical",
+    "confirmation": "merge-observed",
+    "closedAtPhase": "integrate",
+    "completionAtClosure": "integrated",
+    "externalMerge": {
+      "pullRequest": 101,
+      "url": "https://github.com/MateoCerquetella/bb-plugins/pull/101",
+      "state": "MERGED",
+      "mergeCommit": "1d84e329e69ddbcfe4832fb6441bf35d73635751",
+      "targetBranch": "main",
+      "ancestorOfTarget": true,
+      "observedAt": "2026-10-24T00:13:59.436Z"
+    },
+    "closedAt": "2026-10-24T00:14:18.486Z",
+    "digest": "sha256:bfaf96df3070b8dc89ef217b0dae20e99e82d8408e7475634dcdb434cb91f96f"
+  },
+  "completionRecord": {
+    "schemaVersion": 1,
+    "implementedBy": "agent",
+    "completedBy": "empirical",
+    "decisionBy": null,
+    "method": "merged-externally",
+    "reason": "Merged in pull request #101 as 1d84e329e69ddbcfe4832fb6441bf35d73635751 into main; closed when the merge was observed.",
+    "at": "2026-10-24T00:14:18.731Z",
+    "revision": 9,
+    "completion": "integrated",
+    "sourceTreeDigest": "sha256:9632abb41dfde7c668aaa84694cd4597a31f82003c9cd782ac34bd2b514fc14d",
+    "artifactTreeDigest": "sha256:23e8744ef8b361a4696556d2670e03a50240ba31478bc7f1f92e22bde21e4281",
+    "digest": "sha256:75ceb0eb6743a9dc21e8a7cb7c9d861b81d2c49963825688f85e1fe3d56b25e5"
+  }
 }

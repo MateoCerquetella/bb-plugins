@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:4b8420468a0494fea32ac6270e8c9202c6291669f57b2b285528d0243bba1e64",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "9867a696a80032ba7ab86051bfcfe5210786c55e",
+  "headCommit": "18c1fa8f40cdeee58c78fc63c6a93a0e5f85896f",
+  "diffDigest": "sha256:28f474574e9b8a0ce9dea0264ec2a11d620baa37da8d22c80f176dfec4928a2e",
+  "verdict": "APPROVED",
+  "reviewerActor": "opencode/deepseek-v4-pro (fresh context)",
+  "reviewerInvocationId": "review-388eaadd-91b3-45a1-973f-7e57d697aa27",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: action-topbar, touchbar, and usage-tracker plugin icons drop their inline <style> blocks and now declare #7c3aed explicitly per element (fill/stroke); aura and steel-browser remain explicit #7c3aed from the prior pass. No plugin icon inherits currentColor.\n- PASS AC-2: All nine marketplace entries in the delta (action-topbar, aura, dockside, host-monitor, lavender, steel-browser, taskboard, touchbar, usage-tracker) reference refreshed hash-named icons whose visible strokes/fills are explicit #7c3aed; no currentColor, #000, or teal, and no inline <style> leakage remains.\n- PASS AC-3: plugins/agent-canvas stays deleted and this delta reintroduces no catalog/README/install reference; the only mention is inside .empirical review records (a historical review-unit list), which is explicitly permitted.\n- PASS AC-4: entries/steel-browser.json changes only icon.url (→ ./icons/steel-browser-1a2203ef.svg); displayName 'BB Surf', id 'steel-browser', git source subdirectory, and ^0.1.0 range are unchanged, and the icon is explicit violet stroke #7c3aed.\n- PASS AC-5: Full workspace npm run check exits 0 (228 pass / 0 fail) and the marketplace build exits 0 (432 entries); the lockfile remains regenerated without agent-canvas and this delta does not reintroduce it.\n\n## Security / correctness\n\nThe delta removes inline <style> selectors from three plugin SVGs (action-topbar, touchbar, usage-tracker) whose path/rect/circle fill rules leaked across icons when inlined into a shared sheet, causing the solid-blob rendering. Replacing them with per-element explicit fill/stroke #7c3aed is inert, adds no executable logic, and eliminates the cross-icon CSS-leak surface. Marketplace icon copies are re-hashed under new SHA-256 prefixes with entry URLs updated and old hash files deleted; the passing marketplace build (432 entries) and npm run check (228 tests) confirm no dangling references or parse errors.\n\n## Design / maintainability\n\nDirectly implements D-003 (content-addressed icons) and resolves the prior 'harmless but redundant' style blocks, which proved harmful as leaking selectors. Icons are now deterministic explicit violet with no host inheritance. The delta also removes two .empirical review JSONs containing literal unresolved merge-conflict markers, replacing them with a clean record. Minor non-blocking notes: the BB Surf icon lost its <title>/aria-labelledby in the redesign, and usage-tracker paths now render filled rather than outlined.",
+  "bodyDigest": "sha256:0ea85e99f233c095485a5984fcd27c80f61580f253d9dd9ce6436c1e9f638633",
+  "findings": [],
+  "digest": "sha256:22f968460ab766003b5189ec45bb0503b8ba778958af813d6077f4a8f4328194"
+}
