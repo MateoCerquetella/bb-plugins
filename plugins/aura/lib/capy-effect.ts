@@ -1,6 +1,7 @@
 import { VERTEX_SHADER, DITHERING_SHADER } from "./capy-shaders.ts";
-import { ANIMATED_PHOTO_SHADER } from "./photo-shader.ts";
-import type { BackgroundSettings } from "./model.ts";
+import { ANIMATED_PHOTO_SHADER, patternUniforms } from "./photo-shader.ts";
+import { isAnimatedImage, type BackgroundSettings } from "./model.ts";
+import { openAnimatedImage, type FramePlayer } from "./animated-image.ts";
 
 export const CAPY_CSS = `
 .aura-capy-layer { position:absolute; inset:0; z-index:-1; pointer-events:none; overflow:hidden; border-radius:inherit; }
@@ -30,6 +31,17 @@ export const QUALITY_SCALE: Record<BackgroundSettings["quality"], number> = {
   sharp: 1 / 2,
 };
 export const MAX_IMAGE_FRAMEBUFFER_PIXELS = 2_073_600;
+
+// Settings whose change needs a fresh shader program and uniforms.
+const SHADER_KEYS = ["effect", "enabled", "tint", "fit", "fps", "quality", "pattern", "dither", "photoMotion"] as const;
+export function shaderSettingsChanged(previous: BackgroundSettings, next: BackgroundSettings): boolean {
+  return SHADER_KEYS.some(key => previous[key] !== next[key]);
+}
+
+/** A still photo with no texture motion only needs redrawing on resize. */
+export function shaderAnimates(settings: BackgroundSettings, imageUrl: string | null): boolean {
+  return !imageUrl || settings.photoMotion !== "still" || isAnimatedImage(imageUrl);
+}
 
 export function frameIsDue(lastDraw: number | null, now: number, fps: BackgroundSettings["fps"]): boolean {
   return lastDraw === null || now - lastDraw >= 1000 / fps;
@@ -62,12 +74,7 @@ export function mountCapyEffect(parent: HTMLElement, initial: BackgroundSettings
   theme.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "style", "data-color-theme", "data-theme"] });
   function update(next: BackgroundSettings, image: string | null, refresh = false): void {
     if (stopped) return;
-    const wasEffect = settings.effect;
-    const wasEnabled = settings.enabled;
-    const wasTint = settings.tint;
-    const wasFit = settings.fit;
-    const wasFps = settings.fps;
-    const wasQuality = settings.quality;
+    const previous = settings;
     settings = next;
     const dark = document.documentElement.classList.contains("dark");
     layer.style.display = settings.enabled ? "" : "none";
@@ -83,7 +90,7 @@ export function mountCapyEffect(parent: HTMLElement, initial: BackgroundSettings
     else delete ink.dataset.halfWallpaper;
     if (image) { ink.dataset.image = ""; ink.style.backgroundImage = `url("${image}")`; }
     else { delete ink.dataset.image; ink.style.backgroundImage = "none"; }
-    if (image !== currentImage || refresh || wasEffect !== settings.effect || wasEnabled !== settings.enabled || wasTint !== settings.tint || wasFit !== settings.fit || wasFps !== settings.fps || wasQuality !== settings.quality) {
+    if (image !== currentImage || refresh || shaderSettingsChanged(previous, settings)) {
       currentImage = image;
       disposeShader(); disposeShader = () => {};
       if (settings.enabled && settings.effect === "pixels") {
@@ -144,7 +151,7 @@ function mountShader(parent: HTMLElement, imageUrl: string | null, color: string
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
     const position = gl.getAttribLocation(program, "a_position");
     gl.enableVertexAttribArray(position); gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
-    const values: Record<string, number> = { u_originX:.5,u_originY:.5,u_worldWidth:0,u_worldHeight:0,u_fit:imageUrl ? (settings.fit === "cover" ? 2 : 1) : 0,u_scale:imageUrl ? 1 : 2,u_rotation:0,u_offsetX:0,u_offsetY:0,u_shape:1,u_type:4,u_pxSize:imageUrl ? 2 : 3,u_colorSteps:4 };
+    const values: Record<string, number> = { u_originX:.5,u_originY:.5,u_worldWidth:0,u_worldHeight:0,u_fit:imageUrl ? (settings.fit === "cover" ? 2 : 1) : 0,u_scale:imageUrl ? 1 : 2,u_rotation:0,u_offsetX:0,u_offsetY:0,...patternUniforms(settings),u_pxSize:imageUrl ? 2 : 3,u_colorSteps:4 };
     for (const [key, value] of Object.entries(values)) gl.uniform1f(gl.getUniformLocation(program, key), value);
     const probe = document.createElement("canvas"); probe.width = probe.height = 1;
     const ctx = probe.getContext("2d");
@@ -164,6 +171,9 @@ function mountShader(parent: HTMLElement, imageUrl: string | null, color: string
   parent.append(canvas);
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
   const frameInterval = 1000 / settings.fps;
+  const animates = shaderAnimates(settings, imageUrl);
+  let player: FramePlayer | null = null;
+  const loading = new AbortController();
   function draw(now = performance.now()): void {
     if (disposed || lost || !imageReady || !canvas.width || !canvas.height) return;
     gl!.useProgram(program);
@@ -177,7 +187,10 @@ function mountShader(parent: HTMLElement, imageUrl: string | null, color: string
     if (disposed || lost || document.hidden || !visible || reduced.matches) return;
     if (previous !== null) frame += Math.min(now-previous, frameInterval) * .5;
     previous = now;
-    if (frameIsDue(lastDraw, now, settings.fps)) draw(now);
+    // A due GIF frame draws immediately so the FPS cap never drops its frames.
+    const gifFrame = player?.advance(now) ?? null;
+    if (gifFrame) upload(gifFrame);
+    if (gifFrame || frameIsDue(lastDraw, now, settings.fps)) draw(now);
     raf = requestAnimationFrame(tick);
   }
   function schedule() {
@@ -185,7 +198,7 @@ function mountShader(parent: HTMLElement, imageUrl: string | null, color: string
     if (!disposed && !lost && !document.hidden && visible) {
       const now = performance.now();
       if (frameIsDue(lastDraw, now, settings.fps)) draw(now);
-      if (!reduced.matches) raf = requestAnimationFrame(tick);
+      if (animates && !reduced.matches) raf = requestAnimationFrame(tick);
     }
   }
   function resize() {
@@ -199,21 +212,38 @@ function mountShader(parent: HTMLElement, imageUrl: string | null, color: string
     gl!.uniform1f(pixelRatioUniform,canvas.width/width);
     draw();
   }
-  if (imageUrl) {
-    image = new Image();
-    image.onload = () => {
-      if (disposed || lost || !image) return;
-      texture = gl!.createTexture(); gl!.activeTexture(gl!.TEXTURE0); gl!.bindTexture(gl!.TEXTURE_2D,texture);
-      gl!.texParameteri(gl!.TEXTURE_2D,gl!.TEXTURE_WRAP_S,gl!.CLAMP_TO_EDGE); gl!.texParameteri(gl!.TEXTURE_2D,gl!.TEXTURE_WRAP_T,gl!.CLAMP_TO_EDGE);
-      gl!.texParameteri(gl!.TEXTURE_2D,gl!.TEXTURE_MIN_FILTER,gl!.LINEAR); gl!.texParameteri(gl!.TEXTURE_2D,gl!.TEXTURE_MAG_FILTER,gl!.LINEAR);
-      gl!.texImage2D(gl!.TEXTURE_2D,0,gl!.RGBA,gl!.RGBA,gl!.UNSIGNED_BYTE,image);
-      gl!.useProgram(program); gl!.uniform1i(gl!.getUniformLocation(program!,"u_image"),0);
-      gl!.uniform1f(gl!.getUniformLocation(program!,"u_imageAspectRatio"),image.naturalWidth/image.naturalHeight);
-      imageReady = true; resize();
-    };
-    image.onerror = () => { canvas.style.visibility = "hidden"; };
-    image.src = imageUrl;
+  function upload(source: TexImageSource): void {
+    gl!.bindTexture(gl!.TEXTURE_2D,texture);
+    gl!.texImage2D(gl!.TEXTURE_2D,0,gl!.RGBA,gl!.RGBA,gl!.UNSIGNED_BYTE,source);
   }
+  function useTexture(source: TexImageSource, width: number, height: number): void {
+    texture = gl!.createTexture(); gl!.activeTexture(gl!.TEXTURE0); gl!.bindTexture(gl!.TEXTURE_2D,texture);
+    gl!.texParameteri(gl!.TEXTURE_2D,gl!.TEXTURE_WRAP_S,gl!.CLAMP_TO_EDGE); gl!.texParameteri(gl!.TEXTURE_2D,gl!.TEXTURE_WRAP_T,gl!.CLAMP_TO_EDGE);
+    gl!.texParameteri(gl!.TEXTURE_2D,gl!.TEXTURE_MIN_FILTER,gl!.LINEAR); gl!.texParameteri(gl!.TEXTURE_2D,gl!.TEXTURE_MAG_FILTER,gl!.LINEAR);
+    upload(source);
+    gl!.useProgram(program); gl!.uniform1i(gl!.getUniformLocation(program!,"u_image"),0);
+    gl!.uniform1f(gl!.getUniformLocation(program!,"u_imageAspectRatio"),width/height);
+    imageReady = true; resize(); schedule();
+  }
+  function loadStill(url: string): void {
+    image = new Image();
+    image.onload = () => { if (!disposed && !lost && image) useTexture(image, image.naturalWidth, image.naturalHeight); };
+    image.onerror = () => { canvas.style.visibility = "hidden"; };
+    image.src = url;
+  }
+  if (imageUrl && isAnimatedImage(imageUrl)) {
+    openAnimatedImage(imageUrl, loading.signal).then(opened => {
+      if (!opened) { if (!disposed) loadStill(imageUrl); return; } // No WebCodecs: show the first frame.
+      if (disposed || lost) { opened.dispose(); return; }
+      player = opened;
+      const first = opened.current as VideoFrame;
+      useTexture(first, first.displayWidth || 1, first.displayHeight || 1);
+    }).catch(error => {
+      if (disposed) return;
+      console.warn("Aura: animated image unavailable", error);
+      loadStill(imageUrl);
+    });
+  } else if (imageUrl) loadStill(imageUrl);
   function onLost(event: Event) { event.preventDefault(); lost = true; cancelAnimationFrame(raf); canvas.style.visibility = "hidden"; }
   // A context loss falls back to the original image/gradient. A plugin reload
   // or appearance change retries with a fresh context.
@@ -227,6 +257,7 @@ function mountShader(parent: HTMLElement, imageUrl: string | null, color: string
     resizeObserver.disconnect(); intersection.disconnect(); document.removeEventListener("visibilitychange",schedule); reduced.removeEventListener("change",schedule);
     canvas.removeEventListener("webglcontextlost",onLost);
     if (image) { image.onload = null; image.onerror = null; image.src = ""; }
+    loading.abort(); player?.dispose(); player = null;
     releaseGl(); gl!.getExtension("WEBGL_lose_context")?.loseContext(); canvas.remove();
   };
 }
