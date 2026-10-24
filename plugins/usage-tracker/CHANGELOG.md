@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Keep the usage details card visible on bb 0.47.1+, where the sidebar
+  footer's new `clip-path` hid the card that opens above it.
 - Add an opt-in DeepSeek provider that reads the DeepSeek API balance with a
   secret API key or `DEEPSEEK_API_KEY`, and shows budget consumption against a
   user-set topped-up amount. The provider uses the official DeepSeek glyph.
