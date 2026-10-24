@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-fa53741b9cb935bcb6154503",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-10-24T18:45:16.698Z",
+  "completedAt": "2026-10-24T18:45:16.698Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-all-plugin-and-marketplace-icons-to-violet-remove-the",
+    "specRevision": 2,
+    "specDigest": "sha256:5fdb098c8bc7d8a860b673f90101df78305400ab73b4464a4c2821160a566f35",
+    "treeDigest": "sha256:2f3eda82cabe461eda399b9ccc0ca29f7372ce144ff803d06175cbd9b21818de",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:66ff5d8c1773c595a48c367827a84557d6a06d1d5b2987bd2d2f61f755030779",
+  "kind": "collected",
+  "collector": "empirical-review:opencode/deepseek-v4-pro (fresh context)",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/fix-all-plugin-and-marketplace-icons-to-violet-remove-the/reviews/22f968460ab766003b5189ec.json",
+      "mediaType": "application/json",
+      "bytes": 3288,
+      "digest": "sha256:c95341cb82a15464e6552b0e43996a233bad214b9a7d2e35c097022c1f39c20e"
+    },
+    {
+      "path": ".empirical/specs/fix-all-plugin-and-marketplace-icons-to-violet-remove-the/reviews/22f968460ab766003b5189ec.md",
+      "mediaType": "text/markdown",
+      "bytes": 2502,
+      "digest": "sha256:35bf92a9f7332cac347e1c1f6a5664ecbdfa43da3bca93c691cb51d5b922d584"
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "sequence": 15,
+  "previousDigest": "sha256:98e53af83f7a2853e8c02b95c2acdee06412a782c71ddd7bc26006f35bc63ffa",
+  "actor": "empirical-merge-observed",
+  "type": "compaction-boundary",
+  "summary": "Compacted through journal event 14",
+  "createdAt": "2026-10-24T00:14:15.248Z",
+  "stateBeforeDigest": "sha256:57267eef88bb78e7554ba65cfdbb0a2b423a32c34a16c3f476c5434db7d52005",
+  "stateAfterDigest": "sha256:57267eef88bb78e7554ba65cfdbb0a2b423a32c34a16c3f476c5434db7d52005",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 14,
+    "activeFeature": "merge-the-dockside-filter-branch-filter-by-bbplugins-thr-q7uptvnbap",
+    "request": "Merge the dockside filter branch filter-by-bbplugins-thr_q7uptvnbap into main and release Dockside v0.1.8: bump version (0.1.7 is already taken by an unrelated tag), update changelog/README if needed, run dockside checks, tag dockside/v0.1.8, push branch/tag, and verify the marketplace install resolves 0.1.8.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "done",
+    "status": "done",
+    "repairAttempts": 0,
+    "message": "Closed as merged-externally: Merged in pull request #98 as e8736f3858d0a544b70573ddbc92db0291faed53 into main; closed when the merge was observed.",
+    "implementationActor": "agent",
+    "workStartedAt": "2026-10-20T20:02:28.896Z",
+    "specDigest": "sha256:face92d19239cbd2edd29d70d45ee3e17a9e78a6e12969f270c03bc5295f21a7",
+    "approvedSpecRevision": 7,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:2359fdb12468058d4667633f14fe56f988969112891ae17641d4e022b4208700",
+    "impactDigest": "sha256:098d8f4282d3aa8aa1199db02f8764b35ce7c00b3b450ece444b4a46892aec3f",
+    "capabilityClaimId": "merge-the-dockside-filter-branch-filter-by-bbplugins-thr-q7uptvnbap-55654f1ea1c7",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "collected-1db75c32d3eda575abe02727",
+      "qa-2fcfeb2be8a231fbeeb9f18d",
+      "qa-1084879f6169936ffb51df55"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": true,
+      "integrated": true,
+      "delivered": false,
+      "published": false,
+      "highest": "integrated",
+      "reasons": {
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-24T00:14:14.448Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "merge-the-dockside-filter-branch-filter-by-bbplugins-thr-q7uptvnbap-55654f1ea1c7",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "merge-the-dockside-filter-branch-filter-by-bbplugins-thr-q7uptvnbap",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_g3gqe5f7fh-1/bb-plugins-merge-the-dockside-filter-branch-filter-by-bbplugins-thr-q7uptvnbap",
+      "worktreeId": "sha256:9d5909c56937e4d2535f3c97525c645b0c0eede2ca02d8a5b438fd9c910ffd28",
+      "baseCommit": "8cb6c014b581d77a39941f30da6e3073c6be3210",
+      "baseTree": "20f2e45b1a0075a66aa04a24cb44a422a573ba7b",
+      "bases": {
+        "dockside-thread-management": {
+          "capability": "dockside-thread-management",
+          "digest": "sha256:aced6d6e0dd574682f42143477cb0a8d6da4253702573628e354b827c20f906f",
+          "requirements": {
+            "dockside filters its project-first hierarchy by intent": "sha256:e56462ec90f3541291ccf73f6fb833e06fa783d9d9df853982c5a541a9ffc257"
+          }
+        }
+      },
+      "capabilities": [
+        "dockside-thread-management"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-20T20:03:26.547Z",
+      "heartbeatAt": "2026-10-20T20:03:26.547Z",
+      "digest": "sha256:58808a1f60cbefc4033fbde50d4acf016c8c0764c697e5b950976718cdd30540"
+    },
+    "trackerGeneration": 1,
+    "lifecycle": {
+      "stage": "consolidation",
+      "iteration": 1,
+      "awaitingFeedback": false,
+      "contractRevision": 5
+    },
+    "reviewFirst": true,
+    "closure": {
+      "schemaVersion": 1,
+      "outcome": "merged-externally",
+      "reason": "Merged in pull request #98 as e8736f3858d0a544b70573ddbc92db0291faed53 into main; closed when the merge was observed.",
+      "actor": "empirical",
+      "confirmation": "merge-observed",
+      "closedAtPhase": "integrate",
+      "completionAtClosure": "integrated",
+      "externalMerge": {
+        "pullRequest": 98,
+        "url": "https://github.com/MateoCerquetella/bb-plugins/pull/98",
+        "state": "MERGED",
+        "mergeCommit": "e8736f3858d0a544b70573ddbc92db0291faed53",
+        "targetBranch": "main",
+        "ancestorOfTarget": true,
+        "observedAt": "2026-10-24T00:13:59.436Z"
+      },
+      "closedAt": "2026-10-24T00:14:14.220Z",
+      "digest": "sha256:34ea2919cc72368948bc5b4a06d2b4dd524156e61543a19b838d1fc754132ab3"
+    },
+    "completionRecord": {
+      "schemaVersion": 1,
+      "implementedBy": "agent",
+      "completedBy": "empirical",
+      "decisionBy": null,
+      "method": "merged-externally",
+      "reason": "Merged in pull request #98 as e8736f3858d0a544b70573ddbc92db0291faed53 into main; closed when the merge was observed.",
+      "at": "2026-10-24T00:14:14.448Z",
+      "revision": 14,
+      "completion": "integrated",
+      "sourceTreeDigest": "sha256:9632abb41dfde7c668aaa84694cd4597a31f82003c9cd782ac34bd2b514fc14d",
+      "artifactTreeDigest": "sha256:6e560c3ba3156747efe4a7dae212f87beda038ec04f8e762b50fb86f3abcddc9",
+      "digest": "sha256:edbfcfb2d914ebefe2726fd6f8504d57db78adc5270a3ad745d2b54b14ee8cd8"
+    }
+  },
+  "digest": "sha256:739e3373597b166693dedd699b2141aec1bbf7b215b509d920cf390eeda9769f"
+}

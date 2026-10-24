@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-25722237a1e0acf9503f4766",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Focused Aura check passes after violet icon, Agent Canvas removal, and marketplace icon updates.",
+  "passed": true,
+  "startedAt": "2026-10-24T00:27:35.569Z",
+  "completedAt": "2026-10-24T00:27:40.692Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-all-plugin-and-marketplace-icons-to-violet-remove-the",
+    "specRevision": 2,
+    "specDigest": "sha256:5fdb098c8bc7d8a860b673f90101df78305400ab73b4464a4c2821160a566f35",
+    "treeDigest": "sha256:e4fd1b63f2b8092d57288cbda15251947173e0eb7eeaf9ffafdbbbddf648fe1c",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd",
+    "workflowRevision": 6,
+    "gitCommit": "54125c08b60173d54c05cddc37a45cebbb01120c",
+    "textTreeDigest": "sha256:e4fd1b63f2b8092d57288cbda15251947173e0eb7eeaf9ffafdbbbddf648fe1c"
+  },
+  "digest": "sha256:ece3d70f49159c7ec51f2b79014757518f1eefc0ad586308d3c952934b7e50e4",
+  "kind": "qa",
+  "matrixDigest": "sha256:4feef68e40fc79bcb6e88b909c37bb4d71301432185dc6b9a95b42dfc29b96e3",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Focused Aura check passes after violet icon, Agent Canvas removal, and marketplace icon updates.",
+      "startedAt": "2026-10-24T00:27:35.569Z",
+      "completedAt": "2026-10-24T00:27:40.692Z",
+      "durationMs": 5123,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:3102e0660c5a28fb09072a92af73601c0704a8badb5519082e7545d1f876aa50",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-aura"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:25e3f4765fcff15d8a82246dd52abc77c5f5153ba0a3860098a9822ee329536d",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "\n> bb-plugin-aura@0.2.3 check\n> npm run typecheck && npm test && npm run build\n\n\n> bb-plugin-aura@0.2.3 typecheck\n> tsc --noEmit\n\n\n> bb-plugin-aura@0.2.3 test\n> tsx --test test/*.test.ts\n\nTAP version 13\n# Subtest: default-off never requests activity; enabling loads and stale period responses cannot replace newer scope\nok 1 - default-off never requests activity; enabling loads and stale period responses cannot replace newer scope\n  ---\n  duration_ms: 128.909895\n  type: 'test'\n  ...\n# Subtest: failed and unavailable requests omit counts; retry recovers; verified empty differs from error\nok 2 - failed and unavailable requests omit counts; retry recovers; verified empty differs from error\n  ---\n  duration_ms: 58.186232\n  type: 'test'\n  ...\n# Subtest: unmount ignores a late source result and leaves native composer state untouched\nok 3 - unmount ignores a late source result and leaves native composer state untouched\n  ---\n  duration_ms: 6.158651\n  type: 'test'\n  ...\n# Subtest: ranges cover exact inclusive UTC days across leap years and timezone offsets\nok 4 - ranges cover exact inclusive UTC days across leap years and timezone offsets\n  ---\n  duration_ms: 0.986999\n  type: 'test'\n  ...\n# Subtest: calendar validation refuses missing, duplicate and impossible dates instead of filling zero days\nok 5 - calendar validation refuses missing, duplicate and impossible dates instead of filling zero days\n  ---\n  duration_ms: 10.530252\n  type: 'test'\n  ...\n# Subtest: patterns use real consecutive days, yesterday grace, earliest ties and no-activity values\nok 6 - patterns use real consecutive days, yesterday grace, earliest ties and no-activity values\n  ---\n  duration_ms: 0.769523\n  type: 'test'\n  ...\n# Subtest: authenticated counts and dated cells pass through unchanged; explicit viewer login scopes authored searches\nok 7 - authenticated counts and dated cells pass through unchanged; explicit viewer login scopes authored searches\n  ---\n  duration_ms: 6.971333\n  type: 'test'\n  ...\n# Subtest: repository selection scopes actual PR counts and reviews but does not relabel the global calendar\nok 8 - repository selection scopes actual PR counts and reviews but does not relabel the global calendar\n  ---\n  duration_ms: 0.585928\n  type: 'test'\n  ...\n# Subtest: API/authentication failures are sanitized, partial counts stay unconfirmed, and invalid calendars are unavailable\nok 9 - API/authentication failures are sanitized, partial counts stay unconfirmed, and invalid calendars are unavailable\n  ---\n  duration_ms: 1.748829\n  type: 'test'\n  ...\n# Subtest: empty is a complete source response; repository discovery caps never imply missing reviews are zero\nok 10 - empty is a complete source response; repository discovery caps never imply missing reviews are zero\n  ---\n  duration_ms: 1.434576\n  type: 'test'\n  ...\n# Subtest: cache coalesces matching requests, expires after five minutes and does not retain failed counts\nok 11 - cache coalesces matching requests, expires after five minutes and does not retain failed counts\n  ---\n  duration_ms: 3.834402\n  type: 'test'\n  ...\n# Subtest: GIF delays follow browser timing, treating 0–10 ms frames as 100 ms\nok 12 - GIF delays follow browser timing, treating 0–10 ms frames as 100 ms\n  ---\n  duration_ms: 0.836205\n  type: 'test'\n  ...\n# Subtest: frames advance only after their delay, loop, and close what they replace\nok 13 - frames advance only after their delay, loop, and close what they replace\n  ---\n  duration_ms: 7.030138\n  type: 'test'\n  ...\n# Subtest: a single-frame GIF never decodes again and a decode failure keeps the last frame\nok 14 - a single-frame GIF never decodes again and a decode failure keeps the last frame\n  ---\n  duration_ms: 2.570928\n  type: 'test'\n  ...\n# Subtest: a frame decoded after disposal is released immediately\nok 15 - a frame decoded after disposal is released immediately\n  ---\n  duration_ms: 3.688566\n  type: 'test'\n  ...\n# Subtest: every texture option maps to a distinct shader branch\nok 16 - every texture option maps to a distinct shader branch\n  ---\n  duration_ms: 0.516041\n  type: 'test'\n  ...\n# Subtest: texture changes rebuild the shader; a still photo stops the animation loop\nok 17 - texture changes rebuild the shader; a still photo stops the animation loop\n  ---\n  duration_ms: 0.211325\n  type: 'test'\n  ...\n# Subtest: render-quality tiers increase drawing-buffer density\nok 18 - render-quality tiers increase drawing-buffer density\n  ---\n  duration_ms: 2.657055\n  type: 'test'\n  ...\n# Subtest: selected FPS limits the next draw after an immediate frame\nok 19 - selected FPS limits the next draw after an immediate frame\n  ---\n  duration_ms: 0.326506\n  type: 'test'\n  ...\n# Subtest: applies scoped backgrounds, disables cleanly and ignores a late fetch after disposal\nok 20 - applies scoped backgrounds, disables cleanly and ignores a late fetch after disposal\n  ---\n  duration_ms: 146.134594\n  type: 'test'\n  ...\n# Subtest: six independent slots retain images and appearance across switches and reload\nok 21 - six independent slots retain images and appearance across switches and reload\n  ---\n  duration_ms: 29.653843\n  type: 'test'\n  ...\n# Subtest: invalid image or slot rejects the entire apply without partially changing settings\nok 22 - invalid image or slot rejects the entire apply without partially changing settings\n  ---\n  duration_ms: 32.158991\n  type: 'test'\n  ...\n# Subtest: scope stays global across slots; clearing/resetting preserves saved work\nok 23 - scope stays global across slots; clearing/resetting preserves saved work\n  ---\n  duration_ms: 6.460651\n  type: 'test'\n  ...\n# Subtest: image type must match bytes; legacy settings get new defaults\nok 24 - image type must match bytes; legacy settings get new defaults\n  ---\n  duration_ms: 2.278385\n  type: 'test'\n  ...\n# Subtest: overview is default-off and stays global across slots/reset/reload without changing a saved image\nok 25 - overview is default-off and stays global across slots/reset/reload without changing a saved image\n  ---\n  duration_ms: 5.625017\n  type: 'test'\n  ...\n# Subtest: animation speed and quality persist in saved slots\nok 26 - animation speed and quality persist in saved slots\n  ---\n  duration_ms: 2.594802\n  type: 'test'\n  ...\n# Subtest: versioned images use an immutable private browser cache\nok 27 - versioned images use an immutable private browser cache\n  ---\n  duration_ms: 23.113317\n  type: 'test'\n  ...\n# Subtest: New thread dimmer toggles without replacing images or saved slots\nok 28 - New thread dimmer toggles without replacing images or saved slots\n  ---\n  duration_ms: 4.815661\n  type: 'test'\n  ...\n# Subtest: animated GIFs are stored as uploaded, served as GIF and flagged for the animated renderer\nok 29 - animated GIFs are stored as uploaded, served as GIF and flagged for the animated renderer\n  ---\n  duration_ms: 5.338315\n  type: 'test'\n  ...\n# Subtest: GIFs must match their bytes and stay within the GIF budget\nok 30 - GIFs must match their bytes and stay within the GIF budget\n  ---\n  duration_ms: 30.875851\n  type: 'test'\n  ...\n# Subtest: pattern, dither and photo motion persist in saved slots\nok 31 - pattern, dither and photo motion persist in saved slots\n  ---\n  duration_ms: 3.37751\n  type: 'test'\n  ...\n1..31\n# tests 31\n# suites 0\n# pass 31\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 1367.503946\n\n> bb-plugin-aura@0.2.3 build\n> env -u BB_CLI bb plugin build .\n\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:e4fd1b63f2b8092d57288cbda15251947173e0eb7eeaf9ffafdbbbddf648fe1c",
+      "sourceTreeAfter": "sha256:e4fd1b63f2b8092d57288cbda15251947173e0eb7eeaf9ffafdbbbddf648fe1c",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

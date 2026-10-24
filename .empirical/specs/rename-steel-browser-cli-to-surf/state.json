@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 7,
+  "revision": 8,
   "activeFeature": "rename-steel-browser-cli-to-surf",
   "request": "Rename the public Steel Browser CLI command from `bb steel-browser` to `bb surf` so the installed BB Surf interface and terminal command use the same name. Preserve the internal plugin ID, persisted configuration, project browser bindings, handoff directive, and upstream Steel engine terminology to avoid data loss or migration. Update agent instructions, skill guidance, help usage, tests, and README examples; verify the focused plugin checks and locally install/reload the plugin so `bb surf --help` works. Create a pull request against main and merge it after checks pass, as explicitly approved by the user.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "integrate",
-  "status": "waiting",
+  "phase": "done",
+  "status": "done",
   "repairAttempts": 0,
-  "message": "All workspace checks passed with a clean applicable receipt. Focused Surf tests, build, live help, isolated review and scoped security consult passed. Local missing better-sqlite3 binary repaired without source changes.",
+  "message": "Closed as merged-externally: Merged in pull request #93 as 13ac48e657c0074386834176c40ca92bfdc51b1a into main; closed when the merge was observed.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:63a2560dc67cec6b415c1d0420b2a82381875027ee5a0fcddb609043db1c2e8e",
@@ -28,17 +28,16 @@
   "completion": {
     "implemented": true,
     "verified": true,
-    "integrated": false,
+    "integrated": true,
     "delivered": false,
     "published": false,
-    "highest": "verified",
+    "highest": "integrated",
     "reasons": {
-      "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-19T15:40:36.214Z",
+  "updatedAt": "2026-10-24T00:14:16.578Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "rename-steel-browser-cli-to-surf-7fb6bbf4a7dd",
@@ -66,7 +65,6 @@
     "heartbeatAt": "2026-10-19T15:18:11.943Z",
     "digest": "sha256:231083fa27403fe9d21c10ee0be12bb62d250e47d283c1ec8648a22740850a29"
   },
-  "reviewFirst": true,
   "verificationCoverage": {
     "kind": "review-derived",
     "checkId": "qa-fresh-context",
@@ -74,5 +72,40 @@
     "matrixDigest": "sha256:25ada92577a076954ce38c0c824ad8ce6c1f723ff6d7c358aeebf22a41bfcf35",
     "specDigest": "sha256:63a2560dc67cec6b415c1d0420b2a82381875027ee5a0fcddb609043db1c2e8e",
     "revision": 7
+  },
+  "reviewFirst": true,
+  "closure": {
+    "schemaVersion": 1,
+    "outcome": "merged-externally",
+    "reason": "Merged in pull request #93 as 13ac48e657c0074386834176c40ca92bfdc51b1a into main; closed when the merge was observed.",
+    "actor": "empirical",
+    "confirmation": "merge-observed",
+    "closedAtPhase": "integrate",
+    "completionAtClosure": "integrated",
+    "externalMerge": {
+      "pullRequest": 93,
+      "url": "https://github.com/MateoCerquetella/bb-plugins/pull/93",
+      "state": "MERGED",
+      "mergeCommit": "13ac48e657c0074386834176c40ca92bfdc51b1a",
+      "targetBranch": "main",
+      "ancestorOfTarget": true,
+      "observedAt": "2026-10-24T00:13:59.436Z"
+    },
+    "closedAt": "2026-10-24T00:14:16.364Z",
+    "digest": "sha256:dae271f8ef0b6991ab5d2a7a571d0381989901c7aceeafb47b7ab81a06f00d76"
+  },
+  "completionRecord": {
+    "schemaVersion": 1,
+    "implementedBy": "agent",
+    "completedBy": "empirical",
+    "decisionBy": null,
+    "method": "merged-externally",
+    "reason": "Merged in pull request #93 as 13ac48e657c0074386834176c40ca92bfdc51b1a into main; closed when the merge was observed.",
+    "at": "2026-10-24T00:14:16.578Z",
+    "revision": 8,
+    "completion": "integrated",
+    "sourceTreeDigest": "sha256:9632abb41dfde7c668aaa84694cd4597a31f82003c9cd782ac34bd2b514fc14d",
+    "artifactTreeDigest": "sha256:f99cb5f91276d783ad939ff93d632c37b5d772135296b54e5da98d92810e85a9",
+    "digest": "sha256:8e0895ab8802c89780a3be7ac1cb5694d1fe90fe7c63545997991bf53b31e64d"
   }
 }

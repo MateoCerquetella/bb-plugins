@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "sequence": 8,
+  "previousDigest": "sha256:ceb4ebff6d52aa40ee9ca81c9c825a18230d020aefaba9f9685a89d0db07b116",
+  "actor": "empirical-merge-observed",
+  "type": "compaction-boundary",
+  "summary": "Compacted through journal event 7",
+  "createdAt": "2026-10-24T00:14:16.339Z",
+  "stateBeforeDigest": "sha256:6441d638ebd2c291f852cffbbf4d687a933432a3eb9409c421299a2f1022ff7d",
+  "stateAfterDigest": "sha256:6441d638ebd2c291f852cffbbf4d687a933432a3eb9409c421299a2f1022ff7d",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 7,
+    "activeFeature": "pr85-repair",
+    "request": "Repair existing PR #85 in a fresh temporary worktree, rebase onto current origin/main preserving Taskboard behavior, run focused and root checks plus installed browser verification, push existing PR branch and mark ready, do not merge.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "done",
+    "status": "done",
+    "repairAttempts": 0,
+    "message": "Closed as merged-externally: Merged in pull request #85 as 873a12c2f829d8607f2e4b8ecf0c905cc59a1c54 into main; closed when the merge was observed.",
+    "implementationActor": "agent",
+    "workStartedAt": "2026-10-16T02:12:56.159Z",
+    "specDigest": "sha256:f09fe70305423a4a86e431f80b1a14d455d5a33e28a51140383cdbe1bb38f707",
+    "approvedSpecRevision": 3,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:75d1f5c79ee782cb2319be7233ead0b321b4829d367cd43d42d847f2ce001feb",
+    "impactDigest": "sha256:49777cf96efdb4d8be643bb0ced0b1c8ddf311723babd7c4ce48bb60ddf2aed7",
+    "capabilityClaimId": "pr85-repair-4b7fcb0bec06",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-24T00:14:15.518Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "pr85-repair-4b7fcb0bec06",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "pr85-repair",
+      "worktree": "/tmp/bb-plugins-pr85-repair",
+      "worktreeId": "sha256:8068747f21028ea9fe94a74044fd7583c78b9181c3e42da065e72391ea20cf2a",
+      "baseCommit": "28209b163692c3b168395d635d11a78f00597c1e",
+      "baseTree": "828bf741d66841048482bc8bc0999307641886c0",
+      "bases": {
+        "taskboard-pr85-repair": {
+          "capability": "taskboard-pr85-repair",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "current-main compatibility": null
+          }
+        }
+      },
+      "capabilities": [
+        "taskboard-pr85-repair"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-16T02:19:45.722Z",
+      "heartbeatAt": "2026-10-16T02:19:45.722Z",
+      "digest": "sha256:d0c826f53201159ab075970837742abadeed9f88843b6cb5cf7d5a71a33ee4c6"
+    },
+    "reviewFirst": true,
+    "closure": {
+      "schemaVersion": 1,
+      "outcome": "merged-externally",
+      "reason": "Merged in pull request #85 as 873a12c2f829d8607f2e4b8ecf0c905cc59a1c54 into main; closed when the merge was observed.",
+      "actor": "empirical",
+      "confirmation": "merge-observed",
+      "closedAtPhase": "review",
+      "completionAtClosure": "implemented",
+      "externalMerge": {
+        "pullRequest": 85,
+        "url": "https://github.com/MateoCerquetella/bb-plugins/pull/85",
+        "state": "MERGED",
+        "mergeCommit": "873a12c2f829d8607f2e4b8ecf0c905cc59a1c54",
+        "targetBranch": "main",
+        "ancestorOfTarget": true,
+        "observedAt": "2026-10-24T00:13:59.436Z"
+      },
+      "closedAt": "2026-10-24T00:14:15.275Z",
+      "digest": "sha256:dcf28a8f264ed27b909ed5d850e77441376d034c6718979fcbfbef215dd0fb47"
+    },
+    "completionRecord": {
+      "schemaVersion": 1,
+      "implementedBy": "agent",
+      "completedBy": "empirical",
+      "decisionBy": null,
+      "method": "merged-externally",
+      "reason": "Merged in pull request #85 as 873a12c2f829d8607f2e4b8ecf0c905cc59a1c54 into main; closed when the merge was observed.",
+      "at": "2026-10-24T00:14:15.518Z",
+      "revision": 7,
+      "completion": "implemented",
+      "sourceTreeDigest": "sha256:9632abb41dfde7c668aaa84694cd4597a31f82003c9cd782ac34bd2b514fc14d",
+      "artifactTreeDigest": "sha256:d11603537082f0545c97ca7e101392a0289e712822291d6a60e19851dcf76a77",
+      "digest": "sha256:d36a97b3a8b3ca8982f79ecf50153ee010c48bc7d86a31b8045d20a50e471131"
+    }
+  },
+  "digest": "sha256:53f775f73eb934ad9926d99c5c84256c723c65146fe97211837b1e6dd5fae904"
+}
