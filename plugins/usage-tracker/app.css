@@ -79,6 +79,14 @@
   position: relative;
 }
 
+/* bb 0.47.1 wraps the sidebar footer in its own collapsible body with
+ * `clip-path: inset(0 -6px 0 0)`, which clips the details card that opens
+ * above the footer row. Lift the clip only while a card is open so bb's
+ * collapse transition keeps its clipping otherwise. */
+[data-sidebar="collapsible-body"]:has(.usage-tracker-sidebar__details) {
+  clip-path: none;
+}
+
 .usage-tracker-sidebar button {
   margin: 0;
   border: 0;
