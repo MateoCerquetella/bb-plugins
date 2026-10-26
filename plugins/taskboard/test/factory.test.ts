@@ -316,6 +316,8 @@ function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
   let managed = true;
   let spawnInput: unknown;
   let currentThreadId = 'thr_native';
+  let threadProjectId = item.bbProjectId;
+  let environmentProjectId = item.bbProjectId;
   const spawnInputs: { title: string; parentThreadId?: string; providerId?: string; model?: string;
     executionInputSources?: Record<string, string>; environment: { type: string; environmentId?: string } }[] = [];
   const parents = new Map<string, string | null>();
@@ -324,7 +326,8 @@ function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
   const threadEnvironments = new Map<string, string | null>([
     ['thr_native', 'env_test'], ['thr_build', 'env_build'], ['thr_review_seed', 'env_test']
   ]);
-  const sent: { threadId: string; input: { text: string }[] }[] = [];
+  const sent: { threadId: string; input: { text: string }[];
+    model?: string; reasoningLevel?: string; permissionMode?: string }[] = [];
   const events: Parameters<typeof applyNativeEvent>[1][] = [];
   const sdk = {
     threads: {
@@ -363,7 +366,7 @@ function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
       },
       get: async ({ threadId }: { threadId: string }) => ({
         id: threadId, status: threadStatuses.get(threadId) ?? threadStatus,
-        projectId: item.bbProjectId,
+        projectId: threadProjectId,
         environmentId: threadId === 'thr_native' ? buildEnvironment
           : threadEnvironments.has(threadId) ? threadEnvironments.get(threadId) : 'env_test',
         providerId: 'codex', archivedAt: archived.has(threadId) ? 1 : null, deletedAt: deleted.has(threadId) ? 1 : null,
@@ -399,7 +402,7 @@ function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
       return {
         id: environmentId, managed: managed || environmentId === 'env_build',
         isWorktree: managed || environmentId === 'env_build', hostId: 'host_test',
-        projectId: item.bbProjectId, status: environmentStatus, path: '/repo/worktree'
+        projectId: environmentProjectId, status: environmentStatus, path: '/repo/worktree'
       };
     } }
   } as unknown as Parameters<typeof createFactoryService>[0];
@@ -433,6 +436,8 @@ function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
     threadStatus: (value: string, threadId?: string) => {
       if (threadId) threadStatuses.set(threadId, value); else threadStatus = value;
     },
+    threadProject: (value: string) => { threadProjectId = value; },
+    environmentProject: (value: string) => { environmentProjectId = value; },
     unmanaged: () => { managed = false; },
     failProgress: (value = true) => { failProgress = value; },
     complete: (body = 'Implementation plan and verification commands') => {
@@ -1896,6 +1901,190 @@ test('archived Build results survive polling and explicit review repair restores
   }
 });
 
+function seedArchivedTransition(f: ReturnType<typeof fixture>, kind: 'investigate' | 'plan' | 'build', priorBuild = false) {
+  const record = priorBuild ? seedReview(f) : newRecord(item);
+  if (priorBuild) record.runs.pop();
+  record.coordinator = null;
+  record.automatic = true;
+  if (kind === 'build' && !priorBuild) {
+    savePlan(record, 'Implement the approved task');
+    approvePlan(record, record.plans.at(-1)!.digest);
+  }
+  if (kind === 'plan') {
+    const investigation = startRun(record, 'investigate', false);
+    Object.assign(investigation, {
+      status: 'finished', threadId: 'thr_investigation', environmentId: 'env_test',
+      output: 'Current investigation findings'
+    });
+  }
+  const run = startRun(record, kind, false);
+  Object.assign(run, {
+    status: 'finished', threadId: priorBuild ? 'thr_plan' : 'thr_native', environmentId: 'env_test',
+    output: kind === 'build'
+      ? '::taskboard-result{kind="build" verdict="implemented" revision="abc123"}\nVerified implementation.'
+      : 'Current findings and implementation plan'
+  });
+  f.archived.add('thr_native');
+  return f.store.save(record);
+}
+
+test('explicit stage continuation restores archived authors once while polling never restores them', async () => {
+  for (const [kind, priorBuild, nextKind] of [
+    ['investigate', false, 'plan'], ['plan', false, 'build'],
+    ['plan', true, 'build'], ['build', false, 'review']
+  ] as const) {
+    const f = fixture();
+    try {
+      seedArchivedTransition(f, kind, priorBuild);
+      if (kind !== 'build' && !priorBuild) f.unmanaged();
+      const paused = await f.service.get(item);
+      await f.service.poll(new AbortController().signal);
+      assert.match(paused.automationError!, /authoring session is archived/);
+      assert.equal(f.unarchives(), 0);
+      assert.equal(f.spawns(), 0);
+      await Promise.all([f.service.startTask(item, null), f.service.startTask(item, null)]);
+      const resumed = f.store.all()[0];
+      assert.equal(resumed.runs.length, paused.runs.length + 1);
+      assert.equal(resumed.runs.at(-1)?.kind, nextKind);
+      assert.equal(resumed.runs.at(-1)?.status, 'running');
+      assert.equal(resumed.automationError, null);
+      assert.equal(f.unarchives(), 1);
+      assert.equal(f.spawns(), 1);
+      assert.equal(f.sends(), 0);
+      assert.equal(resumed.runs.at(-1)?.environmentId,
+        kind === 'plan' && !priorBuild ? 'env_build' : 'env_test');
+    } finally { f.db.close(); }
+  }
+});
+
+test('explicitly starting a newly approved plan restores the archived prior Build author once', async () => {
+  const f = fixture();
+  try {
+    const record = seedReview(f, blockedReview, false);
+    savePlan(record, 'Implement the newly approved plan');
+    approvePlan(record, record.plans.at(-1)!.digest);
+    f.store.save(record);
+    f.archived.add('thr_native');
+    await Promise.all([f.service.startTask(item, null), f.service.startTask(item, null)]);
+    const resumed = f.store.all()[0];
+    assert.equal(resumed.runs.at(-1)?.kind, 'build');
+    assert.equal(resumed.runs.at(-1)?.planDigest, resumed.approvedDigest);
+    assert.equal(resumed.runs.at(-1)?.repairOf, null);
+    assert.equal(resumed.runs.at(-1)?.continuationOf, null);
+    assert.equal(f.unarchives(), 1);
+    assert.equal(f.spawns(), 1);
+    assert.equal(f.sends(), 0);
+  } finally { f.db.close(); }
+});
+
+test('continuing a new scope uses its Plan instead of an obsolete unavailable Build', async () => {
+  const f = fixture();
+  try {
+    const record = seedArchivedTransition(f, 'plan', true);
+    const oldBuild = record.runs.find(run => run.kind === 'build')!;
+    oldBuild.scopeDigest = 'obsolete-ticket-scope';
+    oldBuild.environmentId = 'env_obsolete';
+    f.buildEnvironment('env_obsolete');
+    f.unmanaged();
+    f.archived.add('thr_plan');
+    const saved = f.store.save(record);
+    const paused = await f.service.get(item);
+    assert.match(paused.automationError!, /authoring session is archived/);
+    assert.equal(f.unarchives(), 0);
+    await Promise.all([f.service.startTask(item, null), f.service.startTask(item, null)]);
+    const resumed = f.store.all()[0];
+    assert.equal(resumed.runs.length, saved.runs.length + 1);
+    assert.equal(resumed.automationError, null);
+    assert.equal(resumed.runs.at(-1)?.kind, 'build');
+    assert.equal(resumed.runs.at(-1)?.status, 'running');
+    assert.equal(resumed.runs.at(-1)?.scopeDigest, record.scopeDigest);
+    assert.equal(resumed.runs.at(-1)?.environmentId, 'env_build');
+    assert.equal(resumed.runs.at(-1)?.planDigest, resumed.approvedDigest);
+    assert.equal(f.archived.has('thr_native'), true, 'obsolete author stays archived');
+    assert.equal(f.archived.has('thr_plan'), false);
+    assert.equal(f.unarchives(), 1);
+    assert.equal(f.coordinatorSpawns(), 1);
+    assert.equal(f.spawns(), 1);
+    assert.equal(f.sends(), 0);
+    assert.match(f.spawnInputs[0]!.title, /: coordinator \[/);
+    assert.equal(f.spawnInputs[1]!.title, `${item.key}: build`);
+    assert.equal(f.spawnInputs[1]!.parentThreadId, resumed.coordinator?.status === 'ready'
+      ? resumed.coordinator.threadId : 'missing coordinator');
+    assert.deepEqual((f.spawnInput() as { environment: unknown }).environment, {
+      type: 'host', hostId: 'host_test', workspace: { type: 'managed-worktree', baseBranch: { kind: 'default' } }
+    });
+  } finally { f.db.close(); }
+});
+
+test('archived planning restoration failure leaves the completed plan without a phantom Build', async () => {
+  const f = fixture();
+  try {
+    seedArchivedTransition(f, 'plan');
+    await f.service.get(item);
+    f.onUnarchive(() => { throw new Error('Unarchive unavailable'); });
+    const paused = await f.service.startTask(item, null);
+    assert.match(paused.automationError!, /Unarchive unavailable/);
+    assert.equal(paused.runs.length, 2);
+    assert.equal(paused.runs.at(-1)?.status, 'finished');
+    assert.equal(paused.stage, 'Planning');
+    assert.equal(f.spawns(), 0);
+  } finally { f.db.close(); }
+});
+
+test('archived stage transitions validate author and workspace before unarchiving', async () => {
+  for (const failure of ['deleted', 'moved', 'destroyed', 'busy', 'project', 'workspace-project', 'parent'] as const) {
+    const f = fixture();
+    try {
+      const record = seedArchivedTransition(f, 'plan');
+      savePlan(record, 'Approved implementation plan');
+      approvePlan(record, record.plans.at(-1)!.digest);
+      if (failure === 'parent') {
+        record.coordinator = {
+          status: 'ready', intentId: 'coordinator-intent', startedAt: new Date().toISOString(),
+          legacyRunCount: 0, threadId: 'thr_root', nativeStatus: 'idle', error: null
+        };
+        f.parents.set('thr_native', 'thr_other');
+      }
+      const saved = f.store.save(record);
+      if (failure === 'deleted') f.deleted.add('thr_native');
+      if (failure === 'moved') f.buildEnvironment('env_other');
+      if (failure === 'destroyed') f.environmentStatus('destroyed');
+      if (failure === 'busy') f.threadStatus('active', 'thr_native');
+      if (failure === 'project') f.threadProject('proj_other');
+      if (failure === 'workspace-project') f.environmentProject('proj_other');
+      await assert.rejects(f.service.start(item, {
+        expectedVersion: saved.version, kind: 'build', contextThreadId: null, retry: false
+      }));
+      assert.equal(f.unarchives(), 0, failure);
+      assert.equal(f.spawns(), 0, failure);
+      assert.equal(f.store.all()[0].runs.length, 2, failure);
+    } finally { f.db.close(); }
+  }
+});
+
+test('archived stage restoration rechecks parent, identity, workspace and idle state before dispatch', async () => {
+  for (const failure of ['deleted', 'moved', 'destroyed', 'busy', 'project', 'workspace-project', 'parent'] as const) {
+    const f = fixture();
+    try {
+      seedArchivedTransition(f, 'plan');
+      await f.service.get(item);
+      f.onUnarchive(() => {
+        if (failure === 'deleted') f.deleted.add('thr_native');
+        if (failure === 'moved') f.buildEnvironment('env_other');
+        if (failure === 'destroyed') f.environmentStatus('destroyed');
+        if (failure === 'busy') f.threadStatus('active', 'thr_native');
+        if (failure === 'project') f.threadProject('proj_other');
+        if (failure === 'workspace-project') f.environmentProject('proj_other');
+        if (failure === 'parent') f.parents.set('thr_native', 'thr_other');
+      });
+      await f.service.startTask(item, null);
+      assert.equal(f.unarchives(), 1, failure);
+      assert.equal(f.spawns(), 0, failure);
+      assert.equal(f.store.all()[0].runs.length, 2, failure);
+    } finally { f.db.close(); }
+  }
+});
+
 test('legacy archive-only failure preserves completed evidence and can return to Build', async () => {
   const f = fixture();
   try {
@@ -2203,11 +2392,112 @@ test('repair Build that needs input pauses without requesting another review', a
     const record = await f.service.get(item);
     assert.equal(record.stage, 'Build');
     assert.equal(record.runs.at(-1)?.buildResult?.verdict, 'needs_input');
-    assert.match(record.automationError!, /Build needs input: Choose the media retention policy/);
+    assert.equal(record.automationError, 'Automatic work paused: Build needs your approval to continue.');
+    assert.match(record.runs.at(-1)?.buildResult?.summary ?? '', /Choose the media retention policy/);
     assert.equal(f.spawns(), 0);
     await assert.rejects(f.service.start(item, {
       expectedVersion: record.version, kind: 'review', contextThreadId: null, retry: false
     }), /unresolved blockers or needs input/);
+
+    const resumed = await f.service.startTask(item, null);
+    const continued = resumed.runs.at(-1)!;
+    assert.equal(continued.kind, 'build');
+    assert.equal(continued.status, 'running');
+    assert.equal(continued.threadId, 'thr_native');
+    assert.equal(continued.continuationOf, record.runs.at(-1)!.id);
+    assert.equal(resumed.automationError, null);
+    assert.equal(f.sends(), 2);
+    assert.match(f.sent.at(-1)!.input[0].text, /Approve and continue/);
+    assert.match(f.sent.at(-1)!.input[0].text, /approved product decisions/);
+    assert.doesNotMatch(f.sent.at(-1)!.input[0].text, /Do not invent product or policy decisions/);
+  } finally { f.db.close(); }
+});
+
+function pausedBuild(execution: NonNullable<ReturnType<typeof newRecord>['execution']>) {
+  const record = newRecord(item);
+  savePlan(record, 'Implement current scope and run the relevant checks');
+  approvePlan(record, record.plans[0].digest);
+  const build = startRun(record, 'build', false);
+  build.status = 'finished';
+  build.threadId = 'thr_native';
+  build.environmentId = 'env_test';
+  build.buildResult = { verdict: 'needs_input', summary: 'Choose retention and limits.', revision: null };
+  record.execution = execution;
+  record.automatic = true;
+  record.automationError = 'Automatic work paused: Build needs your approval to continue.';
+  return record;
+}
+
+test('the ticket AI model is applied to a continued Build session', async () => {
+  const f = fixture();
+  try {
+    f.store.save(pausedBuild({
+      providerId: 'codex', model: 'gpt-5.1', permissionMode: 'auto',
+      reasoningLevel: 'high', serviceTier: 'default'
+    }));
+    const record = await f.service.startTask(item, null);
+    assert.equal(record.runs.at(-1)?.threadId, 'thr_native');
+    assert.equal(f.spawns(), 0);
+    assert.equal(f.sends(), 1);
+    assert.equal(f.sent[0].model, 'gpt-5.1');
+    assert.equal(f.sent[0].reasoningLevel, 'high');
+    assert.equal(f.sent[0].permissionMode, 'auto');
+  } finally { f.db.close(); }
+});
+
+test('switching the ticket AI provider starts a fresh Build session in the same worktree', async () => {
+  const f = fixture();
+  try {
+    f.store.save(pausedBuild({
+      providerId: 'claude', model: 'claude-sonnet', permissionMode: 'auto',
+      reasoningLevel: 'high', serviceTier: 'default'
+    }));
+    const record = await f.service.startTask(item, null);
+    const continued = record.runs.at(-1)!;
+    assert.equal(continued.kind, 'build');
+    assert.equal(continued.status, 'running');
+    assert.equal(continued.continuationOf, record.runs.at(-2)!.id);
+    assert.equal(f.sends(), 0);
+    assert.equal(f.spawns(), 1);
+    assert.equal(continued.threadId, 'thr_build');
+    assert.equal(continued.environmentId, 'env_test');
+    assert.equal(f.spawnInputs.at(-1)!.providerId, 'claude');
+    assert.equal(f.spawnInputs.at(-1)!.model, 'claude-sonnet');
+    assert.equal(f.spawnInputs.at(-1)!.environment.type, 'reuse');
+    assert.equal(f.spawnInputs.at(-1)!.environment.environmentId, 'env_test');
+  } finally { f.db.close(); }
+});
+
+test('retrying a failed Build starts a fresh session in the Build worktree', async () => {
+  const f = fixture();
+  try {
+    const record = newRecord(item);
+    savePlan(record, 'Implement current scope');
+    approvePlan(record, record.plans[0].digest);
+    const build = startRun(record, 'build', false);
+    build.status = 'failed';
+    build.threadId = 'thr_native';
+    build.environmentId = 'env_test';
+    build.error = 'Native session is unavailable or failed.';
+    record.execution = {
+      providerId: 'claude', model: 'claude-sonnet', permissionMode: 'auto',
+      reasoningLevel: 'high', serviceTier: 'default'
+    };
+    const saved = f.store.save(record);
+    f.threadStatus('error', 'thr_native');
+
+    const retried = await f.service.start(item, {
+      expectedVersion: saved.version, kind: 'build', contextThreadId: null, retry: true
+    });
+    const fresh = retried.runs.at(-1)!;
+    assert.equal(fresh.status, 'running');
+    assert.notEqual(fresh.threadId, 'thr_native');
+    assert.equal(fresh.environmentId, 'env_test');
+    assert.equal(f.sends(), 0);
+    assert.equal(f.spawns(), 1);
+    assert.equal(f.spawnInputs.at(-1)!.providerId, 'claude');
+    assert.equal(f.spawnInputs.at(-1)!.environment.type, 'reuse');
+    assert.equal(f.spawnInputs.at(-1)!.environment.environmentId, 'env_test');
   } finally { f.db.close(); }
 });
 
@@ -2375,6 +2665,156 @@ test('scope changes and an empty plan pause automatic build', async () => {
     record = await f.service.startTask(changed, null);
     assert.equal(record.runs.at(-1)?.kind, 'investigate');
     assert.equal(record.plans.length, 0);
+  } finally { f.db.close(); }
+});
+
+test('Start task investigates changed ticket scope instead of resuming obsolete Build blockers', async () => {
+  const f = fixture();
+  try {
+    const record = newRecord(item);
+    savePlan(record, 'Implement the original scope');
+    approvePlan(record, record.plans[0].digest);
+    const blocked = startRun(record, 'build', false);
+    Object.assign(blocked, {
+      status: 'finished', threadId: 'thr_native', environmentId: 'env_test',
+      output: '::taskboard-result{kind="build" verdict="blocked"}\nFinish the original scope.',
+      buildResult: { verdict: 'blocked', summary: 'Finish the original scope.', revision: null }
+    });
+    f.store.save(record);
+
+    const changed = { ...item, description: 'Implement the replacement scope.' };
+    const restarted = await f.service.startTask(changed, null);
+    const latest = restarted.runs.at(-1)!;
+    assert.equal(latest.kind, 'investigate');
+    assert.equal(latest.scopeDigest, restarted.scopeDigest);
+    assert.equal(latest.continuationOf, null);
+    assert.equal(latest.repairOf, null);
+    assert.equal(f.sends(), 0);
+    assert.equal(f.spawns(), 1);
+  } finally { f.db.close(); }
+});
+
+test('Start task requires approval before replacing obsolete Build or Review findings', async () => {
+  for (const kind of ['build', 'review'] as const) {
+    const f = fixture();
+    try {
+      const record = kind === 'review' ? seedReview(f) : newRecord(item);
+      if (kind === 'build') {
+        savePlan(record, 'Implement the original plan');
+        approvePlan(record, record.plans[0].digest);
+        const blocked = startRun(record, 'build', false);
+        Object.assign(blocked, {
+          status: 'finished', threadId: 'thr_native', environmentId: 'env_test',
+          output: '::taskboard-result{kind="build" verdict="blocked"}\nFinish the original plan.',
+          buildResult: { verdict: 'blocked', summary: 'Finish the original plan.', revision: null }
+        });
+      }
+      savePlan(record, 'Implement the revised plan');
+      f.store.save(record);
+
+      await assert.rejects(
+        f.service.startTask(item, null),
+        /Approve the current plan before starting a fresh Build/
+      );
+      assert.equal(f.sends(), 0);
+      assert.equal(f.spawns(), 0);
+      assert.equal(f.store.all()[0].runs.length, kind === 'review' ? 2 : 1);
+      assert.equal(f.store.all()[0].approvedDigest, null);
+    } finally { f.db.close(); }
+  }
+});
+
+test('approved plan changes start a fresh Build without obsolete continuation or repair markers', async () => {
+  for (const kind of ['build', 'review'] as const) {
+    const f = fixture();
+    try {
+      const record = kind === 'review' ? seedReview(f) : newRecord(item);
+      if (kind === 'build') {
+        savePlan(record, 'Implement the original plan');
+        approvePlan(record, record.plans[0].digest);
+        const blocked = startRun(record, 'build', false);
+        Object.assign(blocked, {
+          status: 'finished', threadId: 'thr_native', environmentId: 'env_test',
+          output: '::taskboard-result{kind="build" verdict="blocked"}\nFinish the original plan.',
+          buildResult: { verdict: 'blocked', summary: 'Finish the original plan.', revision: null }
+        });
+      }
+      savePlan(record, 'Implement the revised plan');
+      approvePlan(record, record.plans.at(-1)!.digest);
+      f.store.save(record);
+
+      const restarted = await f.service.startTask(item, null);
+      const latest = restarted.runs.at(-1)!;
+      assert.equal(latest.kind, 'build');
+      assert.equal(latest.planDigest, restarted.approvedDigest);
+      assert.equal(latest.continuationOf, null);
+      assert.equal(latest.repairOf, null);
+      assert.equal(latest.environmentId, 'env_test');
+      assert.equal(f.sends(), 0);
+      assert.equal(f.spawns(), 1);
+      assert.deepEqual((f.spawnInput() as { environment: unknown }).environment,
+        { type: 'reuse', environmentId: 'env_test' });
+    } finally { f.db.close(); }
+  }
+});
+
+test('explicit Build starts fresh when a finished Review belongs to an older approved plan', async () => {
+  const f = fixture();
+  try {
+    const record = seedReview(f);
+    savePlan(record, 'Implement the revised plan');
+    approvePlan(record, record.plans.at(-1)!.digest);
+    const saved = f.store.save(record);
+
+    const restarted = await f.service.start(item, {
+      expectedVersion: saved.version, kind: 'build', contextThreadId: null, retry: false
+    });
+    const latest = restarted.runs.at(-1)!;
+    assert.equal(latest.kind, 'build');
+    assert.equal(latest.planDigest, restarted.approvedDigest);
+    assert.equal(latest.repairOf, null);
+    assert.equal(latest.continuationOf, null);
+    assert.equal(f.sends(), 0);
+    assert.equal(f.spawns(), 1);
+  } finally { f.db.close(); }
+});
+
+test('changed scope never bypasses active, uncertain, or closed task guards', async () => {
+  for (const status of ['running', 'uncertain'] as const) {
+    const f = fixture();
+    try {
+      const record = newRecord(item);
+      const active = startRun(record, 'investigate', false);
+      active.status = status;
+      active.threadId = 'thr_native';
+      f.store.save(record);
+      const changed = await f.service.startTask({ ...item, description: 'Changed while active.' }, null);
+      assert.equal(changed.runs.length, 1);
+      assert.equal(changed.runs[0].status, status);
+      assert.equal(f.spawns(), 0);
+      assert.equal(f.sends(), 0);
+    } finally { f.db.close(); }
+  }
+
+  const f = fixture();
+  try {
+    const record = newRecord(item);
+    savePlan(record, 'Implement the original plan');
+    approvePlan(record, record.plans[0].digest);
+    const blocked = startRun(record, 'build', false);
+    Object.assign(blocked, {
+      status: 'finished', threadId: 'thr_native', environmentId: 'env_test',
+      output: '::taskboard-result{kind="build" verdict="blocked"}\nFinish the original plan.',
+      buildResult: { verdict: 'blocked', summary: 'Finish the original plan.', revision: null }
+    });
+    f.store.save(record);
+    await assert.rejects(
+      f.service.startTask({ ...item, stateCategory: 'done' }, null),
+      /Reopen the issue before starting a task/
+    );
+    assert.equal(f.store.all()[0].runs.length, 1);
+    assert.equal(f.spawns(), 0);
+    assert.equal(f.sends(), 0);
   } finally { f.db.close(); }
 });
 

@@ -23,6 +23,7 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number, label: string): 
   });
 }
 const unavailableSession = 'Native session is unavailable or failed. Open its thread for details.';
+const buildNeedsApproval = 'Automatic work paused: Build needs your approval to continue.';
 const MAX_AUTOMATIC_BUILD_CONTINUATIONS = 2;
 const STATUS_SYNC_TIMEOUT_MS = 6_000;
 const boundedEvidence = (value: string, limit = 20_000) =>
@@ -92,8 +93,9 @@ export function applyNativeEvent(run: FactoryRun, event: Event) {
   }
 }
 
-export function factoryPrompt(item: WorkItem, record: FactoryRecord, kind: FactoryRunKind) {
-  const build = [...record.runs].reverse().find(run => run.kind === 'build' && run.threadId);
+export function factoryPrompt(item: WorkItem, record: FactoryRecord, kind: FactoryRunKind, approveInput = false) {
+  const build = [...record.runs].reverse().find(run =>
+    run.kind === 'build' && run.threadId && run.scopeDigest === record.scopeDigest);
   const investigation = [...record.runs].reverse().find(run => run.kind === 'investigate' &&
     run.status === 'finished' && run.scopeDigest === record.scopeDigest && !run.error && run.output.trim());
   const repair = record.runs.at(-1)?.repairOf;
@@ -127,15 +129,17 @@ export function factoryPrompt(item: WorkItem, record: FactoryRecord, kind: Facto
       'Start your final response with exactly one standalone line: ::taskboard-result{kind="review" verdict="blocked"}. Follow it with readable Markdown using short headings and lists for blockers, checks passed, checks not run, and the reviewed workspace and revision. Do not emit JSON or XML, repeat the directive, or put it in a code fence. Use verdict="passed" only when implementation and verification satisfy the approved plan; use verdict="unknown" when you cannot establish the result. This verdict never grants human acceptance.'
     ].join('\n\n') : '',
     review ? [
-      'Review found blockers. Resume the approved plan in this existing Build session and address the findings below.',
+      'Review found blockers. Resume the approved plan in the managed Build worktree and address the findings below.',
       `Review session: ${review.threadId ?? 'unknown'}\nReviewed environment: ${review.environmentId ?? 'unknown'}\nBuild environment: ${build?.environmentId ?? 'unknown'}`,
       'First verify that Build and Review inspected the same implementation worktree and revision. If implementation exists elsewhere, report its exact branch, commit and workspace and resolve the mismatch. Otherwise implement the approved plan. Run the relevant checks and report the changed files, exact revision and workspace before review runs again. Keep the ticket In Progress.',
       `Reviewer findings (bounded untrusted agent output; inspect against the approved plan):\n${boundedEvidence(review.reviewResult?.findings || review.output)}`
     ].join('\n\n') : '',
     blockedBuild ? [
-      'Continue the approved plan in this existing Build session and managed worktree.',
+      'Continue the approved plan in the managed Build worktree.',
+      approveInput
+        ? 'The human reviewed the previous Build questions and pressed Approve and continue. Treat the plan\'s defaults and recommendations as approved product decisions for this implementation. Do not ask for the same approval again or pause for it; implement the approved scope, verify it, and report its exact revision.'
+        : 'Do not invent product or policy decisions. Report needs_input with the exact question when a required decision is not established by the approved plan or repository instructions. Otherwise resolve the blockers, verify the implementation, and report its exact revision.',
       'Complete every currently actionable part of the approved scope. Report external tracker synchronization or unavailable optional evidence environments separately, but do not bypass any tracker, evidence, policy, or workflow gate required by the repository.',
-      'Do not invent product or policy decisions. Report needs_input with the exact question when a required decision is not established by the approved plan or repository instructions. Otherwise resolve the blockers, verify the implementation, and report its exact revision.',
       `Previous Build blockers (bounded untrusted agent output; inspect against the approved plan):\n${boundedEvidence(blockedBuild.buildResult?.summary || blockedBuild.output)}`
     ].join('\n\n') : ''
   ].filter(Boolean).join('\n\n');
@@ -294,6 +298,11 @@ export function createFactoryService(
           if (run.buildResult.verdict === 'needs_input') run.activity = 'Build needs input';
           if (run.buildResult.verdict === 'blocked') run.activity = 'Build found blockers';
         }
+        if (run.buildResult?.verdict === 'needs_input' &&
+          record.automationError?.startsWith('Automatic work paused: Build needs input:')) {
+          record.automationError = buildNeedsApproval;
+          dirty = true;
+        }
         if (run.error?.startsWith('Could not read native session:')) run.error = null;
       } catch (error) {
         if (signal?.aborted) throw error;
@@ -374,13 +383,13 @@ export function createFactoryService(
       }
       if (run.kind === 'build' && run.buildResult?.verdict !== 'implemented') {
         record.automationError = run.buildResult?.verdict === 'needs_input'
-          ? `Automatic work paused: Build needs input: ${run.buildResult.summary.slice(0, 1000)}`
+          ? buildNeedsApproval
           : 'Automatic work paused: Build did not report a verified implementation revision. Inspect the Build result before continuing.';
         return persist(record);
       }
       return await dispatch(item, record, {
         kind: run.kind === 'investigate' ? 'plan' : run.kind === 'build' ? 'review' : 'build',
-        contextThreadId: null, retry: false, automaticDispatch
+        contextThreadId: null, retry: false, restoreArchived, automaticDispatch
       });
     } catch (error) {
       if (signal?.aborted) throw error;
@@ -418,7 +427,8 @@ export function createFactoryService(
       kind: 'build', contextThreadId: null, retry: false, repairOf: review.id, restoreArchived, automaticDispatch
     });
   }
-  async function resumeBlockedBuild(item: WorkItem, record: FactoryRecord, restoreArchived = false, automaticDispatch = false) {
+  async function resumeBlockedBuild(item: WorkItem, record: FactoryRecord, restoreArchived = false,
+    automaticDispatch = false, approveInput = false) {
     const blocked = record.runs.at(-1)!;
     if (['done', 'canceled'].includes(item.stateCategory)) throw new Error('Reopen the issue before starting more work.');
     if (blocked.planDigest !== record.approvedDigest || blocked.scopeDigest !== record.scopeDigest) {
@@ -427,20 +437,22 @@ export function createFactoryService(
     record.automatic = true;
     record.automationError = null;
     return dispatch(item, record, {
-      kind: 'build', contextThreadId: null, retry: false, continuationOf: blocked.id, restoreArchived, automaticDispatch
+      kind: 'build', contextThreadId: null, retry: false, continuationOf: blocked.id,
+      restoreArchived, automaticDispatch, approveInput
     });
   }
   async function dispatch(item: WorkItem, record: FactoryRecord, input: {
     kind: FactoryRunKind; contextThreadId: string | null; retry: boolean; repairOf?: string; continuationOf?: string;
     restoreArchived?: boolean;
     automaticDispatch?: boolean;
+    approveInput?: boolean;
   }) {
     const linked = [...record.runs].reverse().filter(run => run.threadId);
-    const build = linked.find(run => run.kind === 'build');
+    const build = linked.find(run => run.kind === 'build' && run.scopeDigest === record.scopeDigest);
     const investigation = linked.find(run => run.kind === 'investigate' && run.status === 'finished' &&
       run.scopeDigest === record.scopeDigest && !run.error && run.output.trim());
     const author = input.kind === 'review' || input.repairOf || input.continuationOf ? build
-      : input.kind === 'build' ? build ?? linked.find(run => run.kind === 'plan')
+      : input.kind === 'build' ? build ?? linked.find(run => run.kind === 'plan' && run.scopeDigest === record.scopeDigest)
       : input.kind === 'plan' ? investigation
       : input.retry ? linked.find(run => run.kind === 'investigate') : undefined;
     if (input.kind === 'plan' && !investigation) {
@@ -454,11 +466,6 @@ export function createFactoryService(
       context?.parentThreadId !== record.coordinator.threadId) {
       throw new Error('The original stage session has a different coordinator. Restore its parent before continuing.');
     }
-    const restoreArchived = context?.archivedAt && input.restoreArchived && (input.repairOf || input.continuationOf);
-    if (context?.archivedAt && !restoreArchived) {
-      throw new Error('The original authoring session is archived. Use Return to Build with findings or Start task to resume it.');
-    }
-    if (author && context?.status !== 'idle') throw new SessionBusyError('Stop or finish the preceding session first.');
     const policy = store.getProjectPolicy(item.bbProjectId, item.source);
     const selected = record.execution ?? policy.execution;
     const defaults = selected ? null : context
@@ -469,12 +476,18 @@ export function createFactoryService(
     const environment = context?.environmentId
       ? await sdk.environments.get({ environmentId: context.environmentId }) : null;
     const recovery = !!(input.repairOf || input.continuationOf);
+    const requiresBuildWorktree = !!(recovery || input.kind === 'review' || (input.kind === 'build' && build));
     const isolateBuild = input.kind === 'build' && !build;
+    // A native session cannot change provider. Continue with a fresh session in
+    // the same worktree when the ticket AI names a different provider.
+    const providerMismatch = !!(selected && context && selected.providerId !== context.providerId);
+    const reuseThreadId = recovery && author?.threadId && !providerMismatch ? author.threadId : null;
+    const reuse = !!reuseThreadId;
     if (recovery && (!author?.threadId || author.kind !== 'build' ||
       (input.continuationOf && author.id !== input.continuationOf) || author.environmentId !== context?.environmentId)) {
       throw new Error('Build continuation requires the original Build session and managed worktree. Restore that workspace before continuing.');
     }
-    if ((recovery || input.kind === 'review' || (input.kind === 'build' && build)) &&
+    if (requiresBuildWorktree &&
       (!environment || environment.projectId !== record.projectId ||
       environment.status !== 'ready' || !environment.managed || !environment.isWorktree)) {
       throw new Error('The original Build worktree is unavailable. Restore that workspace before continuing.');
@@ -486,16 +499,30 @@ export function createFactoryService(
     if (isolateBuild && (!author?.threadId || !environment)) {
       throw new Error('Build requires a linked native planning session and environment.');
     }
-    const reuse = recovery && author?.threadId;
-    const events = reuse
-      ? await sdk.threads.events.list({ threadId: reuse, order: 'desc', limit: '1' }) : [];
+    const restoreArchived = !!(author && context?.archivedAt && input.restoreArchived &&
+      !input.automaticDispatch && !providerMismatch);
+    if (context?.archivedAt && !restoreArchived && !providerMismatch) {
+      throw new Error('The original authoring session is archived. Use Continue task to resume it.');
+    }
+    // An errored native session cannot accept another turn; an explicit retry
+    // starts a fresh session in the same worktree instead.
+    const retryAfterError = !!context && context.status === 'error' && input.retry;
+    if (author && context?.status !== 'idle' && !providerMismatch && !retryAfterError) {
+      throw new SessionBusyError('Stop or finish the preceding session first.');
+    }
+    if (restoreArchived && (!environment || environment.projectId !== record.projectId ||
+      environment.status !== 'ready' || author?.environmentId !== environment.id)) {
+      throw new Error('The original authoring workspace is unavailable. Restore that workspace before continuing.');
+    }
+    const events = reuseThreadId
+      ? await sdk.threads.events.list({ threadId: reuseThreadId, order: 'desc', limit: '1' }) : [];
     // Keep a failed restoration out of the caller's durable pause record.
     const draftRecord = structuredClone(record);
     const draft = startRun(draftRecord, input.kind, input.retry);
     draft.repairOf = input.repairOf ?? null;
     draft.continuationOf = input.continuationOf ?? null;
-    if (reuse) {
-      draft.threadId = reuse;
+    if (reuseThreadId) {
+      draft.threadId = reuseThreadId;
       draft.environmentId = context!.environmentId;
       draft.hostId = environment?.hostId ?? null;
       draft.checkoutRoot = environment?.path ?? null;
@@ -508,8 +535,9 @@ export function createFactoryService(
       const workspace = await sdk.environments.get({ environmentId: environment!.id });
       if (restored.deletedAt || restored.archivedAt || restored.projectId !== record.projectId ||
         restored.environmentId !== environment!.id || workspace.projectId !== record.projectId ||
-        workspace.status !== 'ready' || !workspace.managed || !workspace.isWorktree) {
-        throw new Error('The original Build session or worktree changed during restoration. Inspect it before continuing.');
+        restored.parentThreadId !== context!.parentThreadId || workspace.status !== 'ready' ||
+        (requiresBuildWorktree && (!workspace.managed || !workspace.isWorktree))) {
+        throw new Error('The original authoring session or workspace changed during restoration. Inspect it before continuing.');
       }
       if (restored.status !== 'idle') throw new SessionBusyError('Stop or finish the authoring session first.');
     }
@@ -527,7 +555,7 @@ export function createFactoryService(
       if (error instanceof CoordinatorIntentConflict) return store.get(record)!;
       throw error;
     }
-    if (record.coordinator && record.coordinator.status !== 'ready') return record;
+    if (record.coordinator?.status !== 'ready') return record;
     if (record.coordinator?.error) return record;
     if (input.automaticDispatch && record.admission.kind === 'factory') {
       const policy = store.getProjectPolicy(record.projectId, record.source);
@@ -553,10 +581,16 @@ export function createFactoryService(
     }
     const run = record.runs.find(run => run.id === id)!;
     try {
-      const prompt = factoryPrompt(item, record, input.kind);
-      if (reuse) {
+      const prompt = factoryPrompt(item, record, input.kind, input.approveInput);
+      if (reuseThreadId) {
         await sdk.threads.send({
-          threadId: reuse, input: [{ type: 'text', text: prompt, mentions: [] }], mode: 'start'
+          threadId: reuseThreadId, input: [{ type: 'text', text: prompt, mentions: [] }], mode: 'start',
+          // Apply the ticket's current model to an existing session as well;
+          // a provider switch starts a fresh session above.
+          ...(selected ? {
+            model: selected.model, permissionMode: selected.permissionMode,
+            reasoningLevel: selected.reasoningLevel, serviceTier: selected.serviceTier
+          } : {})
         });
       } else {
         const thread = await sdk.threads.spawn({
@@ -716,18 +750,39 @@ export function createFactoryService(
           return syncProgress(item, record);
         }
         if (run?.error?.startsWith('Could not read native session:')) return record;
+        if (['done', 'canceled'].includes(item.stateCategory)) throw new Error('Reopen the issue before starting a task.');
+        if (run?.scopeDigest && run.scopeDigest !== record.scopeDigest) {
+          record.automatic = true;
+          record.automationError = null;
+          record = persist(record);
+          return dispatch(item, record, { kind: 'investigate', contextThreadId, retry: false });
+        }
         if (run?.status === 'finished' && ['build', 'review'].includes(run.kind)) {
+          if (run.planDigest !== record.approvedDigest) {
+            const plan = record.plans.at(-1);
+            if (!plan || record.approvedDigest !== plan.digest || plan.scopeDigest !== record.scopeDigest) {
+              throw new Error('Approve the current plan before starting a fresh Build. The prior findings belong to an older plan.');
+            }
+            record.automatic = true;
+            record.automationError = null;
+            record = persist(record);
+            return dispatch(item, record, { kind: 'build', contextThreadId, retry: false, restoreArchived: true });
+          }
           if (run.kind === 'build' && (run.buildResult ?? readBuildResult(run.output)).verdict === 'blocked') {
             return resumeBlockedBuild(item, record, true);
           }
-          if ((run.kind === 'review' && run.reviewResult?.verdict === 'blocked') || run.repairOf || run.continuationOf) {
+          if (run.kind === 'build' && (run.buildResult ?? readBuildResult(run.output)).verdict === 'needs_input') {
+            // Continue is the human approval for the questions the Build paused on.
+            return resumeBlockedBuild(item, record, true, false, true);
+          }
+          if ((run.kind === 'review' && run.reviewResult?.verdict === 'blocked') ||
+            (run.kind === 'build' && run.buildResult?.verdict === 'implemented') || run.repairOf || run.continuationOf) {
             record.automatic = true;
             record.automationError = null;
             return advance(item, persist(record), undefined, true, false);
           }
           return record;
         }
-        if (['done', 'canceled'].includes(item.stateCategory)) throw new Error('Reopen the issue before starting a task.');
         record.automatic = true;
         record.automationError = null;
         try {
@@ -737,16 +792,13 @@ export function createFactoryService(
           if (winner && winner.version !== record.version) return winner;
           throw error;
         }
-        if (run?.scopeDigest && run.scopeDigest !== record.scopeDigest) {
-          return dispatch(item, record, { kind: 'investigate', contextThreadId, retry: false });
-        }
         if (!run || ['failed', 'canceled'].includes(run.status)) {
-          return dispatch(item, record, { kind: run?.kind ?? 'investigate', contextThreadId, retry: !!run });
+          return dispatch(item, record, { kind: run?.kind ?? 'investigate', contextThreadId, retry: !!run, restoreArchived: true });
         }
         if (run.kind === 'plan' && !run.output.trim()) {
-          return dispatch(item, record, { kind: 'plan', contextThreadId, retry: false });
+          return dispatch(item, record, { kind: 'plan', contextThreadId, retry: false, restoreArchived: true });
         }
-        return advance(item, record, undefined, false, false);
+        return advance(item, record, undefined, true, false);
       });
     },
     async retryStatus(item: WorkItem) {
@@ -823,10 +875,11 @@ export function createFactoryService(
         return reconcile(persist(record));
       });
     },
-    async setExecution(item: WorkItem, expectedVersion: number, execution: FactoryRecord['execution']) {
+    async setExecution(item: WorkItem, execution: FactoryRecord['execution']) {
+      // Execution is an independent preference: last selection wins instead of
+      // failing whenever background progress advanced the record version.
       return locked({ projectId: item.bbProjectId, source: item.source, locator: item.locator }, async () => {
         const record = current(item);
-        assertVersion(record, expectedVersion);
         record.execution = execution;
         return persist(record);
       });
@@ -860,10 +913,11 @@ export function createFactoryService(
           last.status !== 'uncertain') return record;
         assertVersion(requested, input.expectedVersion);
         record.automationError = null;
-        if (input.kind === 'build' && last?.kind === 'review' && last.status === 'finished') {
+        if (input.kind === 'build' && last?.kind === 'review' && last.status === 'finished' &&
+          last.planDigest === record.approvedDigest && last.scopeDigest === record.scopeDigest) {
           return repairReview(item, record, true);
         }
-        return dispatch(item, record, input);
+        return dispatch(item, record, { ...input, restoreArchived: true });
       });
     },
     async recover() {

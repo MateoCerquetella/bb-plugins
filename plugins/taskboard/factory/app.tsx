@@ -30,18 +30,20 @@ function OriginalTicket({ record }: { record: FactoryRecord }) {
   }><Icon name="FileText" className="size-3.5" />Original ticket</Button>;
 }
 
-function ContinueBuild({ run, record }: { run: FactoryRun; record: FactoryRecord }) {
+function ContinueTask({ record, onRecord, onError, label = 'Continue task', primary = false }: {
+  record: FactoryRecord; onRecord: (record: FactoryRecord) => void;
+  onError: (error: string | null) => void; label?: string; primary?: boolean;
+}) {
   const rpc = useRpc<TaskboardRpcContract>();
   const navigate = useBbNavigate();
   const context = useBbContext();
   const [continuing, setContinuing] = useState(false);
-  const [continueError, setContinueError] = useState<string | null>(null);
   const continuePending = useRef(false);
-  async function continueBlockedBuild() {
+  async function continueTask() {
     if (continuePending.current) return;
     continuePending.current = true;
     setContinuing(true);
-    setContinueError(null);
+    onError(null);
     try {
       const result = await rpc.call('factoryStartTask', {
         projectId: record.projectId,
@@ -49,31 +51,34 @@ function ContinueBuild({ run, record }: { run: FactoryRun; record: FactoryRecord
         locator: record.locator,
         contextThreadId: context.projectId === record.projectId ? context.threadId : null
       });
+      onRecord(result.record);
       const resumed = result.record.runs.at(-1);
-      const failure = result.record.automationError ?? resumed?.error;
+      const coordinator = result.record.coordinator;
+      const failure = result.record.automationError ??
+        (coordinator && 'error' in coordinator ? coordinator.error : null) ?? resumed?.error;
       if (failure) {
-        setContinueError(failure);
+        onError(failure);
         return;
       }
       if (!resumed?.threadId || !['starting', 'running'].includes(resumed.status)) {
-        setContinueError('The Build session did not resume. Refresh progress and try again.');
+        onError('The task could not continue. Inspect the current workflow and session status.');
         return;
       }
-      navigate.toThread(resumed.threadId);
+      const threadId = ticketThreadId(result.record) ?? resumed.threadId;
+      requestTaskboardOpen(threadId);
+      navigate.toThread(threadId);
     } catch (reason) {
-      setContinueError(reason instanceof Error ? reason.message : String(reason));
+      onError(reason instanceof Error ? reason.message : String(reason));
     } finally {
       continuePending.current = false;
       setContinuing(false);
     }
   }
-  return <div className="tb-current-recovery" aria-label="Current Build recovery">
-    <Button size="sm" variant="outline" disabled={continuing} aria-busy={continuing} onClick={() => void continueBlockedBuild()}>
+  return <div className="tb-current-recovery" aria-label="Continue existing task">
+    <Button size="sm" variant={primary ? 'default' : 'outline'} disabled={continuing} aria-busy={continuing} onClick={() => void continueTask()}>
       <Icon name={continuing ? 'Loading' : 'MessageCirclePlus'} className="size-3.5" />
-      {continuing ? 'Continuing...' : 'Continue in thread'}
+      {continuing ? 'Continuing...' : label}
     </Button>
-    {continueError && continueError !== run.error && continueError !== record.automationError &&
-      <ErrorNotice title="Build could not continue" nextStep="Inspect the technical details, then try Continue in thread again." detail={continueError} />}
   </div>;
 }
 
@@ -91,6 +96,7 @@ function FactoryWorkbench({ record, onRecord, actions, plan, item }: {
   const [aiBusy, setAiBusy] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [aiNote, setAiNote] = useState<string | null>(null);
+  const [pendingExecution, setPendingExecution] = useState<{ value: FactoryRecord['execution'] } | null>(null);
   const [projectSnapshot, setProjectSnapshot] = useState<{ identity: string; status: FactoryProjectStatus } | null>(null);
   const [policyError, setPolicyError] = useState<{ identity: string; message: string } | null>(null);
   const projectRequest = useRef(0);
@@ -149,18 +155,20 @@ function FactoryWorkbench({ record, onRecord, actions, plan, item }: {
   async function saveExecution(execution: FactoryRecord['execution']) {
     if (aiBusy) return;
     setAiBusy(true);
+    setPendingExecution({ value: execution });
     setAiError(null);
     setAiNote(null);
     try {
-      const result = await rpc.call('factorySetExecution', {
+      const result = await withDeadline(rpc.call('factorySetExecution', {
         projectId: record.projectId, source: record.source, locator: record.locator,
         expectedVersion: record.version, execution
-      });
+      }), 20_000, 'Saving the ticket AI');
       onRecord(result.record);
       setAiNote(execution ? 'AI saved for this ticket.' : 'Using the project default AI.');
     } catch (reason) {
       setAiError(reason instanceof Error ? reason.message : String(reason));
     } finally {
+      setPendingExecution(null);
       setAiBusy(false);
     }
   }
@@ -168,7 +176,7 @@ function FactoryWorkbench({ record, onRecord, actions, plan, item }: {
     <span className="tb-room-ai-label">AI for this ticket</span>
     <ExecutionPicker
       projectId={record.projectId}
-      value={record.execution}
+      value={pendingExecution ? pendingExecution.value : record.execution}
       fallback={policyExecution}
       onChange={saveExecution}
       disabled={aiBusy}
@@ -344,6 +352,20 @@ function EmpiricalProgress({ record }: { record: FactoryRecord }) {
   </section>;
 }
 
+function withDeadline<T>(promise: Promise<T>, ms: number, operation: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = window.setTimeout(() => reject(new Error(`${operation} timed out. Refresh and try again.`)), ms);
+    promise.then(
+      value => { window.clearTimeout(timer); resolve(value); },
+      error => { window.clearTimeout(timer); reject(error); }
+    );
+  });
+}
+
+function awaitsApproval(run: FactoryRun | null | undefined) {
+  return run?.kind === 'build' && run.buildResult?.verdict === 'needs_input';
+}
+
 function FactoryThreadProgressContent({ threadId, isCompactViewport }: { threadId: string; isCompactViewport: boolean }) {
   const rpc = useRpc<TaskboardRpcContract>();
   const [record, setRecord] = useState<FactoryRecord | null>(null);
@@ -380,7 +402,10 @@ function FactoryThreadProgressContent({ threadId, isCompactViewport }: { threadI
       <DialogDescription>{record.stage} · Updated {new Date(record.updatedAt).toLocaleTimeString()}</DialogDescription>
       {error && <ErrorNotice title="Progress could not refresh" nextStep="The last known progress is shown. Refresh will be retried automatically." detail={error} />}
       <FactoryWorkbench record={record} onRecord={setRecord}
-        actions={run && consoleState(record).action === 'continue-build' ? <ContinueBuild run={run} record={record} /> : null}
+        actions={['continue-build', 'continue-task'].includes(consoleState(record).action ?? '')
+          ? <ContinueTask record={record} onRecord={setRecord} onError={setError}
+            label={awaitsApproval(record.runs.at(-1)) ? 'Approve and continue' : undefined}
+            primary={awaitsApproval(record.runs.at(-1))} /> : null}
         plan={record.plans.at(-1) ? <Markdown content={record.plans.at(-1)!.body} /> : undefined} />
       <OriginalTicket record={record} />
     </DialogContent></Dialog>
@@ -404,8 +429,14 @@ export function StartTaskButton({ item, disabled = false }: {
   const [execution, setExecution] = useState<FactoryExecution | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const executionTouched = useRef(false);
   const pending = useRef(false);
+  const planNeedsApproval = !!error && /Approve (the|exact) current plan/i.test(error);
+  const openTask = () => {
+    setOpen(false);
+    navigate.toPluginPanel('tasks', { subPath: originalTicketPath({
+      projectId: item.bbProjectId, source: item.source, locator: item.locator
+    }) });
+  };
   async function start() {
     if (pending.current) return;
     pending.current = true; setBusy(true); setError(null);
@@ -413,7 +444,9 @@ export function StartTaskButton({ item, disabled = false }: {
       const { record } = await rpc.call('factoryStartTask', {
         projectId: item.bbProjectId, source: item.source, locator: item.locator,
         contextThreadId: context.projectId === item.bbProjectId ? context.threadId : null,
-        execution
+        // Only an explicit ticket choice is persisted. Avoiding BB's project
+        // default keeps Jev routing from overriding the factory settings AI.
+        ...(execution ? { execution } : {})
       });
       setOpen(false);
       const run = record.runs.at(-1);
@@ -428,8 +461,8 @@ export function StartTaskButton({ item, disabled = false }: {
     <Button size="sm" variant="outline" disabled={disabled || busy}
       onClick={event => {
         event.stopPropagation();
-        executionTouched.current = false;
         setExecution(null);
+        setError(null);
         setOpen(true);
       }}>
       <Icon name="AiContentGenerator01" className="size-3.5" />{busy ? 'Starting...' : 'Start task'}
@@ -441,26 +474,31 @@ export function StartTaskButton({ item, disabled = false }: {
         <ExecutionPicker
           projectId={item.bbProjectId}
           value={execution}
-          onChange={next => { executionTouched.current = true; setExecution(next); }}
+          onChange={setExecution}
           threadId={context.projectId === item.bbProjectId ? context.threadId : null}
           disabled={busy}
           showSummary
           summaryTitle="AI for this task"
           compact
-          defaultsLabel={context.projectId === item.bbProjectId ? 'Thread default' : 'Project default'}
-          resetLabel={context.projectId === item.bbProjectId ? 'Use thread defaults' : 'Use project defaults'}
-          onDefaults={defaults => {
-            if (!executionTouched.current) setExecution(defaults);
-          }}
+          resetLabel="Use factory AI"
+          preferFactoryAI
         />
-        {error && <ErrorNotice title="Task needs attention" nextStep="Inspect Agent progress before starting again; a session may already exist." detail={error} />}
+        {error && <ErrorNotice title="Task needs attention"
+          nextStep={planNeedsApproval
+            ? 'Review and approve the current plan before starting Build.'
+            : 'Inspect Agent progress before starting again; a session may already exist.'}
+          detail={error} />}
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button type="button" variant="ghost" disabled={busy} onClick={() => setOpen(false)}>Cancel</Button>
-          <Button type="button" disabled={disabled || busy || !execution} aria-busy={busy}
-            onClick={() => void start()}>
-            <Icon name={busy ? 'Loading' : 'AiContentGenerator01'} className="size-3.5" />
-            {busy ? 'Starting...' : 'Start task'}
-          </Button>
+          {planNeedsApproval
+            ? <Button type="button" onClick={openTask}>
+              <Icon name="FileText" className="size-3.5" />Review plan
+            </Button>
+            : <Button type="button" disabled={disabled || busy} aria-busy={busy}
+              onClick={() => void start()}>
+              <Icon name={busy ? 'Loading' : 'AiContentGenerator01'} className="size-3.5" />
+              {busy ? 'Starting...' : 'Start task'}
+            </Button>}
         </div>
       </DialogContent>
     </Dialog>
@@ -533,7 +571,11 @@ export function FactoryProgress({ item }: { item: WorkItem }) {
       rpc.call('factoryRetryStatus', identity)
     )}><Icon name="RotateCcw" className="size-3.5" />Retry status update</Button>}
     {primaryAction === 'start-task' && <StartTaskButton item={item} disabled={!loaded || busy || ['done', 'canceled'].includes(item.stateCategory)} />}
-    {primaryAction === 'continue-build' && run && record && <ContinueBuild key={run.id} run={run} record={record} />}
+    {(primaryAction === 'continue-build' || primaryAction === 'continue-task') && record &&
+      <ContinueTask key={run?.id} record={record} onRecord={setRecord} onError={setError}
+        label={awaitsApproval(run) ? 'Approve and continue'
+          : primaryAction === 'continue-build' ? 'Continue Build' : 'Continue task'}
+        primary={awaitsApproval(run)} />}
     {primaryAction === 'retry' && run && <Button size="sm" disabled={busy} onClick={() => void start(run.kind, true)}>
       <Icon name="RotateCcw" className="size-3.5" />Retry {labels[run.kind].toLowerCase()}
     </Button>}

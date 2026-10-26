@@ -178,3 +178,160 @@ native thread. The grouping MUST remain readable on desktop and mobile.
 - AND the disclosure exposes its expanded state to assistive technology
 - AND a user-expanded or collapsed group retains that state across data refresh
   while that ticket remains present.
+
+### Requirement: Explicit AI selection
+
+The factory MUST expose one AI picker in project settings and the new-task
+dialog. The picker MUST show provider logos and model names. A project policy
+and a task MAY each persist an explicit AI choice: provider, model, reasoning
+level, permission mode, and service tier. Manual Start task, coordinator
+creation, and every new stage session MUST resolve execution as task choice,
+then project policy choice, then native project defaults, and MUST pass an
+explicit choice as caller-explicit inputs. The factory MUST fail with an
+actionable picker message when no choice or default exists.
+
+#### Scenario: Operator chooses the factory AI
+
+- GIVEN a project factory with available BB providers
+- WHEN the operator selects a provider, model, reasoning level, permission mode,
+  and service tier and saves
+- THEN Taskboard persists that choice for the project
+- AND the next coordinator, Investigation, Plan, Build, or Review session is
+  spawned with that exact execution and caller-explicit sources.
+
+#### Scenario: New task overrides the project AI
+
+- GIVEN a project policy with one AI choice
+- WHEN the operator picks a different AI in the new-task dialog and chooses
+  Start now
+- THEN Taskboard persists the task-scoped choice
+- AND that task's coordinator and stages use the task choice
+- AND another ticket still uses the project policy choice.
+
+#### Scenario: Provider and model presentation
+
+- GIVEN a project with several available providers
+- WHEN the picker opens in settings or the new-task dialog
+- THEN each provider option shows its logo and display name
+- AND the selected provider and model are summarized together
+- AND a provider with no logo still has a readable fallback label.
+
+#### Scenario: No explicit choice
+
+- GIVEN no task choice and no saved factory policy choice
+- WHEN a project has native execution defaults
+- THEN a new session uses those defaults as before
+- AND when the project has no defaults the action fails with a message that
+  tells the operator to choose an AI in the picker.
+
+#### Scenario: Changing the choice mid-workflow
+
+- GIVEN an existing coordinator or stage session
+- WHEN the operator saves a different project or task AI choice
+- THEN the existing native session keeps its original execution
+- AND only new sessions use the updated choice.
+
+### Requirement: Software factory operator console
+
+Taskboard MUST present ticket factory work as one operator console rather than
+parallel team, phase, and global-session representations. The console MUST put
+the current state, blocker, and primary action before evidence; expose one stage
+rail with stage-scoped attempts; show one selected-run evidence pane; and keep
+provider ticket context visible beside factory work on wide screens or one view
+switch away on narrow screens. Coordinator recovery and Empirical status MUST
+remain available in the workspace pane and move into the summary only when they
+block work.
+
+#### Scenario: Inspect active factory work
+
+- GIVEN a ticket with a coordinator and multiple stage sessions
+- WHEN the user opens factory progress
+- THEN the first viewport shows the current stage, state, blocker, and primary
+  action
+- AND one stage rail shows Investigation, Plan, Build, and Review
+- AND selecting a stage exposes only that stage's attempts
+- AND selecting an attempt shows its activity, result, commands, updates,
+  changed files, and full output in one evidence pane
+- AND the selected native session has a direct thread action.
+
+#### Scenario: Inspect ticket intent while diagnosing work
+
+- GIVEN a factory ticket with provider metadata, description, acceptance
+  criteria, and comments
+- WHEN the user inspects factory evidence on a wide viewport
+- THEN ticket context remains visible beside the operator console
+- AND on a narrow viewport a keyboard-accessible Factory/Ticket switch keeps
+  both surfaces reachable without duplicating the ticket heading.
+
+#### Scenario: Refresh during historical inspection
+
+- GIVEN the user explicitly selected a historical stage attempt
+- WHEN factory polling returns a newer record
+- THEN the historical selection remains selected while its run still exists
+- AND an operator who did not explicitly choose history continues to follow the
+  current run
+- AND the current-state summary remains visible while history is inspected.
+
+#### Scenario: Blocking workspace state
+
+- GIVEN coordinator recovery, provider truth, or Empirical ownership prevents
+  the next action
+- WHEN the operator opens the ticket
+- THEN the blocking reason and relevant recovery action appear in the summary
+- AND non-blocking coordinator, plan, and Empirical detail remains in the
+  workspace pane
+- AND no duplicate lifecycle rail or team tree is rendered.
+
+#### Scenario: Inspect on a narrow viewport
+
+- GIVEN a mobile viewport
+- WHEN the user opens factory progress
+- THEN current stage and state remain visible
+- AND the primary action remains above the evidence
+- AND stage, attempt, Factory/Ticket, evidence, and thread actions remain
+  reachable
+- AND the page has no horizontal overflow.
+
+#### Scenario: Long operator-facing content
+
+- GIVEN a long ticket title, provider name, or blocker reason
+- WHEN Project Manage or factory progress is viewed on a narrow viewport
+- THEN titles and reasons wrap to readable lines
+- AND provider identity wraps without obscuring controls
+- AND stage labels, attempt controls, and actions retain readable rows
+- AND the page has no horizontal overflow.
+
+#### Scenario: Keyboard and refresh behavior
+
+- GIVEN a user navigates factory progress by keyboard
+- WHEN focus reaches a stage, attempt, evidence tab, disclosure, Factory/Ticket
+  switch, or `Open thread` action
+- THEN the control has a visible focus indicator and activates with its
+  platform-standard keyboard action
+- AND tabs and disclosures expose their selected or expanded state to assistive
+  technology
+- AND explicit historical selection and disclosure state remain stable across
+  data refresh while their underlying records remain present.
+
+### Requirement: Ticket drafting uses the selected AI and detail
+
+Improve title & description MUST offer Concise and Detailed rewriting. The
+hidden helper MUST use the AI selected in the new-task dialog, then the current
+thread's execution, then project defaults. It MUST rewrite text only and MUST
+NOT change the factory policy or the task's saved AI choice.
+
+#### Scenario: Concise or detailed rewrite
+
+- GIVEN a rough title and description and an available AI
+- WHEN the operator chooses Concise or Detailed and selects Improve
+- THEN the helper runs with the selected AI
+- AND Concise returns a short actionable draft
+- AND Detailed returns problem, outcome, scope, acceptance criteria, and risks
+- AND the helper does not modify the repository or create a ticket.
+
+#### Scenario: No task or thread choice
+
+- GIVEN the new-task picker is empty and the current thread has no execution
+- WHEN the operator improves the draft
+- THEN the helper falls back to the project's native execution defaults
+- AND when none exists it fails with an actionable model message.

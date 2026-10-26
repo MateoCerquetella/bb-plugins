@@ -194,7 +194,18 @@ const rpc = {
       if (window.factoryStartDelay) await new Promise(resolve => setTimeout(resolve, window.factoryStartDelay));
       if (window.factoryStartError) throw new Error(window.factoryStartError);
       const previous = record.runs.at(-1);
-      if (previous?.kind === 'build' && previous.status === 'finished' && previous.buildResult?.verdict === 'blocked') {
+      if (previous?.kind === 'plan' && previous.status === 'finished' && record.approvedDigest) {
+        record.automationError = null;
+        record.version++;
+        record.stage = 'Build';
+        record.runs.push({ ...previous, id: 'continued-build', kind: 'build', status: 'running',
+          threadId: 'thr_build', environmentId: 'env_build', planDigest: record.approvedDigest,
+          error: null, output: '', activity: 'Building approved plan' });
+        window.factoryRefresh();
+        return { record: structuredClone(record) };
+      }
+      if (previous?.kind === 'build' && previous.status === 'finished' &&
+        ['blocked', 'needs_input'].includes(previous.buildResult?.verdict ?? '')) {
         record.automationError = null;
         record.version++;
         record.runs.push({ ...previous, id: 'continued', status: 'running', error: null,
@@ -232,6 +243,11 @@ const rpc = {
       record.runs.push({ ...review, id: 'repair', kind: 'build', status: 'running',
         threadId: 'thr_build', repairOf: review.id, continuationOf: null, reviewResult: null, output: '',
         activity: 'Addressing review findings', updates: [], checks: [], steps: [], changedFiles: [] });
+      window.factoryRefresh();
+    }
+    if (method === 'factorySetExecution') {
+      record.execution = (input.execution ?? null) as FactoryRecord['execution'];
+      record.version++;
       window.factoryRefresh();
     }
     if (method === 'factorySavePlan') {

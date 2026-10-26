@@ -47,6 +47,10 @@ export function createCoordinatorLifecycle(
 
   async function ensure(item: WorkItem, record: FactoryRecord) {
     record = await observe(record);
+    if (!record.coordinator) {
+      record.coordinator = { status: 'pending' };
+      record = persist(record);
+    }
     if (!record.coordinator || record.coordinator.status !== 'pending') return record;
     const policy = store.getProjectPolicy(record.projectId, record.source);
     const selected = record.execution ?? policy.execution;

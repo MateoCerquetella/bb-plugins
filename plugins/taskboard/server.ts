@@ -2269,7 +2269,7 @@ export default async function plugin(bb: BbPluginApi) {
     async factorySetExecution(input) {
       await assertProjectExists(input.projectId);
       const item = await getLiveItem(input.projectId, input.source, input.locator);
-      return { record: await factory.setExecution(item, input.expectedVersion, input.execution) };
+      return { record: await factory.setExecution(item, input.execution) };
     },
     async factorySavePlan(input) {
       await assertProjectExists(input.projectId);

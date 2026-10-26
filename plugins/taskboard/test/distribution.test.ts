@@ -58,7 +58,7 @@ const activeContext = await Promise.all([
 ]);
 
 const directGitInstall =
-  'bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.4 --subdirectory plugins/taskboard --tag-prefix taskboard/';
+  'bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.5 --subdirectory plugins/taskboard --tag-prefix taskboard/';
 const usageGitInstall =
   'bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.10 --subdirectory plugins/usage-tracker --tag-prefix usage-tracker/';
 
