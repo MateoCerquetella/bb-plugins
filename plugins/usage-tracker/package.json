@@ -1,6 +1,6 @@
 {
   "name": "bb-plugin-usage-tracker",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "private": true,
   "description": "Compact Codex, Claude, Cursor, Grok, OpenCode, Antigravity, and DeepSeek usage in bb's sidebar footer.",
   "license": "MIT",
