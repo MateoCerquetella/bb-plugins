@@ -1,7 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.2.4
 
+- Fix settings failing to load with `Unrecognized key: "activityOverview"` when
+  data written by this build is read by the older published 0.2.3 release.
+  Stored settings now ignore unknown keys instead of rejecting the snapshot.
 - Add a default-off GitHub activity overview inside AURA, using authenticated
   dated contributions and actual PR/review counts with explicit source limits.
 - Preserve native composer centering with wallpaper/overview disabled and make

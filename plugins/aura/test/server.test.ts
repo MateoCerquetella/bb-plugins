@@ -85,6 +85,21 @@ test("image type must match bytes; legacy settings get new defaults", async () =
   } finally { await host.harness.dispose(); }
 });
 
+test("settings written by a newer build load instead of rejecting the snapshot", async () => {
+  const host = createFakePluginHost(); plugin(host.bb);
+  try {
+    const newer = { ...defaults, activityOverview: true, futureSetting: "from a later release" };
+    host.bb.storage.database().prepare("UPDATE background SET settings = ? WHERE id = 1").run(JSON.stringify(newer));
+    host.bb.storage.database().prepare("INSERT INTO aura_slots (slot, name, settings) VALUES (1, 'Newer', ?)").run(JSON.stringify(newer));
+    const loaded = await host.harness.callRpc("get", null) as Snapshot;
+    assert.equal(loaded.settings.activityOverview, true);
+    assert.equal("futureSetting" in loaded.settings, false);
+    const activated = await host.harness.callRpc("activateSlot", { slot: 1 }) as Snapshot;
+    assert.equal(activated.settings.activityOverview, true);
+    assert.equal(activated.activeSlot, 1);
+  } finally { await host.harness.dispose(); }
+});
+
 test("overview is default-off and stays global across slots/reset/reload without changing a saved image", async () => {
   let host = createFakePluginHost({ pluginId: "aura" }); plugin(host.bb);
   try {

@@ -12,6 +12,9 @@ export const SLOT_COUNT = 6;
 export const PATTERNS = ["noise", "warp", "dots", "wave", "ripple", "swirl", "sphere"] as const;
 export const DITHERS = ["random", "2x2", "4x4", "8x8"] as const;
 export const PHOTO_MOTIONS = ["wave", "ripple", "drift", "shimmer", "still"] as const;
+// Stored settings may come from a newer Aura build (for example after a user
+// downgrades, or an older published release reads data written by this one).
+// Unknown keys are stripped instead of rejecting the whole snapshot.
 export const settingsSchema = z.object({
   enabled: z.boolean(),
   newThreadOnly: z.boolean().default(false),
@@ -28,7 +31,7 @@ export const settingsSchema = z.object({
   imageOpacity: z.number().min(0).max(1),
   fit: z.enum(["cover", "contain"]),
   fade: z.number().min(0).max(1),
-}).strict();
+});
 export type BackgroundSettings = z.infer<typeof settingsSchema>;
 export const defaults: BackgroundSettings = {
   enabled: true, newThreadOnly: false, dimmerEnabled: true, activityOverview: false, effect: "pixels", pattern: "noise", dither: "8x8", photoMotion: "wave", fps: 15, quality: "balanced", tint: "lavender", intensity: 0.5,
