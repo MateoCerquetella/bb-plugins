@@ -29,7 +29,7 @@ All plugins in this repository are independently installable.
 | <img src="./plugins/dockside/assets/icon.svg" width="128" height="128" alt="" /> | [Dockside](./plugins/dockside) | [Git release](#dockside-quick-start) | Adds a project-first sidebar plus mobile navigation across active and unread threads, with synchronized project colors and animated status icons. |
 | <img src="./plugins/host-monitor/assets/icon.svg" width="128" height="128" alt="" /> | [Host Monitor](./plugins/host-monitor) | [Git release](#host-monitor-quick-start) | Monitors CPU, RAM, disk, network, host details, and guarded process actions across every machine enrolled in BB. Requires BB 0.40+. |
 | <img src="./plugins/steel-browser/assets/icon.svg" width="128" height="128" alt="" /> | [BB Surf](./plugins/steel-browser) | [Git release](#bb-surf-quick-start) | Operates self-hosted Steel browser sessions from BB with health, session lifecycle, CLI, and agent guidance. Requires BB 0.40+. |
-| <img src="./plugins/taskboard/assets/icon.svg" width="128" height="128" alt="" /> | [Taskboard](./plugins/taskboard) | [Git release](#taskboard-quick-start) | Brings each BB project's GitHub, GitLab, Linear, or Jira tasks into one focused List or Kanban board. |
+| <img src="./plugins/taskboard/assets/icon.svg" width="128" height="128" alt="" /> | [Taskboard](./plugins/taskboard) | [Git release](#taskboard-quick-start) | Brings each BB project's GitHub, GitLab, Gitea, Linear, or Jira tasks into one focused List or Kanban board. |
 | <img src="./plugins/aura/assets/icon.svg" width="128" height="128" alt="" /> | [Aura](./plugins/aura) | [Install](./plugins/aura#install) | Custom PNG/JPG backgrounds, animated pixel textures, six saved slots, and an optional real GitHub activity overview below the centered New thread composer. |
 | <img src="./plugins/touchbar/assets/icon.svg" width="128" height="128" alt="" /> | [Touch Bar Agent Monitor](./plugins/touchbar) | [Git release](#touch-bar-agent-monitor-quick-start) | Adds a native persistent Control Strip badge and fullscreen BB agent panel to Touch Bar Macs. Requires BB 0.40+. |
 | <img src="./plugins/usage-tracker/assets/icon.svg" width="128" height="128" alt="" /> | [Usage Tracker](./plugins/usage-tracker) | [Git release](#usage-tracker-quick-start) | Keeps Codex, Claude Code, and other provider limits beside BB's sidebar utility icons, including the DeepSeek API balance. |
@@ -162,7 +162,7 @@ configuration, and development details.
 Install the tracking Git release directly from this monorepo:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.4 --subdirectory plugins/taskboard --tag-prefix taskboard/
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.5 --subdirectory plugins/taskboard --tag-prefix taskboard/
 ```
 
 The [BB Community entry](https://github.com/get-bb/marketplace/pull/129)
@@ -172,7 +172,8 @@ is merged. You can also install its configured release range:
 bb plugin install taskboard@bb-community
 ```
 
-The main branch includes unreleased 0.3.5 changes. For a missing local
+Taskboard 0.3.5 adds coordinator-first task dispatch, the autonomous ticket
+factory, and recovery for paused or stale plans. For a missing local
 installation, use [the recovery guide](docs/plugin-recovery.md) to preserve
 your existing configuration without downgrading it.
 
