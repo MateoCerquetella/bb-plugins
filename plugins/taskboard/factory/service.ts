@@ -2,7 +2,7 @@ import type { BbPluginApi } from '@get-bb/plugin-sdk';
 import { posix, win32 } from 'node:path';
 import { formatWorkItemContext, type WorkItem } from '../contract.js';
 import type { FactoryIdentity, FactoryProjectPolicy, FactoryRecord, FactoryRun, FactoryRunKind, FactoryStatusTarget } from './contract.js';
-import { approvePlan, assertVersion, factoryKey, legacyRun, newRecord, savePlan, scopeDigest, startRun } from './state.js';
+import { approvePlan, assertVersion, digest, factoryKey, legacyRun, newRecord, savePlan, scopeDigest, startRun } from './state.js';
 import type { createFactoryStore } from './store.js';
 import { MAX_REVIEW_REPAIRS, readBuildResult, readReviewResult } from './review.js';
 import { CoordinatorIntentConflict, createCoordinatorLifecycle } from './coordinator.js';
@@ -182,10 +182,31 @@ export function createFactoryService(
     const record = store.get(identity) ?? newRecord(item);
     const scope = scopeDigest(item);
     if (record.scopeDigest !== scope) {
+      const run = record.runs.at(-1);
+      const plan = run ? record.plans.find(candidate => candidate.digest === run.planDigest) : undefined;
+      // A live stage sees the ticket change through its own tools; pause only
+      // after it finishes. A paused Build waiting for answers treats the edit as
+      // clarification. Both keep the current workflow instead of restarting.
+      const active = !!run && ['starting', 'running'].includes(run.status);
+      const clarification = !!run && run.kind === 'build' && run.status === 'finished' &&
+        !!run.threadId && (run.buildResult ?? readBuildResult(run.output)).verdict === 'needs_input' &&
+        !!plan;
       record.scopeDigest = scope;
-      record.approvedDigest = null;
-      record.automatic = false;
-      record.automationError = 'Issue scope changed. Automatic work paused; inspect the session and updated plan.';
+      if (run && (active || clarification)) {
+        if (plan) {
+          plan.scopeDigest = scope;
+          plan.digest = digest([scope, plan.body]);
+          run.planDigest = plan.digest;
+          record.approvedDigest = plan.digest;
+        }
+        run.scopeDigest = scope;
+        if (clarification) record.automatic = false;
+        record.automationError = null;
+      } else {
+        record.approvedDigest = null;
+        record.automatic = false;
+        record.automationError = 'Issue scope changed. Automatic work paused; inspect the session and updated plan.';
+      }
       return persist(record);
     }
     return record;

@@ -2645,6 +2645,43 @@ test('legacy waiting Build and repaired turns without a revision cannot imply im
   } finally { f.db.close(); }
 });
 
+test('a ticket edit that answers a paused Build resumes that Build instead of restarting investigation', async () => {
+  const f = fixture();
+  try {
+    const record = newRecord(item);
+    savePlan(record, 'Implement the approved scope');
+    approvePlan(record, record.plans[0].digest);
+    const build = startRun(record, 'build', false);
+    Object.assign(build, {
+      status: 'finished', threadId: 'thr_build', environmentId: 'env_build',
+      output: '::taskboard-result{kind="build" verdict="needs_input"}\nChoose the inventory target.',
+      buildResult: { verdict: 'needs_input', summary: 'Choose the inventory target.', revision: null }
+    });
+    record.automatic = true;
+    record.automationError = 'Automatic work paused: Build needs your approval to continue.';
+    f.store.save(record);
+
+    const clarified = { ...item, description: 'Show progress. Inventory target: production.' };
+    const refreshed = await f.service.get(clarified);
+    assert.equal(refreshed.automationError, null);
+    assert.equal(refreshed.approvedDigest, refreshed.plans.at(-1)!.digest);
+    assert.equal(refreshed.runs.at(-1)!.scopeDigest, refreshed.scopeDigest);
+    assert.equal((await import('../factory/console-state.ts')).consoleState(refreshed).action,
+      'continue-build');
+
+    const resumed = await f.service.startTask(clarified, null);
+    assert.equal(resumed.runs.length, refreshed.runs.length + 1);
+    assert.equal(resumed.runs.at(-1)!.kind, 'build');
+    assert.equal(resumed.runs.at(-1)!.status, 'running');
+    assert.equal(resumed.runs.at(-1)!.threadId, 'thr_build');
+    assert.equal(resumed.runs.at(-1)!.continuationOf, build.id);
+    assert.equal(f.sends(), 1);
+    assert.equal(f.spawns(), 0);
+    assert.match(f.sent[0].input[0].text, /Inventory target: production/);
+    assert.match(f.sent[0].input[0].text, /Treat the plan's defaults and recommendations as approved/);
+  } finally { f.db.close(); }
+});
+
 test('scope changes and an empty plan pause automatic build', async () => {
   const f = fixture();
   try {
@@ -2776,6 +2813,28 @@ test('explicit Build starts fresh when a finished Review belongs to an older app
     assert.equal(latest.continuationOf, null);
     assert.equal(f.sends(), 0);
     assert.equal(f.spawns(), 1);
+  } finally { f.db.close(); }
+});
+
+test('a ticket edit during an active stage does not pause or restart it', async () => {
+  const f = fixture();
+  try {
+    await f.service.startTask(item, null);
+    const changed = { ...item, description: 'Show progress. Investigate the generated inventory section too.' };
+    const running = await f.service.get(changed);
+    assert.equal(running.automationError, null);
+    assert.equal(running.automatic, true);
+    assert.equal(running.runs.length, 1);
+    assert.equal(running.runs[0].status, 'running');
+    assert.equal(running.runs[0].scopeDigest, running.scopeDigest);
+
+    f.complete('Investigation findings for the updated ticket.');
+    const advanced = await f.service.get(changed);
+    assert.equal(advanced.automationError, null);
+    assert.equal(advanced.runs.at(-1)?.kind, 'plan');
+    assert.equal(advanced.runs.at(-1)?.status, 'running');
+    assert.equal(f.spawns(), 2);
+    assert.equal(f.sends(), 0);
   } finally { f.db.close(); }
 });
 
