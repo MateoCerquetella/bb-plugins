@@ -97,12 +97,12 @@ bb plugin reload aura
 The published background release can also be installed with:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.2.3 \
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.2.4 \
   --subdirectory plugins/aura --tag-prefix aura/
 ```
 
-The activity overview is currently implemented in this checkout; it has not
-been published in the Git release above. Installing from the workspace uses it.
+This release includes the GitHub activity overview, animated GIF backgrounds,
+and the pattern, motion, and dither choices.
 
 ![Alpine wallpaper in Aura](../../docs/media/aura/01-alpine-half.jpg)
 ![Moonlight wallpaper in Aura](../../docs/media/aura/02-moonlight-full.jpg)

@@ -1,5 +1,7 @@
 # Changelog
 
+## Unreleased
+
 ## 0.2.4
 
 - Fix settings failing to load with `Unrecognized key: "activityOverview"` when
@@ -22,8 +24,6 @@
 - Add 15, 30, and 60 FPS animation-speed controls.
 - Add Performance, Balanced, and Sharp WebGL render-quality controls.
 - Preserve conservative defaults for existing backgrounds and saved slots.
-
-## Unreleased
 
 ## 0.2.2
 
