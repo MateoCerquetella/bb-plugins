@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.16 - 2026-10-26
 
 - Keep the usage details card visible on bb 0.47.1+, where the sidebar
   footer's new `clip-path` hid the card that opens above it.
