@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "bb-surf-marketplace-listing",
+    "plugin-git-distribution"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:d1db553f02fe8a6340da17cbdbcbb18b7f4e734f91e034896017134c9d0aa430"
+}
