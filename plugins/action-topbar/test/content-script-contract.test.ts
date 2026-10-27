@@ -131,8 +131,11 @@ test("places close controls on the left and closes through persisted tab state",
   );
 });
 
-test("makes Actions drag-only instead of opening them from click or Enter", () => {
+test("drags Actions with a local fallback when the native API is absent", () => {
   assert.match(source, /beginThreadActionSplitDrag/);
+  assert.match(source, /actionPaneAt/);
+  assert.match(source, /requestLaunch\(action, targetPane\)/);
+  assert.doesNotMatch(source, /Reload BB to load Action dragging support/);
   assert.match(source, /tryCapturePointer\(row, pointerId\)/);
   assert.match(source, /tryReleasePointer\(row, pointerId\)/);
   assert.match(source, /option\.kind === "action"\) return/);

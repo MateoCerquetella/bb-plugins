@@ -654,6 +654,16 @@ function makeDragGhost(mirror: MirroredTab): HTMLDivElement {
   return ghost;
 }
 
+function makeActionGhost(label: string, source: HTMLElement): HTMLDivElement {
+  const ghost = document.createElement("div");
+  ghost.className = "action-topbar__drag-ghost";
+  const icon = source.querySelector(".action-topbar__launcher-icon");
+  if (icon !== null) ghost.append(icon.cloneNode(true));
+  ghost.append(document.createTextNode(label));
+  document.body.append(ghost);
+  return ghost;
+}
+
 function positionPaneOverlay(
   overlay: HTMLDivElement,
   pane: HTMLElement | null,
@@ -690,6 +700,21 @@ function paneAt(
     if (
       pane !== null &&
       pane.dataset.focused !== "true" &&
+      pane.getAttribute("aria-hidden") !== "true" &&
+      threadHeaderRowIn(pane) !== null
+    ) {
+      return pane;
+    }
+  }
+  return null;
+}
+
+function actionPaneAt(clientX: number, clientY: number): HTMLElement | null {
+  for (const element of document.elementsFromPoint(clientX, clientY)) {
+    if (!(element instanceof HTMLElement)) continue;
+    const pane = element.closest<HTMLElement>(PANE_SELECTOR);
+    if (
+      pane !== null &&
       pane.getAttribute("aria-hidden") !== "true" &&
       threadHeaderRowIn(pane) !== null
     ) {
@@ -1178,53 +1203,76 @@ export function mountActionTopbar(
           if (option.kind !== "action" || event.button !== 0) {
             return;
           }
-          const showDragError = (message: string): void => {
-            row.dataset.actionTopbarDragState = "unavailable";
-            launcherError = message;
-            if (launcher !== null) {
-              launcher.status.textContent = message;
-              launcher.status.hidden = false;
-            }
-            announce(message);
-          };
-          if (beginThreadActionSplitDrag === undefined) {
-            showDragError("Reload BB to load Action dragging support.");
-            return;
-          }
           const threadId = currentThreadId();
           if (threadId === null) return;
-          const started = beginThreadActionSplitDrag({
-            actionId: option.targetId,
-            threadId,
-            source: row,
-            startX: event.clientX,
-            startY: event.clientY,
-          });
-          row.dataset.actionTopbarDragState = started
-            ? "started"
-            : "unavailable";
-          if (!started) {
-            showDragError(`${option.label} is not available in this workspace.`);
+          const action = { id: option.targetId, label: option.label };
+          const pointerId = event.pointerId;
+          const started =
+            beginThreadActionSplitDrag?.({
+              actionId: action.id,
+              threadId,
+              source: row,
+              startX: event.clientX,
+              startY: event.clientY,
+            }) ?? false;
+          actionDragActive = true;
+          row.dataset.actionTopbarDragState = "started";
+          tryCapturePointer(row, pointerId);
+          if (started) {
+            const finish = (finishEvent: PointerEvent) => {
+              if (finishEvent.pointerId !== pointerId) return;
+              window.removeEventListener("pointerup", finish);
+              window.removeEventListener("pointercancel", finish);
+              tryReleasePointer(row, pointerId);
+              actionDragActive = false;
+              closeLauncher(false);
+              scheduleReconcile();
+            };
+            window.addEventListener("pointerup", finish, {
+              signal,
+            });
+            window.addEventListener("pointercancel", finish, {
+              signal,
+            });
             return;
           }
-          actionDragActive = true;
-          const pointerId = event.pointerId;
-          tryCapturePointer(row, pointerId);
+          const ghost = makeActionGhost(action.label, row);
+          const overlay = makeDropOverlay();
+          let targetPane: HTMLElement | null = null;
+          const cleanUp = (): void => {
+            window.removeEventListener("pointermove", move);
+            window.removeEventListener("pointerup", finish);
+            window.removeEventListener("pointercancel", cancel);
+            tryReleasePointer(row, pointerId);
+            ghost.remove();
+            overlay.remove();
+            actionDragActive = false;
+          };
+          const move = (moveEvent: PointerEvent) => {
+            if (moveEvent.pointerId !== pointerId) return;
+            ghost.style.left = `${moveEvent.clientX + 12}px`;
+            ghost.style.top = `${moveEvent.clientY + 8}px`;
+            targetPane = actionPaneAt(moveEvent.clientX, moveEvent.clientY);
+            positionPaneOverlay(
+              overlay,
+              targetPane,
+              `Open ${action.label} here`,
+            );
+          };
           const finish = (finishEvent: PointerEvent) => {
             if (finishEvent.pointerId !== pointerId) return;
-            window.removeEventListener("pointerup", finish);
-            window.removeEventListener("pointercancel", finish);
-            tryReleasePointer(row, pointerId);
-            actionDragActive = false;
+            cleanUp();
+            if (finishEvent.type === "pointercancel") return;
             closeLauncher(false);
-            scheduleReconcile();
+            void requestLaunch(action, targetPane);
           };
-          window.addEventListener("pointerup", finish, {
-            signal,
-          });
-          window.addEventListener("pointercancel", finish, {
-            signal,
-          });
+          const cancel = (cancelEvent: PointerEvent) => {
+            if (cancelEvent.pointerId !== pointerId) return;
+            cleanUp();
+          };
+          window.addEventListener("pointermove", move, { signal });
+          window.addEventListener("pointerup", finish, { signal });
+          window.addEventListener("pointercancel", cancel, { signal });
         });
         row.addEventListener("click", (event) => {
           if (option.kind === "action") {

@@ -1,20 +1,19 @@
 # Action Topbar
 
-> [!WARNING]
-> This plugin is experimental. Action pane dragging requires the matching BB core changes and the
-> experimental Action split-drag API introduced in Plugin SDK 0.4.33. Install
-> it only on a compatible BB build. Stock BB 0.44.0 does not expose this API;
-> upgrading BB or the SDK alone does not enable Action pane dragging.
-> The v0.1.2 release includes the matching core patch for BB 0.45.0.
+> [!NOTE]
+> Action dragging works on stock BB. When BB exposes the experimental
+> Action split-drag API, drops also use BB's native split zones; otherwise the
+> launcher opens the Action in the pane under the pointer.
 
 Action Topbar projects BB Actions opened as main-workspace panes into the
 **main thread topbar**. Pane content stays under BB's ownership; the topbar
 adds a compact tab strip and searchable **+** combobox while the right panel
 keeps its original New Tab / Actions launcher.
 
-Action-to-pane dragging requires BB's experimental thread Action split-drag
-content-script API. Clients missing that API show a status in the launcher
-instead of silently ignoring the drag.
+Action-to-pane dragging uses BB's experimental thread Action split-drag
+content-script API when it is available. Without it, dropping an Action on a
+pane opens the Action there through BB's native launcher, so a BB upgrade never
+disables the control.
 
 - Click a tab to focus its main-workspace pane without opening the right panel.
 - Close a tab from the left-side **×** shown on hover, focus, or activation.
@@ -22,9 +21,10 @@ instead of silently ignoring the drag.
 - Drag an open Action tab out of the strip to move its existing workspace pane
   through BB's native split zones.
 - Drag an Action directly from the topbar **+** menu onto BB's pane zones.
-  Edge drops create a main-workspace split; a center drop replaces that pane.
-- Action rows are drag-only. Clicking or pressing Enter does not open them in
-  the native right panel.
+  With the native split-drag API, edge drops create a main-workspace split;
+  without it, the drop opens the Action in the target pane. Clicking an Action
+  opens it in the current pane.
+- Action rows never open in the native right panel.
 - Legacy relaunchable panel tabs can still open their panel for another thread
   pane when no native Action pane is available.
 - Select the topbar **+** for an auto-focused combobox. Its empty state lists actions;
@@ -57,7 +57,7 @@ plugin.
 Install from Git on a compatible BB build:
 
 ```sh
-bb plugin install 'git:https://github.com/MateoCerquetella/bb-plugins.git@semver:action-topbar/:^0.1.2' \
+bb plugin install 'git:https://github.com/MateoCerquetella/bb-plugins.git@semver:action-topbar/:^0.1.3' \
   --subdirectory plugins/action-topbar \
   --yes
 ```
