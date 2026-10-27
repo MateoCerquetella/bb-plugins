@@ -89,10 +89,19 @@ pnpm install --offline --frozen-lockfile
 pnpm --filter @bb/app build
 ```
 
-Back up the running `bb-app/app/dist`, replace it with `apps/app/dist`, and
-reload BB. The patch is tied to the 0.46.1 source tree; regenerate it when BB
-changes the split-layout modules. It also fixes Start Terminal from an Action
-pane by creating the terminal for that thread.
+Back up the running `bb-app/app/dist`, then **merge** the built assets over it
+instead of deleting it, and reload BB:
+
+```sh
+cp -a apps/app/dist/. /path/to/bb-app/app/dist/
+```
+
+Keeping the old hashed assets matters: a tab that was already open still
+references its original chunk names, and replacing the directory makes those
+imports fail until every client hard-reloads. The patch is tied to the 0.46.1
+source tree; regenerate it when BB changes the split-layout modules. It also
+fixes Start Terminal from an Action pane by creating the terminal for that
+thread.
 
 ## Develop
 
