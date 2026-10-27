@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.3
+
+- Keep Action dragging working without BB's experimental split-drag API. The
+  launcher now falls back to opening the Action in the pane under the pointer,
+  or in the current pane on a click.
+- Remove the misleading "Reload BB" status when a BB or SDK upgrade drops the
+  experimental API.
+
 ## 0.1.2
 
 - Restore Action dragging on BB 0.45.0 with the matching host frontend patch.
