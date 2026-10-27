@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "sequence": 7,
+  "previousDigest": "sha256:1a1180ec376ca274a30180d02b09407fe3bd7d908bd2ef1bd4f300c045f64f73",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Verify: workspace check passed on the release commit (all plugin workspaces green, source tree unchanged) and the security consult returned advisory with one low supply-chain finding about caret-range tag trust.",
+  "createdAt": "2026-10-27T22:17:18.441Z",
+  "stateBeforeDigest": "sha256:7ae4afb39cefa3034100008d18b70a62233cf07196ed1c14bd02ba0e5087adcc",
+  "stateAfterDigest": "sha256:2b12f5ace2822d54c5654016851eef28363bd87c20216aff9ebe4ec45a5452e5",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 7,
+    "activeFeature": "publish-bb-surf-0-2-0",
+    "request": "Publish BB Surf 0.2.0 with the Jev engine: bump plugin version, tag steel-browser/v0.2.0, update the BB Community marketplace entry range",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "integrate",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Verify: workspace check passed on the release commit (all plugin workspaces green, source tree unchanged) and the security consult returned advisory with one low supply-chain finding about caret-range tag trust.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:ddcd56efdeaad56a8545e30b175fbfd27735c5557278e48a33b0f763813c301e",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:6d93fe2c0cffc09e99efa99d6428da8a061b51eb2bcf1792b3d06e81a6ce65ab",
+    "impactDigest": "sha256:d1db553f02fe8a6340da17cbdbcbb18b7f4e734f91e034896017134c9d0aa430",
+    "capabilityClaimId": "publish-bb-surf-0-2-0-2e163a6899d5",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [
+      "collected-6871b0ca30d51110b2a47ac6",
+      "qa-5549142099a85d5eefd4a23a"
+    ],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": true,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "verified",
+      "reasons": {
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-27T22:17:18.441Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "publish-bb-surf-0-2-0-2e163a6899d5",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "publish-bb-surf-0-2-0",
+      "worktree": "/tmp/opencode/bb-plugins-steel-browser-0.2.0",
+      "worktreeId": "sha256:889b571471cf7c19fee49721fa7133fcdbf25b238ee3dc57fe2399c04bec652c",
+      "baseCommit": "4198b79f4639a35e127faa13144eb197367a1cf9",
+      "baseTree": "6a7c76a036f4a14b683835f38fac27247897cefa",
+      "bases": {
+        "bb-surf-marketplace-listing": {
+          "capability": "bb-surf-marketplace-listing",
+          "digest": "sha256:63d582e934fe70229e93bffd50d41ea809dd4de135ccf18fddab5fd04cb4eb85",
+          "requirements": {
+            "listing range resolves to the current engine surface": null
+          }
+        },
+        "plugin-git-distribution": {
+          "capability": "plugin-git-distribution",
+          "digest": "sha256:97483aac37ef8bb1a7b538a24be367c24d65f9216711a67c49238261e655021b",
+          "requirements": {
+            "release tags carry the merged line": null
+          }
+        }
+      },
+      "capabilities": [
+        "bb-surf-marketplace-listing",
+        "plugin-git-distribution"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-27T16:43:51.271Z",
+      "heartbeatAt": "2026-10-27T16:43:51.271Z",
+      "digest": "sha256:a9ce64b641415eb2025bd53f974be83b73add119bcbeb71044014943f59c0beb"
+    },
+    "reviewFirst": true,
+    "verificationCoverage": {
+      "kind": "review-derived",
+      "checkId": "qa-fresh-context",
+      "receiptId": "collected-6871b0ca30d51110b2a47ac6",
+      "matrixDigest": "sha256:23539f4acf6cd046ddd06eb9c24f7fb02dc3d0ca604a186ee21b8bad266b3722",
+      "specDigest": "sha256:ddcd56efdeaad56a8545e30b175fbfd27735c5557278e48a33b0f763813c301e",
+      "revision": 7
+    }
+  },
+  "digest": "sha256:847e36bd1c696062a323aac7b69e473340a385e618f5fa960ca3072888f1406f"
+}

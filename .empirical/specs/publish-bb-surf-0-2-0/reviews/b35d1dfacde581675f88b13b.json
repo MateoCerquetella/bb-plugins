@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:d5ba5e2132426fb37a3227c96f7b35b7751a5b5f93eebe7668515f187c228f8a",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "4198b79f4639a35e127faa13144eb197367a1cf9",
+  "headCommit": "066faeb6025430dc2eafe39bbd20001bb108cf32",
+  "diffDigest": "sha256:f47562e124cfba0871b5326a0cd5c7dbfdf393f0f56a47313476ffae88b1deab",
+  "verdict": "APPROVED",
+  "reviewerActor": "fresh-context-reviewer",
+  "reviewerInvocationId": "review-2026-10-27-1",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: `plugins/steel-browser/package.json` declares `\"version\": \"0.2.0\"` and `package-lock.json:10108-10109` records `plugins/steel-browser` at `0.2.0`; the tagged tree agrees (`git show steel-browser/v0.2.0^{}:plugins/steel-browser/package.json` -> 0.2.0, lockfile entry -> 0.2.0), and no `0.1.0` reference remains under `plugins/steel-browser` (remaining lockfile `0.1.0` hits are unrelated packages: xml-naming, conversation-space, lavender).\n- PASS AC-2: Annotated tag `steel-browser/v0.2.0` -> `b83f909dc95cd8307b719a84ac8dfffb1994723b`, which is `origin/main` HEAD (squash merge of PR #113) and passes `git merge-base --is-ancestor steel-browser/v0.2.0^{} origin/main`; `git ls-tree -r` on the tag lists `plugins/steel-browser/jev-runtime.ts` and `plugins/steel-browser/engines.ts`, and `git diff HEAD steel-browser/v0.2.0^{}` touches only action-topbar files, so the released BB Surf subtree equals the reviewed tree.\n- PASS AC-3: `README.md:137` and `plugins/steel-browser/README.md:259` both read `...@^0.2.0 --subdirectory plugins/steel-browser --tag-prefix steel-browser/` (same in the tagged tree); the only remaining `@^0.1.0` install commands belong to touchbar (`README.md:78`) and host-monitor (`README.md:95`).\n- PASS AC-4: Marketplace worktree HEAD `33b8498` (identical to PR #716 head OID) sets `source.git` = `{url: bb-plugins, subdir: plugins/steel-browser, range: \"^0.2.0\", tagPrefix: \"steel-browser/\"}` plus a `jev` tag and engine-naming description; CI `npm run build` built 442 entries with exit 0, and I reproduced the `--liveness` predicate from `scripts/build.mjs:317-345` against the remote (`refs/tags/steel-browser/v0.1.0, v0.1.1, v0.2.0` -> tag found), so `^0.2.0` resolves to the pushed tag. Caveat tracked as F-1: the `validate` job's later `npm run check` step never ran because `gate:v1` fails first, and the liveness check only proves a prefixed tag exists, not that the range resolves to it.\n- PASS AC-5: `bb plugin list` reports `steel-browser@0.1.0 running` with `source: path:/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_tepmq99rky-1/bb-plugins/plugins/steel-browser`, and `bb plugin config steel-browser` still exposes `jevApiKey = [set] (string, secret)` and `jevTextModelApiKey = [set] (string, secret)` alongside `jevCheckout`, `jevEnvFile`, and `jevTextModel`; the installed tree contains `jev-runtime.ts`/`engines.ts`. The running copy is the pre-release Jev worktree at version `0.1.0`, which is F-2.\n\n## Security / correctness\n\nNo credential, token, or personal data appears in the commit: the packet diff has no key-like material, and the Jev keys stay in BB plugin secrets (`bb plugin config` prints `[set]`, never a value). The version triple is consistent (plugin manifest 0.2.0, lockfile 0.2.0, tag tree 0.2.0), the tag is annotated and sits exactly on the merged `main` tip, which fixes the 0.1.1 defect of tagging an unmerged branch, and the documented `@^0.2.0` range is valid semver for a 0.x line (>=0.2.0 <0.3.0), so `^0.1.0` installs are deliberately not auto-upgraded. This commit changes no runtime code; the only behavioral consequence is that updating exposes a second engine that can make potentially billable external calls, which the settings text gates behind explicit paid-run opt-ins (`Paid runs require --allow-paid`, `Live Jev runs require potentially billable external API calls`). The residual correctness gap is verification rather than behavior: the marketplace PR's required check is red and its tag-liveness step was skipped in CI (F-1), and the marketplace liveness check itself cannot detect a range that matches no tag.\n\n## Design / maintainability\n\nThe release is documented as a proper Empirical packet (spec, design, decisions D-001..D-004, two capability deltas), each acceptance criterion maps to a checkable artifact, and the tag-point decision is enforced by an explicit ancestry check, so the process is repeatable and the monorepo `steel-browser/` tag prefix keeps per-plugin releases independent. Scope stayed tight: `base..HEAD` touches only the plugin manifest, lockfile, two READMEs, and the empirical journal, with no other plugin's pending release pulled in; the tag tree necessarily carries the already-merged action-topbar release (#112) because it points at `main` HEAD, which is expected for monorepo tagging and not a scope violation. Weak spots: `spec.md` checkboxes and `state.json` still show unverified/completed=false even though the release shipped, the local proof point is a path-source install at `0.1.0` rather than the 0.2.0 artifact (F-2), and the reliance on marketplace CI for tag resolution is weaker than the docs claim because that step is skipped behind `gate:v1` and is range-blind (F-1).",
+  "bodyDigest": "sha256:786fc2d85b0e6490c8217a9d43630e4f9c4bde4e6d7be6fd44f110c965f9fee6",
+  "findings": [
+    {
+      "id": "F-1",
+      "severity": "medium",
+      "category": "tests",
+      "summary": "Marketplace PR #716's only CI run fails at `gate:v1`, so the entry's tag-liveness check never ran in CI."
+    },
+    {
+      "id": "F-2",
+      "severity": "low",
+      "category": "docs",
+      "summary": "The local 'proof that 0.2.0 works' is a running install that reports version 0.1.0 from the pre-release Jev worktree."
+    },
+    {
+      "id": "F-3",
+      "severity": "low",
+      "category": "docs",
+      "summary": "The review packet's diff is not the full `base..HEAD` diff: 4 of 16 committed files (journal events) are omitted."
+    }
+  ],
+  "digest": "sha256:b35d1dfacde581675f88b13ba3fe95145c3d636fb245d02c6a474bbee9c959e2"
+}

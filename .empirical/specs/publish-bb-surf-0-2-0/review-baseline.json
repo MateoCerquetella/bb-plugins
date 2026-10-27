@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "resultPath": ".empirical/specs/publish-bb-surf-0-2-0/reviews/b35d1dfacde581675f88b13b.json",
+  "resultDigest": "sha256:b35d1dfacde581675f88b13ba3fe95145c3d636fb245d02c6a474bbee9c959e2",
+  "contractDigest": "sha256:30dd4276de0e7691664a06d67707aef2a108979cc4386797ae00281f32d0eadf",
+  "carriedDeferred": []
+}
