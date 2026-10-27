@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.4
+
+- Restore native Action workspace panes on BB 0.46.1 with the included
+  `patches/bb-0.46.1-action-drag.patch`. Official BB 0.46.1 and 0.47.1 builds
+  no longer expose the experimental split-drag API to content scripts.
+- The patched host opens Terminal, Browser, and plugin Actions as real
+  main-workspace panes; edge drops split, center drops replace.
+- Start Terminal from an Action pane creates the terminal for that thread
+  instead of rendering an empty pane.
+
 ## 0.1.3
 
 - Keep Action dragging working without BB's experimental split-drag API. The
