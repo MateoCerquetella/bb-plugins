@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-50cf9ae4b14f6013f6d95733",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "BB Surf 0.2.0 release gate: types, typecheck, 62 plugin tests, and build",
+  "passed": true,
+  "startedAt": "2026-10-27T22:15:08.306Z",
+  "completedAt": "2026-10-27T22:15:13.689Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "publish-bb-surf-0-2-0",
+    "specRevision": 2,
+    "specDigest": "sha256:ddcd56efdeaad56a8545e30b175fbfd27735c5557278e48a33b0f763813c301e",
+    "treeDigest": "sha256:163570d33dfc1d479e01abc6de84d74918f5d6e05603524de7466b5b26559276",
+    "policyDigest": "sha256:b30422a457c8a9513852d9ad001aae29ae83d7c418c76b68be2cba987dba37f2",
+    "workflowRevision": 6,
+    "gitCommit": "066faeb6025430dc2eafe39bbd20001bb108cf32",
+    "textTreeDigest": "sha256:163570d33dfc1d479e01abc6de84d74918f5d6e05603524de7466b5b26559276"
+  },
+  "digest": "sha256:2058e2451d03fd0c72721f86e811d4247b287e059700764d020ff65c454b0297",
+  "kind": "qa",
+  "matrixDigest": "sha256:27b1f7b9d53906be21d37aea9bc92fab4ab2f19efd17ececb28c5765fe812109",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "BB Surf 0.2.0 release gate: types, typecheck, 62 plugin tests, and build",
+      "startedAt": "2026-10-27T22:15:08.306Z",
+      "completedAt": "2026-10-27T22:15:13.689Z",
+      "durationMs": 5383,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:3102e0660c5a28fb09072a92af73601c0704a8badb5519082e7545d1f876aa50",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-steel-browser"
+        ],
+        "cwd": ".",
+        "timeoutMs": 600000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:b458701dbc335109ab73877256a9b175a8801873184703f2fbb641cd00372c08",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "ect bindings are isolated, immutable and fail closed\nok 26 - project bindings are isolated, immutable and fail closed\n  ---\n  duration_ms: 5.952944\n  type: 'test'\n  ...\n# Subtest: engine preferences do not leak between projects\nok 27 - engine preferences do not leak between projects\n  ---\n  duration_ms: 3.270432\n  type: 'test'\n  ...\n# Subtest: automatic setup serializes projects, coalesces duplicates, and revalidates bindings\nok 28 - automatic setup serializes projects, coalesces duplicates, and revalidates bindings\n  ---\n  duration_ms: 19.110702\n  type: 'test'\n  ...\n# Subtest: failed provisioning persists nothing and a later request can retry\nok 29 - failed provisioning persists nothing and a later request can retry\n  ---\n  duration_ms: 1.229813\n  type: 'test'\n  ...\n# Subtest: healthy stored bindings coalesce probes and bypass provisioning\nok 30 - healthy stored bindings coalesce probes and bypass provisioning\n  ---\n  duration_ms: 0.538772\n  type: 'test'\n  ...\n# Subtest: recent healthy bindings avoid repeated probes but expire for recovery\nok 31 - recent healthy bindings avoid repeated probes but expire for recovery\n  ---\n  duration_ms: 0.715204\n  type: 'test'\n  ...\n# Subtest: failed readiness repairs only the stored project and preserves its binding\nok 32 - failed readiness repairs only the stored project and preserves its binding\n  ---\n  duration_ms: 0.659352\n  type: 'test'\n  ...\n# Subtest: viewer readiness errors are not cached and never enter container provisioning\nok 33 - viewer readiness errors are not cached and never enter container provisioning\n  ---\n  duration_ms: 0.686712\n  type: 'test'\n  ...\n# Subtest: healthy projects do not wait for another project's slow setup\nok 34 - healthy projects do not wait for another project's slow setup\n  ---\n  duration_ms: 1.06949\n  type: 'test'\n  ...\n# Subtest: existing bindings are passed into recovery and retained after a failed check\nok 35 - existing bindings are passed into recovery and retained after a failed check\n  ---\n  duration_ms: 1.00967\n  type: 'test'\n  ...\n# Subtest: fallback is opt-in and only selects an engine during preflight\nok 36 - fallback is opt-in and only selects an engine during preflight\n  ---\n  duration_ms: 0.479224\n  type: 'test'\n  ...\n# Subtest: cancellation during preflight never dispatches fallback\nok 37 - cancellation during preflight never dispatches fallback\n  ---\n  duration_ms: 0.516421\n  type: 'test'\n  ...\n# (node:4124879) ExperimentalWarning: Transform Types is an experimental feature and might change at any time\n# (Use `node --trace-warnings ...` to show where the warning was created)\n# Subtest: missing viewer share validates the container then exposes only API on the Steel host\nok 38 - missing viewer share validates the container then exposes only API on the Steel host\n  ---\n  duration_ms: 2.381432\n  type: 'test'\n  ...\n# Subtest: matching viewer share validates ownership and is reused without share mutations\nok 39 - matching viewer share validates ownership and is reused without share mutations\n  ---\n  duration_ms: 0.575379\n  type: 'test'\n  ...\n# Subtest: matching viewer share rejects container mismatch without calling Connect\nok 40 - matching viewer share rejects container mismatch without calling Connect\n  ---\n  duration_ms: 0.864677\n  type: 'test'\n  ...\n# Subtest: viewer share validation and Connect errors propagate without repair\nok 41 - viewer share validation and Connect errors propagate without repair\n  ---\n  duration_ms: 0.962074\n  type: 'test'\n  ...\n# Subtest: viewer recovery refuses nonlocal and CDP ports before calling Connect\nok 42 - viewer recovery refuses nonlocal and CDP ports before calling Connect\n  ---\n  duration_ms: 0.545264\n  type: 'test'\n  ...\n# Subtest: readiness probes API and CDP concurrently and rejects unhealthy responses\nok 43 - readiness probes API and CDP concurrently and rejects unhealthy responses\n  ---\n  duration_ms: 32.656138\n  type: 'test'\n  ...\n# Subtest: new setup skips occupied/shared ports and exposes only API on the server host\nok 44 - new setup skips occupied/shared ports and exposes only API on the server host\n  ---\n  duration_ms: 1.916484\n  type: 'test'\n  ...\n# Subtest: existing project with inherited DNS is recreated with the same profile\nok 45 - existing project with inherited DNS is recreated with the same profile\n  ---\n  duration_ms: 1.222539\n  type: 'test'\n  ...\n# Subtest: dead CDP on a validated project triggers one scoped repair\nok 46 - dead CDP on a validated project triggers one scoped repair\n  ---\n  duration_ms: 1.245541\n  type: 'test'\n  ...\n# Subtest: persistent CDP failure is bounded to one recovery attempt\nok 47 - persistent CDP failure is bounded to one recovery attempt\n  ---\n  duration_ms: 1.223531\n  type: 'test'\n  ...\n# Subtest: shared profile or changed saved binding cannot trigger destructive repair\nok 48 - shared profile or changed saved binding cannot trigger destructive repair\n  ---\n  duration_ms: 1.163491\n  type: 'test'\n  ...\n# Subtest: existing stopped project is validated and resumed without replacing its profile\nok 49 - existing stopped project is validated and resumed without replacing its profile\n  ---\n  duration_ms: 0.579967\n  type: 'test'\n  ...\n# Subtest: foreign profile and Connect errors fail closed\nok 50 - foreign profile and Connect errors fail closed\n  ---\n  duration_ms: 0.889752\n  type: 'test'\n  ...\n# Subtest: viewer origins reject credentials, non-HTTPS and paths\nok 51 - viewer origins reject credentials, non-HTTPS and paths\n  ---\n  duration_ms: 0.348846\n  type: 'test'\n  ...\n# Subtest: Docker port inspection requests only bounded port metadata\nok 52 - Docker port inspection requests only bounded port metadata\n  ---\n  duration_ms: 0.449459\n  type: 'test'\n  ...\n# (node:4124912) ExperimentalWarning: Transform Types is an experimental feature and might change at any time\n# (Use `node --trace-warnings ...` to show where the warning was created)\n# Subtest: RPC returns successful results and preserves actionable errors\nok 53 - RPC returns successful results and preserves actionable errors\n  ---\n  duration_ms: 1.728541\n  type: 'test'\n  ...\n# Subtest: stalled RPC expires without replaying the operation or accepting a late result\nok 54 - stalled RPC expires without replaying the operation or accepting a late result\n  ---\n  duration_ms: 10.690701\n  type: 'test'\n  ...\n# Subtest: late RPC rejection after timeout is handled\nok 55 - late RPC rejection after timeout is handled\n  ---\n  duration_ms: 13.261187\n  type: 'test'\n  ...\n# Subtest: stalled reads retry once and recover, while permanent hangs are bounded\nok 56 - stalled reads retry once and recover, while permanent hangs are bounded\n  ---\n  duration_ms: 32.186702\n  type: 'test'\n  ...\n# Subtest: mutations and explicit server failures are never replayed\nok 57 - mutations and explicit server failures are never replayed\n  ---\n  duration_ms: 30.875611\n  type: 'test'\n  ...\n# (node:4124919) ExperimentalWarning: Transform Types is an experimental feature and might change at any time\n# (Use `node --trace-warnings ...` to show where the warning was created)\n# Subtest: normalizes a safe endpoint and rejects unsupported URL forms\nok 58 - normalizes a safe endpoint and rejects unsupported URL forms\n  ---\n  duration_ms: 1.762763\n  type: 'test'\n  ...\n# Subtest: loads a normalized dashboard\nok 59 - loads a normalized dashboard\n  ---\n  duration_ms: 35.433692\n  type: 'test'\n  ...\n# Subtest: creates and releases an exact session\nok 60 - creates and releases an exact session\n  ---\n  duration_ms: 37.427878\n  type: 'test'\n  ...\n# Subtest: idle bootstrap sessions allow new session creation; live sessions do not\nok 61 - idle bootstrap sessions allow new session creation; live sessions do not\n  ---\n  duration_ms: 20.605568\n  type: 'test'\n  ...\n# Subtest: returns a stable unavailable dashboard\nok 62 - returns a stable unavailable dashboard\n  ---\n  duration_ms: 1.588557\n  type: 'test'\n  ...\n1..62\n# tests 62\n# suites 0\n# pass 62\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 1291.448646\n\n> bb-plugin-steel-browser@0.2.0 build\n> env -u BB_CLI bb plugin build .\n\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:163570d33dfc1d479e01abc6de84d74918f5d6e05603524de7466b5b26559276",
+      "sourceTreeAfter": "sha256:163570d33dfc1d479e01abc6de84d74918f5d6e05603524de7466b5b26559276",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

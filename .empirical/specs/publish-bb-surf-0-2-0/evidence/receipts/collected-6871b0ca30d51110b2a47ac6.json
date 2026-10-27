@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-6871b0ca30d51110b2a47ac6",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-10-27T22:13:42.542Z",
+  "completedAt": "2026-10-27T22:13:42.542Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "publish-bb-surf-0-2-0",
+    "specRevision": 2,
+    "specDigest": "sha256:ddcd56efdeaad56a8545e30b175fbfd27735c5557278e48a33b0f763813c301e",
+    "treeDigest": "sha256:163570d33dfc1d479e01abc6de84d74918f5d6e05603524de7466b5b26559276",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:3d3e5b5735740bed710f931f19e80ff883c076958101d8cddd66b4a2dac4f5b1",
+  "kind": "collected",
+  "collector": "empirical-review:fresh-context-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/publish-bb-surf-0-2-0/reviews/b35d1dfacde581675f88b13b.json",
+      "mediaType": "application/json",
+      "bytes": 6167,
+      "digest": "sha256:ec8a89f09312db290dfb4bbc32751d0212c43292b447651f5bd726bb586fe085"
+    },
+    {
+      "path": ".empirical/specs/publish-bb-surf-0-2-0/reviews/b35d1dfacde581675f88b13b.md",
+      "mediaType": "text/markdown",
+      "bytes": 4766,
+      "digest": "sha256:2a94e132037758781df3ff910f8436ea3cfcd8fe40c5b600d40e604523905557"
+    }
+  ]
+}

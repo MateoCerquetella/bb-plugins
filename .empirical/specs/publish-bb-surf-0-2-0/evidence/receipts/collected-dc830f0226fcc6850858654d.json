@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-dc830f0226fcc6850858654d",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "Fresh-context reviewer (isolated subagent session ses_e8098a36bffetjlCroZy8QNIV5, no authoring context) reviewed the exact 4198b79f..066faeb6 release diff against the five acceptance criteria: all PASS, verdict APPROVED, three non-blocking findings deferred (F-1 marketplace v1-change label, F-2 local install reports 0.1.0, F-3 packet filtered journal files).",
+  "passed": true,
+  "startedAt": "2026-10-27T22:14:17.794Z",
+  "completedAt": "2026-10-27T22:14:17.794Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "publish-bb-surf-0-2-0",
+    "specRevision": 2,
+    "specDigest": "sha256:ddcd56efdeaad56a8545e30b175fbfd27735c5557278e48a33b0f763813c301e",
+    "treeDigest": "sha256:163570d33dfc1d479e01abc6de84d74918f5d6e05603524de7466b5b26559276",
+    "policyDigest": "sha256:4aedcfe7f723bdfc2b5d92de7eacf6bac553de4731715c9d0f84dc58dd5754bd"
+  },
+  "digest": "sha256:be667096b046c4c4d3ce3bd97bce768d536abf31927200d4364c5ac27d2dfbed",
+  "kind": "collected",
+  "collector": "fresh-context-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/publish-bb-surf-0-2-0/reviews/b35d1dfacde581675f88b13b.json",
+      "mediaType": "application/json",
+      "bytes": 6167,
+      "digest": "sha256:ec8a89f09312db290dfb4bbc32751d0212c43292b447651f5bd726bb586fe085"
+    },
+    {
+      "path": ".empirical/specs/publish-bb-surf-0-2-0/reviews/b35d1dfacde581675f88b13b.md",
+      "mediaType": "text/markdown",
+      "bytes": 4766,
+      "digest": "sha256:2a94e132037758781df3ff910f8436ea3cfcd8fe40c5b600d40e604523905557"
+    }
+  ]
+}

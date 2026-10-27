@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "sequence": 5,
+  "previousDigest": "sha256:9402f7e7f1489ea180b8eb881fa1fc208178c3b821055c1130b8770bfe129dad",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Bumped BB Surf to 0.2.0, synced the lockfile, pointed both READMEs at ^0.2.0, ran the plugin check (62/62 tests, typecheck, build), merged PR #113, and tagged steel-browser/v0.2.0 on the merged commit.",
+  "createdAt": "2026-10-27T22:06:11.658Z",
+  "stateBeforeDigest": "sha256:677ddad8aa9d7e9f2f6eba3f74529e93692defe1f64333b9300c746c40fdaf50",
+  "stateAfterDigest": "sha256:044f66aa972d4d127577905aedc3541131f0d4cf84f4e4e194611873bad8df69",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 5,
+    "activeFeature": "publish-bb-surf-0-2-0",
+    "request": "Publish BB Surf 0.2.0 with the Jev engine: bump plugin version, tag steel-browser/v0.2.0, update the BB Community marketplace entry range",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "review",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Bumped BB Surf to 0.2.0, synced the lockfile, pointed both READMEs at ^0.2.0, ran the plugin check (62/62 tests, typecheck, build), merged PR #113, and tagged steel-browser/v0.2.0 on the merged commit.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:ddcd56efdeaad56a8545e30b175fbfd27735c5557278e48a33b0f763813c301e",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:6d93fe2c0cffc09e99efa99d6428da8a061b51eb2bcf1792b3d06e81a6ce65ab",
+    "impactDigest": "sha256:d1db553f02fe8a6340da17cbdbcbb18b7f4e734f91e034896017134c9d0aa430",
+    "capabilityClaimId": "publish-bb-surf-0-2-0-2e163a6899d5",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-10-27T22:06:11.658Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "publish-bb-surf-0-2-0-2e163a6899d5",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "publish-bb-surf-0-2-0",
+      "worktree": "/tmp/opencode/bb-plugins-steel-browser-0.2.0",
+      "worktreeId": "sha256:889b571471cf7c19fee49721fa7133fcdbf25b238ee3dc57fe2399c04bec652c",
+      "baseCommit": "4198b79f4639a35e127faa13144eb197367a1cf9",
+      "baseTree": "6a7c76a036f4a14b683835f38fac27247897cefa",
+      "bases": {
+        "bb-surf-marketplace-listing": {
+          "capability": "bb-surf-marketplace-listing",
+          "digest": "sha256:63d582e934fe70229e93bffd50d41ea809dd4de135ccf18fddab5fd04cb4eb85",
+          "requirements": {
+            "listing range resolves to the current engine surface": null
+          }
+        },
+        "plugin-git-distribution": {
+          "capability": "plugin-git-distribution",
+          "digest": "sha256:97483aac37ef8bb1a7b538a24be367c24d65f9216711a67c49238261e655021b",
+          "requirements": {
+            "release tags carry the merged line": null
+          }
+        }
+      },
+      "capabilities": [
+        "bb-surf-marketplace-listing",
+        "plugin-git-distribution"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-10-27T16:43:51.271Z",
+      "heartbeatAt": "2026-10-27T16:43:51.271Z",
+      "digest": "sha256:a9ce64b641415eb2025bd53f974be83b73add119bcbeb71044014943f59c0beb"
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:c9f8da897ca4f99a1a4852491d885791d9f3a092f9af8bf973ff1bfc1f0f7296"
+}

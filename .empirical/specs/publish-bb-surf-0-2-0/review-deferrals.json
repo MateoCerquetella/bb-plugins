@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "deferrals": [
+    {
+      "schemaVersion": 1,
+      "resultDigest": "sha256:b35d1dfacde581675f88b13ba3fe95145c3d636fb245d02c6a474bbee9c959e2",
+      "findingIds": [
+        "F-1",
+        "F-2",
+        "F-3"
+      ],
+      "reason": "Non-blocking review findings are deferred automatically so they never start another fix lap; track them as a follow-up.",
+      "ticket": null,
+      "recordedAt": "2026-10-27T22:13:42.547Z"
+    }
+  ]
+}
