@@ -1,0 +1,1829 @@
+diff --git a/apps/app/src/components/plugin/PluginPanelActions.tsx b/apps/app/src/components/plugin/PluginPanelActions.tsx
+index 7ba8e0e94b..c5df0598d1 100644
+--- a/apps/app/src/components/plugin/PluginPanelActions.tsx
++++ b/apps/app/src/components/plugin/PluginPanelActions.tsx
+@@ -80,7 +80,7 @@ interface RunPluginPanelActionArgs {
+   threadId: string;
+ }
+ 
+-function runPluginPanelAction({
++export function runPluginPanelAction({
+   action,
+   openPluginPanel,
+   threadId,
+diff --git a/apps/app/src/lib/plugin-frontend.ts b/apps/app/src/lib/plugin-frontend.ts
+index 0defa890db..ff88eb4c5a 100644
+--- a/apps/app/src/lib/plugin-frontend.ts
++++ b/apps/app/src/lib/plugin-frontend.ts
+@@ -38,6 +38,7 @@ import type {
+   PluginContentScriptDisposer,
+   PluginContentScriptRegistration,
+   PluginSdkApp,
++  ExperimentalThreadActionSplitDragRequest,
+ } from "@get-bb/plugin-sdk";
+ import { normalizePluginThreadRowStatus } from "@get-bb/plugin-sdk/internal/composer-customization-validation";
+ import { resetCrashedPluginSlots } from "@/components/plugin/PluginSlotMount";
+@@ -63,6 +64,7 @@ import {
+   clearPluginThreadRowStatusesByOwner,
+   setPluginThreadRowStatus,
+ } from "./plugin-thread-row-status";
++import { beginPluginThreadActionSplitDrag } from "./plugin-thread-action-split-drag";
+ 
+ interface PluginFrontendBundle {
+   jsUrl: string;
+@@ -531,6 +533,36 @@ async function mountWithTimeout(
+               statusOwner,
+             );
+           },
++          experimental_beginThreadActionSplitDrag: (
++            request: ExperimentalThreadActionSplitDragRequest,
++          ) => {
++            if (controller.signal.aborted) return false;
++            if (
++              typeof request !== "object" ||
++              request === null ||
++              typeof request.actionId !== "string" ||
++              request.actionId.trim().length === 0 ||
++              request.actionId.trim().length > 256 ||
++              typeof request.threadId !== "string" ||
++              request.threadId.trim().length === 0 ||
++              request.threadId.trim().length > 128 ||
++              !(request.source instanceof HTMLElement) ||
++              !Number.isFinite(request.startX) ||
++              !Number.isFinite(request.startY)
++            ) {
++              deps.warn(
++                `bb plugin "${pluginId}": contentScript.experimental_beginThreadActionSplitDrag: invalid request`,
++              );
++              return false;
++            }
++            return beginPluginThreadActionSplitDrag({
++              actionId: request.actionId.trim(),
++              threadId: request.threadId.trim(),
++              source: request.source,
++              startX: request.startX,
++              startY: request.startY,
++            });
++          },
+         }),
+       pluginId,
+       controller.signal,
+diff --git a/apps/app/src/lib/plugin-thread-action-split-drag.test.ts b/apps/app/src/lib/plugin-thread-action-split-drag.test.ts
+new file mode 100644
+index 0000000000..fbff4741c6
+--- /dev/null
++++ b/apps/app/src/lib/plugin-thread-action-split-drag.test.ts
+@@ -0,0 +1,131 @@
++// @vitest-environment jsdom
++
++import { describe, expect, it } from "vitest";
++import {
++  applyThreadActionDrop,
++  beginPluginThreadActionSplitDrag,
++  decideActionDrop,
++  setPluginThreadActionSplitDragHandler,
++} from "./plugin-thread-action-split-drag";
++import {
++  countPanes,
++  findPaneByContent,
++  type PaneContent,
++  type SplitLayout,
++} from "@/lib/split-layout";
++
++const action: PaneContent = {
++  kind: "thread-action",
++  projectId: "p1",
++  threadId: "thr_1",
++  actionId: "plugin-action:tasks:taskboard",
++  title: "Taskboard",
++  paramsJson: null,
++};
++
++function layout(): SplitLayout {
++  return {
++    root: {
++      type: "pane",
++      paneId: "pane-1",
++      content: {
++        kind: "thread",
++        projectId: "p1",
++        threadId: "thr_1",
++      },
++    },
++    focusedPaneId: "pane-1",
++  };
++}
++
++describe("thread Action split drag", () => {
++  it("uses sidebar-style edge, center, open, and pane-cap decisions", () => {
++    expect(
++      decideActionDrop({
++        atMaxPanes: false,
++        isOpen: false,
++        title: "Taskboard",
++        zone: "right",
++      }),
++    ).toEqual({ zone: "right", label: "Split right" });
++    expect(
++      decideActionDrop({
++        atMaxPanes: false,
++        isOpen: false,
++        title: "Taskboard",
++        zone: "center",
++      }),
++    ).toEqual({ zone: "center", label: "Open Taskboard here" });
++    expect(
++      decideActionDrop({
++        atMaxPanes: true,
++        isOpen: false,
++        title: "Taskboard",
++        zone: "left",
++      }),
++    ).toEqual({ zone: "center", label: "Open Taskboard here" });
++    expect(
++      decideActionDrop({
++        atMaxPanes: false,
++        isOpen: true,
++        title: "Taskboard",
++        zone: "left",
++      }),
++    ).toEqual({ zone: "center", label: "Focus Taskboard" });
++  });
++
++  it("splits, replaces, and focuses without duplicating an Action pane", () => {
++    const split = applyThreadActionDrop(
++      layout(),
++      { paneId: "pane-1", zone: "right" },
++      action,
++    );
++    expect(countPanes(split.root)).toBe(2);
++    expect(findPaneByContent(split.root, action)?.paneId).toBe(
++      split.focusedPaneId,
++    );
++
++    const focused = applyThreadActionDrop(
++      split,
++      { paneId: "pane-1", zone: "left" },
++      action,
++    );
++    expect(countPanes(focused.root)).toBe(2);
++    expect(focused.focusedPaneId).toBe(split.focusedPaneId);
++
++    const refreshed = applyThreadActionDrop(
++      focused,
++      { paneId: "pane-1", zone: "left" },
++      { ...action, paramsJson: `{"view":"today"}` },
++    );
++    expect(findPaneByContent(refreshed.root, action)?.content).toEqual({
++      ...action,
++      paramsJson: `{"view":"today"}`,
++    });
++
++    const replacement = applyThreadActionDrop(
++      layout(),
++      { paneId: "pane-1", zone: "center" },
++      action,
++    );
++    expect(countPanes(replacement.root)).toBe(1);
++    expect(findPaneByContent(replacement.root, action)?.paneId).toBe("pane-1");
++  });
++
++  it("exposes one active imperative host handler", () => {
++    const source = document.createElement("button");
++    const request = {
++      actionId: "plugin-action:tasks:taskboard",
++      threadId: "thr_1",
++      source,
++      startX: 10,
++      startY: 20,
++    };
++    const clear = setPluginThreadActionSplitDragHandler(
++      (received) => received === request,
++    );
++    expect(beginPluginThreadActionSplitDrag(request)).toBe(true);
++    clear();
++    expect(beginPluginThreadActionSplitDrag(request)).toBe(false);
++  });
++});
+diff --git a/apps/app/src/lib/plugin-thread-action-split-drag.ts b/apps/app/src/lib/plugin-thread-action-split-drag.ts
+new file mode 100644
+index 0000000000..6fcf92f239
+--- /dev/null
++++ b/apps/app/src/lib/plugin-thread-action-split-drag.ts
+@@ -0,0 +1,214 @@
++import type { ExperimentalThreadActionSplitDragRequest } from "@get-bb/plugin-sdk";
++import { useCallback, useEffect } from "react";
++import { useStore } from "jotai";
++import { useNavigate } from "react-router-dom";
++import {
++  countPanes,
++  findPane,
++  findPaneByContent,
++  listPanes,
++  MAX_PANES,
++  replacePaneContent,
++  setFocus,
++  splitPane,
++  type PaneContent,
++  type SplitLayout,
++} from "@/lib/split-layout";
++import { splitLayoutAtom } from "@/lib/split-layout/atoms";
++import {
++  beginSplitDrag,
++  resolveSinglePaneSplitDragFallback,
++  type SplitDropTarget,
++  type SplitZone,
++  type ZoneDecision,
++} from "@/lib/split-drag";
++import { usePluginSlots } from "@/lib/plugin-slots";
++import { useIsCompactViewport } from "@bb/shared-ui/hooks/use-compact-viewport";
++import { useSplitWorkspaceActive } from "@/hooks/useSplitWorkspaceActive";
++import { paneContentRoute } from "@/views/thread-detail/splitThreadNavigation";
++import { runPluginPanelAction } from "@/components/plugin/PluginPanelActions";
++
++type ThreadActionSplitDragHandler = (
++  request: ExperimentalThreadActionSplitDragRequest,
++) => boolean;
++
++let handler: ThreadActionSplitDragHandler | null = null;
++
++const BROWSER_ACTION_ID = "file-search-result-open-browser";
++const TERMINAL_ACTION_ID = "file-search-result-start-terminal";
++const DRAG_DISTANCE = 7;
++
++export function beginPluginThreadActionSplitDrag(
++  request: ExperimentalThreadActionSplitDragRequest,
++): boolean {
++  return handler?.(request) ?? false;
++}
++
++export function setPluginThreadActionSplitDragHandler(
++  next: ThreadActionSplitDragHandler,
++): () => void {
++  handler = next;
++  return () => {
++    if (handler === next) handler = null;
++  };
++}
++
++function pluginActionIdentity(
++  actionId: string,
++): { pluginId: string; actionId: string } | null {
++  const match = /^plugin-action:([^:]+):([^:]+)$/u.exec(actionId);
++  return match?.[1] && match[2]
++    ? { pluginId: match[1], actionId: match[2] }
++    : null;
++}
++
++export function decideActionDrop({
++  atMaxPanes,
++  isOpen,
++  title,
++  zone,
++}: {
++  atMaxPanes: boolean;
++  isOpen: boolean;
++  title: string;
++  zone: SplitZone;
++}): ZoneDecision {
++  if (isOpen) return { zone: "center", label: `Focus ${title}` };
++  if (atMaxPanes) {
++    return { zone: "center", label: `Open ${title} here` };
++  }
++  return {
++    zone,
++    label: zone === "center" ? `Open ${title} here` : `Split ${zone}`,
++  };
++}
++
++export function applyThreadActionDrop(
++  layout: SplitLayout,
++  target: SplitDropTarget,
++  content: PaneContent,
++) {
++  const existing = findPaneByContent(layout.root, content);
++  if (findPane(layout.root, target.paneId) === null) return layout;
++  if (existing !== null) {
++    const updated =
++      existing.content.kind === "thread-action" &&
++      content.kind === "thread-action" &&
++      (existing.content.title !== content.title ||
++        existing.content.paramsJson !== content.paramsJson)
++        ? replacePaneContent(layout, existing.paneId, content)
++        : layout;
++    return setFocus(updated, existing.paneId);
++  }
++  return target.zone === "center" || countPanes(layout.root) >= MAX_PANES
++    ? replacePaneContent(layout, target.paneId, content)
++    : splitPane(layout, target.paneId, target.zone, content);
++}
++
++function openActionContent(
++  store: ReturnType<typeof useStore>,
++  navigate: ReturnType<typeof useNavigate>,
++  target: SplitDropTarget,
++  content: PaneContent,
++): boolean {
++  const layout = store.get(splitLayoutAtom);
++  if (layout === null) return false;
++  const existing = findPaneByContent(layout.root, content);
++  const next = applyThreadActionDrop(layout, target, content);
++  if (next === layout && existing === null) return false;
++  if (next !== layout) store.set(splitLayoutAtom, next);
++  void navigate(paneContentRoute(content), {
++    replace: existing !== null,
++  });
++  return true;
++}
++
++export function usePluginThreadActionSplitDrag(): void {
++  const store = useStore();
++  const navigate = useNavigate();
++  const { threadPanelActions } = usePluginSlots();
++  const isCompact = useIsCompactViewport();
++  const splitWorkspaceActive = useSplitWorkspaceActive();
++  const begin = useCallback<ThreadActionSplitDragHandler>(
++    (request) => {
++      if (isCompact || !splitWorkspaceActive) return false;
++      const layout = store.get(splitLayoutAtom);
++      if (layout === null) return false;
++      const threadPane =
++        listPanes(layout.root).find(
++          (pane) =>
++            pane.content.kind === "thread" &&
++            pane.content.threadId === request.threadId,
++        ) ?? null;
++      if (threadPane === null || threadPane.content.kind !== "thread") {
++        return false;
++      }
++      const pluginIdentity = pluginActionIdentity(request.actionId);
++      const pluginAction =
++        pluginIdentity === null
++          ? null
++          : (threadPanelActions.find(
++              (action) =>
++                action.pluginId === pluginIdentity.pluginId &&
++                action.id === pluginIdentity.actionId,
++            ) ?? null);
++      const title =
++        request.actionId === BROWSER_ACTION_ID
++          ? "Browser"
++          : request.actionId === TERMINAL_ACTION_ID
++            ? "Terminal"
++            : pluginAction?.title;
++      if (title === undefined) return false;
++      const content: PaneContent = {
++        kind: "thread-action",
++        projectId: threadPane.content.projectId,
++        threadId: request.threadId,
++        actionId: request.actionId,
++        title,
++        paramsJson: null,
++      };
++      const fallback = resolveSinglePaneSplitDragFallback(layout);
++      beginSplitDrag({
++        ghostLabel: title,
++        sourceEl: request.source,
++        ...(fallback === null ? {} : { fallback }),
++        shouldEngage: (clientX, clientY) =>
++          Math.hypot(clientX - request.startX, clientY - request.startY) >
++          DRAG_DISTANCE,
++        decide: (_paneId, zone) => {
++          const current = store.get(splitLayoutAtom);
++          return current === null
++            ? null
++            : decideActionDrop({
++                atMaxPanes: countPanes(current.root) >= MAX_PANES,
++                isOpen: findPaneByContent(current.root, content) !== null,
++                title,
++                zone,
++              });
++        },
++        onDrop: (target) => {
++          if (pluginAction === null) {
++            openActionContent(store, navigate, target, content);
++            return;
++          }
++          let accepted = false;
++          runPluginPanelAction({
++            action: pluginAction,
++            threadId: request.threadId,
++            openPluginPanel: (opened) => {
++              if (accepted) return;
++              accepted = openActionContent(store, navigate, target, {
++                ...content,
++                title: opened.title,
++                paramsJson: opened.paramsJson,
++              });
++            },
++          });
++        },
++      });
++      return true;
++    },
++    [isCompact, navigate, splitWorkspaceActive, store, threadPanelActions],
++  );
++  useEffect(() => setPluginThreadActionSplitDragHandler(begin), [begin]);
++}
+diff --git a/apps/app/src/lib/split-drag/index.ts b/apps/app/src/lib/split-drag/index.ts
+index ad099d4467..bf5bf7fca9 100644
+--- a/apps/app/src/lib/split-drag/index.ts
++++ b/apps/app/src/lib/split-drag/index.ts
+@@ -1,2 +1,3 @@
+ export * from "./zones";
+ export * from "./splitDragSession";
++export * from "./singlePaneFallback";
+diff --git a/apps/app/src/lib/split-drag/singlePaneFallback.test.ts b/apps/app/src/lib/split-drag/singlePaneFallback.test.ts
+new file mode 100644
+index 0000000000..e87f5d470a
+--- /dev/null
++++ b/apps/app/src/lib/split-drag/singlePaneFallback.test.ts
+@@ -0,0 +1,67 @@
++// @vitest-environment jsdom
++
++import { afterEach, describe, expect, it } from "vitest";
++import type { SplitLayout } from "@/lib/split-layout";
++import { resolveSinglePaneSplitDragFallback } from "./singlePaneFallback";
++
++function singlePaneLayout(): SplitLayout {
++  return {
++    root: {
++      type: "pane",
++      paneId: "pane-1",
++      content: {
++        kind: "thread",
++        projectId: "project-1",
++        threadId: "thread-1",
++      },
++    },
++    focusedPaneId: "pane-1",
++  };
++}
++
++afterEach(() => {
++  document.body.replaceChildren();
++});
++
++describe("single-pane split drag fallback", () => {
++  it("targets the visible thread column instead of the surrounding main area", () => {
++    const main = document.createElement("main");
++    const timeline = document.createElement("section");
++    timeline.id = "thread-detail-timeline-panel";
++    const rightPanel = document.createElement("aside");
++    main.append(timeline, rightPanel);
++    document.body.append(main);
++
++    expect(resolveSinglePaneSplitDragFallback(singlePaneLayout())).toEqual({
++      paneId: "pane-1",
++      container: timeline,
++    });
++  });
++
++  it("declines when the layout is split or the timeline target is absent", () => {
++    expect(resolveSinglePaneSplitDragFallback(singlePaneLayout())).toBeNull();
++
++    const timeline = document.createElement("section");
++    timeline.id = "thread-detail-timeline-panel";
++    document.body.append(timeline);
++    const layout = singlePaneLayout();
++    layout.root = {
++      type: "split",
++      dir: "row",
++      sizes: [0.5, 0.5],
++      children: [
++        layout.root,
++        {
++          type: "pane",
++          paneId: "pane-2",
++          content: {
++            kind: "thread",
++            projectId: "project-1",
++            threadId: "thread-2",
++          },
++        },
++      ],
++    };
++    expect(resolveSinglePaneSplitDragFallback(layout)).toBeNull();
++  });
++});
+diff --git a/apps/app/src/lib/split-drag/singlePaneFallback.ts b/apps/app/src/lib/split-drag/singlePaneFallback.ts
+new file mode 100644
+index 0000000000..5833369f77
+--- /dev/null
++++ b/apps/app/src/lib/split-drag/singlePaneFallback.ts
+@@ -0,0 +1,19 @@
++import { listPanes, type SplitLayout } from "@/lib/split-layout";
++import type { SplitDragFallbackTarget } from "./splitDragSession";
++
++const THREAD_TIMELINE_PANEL_SELECTOR = "#thread-detail-timeline-panel";
++
++export function resolveSinglePaneSplitDragFallback(
++  layout: SplitLayout | null,
++): SplitDragFallbackTarget | null {
++  if (layout === null) return null;
++  const panes = listPanes(layout.root);
++  const onlyPane = panes[0];
++  if (panes.length !== 1 || onlyPane === undefined) return null;
++  const container = document.querySelector<HTMLElement>(
++    THREAD_TIMELINE_PANEL_SELECTOR,
++  );
++  return container === null
++    ? null
++    : { paneId: onlyPane.paneId, container };
++}
+diff --git a/apps/app/src/lib/split-layout/index.ts b/apps/app/src/lib/split-layout/index.ts
+index 5b634c3609..295edaee76 100644
+--- a/apps/app/src/lib/split-layout/index.ts
++++ b/apps/app/src/lib/split-layout/index.ts
+@@ -1,4 +1,5 @@
+ export * from "./computePaneRects";
+ export * from "./ops";
+ export * from "./persistence";
++export * from "./threadWorkspaces";
+ export type * from "./types";
+diff --git a/apps/app/src/lib/split-layout/ops.ts b/apps/app/src/lib/split-layout/ops.ts
+index fc8e5eded6..b3332a33d9 100644
+--- a/apps/app/src/lib/split-layout/ops.ts
++++ b/apps/app/src/lib/split-layout/ops.ts
+@@ -78,6 +78,14 @@ export function isSamePaneContent(
+       candidate.pluginId === content.pluginId
+     );
+   }
++  if (content.kind === "thread-action") {
++    return (
++      candidate.kind === "thread-action" &&
++      candidate.projectId === content.projectId &&
++      candidate.threadId === content.threadId &&
++      candidate.actionId === content.actionId
++    );
++  }
+   return (
+     candidate.kind === "plugin-panel" &&
+     candidate.pluginId === content.pluginId &&
+diff --git a/apps/app/src/lib/split-layout/persistence.test.ts b/apps/app/src/lib/split-layout/persistence.test.ts
+index bd796215d4..19599cc166 100644
+--- a/apps/app/src/lib/split-layout/persistence.test.ts
++++ b/apps/app/src/lib/split-layout/persistence.test.ts
+@@ -95,6 +95,50 @@ describe("split layout persistence", () => {
+     expect(deserializeSplitLayout(serializeSplitLayout(mixed))).toEqual(mixed);
+   });
+ 
++  it("round-trips a thread Action pane with its resolved plugin params", () => {
++    const actionLayout: SplitLayout = {
++      root: {
++        type: "pane",
++        paneId: "pane-1",
++        content: {
++          kind: "thread-action",
++          projectId: "project-1",
++          threadId: "thread-1",
++          actionId: "plugin-action:tasks:taskboard",
++          title: "Taskboard",
++          paramsJson: `{"view":"today"}`,
++        },
++      },
++      focusedPaneId: "pane-1",
++    };
++
++    expect(deserializeSplitLayout(serializeSplitLayout(actionLayout))).toEqual(
++      actionLayout,
++    );
++  });
++
++  it("rejects an unbounded persisted thread Action pane", () => {
++    const actionLayout: SplitLayout = {
++      root: {
++        type: "pane",
++        paneId: "pane-1",
++        content: {
++          kind: "thread-action",
++          projectId: "project-1",
++          threadId: "thread-1",
++          actionId: `plugin-action:tasks:${"x".repeat(300)}`,
++          title: "Taskboard",
++          paramsJson: null,
++        },
++      },
++      focusedPaneId: "pane-1",
++    };
++
++    expect(
++      deserializeSplitLayout(serializeSplitLayout(actionLayout)),
++    ).toBeNull();
++  });
++
+   it("round-trips and restores all eight panes with focus and sizes intact", () => {
+     const eightPanes = layoutWithPaneCount(8);
+ 
+diff --git a/apps/app/src/lib/split-layout/persistence.ts b/apps/app/src/lib/split-layout/persistence.ts
+index 8a03f700bf..2afa4a6935 100644
+--- a/apps/app/src/lib/split-layout/persistence.ts
++++ b/apps/app/src/lib/split-layout/persistence.ts
+@@ -28,6 +28,16 @@ const paneContentSchema = z.discriminatedUnion("kind", [
+       pluginId: z.string().min(1),
+     })
+     .strict(),
++  z
++    .object({
++      kind: z.literal("thread-action"),
++      projectId: z.string().min(1).max(128),
++      threadId: z.string().min(1).max(128),
++      actionId: z.string().min(1).max(256),
++      title: z.string().min(1).max(160),
++      paramsJson: z.string().max(65_536).nullable(),
++    })
++    .strict(),
+ ]);
+ 
+ const paneNodeSchema: z.ZodType<PaneNode> = z
+diff --git a/apps/app/src/lib/split-layout/threadWorkspaces.test.ts b/apps/app/src/lib/split-layout/threadWorkspaces.test.ts
+new file mode 100644
+index 0000000000..b1fdbcdb73
+--- /dev/null
++++ b/apps/app/src/lib/split-layout/threadWorkspaces.test.ts
+@@ -0,0 +1,84 @@
++// @vitest-environment jsdom
++
++import { afterEach, describe, expect, it } from "vitest";
++import type { SplitLayout } from "./types";
++import {
++  loadThreadSplitWorkspace,
++  saveThreadSplitWorkspaces,
++  splitLayoutContainsThread,
++  threadIdsInSplitLayout,
++  THREAD_WORKSPACES_STORAGE_KEY,
++} from "./threadWorkspaces";
++
++function layout(): SplitLayout {
++  return {
++    root: {
++      type: "split",
++      dir: "row",
++      sizes: [0.4, 0.6],
++      children: [
++        {
++          type: "pane",
++          paneId: "pane-1",
++          content: {
++            kind: "thread",
++            projectId: "project-1",
++            threadId: "thread-1",
++          },
++        },
++        {
++          type: "pane",
++          paneId: "pane-2",
++          content: {
++            kind: "thread-action",
++            projectId: "project-1",
++            threadId: "thread-1",
++            actionId: "file-search-result-start-terminal",
++            title: "Terminal",
++            paramsJson: null,
++          },
++        },
++      ],
++    },
++    focusedPaneId: "pane-2",
++  };
++}
++
++afterEach(() => {
++  window.localStorage.clear();
++});
++
++describe("thread split workspaces", () => {
++  it("persists and restores pane geometry and Action panes by thread", () => {
++    const value = layout();
++    saveThreadSplitWorkspaces(value, 100);
++
++    expect(loadThreadSplitWorkspace("thread-1")).toEqual(value);
++    expect(loadThreadSplitWorkspace("thread-2")).toBeNull();
++  });
++
++  it("indexes every thread represented by a mixed workspace", () => {
++    const value = layout();
++    if (value.root.type !== "split") throw new Error("Expected split layout");
++    value.root.children.push({
++      type: "pane",
++      paneId: "pane-3",
++      content: {
++        kind: "thread",
++        projectId: "project-1",
++        threadId: "thread-2",
++      },
++    });
++    value.root.sizes = [0.3, 0.4, 0.3];
++
++    expect(threadIdsInSplitLayout(value)).toEqual(["thread-1", "thread-2"]);
++    expect(splitLayoutContainsThread(value, "thread-2")).toBe(true);
++    saveThreadSplitWorkspaces(value, 200);
++    expect(loadThreadSplitWorkspace("thread-2")).toEqual(value);
++  });
++
++  it("rejects malformed persisted workspace state", () => {
++    window.localStorage.setItem(THREAD_WORKSPACES_STORAGE_KEY, "not json");
++    expect(loadThreadSplitWorkspace("thread-1")).toBeNull();
++  });
++});
+diff --git a/apps/app/src/lib/split-layout/threadWorkspaces.ts b/apps/app/src/lib/split-layout/threadWorkspaces.ts
+new file mode 100644
+index 0000000000..53727945c1
+--- /dev/null
++++ b/apps/app/src/lib/split-layout/threadWorkspaces.ts
+@@ -0,0 +1,104 @@
++import { z } from "zod";
++import { listPanes } from "./ops";
++import { deserializeSplitLayout, serializeSplitLayout } from "./persistence";
++import type { SplitLayout } from "./types";
++
++export const THREAD_WORKSPACES_STORAGE_KEY = "bb.splitLayout.byThread";
++
++const MAX_THREAD_WORKSPACES = 100;
++const MAX_SERIALIZED_LAYOUT_LENGTH = 256_000;
++
++const storedWorkspaceSchema = z
++  .object({
++    layout: z.string().max(MAX_SERIALIZED_LAYOUT_LENGTH),
++    updatedAt: z.number().int().nonnegative(),
++  })
++  .strict();
++
++const storedWorkspacesSchema = z
++  .object({
++    version: z.literal(1),
++    workspaces: z.record(z.string().min(1).max(128), storedWorkspaceSchema),
++  })
++  .strict();
++
++type StoredWorkspaces = z.infer<typeof storedWorkspacesSchema>;
++
++const EMPTY_STORED_WORKSPACES: StoredWorkspaces = {
++  version: 1,
++  workspaces: {},
++};
++
++function readStoredWorkspaces(): StoredWorkspaces {
++  if (typeof window === "undefined") return EMPTY_STORED_WORKSPACES;
++  try {
++    const raw = window.localStorage.getItem(THREAD_WORKSPACES_STORAGE_KEY);
++    if (raw === null) return EMPTY_STORED_WORKSPACES;
++    const parsed: unknown = JSON.parse(raw);
++    const result = storedWorkspacesSchema.safeParse(parsed);
++    return result.success ? result.data : EMPTY_STORED_WORKSPACES;
++  } catch {
++    return EMPTY_STORED_WORKSPACES;
++  }
++}
++
++function writeStoredWorkspaces(value: StoredWorkspaces): void {
++  if (typeof window === "undefined") return;
++  try {
++    window.localStorage.setItem(
++      THREAD_WORKSPACES_STORAGE_KEY,
++      JSON.stringify(value),
++    );
++  } catch {
++    return;
++  }
++}
++
++export function threadIdsInSplitLayout(layout: SplitLayout): string[] {
++  return [
++    ...new Set(
++      listPanes(layout.root).flatMap((pane) => {
++        const content = pane.content;
++        return content.kind === "thread" || content.kind === "thread-action"
++          ? [content.threadId]
++          : [];
++      }),
++    ),
++  ];
++}
++
++export function splitLayoutContainsThread(
++  layout: SplitLayout,
++  threadId: string,
++): boolean {
++  return threadIdsInSplitLayout(layout).includes(threadId);
++}
++
++export function loadThreadSplitWorkspace(threadId: string): SplitLayout | null {
++  const stored = readStoredWorkspaces().workspaces[threadId];
++  if (stored === undefined) return null;
++  const layout = deserializeSplitLayout(stored.layout);
++  return layout !== null && splitLayoutContainsThread(layout, threadId)
++    ? layout
++    : null;
++}
++
++export function saveThreadSplitWorkspaces(
++  layout: SplitLayout,
++  now = Date.now(),
++): void {
++  const threadIds = threadIdsInSplitLayout(layout);
++  if (threadIds.length === 0) return;
++  const current = readStoredWorkspaces();
++  const serialized = serializeSplitLayout(layout);
++  const workspaces = { ...current.workspaces };
++  for (const threadId of threadIds) {
++    workspaces[threadId] = { layout: serialized, updatedAt: now };
++  }
++  const retained = Object.fromEntries(
++    Object.entries(workspaces)
++      .sort((left, right) => right[1].updatedAt - left[1].updatedAt)
++      .slice(0, MAX_THREAD_WORKSPACES),
++  );
++  writeStoredWorkspaces({ version: 1, workspaces: retained });
++}
+diff --git a/apps/app/src/lib/split-layout/types.ts b/apps/app/src/lib/split-layout/types.ts
+index 5282efb56e..4d0ed10727 100644
+--- a/apps/app/src/lib/split-layout/types.ts
++++ b/apps/app/src/lib/split-layout/types.ts
+@@ -16,6 +16,14 @@ export type PaneContent =
+   | {
+       kind: "plugin-detail";
+       pluginId: string;
++    }
++  | {
++      kind: "thread-action";
++      projectId: string;
++      threadId: string;
++      actionId: string;
++      title: string;
++      paramsJson: string | null;
+     };
+ 
+ export interface PaneNode {
+diff --git a/apps/app/src/views/thread-detail/SplitThreadArea.test.tsx b/apps/app/src/views/thread-detail/SplitThreadArea.test.tsx
+index 66b086a1d0..536babc7a2 100644
+--- a/apps/app/src/views/thread-detail/SplitThreadArea.test.tsx
++++ b/apps/app/src/views/thread-detail/SplitThreadArea.test.tsx
+@@ -28,6 +28,7 @@ import { wsManager } from "@/lib/ws";
+ import {
+   listPanes,
+   movePane,
++  saveThreadSplitWorkspaces,
+   serializeSplitLayout,
+   SPLIT_LAYOUT_STORAGE_KEY,
+ } from "@/lib/split-layout";
+@@ -764,6 +765,115 @@ afterEach(() => {
+ });
+ 
+ describe("SplitThreadArea", () => {
++  it("restores the workspace saved for the routed thread", async () => {
++    const saved: SplitLayout = {
++      root: {
++        type: "split",
++        dir: "row",
++        sizes: [0.35, 0.65],
++        children: [
++          { type: "pane", paneId: "pane-1", content: threadContent("thr-a") },
++          {
++            type: "pane",
++            paneId: "pane-2",
++            content: {
++              kind: "thread-action",
++              projectId: PERSONAL_PROJECT_ID,
++              threadId: "thr-a",
++              actionId: "file-search-result-start-terminal",
++              title: "Terminal",
++              paramsJson: null,
++            },
++          },
++        ],
++      },
++      focusedPaneId: "pane-2",
++    };
++    saveThreadSplitWorkspaces(saved, 100);
++    const store = renderSplitArea({
++      path: threadPath("thr-a"),
++      layout: {
++        root: {
++          type: "pane",
++          paneId: "pane-1",
++          content: threadContent("thr-b"),
++        },
++        focusedPaneId: "pane-1",
++      },
++    });
++
++    await waitFor(() => {
++      expect(store.get(splitLayoutAtom)).toEqual({
++        ...saved,
++        focusedPaneId: "pane-1",
++      });
++    });
++  });
++
++  it("switches from a populated workspace to another thread's workspace", async () => {
++    const saved: SplitLayout = {
++      root: {
++        type: "split",
++        dir: "col",
++        sizes: [0.55, 0.45],
++        children: [
++          { type: "pane", paneId: "pane-1", content: threadContent("thr-b") },
++          {
++            type: "pane",
++            paneId: "pane-2",
++            content: {
++              kind: "thread-action",
++              projectId: PERSONAL_PROJECT_ID,
++              threadId: "thr-b",
++              actionId: "file-search-result-open-browser",
++              title: "Browser",
++              paramsJson: null,
++            },
++          },
++        ],
++      },
++      focusedPaneId: "pane-2",
++    };
++    saveThreadSplitWorkspaces(saved, 100);
++    const store = renderSplitArea({
++      path: threadPath("thr-a"),
++      externalTo: threadPath("thr-b"),
++      layout: {
++        root: {
++          type: "split",
++          dir: "row",
++          sizes: [0.5, 0.5],
++          children: [
++            { type: "pane", paneId: "pane-1", content: threadContent("thr-a") },
++            {
++              type: "pane",
++              paneId: "pane-2",
++              content: {
++                kind: "thread-action",
++                projectId: PERSONAL_PROJECT_ID,
++                threadId: "thr-a",
++                actionId: "file-search-result-start-terminal",
++                title: "Terminal",
++                paramsJson: null,
++              },
++            },
++          ],
++        },
++        focusedPaneId: "pane-1",
++      },
++    });
++    await screen.findByTestId("pane-thr-a");
++
++    fireEvent.click(screen.getByTestId("external-nav"));
++
++    await waitFor(() => {
++      expect(store.get(splitLayoutAtom)).toEqual({
++        ...saved,
++        focusedPaneId: "pane-1",
++      });
++    });
++  });
++
+   it("hosts Browser-tab navigation on compact plugin-panel routes", async () => {
+     viewportState.compact = true;
+ 
+@@ -1917,7 +2027,7 @@ describe("SplitThreadArea", () => {
+     ).toBe("");
+   });
+ 
+-  it("replaces the focused pane's content on external navigation without dismantling the layout", async () => {
++  it("opens an unrelated thread in its own workspace", async () => {
+     renderSplitArea({
+       path: threadPath("thr-b"),
+       layout: twoPaneLayout("pane-2"),
+@@ -1936,15 +2046,9 @@ describe("SplitThreadArea", () => {
+     fireEvent.click(screen.getByTestId("external-nav"));
+ 
+     expect(await screen.findByTestId("pane-thr-c")).toBeTruthy();
+-    expect(screen.getByTestId("pane-thr-a")).toBeTruthy();
++    expect(screen.queryByTestId("pane-thr-a")).toBeNull();
+     expect(screen.queryByTestId("pane-thr-b")).toBeNull();
+-    expect(
+-      screen
+-        .getAllByTestId(/^pane-thr-/)
+-        .filter(
+-          (pane) => pane.getAttribute("data-window-top-left-owner") === "true",
+-        ),
+-    ).toEqual([screen.getByTestId("pane-thr-a")]);
++    expect(screen.queryAllByTestId(/^pane-/)).toHaveLength(1);
+   });
+ 
+   it("opens a created thread in the focused composer pane", async () => {
+diff --git a/apps/app/src/views/thread-detail/SplitThreadArea.tsx b/apps/app/src/views/thread-detail/SplitThreadArea.tsx
+index fe0961a7c7..e61e53f270 100644
+--- a/apps/app/src/views/thread-detail/SplitThreadArea.tsx
++++ b/apps/app/src/views/thread-detail/SplitThreadArea.tsx
+@@ -20,6 +20,7 @@ import {
+   type ReactNode,
+   type SetStateAction,
+ } from "react";
++import { useLocation, useNavigate } from "react-router-dom";
+ import { useRouteState } from "@/hooks/useRouteState";
+ import {
+   getThreadRoutePath,
+@@ -39,11 +40,14 @@ import {
+   countPanes,
+   findPane,
+   listPanes,
++  loadThreadSplitWorkspace,
+   movePane,
+   removePane,
+   replacePaneContent,
+   resizeSplit,
+   setFocus,
++  saveThreadSplitWorkspaces,
++  splitLayoutContainsThread,
+   swapPanes,
+ } from "@/lib/split-layout";
+ import {
+@@ -79,6 +83,7 @@ import {
+ } from "./PaneContext";
+ import { LazyThreadDetailView as ThreadDetailView } from "./LazyThreadDetailView";
+ import { LazyRootComposeView as RootComposeView } from "@/views/LazyRootComposeView";
++import { ThreadActionPaneView } from "./ThreadActionPaneView";
+ import { PluginPanelView } from "@/views/PluginPanelView";
+ import {
+   AppPageHeader,
+@@ -102,6 +107,8 @@ import {
+   createSinglePaneLayout,
+   focusedPaneRoute,
+   paneContentRoute,
++  THREAD_ACTION_PANE_QUERY_KEY,
++  threadActionPaneContentForRoute,
+   reconcileLayoutForContent,
+   replaceOriginPaneContent,
+   threadPaneContent,
+@@ -124,6 +131,7 @@ import { useImmediateRouteNavigate } from "@/components/ui/app-route-anchor";
+ import { PluginDetailOpenerBoundary } from "@/components/plugin/plugin-detail-opener";
+ import { defineSplit } from "@/lib/define-split";
+ import { LazyPluginDetailPaneView } from "@/views/ToolsViewSplits";
++import { usePluginThreadActionSplitDrag } from "@/lib/plugin-thread-action-split-drag";
+ 
+ const LazyPluginPanelRightPanelHost = defineSplit<
+   ComponentProps<
+@@ -273,6 +281,7 @@ export function SplitThreadArea(props: SplitThreadAreaProps = {}) {
+ 
+ function SplitThreadAreaContent({ routeContent }: SplitThreadAreaProps) {
+   const { projectId, threadId } = useRouteState();
++  const location = useLocation();
+   const splitWorkspaceActive = useSplitWorkspaceActive();
+   const navigate = useImmediateRouteNavigate();
+   const store = useStore();
+@@ -284,25 +293,57 @@ function SplitThreadAreaContent({ routeContent }: SplitThreadAreaProps) {
+     () => createPaneSecondaryPanelRegistry(),
+     [],
+   );
++  usePluginThreadActionSplitDrag();
+ 
+   const routeThread = useMemo<ThreadRoutePathArgs | null>(
+     () => (projectId && threadId ? { projectId, threadId } : null),
+     [projectId, threadId],
+   );
++  const routeThreadAction = useMemo(
++    () =>
++      threadActionPaneContentForRoute({
++        actionId: new URLSearchParams(location.search).get(
++          THREAD_ACTION_PANE_QUERY_KEY,
++        ),
++        projectId: projectId ?? null,
++        threadId: threadId ?? null,
++      }),
++    [location.search, projectId, threadId],
++  );
+   const currentContent = useMemo<PaneContent | null>(
+-    () => routeContent ?? (routeThread ? threadPaneContent(routeThread) : null),
+-    [routeContent, routeThread],
++    () =>
++      routeContent ??
++      routeThreadAction ??
++      (routeThread ? threadPaneContent(routeThread) : null),
++    [routeContent, routeThread, routeThreadAction],
+   );
+ 
+   useEffect(() => {
+     if (currentContent === null) {
+       return;
+     }
+-    setLayout((previous) =>
+-      reconcileLayoutForContent(previous, currentContent),
+-    );
++    setLayout((previous) => {
++      const contentThreadId =
++        currentContent.kind === "thread" ||
++        currentContent.kind === "thread-action"
++          ? currentContent.threadId
++          : null;
++      if (contentThreadId === null) {
++        return reconcileLayoutForContent(previous, currentContent);
++      }
++      const workspace =
++        previous !== null &&
++        splitLayoutContainsThread(previous, contentThreadId)
++          ? previous
++          : loadThreadSplitWorkspace(contentThreadId);
++      return reconcileLayoutForContent(workspace, currentContent);
++    });
+   }, [currentContent, setLayout]);
+ 
++  useEffect(() => {
++    if (storedLayout !== null) saveThreadSplitWorkspaces(storedLayout);
++  }, [storedLayout]);
++
+   const layout: SplitLayout | null =
+     storedLayout ??
+     (currentContent?.kind === "thread" && routeThread
+@@ -907,7 +948,8 @@ function SplitTree(props: SplitTreeProps) {
+         data-focused={isFocused ? "true" : "false"}
+         data-maximized={isMaximized ? "true" : undefined}
+       >
+-        {node.content.kind === "thread" ? (
++        {node.content.kind === "thread" ||
++        node.content.kind === "thread-action" ? (
+           <PaneStaleWatcher
+             key={node.content.threadId}
+             threadId={node.content.threadId}
+@@ -1161,6 +1203,15 @@ function StandalonePaneContent({
+   if (content.kind === "plugin-detail") {
+     return <LazyPluginDetailPaneView pluginId={content.pluginId} />;
+   }
++  if (content.kind === "thread-action") {
++    return (
++      <ThreadActionPaneView
++        content={content}
++        isFocused
++        paneId={paneId ?? "pane-1"}
++      />
++    );
++  }
+   const panelEntry = navPanelChrome.find(
+     (candidate) =>
+       candidate.chrome.pluginId === content.pluginId &&
+@@ -1242,10 +1293,12 @@ function NonThreadPaneContent({
+   const navPanelChrome = usePluginNavPanelChrome();
+   const resourceRouteLabel = useAtomValue(resourceRouteLabelAtom);
+   const dimsInactiveSplits = useAtomValue(dimInactiveSplitsAtom);
+-  const { reservesWindowPanelToggle, isFocused } = useOptionalPaneContext() ?? {
+-    reservesWindowPanelToggle: false,
+-    isFocused: true,
+-  };
++  const { reservesWindowPanelToggle, isFocused, paneId } =
++    useOptionalPaneContext() ?? {
++      reservesWindowPanelToggle: false,
++      isFocused: true,
++      paneId: "",
++    };
+   const hostLayout = useContext(SecondaryPanelHostLayoutContext);
+   const showsWindowPanelToggle = hostLayout?.pinsCornerToggle === true;
+   const [desktopInfo] = useState(getBbDesktopInfo);
+@@ -1269,7 +1322,11 @@ function NonThreadPaneContent({
+       : null;
+   const label =
+     panelChrome?.title ??
+-    (content.kind === "plugin-detail" ? "Extension" : "New thread");
++    (content.kind === "plugin-detail"
++      ? "Extension"
++      : content.kind === "thread-action"
++        ? content.title
++        : "New thread");
+   const handlePointerDown = (event: ReactPointerEvent) => {
+     if (
+       event.target instanceof Element &&
+@@ -1370,7 +1427,9 @@ function NonThreadPaneContent({
+                 >
+                   {content.kind === "plugin-detail"
+                     ? "Extension"
+-                    : "New thread"}
++                    : content.kind === "thread-action"
++                      ? content.title
++                      : "New thread"}
+                 </p>
+               )}
+             </div>
+@@ -1383,12 +1442,19 @@ function NonThreadPaneContent({
+         className={cn(
+           "flex min-h-0 min-w-0 flex-1 flex-col p-4 md:p-5",
+           isBoundedPane && content.kind === "plugin-panel" && "isolate",
++          content.kind === "thread-action" && "p-0 md:p-0",
+         )}
+       >
+         {content.kind === "new-thread" ? (
+           <RootComposeView />
+         ) : content.kind === "plugin-detail" ? (
+           <LazyPluginDetailPaneView pluginId={content.pluginId} />
++        ) : content.kind === "thread-action" ? (
++          <ThreadActionPaneView
++            content={content}
++            isFocused={isFocused}
++            paneId={paneId}
++          />
+         ) : (
+           <PluginPanelView
+             pluginId={content.pluginId}
+diff --git a/apps/app/src/views/thread-detail/ThreadActionPaneView.test.tsx b/apps/app/src/views/thread-detail/ThreadActionPaneView.test.tsx
+new file mode 100644
+index 0000000000..aedb21ae49
+--- /dev/null
++++ b/apps/app/src/views/thread-detail/ThreadActionPaneView.test.tsx
+@@ -0,0 +1,65 @@
++// @vitest-environment jsdom
++
++import { cleanup, render, screen } from "@testing-library/react";
++import { afterEach, describe, expect, it, vi } from "vitest";
++import type { PaneContent } from "@/lib/split-layout";
++import { ThreadActionPaneView } from "./ThreadActionPaneView";
++
++vi.mock("@/hooks/queries/thread-queries", () => ({
++  useThread: () => ({ data: { environmentId: "environment-1" } }),
++}));
++
++vi.mock("@/hooks/queries/environment-queries", () => ({
++  useEnvironment: () => ({
++    data: { hostId: "host-1", status: "ready" },
++  }),
++}));
++
++vi.mock("@/hooks/queries/host-queries", () => ({
++  useHosts: () => ({ data: [{ id: "host-1", status: "connected" }] }),
++}));
++
++vi.mock("@/components/secondary-panel/lazySecondaryPanelComponents", () => ({
++  LazyThreadTerminalPanel: () => <div data-testid="terminal-pane" />,
++}));
++
++vi.mock("@/components/secondary-panel/BrowserTabDeck", () => ({
++  BrowserTabDeck: () => <div data-testid="browser-pane" />,
++  BrowserTabLifecycleObserver: () => null,
++}));
++
++vi.mock("@/components/plugin/PluginPanelActions", () => ({
++  PluginPanelTabContent: () => <div data-testid="plugin-pane" />,
++}));
++
++afterEach(cleanup);
++
++describe("ThreadActionPaneView", () => {
++  it("exposes the thread and Action identity on the main pane content", () => {
++    const content: Extract<PaneContent, { kind: "thread-action" }> = {
++      kind: "thread-action",
++      projectId: "project-1",
++      threadId: "thread-1",
++      actionId: "file-search-result-start-terminal",
++      title: "Terminal",
++      paramsJson: null,
++    };
++
++    const { container } = render(
++      <ThreadActionPaneView content={content} isFocused paneId="pane-2" />,
++    );
++
++    const marker = container.firstElementChild;
++    expect(marker).toBeInstanceOf(HTMLElement);
++    expect(marker?.getAttribute("data-thread-action-pane-action-id")).toBe(
++      content.actionId,
++    );
++    expect(marker?.getAttribute("data-thread-action-pane-thread-id")).toBe(
++      content.threadId,
++    );
++    expect(marker?.getAttribute("data-thread-action-pane-title")).toBe(
++      content.title,
++    );
++    expect(screen.getByTestId("terminal-pane")).toBeTruthy();
++  });
++});
+diff --git a/apps/app/src/views/thread-detail/ThreadActionPaneView.tsx b/apps/app/src/views/thread-detail/ThreadActionPaneView.tsx
+new file mode 100644
+index 0000000000..a173bd5719
+--- /dev/null
++++ b/apps/app/src/views/thread-detail/ThreadActionPaneView.tsx
+@@ -0,0 +1,192 @@
++import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
++import type { BrowserFixedPanelTab } from "@/lib/fixed-panel-tabs-state";
++import { createPluginPanelFixedPanelTab } from "@/lib/fixed-panel-tabs-state";
++import { BrowserTabDeck } from "@/components/secondary-panel/BrowserTabDeck";
++import { BrowserTabLifecycleObserver } from "@/components/secondary-panel/BrowserTabLifecycleObserver";
++import { LazyThreadTerminalPanel } from "@/components/secondary-panel/lazySecondaryPanelComponents";
++import { PluginPanelTabContent } from "@/components/plugin/PluginPanelActions";
++import { useThread } from "@/hooks/queries/thread-queries";
++import { useEnvironment } from "@/hooks/queries/environment-queries";
++import { useHosts } from "@/hooks/queries/host-queries";
++import { useCreateTerminal } from "@/hooks/queries/thread-terminal-queries";
++import {
++  DEFAULT_TERMINAL_COLS,
++  DEFAULT_TERMINAL_ROWS,
++} from "@/components/thread/terminal/useThreadTerminalController";
++import type { PaneContent } from "@/lib/split-layout";
++
++const BROWSER_ACTION_ID = "file-search-result-open-browser";
++const TERMINAL_ACTION_ID = "file-search-result-start-terminal";
++
++interface ThreadActionPaneViewProps {
++  content: Extract<PaneContent, { kind: "thread-action" }>;
++  isFocused: boolean;
++  paneId: string;
++}
++
++function pluginActionIdentity(
++  actionId: string,
++): { pluginId: string; actionId: string } | null {
++  const match = /^plugin-action:([^:]+):([^:]+)$/u.exec(actionId);
++  return match?.[1] && match[2]
++    ? { pluginId: match[1], actionId: match[2] }
++    : null;
++}
++
++export function ThreadActionPaneView({
++  content,
++  isFocused,
++  paneId,
++}: ThreadActionPaneViewProps) {
++  const { data: thread } = useThread(content.threadId);
++  const { data: environment } = useEnvironment(thread?.environmentId ?? "", {
++    enabled:
++      thread?.environmentId !== null && thread?.environmentId !== undefined,
++  });
++  const hosts = useHosts({
++    enabled: environment !== undefined,
++  });
++  const canCreateTerminal =
++    environment?.status === "ready" &&
++    (hosts.data ?? []).some(
++      (host) => host.id === environment.hostId && host.status === "connected",
++    );
++  let body: ReactNode;
++  if (content.actionId === TERMINAL_ACTION_ID) {
++    body = (
++      <ThreadActionTerminalPane
++        content={content}
++        isFocused={isFocused}
++        canCreateTerminal={canCreateTerminal}
++      />
++    );
++  } else if (content.actionId === BROWSER_ACTION_ID) {
++    body = (
++      <ThreadActionBrowserPane
++        environmentId={thread?.environmentId ?? null}
++        isFocused={isFocused}
++        threadId={content.threadId}
++      />
++    );
++  } else {
++    const identity = pluginActionIdentity(content.actionId);
++    if (identity === null) return null;
++    const tab = createPluginPanelFixedPanelTab({
++      actionId: identity.actionId,
++      paramsJson: content.paramsJson,
++      pluginId: identity.pluginId,
++      title: content.title,
++    });
++    body = (
++      <PluginPanelTabContent
++        tab={tab}
++        context={{ kind: "thread", threadId: content.threadId }}
++      />
++    );
++  }
++  return (
++    <div
++      data-thread-action-pane-action-id={content.actionId}
++      data-thread-action-pane-thread-id={content.threadId}
++      data-thread-action-pane-title={content.title}
++      className="h-full min-h-0 min-w-0"
++    >
++      {body}
++    </div>
++  );
++}
++
++function ThreadActionTerminalPane({
++  content,
++  isFocused,
++  canCreateTerminal,
++}: {
++  content: Extract<PaneContent, { kind: "thread-action" }>;
++  isFocused: boolean;
++  canCreateTerminal: boolean;
++}) {
++  const createTerminal = useCreateTerminal();
++  const [terminalId, setTerminalId] = useState<string | null>(null);
++  const [error, setError] = useState<string | null>(null);
++  const started = useRef(false);
++  const target = useMemo(
++    () => ({ kind: "thread" as const, threadId: content.threadId }),
++    [content.threadId],
++  );
++  useEffect(() => {
++    if (started.current || !canCreateTerminal) return;
++    started.current = true;
++    void createTerminal
++      .mutateAsync({
++        cols: DEFAULT_TERMINAL_COLS,
++        rows: DEFAULT_TERMINAL_ROWS,
++        target,
++      })
++      .then((session) => setTerminalId(session.id))
++      .catch(() => {
++        started.current = false;
++        setError(
++          "This thread has no workspace available, so a terminal cannot start here.",
++        );
++      });
++  }, [canCreateTerminal, createTerminal, target]);
++  if (terminalId === null) {
++    return (
++      <div className="grid h-full place-items-center px-4 text-center text-xs text-muted-foreground">
++        {error ?? "Starting terminal…"}
++      </div>
++    );
++  }
++  return (
++    <LazyThreadTerminalPanel
++      autoFocus={isFocused}
++      isPanelOpen
++      isPanelPersistedOpen
++      target={target}
++      terminalId={terminalId}
++    />
++  );
++}
++
++function ThreadActionBrowserPane({
++  environmentId,
++  isFocused,
++  threadId,
++}: {
++  environmentId: string | null;
++  isFocused: boolean;
++  threadId: string;
++}) {
++  const tabId = `thread-action-browser:${threadId}`;
++  const [state, setState] = useState({ title: null as string | null, url: "" });
++  const [addressFocusRequest, setAddressFocusRequest] = useState<{
++    requestId: number;
++    tabId: string;
++  } | null>({ requestId: 1, tabId });
++  const tab = useMemo<BrowserFixedPanelTab>(
++    () => ({
++      environmentId,
++      id: tabId,
++      kind: "browser",
++      title: state.title,
++      url: state.url,
++    }),
++    [environmentId, state.title, state.url, tabId],
++  );
++  return (
++    <>
++      <BrowserTabLifecycleObserver browserTabs={[tab]} threadId={threadId} />
++      <BrowserTabDeck
++        browserTabs={[tab]}
++        activeBrowserTabId={tab.id}
++        addressFocusRequest={addressFocusRequest}
++        onAddressFocusRequestConsumed={() => setAddressFocusRequest(null)}
++        environmentId={environmentId}
++        canShowNativeBrowserView={isFocused}
++        canHandleBrowserCommands={isFocused}
++        threadId={threadId}
++        onUpdate={({ title, url }) => setState({ title, url })}
++      />
++    </>
++  );
++}
+diff --git a/apps/app/src/views/thread-detail/splitThreadNavigation.test.ts b/apps/app/src/views/thread-detail/splitThreadNavigation.test.ts
+index 0f564ba57f..a5f7dde889 100644
+--- a/apps/app/src/views/thread-detail/splitThreadNavigation.test.ts
++++ b/apps/app/src/views/thread-detail/splitThreadNavigation.test.ts
+@@ -12,7 +12,9 @@ import {
+   applyThreadPaneActionToLayout,
+   createSinglePaneLayout,
+   focusedPaneRoute,
++  paneContentRoute,
+   reconcileLayoutForContent,
++  threadActionPaneContentForRoute,
+ } from "./splitThreadNavigation";
+ 
+ function twoPaneLayout(): SplitLayout {
+@@ -78,6 +80,53 @@ describe("mixed page navigation", () => {
+     });
+     expect(focusedPaneRoute(after)).toBe("/plugins/notes/notes/work/today.md");
+   });
++
++  it("round-trips a thread Action route and preserves resolved pane state", () => {
++    const action = {
++      kind: "thread-action",
++      projectId: "p1",
++      threadId: "thread-1",
++      actionId: "plugin-action:tasks:taskboard",
++      title: "Taskboard",
++      paramsJson: `{"view":"today"}`,
++    } as const;
++    const before = splitPane(twoPaneLayout(), "pane-1", "bottom", action);
++    const route = paneContentRoute(action);
++    const parsed = threadActionPaneContentForRoute({
++      actionId: new URL(route, "https://bb.test").searchParams.get(
++        "action-pane",
++      ),
++      projectId: "p1",
++      threadId: "thread-1",
++    });
++    const after =
++      parsed === null ? before : reconcileLayoutForContent(before, parsed);
++
++    expect(route).toBe(
++      "/projects/p1/threads/thread-1?action-pane=plugin-action%3Atasks%3Ataskboard",
++    );
++    expect(findPaneByContent(after.root, action)?.content).toEqual(action);
++    expect(after.focusedPaneId).toBe(
++      findPaneByContent(after.root, action)?.paneId,
++    );
++  });
++
++  it("rejects unknown and unbounded thread Action routes", () => {
++    expect(
++      threadActionPaneContentForRoute({
++        actionId: "plugin-action:tasks",
++        projectId: "p1",
++        threadId: "thread-1",
++      }),
++    ).toBeNull();
++    expect(
++      threadActionPaneContentForRoute({
++        actionId: `plugin-action:tasks:${"x".repeat(300)}`,
++        projectId: "p1",
++        threadId: "thread-1",
++      }),
++    ).toBeNull();
++  });
+ });
+ 
+ describe("applyThreadOpenToLayout", () => {
+diff --git a/apps/app/src/views/thread-detail/splitThreadNavigation.ts b/apps/app/src/views/thread-detail/splitThreadNavigation.ts
+index aa59c02cf8..24f33965a6 100644
+--- a/apps/app/src/views/thread-detail/splitThreadNavigation.ts
++++ b/apps/app/src/views/thread-detail/splitThreadNavigation.ts
+@@ -28,6 +28,7 @@ import {
+ const FIRST_PANE_ID = "pane-1";
+ const SPLITTABLE_THREAD_ROUTE_PATH = "/projects/:projectId/threads/:threadId";
+ const SPLITTABLE_PERSONAL_THREAD_ROUTE_PATH = "/threads/:threadId";
++export const THREAD_ACTION_PANE_QUERY_KEY = "action-pane";
+ 
+ export function threadPaneContent(thread: ThreadRoutePathArgs): PaneContent {
+   return {
+@@ -67,6 +68,11 @@ export function paneContentRoute(content: PaneContent): string {
+   if (content.kind === "plugin-detail") {
+     return getPluginDetailRoutePath({ pluginId: content.pluginId });
+   }
++  if (content.kind === "thread-action") {
++    const search = new URLSearchParams();
++    search.set(THREAD_ACTION_PANE_QUERY_KEY, content.actionId);
++    return `${getThreadRoutePath(content)}?${search.toString()}`;
++  }
+   return getPluginPanelRoutePath({
+     pluginId: content.pluginId,
+     path: content.panelPath,
+@@ -74,6 +80,42 @@ export function paneContentRoute(content: PaneContent): string {
+   });
+ }
+ 
++export function threadActionPaneContentForRoute({
++  actionId,
++  projectId,
++  threadId,
++}: {
++  actionId: string | null;
++  projectId: string | null;
++  threadId: string | null;
++}): PaneContent | null {
++  if (
++    actionId === null ||
++    actionId.length === 0 ||
++    actionId.length > 256 ||
++    (actionId !== "file-search-result-open-browser" &&
++      actionId !== "file-search-result-start-terminal" &&
++      !/^plugin-action:[^:]+:[^:]+$/u.test(actionId)) ||
++    projectId === null ||
++    threadId === null
++  ) {
++    return null;
++  }
++  return {
++    kind: "thread-action",
++    projectId,
++    threadId,
++    actionId,
++    title:
++      actionId === "file-search-result-open-browser"
++        ? "Browser"
++        : actionId === "file-search-result-start-terminal"
++          ? "Terminal"
++          : "Action",
++    paramsJson: null,
++  };
++}
++
+ export function paneContentForPathname(pathname: string): PaneContent | null {
+   if (pathname === APP_ROOT_ROUTE_PATH) {
+     return { kind: "new-thread" };
+diff --git a/docs/api_to_audit.md b/docs/api_to_audit.md
+index 1159a9a4d3..bdee4fdcb3 100644
+--- a/docs/api_to_audit.md
++++ b/docs/api_to_audit.md
+@@ -1286,6 +1286,26 @@ Before stabilization, audit:
+   under `plugins/*` sets a status today, so the rename is free until the
+   prefix drops.
+ 
++## `PluginContentScriptContext.experimental_beginThreadActionSplitDrag`
++
++Lets a trusted content script hand one native thread Action to BB's split-drag
++layer. The host resolves the Action, owns the drag ghost and pane zones, runs
++the Action only after a valid drop, and renders Browser, Terminal, or a
++registered thread-panel Action in a persistent main-workspace pane.
++
++Before stabilization, audit:
++
++- whether Action discovery should become a typed host directory instead of
++  accepting the stable ids exposed by the native New Tab launcher;
++- whether center replacement and edge splitting should be configurable;
++- how custom Actions that call `openPanel` more than once choose a pane;
++- persistence and recovery when a plugin Action disappears or its params
++  schema changes;
++- compact behavior, keyboard placement, pointer cancellation, and the pane
++  limit;
++- whether Browser and Terminal should share this Action contract or expose
++  separate typed targets.
++
+ ## `bb.providers.register` (`experimental_bridgeOptions`, `experimental_visibility`, and the `experimental_providerBridge` artifact export)
+ 
+ **Kept experimental (2026-08-22).** `bb.providers.register` and the
+diff --git a/packages/plugin-sdk/src/app-contract.ts b/packages/plugin-sdk/src/app-contract.ts
+index 461ae5d417..24b5930098 100644
+--- a/packages/plugin-sdk/src/app-contract.ts
++++ b/packages/plugin-sdk/src/app-contract.ts
+@@ -2355,6 +2355,19 @@ export interface PluginAppComposer {
+   ): void;
+ }
+ 
++export interface ExperimentalThreadActionSplitDragRequest {
++  /** Action id exposed by the thread's native New Tab launcher. */
++  readonly actionId: string;
++  /** Thread that owns the Action and supplies its execution context. */
++  readonly threadId: string;
++  /** Interactive element whose pointer gesture starts the drag. */
++  readonly source: HTMLElement;
++  /** Pointer position from the initiating pointerdown event. */
++  readonly startX: number;
++  /** Pointer position from the initiating pointerdown event. */
++  readonly startY: number;
++}
++
+ /** Stable lifecycle values for one content-script instance in one bb client. */
+ export interface PluginContentScriptContext {
+   /** The id of the plugin that owns this script. */
+@@ -2378,6 +2391,21 @@ export interface PluginContentScriptContext {
+     threadId: string,
+     status: PluginComposerThreadRowStatus | null,
+   ) => void;
++  /**
++   * Start BB's host-owned pane-zone drag for one Action in a thread.
++   *
++   * Edge drops create a main-workspace split, center drops replace the target
++   * pane, an already-open Action focuses its pane, and the pane cap converts
++   * an edge drop into a replacement. The Action runs only after a valid drop.
++   * Returns false when the Action, thread, split workspace, or host support is
++   * unavailable.
++   *
++   * Optional so compatible 0.x clients can be feature-detected.
++   * Experimental: see docs/api_to_audit.md.
++   */
++  readonly experimental_beginThreadActionSplitDrag?: (
++    request: ExperimentalThreadActionSplitDragRequest,
++  ) => boolean;
+ }
+ 
+ /** Cleanup returned by a frontend content script. */
+diff --git a/packages/plugin-sdk/src/testing/__tests__/app-harness.test.tsx b/packages/plugin-sdk/src/testing/__tests__/app-harness.test.tsx
+index 6792f77d2e..6009c9bf02 100644
+--- a/packages/plugin-sdk/src/testing/__tests__/app-harness.test.tsx
++++ b/packages/plugin-sdk/src/testing/__tests__/app-harness.test.tsx
+@@ -825,6 +825,68 @@ describe("loadPluginApp", () => {
+     await mounted.lifecycle.dispose();
+   });
+ 
++  it("models the optional thread Action split-drag content-script API", async () => {
++    const source = document.createElement("button");
++    let accepted = false;
++    const captured = await loadPluginApp(
++      definePluginApp((builder) => {
++        builder.contentScripts.register({
++          id: "action-drag",
++          mount({ experimental_beginThreadActionSplitDrag }) {
++            accepted =
++              experimental_beginThreadActionSplitDrag?.({
++                actionId: "plugin-action:tasks:taskboard",
++                threadId: "thr_1",
++                source,
++                startX: 120,
++                startY: 40,
++              }) ?? false;
++          },
++        });
++      }),
++    );
++
++    const mounted = await mountPluginContentScripts(captured, {
++      pluginId: "action-topbar",
++      experimental_beginThreadActionSplitDrag: () => true,
++    });
++    expect(accepted).toBe(true);
++    expect(mounted.inspection.experimental_threadActionSplitDragCalls).toEqual([
++      {
++        actionId: "plugin-action:tasks:taskboard",
++        threadId: "thr_1",
++        source,
++        startX: 120,
++        startY: 40,
++      },
++    ]);
++    await mounted.lifecycle.dispose();
++  });
++
++  it("can omit thread Action split drag for older compatible hosts", async () => {
++    let available = true;
++    const captured = await loadPluginApp(
++      definePluginApp((builder) => {
++        builder.contentScripts.register({
++          id: "action-drag-compatibility",
++          mount({ experimental_beginThreadActionSplitDrag }) {
++            available = experimental_beginThreadActionSplitDrag !== undefined;
++          },
++        });
++      }),
++    );
++
++    const mounted = await mountPluginContentScripts(captured, {
++      pluginId: "action-topbar",
++      omitExperimentalThreadActionSplitDrag: true,
++    });
++    expect(available).toBe(false);
++    expect(mounted.inspection.experimental_threadActionSplitDragCalls).toEqual(
++      [],
++    );
++    await mounted.lifecycle.dispose();
++  });
++
+   it("rolls back earlier content scripts when a later mount rejects", async () => {
+     const events: string[] = [];
+     const captured = await loadPluginApp(
+diff --git a/plugins/bb-guide/skills/bb-plugin-authoring/references/frontend-api-index.md b/plugins/bb-guide/skills/bb-plugin-authoring/references/frontend-api-index.md
+index 92707afdc3..92a4368c4a 100644
+--- a/plugins/bb-guide/skills/bb-plugin-authoring/references/frontend-api-index.md
++++ b/plugins/bb-guide/skills/bb-plugin-authoring/references/frontend-api-index.md
+@@ -205,6 +205,7 @@ Read the installed SDK declarations for the exact current signatures.
+ - `PluginAppSlots`
+ - `PluginAppComposer`
+ - `PluginContentScriptContext`
++- `ExperimentalThreadActionSplitDragRequest`
+ - `PluginContentScriptDisposer`
+ - `PluginContentScriptRegistration`
+ - `PluginAppContentScripts`
+diff --git a/plugins/bb-guide/skills/bb-plugin-authoring/references/frontend-core-slots.md b/plugins/bb-guide/skills/bb-plugin-authoring/references/frontend-core-slots.md
+index 46c8c0fb73..c960dd904f 100644
+--- a/plugins/bb-guide/skills/bb-plugin-authoring/references/frontend-core-slots.md
++++ b/plugins/bb-guide/skills/bb-plugin-authoring/references/frontend-core-slots.md
+@@ -12,7 +12,8 @@ compatible ESM bundle.
+ 
+ The host mounts scripts in registration order after the bundle loads and
+ `definePluginApp` setup validates. `mount` receives
+-`{ pluginId, generation, signal, experimental_setThreadRowStatus? }`:
++`{ pluginId, generation, signal, experimental_setThreadRowStatus?,
++experimental_beginThreadActionSplitDrag? }`:
+ `generation` is a monotonic per-window mount attempt number, and `signal`
+ aborts before cleanup starts. The optional experimental setter targets an
+ explicit thread row with `{ icon, label, tone? }` or clears it with `null`.
+@@ -21,6 +22,14 @@ scopes statuses to the calling plugin and automatically clears them when that
+ frontend generation deactivates; feature-detect the setter for compatibility
+ with older bb clients.
+ 
++`experimental_beginThreadActionSplitDrag` hands an Action-row pointer gesture
++to BB's pane-zone drag layer. Pass the Action id exposed by the native thread
++New Tab launcher, the owning thread id, the interactive source element, and
++the pointerdown coordinates. Edge drops split, center drops replace, an
++already-open Action focuses, and the pane cap replaces. Feature-detect it for
++older clients. Clicking the source remains plugin-owned; the host runs the
++Action only after a valid drop.
++
+ A script may return nothing, a disposer, or a promise of either; async mount
+ setup is time-boxed to 10 seconds. Keep long-running work outside the returned
+ promise, observe `signal`, and catch failures in work the host does not await.
+diff --git a/plugins/bb-guide/skills/bb-plugin-authoring/references/frontend-testing-api-index.md b/plugins/bb-guide/skills/bb-plugin-authoring/references/frontend-testing-api-index.md
+index 468cfb9f63..71d6d4b0cd 100644
+--- a/plugins/bb-guide/skills/bb-plugin-authoring/references/frontend-testing-api-index.md
++++ b/plugins/bb-guide/skills/bb-plugin-authoring/references/frontend-testing-api-index.md
+@@ -19,6 +19,7 @@ Read `testing.md` for examples and fidelity limits.
+ - `PluginAppSource`
+ - `loadPluginApp`
+ - `ContentScriptTestMountOptions`
++- `ExperimentalContentScriptThreadActionSplitDragCall`
+ - `ContentScriptThreadRowStatusCall`
+ - `MountedPluginContentScripts`
+ - `mountPluginContentScripts`

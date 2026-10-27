@@ -1,9 +1,10 @@
 # Action Topbar
 
 > [!NOTE]
-> Action dragging works on stock BB. When BB exposes the experimental
-> Action split-drag API, drops also use BB's native split zones; otherwise the
-> launcher opens the Action in the pane under the pointer.
+> Native Action workspace panes need a BB build that exposes the experimental
+> split-drag API. Official BB 0.46.1 and 0.47.1 builds do not. Without it,
+> dropping an Action opens it in the pane under the pointer. The included
+> [0.46.1 patch](#native-action-splits-on-bb-0461) restores real splits.
 
 Action Topbar projects BB Actions opened as main-workspace panes into the
 **main thread topbar**. Pane content stays under BB's ownership; the topbar
@@ -13,7 +14,8 @@ keeps its original New Tab / Actions launcher.
 Action-to-pane dragging uses BB's experimental thread Action split-drag
 content-script API when it is available. Without it, dropping an Action on a
 pane opens the Action there through BB's native launcher, so a BB upgrade never
-disables the control.
+disables the control. Apply the included host patch to get real main-workspace
+Action panes on BB 0.46.1.
 
 - Click a tab to focus its main-workspace pane without opening the right panel.
 - Close a tab from the left-side **×** shown on hover, focus, or activation.
@@ -57,7 +59,7 @@ plugin.
 Install from Git on a compatible BB build:
 
 ```sh
-bb plugin install 'git:https://github.com/MateoCerquetella/bb-plugins.git@semver:action-topbar/:^0.1.3' \
+bb plugin install 'git:https://github.com/MateoCerquetella/bb-plugins.git@semver:action-topbar/:^0.1.4' \
   --subdirectory plugins/action-topbar \
   --yes
 ```
@@ -67,6 +69,30 @@ Or install a local checkout in place:
 ```sh
 bb plugin install path:/absolute/path/to/bb-plugins/plugins/action-topbar --yes
 ```
+
+## Native Action splits on BB 0.46.1
+
+Official BB 0.46.1 and 0.47.1 removed the experimental
+`experimental_beginThreadActionSplitDrag` content-script API, so stock builds
+can only open an Action in an existing pane. The included
+[`patches/bb-0.46.1-action-drag.patch`](./patches/bb-0.46.1-action-drag.patch)
+restores real Action panes on BB 0.46.1.
+
+Apply it to a BB 0.46.1 source checkout, then build and install the app
+frontend:
+
+```sh
+cd /path/to/bb-source
+git checkout desktop-v0.46.1
+git apply /path/to/bb-plugins/plugins/action-topbar/patches/bb-0.46.1-action-drag.patch
+pnpm install --offline --frozen-lockfile
+pnpm --filter @bb/app build
+```
+
+Back up the running `bb-app/app/dist`, replace it with `apps/app/dist`, and
+reload BB. The patch is tied to the 0.46.1 source tree; regenerate it when BB
+changes the split-layout modules. It also fixes Start Terminal from an Action
+pane by creating the terminal for that thread.
 
 ## Develop
 
