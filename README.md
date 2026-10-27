@@ -27,7 +27,7 @@ All plugins in this repository are independently installable.
 | <img src="./plugins/action-topbar/assets/icon.svg" width="128" height="128" alt="" /> | [Action Topbar](./plugins/action-topbar) | [Git install](#action-topbar-install) | Adds a compact main-thread topbar with draggable BB Actions and persistent, per-thread workspace panes. |
 | <img src="./plugins/dockside/assets/icon.svg" width="128" height="128" alt="" /> | [Dockside](./plugins/dockside) | [Git release](#dockside-quick-start) | Adds a project-first sidebar plus mobile navigation across active and unread threads, with synchronized project colors and animated status icons. |
 | <img src="./plugins/host-monitor/assets/icon.svg" width="128" height="128" alt="" /> | [Host Monitor](./plugins/host-monitor) | [Git release](#host-monitor-quick-start) | Monitors CPU, RAM, disk, network, host details, and guarded process actions across every machine enrolled in BB. Requires BB 0.40+. |
-| <img src="./plugins/steel-browser/assets/icon.svg" width="128" height="128" alt="" /> | [BB Surf](./plugins/steel-browser) | [Git release](#bb-surf-quick-start) | Operates self-hosted Steel browser sessions from BB with health, session lifecycle, CLI, and agent guidance. Requires BB 0.40+. |
+| <img src="./plugins/steel-browser/assets/icon.svg" width="128" height="128" alt="" /> | [BB Surf](./plugins/steel-browser) | [Git release](#bb-surf-quick-start) | Operates self-hosted Steel browser sessions from BB with health, session lifecycle, CLI, agent guidance, and selectable Playwright or Jev execution. Requires BB 0.40+. |
 | <img src="./plugins/taskboard/assets/icon.svg" width="128" height="128" alt="" /> | [Taskboard](./plugins/taskboard) | [Git release](#taskboard-quick-start) | Brings each BB project's GitHub, GitLab, Gitea, Linear, or Jira tasks into one focused List or Kanban board. |
 | <img src="./plugins/aura/assets/icon.svg" width="128" height="128" alt="" /> | [Aura](./plugins/aura) | [Install](./plugins/aura#install) | Custom PNG/JPG backgrounds, animated pixel textures, six saved slots, and an optional real GitHub activity overview below the centered New thread composer. |
 | <img src="./plugins/touchbar/assets/icon.svg" width="128" height="128" alt="" /> | [Touch Bar Agent Monitor](./plugins/touchbar) | [Git release](#touch-bar-agent-monitor-quick-start) | Adds a native persistent Control Strip badge and fullscreen BB agent panel to Touch Bar Macs. Requires BB 0.40+. |
@@ -134,7 +134,7 @@ service runs as a pinned Docker container on loopback port `3100`.
 Install from the published Git release range:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.0 --subdirectory plugins/steel-browser --tag-prefix steel-browser/
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.2.0 --subdirectory plugins/steel-browser --tag-prefix steel-browser/
 bb plugin reload steel-browser
 ```
 

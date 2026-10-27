@@ -256,7 +256,7 @@ Steel, Docker and the optional Jev runtime must be reachable from the BB server
 on dyaus. This implementation does not dispatch runners to a different host.
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.0 --subdirectory plugins/steel-browser --tag-prefix steel-browser/
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.2.0 --subdirectory plugins/steel-browser --tag-prefix steel-browser/
 bb plugin reload steel-browser
 ```
 
