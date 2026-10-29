@@ -6,12 +6,15 @@ import {
 import {
   applyPooledAccounts,
   loadPooledAccounts,
+  withTimeout,
   type PoolRpcSdk,
 } from "./pooled-usage.ts";
 import {
+  dedupeByAccountEmail,
   normalizeUsage,
   providerIdForWireId,
   type ProviderId,
+  type ProviderUsage,
   type RawProviderId,
   type RawUsageResponse,
   type UsageSnapshot,
@@ -25,8 +28,7 @@ const SUPPLEMENTAL_PROVIDER_IDS = [
 
 export interface UsageSdk {
   threads: {
-    get(args: { threadId: string }): Promise<{ environmentId: string | null }>;
-    count?(args: {
+    count?(args?: {
       groupBy?: "provider";
       status?: "active" | "starting";
     }): Promise<{
@@ -34,11 +36,8 @@ export interface UsageSdk {
       groups?: Array<{ key: string | null; count: number }>;
     }>;
   };
-  environments: {
-    get(args: { environmentId: string }): Promise<{ hostId: string }>;
-  };
   hosts: {
-    get(args: { hostId: string }): Promise<{ name: string }>;
+    list(args?: { signal?: AbortSignal }): Promise<UsageHost[]>;
   };
   system: {
     usageLimits(args?: {
@@ -50,58 +49,59 @@ export interface UsageSdk {
   plugins?: PoolRpcSdk["plugins"];
 }
 
-export async function resolveThreadHostId(
-  sdk: Pick<UsageSdk, "threads" | "environments">,
-  threadId: string,
-): Promise<string | null> {
-  const thread = await sdk.threads.get({ threadId });
-  if (thread.environmentId === null) return null;
-
-  try {
-    const environment = await sdk.environments.get({
-      environmentId: thread.environmentId,
-    });
-    return environment.hostId;
-  } catch {
-    return null;
-  }
+export interface UsageHost {
+  id: string;
+  name: string;
+  status: "connected" | "disconnected";
+  lastSeenAt: number | null;
 }
 
-async function resolveHostName(
-  sdk: Pick<UsageSdk, "hosts">,
-  hostId: string | null,
-): Promise<string | null> {
-  if (hostId === null) return null;
+/** One machine's raw readings. A null host id marks readings not tied to a machine. */
+interface UsageSource {
+  host: { id: string | null; name: string | null; lastSeenAt: number | null };
+  response: RawUsageResponse;
+}
+
+type MachineReading = { host: UsageSource["host"]; snapshot: UsageSnapshot };
+
+const HOST_USAGE_TIMEOUT_MS = 8_000;
+
+/** Connected machines only, so an offline machine's accounts stay hidden until it reconnects. */
+async function connectedHosts(sdk: UsageSdk): Promise<UsageSource["host"][]> {
   try {
-    return (await sdk.hosts.get({ hostId })).name;
+    return (await sdk.hosts.list()).filter((host) => host.status === "connected");
   } catch {
-    return null;
+    // The host list is unreadable: fall back to the primary machine.
+    return [{ id: null, name: null, lastSeenAt: null }];
   }
 }
 
 export async function loadUsageSnapshot(
   sdk: UsageSdk,
-  threadId: string | null,
   fetchedAt = new Date(),
   overrides: Promise<RawUsageResponse> = Promise.resolve({}),
   poolAccounts: Promise<PoolAccountRecord[]> = loadPoolAccountRecords(),
 ): Promise<UsageSnapshot> {
-  const hostId =
-    threadId === null ? null : await resolveThreadHostId(sdk, threadId);
   const plugins = sdk.plugins;
-  const [response, hostName, pooled, routedAccounts, overridden] =
-    await Promise.all([
-      loadRawUsage(sdk, hostId),
-      resolveHostName(sdk, hostId),
-      plugins === undefined ? null : loadPooledAccounts({ plugins }, hostId),
-      poolAccounts,
-      overrides,
-    ]);
-
+  const [hosts, overridden, pooled, routedAccounts] = await Promise.all([
+    connectedHosts(sdk),
+    overrides,
+    plugins === undefined ? null : loadPooledAccounts({ plugins }),
+    poolAccounts,
+  ]);
+  const readings = await Promise.all(
+    hosts.map(async (host) => {
+      const response = await withTimeout(
+        loadRawUsage(sdk, host.id),
+        HOST_USAGE_TIMEOUT_MS,
+      ).catch(() => null);
+      return response === null ? null : { host, response };
+    }),
+  );
   const snapshot = applyPooledAccounts(
-    normalizeUsage(
-      { ...response, ...overridden },
-      { id: hostId, name: hostName },
+    mergeAccountSources(
+      readings.filter((reading): reading is UsageSource => reading !== null),
+      overridden,
       fetchedAt,
     ),
     pooled,
@@ -109,6 +109,71 @@ export async function loadUsageSnapshot(
   );
   const activity = await loadInUseProviderIds(sdk, routedAccounts);
   return markProvidersInUse(snapshot, activity.ids, activity.complete);
+}
+
+const freshness = (host: UsageSource["host"]): number => host.lastSeenAt ?? 0;
+
+/**
+ * Merges every connected machine's readings into one account list per provider.
+ * The same email on two machines shows once, from the most recently seen machine.
+ * Local overrides (the Keychain read) fill a provider only when no machine reports it healthy.
+ */
+function mergeAccountSources(
+  sources: readonly UsageSource[],
+  overridden: RawUsageResponse,
+  fetchedAt: Date,
+): UsageSnapshot {
+  const machines: MachineReading[] = sources.map((source) => ({
+    host: source.host,
+    snapshot: normalizeUsage(source.response, source.host, fetchedAt),
+  }));
+  const local = normalizeUsage(overridden, { id: null, name: null }, fetchedAt);
+  return {
+    fetchedAt: fetchedAt.toISOString(),
+    host: { id: null, name: null },
+    providers: local.providers.map((provider) =>
+      mergeProvider(provider.id, machines, provider),
+    ),
+  };
+}
+
+function mergeProvider(
+  providerId: ProviderId,
+  machines: readonly MachineReading[],
+  local: ProviderUsage,
+): ProviderUsage {
+  const candidates = machines
+    .map(({ host, snapshot }) => ({
+      host,
+      provider: snapshot.providers.find((provider) => provider.id === providerId)!,
+    }))
+    .sort((a, b) => freshness(b.host) - freshness(a.host));
+  const healthy = candidates.filter(({ provider }) => provider.status === "ok");
+  if (healthy.length === 0) {
+    // Keychain read wins over unhealthy machines; otherwise show the freshest status.
+    return local.status === "ok" ? local : (candidates[0]?.provider ?? local);
+  }
+
+  const accounts = dedupeByAccountEmail(healthy, ({ host, provider }) => ({
+    email: provider.accountEmail,
+    ok: true,
+    freshness: freshness(host),
+  }));
+  const best = accounts[0]!;
+  if (accounts.length === 1) return best.provider;
+  return {
+    ...best.provider,
+    accounts: accounts.map(({ host, provider }) => ({
+      id: host.id ?? "local",
+      label: host.name ?? "This machine",
+      status: provider.status,
+      accountEmail: provider.accountEmail,
+      planLabel: provider.planLabel,
+      message: provider.message,
+      observedAt: null,
+      windows: provider.windows,
+    })),
+  };
 }
 
 export function inUseProviderIdsFromPool(

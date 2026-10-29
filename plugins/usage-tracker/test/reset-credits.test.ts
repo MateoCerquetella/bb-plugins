@@ -7,7 +7,9 @@ import {
   formatResetCredits,
   normalizeUsage,
   withCodexResetCredits,
+  withReadOnlyResetCredits,
 } from "../lib/usage.ts";
+import { accountUsageRows, totalResetCredits } from "../lib/sidebar-usage.ts";
 
 test("reads the authoritative Codex reset count", () => {
   assert.equal(
@@ -67,4 +69,32 @@ test("rejects invalid reset counts before they reach the UI", () => {
     () => withCodexResetCredits(snapshot, Number.MAX_SAFE_INTEGER + 1),
     /non-negative integers/u,
   );
+});
+
+test("adds read-only resets to the matching account row, then totals them", () => {
+  const account = (email: string) => ({
+    id: email, label: email, status: "ok" as const, accountEmail: email,
+    planLabel: null, message: null, observedAt: null, windows: [],
+  });
+  const base = normalizeUsage(
+    { codex: { status: "ok", accountEmail: "a@x.io", planLabel: null, windows: [] } },
+    { id: null, name: null },
+    new Date(0),
+  );
+  const codex = base.providers.find((provider) => provider.id === "codex")!;
+  const snapshot = {
+    ...base,
+    providers: [{ ...codex, accounts: [account("a@x.io"), account("B@x.io")] }],
+  };
+  const local = withCodexResetCredits(snapshot, 3, "a@x.io");
+  const merged = withReadOnlyResetCredits(local, "codex", [
+    { email: "a@x.io", availableCount: 9 },
+    { email: "b@x.io", availableCount: 3 },
+  ]);
+  const rows = accountUsageRows(merged.providers[0]!);
+  assert.deepEqual(rows.map((row) => row.resetCredits), [
+    { availableCount: 3 },
+    { availableCount: 3, readOnly: true },
+  ]);
+  assert.equal(totalResetCredits(rows), 6);
 });

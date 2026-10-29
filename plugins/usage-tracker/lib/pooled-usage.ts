@@ -1,6 +1,7 @@
 import { z } from "zod";
 import {
   clampPercent,
+  dedupeByAccountEmail,
   providerIdForWireId,
   type PooledAccountUsage,
   type ProviderId,
@@ -103,7 +104,7 @@ export interface PooledAccount {
 
 export type PooledAccountsByProvider = Map<ProviderId, PooledAccount[]>;
 
-function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+export function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<never>((_, reject) => {
     timer = setTimeout(() => reject(new Error("Account Pooler timed out")), ms);
@@ -182,13 +183,12 @@ export function pooledAccountFromResource(
 }
 
 /**
- * Lists every pooled account and its cached usage. Returns null when the
- * Account Pooler is missing, disabled, or unresponsive so callers fall back
- * to bb's host-local usage.
+ * Lists every pooled account across all machines with its cached usage.
+ * Returns null when the Account Pooler is missing, disabled, or unresponsive so
+ * callers fall back to host-local usage.
  */
 export async function loadPooledAccounts(
   sdk: PoolRpcSdk,
-  hostId: string | null,
 ): Promise<PooledAccountsByProvider | null> {
   let list: PoolResourceList;
   try {
@@ -206,10 +206,7 @@ export async function loadPooledAccounts(
   }
 
   const resources = list.resources.filter(
-    (resource) =>
-      providerIdForWireId(resource.providerId) !== null &&
-      (resource.scope.kind === "shared" ||
-        resource.scope.hostId === hostId),
+    (resource) => providerIdForWireId(resource.providerId) !== null,
   );
   const results = await Promise.all(
     resources.map((resource) =>
@@ -235,6 +232,16 @@ export async function loadPooledAccounts(
     accounts.push(pooledAccountFromResource(resource, results[index]!));
     byProvider.set(providerId, accounts);
   });
+  for (const [providerId, accounts] of byProvider) {
+    byProvider.set(
+      providerId,
+      dedupeByAccountEmail(accounts, ({ usage }) => ({
+        email: usage.accountEmail,
+        ok: usage.status === "ok",
+        freshness: Date.parse(usage.observedAt ?? "") || 0,
+      })),
+    );
+  }
   return byProvider;
 }
 

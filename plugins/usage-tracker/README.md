@@ -35,9 +35,10 @@ and, when a topped-up budget is configured, the share already used.
 
 - Shows Codex, Claude Code, Cursor, Grok, OpenCode, Antigravity, and DeepSeek usage in BB's sidebar footer.
 - Lets you show or hide every provider independently; the strip compacts for
-  one or two providers and summarizes larger sets with cumulative usage across
-  providers currently in use plus an additional-provider count. Idle providers
-  do not drive the summary. It disappears when every provider is disabled.
+  one or two providers and averages the selected usage percentages across all
+  enabled providers with usage data. Zero-use providers count in the average;
+  providers without a reading are shown separately. It disappears when every
+  provider is disabled.
 - Opens the summary into a complete provider overview; select any overview row
   to drill into that provider's existing limit details.
 - Colors usage yellow from 80% and red from 95% in both compact and expanded

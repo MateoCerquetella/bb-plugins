@@ -30,6 +30,8 @@ export interface UsageCost {
 
 export interface UsageResetCredits {
   availableCount: number;
+  /** Set when the count belongs to a login this server cannot spend from. */
+  readOnly?: boolean;
 }
 
 export interface RawUsageWindow {
@@ -84,6 +86,7 @@ export interface PooledAccountUsage {
   message: string | null;
   observedAt: string | null;
   windows: UsageWindow[];
+  resetCredits?: UsageResetCredits | null;
 }
 
 /** Prepaid API balance, as reported by DeepSeek and optionally measured against a budget. */
@@ -126,6 +129,36 @@ export interface UsageSnapshot {
   providers: ProviderUsage[];
 }
 
+/**
+ * Keeps one entry per account email (case-insensitive). A healthy reading beats
+ * an unhealthy one, then the fresher reading wins. Entries without an email stay.
+ */
+export function dedupeByAccountEmail<T>(
+  items: readonly T[],
+  identity: (item: T) => { email: string | null; ok: boolean; freshness: number },
+): T[] {
+  const kept: T[] = [];
+  const slotByEmail = new Map<string, number>();
+  for (const item of items) {
+    const { email, ok, freshness } = identity(item);
+    const key = email?.trim().toLowerCase() ?? "";
+    if (key === "") {
+      kept.push(item);
+      continue;
+    }
+    const slot = slotByEmail.get(key);
+    if (slot === undefined) {
+      slotByEmail.set(key, kept.length);
+      kept.push(item);
+      continue;
+    }
+    const current = identity(kept[slot]!);
+    const better = ok === current.ok ? freshness > current.freshness : ok;
+    if (better) kept[slot] = item;
+  }
+  return kept;
+}
+
 function resetCreditsForCount(
   availableCount: number | null,
 ): UsageResetCredits | null {
@@ -139,13 +172,76 @@ function resetCreditsForCount(
 export function withCodexResetCredits(
   snapshot: UsageSnapshot,
   availableCount: number | null,
+  accountEmail: string | null = null,
 ): UsageSnapshot {
   const resetCredits = resetCreditsForCount(availableCount);
   return {
     ...snapshot,
-    providers: snapshot.providers.map((provider) =>
-      provider.id === "codex" ? { ...provider, resetCredits } : provider,
-    ),
+    providers: snapshot.providers.map((provider) => {
+      if (provider.id !== "codex") return provider;
+      // Resets belong to the Codex login on the server, so only that account row carries them.
+      const owner = provider.accounts?.find(
+        (account) =>
+          accountEmail !== null &&
+          account.accountEmail?.toLowerCase() === accountEmail.toLowerCase(),
+      );
+      if (provider.accounts === undefined || owner === undefined) {
+        return { ...provider, resetCredits };
+      }
+      return {
+        ...provider,
+        resetCredits: null,
+        accounts: provider.accounts.map((account) => ({
+          ...account,
+          resetCredits: account === owner ? resetCredits : null,
+        })),
+      };
+    }),
+  };
+}
+
+export interface ResetReading {
+  email: string;
+  availableCount: number;
+}
+
+/** Adds read-only reset counts to rows of one provider that have none yet, matched by account email. */
+export function withReadOnlyResetCredits(
+  snapshot: UsageSnapshot,
+  providerId: ProviderId,
+  readings: readonly ResetReading[],
+): UsageSnapshot {
+  if (readings.length === 0) return snapshot;
+  const creditFor = (
+    email: string | null,
+    current: UsageResetCredits | null | undefined,
+  ): UsageResetCredits | null => {
+    if (current != null) return current;
+    const reading = readings.find(
+      (candidate) => email?.toLowerCase() === candidate.email.toLowerCase(),
+    );
+    return reading === undefined
+      ? null
+      : { availableCount: reading.availableCount, readOnly: true };
+  };
+  return {
+    ...snapshot,
+    providers: snapshot.providers.map((provider) => {
+      if (provider.id !== providerId) return provider;
+      if (provider.accounts === undefined || provider.accounts.length === 0) {
+        return {
+          ...provider,
+          resetCredits: creditFor(provider.accountEmail, provider.resetCredits),
+        };
+      }
+      return {
+        ...provider,
+        accounts: provider.accounts.map((account) => ({
+          ...account,
+          resetCredits: creditFor(account.accountEmail, account.resetCredits),
+        })),
+      };
+    }),
   };
 }
 

@@ -28,8 +28,15 @@ test("emits semantic severity for compact, rail, and detail presentation", () =>
 
 test("summarizes larger provider sets and exposes the complete overview", () => {
   assert.match(source, /items\.length > 2/u);
-  assert.match(source, /cumulativeInUseUsage\(items\)/u);
-  assert.match(source, /`\+\$\{additionalCount\}`/u);
+  assert.match(source, /averageProviderUsage\(accountRows\)/u);
+  assert.match(
+    source,
+    /accountRows\.filter\(\(item\) => item\.selection\.window !== null \|\| item\.provider\.balance !== undefined\)/u,
+  );
+  assert.match(source, /const pooled = provider\.currentAccountId !== undefined/u);
+  assert.match(source, /average across/u);
+  assert.match(source, /without usage data/u);
+  assert.match(source, /`\+\$\{resetTotal\}`/u);
   assert.match(source, /Agent usage overview/u);
   assert.match(source, /usage-tracker-sidebar__overview-provider/u);
   assert.match(styles, /\.usage-tracker-sidebar__summary/u);

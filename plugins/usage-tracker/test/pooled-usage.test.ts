@@ -156,7 +156,7 @@ test("loads every pooled account and replaces host-local usage per provider", as
     b: claudeUsage("b@example.com", 0, 57, "2026-09-28T11:00:00.000Z"),
     c: new Error("Codex quota refresh failed"),
   });
-  const pooled = await loadPooledAccounts(sdk, "host_1");
+  const pooled = await loadPooledAccounts(sdk);
   const snapshot = applyPooledAccounts(
     normalizeUsage(
       {
@@ -206,7 +206,7 @@ test("prefers the Account Pooler current account over host-local email", async (
     b: claudeUsage("b@example.com", 0, 57, "2026-09-28T11:00:00.000Z"),
     c: new Error("Codex quota refresh failed"),
   });
-  const pooled = await loadPooledAccounts(sdk, "host_1");
+  const pooled = await loadPooledAccounts(sdk);
   const snapshot = applyPooledAccounts(
     normalizeUsage(
       {
@@ -229,9 +229,12 @@ test("prefers the Account Pooler current account over host-local email", async (
   assert.equal(sidebarUsageWindows(claude).weekly?.usedPercent, 57);
 });
 
-test("skips accounts scoped to another host", async () => {
+test("includes accounts scoped to other machines", async () => {
   const sdk = fakePoolSdk(
-    { a: claudeUsage("a@example.com", 4, 37, "2026-09-24T18:00:00.000Z") },
+    {
+      a: claudeUsage("a@example.com", 4, 37, "2026-09-24T18:00:00.000Z"),
+      z: claudeUsage("z@example.com", 9, 9, "2026-09-24T18:00:00.000Z"),
+    },
     [
       RESOURCES[0]!,
       {
@@ -242,12 +245,11 @@ test("skips accounts scoped to another host", async () => {
       },
     ],
   );
-  const pooled = await loadPooledAccounts(sdk, "host_1");
+  const pooled = await loadPooledAccounts(sdk);
   assert.deepEqual(
     pooled?.get("claudeCode")?.map((account) => account.usage.id),
-    ["a"],
+    ["a", "z"],
   );
-  assert.equal(sdk.calls.some((call) => call.endsWith(":z")), false);
 });
 
 test("falls back to host-local usage when the Account Pooler is unavailable", async () => {
@@ -260,9 +262,8 @@ test("falls back to host-local usage when the Account Pooler is unavailable", as
     },
   };
   const sdk: UsageSdk = {
-    threads: { get: async () => ({ environmentId: null }) },
-    environments: { get: async () => ({ hostId: "host_1" }) },
-    hosts: { get: async () => ({ name: "Mac" }) },
+    threads: {},
+    hosts: { list: async () => [{ id: "host_1", name: "Mac", status: "connected", lastSeenAt: 1 }] },
     system: { usageLimits: async () => localResponse },
     plugins: {
       callRpc: async () => {
@@ -272,7 +273,6 @@ test("falls back to host-local usage when the Account Pooler is unavailable", as
   };
   const snapshot = await loadUsageSnapshot(
     sdk,
-    null,
     new Date(),
     Promise.resolve({}),
     Promise.resolve([]),
@@ -283,17 +283,28 @@ test("falls back to host-local usage when the Account Pooler is unavailable", as
   assert.equal(claude.windows[0]?.usedPercent, 12);
 });
 
-test("unresolved hosts include only shared accounts", async () => {
+test("dedupes pooled accounts that share an email, keeping the newest reading", async () => {
+  const older = claudeUsage("a@example.com", 4, 37, "2026-09-24T18:00:00.000Z");
+  const newer = claudeUsage("A@example.com", 6, 41, "2026-09-24T18:00:00.000Z");
+  older.observedAt = Date.parse("2026-09-23T10:00:00.000Z");
+  newer.observedAt = Date.parse("2026-09-23T12:00:00.000Z");
   const sdk = fakePoolSdk(
-    { a: claudeUsage("a@example.com", 4, 37, "2026-09-24T18:00:00.000Z") },
-    [RESOURCES[0]!, {
-      id: "other", providerId: "claude-code", label: "Other",
-      scope: { kind: "host", hostId: "host_2", hostName: "Other" },
-    }],
+    { a: older, z: newer },
+    [
+      RESOURCES[0]!,
+      {
+        id: "z",
+        providerId: "claude-code",
+        label: "A@example.com",
+        scope: { kind: "host", hostId: "host_2", hostName: "Other" },
+      },
+    ],
   );
-  const pooled = await loadPooledAccounts(sdk, null);
-  assert.deepEqual(pooled?.get("claudeCode")?.map(a => a.usage.id), ["a"]);
-  assert.equal(sdk.calls.some(call => call.endsWith(":other")), false);
+  const pooled = await loadPooledAccounts(sdk);
+  assert.deepEqual(
+    pooled?.get("claudeCode")?.map((account) => account.usage.id),
+    ["z"],
+  );
 });
 
 test("single pooled accounts preserve reported credit amounts", async () => {
@@ -301,7 +312,7 @@ test("single pooled accounts preserve reported credit amounts", async () => {
   if (result.usage.status !== "ok") throw new Error("expected ok");
   const cost = { usedUsdCents: 1234, limitUsdCents: 5000 };
   result.usage.windows[0]!.cost = cost;
-  const pooled = await loadPooledAccounts(fakePoolSdk({ a: result }, [RESOURCES[0]!]), null);
+  const pooled = await loadPooledAccounts(fakePoolSdk({ a: result }, [RESOURCES[0]!]));
   const snapshot = applyPooledAccounts(normalizeUsage(
     {}, { id: null, name: null }, new Date(),
   ), pooled);

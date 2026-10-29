@@ -205,3 +205,21 @@ export async function consumeCodexRateLimitResetCredit(
   );
   return consumeResponseSchema.parse(result).outcome;
 }
+
+const accountReadResponseSchema = z
+  .object({
+    account: z
+      .object({ email: z.string().nullable().optional() })
+      .passthrough()
+      .nullable()
+      .optional(),
+  })
+  .passthrough();
+
+/** Email of this machine Codex login; null for API-key or signed-out sessions. */
+export async function readCodexAccountEmail(): Promise<string | null> {
+  const parsed = accountReadResponseSchema.safeParse(
+    await runCodexAppServerRequest("account/read", { refreshToken: false }),
+  );
+  return parsed.success ? (parsed.data.account?.email ?? null) : null;
+}

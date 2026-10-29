@@ -1,4 +1,5 @@
 import {
+  clampPercent,
   formatCurrencyAmount,
   formatUsedPercent,
   providerStatusLabel,
@@ -34,46 +35,60 @@ export interface SidebarUsageOverviewItem {
   selection: SidebarUsagePrimarySelection;
 }
 
-export interface CumulativeInUseUsage {
+export interface AverageProviderUsage {
   percent: number | null;
   count: number;
   names: string[];
 }
 
-export function inUseOverviewItems(
+export function averageProviderUsage(
   items: readonly SidebarUsageOverviewItem[],
-): SidebarUsageOverviewItem[] {
-  const marked = items.filter((item) => typeof item.provider.inUse === "boolean");
-  if (marked.length !== items.length) return [...items];
-  return items.filter((item) => item.provider.inUse === true);
-}
-
-/** In-use providers that report an agent usage window rather than a balance. */
-export function inUseAgentUsageItems(
-  items: readonly SidebarUsageOverviewItem[],
-): SidebarUsageOverviewItem[] {
-  return inUseOverviewItems(items).filter(
-    (item) =>
-      item.selection.window !== null && item.provider.balance === undefined,
-  );
-}
-
-export function cumulativeInUseUsage(
-  items: readonly SidebarUsageOverviewItem[],
-): CumulativeInUseUsage {
-  const active = inUseAgentUsageItems(items);
-  if (active.length === 0) {
+): AverageProviderUsage {
+  const available = items.filter((item) => item.selection.window !== null && item.provider.balance === undefined);
+  if (available.length === 0) {
     return { percent: null, count: 0, names: [] };
   }
-  const percent = active.reduce(
-    (sum, item) => sum + (item.selection.window?.usedPercent ?? 0),
-    0,
-  );
+  const percent =
+    available.reduce(
+      (sum, item) =>
+        sum + clampPercent(item.selection.window?.usedPercent ?? 0),
+      0,
+    ) / available.length;
   return {
     percent,
-    count: active.length,
-    names: active.map((item) => item.provider.name),
+    count: available.length,
+    names: available.map((item) => item.provider.name),
   };
+}
+
+/** One overview row per account; a provider with at most one account stays one row. */
+export function accountUsageRows(provider: ProviderUsage): ProviderUsage[] {
+  const accounts = provider.accounts ?? [];
+  if (accounts.length <= 1) return [provider];
+  return accounts.map((account) => ({
+    ...provider,
+    name: `${provider.name} · ${account.accountEmail ?? account.label}`,
+    status: account.status,
+    accountEmail: account.accountEmail,
+    planLabel: account.planLabel,
+    message: account.message,
+    windows: account.windows,
+    resetCredits: account.resetCredits ?? null,
+    accounts: undefined,
+  }));
+}
+
+/** Drops providers with no usable window; keeps them all while none has data, so loading and error states stay visible. */
+export function itemsWithUsageData(
+  items: readonly SidebarUsageOverviewItem[],
+): SidebarUsageOverviewItem[] {
+  const withData = items.filter((item) => item.selection.window !== null);
+  return withData.length > 0 ? withData : [...items];
+}
+
+/** Usage resets available across the given account rows. */
+export function totalResetCredits(rows: readonly ProviderUsage[]): number {
+  return rows.reduce((sum, row) => sum + (row.resetCredits?.availableCount ?? 0), 0);
 }
 
 export function highestSidebarUsagePrimary(
