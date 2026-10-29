@@ -14,6 +14,8 @@
   entry. Counts from other machines are read-only: only the server's own login
   can spend a reset. The summary badge now shows the total resets available
   instead of the number of additional providers.
+- Show Claude Code usage resets (the weekly session reset plus granted
+  resets) for the Claude login stored on the server machine, read-only.
 - Build against bb-app 0.48.0 and plugin SDK 0.6.94, which the host entry needs.
 
 ## 0.1.16 - 2026-10-26

@@ -98,3 +98,16 @@ test("adds read-only resets to the matching account row, then totals them", () =
   ]);
   assert.equal(totalResetCredits(rows), 6);
 });
+
+test("an unnamed reading belongs to the first row only", () => {
+  const snapshot = normalizeUsage(
+    { claudeCode: undefined, "claude-code": { status: "ok", accountEmail: null, planLabel: null, windows: [] } } as never,
+    { id: null, name: null },
+    new Date(0),
+  );
+  const claude = withReadOnlyResetCredits(snapshot, "claudeCode", [{ email: null, availableCount: 1 }]);
+  assert.deepEqual(claude.providers.find((p) => p.id === "claudeCode")?.resetCredits, {
+    availableCount: 1,
+    readOnly: true,
+  });
+});

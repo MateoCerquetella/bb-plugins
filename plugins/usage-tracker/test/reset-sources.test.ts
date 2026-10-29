@@ -1,4 +1,7 @@
 import assert from "node:assert/strict";
+import { mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import test from "node:test";
 import { createResetSources } from "../lib/reset-sources.ts";
 import { normalizeUsage } from "../lib/usage.ts";
@@ -43,6 +46,8 @@ test("reads Codex resets on each connected machine and caches them", async () =>
     providers: [{ ...codex, accounts: [account("a@x.io"), account("b@x.io")] }],
   };
 
+  // No Claude login here, so the Claude reader stays offline.
+  process.env.CLAUDE_CONFIG_DIR = mkdtempSync(path.join(tmpdir(), "claude-"));
   const sources = createResetSources(bb);
   const result = await sources.apply(snapshot);
   assert.deepEqual(
