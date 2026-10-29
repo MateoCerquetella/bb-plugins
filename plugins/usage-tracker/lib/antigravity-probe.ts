@@ -18,6 +18,7 @@ const candidatePaths = [
 let cached: ProviderUsage = unavailableUsage("not_installed");
 let refreshInFlight: Promise<void> | null = null;
 let intervalStarted = false;
+let lastRefreshStartedAt = 0;
 
 function unavailableUsage(status: "not_installed" | "error", message = NOT_INSTALLED_MESSAGE): ProviderUsage {
   return {
@@ -195,6 +196,8 @@ async function executeAgy(): Promise<string> {
 
 export async function refreshAntigravityUsage(): Promise<void> {
   if (refreshInFlight !== null) return refreshInFlight;
+  // Failed probes also wait a full interval, so a broken agy is not respawned on every poll.
+  lastRefreshStartedAt = Date.now();
   refreshInFlight = (async () => {
     try {
       const output = JSON.parse(await executeAgy()) as unknown;
@@ -221,6 +224,6 @@ export function getCachedAntigravityUsage(): ProviderUsage {
     const interval = setInterval(() => void refreshAntigravityUsage(), REFRESH_INTERVAL_MS);
     interval.unref?.();
   }
-  void refreshAntigravityUsage();
+  if (Date.now() - lastRefreshStartedAt >= REFRESH_INTERVAL_MS) void refreshAntigravityUsage();
   return cached;
 }

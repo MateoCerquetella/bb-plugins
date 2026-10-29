@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Probe `agy` at most once per refresh interval, including after a failed
+  probe, instead of spawning it again on every usage poll.
+
 ## 0.1.16 - 2026-10-26
 
 - Keep the usage details card visible on bb 0.47.1+, where the sidebar
