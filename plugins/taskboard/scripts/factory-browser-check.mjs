@@ -76,6 +76,28 @@ try {
   await page.setViewportSize({ width: 1280, height: 1000 });
   await page.route('https://taskboard-preview.test/**', route => route.fulfill({ contentType: 'text/html', body: html }));
   await page.goto('https://taskboard-preview.test/');
+  if (process.env.TASKBOARD_IMPROVE_ONLY) {
+    await page.goto('https://taskboard-preview.test/?creation=true');
+    const dialog = page.getByRole('dialog');
+    await dialog.waitFor();
+    await dialog.getByLabel('Title', { exact: true }).fill('Fix cart total');
+    await dialog.getByLabel('Description', { exact: true }).fill('The cart total ignores the discount.');
+    await page.evaluate(() => {
+      Object.defineProperty(window.crypto, 'randomUUID', { value: undefined, configurable: true });
+    });
+    await dialog.getByRole('button', { name: 'Improve title & description', exact: true }).click();
+    await page.waitForFunction(() => window.ticketImprovementInputs.length === 1);
+    const improvement = await page.evaluate(() => window.ticketImprovementInputs.at(-1));
+    assert.match(improvement.requestId, /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u);
+    assert.equal(improvement.projectId, 'proj_test');
+    assert.equal(improvement.title, 'Fix cart total');
+    assert.equal(improvement.description, 'The cart total ignores the discount.');
+    await page.waitForFunction(() => document.querySelector('input[id$="-title"]')?.value === 'Improved title');
+    await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, 'taskboard-improve-insecure-webview.png') });
+    assert.deepEqual(errors, []);
+    console.log(JSON.stringify({ improve: 'passed', insecureWebview: 'passed', errors }));
+    process.exit(0);
+  }
   if (process.env.TASKBOARD_AI_ONLY) {
     for (const width of [1280, 390]) {
       await page.setViewportSize({ width, height: 1000 });

@@ -16,6 +16,7 @@ registerHooks({
 const { createTicketImprovementService } = await import('../ticket-improvement-service.ts');
 const { parseTicketImprovement, improvementRpcMethods, ticketImprovementPrompt } =
   await import('../ticket-improvement.ts');
+const { createImprovementRequestId } = await import('../ticket-improvement-id.ts');
 const identity = { projectId: 'proj_test', requestId: 'c726ced9-48c8-44dc-b0fb-801251f3ea9b' };
 const input = { ...identity, title: '', description: 'fix the broken save button' };
 
@@ -102,6 +103,10 @@ test('draft parser accepts JSON or a single fence and rejects missing, extra or 
   const draft = { title: 'Fixed title', description: 'Clear description' };
   assert.deepEqual(parseTicketImprovement(JSON.stringify(draft)), draft);
   assert.deepEqual(parseTicketImprovement('```json\n' + JSON.stringify(draft) + '\n```'), draft);
+  assert.deepEqual(parseTicketImprovement(
+    'Here is the finished draft:\n```json\n' + JSON.stringify(draft) + '\n```\nNo other changes.'
+  ), draft);
+  assert.deepEqual(parseTicketImprovement('Draft follows.\n' + JSON.stringify(draft) + '\nDone.'), draft);
   for (const output of ['not JSON', '{}', '{"title":"Title","description":""}',
     JSON.stringify({ ...draft, title: 'x'.repeat(501) }),
     JSON.stringify({ ...draft, labels: ['invented'] })]) {
@@ -112,6 +117,22 @@ test('draft parser accepts JSON or a single fence and rejects missing, extra or 
     ...input, description: ' '
   }).success, false);
   assert.match(ticketImprovementPrompt(input), /untrusted draft data/u);
+});
+
+test('improvement request IDs fall back to getRandomValues when randomUUID is unavailable', () => {
+  const fallback = createImprovementRequestId({
+    getRandomValues(bytes) {
+      for (let index = 0; index < bytes.length; index++) bytes[index] = index;
+      return bytes;
+    }
+  });
+  assert.match(fallback, /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u);
+  assert.equal(createImprovementRequestId({
+    randomUUID: () => 'c726ced9-48c8-44dc-b0fb-801251f3ea9b',
+    getRandomValues: () => { throw new Error('must not be called'); }
+  }), 'c726ced9-48c8-44dc-b0fb-801251f3ea9b');
+  assert.match(createImprovementRequestId({ randomUUID: () => 'not-a-uuid' }),
+    /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u);
 });
 
 test('concurrent starts spawn once with project defaults and only validated text is returned', async () => {
