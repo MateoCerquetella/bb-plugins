@@ -1,5 +1,6 @@
 import { registerPreparationApp } from './preparation/app.js';
 import { clipboardTicketImages, readTicketImages, type TicketImage } from './ticket-images.js';
+import { createImprovementRequestId } from './ticket-improvement-id.js';
 import { originalTicketPath, requestTaskboardOpen, ticketThreadId } from './factory/navigation.js';
 import {
   useCallback,
@@ -805,7 +806,13 @@ function CreateIssueDialog(props: CreateIssueDialogProps) {
   async function improveDraft() {
     if (!projectId || improvementRef.current || improving || creating ||
       improvementUncertain || !(title.trim() || description.trim())) return;
-    const request = { projectId, requestId: crypto.randomUUID() };
+    let request: { projectId: string; requestId: string };
+    try {
+      request = { projectId, requestId: createImprovementRequestId() };
+    } catch (error) {
+      setImprovementError(describeError(error));
+      return;
+    }
     const before = { title, description };
     improvementRef.current = request;
     setImproving(true);
