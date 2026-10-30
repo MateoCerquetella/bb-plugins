@@ -209,7 +209,7 @@ function mountShader(parent: HTMLElement, imageUrl: string | null, color: string
     gl!.viewport(0,0,canvas.width,canvas.height);
     gl!.useProgram(program);
     gl!.uniform2f(resolutionUniform,canvas.width,canvas.height);
-    gl!.uniform1f(pixelRatioUniform,canvas.width/width);
+    gl!.uniform1f(pixelRatioUniform,Math.max(1 / (imageUrl ? 2 : 3),canvas.width/width));
     draw();
   }
   function upload(source: TexImageSource): void {

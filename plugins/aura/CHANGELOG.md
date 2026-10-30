@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Keep pixel dithering continuous when the panel size is not a multiple of four
+  pixels instead of splitting the canvas into four threshold quadrants.
+
 ## 0.2.4
 
 - Fix settings failing to load with `Unrecognized key: "activityOverview"` when

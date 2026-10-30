@@ -80,6 +80,21 @@ function browserLabel(url: string, title: string | null): string {
 
 function summarizeTab(tab: ThreadTab): TabSummary {
   const kind = tab.kind as TabKind;
+  // BB 0.48 persists Info and Diff as "plugin-fixed" tabs. The pinned SDK
+  // types predate that kind, so read it through a loose shape.
+  const fixed = tab as { kind: string; id: string; tabId?: unknown };
+  if (fixed.kind === "plugin-fixed") {
+    return {
+      id: fixed.id,
+      kind: "plugin-fixed",
+      label: boundedTabLabel(
+        typeof fixed.tabId === "string" ? fixed.tabId : "",
+        "Fixed tab",
+      ),
+      closable: false,
+      relaunchActionId: null,
+    };
+  }
   switch (tab.kind) {
     case "thread-info":
       return {
