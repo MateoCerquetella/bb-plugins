@@ -41,12 +41,16 @@
 }
 .steel-thread-panel--expanded {
   position: fixed;
+  inset: auto;
+  margin: 0;
+  padding: 0;
   z-index: 180;
   max-width: calc(100vw - 16px);
   border: 1px solid var(--border, #36373d);
   border-radius: 8px;
   box-shadow: 0 8px 32px #0003;
 }
+.steel-thread-panel--expanded::backdrop { background: transparent; pointer-events: none; }
 .steel-panel-actions { display: flex; align-items: center; gap: 4px; }
 .steel-thread-panel .steel-icon-button {
   display: inline-grid;

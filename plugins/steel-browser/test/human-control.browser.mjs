@@ -36,7 +36,7 @@ const result = await build({
             websocketUrl:"ws://127.0.0.1:3100/"}))};
       }};
       export const useRpc=()=>rpc;export const definePluginApp=()=>null;
-      export const useBbNavigate=()=>({openThreadPanel:()=>false});
+      export const experimental_useAppPanel=()=>({openTab:()=>false});
       export const useBbContext=()=>({threadId:null,projectId:"test-project"});
       export const experimental_useSidebarThreads=()=>({status:"ready",projects:[{id:"test-project",name:"Test project"}]});
       export const useSettings=()=>({values:{},isLoading:false});`
@@ -54,9 +54,18 @@ const pages = [];
 try {
   for (const width of [1280, 390]) {
     const page = await context.newPage(); pages.push(page);
+    // The live Steel viewer can resize shared pages; retain the fixture's input mode.
+    await page.addInitScript(compact => {
+      const nativeMatchMedia=window.matchMedia.bind(window);
+      window.matchMedia=query=>{
+        const media=nativeMatchMedia(query);
+        if(query==="(max-width: 640px), (pointer: coarse)") Object.defineProperty(media,"matches",{value:compact});
+        return media;
+      };
+    },width<=640);
     const metrics = await context.newCDPSession(page);
     let loads = 0;
-    await page.route("https://steel.test/**", route => {
+    await page.route("**/api/v1/plugins/steel-browser/http/viewer?*", route => {
       loads++;
       return route.fulfill({ contentType: "text/html", body: `
         <body style="margin:0;background:#f5f7f9;color:#202429;font:16px system-ui">
@@ -73,7 +82,7 @@ try {
           });
         </script>` });
     });
-    await page.route("https://steel-ui.test/**", route => route.fulfill({
+    await page.route(/^https:\/\/steel-ui\.test\/(?:\?.*)?$/u, route => route.fulfill({
       contentType: "text/html", body: `<meta name="viewport" content="width=device-width,initial-scale=1">
         <style>body{margin:0;font-family:system-ui;background:#18191c;color:#ececef}#root{height:100dvh}${css}</style>
         <div id="root"></div><script>${js}</script>`,

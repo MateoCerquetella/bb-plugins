@@ -22,6 +22,18 @@ test("viewer URL pins the authenticated origin and enables the native bridge", (
   assert.equal(liveViewerUrl(null), null);
 });
 
+test("embedded viewer uses the current BB origin without a second Connect login", () => {
+  const dashboard = { connected: true, uiUrl: "https://project.test/ui",
+    sessions: [{ status: "idle" }] } as Dashboard;
+  assert.equal(liveViewerUrl(dashboard, { threadId: "thread-one" }, "http://127.0.0.1:38886/threads/one"),
+    "http://127.0.0.1:38886/api/v1/plugins/steel-browser/http/viewer?threadId=thread-one&interactive=true&clipboardBridge=true");
+  assert.equal(liveViewerUrl(dashboard, { projectId: "project-two" }, "https://my-bb.test/"),
+    "https://my-bb.test/api/v1/plugins/steel-browser/http/viewer?projectId=project-two&interactive=true&clipboardBridge=true");
+  assert.equal(liveViewerUrl(dashboard, {}, "http://127.0.0.1:38886"), null);
+  assert.equal(liveViewerUrl(dashboard, { projectId: "one" }, "file:///tmp/bb"), null);
+  assert.equal(liveViewerUrl(null, { projectId: "one" }, "http://127.0.0.1:38886"), null);
+});
+
 test("clipboard bridge requires exact source and origin; login paste rejects control keys", () => {
   const frame = {} as Window;
   const valid = { source: frame, origin: "https://project.test", data: { type: "clipboardBridgeReady" } };

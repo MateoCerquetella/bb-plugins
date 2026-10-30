@@ -11,6 +11,17 @@
     },
     "commands": [
       {
+        "id": "steel-browser-focused",
+        "argv": ["npm", "run", "check", "--workspace", "bb-plugin-steel-browser"],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "evidenceKinds": ["test"],
+        "checks": ["unit", "adapter-contract", "fault-injection"],
+        "criteria": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-UI-1", "AC-UI-2"],
+        "scope": ["plugins/steel-browser"]
+      },
+      {
         "id": "aura-focused",
         "argv": [
           "npm",

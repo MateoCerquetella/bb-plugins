@@ -9,6 +9,7 @@ import { actOnProject, parseBrowserAction } from "./actions.ts";
 import { SignIns } from "./sign-ins.ts";
 import { DashboardCache } from "./dashboard-cache.ts";
 import type { Dashboard } from "./contract.ts";
+import { registerViewerRelay } from "./viewer-relay.ts";
 
 const DEFAULT_OPTIONS: CreateOptions = {
   blockAds: true,
@@ -91,6 +92,8 @@ export default function steelBrowserPlugin(bb: BbPluginApi): void {
     const binding = ensure ? await ensureBinding(projectId) : await projects.require(projectId);
     return new SteelClient(binding.apiUrl);
   }
+
+  registerViewerRelay(bb, async scope => projects.require((await resolve(scope)).projectId));
 
   async function ensureBinding(projectId: string) {
     return projects.ensure(projectId, async (id, existing) => {

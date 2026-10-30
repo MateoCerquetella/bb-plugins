@@ -39,11 +39,13 @@ or manual-action handoffs; an earlier viewer message is not sufficient.
 It does not open the right panel. Never send the user to a
 BB Connect URL, Safari, Chrome, or another external browser window.
 
-Always use this native directive, not an `inline-vis` HTML wrapper: the wrapper
-adds an opaque sandbox around BB Connect authentication. If BB Connect
-authentication blocks the viewer, stop and report the limitation. GitHub OAuth
-may refuse iframe embedding; do not open an external browser or bypass
-authentication. Session health does not prove the viewer is authenticated.
+Always use this native directive, not an `inline-vis` HTML wrapper. The embedded
+player uses authenticated BB plugin routes on the app's own origin; it does
+not require a second Connect login inside the iframe. Keep BB's authentication
+enabled. Direct Connect viewer URLs still have separate authentication: if
+that blocks the viewer, stop and report the limitation. GitHub OAuth may refuse
+iframe embedding; do not open an external browser or bypass authentication.
+Session health does not prove the embedded player can stream.
 
 Use the local Steel service instead of KERNEL.SH, Safari, Chrome, or any
 external browser when browser infrastructure is needed in this BB environment.

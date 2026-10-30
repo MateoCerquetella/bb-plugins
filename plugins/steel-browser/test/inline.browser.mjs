@@ -26,7 +26,7 @@ const result = await build({
       export const useRpc=()=>rpc;
       export const experimental_useSidebarThreads=()=>({status:"ready",projects:[]});
       export const useSettings=()=>({values:{},isLoading:false});
-      export const useBbNavigate=()=>({openThreadPanel:()=>false});
+      export const experimental_useAppPanel=()=>({openTab:()=>false});
       export const useBbContext=()=>location.search ? {threadId:null,projectId:null} : {threadId:"t",projectId:"p"};
       export const definePluginApp=()=>null;
     ` }));
@@ -54,11 +54,11 @@ try {
     console.log(`Checking inline viewer: width=${width}, touch=${touch}`);
     const minimized = width <= 640 || touch;
     let loads = 0;
-    await page.route("https://viewer.test/**", route => {
+    await page.route("**/api/v1/plugins/steel-browser/http/viewer?*", route => {
       loads++;
       return route.fulfill({ body: "<body style='background:#edf1f5'><h2>Project A browser</h2><input aria-label='Fixture'></body>", contentType: "text/html" });
     });
-    await page.route("http://inline.test/**", route => route.fulfill({
+    await page.route(/^http:\/\/inline\.test\/(?:\?.*)?$/u, route => route.fulfill({
       body: `<meta name="viewport" content="width=device-width, initial-scale=1"><style>body{margin:16px;font-family:system-ui}#thread{height:700px;overflow:auto}#message{display:flow-root;padding-top:80px}#later{height:1600px}${css}</style><main id="thread"><article id="message"><div id="root"></div></article><div id="later">Later messages</div></main><textarea aria-label="Composer"></textarea><script>${js}</script>`,
       contentType: "text/html",
     }));

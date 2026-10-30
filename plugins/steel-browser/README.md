@@ -7,7 +7,8 @@ leaving the active thread visible beside it;
 moving back to chat shrinks it. **Expand browser panel** keeps it wide until
 you choose **Shrink browser panel** or press Escape in BB. Touch devices use
 these explicit controls. Expansion preserves the browser session and viewer,
-without dimming or blocking the remaining conversation.
+without dimming or blocking the remaining conversation. The expanded view stays
+above composer and pane-divider chrome, including at non-default UI zoom.
 
 The interface follows BB's light/dark theme. BB Surf is the display name and
 `bb surf` is the public CLI command. Existing `steel-browser` plugin IDs,
@@ -62,10 +63,15 @@ instead of staying at Connecting indefinitely. Session mutations time out after
 refresh before trying again. Late responses do not replace the recovered state.
 
 Browser navigation stays in the current BB thread with no external viewer
-links. Website logins happen inside the remote browser. BB Connect
-authentication is separate: GitHub OAuth may refuse iframe embedding.
-If that blocks the viewer, report the authentication limitation rather than
-opening an external browser. Session health does not prove viewer access.
+links. The embedded player and its WebSocket use BB's own origin through
+locally authenticated plugin routes. The relay resolves the thread/project's
+saved loopback binding; callers cannot choose an upstream URL or access CDP.
+It forwards neither BB cookies nor authorization headers to Steel and retains
+same-origin frame protection. Remote use inherits the login protecting BB
+itself, rather than starting a second Connect OAuth flow inside an iframe.
+Website logins still happen inside the remote browser. Direct Connect viewer
+URLs have separate authentication; GitHub OAuth may refuse iframe embedding.
+Session health does not prove the embedded player can stream.
 
 The Browser viewport has a **Watch browser** play control and embeds Steel's
 session player, not the Steel dashboard. **Take control** expands the existing
