@@ -10,14 +10,17 @@ const player = `<script>const baseWsUrl = 'wss://separate-connect.test/v1/sessio
 function cast(pageId) { return pageId === 'tab-discovery'
   ? \`\${baseWsUrl}?tabInfo=true\` : \`\${baseWsUrl}?pageId=\${encodeURIComponent(pageId)}\`; }</script>`;
 
-async function fixture() {
+async function fixture(handshake?: Promise<void>) {
   const requests: { url: string; cookie?: string; authorization?: string }[] = [];
   const server = createServer((req, res) => {
     requests.push({ url: req.url!, cookie: req.headers.cookie, authorization: req.headers.authorization });
     res.writeHead(200, { "content-type": "text/html", "set-cookie": "upstream-only=dummy" });
     res.end(player);
   });
-  const sockets = new WebSocketServer({ server });
+  const sockets = new WebSocketServer({ server, verifyClient: (_info, done) => {
+    if (handshake) void handshake.then(() => done(true));
+    else done(true);
+  } });
   sockets.on("connection", (socket, req) => {
     requests.push({ url: req.url! });
     socket.send("ready");
@@ -97,4 +100,31 @@ test("unknown projects, malformed page targets and oversized input never reach S
     await socket.receive("x".repeat(65537));
     assert(socket.closeCalls.length > 0);
   } finally { await f.close(); }
+});
+
+test("pending input drops empty messages and bounds tiny-message queue entries", async () => {
+  let finish!: () => void;
+  const f = await fixture(new Promise<void>(resolve => { finish = resolve; }));
+  try {
+    const socket = await f.host.harness.behavior.experimental_openWebSocket("/viewer-cast?projectId=project-one&tabInfo=true");
+    for (let i = 0; i < 300; i++) await socket.receive(i % 2 ? "" : new Uint8Array());
+    assert.equal(socket.closeCalls.length, 0, "empty messages consume no queue entries");
+    for (let i = 0; i < 257; i++) await socket.receive("x");
+    assert(socket.closeCalls.length > 0, "pending message count is bounded independently of bytes");
+  } finally { finish(); await f.close(); }
+});
+
+test("a slow upstream cannot accumulate unbounded human input", async () => {
+  const f = await fixture();
+  const descriptor = Object.getOwnPropertyDescriptor(WebSocket.prototype, "bufferedAmount")!;
+  try {
+    const socket = await f.host.harness.behavior.experimental_openWebSocket("/viewer-cast?projectId=project-one&tabInfo=true");
+    await until(() => socket.sent.includes("ready"));
+    Object.defineProperty(WebSocket.prototype, "bufferedAmount", { configurable: true, get: () => 65536 });
+    await socket.receive("x");
+    assert(socket.closeCalls.length > 0);
+  } finally {
+    Object.defineProperty(WebSocket.prototype, "bufferedAmount", descriptor);
+    await f.close();
+  }
 });

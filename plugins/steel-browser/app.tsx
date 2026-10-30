@@ -163,7 +163,7 @@ function ScopedSteelThreadPanel({ threadId }: { threadId: string }) {
         </div>
       </header>
       {playerUrl && active && visible ? (
-        <LiveViewer key={playerKey} url={playerUrl} title={`BB Surf for ${threadId}`} />
+        <LiveViewer key={playerKey} url={playerUrl} title={`BB Surf for ${threadId}`} showViewControls={false} />
       ) : error || dashboard?.error ? (
         <div className="steel-panel-state" role="alert">{error ?? dashboard?.error}</div>
       ) : (

@@ -81,6 +81,12 @@ try {
     await metrics.send("Emulation.setTouchEmulationEnabled", {enabled:touch,maxTouchPoints:5});
     const panel = page.locator(".steel-thread-panel");
     await panel.locator("iframe").waitFor();
+    assert.equal(await panel.getByRole("button",{name:"Expand browser panel",exact:true}).count(),1);
+    assert.equal(await panel.getByRole("button",{name:"Reload browser panel",exact:true}).count(),1);
+    assert.equal(await panel.getByRole("button",{name:"Take control",exact:true}).count(),0,"panel has one expansion owner");
+    assert.equal(await panel.getByRole("button",{name:"Reconnect live viewer",exact:true}).count(),0,"panel has one reconnect owner");
+    assert.equal(await panel.getByRole("button",{name:"Copy selected browser text",exact:true}).count(),1);
+    assert.equal(await panel.getByRole("button",{name:"Paste into browser",exact:true}).count(),1);
     await page.getByRole("button", {name:"Open browser panel"}).click();
     assert.deepEqual(await page.evaluate(()=>window.openCalls), [{tab:{id:"steel-live-browser",context:{kind:"thread"},availability:"action"},title:"BB Surf"}]);
     assert.equal(await page.locator(".steel-inline-browser iframe").count(),0,"handoff transfers viewing to side panel");
@@ -167,6 +173,10 @@ try {
     await page.waitForTimeout(2100);
     assert.equal(await page.locator(".steel-thread-panel--expanded").count(),0,"manual shrink does not immediately expand again");
     assert.equal(loads,baseline,"manual controls preserve stream");
+    await panel.getByRole("button",{name:"Reload browser panel",exact:true}).click();
+    await page.waitForFunction(()=>document.querySelector(".steel-thread-panel iframe")!==window.originalFrame);
+    await panel.frameLocator("iframe").getByRole("textbox").waitFor();
+    assert.equal(loads,baseline+1,"the single reconnect action reloads the viewer once");
     if(shots) await page.screenshot({path:`${shots}/cerq-panel-compact-${width}-${touch}-${theme}.png`});
     await panel.getByRole("button",{name:"Expand browser panel"}).click();
     await page.getByRole("button",{name:"Switch thread"}).evaluate(button=>button.click());

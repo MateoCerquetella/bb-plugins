@@ -12,7 +12,7 @@ export function useDocumentVisible() {
   return visible;
 }
 
-export function LiveViewer({ url, title }: { url: string; title: string }) {
+export function LiveViewer({ url, title, showViewControls = true }: { url: string; title: string; showViewControls?: boolean }) {
   const frame = useRef<HTMLIFrameElement>(null);
   const input = useRef<HTMLInputElement>(null);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -105,11 +105,11 @@ export function LiveViewer({ url, title }: { url: string; title: string }) {
           }}><Copy /></button>
         <button type="button" title="Paste into focused browser field" aria-label="Paste into browser"
           disabled={!ready} onClick={() => { setStatus(""); setPasteOpen(true); }}><ClipboardPaste /></button>
-        <button type="button" title="Reload viewer" aria-label="Reconnect live viewer"
+        {showViewControls && <><button type="button" title="Reload viewer" aria-label="Reconnect live viewer"
           onClick={() => setReload(value => value + 1)}><RefreshCw /></button>
         <button type="button" title={expanded ? "Exit expanded control" : "Take control"}
           aria-label={expanded ? "Exit expanded control" : "Take control"} aria-pressed={expanded}
-          onClick={() => setExpanded(value => !value)}>{expanded ? <Minimize2 /> : <Maximize2 />}</button>
+          onClick={() => setExpanded(value => !value)}>{expanded ? <Minimize2 /> : <Maximize2 />}</button></>}
       </div>
     </div>
     <iframe ref={frame} key={`${url}:${reload}`} src={url} title={title}

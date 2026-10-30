@@ -16,6 +16,8 @@ All embedded UI entry points build the player URL from the current app origin an
 
 For expansion, calculate the anchor's visual-to-layout scale independently for each axis using its DOMRect and offset dimensions. Divide computed top, right, width and height by that scale before assigning fixed-position CSS properties. Promote the existing section to the browser top layer using a manual popover while expanded; reset native popover margins and insets. This escapes pane stacking contexts without moving or remounting the iframe, and keeps the chat interactive. Keep the current hover/pinned state machine and iframe node. Strengthen the browser test to check unobscured chat space, not the unchanged underlying chat element width.
 
+The sidebar uses the outer header as the single owner of expansion and reconnect actions. A single optional LiveViewer property hides its internal view controls in this embedding; Copy/Paste remain visible, and inline/plugin-page defaults are preserved.
+
 ## Verification and failure behavior
 
 Focused tests cover relay target binding, headers, foreign origins, unknown projects, malformed page IDs, input limits, binary/text messages and disposal. Browser checks exercise real frames and human input, then panel hover/pin behavior at normal and 125% zoom, desktop/mobile and both themes. Scope unavailable/template mismatch produces a bounded unavailable response; no public or external-browser fallback is introduced.

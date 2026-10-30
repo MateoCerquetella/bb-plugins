@@ -52,3 +52,13 @@ The browser SHALL retain its two-second fine-pointer hover expansion and explici
 - THEN hit testing within the expanded viewer reaches the viewer
 - AND the uncovered chat remains interactive
 - AND the existing iframe is not reloaded.
+
+
+The sidebar SHALL show one panel expansion control and one reconnect action in its outer header. The inner viewer SHALL retain Copy/Paste without duplicate size/reconnect icons. Inline and plugin-page viewers SHALL retain their own complete toolbar.
+
+#### Scenario: View an active browser in the sidebar
+
+- WHEN the sidebar viewer is active
+- THEN the outer header offers expansion and reconnect once
+- AND the inner toolbar offers Copy and Paste
+- AND there is no second full-viewport expansion mode.

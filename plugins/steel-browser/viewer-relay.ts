@@ -118,12 +118,14 @@ export function registerViewerRelay(bb: BbPluginApi, bindingFor: (scope: Scope) 
       onMessage(_socket, data) {
         if (closed) return;
         const size = typeof data === "string" ? Buffer.byteLength(data) : data.byteLength;
+        if (size === 0) return;
         if (size > 65536) { close(); return; }
         if (upstream?.readyState === WebSocket.OPEN) {
+          if (upstream.bufferedAmount + size > 65536) { close(); return; }
           upstream.send(typeof data === "string" ? data : new Uint8Array(data));
         } else {
           queuedBytes += size;
-          if (queuedBytes > 65536) { close(); return; }
+          if (queuedBytes > 65536 || queue.length >= 256) { close(); return; }
           queue.push(data);
         }
       },

@@ -10,6 +10,20 @@ assert(process.env.BB_THREAD_ID, "A current BB thread is required");
 const appOrigin = new URL(process.env.BB_VIEWER_BASE_URL).origin;
 const viewer = new URL("/api/v1/plugins/steel-browser/http/viewer", appOrigin);
 viewer.search = new URLSearchParams({ threadId: process.env.BB_THREAD_ID, interactive: "true", clipboardBridge: "true" });
+assert.equal((await fetch(viewer, {headers:{Origin:"https://foreign-origin.test"}})).status,403,
+  "BB rejects foreign-origin player requests");
+await new Promise((resolve,reject) => {
+  const url=new URL(viewer);url.protocol=url.protocol==="https:"?"wss:":"ws:";
+  url.pathname="/api/v1/plugins/steel-browser/http/viewer-cast";url.searchParams.set("tabInfo","true");
+  const socket=new WebSocket(url,{origin:"https://foreign-origin.test",handshakeTimeout:5000});
+  socket.on("open",()=>{socket.close();reject(new Error("Foreign-origin cast connection accepted"));});
+  socket.on("unexpected-response",(_request,response)=>{
+    response.resume();socket.terminate();
+    if(response.statusCode===403) resolve();else reject(new Error(`Expected 403, received ${response.statusCode}`));
+  });
+  socket.on("error",reject);
+});
+console.log("PASS: real BB HTTP and WebSocket routes reject foreign Origins");
 const bundled = await build({
   stdin: {
     contents: `import React from 'react'; import {createRoot} from 'react-dom/client';

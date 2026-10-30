@@ -77,3 +77,29 @@ Requires Popover API support in supported BB webviews. A later modal clipboard d
 ### Verification
 
 Add an isolated pane plus high-layer composer/splitter fixture. Before the change, hit testing reports the obstructing chrome; afterwards the same coordinates reach the viewer in hover and pinned modes. Assert iframe identity, load count, field state, usable chat and shrink/leave/Escape behavior at normal and 125% zoom.
+
+## D-004: Give sidebar view controls one owner
+
+Status: Accepted
+
+### Evidence
+
+The user screenshot shows duplicate size and reconnect icons. The outer size button expands the sidebar, while the inner Take control button uses a separate full-viewport layout. Both reconnect buttons replace the same viewer.
+
+### Options
+
+- Keep both pairs and add more explanation.
+- Remove sidebar clipboard tools.
+- Retain outer view controls and omit the redundant inner pair in this embedding.
+
+### Chosen approach
+
+Keep one expansion/reconnect pair in the panel header. Add one optional LiveViewer showViewControls property, defaulting to true, and set it false in the sidebar. Copy and Paste remain available.
+
+### Trade-offs and risks
+
+Standalone and inline viewers continue to need their own view controls; their defaults must stay intact. The sidebar cannot enter a second, conflicting full-viewport expansion mode.
+
+### Verification
+
+Check the sidebar's visible control counts and unchanged clipboard behavior, outer reconnect and retained-frame expansion. Existing standalone human-control tests cover the default full toolbar.

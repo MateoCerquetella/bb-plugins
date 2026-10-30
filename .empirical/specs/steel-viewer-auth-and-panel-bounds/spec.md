@@ -15,6 +15,7 @@ Make the embedded BB Surf viewer usable without a second Connect OAuth login and
 - [ ] [AC-3] Text and binary transport, bounded input, connection deadlines and disposal work without replacing browser profiles or changing engine policy.
 - [ ] [AC-UI-1] The real player displays frames and supports mouse, keyboard, masked paste and copy. Existing desktop/mobile human-control behavior remains intact.
 - [ ] [AC-UI-2] Composer and splitter chrome cannot cover or intercept the expanded viewer. Hover and explicit expansion fit the viewport at 100% and 125% UI zoom, preserve usable chat space on desktop, retain the same iframe and field contents, and respect leave, shrink, Escape and thread changes.
+- [ ] [AC-UI-3] The sidebar shows one panel expand/shrink control and one viewer reconnect control; the inner toolbar retains Copy/Paste without duplicate size/reconnect icons. Inline and plugin-page viewers retain their existing controls.
 - [ ] [AC-4] Plugin type, unit and build checks pass with a matching declared BB/SDK pair. Repository-wide checks are run and any unrelated baseline failure is reported.
 
 ## Scope
