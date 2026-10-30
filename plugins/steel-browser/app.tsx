@@ -17,11 +17,11 @@ import {
   useRpc,
   useSettings,
   useBbContext,
-  useBbNavigate,
+  experimental_useAppPanel,
   experimental_useSidebarThreads,
   type PluginRpcClient,
   type PluginMessageDirectiveProps,
-  type PluginThreadPanelProps,
+  type ExperimentalThreadTabProps,
 } from "@get-bb/plugin-sdk/app";
 import type { BrowserSession, Dashboard, Scope, ProjectState, EnginePolicy, rpcContract } from "./contract.ts";
 import { callSteelRpc } from "./rpc-timeout.ts";
@@ -124,7 +124,7 @@ function useSteelDashboard(scope: Scope, shouldPoll: () => boolean = ALWAYS_POLL
   return { dashboard, error, refresh, start, starting };
 }
 
-export function SteelThreadPanel({ threadId }: PluginThreadPanelProps) {
+export function SteelThreadPanel({ threadId }: ExperimentalThreadTabProps) {
   return <ScopedSteelThreadPanel key={threadId} threadId={threadId} />;
 }
 
@@ -133,13 +133,14 @@ function ScopedSteelThreadPanel({ threadId }: { threadId: string }) {
   const scope = useScope(threadId);
   const { dashboard, error, refresh, start, starting } = useSteelDashboard(scope);
   const [playerKey, setPlayerKey] = useState(0);
-  const playerUrl = liveViewerUrl(dashboard);
+  const playerUrl = liveViewerUrl(dashboard, scope, window.location.href);
   const visible = useDocumentVisible();
   const active = dashboard?.sessions.some(session => ["idle", "live"].includes(session.status));
 
   return (
     <div ref={expansion.anchor} className="steel-thread-panel-anchor">
     <section ref={expansion.panel} style={expansion.geometry}
+      popover={expansion.expanded ? "manual" : undefined}
       onPointerEnter={expansion.enter} onPointerLeave={expansion.leave}
       onPointerOverCapture={expansion.enter} onPointerOutCapture={expansion.leave}
       className={`steel-thread-panel${expansion.expanded ? " steel-thread-panel--expanded" : ""}`} aria-label="BB Surf">
@@ -162,7 +163,7 @@ function ScopedSteelThreadPanel({ threadId }: { threadId: string }) {
         </div>
       </header>
       {playerUrl && active && visible ? (
-        <LiveViewer key={playerKey} url={playerUrl} title={`BB Surf for ${threadId}`} />
+        <LiveViewer key={playerKey} url={playerUrl} title={`BB Surf for ${threadId}`} showViewControls={false} />
       ) : error || dashboard?.error ? (
         <div className="steel-panel-state" role="alert">{error ?? dashboard?.error}</div>
       ) : (
@@ -185,7 +186,7 @@ export function SteelBrowserDirective(props: PluginMessageDirectiveProps) {
 }
 
 function ScopedSteelBrowser({ message }: PluginMessageDirectiveProps) {
-  const navigate = useBbNavigate();
+  const panel = experimental_useAppPanel();
   const { anchor, style, anchorStyle, latest } = useFollowViewer(message.threadId);
   const scope = useScope(message.threadId);
   const [minimized, setMinimized] = useState(startsInlineViewerMinimized);
@@ -195,7 +196,7 @@ function ScopedSteelBrowser({ message }: PluginMessageDirectiveProps) {
   }, [anchor, message.threadId, minimized]);
   const { dashboard, error, refresh, start, starting } = useSteelDashboard(scope, shouldPoll);
   const [playerKey, setPlayerKey] = useState(0);
-  const playerUrl = liveViewerUrl(dashboard);
+  const playerUrl = liveViewerUrl(dashboard, scope, window.location.href);
   const visible = useDocumentVisible();
   const active = dashboard?.sessions.some(session => ["idle", "live"].includes(session.status));
 
@@ -216,7 +217,7 @@ function ScopedSteelBrowser({ message }: PluginMessageDirectiveProps) {
         <div className="steel-inline-browser__actions">
           <button aria-label="Open browser panel" title="Watch in the right panel" type="button"
             onClick={() => {
-              if (navigate.openThreadPanel({ actionId: THREAD_PANEL_ACTION_ID })) setMinimized(true);
+              if (panel.openTab({ tab: { id: THREAD_PANEL_ACTION_ID, context: { kind: "thread" }, availability: "action" }, title: "BB Surf" })) setMinimized(true);
               else setMinimized(false);
             }}><PanelRightOpen aria-hidden="true" /></button>
           <button
@@ -503,7 +504,7 @@ function ScopedSteelBrowserPage({ scope, picker }: { scope: Scope; picker: React
   const sessions = dashboard?.sessions ?? [];
   const endpoint = dashboard?.endpoint ?? (error ? "Endpoint unavailable" : "Loading endpoint...");
   const activeSession = sessions.find(session => ["idle", "live"].includes(session.status));
-  const playerUrl = liveViewerUrl(dashboard);
+  const playerUrl = liveViewerUrl(dashboard, scope, window.location.href);
 
   return (
     <main className="steel-page" ref={pageRef}>
@@ -678,7 +679,9 @@ export default definePluginApp((app) => {
     title: "Browser agent",
     component: SteelAgentSettings,
   });
-  app.slots.threadPanelAction({
+  app.slots.experimental_tab({
+    context: { kind: "thread" },
+    availability: "action",
     id: THREAD_PANEL_ACTION_ID,
     title: "BB Surf",
     icon: "Monitor",

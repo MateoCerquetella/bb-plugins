@@ -85,20 +85,40 @@ after the user explicitly restores it.
 
 ### Requirement: Expand the live right panel without a modal
 
-The browser SHALL offer the host right thread panel through its Monitor icon and an Open browser panel button in each handoff. A fine pointer dwelling for 2000ms SHALL expand the visible panel toward the viewport width without a backdrop or focus trap. Pointer leave SHALL restore a hover expansion. Explicit Expand/Shrink and Escape SHALL be available, and the same iframe SHALL survive resizing. Mobile SHALL use explicit controls without automatic hover expansion. Timer cleanup SHALL prevent expansion after leave, blur, unmount or thread change.
+The browser SHALL retain its two-second fine-pointer hover expansion and explicit Expand/Shrink/Escape controls. Ordinary composer and pane-splitter chrome SHALL NOT cover or intercept the expanded viewer. Both hover and pinned geometry SHALL remain within the viewport under supported UI zoom, leave at least a usable third of a desktop viewport unobscured when space allows, and retain the existing iframe and human input state. Leaving, blur, unmount and thread changes SHALL cancel pending hover behavior. Mobile SHALL use explicit controls without automatic hover expansion.
 
-#### Scenario: Watch an agent and return to chat
+#### Scenario: Expanded viewer at non-default zoom
 
-- **WHEN** the user opens the browser panel and hovers for two seconds
-- **THEN** the existing project viewer expands with BB theme styling
-- **AND** leaving restores the compact view without restarting the viewer or browser
+- GIVEN a desktop viewer at 125% UI zoom
+- WHEN the pointer dwells for two seconds or the user explicitly expands it
+- THEN its rendered width remains bounded by the intended viewport fraction
+- AND its right and bottom edges remain inside the viewport
+- AND the same iframe and its field contents survive the resize.
 
-#### Scenario: Short hover or keyboard use
+#### Scenario: Return to the thread
 
-- **WHEN** the pointer leaves before two seconds
-- **THEN** no expansion occurs later
-- **WHEN** the user activates Expand, Shrink or Escape
-- **THEN** the panel changes size predictably without trapping focus
+- WHEN the pointer leaves a hover-expanded viewer
+- THEN the panel returns to compact mode
+- WHEN Shrink or Escape is used
+- THEN it stays compact until a new deliberate interaction.
+
+#### Scenario: Chat chrome overlaps the expansion
+
+- GIVEN the sidebar is in a stacking context below composer and splitter chrome
+- WHEN the viewer expands over their area
+- THEN hit testing within the expanded viewer reaches the viewer
+- AND the uncovered chat remains interactive
+- AND the existing iframe is not reloaded.
+
+
+The sidebar SHALL show one panel expansion control and one reconnect action in its outer header. The inner viewer SHALL retain Copy/Paste without duplicate size/reconnect icons. Inline and plugin-page viewers SHALL retain their own complete toolbar.
+
+#### Scenario: View an active browser in the sidebar
+
+- WHEN the sidebar viewer is active
+- THEN the outer header offers expansion and reconnect once
+- AND the inner toolbar offers Copy and Paste
+- AND there is no second full-viewport expansion mode.
 
 ### Requirement: Personalized browser presentation
 
@@ -183,3 +203,27 @@ The CDP bridge SHALL accept only authenticated bounded supported operations.
 #### Scenario: Runtime returns invalid output
 - WHEN execution has started and output is malformed or non-terminal
 - THEN BB Surf reports uncertainty and does not replay or claim success.
+
+### Requirement: Use the existing BB viewer authentication
+
+The embedded player and cast transport SHALL use locally authenticated plugin routes on the active BB app origin, resolving the saved project loopback binding on the server. The relay SHALL NOT forward BB credentials or accept a caller-selected upstream URL or CDP target.
+
+#### Scenario: Viewer has no separate Connect browser session
+
+- GIVEN the user can access BB and the saved project Steel browser is healthy
+- WHEN the embedded viewer opens
+- THEN the player and cast socket use the BB app origin
+- AND no separate Connect OAuth login is required in an iframe.
+
+#### Scenario: Untrusted origin or invalid target
+
+- WHEN a foreign Origin accesses the HTTP or WebSocket viewer route
+- THEN BB rejects the request
+- WHEN a viewer request has no valid scope, references an unknown project, or supplies an invalid page target
+- THEN it cannot reach an arbitrary service or expose CDP.
+
+#### Scenario: Viewer lifecycle ends
+
+- WHEN the viewer disconnects or its plugin is disposed
+- THEN the associated upstream socket and pending buffers are released
+- AND the project browser and profile remain running.

@@ -11,8 +11,8 @@ test("declares an independent BB app, server, CLI skill, and pinned SDK", async 
   assert.equal(packageJson.bb.server, "./server.ts");
   assert.equal(packageJson.bb.app, "./app.tsx");
   assert.deepEqual(packageJson.bb.skills, ["./skills/steel-browser"]);
-  assert.equal(packageJson.devDependencies["@get-bb/plugin-sdk"], "0.4.21");
-  assert.equal(packageJson.devDependencies["bb-app"], "0.40.0");
+  assert.equal(packageJson.devDependencies["@get-bb/plugin-sdk"], "0.6.104");
+  assert.equal(packageJson.devDependencies["bb-app"], "0.48.1");
   assert.match(packageJson.scripts.build, /^env -u BB_CLI /u);
   assert.ok(packageJson.files.includes("jev-runtime.ts"));
 });

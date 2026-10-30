@@ -1,12 +1,23 @@
-import type { Dashboard } from "./contract.ts";
+import type { Dashboard, Scope } from "./contract.ts";
 
 export const MAX_CLIPBOARD_LENGTH = 4096;
 
 // Only embed paths on the authenticated, project-bound viewer origin.
-export function liveViewerUrl(dashboard: Dashboard | null): string | null {
+export function liveViewerUrl(dashboard: Dashboard | null, scope?: Scope, appBaseUrl?: string): string | null {
   if (!dashboard?.connected) return null;
   const session = dashboard.sessions.find(item => ["idle", "live"].includes(item.status));
   if (!session) return null;
+  if (scope && appBaseUrl) {
+    if (!scope.threadId && !scope.projectId) return null;
+    const app = new URL(appBaseUrl);
+    if (!["http:", "https:"].includes(app.protocol) || app.username || app.password) return null;
+    const url = new URL("/api/v1/plugins/steel-browser/http/viewer", app.origin);
+    if (scope.threadId) url.searchParams.set("threadId", scope.threadId);
+    if (scope.projectId) url.searchParams.set("projectId", scope.projectId);
+    url.searchParams.set("interactive", "true");
+    url.searchParams.set("clipboardBridge", "true");
+    return url.href;
+  }
   const base = new URL(dashboard.uiUrl);
   if (base.protocol !== "https:" || base.username || base.password) return null;
   const url = new URL("/v1/sessions/debug", base.origin);

@@ -19,17 +19,30 @@ export function usePanelExpansion() {
   const canHover = () => !document.hidden && document.hasFocus() && !matchMedia("(pointer: coarse), (max-width: 640px)").matches;
 
   useLayoutEffect(() => {
+    const element = panel.current;
+    if (mode === "compact" || !element?.showPopover) return;
+    // The top layer escapes pane stacking contexts without moving the iframe.
+    element.showPopover();
+    return () => { if (element.isConnected && element.matches(":popover-open")) element.hidePopover(); };
+  }, [mode]);
+
+  useLayoutEffect(() => {
     if (mode === "compact") { setGeometry(undefined); return; }
     const update = () => {
-      const box = anchor.current?.getBoundingClientRect();
-      if (!box || box.width <= 0 || box.height <= 0) { shrink(); return; }
+      const element = anchor.current;
+      const box = element?.getBoundingClientRect();
+      if (!element || !box || box.width <= 0 || box.height <= 0 || !element.offsetWidth || !element.offsetHeight) { shrink(); return; }
+      // DOMRects include ancestor CSS zoom; authored fixed-position sizes do not.
+      const scaleX = box.width / element.offsetWidth;
+      const scaleY = box.height / element.offsetHeight;
       const top = Math.max(8, Math.min(box.top, innerHeight - 80));
       const right = Math.max(8, innerWidth - box.right);
-      setGeometry({ top, right, height: Math.max(0, Math.min(box.bottom, innerHeight - 8) - top),
+      setGeometry({ top: top / scaleY, right: right / scaleX,
+        height: Math.max(0, Math.min(box.bottom, innerHeight - 8) - top) / scaleY,
         width: Math.min(
           innerWidth - right - 8,
           Math.max(box.width, innerWidth * EXPANDED_VIEWPORT_RATIO),
-        ) });
+        ) / scaleX });
     };
     update();
     const observer = new ResizeObserver(update);
