@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Accept BB 0.48's persisted `plugin-fixed` Info and Diff tabs in `listTabs`
+  instead of failing output validation.
+- Let empty Action Topbar space drag the BB window; only the interactive
+  controls stay `no-drag`.
+
 ## 0.1.4
 
 - Restore native Action workspace panes on BB 0.46.1 with the included

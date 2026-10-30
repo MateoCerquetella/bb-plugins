@@ -353,3 +353,60 @@ test("bounds host-provided tab labels before returning the RPC projection", asyn
 
   assert.equal(result.tabs[0]?.label.length, 160);
 });
+
+test("lists the fixed tabs BB 0.48 persists as plugin-fixed", async (t) => {
+  const fake = createFakePluginHost({
+    pluginId: "action-topbar",
+    sdk: {
+      threads: {
+        tabs: {
+          async get() {
+            return {
+              revision: 1,
+              tabs: [
+                {
+                  id: "plugin-fixed:core:info",
+                  kind: "plugin-fixed" as const,
+                  pluginId: "core",
+                  tabId: "info",
+                },
+                {
+                  id: "plugin-fixed:core:diff",
+                  kind: "plugin-fixed" as const,
+                  pluginId: "core",
+                  tabId: "diff",
+                },
+              ],
+            };
+          },
+        },
+      },
+    },
+  });
+  t.after(() => fake.harness.lifecycle.dispose());
+  await plugin(fake.bb);
+
+  const result = await fake.harness.behavior.callRpc("listTabs", {
+    threadId: "thr_1",
+  });
+
+  assert.deepEqual(result, {
+    revision: 1,
+    tabs: [
+      {
+        id: "plugin-fixed:core:info",
+        kind: "plugin-fixed",
+        label: "info",
+        closable: false,
+        relaunchActionId: null,
+      },
+      {
+        id: "plugin-fixed:core:diff",
+        kind: "plugin-fixed",
+        label: "diff",
+        closable: false,
+        relaunchActionId: null,
+      },
+    ],
+  });
+});

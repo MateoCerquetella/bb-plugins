@@ -28,6 +28,10 @@
   font: inherit;
 }
 
+.action-topbar button {
+  -webkit-app-region: no-drag;
+}
+
 .action-topbar {
   position: relative;
   z-index: var(--action-topbar-z-index);
@@ -39,7 +43,6 @@
   align-items: stretch;
   overflow: hidden;
   color: var(--muted-foreground);
-  -webkit-app-region: no-drag;
 }
 
 .action-topbar__tabs {

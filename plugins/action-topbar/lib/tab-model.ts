@@ -3,6 +3,7 @@ import type { ActionDescriptor } from "./action-catalog.js";
 export const TAB_KINDS = [
   "thread-info",
   "git-diff",
+  "plugin-fixed",
   "plugin-panel",
   "workspace-file-preview",
   "host-file-preview",
