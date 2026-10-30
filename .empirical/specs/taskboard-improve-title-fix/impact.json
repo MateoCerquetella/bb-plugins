@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "workflow": "fast",
+  "classification": "behavioral",
+  "request": "Fix Taskboard Improve title & description: use a UUID fallback when crypto.randomUUID is unavailable in an insecure webview, surface request-creation errors in the dialog, and accept a fenced JSON object with surrounding helper commentary while still rejecting extra fields. Add focused parser and browser-dialog tests.",
+  "capabilities": [],
+  "surfaces": [
+    "request-scoped-implementation"
+  ],
+  "canonical": false,
+  "verification": "skipped",
+  "digest": "sha256:21eccab6313a1a13695d045588a5468ac07768651d03614bfb55469ffe4f4ac2"
+}
