@@ -198,16 +198,14 @@ test("is unavailable outside macOS", async () => {
 
 test("overrides BB's Claude Code usage in the snapshot", async () => {
   const sdk: UsageSdk = {
-    threads: { get: async () => ({ environmentId: null }) },
-    environments: { get: async () => ({ hostId: "host" }) },
-    hosts: { get: async () => ({ name: "Host" }) },
+    threads: {},
+    hosts: { list: async () => [{ id: "host", name: "Host", status: "connected", lastSeenAt: 1 }] },
     system: {
       usageLimits: async () => ({ "claude-code": { status: "unauthenticated" } }),
     },
   };
   const snapshot = await loadUsageSnapshot(
     sdk,
-    null,
     new Date("2026-09-22T12:00:00Z"),
     Promise.resolve({
       "claude-code": {

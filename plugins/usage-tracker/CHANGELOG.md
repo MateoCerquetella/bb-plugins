@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased
+
+- Average the selected limit percentage across enabled providers with available
+  data, including idle zero-use providers; exclude providers without a reading
+  and cap each provider's contribution at 100%.
+- Read usage from every connected machine instead of only the current thread's
+  host, and include Account Pooler accounts from every machine. An account
+  email seen on several machines shows once, from the most recently seen one;
+  a provider with several accounts gets one overview row per account.
+  `getUsage` no longer takes a thread id.
+- Read Codex usage resets for the login on each machine through a new `host`
+  entry. Counts from other machines are read-only: only the server's own login
+  can spend a reset. The summary badge now shows the total resets available
+  instead of the number of additional providers.
+- Build against bb-app 0.48.0 and plugin SDK 0.6.94, which the host entry needs.
+
 ## 0.1.16 - 2026-10-26
 
 - Keep the usage details card visible on bb 0.47.1+, where the sidebar

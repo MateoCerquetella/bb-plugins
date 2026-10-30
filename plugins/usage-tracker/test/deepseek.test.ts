@@ -17,7 +17,7 @@ import {
 import { enabledSidebarProviderIds } from "../lib/preferences.ts";
 import { providerMark } from "../lib/provider-marks.ts";
 import {
-  cumulativeInUseUsage,
+  averageProviderUsage,
   mergeLastKnownWindows,
   selectSidebarUsagePrimary,
   sidebarUsageDetailRows,
@@ -458,9 +458,9 @@ test("keeps a balance provider out of the cumulative agent summary", async () =>
     provider,
     selection: selectSidebarUsagePrimary(provider, provider, "Weekly"),
   }));
-  const cumulative = cumulativeInUseUsage(items);
-  assert.equal(cumulative.percent, 17);
-  assert.deepEqual(cumulative.names, ["Codex"]);
+  const average = averageProviderUsage(items);
+  assert.equal(average.percent, 17);
+  assert.deepEqual(average.names, ["Codex"]);
 });
 
 test("does not resurrect a removed budget window", async () => {

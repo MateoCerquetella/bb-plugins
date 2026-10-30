@@ -2,6 +2,7 @@ import { defineRpcContract, type BbPluginApi } from "@get-bb/plugin-sdk";
 import { z } from "zod";
 import {
   consumeCodexRateLimitResetCredit,
+  readCodexAccountEmail,
   readCodexResetCredits,
 } from "./lib/codex-reset-credits.ts";
 import { readClaudeUsageFromKeychain } from "./lib/claude-keychain-usage.ts";
@@ -14,6 +15,7 @@ import { loadUsageSnapshot } from "./lib/load-usage.ts";
 import { getCachedAntigravityUsage } from "./lib/antigravity-probe.ts";
 import { createResetActionGate, type ResetPrepareResult } from "./lib/reset-action-gate.ts";
 import { PROVIDER_IDS, withCodexResetCredits } from "./lib/usage.ts";
+import { createResetSources } from "./lib/reset-sources.ts";
 import {
   loadPoolAccountRecords,
   poolOwnsProvider,
@@ -36,6 +38,7 @@ const costSchema = z
 const resetCreditsSchema = z
   .object({
     availableCount: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER),
+    readOnly: z.boolean().optional(),
   })
   .strict();
 
@@ -74,6 +77,7 @@ const pooledAccountSchema = z
     message: z.string().nullable(),
     observedAt: z.string().nullable(),
     windows: z.array(usageWindowSchema),
+    resetCredits: resetCreditsSchema.nullable().optional(),
   })
   .strict();
 
@@ -131,7 +135,7 @@ export const usageRpcContract = defineRpcContract({
       .strict(),
   },
   getUsage: {
-    input: z.object({ threadId: z.string().trim().min(1).nullable() }).strict(),
+    input: z.null(),
     output: z
       .object({
         fetchedAt: z.string(),
@@ -245,7 +249,10 @@ export default function plugin(bb: BbPluginApi) {
 
   const resetGate = createResetActionGate(consumeCodexRateLimitResetCredit);
 
+  const resetSources = createResetSources(bb);
+
   let lastKnownCodexResetCount: number | null = null;
+  let lastKnownCodexAccountEmail: string | null = null;
 
   bb.rpc.register(usageRpcContract, {
     async getPreferences() {
@@ -255,7 +262,7 @@ export default function plugin(bb: BbPluginApi) {
         compactLimit: normalizeCompactLimitOption(preferences.compactLimit),
       };
     },
-    async getUsage({ threadId }) {
+    async getUsage() {
       const preferences = await settings.get();
       const claudeKeychainService = preferences.claudeKeychainService.trim();
       const routedAccounts = loadPoolAccountRecords();
@@ -267,7 +274,6 @@ export default function plugin(bb: BbPluginApi) {
       const [snapshot, deepSeek] = await Promise.all([
         loadUsageSnapshot(
           bb.sdk,
-          threadId,
           new Date(),
           claudeKeychainService === ""
             ? Promise.resolve({})
@@ -295,8 +301,7 @@ export default function plugin(bb: BbPluginApi) {
         snapshot.providers.some(
           (provider) =>
             provider.id === "codex" &&
-            provider.status === "ok" &&
-            (provider.accounts?.length ?? 0) === 0,
+            provider.status === "ok",
         ) && !poolOwnsProvider(await routedAccounts, "codex");
       if (codexIsAvailable) {
         try {
@@ -304,11 +309,19 @@ export default function plugin(bb: BbPluginApi) {
         } catch {
           bb.log.warn("Codex usage reset availability could not be loaded.");
         }
+        lastKnownCodexAccountEmail = await readCodexAccountEmail().catch(() => null);
       } else {
         lastKnownCodexResetCount = null;
+        lastKnownCodexAccountEmail = null;
       }
       resetGate.setAvailableCount(lastKnownCodexResetCount);
-      return withCodexResetCredits({ ...snapshot, providers }, lastKnownCodexResetCount);
+      return resetSources.apply(
+        withCodexResetCredits(
+          { ...snapshot, providers },
+          lastKnownCodexResetCount,
+          lastKnownCodexAccountEmail,
+        ),
+      );
     },
     prepareReset(): ResetPrepareResult {
       return resetGate.prepare();

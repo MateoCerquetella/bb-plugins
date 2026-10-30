@@ -3,7 +3,6 @@ import test from "node:test";
 import {
   loadUsageSnapshot,
   markProvidersInUse,
-  resolveThreadHostId,
   type UsageSdk,
 } from "../lib/load-usage.ts";
 import {
@@ -20,7 +19,7 @@ import {
 } from "../lib/usage.ts";
 import { normalizeAntigravityOutput } from "../lib/antigravity-probe.ts";
 import {
-  cumulativeInUseUsage,
+  averageProviderUsage,
   highestSidebarUsagePrimary,
   mergeLastKnownWindows,
   selectSidebarUsagePrimary,
@@ -79,18 +78,12 @@ function healthyProvider(
 function makeSdk(overrides: Partial<UsageSdk> = {}): UsageSdk {
   return {
     threads: {
-      async get() {
-        return { environmentId: "env_1" };
-      },
-    },
-    environments: {
-      async get() {
-        return { hostId: "host_1" };
-      },
     },
     hosts: {
-      async get() {
-        return { name: "Mateo's MacBook" };
+      async list() {
+        return [
+          { id: "host_1", name: "Mateo's MacBook", status: "connected", lastSeenAt: 1 },
+        ];
       },
     },
     system: {
@@ -531,31 +524,54 @@ test("selects the configured compact usage window", () => {
   assert.equal(sidebarUsagePrimarySummary(provider, "Five-hour"), "120%");
 });
 
-test("sums compact usage across accounts in use and ignores idle providers", () => {
+test("averages compact usage across providers with data, including idle zero-use providers", () => {
   const snapshot = normalizeUsage(
     {
       codex: healthyProvider("Weekly limit", 17),
       "claude-code": healthyProvider("Weekly limit", 2),
-      "acp-cursor": healthyProvider("Plan usage", 100),
+      "acp-cursor": healthyProvider("Plan usage", 0),
+      "acp-grok": healthyProvider("Weekly limit", 100),
       "acp-opencode": healthyProvider("Weekly", 4),
     },
     { id: null, name: null },
   );
   const items = snapshot.providers.map((provider) => ({
-    provider: {
-      ...provider,
-      inUse: provider.id === "codex" || provider.id === "claudeCode",
-    },
+    provider: { ...provider, inUse: provider.id === "codex" },
     selection: selectSidebarUsagePrimary(provider, provider, "Weekly"),
   }));
-  const cumulative = cumulativeInUseUsage(items);
-  assert.equal(cumulative.percent, 19);
-  assert.deepEqual(cumulative.names, ["Codex", "Claude Code"]);
-  assert.equal(
-    items.find((item) => item.provider.id === "cursor")?.selection.window
-      ?.usedPercent,
-    100,
+  const unavailable = items.find((item) => item.provider.id === "grok");
+  assert.ok(unavailable);
+  unavailable.selection = {
+    window: null,
+    actualKind: null,
+    fallback: "unavailable",
+  };
+
+  const average = averageProviderUsage(items);
+  assert.equal(average.percent, 5.75);
+  assert.equal(average.count, 4);
+  assert.deepEqual(average.names, [
+    "Codex",
+    "Claude Code",
+    "Cursor",
+    "OpenCode",
+  ]);
+});
+
+test("caps each provider contribution at 100 percent", () => {
+  const snapshot = normalizeUsage(
+    {
+      codex: healthyProvider("Weekly limit", 120),
+      "claude-code": healthyProvider("Weekly limit", 120),
+    },
+    { id: null, name: null },
   );
+  const items = snapshot.providers.map((provider) => ({
+    provider,
+    selection: selectSidebarUsagePrimary(provider, provider, "Weekly"),
+  }));
+
+  assert.equal(averageProviderUsage(items).percent, 100);
 });
 
 test("selects the highest available compact usage for an overview summary", () => {
@@ -914,62 +930,146 @@ test("keeps additional last-known windows without stale duplicates", () => {
 
 });
 
-test("resolves the thread environment host", async () => {
-  const sdk = makeSdk();
-  assert.equal(await resolveThreadHostId(sdk, "thr_1"), "host_1");
-});
-
-test("falls back when a thread has no environment or lookup fails", async () => {
-  const noEnvironment = makeSdk({
-    threads: {
-      async get() {
-        return { environmentId: null };
-      },
-    },
-  });
-  assert.equal(await resolveThreadHostId(noEnvironment, "thr_1"), null);
-
-  const missingEnvironment = makeSdk({
-    environments: {
-      async get() {
-        throw new Error("environment missing");
-      },
-    },
-  });
-  assert.equal(await resolveThreadHostId(missingEnvironment, "thr_1"), null);
-});
-
-test("loads usage for the resolved host and tolerates missing host metadata", async () => {
-  const calls: Array<{ hostId?: string } | undefined> = [];
+test("reads usage from every connected machine and skips offline ones", async () => {
+  const hostIds = new Set<string | undefined>();
   const sdk = makeSdk({
     hosts: {
-      async get() {
-        throw new Error("host metadata unavailable");
+      async list() {
+        return [
+          { id: "host_1", name: "Mac", status: "connected", lastSeenAt: 1 },
+          { id: "host_2", name: "NUC", status: "disconnected", lastSeenAt: 2 },
+        ];
       },
     },
     system: {
       async usageLimits(args) {
-        calls.push(args);
+        hostIds.add(args?.hostId);
         return healthyResponse();
       },
     },
   });
 
+  await loadUsageSnapshot(sdk, new Date(), Promise.resolve({}), Promise.resolve([]));
+  assert.deepEqual([...hostIds], ["host_1"]);
+});
+
+function codexReading(accountEmail: string | null, usedPercent: number) {
+  return {
+    codex: {
+      status: "ok" as const,
+      accountEmail,
+      planLabel: "Plus",
+      windows: [{ label: "Weekly limit", usedPercent, resetsAt: null }],
+    },
+  };
+}
+
+async function loadCodex(sdk: UsageSdk) {
   const snapshot = await loadUsageSnapshot(
     sdk,
-    "thr_1",
-    new Date("2026-08-11T17:00:00.000Z"),
+    new Date(),
+    Promise.resolve({}),
+    Promise.resolve([]),
   );
-  assert.deepEqual(calls, [{ hostId: "host_1" }]);
-  assert.deepEqual(snapshot.host, { id: "host_1", name: null });
+  return snapshot.providers.find((provider) => provider.id === "codex")!;
+}
+
+const TWO_MACHINES: Pick<UsageSdk["hosts"], "list"> = {
+  async list() {
+    return [
+      { id: "host_1", name: "Mac", status: "connected", lastSeenAt: 100 },
+      { id: "host_2", name: "NUC", status: "connected", lastSeenAt: 200 },
+    ];
+  },
+};
+
+test("shows one account seen on two machines with its freshest reading", async () => {
+  const sdk = makeSdk({
+    hosts: {
+      async list() {
+        return [
+          { id: "host_old", name: "NUC", status: "connected", lastSeenAt: 100 },
+          { id: "host_new", name: "Mac", status: "connected", lastSeenAt: 200 },
+        ];
+      },
+    },
+    system: {
+      async usageLimits(args) {
+        return args?.hostId === "host_new"
+          ? codexReading("Mateo@Example.com", 40)
+          : codexReading("mateo@example.com", 10);
+      },
+    },
+  });
+
+  const codex = await loadCodex(sdk);
+  assert.equal(codex.accounts, undefined);
+  assert.equal(codex.accountEmail, "Mateo@Example.com");
+  assert.equal(codex.windows[0]?.usedPercent, 40);
 });
 
-test("omits host override for primary-machine fallback", async () => {
-  const calls: Array<{ hostId?: string } | undefined> = [];
+test("lists different accounts from different machines, freshest first", async () => {
   const sdk = makeSdk({
-    threads: {
-      async get() {
-        return { environmentId: null };
+    hosts: TWO_MACHINES,
+    system: {
+      async usageLimits(args) {
+        return args?.hostId === "host_1"
+          ? codexReading("a@example.com", 10)
+          : codexReading("b@example.com", 30);
+      },
+    },
+  });
+
+  const codex = await loadCodex(sdk);
+  assert.deepEqual(
+    codex.accounts?.map((account) => [account.label, account.accountEmail]),
+    [
+      ["NUC", "b@example.com"],
+      ["Mac", "a@example.com"],
+    ],
+  );
+  assert.equal(codex.currentAccountId, undefined);
+});
+
+test("keeps accounts without an email separate per machine", async () => {
+  const sdk = makeSdk({
+    hosts: TWO_MACHINES,
+    system: {
+      async usageLimits() {
+        return codexReading(null, 10);
+      },
+    },
+  });
+
+  const codex = await loadCodex(sdk);
+  assert.deepEqual(
+    codex.accounts?.map((account) => account.label).sort(),
+    ["Mac", "NUC"],
+  );
+});
+
+test("skips a machine whose usage read fails without failing the snapshot", async () => {
+  const sdk = makeSdk({
+    hosts: TWO_MACHINES,
+    system: {
+      async usageLimits(args) {
+        if (args?.hostId === "host_2") throw new Error("usage unavailable");
+        return codexReading("a@example.com", 10);
+      },
+    },
+  });
+
+  const codex = await loadCodex(sdk);
+  assert.equal(codex.status, "ok");
+  assert.equal(codex.accounts, undefined);
+});
+
+test("falls back to the primary machine when the host list is unreadable", async () => {
+  const calls: unknown[] = [];
+  const sdk = makeSdk({
+    hosts: {
+      async list() {
+        throw new Error("hosts unavailable");
       },
     },
     system: {
@@ -980,38 +1080,27 @@ test("omits host override for primary-machine fallback", async () => {
     },
   });
 
-  const snapshot = await loadUsageSnapshot(sdk, "thr_1");
-  assert.deepEqual(calls, [undefined]);
-  assert.deepEqual(snapshot.host, { id: null, name: null });
+  await loadUsageSnapshot(sdk, new Date(), Promise.resolve({}), Promise.resolve([]));
+  assert.equal(calls[0], undefined);
 });
 
-test("loads the primary machine directly for the sidebar strip", async () => {
-  const calls: Array<{ hostId?: string } | undefined> = [];
+test("keeps a single unhealthy status when no machine reports usage", async () => {
   const sdk = makeSdk({
-    threads: {
-      async get() {
-        throw new Error("the primary-machine surface must not resolve a thread");
-      },
-    },
     system: {
-      async usageLimits(args) {
-        calls.push(args);
-        return healthyResponse();
+      async usageLimits() {
+        return { codex: { status: "expired" as const } };
       },
     },
   });
 
-  const snapshot = await loadUsageSnapshot(sdk, null);
-  assert.deepEqual(calls, [undefined]);
-  assert.deepEqual(snapshot.host, { id: null, name: null });
+  const codex = await loadCodex(sdk);
+  assert.equal(codex.status, "expired");
+  assert.equal(codex.accounts, undefined);
 });
 
 test("leaves provider activity unknown when thread counts are unavailable", async () => {
   const sdk = makeSdk({
     threads: {
-      async get() {
-        return { environmentId: null };
-      },
       async count() {
         throw new Error("thread counts unavailable");
       },
@@ -1020,7 +1109,6 @@ test("leaves provider activity unknown when thread counts are unavailable", asyn
 
   const snapshot = await loadUsageSnapshot(
     sdk,
-    null,
     new Date(),
     Promise.resolve({}),
     Promise.resolve([]),
@@ -1034,10 +1122,8 @@ test("leaves provider activity unknown when thread counts are unavailable", asyn
 test("marks inactive providers only when every thread count succeeds", async () => {
   const sdk = makeSdk({
     threads: {
-      async get() {
-        return { environmentId: null };
-      },
-      async count({ status }) {
+      async count(args) {
+        const status = args?.status;
         return {
           total: status === "active" ? 1 : 0,
           groups: status === "active" ? [{ key: "codex", count: 1 }] : [],
@@ -1048,7 +1134,6 @@ test("marks inactive providers only when every thread count succeeds", async () 
 
   const snapshot = await loadUsageSnapshot(
     sdk,
-    null,
     new Date(),
     Promise.resolve({}),
     Promise.resolve([]),
@@ -1067,10 +1152,8 @@ test("marks inactive providers only when every thread count succeeds", async () 
 test("keeps activity unknown when thread counts omit provider groups", async () => {
   const sdk = makeSdk({
     threads: {
-      async get() {
-        return { environmentId: null };
-      },
-      async count({ status }) {
+      async count(args) {
+        const status = args?.status;
         return {
           total: status === "active" ? 1 : 0,
         };
@@ -1080,7 +1163,6 @@ test("keeps activity unknown when thread counts omit provider groups", async () 
 
   const snapshot = await loadUsageSnapshot(
     sdk,
-    null,
     new Date(),
     Promise.resolve({}),
     Promise.resolve([]),
@@ -1093,8 +1175,7 @@ test("keeps activity unknown when thread counts omit provider groups", async () 
 
 test("omits activity when the thread count API is absent", async () => {
   const snapshot = await loadUsageSnapshot(
-    makeSdk({ threads: { async get() { return { environmentId: null }; } } }),
-    null,
+    makeSdk({ threads: {} }),
     new Date(),
     Promise.resolve({}),
     Promise.resolve([]),
@@ -1108,15 +1189,13 @@ test("keeps known activity while omitting unknown activity for unmapped provider
   const snapshot = await loadUsageSnapshot(
     makeSdk({
       threads: {
-        async get() { return { environmentId: null }; },
-        async count({ status }) {
-          return status === "active"
+        async count(args) {
+          return args?.status === "active"
             ? { total: 2, groups: [{ key: "codex", count: 1 }, { key: "pi", count: 1 }] }
             : { total: 0, groups: [] };
         },
       },
     }),
-    null,
     new Date(),
     Promise.resolve({}),
     Promise.resolve([]),
@@ -1147,22 +1226,54 @@ test("removes stale activity without mutating the input snapshot", () => {
   }
 });
 
-test("propagates thread and request-level usage failures", async () => {
-  const threadFailure = makeSdk({
-    threads: {
-      async get() {
-        throw new Error("thread missing");
+test("prefers a healthy machine reading over a fresher unhealthy one", async () => {
+  const sdk = makeSdk({
+    hosts: TWO_MACHINES,
+    system: {
+      async usageLimits(args) {
+        return args?.hostId === "host_2"
+          ? { codex: { status: "expired" as const } }
+          : codexReading("a@example.com", 10);
       },
     },
   });
-  await assert.rejects(() => loadUsageSnapshot(threadFailure, "thr_1"), /thread missing/);
 
-  const usageFailure = makeSdk({
+  const codex = await loadCodex(sdk);
+  assert.equal(codex.status, "ok");
+  assert.equal(codex.accountEmail, "a@example.com");
+  assert.equal(codex.accounts, undefined);
+});
+
+test("ignores Keychain overrides while a machine reports Claude Code healthy", async () => {
+  const sdk = makeSdk({
     system: {
       async usageLimits() {
-        throw new Error("usage unavailable");
+        return {
+          "claude-code": {
+            status: "ok" as const,
+            accountEmail: "a@example.com",
+            planLabel: "Max",
+            windows: [],
+          },
+        };
       },
     },
   });
-  await assert.rejects(() => loadUsageSnapshot(usageFailure, "thr_1"), /usage unavailable/);
+
+  const snapshot = await loadUsageSnapshot(
+    sdk,
+    new Date(),
+    Promise.resolve({
+      "claude-code": {
+        status: "ok" as const,
+        accountEmail: null,
+        planLabel: "Pro",
+        windows: [],
+      },
+    }),
+    Promise.resolve([]),
+  );
+  const claude = snapshot.providers.find((provider) => provider.id === "claudeCode")!;
+  assert.equal(claude.accountEmail, "a@example.com");
+  assert.equal(claude.planLabel, "Max");
 });

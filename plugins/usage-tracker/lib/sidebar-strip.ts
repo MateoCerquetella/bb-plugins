@@ -20,8 +20,10 @@ import {
 } from "./preferences.ts";
 import { providerMark } from "./provider-marks.ts";
 import {
-  cumulativeInUseUsage,
-  inUseAgentUsageItems,
+  accountUsageRows,
+  averageProviderUsage,
+  totalResetCredits,
+  itemsWithUsageData,
   mergeLastKnownWindows,
   selectSidebarUsagePrimary,
   sidebarUsageDetailRows,
@@ -469,7 +471,7 @@ function resetSection(
   );
   section.append(summary);
 
-  if (count !== null && count > 0) {
+  if (count !== null && count > 0 && provider.resetCredits?.readOnly !== true) {
     if (actions.confirmation === null) {
       section.append(
         resetActionButton(
@@ -662,6 +664,9 @@ function detailsCard(
   resetActions: ResetCardActions,
   onSelectAccount: ((accountId: string) => void) | null,
 ): HTMLDivElement {
+  const accounts = provider.accounts ?? [];
+  // Only Account Pooler accounts can be switched; machine accounts are read-only.
+  const pooled = provider.currentAccountId !== undefined;
   const card = element("div", "usage-tracker-sidebar__details");
   card.id = detailsId(provider.id);
   card.setAttribute("role", "dialog");
@@ -678,13 +683,15 @@ function detailsCard(
     element(
       "span",
       undefined,
-      provider.accounts !== undefined && provider.accounts.length > 0
-        ? `Account Pooler · ${provider.accounts.length} account${provider.accounts.length === 1 ? "" : "s"}`
-        : provider.status === "ok"
-          ? provider.id === "deepSeek"
-            ? "API balance"
-            : "Subscription usage"
-          : providerStatusLabel(provider.status),
+      pooled && accounts.length > 0
+        ? `Account Pooler · ${accounts.length} account${accounts.length === 1 ? "" : "s"}`
+        : accounts.length > 1
+          ? `${accounts.length} accounts across machines`
+          : provider.status === "ok"
+            ? provider.id === "deepSeek"
+              ? "API balance"
+              : "Subscription usage"
+            : providerStatusLabel(provider.status),
     ),
   );
   identity.append(mark, title);
@@ -704,22 +711,16 @@ function detailsCard(
   windows.tabIndex = 0;
   windows.setAttribute("role", "region");
   windows.setAttribute("aria-label", `${provider.name} usage windows`);
-  const accounts = provider.accounts ?? [];
   if (accounts.length > 1) {
     windows.dataset.pooled = "true";
-    const currentEmail = provider.accountEmail;
     const ordered = [...accounts].sort((left, right) => {
-      const leftCurrent = left.accountEmail === currentEmail ? 0 : 1;
-      const rightCurrent = right.accountEmail === currentEmail ? 0 : 1;
+      const leftCurrent = left.id === provider.currentAccountId ? 0 : 1;
+      const rightCurrent = right.id === provider.currentAccountId ? 0 : 1;
       return leftCurrent - rightCurrent;
     });
     windows.append(
       ...ordered.map((account) => {
-        const isCurrent =
-          account.id === provider.currentAccountId ||
-          (provider.currentAccountId === undefined &&
-            currentEmail !== null &&
-            account.accountEmail === currentEmail);
+        const isCurrent = pooled && account.id === provider.currentAccountId;
         return accountSection(
           account.accountEmail ?? account.label,
           isCurrent
@@ -728,7 +729,7 @@ function detailsCard(
               ? account.planLabel
               : providerStatusLabel(account.status),
           { ...provider, ...account, id: provider.id, accounts: undefined },
-          isCurrent || onSelectAccount === null
+          isCurrent || !pooled || onSelectAccount === null
             ? null
             : () => onSelectAccount(account.id),
         );
@@ -739,7 +740,7 @@ function detailsCard(
   }
   card.append(header, windows);
 
-  if (provider.id === "codex") {
+  if (provider.id === "codex" || provider.resetCredits != null) {
     card.append(resetSection(provider, resetActions));
   }
 
@@ -762,7 +763,7 @@ function overviewCard(
   items: readonly SidebarUsageOverviewItem[],
   compactLimit: CompactLimitOption,
   onClose: () => void,
-  onSelect: (providerId: SidebarProviderId) => void,
+  onSelect: (item: SidebarUsageOverviewItem) => void,
   refresh: HTMLButtonElement,
 ): HTMLDivElement {
   const card = element(
@@ -780,7 +781,7 @@ function overviewCard(
   const title = element("div");
   title.append(
     element("strong", undefined, "Agent usage"),
-    element("span", undefined, `${items.length} providers`),
+    element("span", undefined, `${items.length} ${items.length === 1 ? "account" : "accounts"}`),
   );
   identity.append(mark, title);
 
@@ -843,7 +844,7 @@ function overviewCard(
       row.append(progressRail(item.selection.window));
     }
     row.append(reading);
-    row.addEventListener("click", () => onSelect(providerId));
+    row.addEventListener("click", () => onSelect(item));
     list.append(row);
   }
 
@@ -869,6 +870,7 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
   let enabledProviderIds = readCachedProviderIds();
   let compactLimit = readCachedCompactLimit();
   let selectedProviderId: SidebarProviderId | null = null;
+  let selectedRowName: string | null = null;
   let isOverviewOpen = false;
   let isLoading = false;
   let refreshQueued = false;
@@ -906,6 +908,19 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
         ),
       };
     });
+
+  const accountItems = (
+    items: readonly SidebarUsageOverviewItem[],
+  ): SidebarUsageOverviewItem[] =>
+    items.flatMap(({ provider, selection }) =>
+      accountUsageRows(provider).map((row) => ({
+        provider: row,
+        selection:
+          row === provider
+            ? selection
+            : selectSidebarUsagePrimary(row, undefined, compactLimit),
+      })),
+    );
 
   const refreshButton = (): HTMLButtonElement => {
     const refresh = element("button", "usage-tracker-sidebar__refresh");
@@ -1133,13 +1148,18 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
       return;
     }
     const items = overviewItems();
+    const accountRows = accountItems(items);
     const content: Node[] = [];
 
     if (selectedProviderId !== null) {
       const providerId = selectedProviderId;
       content.push(
         detailsCard(
-          providerFor(providerId),
+          accountRows.find(
+            (item) =>
+              item.provider.id === providerId &&
+              item.provider.name === selectedRowName,
+          )?.provider ?? providerFor(providerId),
           () => {
             selectedProviderId = null;
             resetConfirmation = null;
@@ -1165,15 +1185,16 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
     } else if (isOverviewOpen && items.length > 2) {
       content.push(
         overviewCard(
-          items,
+          accountRows.filter((item) => item.selection.window !== null || item.provider.balance !== undefined),
           compactLimit,
           () => {
             isOverviewOpen = false;
             requestedFocus = { kind: "summary" };
             render();
           },
-          (providerId) => {
-            selectedProviderId = providerId;
+          (item) => {
+            selectedProviderId = item.provider.id as SidebarProviderId;
+            selectedRowName = item.provider.name;
             resetConfirmation = null;
             resetMessage = null;
             requestedFocus = { kind: "close" };
@@ -1190,25 +1211,22 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
     strip.setAttribute("aria-label", "Agent usage limits");
 
     if (items.length > 2) {
-      const cumulative = cumulativeInUseUsage(items);
-      const additionalCount = Math.max(
-        0,
-        items.length - Math.max(cumulative.count, 1),
-      );
+      const average = averageProviderUsage(accountRows);
+      const unavailableCount = accountRows.length - average.count;
+      const resetTotal = totalResetCredits(accountRows.map((item) => item.provider));
       const primarySummary =
-        cumulative.percent === null
+        average.percent === null
           ? "—%"
-          : `${formatUsedPercent(cumulative.percent)}%`;
+          : `${formatUsedPercent(average.percent)}%`;
       const overviewIsVisible = isOverviewOpen && selectedProviderId === null;
       const action = overviewIsVisible ? "Close" : "Open";
-      const inUseLabel = cumulative.names.join(" and ");
       const accessibleText =
-        cumulative.percent === null
-          ? `Agent usage overview: no accounts are in use. ${action} usage overview.`
-          : `Agent usage overview: ${primarySummary} across ${inUseLabel} in use; ${additionalCount} additional provider${additionalCount === 1 ? "" : "s"}. ${action} usage overview.`;
+        average.percent === null
+          ? `Agent usage overview: no provider usage data available. ${action} usage overview.`
+          : `Agent usage overview: ${primarySummary} average across ${average.names.join(" and ")}; ${unavailableCount} provider${unavailableCount === 1 ? "" : "s"} without usage data; ${resetTotal} usage reset${resetTotal === 1 ? "" : "s"} available. ${action} usage overview.`;
       const summary = element("button", "usage-tracker-sidebar__summary");
       summary.type = "button";
-      summary.dataset.level = usageLevel(cumulative.percent);
+      summary.dataset.level = usageLevel(average.percent);
       summary.setAttribute("aria-haspopup", "dialog");
       summary.setAttribute("aria-controls", OVERVIEW_DETAILS_ID);
       summary.setAttribute("aria-expanded", String(overviewIsVisible));
@@ -1216,9 +1234,11 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
       summary.title = accessibleText;
 
       const mark = element("span", "usage-tracker-sidebar__summary-mark");
-      const active = inUseAgentUsageItems(items);
-      if (active.length === 1) {
-        const providerId = active[0]!.provider.id as SidebarProviderId;
+      const contributors = accountRows.filter(
+        (item) => item.selection.window !== null,
+      );
+      if (contributors.length === 1) {
+        const providerId = contributors[0]!.provider.id as SidebarProviderId;
         mark.dataset.provider = providerId;
         mark.append(providerGlyph(providerId));
       } else {
@@ -1234,7 +1254,7 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
         element(
           "span",
           "usage-tracker-sidebar__summary-count",
-          `+${additionalCount}`,
+          `+${resetTotal}`,
         ),
       );
       summary.addEventListener("click", () => {
@@ -1253,7 +1273,9 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
       });
       strip.append(summary);
     } else {
-      for (const item of items) {
+      const shown = itemsWithUsageData(items);
+      strip.dataset.providerCount = String(shown.length);
+      for (const item of shown) {
         const providerId = item.provider.id as SidebarProviderId;
         const provider = item.provider;
         const primary = item.selection;
@@ -1296,6 +1318,7 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
           isOverviewOpen = false;
           const isClosing = selectedProviderId === providerId;
           selectedProviderId = isClosing ? null : providerId;
+          selectedRowName = null;
           resetConfirmation = null;
           resetMessage = null;
           requestedFocus = isClosing
@@ -1361,7 +1384,7 @@ export function mountSidebarUsageStrip(signal: AbortSignal): () => void {
         {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ threadId: null }),
+          body: JSON.stringify(null),
           credentials: "same-origin",
           signal: requestController.signal,
         },
