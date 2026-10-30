@@ -15,6 +15,8 @@
   can spend a reset. The summary badge now shows the total resets available
   instead of the number of additional providers.
 - Build against bb-app 0.48.0 and plugin SDK 0.6.94, which the host entry needs.
+- Probe `agy` at most once per refresh interval, including after a failed
+  probe, instead of spawning it again on every usage poll.
 
 ## 0.1.16 - 2026-10-26
 
