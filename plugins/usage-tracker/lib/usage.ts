@@ -201,7 +201,8 @@ export function withCodexResetCredits(
 }
 
 export interface ResetReading {
-  email: string;
+  /** Null when the source does not name the account; it then belongs to the first row. */
+  email: string | null;
   availableCount: number;
 }
 
@@ -214,11 +215,14 @@ export function withReadOnlyResetCredits(
   if (readings.length === 0) return snapshot;
   const creditFor = (
     email: string | null,
+    index: number,
     current: UsageResetCredits | null | undefined,
   ): UsageResetCredits | null => {
     if (current != null) return current;
-    const reading = readings.find(
-      (candidate) => email?.toLowerCase() === candidate.email.toLowerCase(),
+    const reading = readings.find((candidate) =>
+      candidate.email === null
+        ? index === 0
+        : email?.toLowerCase() === candidate.email.toLowerCase(),
     );
     return reading === undefined
       ? null
@@ -231,14 +235,14 @@ export function withReadOnlyResetCredits(
       if (provider.accounts === undefined || provider.accounts.length === 0) {
         return {
           ...provider,
-          resetCredits: creditFor(provider.accountEmail, provider.resetCredits),
+          resetCredits: creditFor(provider.accountEmail, 0, provider.resetCredits),
         };
       }
       return {
         ...provider,
-        accounts: provider.accounts.map((account) => ({
+        accounts: provider.accounts.map((account, index) => ({
           ...account,
-          resetCredits: creditFor(account.accountEmail, account.resetCredits),
+          resetCredits: creditFor(account.accountEmail, index, account.resetCredits),
         })),
       };
     }),
