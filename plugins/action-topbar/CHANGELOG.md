@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.5 - 2026-10-30
 
 - Accept BB 0.48's persisted `plugin-fixed` Info and Diff tabs in `listTabs`
   instead of failing output validation.

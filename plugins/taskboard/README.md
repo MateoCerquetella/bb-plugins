@@ -331,7 +331,7 @@ Taskboard is a full-trust BB plugin. Review the source, then install its trackin
 Git release directly from this monorepo:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.6 --subdirectory plugins/taskboard --tag-prefix taskboard/
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.3.7 --subdirectory plugins/taskboard --tag-prefix taskboard/
 ```
 
 The [BB Community entry](https://github.com/get-bb/marketplace/pull/129)
@@ -341,9 +341,10 @@ is merged. You can also install its configured release range:
 bb plugin install taskboard@bb-community
 ```
 
-Taskboard 0.3.6 keeps a running stage attached when the ticket changes, resumes a
-paused Build with the updated answers, and includes coordinator-first task
-dispatch and the autonomous ticket factory. For a missing local
+Taskboard 0.3.7 keeps a running stage attached when the ticket changes, resumes a
+paused Build with the updated answers, includes coordinator-first task dispatch
+and the autonomous ticket factory, and fixes Improve title & description in
+insecure BB webviews. For a missing local
 installation, use [the recovery guide](../../docs/plugin-recovery.md) to
 preserve your configuration without uninstalling or downgrading.
 
