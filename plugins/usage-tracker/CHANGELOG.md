@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.17 - 2026-10-30
 
 - Average the selected limit percentage across enabled providers with available
   data, including idle zero-use providers; exclude providers without a reading

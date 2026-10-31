@@ -1,6 +1,6 @@
 {
   "name": "bb-plugin-taskboard",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "private": true,
   "description": "Bring each BB project\u2019s GitHub, GitLab, Gitea, Linear, or Jira issues into one focused taskboard.",
   "type": "module",

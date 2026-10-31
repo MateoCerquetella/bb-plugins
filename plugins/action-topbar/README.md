@@ -59,7 +59,7 @@ plugin.
 Install from Git on a compatible BB build:
 
 ```sh
-bb plugin install 'git:https://github.com/MateoCerquetella/bb-plugins.git@semver:action-topbar/:^0.1.4' \
+bb plugin install 'git:https://github.com/MateoCerquetella/bb-plugins.git@semver:action-topbar/:^0.1.5' \
   --subdirectory plugins/action-topbar \
   --yes
 ```

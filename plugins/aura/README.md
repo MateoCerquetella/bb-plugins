@@ -97,7 +97,7 @@ bb plugin reload aura
 The published background release can also be installed with:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.2.4 \
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.2.5 \
   --subdirectory plugins/aura --tag-prefix aura/
 ```
 

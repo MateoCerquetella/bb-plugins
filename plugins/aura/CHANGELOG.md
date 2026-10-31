@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.5 - 2026-10-30
 
 - Keep pixel dithering continuous when the panel size is not a multiple of four
   pixels instead of splitting the canvas into four threshold quadrants.
