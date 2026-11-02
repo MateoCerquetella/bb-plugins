@@ -45,6 +45,9 @@ const BASE_ENV_KEYS = [
   "SystemRoot",
   "ComSpec",
   "PATHEXT",
+  "USERPROFILE",
+  "APPDATA",
+  "LOCALAPPDATA",
 ];
 
 function childEnvironment(overrides: Record<string, string>): Record<string, string> {
@@ -145,6 +148,7 @@ export class FactoryMcpClient {
   private async start(): Promise<void> {
     const child = spawn(this.config.command, this.config.args, {
       env: childEnvironment(this.config.env),
+      ...(this.config.cwd === undefined ? {} : { cwd: this.config.cwd }),
       stdio: ["pipe", "pipe", "pipe"],
       shell: false,
     });

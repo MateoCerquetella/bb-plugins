@@ -104,14 +104,25 @@ function rpcBody(result) {
   return { ok: true, result };
 }
 
-async function mock(page, method, result, hits) {
-  await page.route(`**/api/v1/plugins/factory-bots/rpc/${method}`, (request) => {
+async function mock(page, method, result, hits, options = {}) {
+  await page.route(`**/api/v1/plugins/factory-bots/rpc/${method}`, async (request) => {
     hits.count += 1;
-    return request.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify(rpcBody(result)),
-    });
+    if (options.track !== undefined) {
+      options.track.active += 1;
+      options.track.max = Math.max(options.track.max, options.track.active);
+    }
+    try {
+      if (options.delayMs !== undefined) {
+        await new Promise((resolve) => setTimeout(resolve, options.delayMs));
+      }
+      await request.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(rpcBody(result)),
+      });
+    } finally {
+      if (options.track !== undefined) options.track.active -= 1;
+    }
   });
 }
 
@@ -129,28 +140,41 @@ try {
   });
 
   const boardHits = { count: 0 };
-  await mock(page, "getBoard", board, boardHits);
+  const boardTrack = { active: 0, max: 0 };
+  await mock(page, "getBoard", board, boardHits, { delayMs: 1_500, track: boardTrack });
   await page.goto(PANEL, { waitUntil: "domcontentloaded" });
   await page.locator(".fb-grid").waitFor();
   const cards = page.locator(".fb-card");
   assert((await cards.count()) === 7, "expected seven agent cards");
   assert((await page.locator(".fb-status--working").count()) === 1, "expected one working agent");
   assert((await page.locator(".fb-header").innerText()).includes("7"), "header lost the agent count");
-  await page.waitForTimeout(5_500);
+
+  // Wait until the second 5s board read is in flight, then change route.
+  // With the lifetime loop the new route queues behind it; a per-route effect
+  // would start a second board read and push max above one.
+  await page.waitForTimeout(6_000);
   assert(boardHits.count >= 2, "the board did not refresh after 5s");
   await page.locator(".fb-root").screenshot({ path: `${ARTIFACTS}board.png` });
-
   const ticketHits = { count: 0 };
   await mock(page, "getTicket", detail, ticketHits);
   await page.getByRole("button", { name: /^Helm,/ }).click();
+  await page.waitForTimeout(600);
+  assert(boardTrack.max === 1, `board reads overlapped: max ${boardTrack.max}`);
   await page.locator(".fb-ticket-row").first().waitFor();
   await page.locator(".fb-ticket-row").first().click();
   await page.locator(".fb-tool.is-active").waitFor();
   assert((await page.locator(".fb-tool.is-active").innerText()).includes("RUNNING"), "live tool is not highlighted");
   assert((await page.locator(".fb-fields").innerText()).includes("/tmp/worktrees/fb-2"), "worktree is missing");
-  await page.waitForTimeout(5_500);
+  await page.waitForTimeout(6_500);
   assert(ticketHits.count >= 2, "the selected ticket did not refresh after 5s");
   await page.locator(".fb-root").screenshot({ path: `${ARTIFACTS}ticket.png` });
+
+  await page.goto(`${PANEL}/agent/lens/ticket/FB-2`, { waitUntil: "domcontentloaded" });
+  await page.locator(".fb-wrong-holder").waitFor();
+  assert(
+    (await page.locator(".fb-wrong-holder").innerText()).includes("helm holds this ticket"),
+    "the wrong-owner ticket pane did not explain who holds it",
+  );
 
   const offlinePage = await browser.newPage({
     viewport: { width: 1440, height: 900 },

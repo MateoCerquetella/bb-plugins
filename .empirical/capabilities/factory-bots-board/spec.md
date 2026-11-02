@@ -10,42 +10,38 @@ path into the factory.
 
 ### Requirement: Read-only Factory board
 
-The plugin SHALL read Empirical Factory state only through the configured
-Factory MCP server. It SHALL call only `factory_status`, `factory_tickets`,
-`factory_ticket`, `factory_tasks`, and `factory_transcript`, and SHALL NOT issue
-writes, open the factory database, or infer an agent that `factory_status` did
-not return.
+The plugin SHALL retry one failed ticket-detail read before declaring the board
+not running or unavailable, and SHALL keep only a minimal environment on the
+MCP child. The board snapshot SHALL NOT expose the factory storage path.
 
-#### Scenario: The factory reports seven agents
+#### Scenario: A detail read fails once
 
-- **WHEN** `factory_status` returns the seven known bots
-- **THEN** the board shows one card for each, in the documented order
-- **AND** each card shows its conversation id, owned column, and held ticket
-  count
+- **WHEN** `factory_ticket` fails for one ticket during a board refresh
+- **THEN** the plugin reads that ticket once more
+- **AND** a successful retry keeps the board live with the correct stop reason
 
-#### Scenario: An agent is absent from status
+#### Scenario: A detail read keeps failing
 
-- **WHEN** `factory_status` omits an agent
-- **THEN** no card for that agent is rendered
+- **WHEN** the retried `factory_ticket` read also fails
+- **THEN** the board returns the corresponding not-running or unavailable state
+
+#### Scenario: A custom factory URL
+
+- **WHEN** `factory.mcp.json` sets a non-default `FACTORY_URL`
+- **THEN** the offline start command includes that URL as a shell-quoted prefix
+- **AND** the default loopback URL remains omitted
 
 ### Requirement: Derived agent status
 
-An agent SHALL be `blocked` when one of its held tickets has a non-null
-`stopReason` or a matching task has a non-null `blocked` reason, and the card
-SHALL surface that reason verbatim. Otherwise it SHALL be `working` when a
-`factory_tasks` entry matches its owner or conversation (including a held
-ticket's conversation), and `idle` with no match.
+The status rules are unchanged. The panel SHALL use one poll loop for its
+lifetime, so changing routes cannot start a second concurrent board read.
 
-#### Scenario: A ticket is stopped
+#### Scenario: Navigating during a refresh
 
-- **WHEN** a held ticket carries `stopReason: "attempt budget exhausted"`
-- **THEN** the card shows `blocked` and that exact reason
-- **AND** a running task for the same agent does not downgrade it to working
-
-#### Scenario: A task names a held conversation
-
-- **WHEN** a task's `conversationId` equals a ticket held by the agent
-- **THEN** the agent is `working`
+- **WHEN** the operator opens an agent or ticket while a board read is running
+- **THEN** the existing loop finishes and the change is picked up in the same
+  or next cycle
+- **AND** no second loop starts
 
 ### Requirement: Ticket drill-down and live transcript
 
@@ -69,18 +65,23 @@ id changed.
 
 ### Requirement: Normal offline and empty states
 
-A `fetch failed` MCP answer SHALL render a not-running state with the resolved
-start command and SHALL keep polling. A factory with no tickets SHALL render
-normal zero health and idle cards.
+A missing MCP script SHALL render an actionable configuration error naming the
+missing path and `FACTORY_BOTS_MCP_CONFIG`; it SHALL NOT render the not-running
+start command as if the script existed.
 
-#### Scenario: The factory process is down
+#### Scenario: The configured script is absent
 
-- **WHEN** the MCP tool answers `fetch failed`
-- **THEN** the panel shows "Factory is not running" and
-  `node <factory>/dist/main.js up`
-- **AND** no stack trace or JSON error payload is shown
+- **WHEN** `factory.mcp.json` points at a path that does not exist
+- **THEN** the panel explains that the script is missing
+- **AND** it names the path and the config override
 
-#### Scenario: The factory has no tickets
+### Requirement: MCP client lifecycle
 
-- **WHEN** `factory_status` reports zero tickets
-- **THEN** the header shows zero and each agent card remains visible and idle
+A stdout or stderr pipe failure SHALL reject pending calls and stop the child.
+The child SHALL NOT inherit unrelated BB process secrets.
+
+#### Scenario: The child's pipe fails
+
+- **WHEN** stdout or stderr emits an error
+- **THEN** pending calls reject and the child is replaced on the next call
+- **AND** no unhandled error escapes the plugin

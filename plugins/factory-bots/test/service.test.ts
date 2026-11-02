@@ -184,6 +184,7 @@ test("the board is built only from the five read-only tools", async () => {
 });
 
 test("a failed ticket detail read fails the board instead of clearing blocked state", async () => {
+  let detailCalls = 0;
   const caller: ToolCaller = {
     async callTool(name) {
       if (name === "factory_status") {
@@ -202,6 +203,7 @@ test("a failed ticket detail read fails the board instead of clearing blocked st
       if (name === "factory_tasks") {
         return { isError: false, text: JSON.stringify({ tasks: TASKS }) };
       }
+      detailCalls += 1;
       return { isError: true, text: "fetch failed" };
     },
   };
@@ -215,6 +217,7 @@ test("a failed ticket detail read fails the board instead of clearing blocked st
   if (board.ok) return;
   assert.equal(board.reason, "not-running");
   assert.equal(board.startCommand, "node /opt/factory/dist/main.js up");
+  assert.equal(detailCalls, 6);
 });
 
 test("a first ticket-detail failure is retried once", async () => {

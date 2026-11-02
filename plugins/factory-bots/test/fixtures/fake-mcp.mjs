@@ -260,6 +260,16 @@ function handle(message) {
       }
     }
 
+    if (mode === "pipe-error-once" && firstToolCall) {
+      firstToolCall = false;
+      const marker = process.env.FAKE_MCP_PIPE_FILE;
+      if (marker !== undefined && !existsSync(marker)) {
+        writeFileSync(marker, "errored");
+        setTimeout(() => process.stdout.destroy(new Error("stdout boom")), 10);
+        return;
+      }
+    }
+
     if (mode === "not-running") {
       send({
         jsonrpc: "2.0",

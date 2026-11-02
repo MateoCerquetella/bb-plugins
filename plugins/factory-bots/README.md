@@ -41,7 +41,8 @@ The connection lives in [`factory.mcp.json`](./factory.mcp.json):
 Move the factory checkout? Edit that file, or set
 `FACTORY_BOTS_MCP_CONFIG` to an absolute path for another config. The offline
 state's start command is derived from the same file (the `mcp` argument becomes
-`up`), so it cannot drift from the connection in use.
+`up`), and a non-default `FACTORY_URL` is preserved; the `VAR=value` prefix is
+POSIX shell syntax.
 
 The MCP child gets only a small runtime environment (paths, locale, timezone)
 plus the config's `env`; it does not inherit BB's provider credentials.

@@ -133,6 +133,22 @@ test("a timeout replaces the child and the next call recovers", async () => {
   }
 });
 
+test("a stdout failure rejects the call and the next child recovers", async () => {
+  const pipeMarker = marker();
+  const mcp = client("pipe-error-once", 5_000, { FAKE_MCP_PIPE_FILE: pipeMarker });
+  try {
+    await assert.rejects(
+      () => mcp.callTool("factory_status"),
+      /stdout failed|exited|stdin failed/,
+    );
+    assert.equal(mcp.childPid, null);
+    const result = await mcp.callTool("factory_status");
+    assert.equal(result.isError, false);
+  } finally {
+    mcp.dispose();
+  }
+});
+
 test("an exited child is replaced on the next call", async () => {
   const mcp = client();
   try {

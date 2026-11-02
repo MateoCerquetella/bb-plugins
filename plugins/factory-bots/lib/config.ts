@@ -1,5 +1,5 @@
 import { access, readFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { dirname, isAbsolute, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 /** The plugin-owned MCP connection, exactly as the factory documents it. */
@@ -7,6 +7,8 @@ export interface FactoryMcpConfig {
   command: string;
   args: string[];
   env: Record<string, string>;
+  /** Set by the loader when a relative script path needs the config's dir. */
+  cwd?: string;
 }
 
 export interface LoadedFactoryMcpConfig {
@@ -56,8 +58,8 @@ export function shellQuote(value: string): string {
 }
 
 /**
- * Derive the human start command from the same config the MCP client uses, so
- * the offline message cannot drift from the connection it replaces.
+ * Derive the start command from the same config the MCP client uses. The
+ * non-default FACTORY_URL is preserved; the VAR=value prefix is POSIX syntax.
  */
 export function startCommand(config: FactoryMcpConfig): string {
   const args = [...config.args];
@@ -66,8 +68,23 @@ export function startCommand(config: FactoryMcpConfig): string {
   const command = [config.command, ...args].map(shellQuote).join(" ");
   const url = config.env.FACTORY_URL;
   return url !== undefined && url !== DEFAULT_FACTORY_URL
-    ? `FACTORY_URL=${shellQuote(url)} ${command}`
+    ? `FACTORY_URL=${shellQuote(redactUrl(url))} ${command}`
     : command;
+}
+
+/** Keep the origin but never print credentials embedded in a URL. */
+function redactUrl(value: string): string {
+  try {
+    const url = new URL(value);
+    if (url.username !== "" || url.password !== "") {
+      url.username = "";
+      url.password = "";
+      return url.toString().replace(/\/$/, "");
+    }
+    return value;
+  } catch {
+    return value;
+  }
 }
 
 export interface LoadConfigOptions {
@@ -121,13 +138,20 @@ export async function loadMcpConfig(
     try {
       const parsed: unknown = JSON.parse(text);
       const config = parseMcpConfig(parsed);
-      const script = scriptPath(config);
-      if (script !== null && !(await exists(script))) {
-        return {
-          config: null,
-          path,
-          error: `Factory MCP script not found at ${script}. Edit ${path} or set FACTORY_BOTS_MCP_CONFIG to a config for this host.`,
-        };
+      const baseDir = dirname(path);
+      const scripts = scriptPaths(config);
+      if (scripts.some((script) => !isAbsolute(script))) {
+        config.cwd = baseDir;
+      }
+      for (const candidate of scripts) {
+        const script = resolve(baseDir, candidate);
+        if (!(await exists(script))) {
+          return {
+            config: null,
+            path,
+            error: `Factory MCP script not found at ${script}. Edit ${path} or set FACTORY_BOTS_MCP_CONFIG to a config for this host, then reload the Factory Bots plugin.`,
+          };
+        }
       }
       return { config, path, error: null };
     } catch (cause) {
@@ -146,9 +170,13 @@ export async function loadMcpConfig(
   };
 }
 
-function scriptPath(config: FactoryMcpConfig): string | null {
-  const first = config.args[0];
-  if (first === undefined || first.startsWith("-")) return null;
-  if (!/[\\/]/.test(first) && !/\.(?:m?js|cjs)$/.test(first)) return null;
-  return resolve(first);
+function scriptPaths(config: FactoryMcpConfig): string[] {
+  const paths: string[] = [];
+  for (const value of [config.command, ...config.args]) {
+    if (value.startsWith("-")) continue;
+    if (/[\\/]/.test(value) || /\.(?:m?js|cjs)$/.test(value)) {
+      paths.push(value);
+    }
+  }
+  return paths;
 }

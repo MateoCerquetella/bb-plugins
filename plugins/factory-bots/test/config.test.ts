@@ -61,6 +61,18 @@ test("keeps a non-default FACTORY_URL on the start command", () => {
   );
 });
 
+test("redacts credentials from a displayed FACTORY_URL", () => {
+  assert.equal(
+    startCommand(
+      parseMcpConfig({
+        ...VALID,
+        env: { FACTORY_URL: "http://user:secret@127.0.0.1:9090" },
+      }),
+    ),
+    "FACTORY_URL=http://127.0.0.1:9090 node /opt/factory/dist/main.js up",
+  );
+});
+
 test("shell quotes only when needed", () => {
   assert.equal(shellQuote("/opt/factory/main.js"), "/opt/factory/main.js");
   assert.equal(shellQuote("/opt/my factory/main.js"), "'/opt/my factory/main.js'");
@@ -131,4 +143,45 @@ test("reports a missing MCP script as an actionable config error", async () => {
   assert.equal(loaded.config, null);
   assert.match(loaded.error ?? "", /Factory MCP script not found at \/opt\/factory\/dist\/main\.js/);
   assert.match(loaded.error ?? "", /FACTORY_BOTS_MCP_CONFIG/);
+  assert.match(loaded.error ?? "", /reload the Factory Bots plugin/);
+});
+
+test("finds the script after a runtime flag and when it is the command", async () => {
+  const flagged = await loadMcpConfig({
+    moduleUrl: "file:///opt/plugin/server.ts",
+    env: {},
+    readFile: async () =>
+      JSON.stringify({
+        command: "node",
+        args: ["--enable-source-maps", "/missing/main.js", "mcp"],
+      }),
+    exists: async (path) => path !== "/missing/main.js",
+  });
+  assert.equal(flagged.config, null);
+  assert.match(flagged.error ?? "", /\/missing\/main\.js/);
+
+  const asCommand = await loadMcpConfig({
+    moduleUrl: "file:///opt/plugin/server.ts",
+    env: {},
+    readFile: async () =>
+      JSON.stringify({ command: "/missing/main.mjs", args: ["mcp"] }),
+    exists: async (path) => path !== "/missing/main.mjs",
+  });
+  assert.equal(asCommand.config, null);
+  assert.match(asCommand.error ?? "", /\/missing\/main\.mjs/);
+});
+
+test("resolves a relative script against the config directory", async () => {
+  const loaded = await loadMcpConfig({
+    moduleUrl: "file:///opt/plugin/server.ts",
+    env: {},
+    readFile: async () =>
+      JSON.stringify({ command: "node", args: ["./dist/main.js", "mcp"] }),
+    exists: async (path) => {
+      assert.equal(path, "/opt/plugin/dist/main.js");
+      return true;
+    },
+  });
+  assert.equal(loaded.config?.cwd, "/opt/plugin");
+  assert.equal(loaded.error, null);
 });
