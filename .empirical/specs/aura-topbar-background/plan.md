@@ -32,6 +32,7 @@
 
 - plugins/aura/test/server.test.ts
 - plugins/aura/test/lifecycle.test.ts
+- plugins/aura/test/registration.test.ts
 
 ## Risks and fallbacks
 

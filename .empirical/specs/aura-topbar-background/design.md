@@ -22,17 +22,18 @@ the same `--bb-app-chrome-row-height` space.
 3. In `lib/background.ts`, append a CSS rule scoped to the active target:
    when the preference is off, `.aura-capy-layer { top:
    var(--bb-app-chrome-row-height, 48px); }`; when on, keep `top: 0`.
-   Clipping the decorative layer is safer than restyling the host header,
-   because it cannot alter host text, borders, controls, or drag behavior and
-   it also covers the New thread band.
+   Emit it after `CAPY_CSS` so the layer's base `inset: 0` cannot win on cascade
+   order even if specificity changes. Clipping the decorative layer is safer
+   than restyling the host header, because it cannot alter host text, borders,
+   controls, or drag behavior and it also covers the New thread band.
 4. Add a **Top bar background** checkbox in the settings fieldset, next to the
    existing scope/half-wallpaper checkboxes. It edits the draft and saves with
    **Apply background**, matching the existing appearance controls and slot
    workflow.
 5. Bump `plugins/aura/package.json` to `0.2.6`, update `package-lock.json`,
    `CHANGELOG.md`, and the README install example. Add focused tests for the
-   default, slot preservation, reset preservation, legacy loading, and the
-   emitted CSS rule.
+   default, slot preservation, reset preservation, legacy loading, the emitted
+   CSS rule, and the shared Settings/thread-panel registration.
 
 ## Files
 
@@ -45,7 +46,8 @@ the same `--bb-app-chrome-row-height` space.
   covered by the shared helper.
 - `plugins/aura/README.md`, `CHANGELOG.md`, `package.json`, root
   `package-lock.json`.
-- `plugins/aura/test/server.test.ts`, `test/lifecycle.test.ts` — behavior.
+- `plugins/aura/test/server.test.ts`, `test/lifecycle.test.ts`,
+  `test/registration.test.ts` — behavior and shared-surface contract.
 
 ## Trade-offs
 

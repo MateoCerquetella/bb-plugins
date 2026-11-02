@@ -133,3 +133,62 @@ controls and add release overhead without reducing risk.
 
 The repository's Aura-focused check and the live installed-UI check cover the
 whole change; the PR carries the version bump with the implementation.
+
+## D-005: Emit the offset after the base layer CSS
+
+Status: Accepted
+
+### Evidence
+
+`CAPY_CSS` declares `.aura-capy-layer { position:absolute; inset:0; … }`.
+The new selector is more specific, but relying on specificity alone leaves a
+silent no-op risk if the base rule changes.
+
+### Options
+
+1. Keep the offset before `CAPY_CSS` and rely on specificity.
+2. Emit the offset after `CAPY_CSS` so cascade order also protects it.
+
+### Chosen approach
+
+Emit `topbarBackgroundRule(...)` after `CAPY_CSS` in the generated stylesheet.
+
+### Trade-offs and risks
+
+None material; the rule remains scoped to the active Aura target and the
+preview is unaffected.
+
+### Verification
+
+The lifecycle test asserts the emitted off/on rule. A live browser check
+confirms the top bar band is clean at the default.
+
+## D-006: Prove both surfaces share one editor
+
+Status: Accepted
+
+### Evidence
+
+`app.tsx` registers `BackgroundEditor` for both `settingsSection` and the
+thread-panel action. The review diff only shows the checkbox line, so a
+reviewer cannot see the unchanged registrations.
+
+### Options
+
+1. Duplicate the checkbox in a second component.
+2. Add a source-contract test that both registrations reference
+   `BackgroundEditor`.
+
+### Chosen approach
+
+Keep one component and add `test/registration.test.ts` that reads `app.tsx` and
+asserts both registrations mount `BackgroundEditor`.
+
+### Trade-offs and risks
+
+The test guards the wiring rather than rendered markup. It is small, stable,
+and complements the live browser check in both surfaces.
+
+### Verification
+
+The registration test runs inside the Aura-focused check.

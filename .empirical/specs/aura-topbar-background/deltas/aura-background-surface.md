@@ -6,7 +6,7 @@ Keep Aura's decorative wallpaper from tinting BB's top bar unless the user
 explicitly asks for it, with one persisted preference that applies consistently
 across the New thread screen, existing conversations, and saved slots.
 
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: Opt-in top bar background
 Aura SHALL keep its wallpaper out of BB's top bar band by default. A persisted
@@ -26,6 +26,13 @@ resetting the background.
 - WHEN the user checks **Top bar background** and applies the background
 - THEN the wallpaper is painted behind the top bar band
 - AND the choice survives a reload, a slot switch, and Reset to default.
+
+#### Scenario: Shared editor surface
+- GIVEN the Aura thread-panel action and the Settings section both mount the
+  same `BackgroundEditor`
+- WHEN the user opens either surface
+- THEN both show the same **Top bar background** checkbox
+- AND toggling it follows the same draft and Apply background flow.
 
 #### Scenario: Older stored settings load
 - GIVEN settings persisted before this preference existed

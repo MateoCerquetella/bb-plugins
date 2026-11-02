@@ -184,7 +184,7 @@ export function mountBackground(signal: AbortSignal): () => void {
   function apply(snapshot: Snapshot): void {
     current = snapshot;
     const target = targetsFor(snapshot);
-    const css = snapshot.settings.enabled ? `${backgroundRules(target)}\n${topbarBackgroundRule(target, snapshot.settings.topbarBackground)}\n${CAPY_CSS}\n${COMPOSE_LAYOUT}\n${snapshot.settings.newThreadOnly ? "" : READING_SURFACE}` : COMPOSE_CENTER;
+    const css = snapshot.settings.enabled ? `${backgroundRules(target)}\n${CAPY_CSS}\n${topbarBackgroundRule(target, snapshot.settings.topbarBackground)}\n${COMPOSE_LAYOUT}\n${snapshot.settings.newThreadOnly ? "" : READING_SURFACE}` : COMPOSE_CENTER;
     if (css !== lastCss) { style.textContent = css; lastCss = css; }
     reconcile();
   }

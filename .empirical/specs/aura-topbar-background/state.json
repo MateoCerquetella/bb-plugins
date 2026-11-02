@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 5,
+  "revision": 10,
   "activeFeature": "aura-topbar-background",
   "request": "Fix the Aura plugin so BB's top bar no longer picks up the wallpaper by default, add a Settings -> Aura checkbox to opt the top bar background in or out, verify it in the installed UI, bump the Aura version, and open and merge a PR.",
   "profile": "complex",
@@ -9,13 +9,13 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Wrote the implementation and verification plan with affected tests.",
-  "implementationActor": null,
+  "message": "Plan now covers post-CAPY_CSS ordering and the registration test.",
+  "implementationActor": "agent",
   "workStartedAt": null,
-  "specDigest": "sha256:138d83ce3500c7e3e5a49ddba27b37b8ceaf7768cee7de881ab8b2b6e670d765",
-  "approvedSpecRevision": 2,
+  "specDigest": "sha256:e4b3916524e1c34525922f1ab3f26276cfe683eda2c5c1c60a9693dab0d88923",
+  "approvedSpecRevision": 8,
   "capabilityArchiveRequired": true,
-  "capabilityDeltaDigest": "sha256:0239c42839897096df88fc625db8060e9c4ff2a1996ae950e3a1d85eee4d4c10",
+  "capabilityDeltaDigest": "sha256:99fd778a9b2ad8f93d3b4cd126eb886cccde9c5789760eb20b398208a334fbe5",
   "impactDigest": "sha256:3116b87f21a9f0ec9966858149360e07dbcef6b53744e392ce4bbcaf201db62a",
   "capabilityClaimId": "aura-topbar-background-2e6152ecb91d",
   "authorizationDigest": null,
@@ -37,7 +37,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-11-02T20:52:34.541Z",
+  "updatedAt": "2026-11-02T21:00:54.862Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "aura-topbar-background-2e6152ecb91d",
@@ -72,6 +72,13 @@
     "reason": "One small cohesive surface preference: schema, CSS, one checkbox, tests, version, PR. Splitting would separate a setting from the only behavior it controls and add release overhead without reducing risk.",
     "actor": "agent",
     "revision": 2
+  },
+  "trackerGeneration": 1,
+  "lifecycle": {
+    "stage": "development",
+    "iteration": 1,
+    "awaitingFeedback": false,
+    "contractRevision": 6
   },
   "reviewFirst": true
 }
