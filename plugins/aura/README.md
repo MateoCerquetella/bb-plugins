@@ -55,6 +55,10 @@ In **Settings → Aura**, use **Half wallpaper on New thread**:
 
 Select **Apply background** to save the setting.
 
+- **Top bar background** is off by default, so BB's top bar stays clean and the
+  wallpaper starts below it. Turn it on to continue the wallpaper behind the
+  top bar. This preference is global and survives slot switches and reset.
+
 - Choose or drop a PNG/JPG (up to 32 MB). Large images are resized automatically
   to fit the 2 MB stored-image limit. The preview shows the result before saving.
 - Or choose an animated GIF (up to 8 MB and 4,096 px per side). GIFs are stored as uploaded — resizing
@@ -73,7 +77,8 @@ Select **Apply background** to save the setting.
   Occupied slots have an explicit **Replace slot** button. Each slot keeps its
   image and appearance independently; click its card to switch immediately.
 - **New thread screen only** hides Aura inside existing conversations. Apply it
-  to save. This scope and the Enabled preference remain global when switching slots.
+  to save. This scope, the Top bar background preference, and the Enabled
+  preference remain global when switching slots.
 - **Clear** removes a saved slot without removing the currently displayed image.
   **Reset to default** restores the noise effect while keeping your saved slots
   and global scope/enabled preferences.
@@ -97,7 +102,7 @@ bb plugin reload aura
 The published background release can also be installed with:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.2.5 \
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.2.6 \
   --subdirectory plugins/aura --tag-prefix aura/
 ```
 

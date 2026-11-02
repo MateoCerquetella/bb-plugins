@@ -45,6 +45,10 @@ test("applies scoped backgrounds, disables cleanly and ignores a late fetch afte
     assert.match(document.head.textContent!, /:root:not\(\.dark\).*data-root-compose-mobile-recents.*background:color-mix\(in oklab,var\(--background\) 94%,transparent\)/s);
     assert.match(document.head.textContent!, /\.dark.*data-root-compose-mobile-recents.*background:color-mix\(in oklab,var\(--background\) 30%,transparent\)/s);
     assert.ok(!document.head.textContent!.includes("aside"));
+    assert.ok(document.head.textContent!.includes(".aura-capy-layer{top:var(--bb-app-chrome-row-height, 48px);}"));
+    notifyChange({ settings: { ...defaults, topbarBackground: true }, image: null, slots: [], activeSlot: null });
+    assert.ok(document.head.textContent!.includes(".aura-capy-layer{top:0;}"));
+    notifyChange({ settings: defaults, image: null, slots: [], activeSlot: null });
     assert.equal(document.querySelectorAll('.aura-capy-layer').length, 2);
     notifyChange({ settings: { ...defaults, newThreadOnly: true }, image: null, slots: [], activeSlot: null });
     assert.equal(document.querySelector('#thread-detail-timeline-panel .aura-capy-layer'), null);
