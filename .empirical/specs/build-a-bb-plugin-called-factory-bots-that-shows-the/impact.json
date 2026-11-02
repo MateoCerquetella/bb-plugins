@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "factory-bots-board"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:34c5233d891b30a93adc95c3390e5e5e086f792b5a9ae21de15cdadc9563057c"
+}

@@ -12,14 +12,36 @@
     "commands": [
       {
         "id": "steel-browser-focused",
-        "argv": ["npm", "run", "check", "--workspace", "bb-plugin-steel-browser"],
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-steel-browser"
+        ],
         "cwd": ".",
         "timeoutMs": 120000,
         "maxOutputBytes": 1048576,
-        "evidenceKinds": ["test"],
-        "checks": ["unit", "adapter-contract", "fault-injection"],
-        "criteria": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-UI-1", "AC-UI-2", "AC-UI-3"],
-        "scope": ["plugins/steel-browser"]
+        "evidenceKinds": [
+          "test"
+        ],
+        "checks": [
+          "unit",
+          "adapter-contract",
+          "fault-injection"
+        ],
+        "criteria": [
+          "AC-1",
+          "AC-2",
+          "AC-3",
+          "AC-4",
+          "AC-UI-1",
+          "AC-UI-2",
+          "AC-UI-3"
+        ],
+        "scope": [
+          "plugins/steel-browser"
+        ]
       },
       {
         "id": "aura-focused",
@@ -394,6 +416,68 @@
           "cross-platform"
         ],
         "criteria": []
+      },
+      {
+        "id": "factory-bots-focused",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-factory-bots"
+        ],
+        "cwd": ".",
+        "timeoutMs": 180000,
+        "maxOutputBytes": 1048576,
+        "evidenceKinds": [
+          "test"
+        ],
+        "checks": [
+          "unit"
+        ],
+        "criteria": [
+          "AC-1",
+          "AC-2",
+          "AC-3",
+          "AC-4",
+          "AC-5",
+          "AC-6",
+          "AC-7",
+          "AC-8",
+          "AC-9",
+          "AC-10"
+        ],
+        "scope": [
+          "plugins/factory-bots"
+        ]
+      },
+      {
+        "id": "factory-bots-browser",
+        "argv": [
+          "node",
+          ".empirical/specs/build-a-bb-plugin-called-factory-bots-that-shows-the/qa/browser.mjs"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 262144,
+        "evidenceKinds": [
+          "browser",
+          "screenshot"
+        ],
+        "checks": [
+          "end-to-end"
+        ],
+        "criteria": [
+          "AC-1",
+          "AC-2",
+          "AC-3",
+          "AC-5",
+          "AC-8",
+          "AC-10"
+        ],
+        "scope": [
+          "plugins/factory-bots"
+        ]
       }
     ]
   },

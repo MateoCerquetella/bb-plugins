@@ -1,0 +1,10 @@
+{
+  "command": "node",
+  "args": [
+    "/home/dyaus/Developer/projects/GoEmpirical/empirical-factory/dist/main.js",
+    "mcp"
+  ],
+  "env": {
+    "FACTORY_URL": "http://127.0.0.1:8080"
+  }
+}
