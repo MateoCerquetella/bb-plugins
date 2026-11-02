@@ -6,7 +6,7 @@ import { approvePlan, assertVersion, digest, factoryKey, legacyRun, newRecord, s
 import type { createFactoryStore } from './store.js';
 import { MAX_REVIEW_REPAIRS, readBuildResult, readReviewResult } from './review.js';
 import { CoordinatorIntentConflict, createCoordinatorLifecycle } from './coordinator.js';
-import { dispatchRejection, executionForDispatch, nativeError as message, threadExecution } from './native-dispatch.js';
+import { dispatchRejection, executionForDispatch, projectRoleExecution, nativeError as message, threadExecution } from './native-dispatch.js';
 import { statusTargetLabel, trackerTarget } from './tracker.js';
 
 type Store = ReturnType<typeof createFactoryStore>;
@@ -488,7 +488,7 @@ export function createFactoryService(
       throw new Error('The original stage session has a different coordinator. Restore its parent before continuing.');
     }
     const policy = store.getProjectPolicy(item.bbProjectId, item.source);
-    const selected = record.execution ?? policy.execution;
+    const selected = projectRoleExecution(policy, 'worker', record.execution);
     const defaults = selected ? null : context
       ? await sdk.threads.defaultExecutionOptions({ threadId: context.id }).then(value =>
           value ? threadExecution(context.providerId, value) : null)

@@ -182,22 +182,22 @@ workflow. The setting is disabled by default and the concurrency limit applies
 only to automatically claimed work. Manual **Start task** actions remain
 available.
 
-The same block selects the AI for the coordinator and every new stage session:
-provider, model, reasoning level, permission mode, and service tier. The picker
-is BB's own provider/model picker, with provider logos, live model search, and
-the native reasoning and service-tier controls. The choice is stored on the
-project factory policy and
-applies to manual **Start task** and automatic intake. **Use project defaults**
-clears it and falls back to the project's native execution defaults. When neither
-is available, Start task fails with a settings prompt instead of dispatching.
-Changing the choice affects new sessions; existing native sessions keep the
-provider and model they were created with.
+The same block selects **Orchestrator AI** and **Worker AI** separately. Each
+uses BB's native provider/model picker with independent reasoning level,
+permission mode, and service tier. The orchestrator is the stable coordinator
+conversation; investigation, planning, Build and Review use the worker selection.
+These project settings apply to both manual **Start task** and automatic intake.
+**Use project defaults** resets only that role. Existing shared factory AI settings
+are inherited by both roles until independent settings are saved.
 
-**Create new ticket** shows the same AI picker for that task. It starts from the
-current thread's execution, and a changed choice is saved only on that ticket's
-factory record. Its coordinator and stages use the task choice first, then the
-project policy, then native defaults. **Use thread defaults** clears the task
-override.
+An explicit ticket AI choice overrides both roles. Otherwise dispatch uses the
+role's project selection, the legacy shared factory selection (if present), then
+native defaults. **Start task** initially displays the worker AI and explains the
+override. **Create new ticket** can also save a ticket-specific choice based on
+the current thread. New project settings apply at subsequent dispatches, not to
+already running turns. Build continuations receive the current worker model and
+reasoning; changing provider starts a new session in the same Build worktree.
+CLI **factory enable/pause** preserves both role selections.
 
 Each new ticket workflow gets one native coordinator thread. Investigation,
 Plan, Build, and independent Review sessions appear beneath it as stage agents;

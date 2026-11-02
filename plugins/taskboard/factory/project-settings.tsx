@@ -14,7 +14,8 @@ export function FactoryProjectSettings({ projectId, provider }: { projectId: str
 function ProjectSettings({ projectId, provider }: { projectId: string; provider: WorkSource }) {
   const rpc = useRpc<TaskboardRpcContract>();
   const [status, setStatus] = useState<FactoryProjectStatus | null>(null);
-  const [execution, setExecution] = useState<FactoryExecution | null>(null);
+  const [orchestratorExecution, setOrchestratorExecution] = useState<FactoryExecution | null>(null);
+  const [workerExecution, setWorkerExecution] = useState<FactoryExecution | null>(null);
   const [enabled, setEnabled] = useState(false);
   const [limit, setLimit] = useState(1);
   const [dirty, setDirty] = useState(false);
@@ -32,7 +33,8 @@ function ProjectSettings({ projectId, provider }: { projectId: string; provider:
       if (!dirty) {
         setEnabled(result.policy.enabled);
         setLimit(result.policy.maxConcurrent);
-        setExecution(result.policy.execution);
+        setOrchestratorExecution(result.policy.orchestratorExecution ?? result.policy.execution);
+        setWorkerExecution(result.policy.workerExecution ?? result.policy.execution);
       }
       setError(null);
     } catch (error) {
@@ -53,13 +55,15 @@ function ProjectSettings({ projectId, provider }: { projectId: string; provider:
     setError(null);
     try {
       const result = await rpc.call('factorySaveProject', {
-        projectId, provider, enabled, maxConcurrent: limit, intake: 'todo', execution
+        projectId, provider, enabled, maxConcurrent: limit, intake: 'todo', execution: null,
+        orchestratorExecution, workerExecution
       });
       if (mounted.current) {
         setStatus(result.status);
         setEnabled(result.policy.enabled);
         setLimit(result.policy.maxConcurrent);
-        setExecution(result.policy.execution);
+        setOrchestratorExecution(result.policy.orchestratorExecution ?? result.policy.execution);
+        setWorkerExecution(result.policy.workerExecution ?? result.policy.execution);
         setDirty(false);
         void load();
       }
@@ -94,22 +98,22 @@ function ProjectSettings({ projectId, provider }: { projectId: string; provider:
       </div>
     </div>
 
-    <div className="flex flex-wrap items-center gap-3">
-      <span className="text-xs font-medium text-muted-foreground">AI for new sessions</span>
-      <div className="min-w-0 flex-1" style={{ flexBasis: 280 }}>
-        <ExecutionPicker
-          projectId={projectId}
-          value={execution}
-          onChange={next => { setExecution(next); setDirty(true); }}
-          disabled={saving || !status}
-        />
-      </div>
-      <Button type="button" variant="ghost" size="sm" disabled={saving || !status || !execution}
-        onClick={() => { setExecution(null); setDirty(true); }}>
-        Use project defaults
-      </Button>
-    </div>
-
+    <fieldset className="min-w-0 space-y-2" disabled={saving || !status}>
+      <legend className="text-xs font-medium text-muted-foreground">Orchestrator AI</legend>
+      <ExecutionPicker projectId={projectId} role="orchestrator" value={orchestratorExecution}
+        onChange={next => { setOrchestratorExecution(next); setDirty(true); }}
+        disabled={saving || !status} showSummary summaryTitle="Coordinator session" />
+    </fieldset>
+    <fieldset className="min-w-0 space-y-2" disabled={saving || !status}>
+      <legend className="text-xs font-medium text-muted-foreground">Worker AI</legend>
+      <ExecutionPicker projectId={projectId} role="worker" value={workerExecution}
+        onChange={next => { setWorkerExecution(next); setDirty(true); }}
+        disabled={saving || !status} showSummary summaryTitle="Investigation, planning, build and review" />
+    </fieldset>
+    <p className="text-xs text-muted-foreground">
+      Choose a model and reasoning level independently for each role. Applies to new sessions and worker continuations.
+      An explicit ticket AI overrides both roles.
+    </p>
     <div className="flex flex-wrap items-center justify-between gap-3">
       <label className="flex min-w-0 cursor-pointer items-center gap-2 text-sm">
         <input type="checkbox" className="mt-0.5 size-4 shrink-0" checked={enabled} disabled={saving || !status}

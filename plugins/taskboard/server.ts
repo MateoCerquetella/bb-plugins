@@ -80,7 +80,7 @@ import { decodeTicketImage } from './ticket-images-server.js';
 import { createFactoryStore } from './factory/store.js';
 import { createFactoryService } from './factory/service.js';
 import { factoryProjectPolicySchema, type FactoryIdentity, type FactoryStatusTarget } from './factory/contract.js';
-import { threadExecution } from './factory/native-dispatch.js';
+import { projectRoleExecution, threadExecution } from './factory/native-dispatch.js';
 import { factoryKey } from './factory/state.js';
 import { createEmpiricalObservationQueue } from './empirical/serial.js';
 import { hostContract } from './preparation/contract.js';
@@ -2190,7 +2190,7 @@ export default async function plugin(bb: BbPluginApi) {
       ]);
       return {
         defaults: threadDefaults ?? projectDefaults ?? null,
-        selected: policy.execution ?? null,
+        selected: projectRoleExecution(policy, input.role ?? 'worker'),
         routing
       };
     },
@@ -2617,7 +2617,9 @@ export default async function plugin(bb: BbPluginApi) {
             result = await handlers.factorySaveProject({
               projectId: project.id, provider: projectConfig(project.id, true).source,
               enabled: verb === 'enable', intake: 'todo', maxConcurrent: concurrency,
-              execution: snapshot.policy.execution ?? null
+              execution: snapshot.policy.execution ?? null,
+              orchestratorExecution: snapshot.policy.orchestratorExecution ?? null,
+              workerExecution: snapshot.policy.workerExecution ?? null
             });
           } else if (verb === 'scan' && args.positionals.length <= 1) {
             const scanned = await handlers.factoryScanProject({ projectId: project.id });

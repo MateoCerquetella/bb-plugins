@@ -16,9 +16,10 @@ export function ExecutionPicker({
   projectId, value, onChange, threadId = null, disabled = false,
   showSummary = false, summaryTitle = 'AI for coordinator and stage sessions',
   defaultsLabel, resetLabel = 'Use project defaults', fallback = null,
-  onDefaults, preferFactoryAI = false
+  onDefaults, preferFactoryAI = false, role = 'worker'
 }: {
   projectId: string;
+  role?: 'orchestrator' | 'worker';
   value: FactoryExecution | null;
   onChange: (value: FactoryExecution | null) => void;
   threadId?: string | null;
@@ -47,7 +48,7 @@ export function ExecutionPicker({
     setLoading(true);
     try {
       const result = await rpc.call('factoryExecutionOptions', {
-        projectId, providerId: null, threadId: threadId ?? null
+        projectId, role, providerId: null, threadId: threadId ?? null
       });
       if (!mounted.current || request !== generation.current) return;
       setOptions(result);
@@ -61,7 +62,7 @@ export function ExecutionPicker({
     } finally {
       if (mounted.current && request === generation.current) setLoading(false);
     }
-  }, [projectId, rpc, threadId]);
+  }, [projectId, role, rpc, threadId]);
   useEffect(() => {
     mounted.current = true;
     return () => { mounted.current = false; generation.current++; };
