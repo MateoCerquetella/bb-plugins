@@ -43,6 +43,9 @@ Move the factory checkout? Edit that file, or set
 state's start command is derived from the same file (the `mcp` argument becomes
 `up`), so it cannot drift from the connection in use.
 
+The MCP child gets only a small runtime environment (paths, locale, timezone)
+plus the config's `env`; it does not inherit BB's provider credentials.
+
 The plugin never starts, stops, or drives the factory. There is no POST, no
 ticket creation, no stage change, and no database access anywhere in it.
 
@@ -69,8 +72,9 @@ may use do not attribute usage per agent, so showing a number would be invented.
 One poll loop refreshes the board and then, when a ticket is selected, that
 ticket — one request at a time, with the next 5-second tick scheduled only after
 both settle. Ticket details are read every cycle so a stop reason cannot go
-stale; if any detail read fails, the board reports the offline/unavailable
-state instead of claiming to be Live with a possibly cleared blocked agent.
+stale. A detail read that fails is retried once; if it fails again, the board
+reports the offline/unavailable state instead of claiming to be Live with a
+possibly cleared blocked agent.
 
 The transcript is different: it is fetched again only when that ticket's stage
 or conversation id changed, and an unchanged ticket reuses the held transcript.

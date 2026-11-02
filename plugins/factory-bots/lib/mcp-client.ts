@@ -29,6 +29,33 @@ interface PendingRequest {
 
 const MAX_BUFFER_BYTES = 4 * 1024 * 1024;
 
+/** Runtime essentials only; provider credentials stay with BB. */
+const BASE_ENV_KEYS = [
+  "PATH",
+  "HOME",
+  "TMPDIR",
+  "TMP",
+  "TEMP",
+  "LANG",
+  "LC_ALL",
+  "TZ",
+  "USER",
+  "LOGNAME",
+  "SHELL",
+  "SystemRoot",
+  "ComSpec",
+  "PATHEXT",
+];
+
+function childEnvironment(overrides: Record<string, string>): Record<string, string> {
+  const env: Record<string, string> = {};
+  for (const key of BASE_ENV_KEYS) {
+    const value = process.env[key];
+    if (value !== undefined) env[key] = value;
+  }
+  return { ...env, ...overrides };
+}
+
 /**
  * A small client for one Factory MCP server on stdio. It only sends the
  * protocol handshake and `tools/call`; the factory's writes are not exposed
@@ -117,7 +144,7 @@ export class FactoryMcpClient {
 
   private async start(): Promise<void> {
     const child = spawn(this.config.command, this.config.args, {
-      env: { ...process.env, ...this.config.env },
+      env: childEnvironment(this.config.env),
       stdio: ["pipe", "pipe", "pipe"],
       shell: false,
     });
@@ -139,10 +166,13 @@ export class FactoryMcpClient {
     // A write racing the process exit emits EPIPE on stdin. Without a
     // listener it becomes an unhandled error; fail the in-flight calls instead.
     child.stdin.on("error", (error) => {
-      if (this.child !== child) return;
-      this.child = null;
-      this.terminate(child);
-      this.failAll(new Error(`Factory MCP stdin failed: ${error.message}`));
+      this.failChild(child, `Factory MCP stdin failed: ${error.message}`);
+    });
+    child.stdout.on("error", (error) => {
+      this.failChild(child, `Factory MCP stdout failed: ${error.message}`);
+    });
+    child.stderr.on("error", (error) => {
+      this.failChild(child, `Factory MCP stderr failed: ${error.message}`);
     });
     child.on("error", (error) => {
       if (this.child !== child) return;
@@ -276,6 +306,13 @@ export class FactoryMcpClient {
     this.child = null;
     if (child !== null) this.terminate(child);
     this.failAll(new Error("Factory MCP was replaced after a failed request."));
+  }
+
+  private failChild(child: ChildProcessWithoutNullStreams, message: string): void {
+    if (this.child !== child) return;
+    this.child = null;
+    this.terminate(child);
+    this.failAll(new Error(message));
   }
 
   /** SIGTERM, then SIGKILL if a wedged child ignores it. */

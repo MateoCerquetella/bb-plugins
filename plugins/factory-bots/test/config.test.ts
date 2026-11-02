@@ -40,6 +40,27 @@ test("derives the start command from the same config", () => {
   );
 });
 
+test("keeps a non-default FACTORY_URL on the start command", () => {
+  assert.equal(
+    startCommand(
+      parseMcpConfig({
+        ...VALID,
+        env: { FACTORY_URL: "http://127.0.0.1:9090" },
+      }),
+    ),
+    "FACTORY_URL=http://127.0.0.1:9090 node /opt/factory/dist/main.js up",
+  );
+  assert.equal(
+    startCommand(
+      parseMcpConfig({
+        ...VALID,
+        env: { FACTORY_URL: "http://my factory:8080" },
+      }),
+    ),
+    "FACTORY_URL='http://my factory:8080' node /opt/factory/dist/main.js up",
+  );
+});
+
 test("shell quotes only when needed", () => {
   assert.equal(shellQuote("/opt/factory/main.js"), "/opt/factory/main.js");
   assert.equal(shellQuote("/opt/my factory/main.js"), "'/opt/my factory/main.js'");
@@ -55,6 +76,10 @@ test("loads an explicit FACTORY_BOTS_MCP_CONFIG path", async () => {
       assert.equal(path, "/tmp/work/custom.json");
       return JSON.stringify(VALID);
     },
+    exists: async (path) => {
+      assert.equal(path, "/opt/factory/dist/main.js");
+      return true;
+    },
   });
   assert.equal(loaded.error, null);
   assert.deepEqual(loaded.config, VALID);
@@ -68,6 +93,7 @@ test("loads the config beside or above the module", async () => {
       if (path === "/opt/plugin/factory.mcp.json") return JSON.stringify(VALID);
       throw new Error("missing");
     },
+    exists: async () => true,
   });
   assert.deepEqual(loaded.config, VALID);
   assert.equal(loaded.path, "/opt/plugin/factory.mcp.json");
@@ -93,4 +119,16 @@ test("reports invalid JSON with the file path", async () => {
   });
   assert.equal(loaded.config, null);
   assert.match(loaded.error ?? "", /JSON|Unexpected|Expected/);
+});
+
+test("reports a missing MCP script as an actionable config error", async () => {
+  const loaded = await loadMcpConfig({
+    moduleUrl: "file:///opt/plugin/server.ts",
+    env: {},
+    readFile: async () => JSON.stringify(VALID),
+    exists: async () => false,
+  });
+  assert.equal(loaded.config, null);
+  assert.match(loaded.error ?? "", /Factory MCP script not found at \/opt\/factory\/dist\/main\.js/);
+  assert.match(loaded.error ?? "", /FACTORY_BOTS_MCP_CONFIG/);
 });

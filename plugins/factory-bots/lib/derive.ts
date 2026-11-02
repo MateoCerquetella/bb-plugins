@@ -93,7 +93,6 @@ export function deriveSnapshot(
     bots: Object.keys(status.bots).length,
     tickets: status.tickets ?? tickets.length,
     byStage: stageCounts(counts),
-    storage: status.storage ?? null,
     startedAt: status.startedAt ?? null,
   };
 }

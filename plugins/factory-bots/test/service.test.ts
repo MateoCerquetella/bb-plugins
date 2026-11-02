@@ -217,6 +217,53 @@ test("a failed ticket detail read fails the board instead of clearing blocked st
   assert.equal(board.startCommand, "node /opt/factory/dist/main.js up");
 });
 
+test("a first ticket-detail failure is retried once", async () => {
+  let detailCalls = 0;
+  let failedOnce = false;
+  const byId: Record<string, (typeof TICKETS)[number] | undefined> = {
+    "FB-1": TICKETS[0],
+    "FB-2": TICKETS[1],
+    "FB-4": TICKETS[2],
+  };
+  const caller: ToolCaller = {
+    async callTool(name, args) {
+      if (name === "factory_status") {
+        return {
+          isError: false,
+          text: JSON.stringify({
+            bots: BOTS,
+            tickets: 3,
+            byStage: { triage: 1, implement: 1, review: 1 },
+          }),
+        };
+      }
+      if (name === "factory_tickets") {
+        return { isError: false, text: JSON.stringify({ tickets: TICKETS }) };
+      }
+      if (name === "factory_tasks") {
+        return { isError: false, text: JSON.stringify({ tasks: TASKS }) };
+      }
+      detailCalls += 1;
+      if (args?.linearId === "FB-2" && !failedOnce) {
+        failedOnce = true;
+        return { isError: true, text: "fetch failed" };
+      }
+      const ticket = byId[String(args?.linearId)];
+      return {
+        isError: false,
+        text: JSON.stringify(detail(ticket === undefined ? {} : { ...ticket, stopReason: null })),
+      };
+    },
+  };
+  const service = new FactoryService({ caller, startCommand: null, now: () => 1 });
+  const board = await service.getBoard();
+  assert.equal(board.ok, true);
+  if (!board.ok) return;
+  assert.equal(failedOnce, true);
+  assert.equal(detailCalls, 4);
+  assert.equal(board.agents.find((agent) => agent.name === "helm")!.status, "working");
+});
+
 test("fetch failed is a normal not-running board with the start command", async () => {
   const service = new FactoryService({
     caller: {

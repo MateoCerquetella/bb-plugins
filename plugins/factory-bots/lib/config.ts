@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -16,6 +16,7 @@ export interface LoadedFactoryMcpConfig {
 }
 
 const CONFIG_FILENAME = "factory.mcp.json";
+export const DEFAULT_FACTORY_URL = "http://127.0.0.1:8080";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -62,7 +63,11 @@ export function startCommand(config: FactoryMcpConfig): string {
   const args = [...config.args];
   if (args.at(-1) === "mcp") args[args.length - 1] = "up";
   else args.push("up");
-  return [config.command, ...args].map(shellQuote).join(" ");
+  const command = [config.command, ...args].map(shellQuote).join(" ");
+  const url = config.env.FACTORY_URL;
+  return url !== undefined && url !== DEFAULT_FACTORY_URL
+    ? `FACTORY_URL=${shellQuote(url)} ${command}`
+    : command;
 }
 
 export interface LoadConfigOptions {
@@ -71,6 +76,7 @@ export interface LoadConfigOptions {
   env?: Record<string, string | undefined>;
   cwd?: string;
   readFile?: (path: string) => Promise<string>;
+  exists?: (path: string) => Promise<boolean>;
 }
 
 /**
@@ -82,6 +88,16 @@ export async function loadMcpConfig(
   options: LoadConfigOptions,
 ): Promise<LoadedFactoryMcpConfig> {
   const read = options.readFile ?? ((path: string) => readFile(path, "utf8"));
+  const exists =
+    options.exists ??
+    (async (path: string) => {
+      try {
+        await access(path);
+        return true;
+      } catch {
+        return false;
+      }
+    });
   const env = options.env ?? process.env;
   const cwd = options.cwd ?? process.cwd();
   const override = env.FACTORY_BOTS_MCP_CONFIG;
@@ -104,7 +120,16 @@ export async function loadMcpConfig(
     }
     try {
       const parsed: unknown = JSON.parse(text);
-      return { config: parseMcpConfig(parsed), path, error: null };
+      const config = parseMcpConfig(parsed);
+      const script = scriptPath(config);
+      if (script !== null && !(await exists(script))) {
+        return {
+          config: null,
+          path,
+          error: `Factory MCP script not found at ${script}. Edit ${path} or set FACTORY_BOTS_MCP_CONFIG to a config for this host.`,
+        };
+      }
+      return { config, path, error: null };
     } catch (cause) {
       return {
         config: null,
@@ -119,4 +144,11 @@ export async function loadMcpConfig(
     path: null,
     error: `No ${CONFIG_FILENAME} found next to the plugin. Looked in ${candidates.join(", ")}.`,
   };
+}
+
+function scriptPath(config: FactoryMcpConfig): string | null {
+  const first = config.args[0];
+  if (first === undefined || first.startsWith("-")) return null;
+  if (!/[\\/]/.test(first) && !/\.(?:m?js|cjs)$/.test(first)) return null;
+  return resolve(first);
 }

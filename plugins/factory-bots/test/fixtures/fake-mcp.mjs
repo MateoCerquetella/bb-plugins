@@ -185,6 +185,12 @@ function payloadFor(name, args) {
       return { tickets };
     case "factory_tasks":
       return { tasks };
+    case "debug_env":
+      return {
+        sentinel: process.env.FACTORY_TEST_SENTINEL ?? null,
+        path: process.env.PATH ?? null,
+        mode: process.env.FAKE_MCP_MODE ?? null,
+      };
     case "factory_ticket": {
       const detail = details[args.linearId];
       if (detail === undefined) {

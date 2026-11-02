@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "outcome": "superseded",
+  "reason": "Superseded by a follow-up feature that fixes the deferred review findings and reinstalls the plugin in this checkout.",
+  "actor": "human",
+  "confirmation": "cli-unattended",
+  "closedAtPhase": "integrate",
+  "completionAtClosure": "verified",
+  "closedAt": "2026-11-02T23:12:15.800Z",
+  "digest": "sha256:d26b2f9bf425181bddac73e318be2346075723b67a55654b4739f93eea70ab14"
+}

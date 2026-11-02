@@ -35,7 +35,6 @@ const board = {
     bots: 7,
     tickets: 2,
     byStage: [{ stage: "implement", label: "Implement", count: 2 }],
-    storage: null,
     startedAt: null,
   },
   agents: names.map((name) => ({

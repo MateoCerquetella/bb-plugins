@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
   "sequence": 1,
-  "previousDigest": "sha256:ab2016a82f6fde90668b14b01f0bc8bf3e78a350058c16f60f3e079cb66fe54d",
+  "previousDigest": "sha256:b97c4b7cee7ee66e3f60b05ca8d0aa4f5a2c6c776c01f2a0332bc826066ba956",
   "actor": "empirical-start",
   "type": "transition",
-  "summary": "Started build-a-bb-plugin-called-factory-bots-that-shows-the",
-  "createdAt": "2026-11-02T20:51:44.923Z",
+  "summary": "Started fix-the-deferred-factory-bots-review-findings-and-reinstall-retry",
+  "createdAt": "2026-11-02T23:12:29.863Z",
   "stateBeforeDigest": "sha256:74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
-  "stateAfterDigest": "sha256:56678207f1a19a5480ef0cfad287d3dc452d7561c695a7aa0867bd288cc9a3c5",
+  "stateAfterDigest": "sha256:a03d79b78d8b251a9059a679fb22d42cafb6689c93390e855a72c1aa67a13493",
   "state": {
     "schemaVersion": 5,
     "revision": 1,
-    "activeFeature": "build-a-bb-plugin-called-factory-bots-that-shows-the",
-    "request": "Build a BB plugin called Factory Bots that shows the agents of an Empirical Factory as a live read-only board: header with factory health, one card per bot from factory_status with status dot and owned column, click-through to tickets, ticket detail with factory_ticket fields and factory_transcript, refresh every 5s with transcript refetch only when stage or conversation changed. Data only through the Factory MCP server (factory_status, factory_tickets, factory_ticket, factory_tasks, factory_transcript); handle factory-not-running and no-tickets as normal states.",
+    "activeFeature": "fix-the-deferred-factory-bots-review-findings-and-reinstall-retry",
+    "request": "Fix the deferred Factory Bots review findings and reinstall: retry one failed ticket detail read; preserve a non-default FACTORY_URL in the offline start command; pass a minimal environment to the MCP child and fail pending calls on stdout/stderr errors; keep one poll loop across route changes; remove the unused storage path from the board snapshot; make a missing MCP script an actionable config error; add focused regression tests; rebuild, install, and reload the plugin.",
     "profile": "complex",
     "workflow": "complex",
     "mode": "normal",
@@ -22,7 +22,7 @@
     "message": null,
     "implementationActor": null,
     "workStartedAt": null,
-    "specDigest": "sha256:2eb08c6a4cf9b1c4562df50390c49eb06ff1252f477bffd9860d4e905399daf7",
+    "specDigest": "sha256:96e7e80e122dc1e931d90697cfc5a5c046b25092163429a1e7b5405ef9550248",
     "approvedSpecRevision": null,
     "capabilityArchiveRequired": true,
     "capabilityDeltaDigest": null,
@@ -47,8 +47,8 @@
         "published": "published has not been proven by a durable receipt."
       }
     },
-    "updatedAt": "2026-11-02T20:51:44.923Z",
+    "updatedAt": "2026-11-02T23:12:29.863Z",
     "reviewFirst": true
   },
-  "digest": "sha256:cdc203faa9589092756d6eb0506f90c9066e395cf18149f7f45ae5ef7a672347"
+  "digest": "sha256:6e79b200fd1221d8b1620b4e6f064afc9e55b813f319f79c3d371970ece40162"
 }

@@ -113,9 +113,7 @@ export class FactoryService {
     const detailFailures: { reason: FailureReason; message: string }[] = [];
     await mapLimit(tickets.data.tickets, 4, async (ticket) => {
       if (detailFailures.length > 0) return;
-      const read = await this.readTool("factory_ticket", {
-        linearId: ticket.linearId,
-      });
+      const read = await this.readDetail(ticket.linearId);
       if (!read.ok) {
         detailFailures.push({ reason: read.reason, message: read.message });
         return;
@@ -222,6 +220,16 @@ export class FactoryService {
       transcriptError: null,
       transcriptRefetched: true,
     };
+  }
+
+  /**
+   * One transient detail failure should not blank the board; a second failure
+   * still fails closed so a blocked ticket can never silently disappear.
+   */
+  private async readDetail(linearId: string): Promise<ToolRead> {
+    const first = await this.readTool("factory_ticket", { linearId });
+    if (first.ok) return first;
+    return this.readTool("factory_ticket", { linearId });
   }
 
   private async readTool(

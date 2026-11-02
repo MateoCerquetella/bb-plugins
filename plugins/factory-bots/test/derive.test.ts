@@ -287,6 +287,7 @@ test("snapshot counts agents and orders stages with labels", () => {
     ],
   );
   assert.equal(stageLabel("some-custom_stage"), "Some Custom Stage");
+  assert.equal("storage" in snapshot, false);
 });
 
 test("stage counts fall back to the ticket list when byStage is absent", () => {

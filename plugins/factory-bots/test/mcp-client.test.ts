@@ -82,6 +82,28 @@ test("surfaces an unknown tool as an error answer", async () => {
   }
 });
 
+test("the child gets a minimal environment plus the configured env", async () => {
+  const previous = process.env.FACTORY_TEST_SENTINEL;
+  process.env.FACTORY_TEST_SENTINEL = "should-not-reach-the-child";
+  const mcp = client();
+  try {
+    const result = await mcp.callTool("debug_env");
+    assert.equal(result.isError, false);
+    const env = parse(result.text) as {
+      sentinel: string | null;
+      path: string | null;
+      mode: string | null;
+    };
+    assert.equal(env.sentinel, null);
+    assert.notEqual(env.path, null);
+    assert.equal(env.mode, "ok");
+  } finally {
+    mcp.dispose();
+    if (previous === undefined) delete process.env.FACTORY_TEST_SENTINEL;
+    else process.env.FACTORY_TEST_SENTINEL = previous;
+  }
+});
+
 test("concurrent first calls wait for the initialize handshake", async () => {
   const mcp = client("slow-init");
   try {

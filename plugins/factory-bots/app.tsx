@@ -63,6 +63,10 @@ function useFactoryPoll(
 ): FactoryPoll {
   const rpcRef = useRef(rpc);
   rpcRef.current = rpc;
+  const linearIdRef = useRef(linearId);
+  linearIdRef.current = linearId;
+  const wakeRef = useRef<() => void>(() => {});
+  const firstSelection = useRef(true);
   const [board, setBoard] = useState<Polled<BoardResult>>({
     data: null,
     error: null,
@@ -75,30 +79,40 @@ function useFactoryPoll(
   useEffect(() => {
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
-    setTicket({ data: null, error: null });
+    let inFlight = false;
+    let queued = false;
 
-    const tick = async (): Promise<void> => {
+    const run = async (): Promise<void> => {
       if (cancelled) return;
+      if (inFlight) {
+        queued = true;
+        return;
+      }
+      inFlight = true;
       if (typeof document !== "undefined" && document.visibilityState === "hidden") {
-        timer = setTimeout(() => void tick(), REFRESH_MS);
+        inFlight = false;
+        timer = setTimeout(() => void run(), REFRESH_MS);
         return;
       }
 
       let boardOnline = false;
       try {
         const data = await rpcRef.current.call("getBoard", null);
-        if (cancelled) return;
-        setBoard({ data, error: null });
-        boardOnline = data.ok;
+        if (!cancelled) {
+          setBoard({ data, error: null });
+          boardOnline = data.ok;
+        }
       } catch (cause) {
-        if (cancelled) return;
-        setBoard({ data: null, error: errorText(cause) });
+        if (!cancelled) setBoard({ data: null, error: errorText(cause) });
       }
 
-      if (linearId !== null) {
+      const selected = linearIdRef.current;
+      if (selected !== null) {
         if (boardOnline) {
           try {
-            const data = await rpcRef.current.call("getTicket", { linearId });
+            const data = await rpcRef.current.call("getTicket", {
+              linearId: selected,
+            });
             if (!cancelled) setTicket({ data, error: null });
           } catch (cause) {
             if (!cancelled) setTicket({ data: null, error: errorText(cause) });
@@ -108,14 +122,42 @@ function useFactoryPoll(
         }
       }
 
-      if (!cancelled) timer = setTimeout(() => void tick(), REFRESH_MS);
+      inFlight = false;
+      if (cancelled) return;
+      if (queued) {
+        queued = false;
+        void run();
+        return;
+      }
+      timer = setTimeout(() => void run(), REFRESH_MS);
     };
 
-    void tick();
+    wakeRef.current = () => {
+      if (cancelled) return;
+      if (timer !== undefined) {
+        clearTimeout(timer);
+        timer = undefined;
+      }
+      void run();
+    };
+
+    void run();
     return () => {
       cancelled = true;
       if (timer !== undefined) clearTimeout(timer);
+      wakeRef.current = () => {};
     };
+  }, []);
+
+  // A route change resets the pane and wakes the one loop; it never mounts a
+  // second loop, and the loop's queued flag prevents overlapping reads.
+  useEffect(() => {
+    setTicket({ data: null, error: null });
+    if (firstSelection.current) {
+      firstSelection.current = false;
+      return;
+    }
+    wakeRef.current();
   }, [linearId]);
 
   return { board, ticket };

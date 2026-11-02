@@ -1,26 +1,26 @@
 {
   "schemaVersion": 1,
-  "sequence": 3,
-  "previousDigest": "sha256:909588248f2ea91850cbddc29fbf4b34161d1739afa1de5667aa2259ebfd25ba",
-  "actor": "agent",
-  "type": "transition",
-  "summary": "Size: keep as one (The delivery is one installable read-only board: MCP transport, derivation, panel, drill-down and cache share one contract and UI. Slicing would ship a panel that cannot show status or tickets, so it stays one feature.)",
-  "createdAt": "2026-11-02T20:54:56.953Z",
-  "stateBeforeDigest": "sha256:38afc2954e2b22fb19dbd0022fd01d81db7ae4df9aebbbb7abce23ee17ed1ab0",
-  "stateAfterDigest": "sha256:0ce5d890a186e26952103d9b2a5f91715ad769e49979a6822a5c7c255165ccb7",
+  "sequence": 10,
+  "previousDigest": "sha256:d89b9660e106628c91fe4241c3264a0e39c07329e4d0d297e0046526d814078a",
+  "actor": "empirical-force-close",
+  "type": "compaction-boundary",
+  "summary": "Compacted through journal event 9",
+  "createdAt": "2026-11-02T23:12:16.996Z",
+  "stateBeforeDigest": "sha256:87df4e540af16c36cd63862bc23ef293d5acb13a73993fc8c1fbbe3d80a26a75",
+  "stateAfterDigest": "sha256:87df4e540af16c36cd63862bc23ef293d5acb13a73993fc8c1fbbe3d80a26a75",
   "state": {
     "schemaVersion": 5,
-    "revision": 3,
+    "revision": 9,
     "activeFeature": "build-a-bb-plugin-called-factory-bots-that-shows-the",
     "request": "Build a BB plugin called Factory Bots that shows the agents of an Empirical Factory as a live read-only board: header with factory health, one card per bot from factory_status with status dot and owned column, click-through to tickets, ticket detail with factory_ticket fields and factory_transcript, refresh every 5s with transcript refetch only when stage or conversation changed. Data only through the Factory MCP server (factory_status, factory_tickets, factory_ticket, factory_tasks, factory_transcript); handle factory-not-running and no-tickets as normal states.",
     "profile": "complex",
     "workflow": "complex",
     "mode": "normal",
-    "phase": "design",
-    "status": "waiting",
+    "phase": "done",
+    "status": "done",
     "repairAttempts": 0,
-    "message": "Wrote the Factory Bots contract with board, status derivation, drill-down, transcript cache, read-only MCP, and normal offline/empty criteria plus the added board capability delta.",
-    "implementationActor": null,
+    "message": "Closed as superseded: Superseded by a follow-up feature that fixes the deferred review findings and reinstalls the plugin in this checkout.",
+    "implementationActor": "agent",
     "workStartedAt": null,
     "specDigest": "sha256:7812a5465d38bfed2d475ada192fd5470c8ec6ff0d783602242897f844e9a806",
     "approvedSpecRevision": 2,
@@ -30,24 +30,28 @@
     "capabilityClaimId": "build-a-bb-plugin-called-factory-bots-that-shows-the-f033b5b21ed3",
     "authorizationDigest": null,
     "evidence": [],
-    "evidenceReceiptIds": [],
+    "evidenceReceiptIds": [
+      "collected-949ad7b6d34933915a931c6a",
+      "qa-179a63f7c2eb7a26f67b9aea",
+      "qa-2ac1a2ac3b81543ccea98baf",
+      "executed-780b6add8e31d6ba97f3706b",
+      "collected-f8aca5c87d00551d5ba353aa"
+    ],
     "legacyEvidenceCount": 0,
     "completion": {
-      "implemented": false,
-      "verified": false,
+      "implemented": true,
+      "verified": true,
       "integrated": false,
       "delivered": false,
       "published": false,
-      "highest": "none",
+      "highest": "verified",
       "reasons": {
-        "implemented": "implemented has not been proven by a durable receipt.",
-        "verified": "verified has not been proven by a durable receipt.",
         "integrated": "integrated has not been proven by a durable receipt.",
         "delivered": "delivered has not been proven by a durable receipt.",
         "published": "published has not been proven by a durable receipt."
       }
     },
-    "updatedAt": "2026-11-02T20:54:56.953Z",
+    "updatedAt": "2026-11-02T23:12:16.094Z",
     "capabilityBase": {
       "schemaVersion": 1,
       "id": "build-a-bb-plugin-called-factory-bots-that-shows-the-f033b5b21ed3",
@@ -78,7 +82,6 @@
       "heartbeatAt": "2026-11-02T20:54:49.905Z",
       "digest": "sha256:2f2194828d6cdd765dd996ef8895d9e84ca3386d404cf9b3dbf35e362f7a67b7"
     },
-    "reviewFirst": true,
     "sizeDecision": {
       "choice": "keep",
       "criteria": 10,
@@ -86,7 +89,33 @@
       "reason": "The delivery is one installable read-only board: MCP transport, derivation, panel, drill-down and cache share one contract and UI. Slicing would ship a panel that cannot show status or tickets, so it stays one feature.",
       "actor": "agent",
       "revision": 2
+    },
+    "reviewFirst": true,
+    "closure": {
+      "schemaVersion": 1,
+      "outcome": "superseded",
+      "reason": "Superseded by a follow-up feature that fixes the deferred review findings and reinstalls the plugin in this checkout.",
+      "actor": "human",
+      "confirmation": "cli-unattended",
+      "closedAtPhase": "integrate",
+      "completionAtClosure": "verified",
+      "closedAt": "2026-11-02T23:12:15.800Z",
+      "digest": "sha256:d26b2f9bf425181bddac73e318be2346075723b67a55654b4739f93eea70ab14"
+    },
+    "completionRecord": {
+      "schemaVersion": 1,
+      "implementedBy": "agent",
+      "completedBy": "human",
+      "decisionBy": null,
+      "method": "superseded",
+      "reason": "Superseded by a follow-up feature that fixes the deferred review findings and reinstalls the plugin in this checkout.",
+      "at": "2026-11-02T23:12:16.094Z",
+      "revision": 9,
+      "completion": "verified",
+      "sourceTreeDigest": "sha256:084cc7c502fc9f492744445b29662ab4aadde647fadd126c73481f050cd31a1d",
+      "artifactTreeDigest": "sha256:55229db9a0fb69fd73b466eebd5e8b8f89295eba8ad739aeff0a6914e3e0bb3e",
+      "digest": "sha256:a4e30f7244431f5e9a3ab1304e909b9a159697bda9b8a1e8084a14dde32f0c04"
     }
   },
-  "digest": "sha256:18d1c4295698499b141630b1fdec5a1c1b47ce30d6a374f096bdd4390cd8bd4c"
+  "digest": "sha256:689faafab0499ffce6d283314909337d35e8466718a4fbbd452d4e604c605fc3"
 }

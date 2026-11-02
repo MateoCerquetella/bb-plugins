@@ -90,7 +90,6 @@ export const BoardSnapshotSchema = z.object({
   bots: z.number().int().nonnegative(),
   tickets: z.number().int().nonnegative(),
   byStage: z.array(StageCountSchema),
-  storage: z.string().nullable(),
   startedAt: z.string().nullable(),
 });
 
