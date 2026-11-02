@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "revision": 10,
+  "revision": 15,
   "activeFeature": "aura-topbar-background",
   "request": "Fix the Aura plugin so BB's top bar no longer picks up the wallpaper by default, add a Settings -> Aura checkbox to opt the top bar background in or out, verify it in the installed UI, bump the Aura version, and open and merge a PR.",
   "profile": "complex",
@@ -9,13 +9,13 @@
   "phase": "implement",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Plan now covers post-CAPY_CSS ordering and the registration test.",
+  "message": "Plan unchanged; one new capability added, no code delta.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:e4b3916524e1c34525922f1ab3f26276cfe683eda2c5c1c60a9693dab0d88923",
-  "approvedSpecRevision": 8,
+  "approvedSpecRevision": 13,
   "capabilityArchiveRequired": true,
-  "capabilityDeltaDigest": "sha256:99fd778a9b2ad8f93d3b4cd126eb886cccde9c5789760eb20b398208a334fbe5",
+  "capabilityDeltaDigest": "sha256:f353204a405bf2626785fdf6420b80654f003a47eb607a2e106da4bebe999623",
   "impactDigest": "sha256:3116b87f21a9f0ec9966858149360e07dbcef6b53744e392ce4bbcaf201db62a",
   "capabilityClaimId": "aura-topbar-background-2e6152ecb91d",
   "authorizationDigest": null,
@@ -37,7 +37,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-11-02T21:00:54.862Z",
+  "updatedAt": "2026-11-02T21:06:25.338Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "aura-topbar-background-2e6152ecb91d",
@@ -73,12 +73,12 @@
     "actor": "agent",
     "revision": 2
   },
-  "trackerGeneration": 1,
+  "trackerGeneration": 2,
   "lifecycle": {
     "stage": "development",
-    "iteration": 1,
+    "iteration": 2,
     "awaitingFeedback": false,
-    "contractRevision": 6
+    "contractRevision": 11
   },
   "reviewFirst": true
 }

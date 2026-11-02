@@ -6,7 +6,7 @@ Keep Aura's decorative wallpaper from tinting BB's top bar unless the user
 explicitly asks for it, with one persisted preference that applies consistently
 across the New thread screen, existing conversations, and saved slots.
 
-## MODIFIED Requirements
+## ADDED Requirements
 
 ### Requirement: Opt-in top bar background
 Aura SHALL keep its wallpaper out of BB's top bar band by default. A persisted
