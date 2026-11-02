@@ -193,6 +193,14 @@ is available, Start task fails with a settings prompt instead of dispatching.
 Changing the choice affects new sessions; existing native sessions keep the
 provider and model they were created with.
 
+**Additional factory instructions** accepts up to 20,000 characters of project
+conventions or verification requirements. Nonblank text is appended unchanged to
+the end of every worker stage prompt, including retries and Build continuations.
+An empty or whitespace-only value leaves the standard prompt unchanged. These
+instructions do not alter the coordinator acknowledgement prompt. The setting
+applies to manual starts and automatic intake, and is preserved by CLI
+**factory enable/pause**.
+
 **Create new ticket** shows the same AI picker for that task. It starts from the
 current thread's execution, and a changed choice is saved only on that ticket's
 factory record. Its coordinator and stages use the task choice first, then the

@@ -16,7 +16,7 @@ registerHooks({
     return next(specifier, context);
   }
 });
-const { factoryCoordinatorSchema, factoryRecordSchema } = await import('../factory/contract.ts');
+const { factoryCoordinatorSchema, factoryRecordSchema, factoryProjectPolicySchema } = await import('../factory/contract.ts');
 const { progressStatus, reviewStatus } = await import('../factory/tracker.ts');
 const { newRecord, savePlan, approvePlan, startRun } = await import('../factory/state.ts');
 const { createFactoryStore } = await import('../factory/store.ts');
@@ -318,7 +318,7 @@ function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
   let currentThreadId = 'thr_native';
   let threadProjectId = item.bbProjectId;
   let environmentProjectId = item.bbProjectId;
-  const spawnInputs: { title: string; parentThreadId?: string; providerId?: string; model?: string;
+  const spawnInputs: { title: string; prompt: string; parentThreadId?: string; providerId?: string; model?: string;
     executionInputSources?: Record<string, string>; environment: { type: string; environmentId?: string } }[] = [];
   const parents = new Map<string, string | null>();
   const titles = new Map<string, string>();
@@ -2891,4 +2891,72 @@ test('only provider-supported In progress and In review transitions are selected
   ])?.id, 'review');
   assert.equal(reviewStatus([option('qa', 'QA', 'in_progress')])?.id, 'qa');
   assert.equal(reviewStatus([option('work', 'In Progress', 'in_progress')]), undefined);
+});
+
+
+test('project factory instructions default empty and validate their size', () => {
+  const policy = factoryProjectPolicySchema.parse({ projectId: item.bbProjectId, provider: item.source, updatedAt: '' });
+  assert.equal(policy.factoryInstructions, '');
+  assert.equal(factoryProjectPolicySchema.safeParse({ ...policy, factoryInstructions: 'a'.repeat(20_000) }).success, true);
+  assert.equal(factoryProjectPolicySchema.safeParse({ ...policy, factoryInstructions: 'a'.repeat(20_001) }).success, false);
+});
+
+test('project instructions reach every worker stage for manual and automatic intake', async () => {
+  for (const automatic of [false, true]) {
+    const f = fixture(automatic ? {
+      provider: () => item.source, candidates: async () => [item], liveItem: async () => item
+    } : undefined);
+    try {
+      const instructions = '  Project conventions\nRun regression checks.\n';
+      f.store.saveProjectPolicy({
+        ...f.store.getProjectPolicy(item.bbProjectId, item.source), enabled: true, factoryInstructions: instructions
+      });
+      if (automatic) await f.service.scan(item.bbProjectId);
+      else await f.service.startTask(item, null);
+      f.complete('Investigation findings');
+      await f.service.get(item);
+      f.complete('Implementation plan');
+      await f.service.get(item);
+      f.complete('::taskboard-result{kind="build" verdict="implemented" revision="abc123"}\nImplemented and verified.');
+      await f.service.get(item);
+      assert.equal(f.spawnInputs.length, 5);
+      assert.ok(!f.spawnInputs[0].prompt.includes(instructions), 'Coordinator acknowledgement is unchanged');
+      for (const worker of f.spawnInputs.slice(1)) {
+        assert.ok(worker.prompt.endsWith('\n\n' + instructions));
+        assert.equal(worker.prompt.split(instructions).length, 2);
+      }
+      assert.equal(f.store.getProjectPolicy('proj_other', item.source).factoryInstructions, '');
+    } finally { f.db.close(); }
+  }
+});
+
+test('current project instructions apply to continued Build turns', async () => {
+  const f = fixture();
+  try {
+    f.store.save(pausedBuild({ providerId: 'codex', model: 'test', permissionMode: 'auto',
+      reasoningLevel: 'medium', serviceTier: 'default' }));
+    f.store.saveProjectPolicy({ ...f.store.getProjectPolicy(item.bbProjectId, item.source),
+      factoryInstructions: 'Continue using project conventions.' });
+    await f.service.startTask(item, null);
+    assert.equal(f.sends(), 1);
+    assert.ok(f.sent[0].input[0].text.endsWith('\n\nContinue using project conventions.'));
+  } finally { f.db.close(); }
+});
+
+test('blank project instructions preserve the standard prompt for every stage', () => {
+  const record = newRecord(item);
+  for (const kind of ['investigate', 'plan', 'build', 'review'] as const) {
+    assert.equal(factoryPrompt(item, record, kind, false, '  \n '), factoryPrompt(item, record, kind));
+  }
+});
+
+test('instruction changes reject stale admission even with identical timestamps', () => {
+  const db = new Database(':memory:');
+  try {
+    const store = createFactoryStore(db);
+    const before = store.saveProjectPolicy({ ...store.getProjectPolicy(item.bbProjectId, item.source), enabled: true });
+    const changed = store.saveProjectPolicy({ ...before, factoryInstructions: 'Project instructions' });
+    assert.equal(store.admit({ projectId: item.bbProjectId, source: item.source,
+      locator: item.locator, scopeDigest: 'scope' }, { ...before, updatedAt: changed.updatedAt }).kind, 'disabled');
+  } finally { db.close(); }
 });

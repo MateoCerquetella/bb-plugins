@@ -2617,7 +2617,8 @@ export default async function plugin(bb: BbPluginApi) {
             result = await handlers.factorySaveProject({
               projectId: project.id, provider: projectConfig(project.id, true).source,
               enabled: verb === 'enable', intake: 'todo', maxConcurrent: concurrency,
-              execution: snapshot.policy.execution ?? null
+              execution: snapshot.policy.execution ?? null,
+              factoryInstructions: snapshot.policy.factoryInstructions ?? ''
             });
           } else if (verb === 'scan' && args.positionals.length <= 1) {
             const scanned = await handlers.factoryScanProject({ projectId: project.id });

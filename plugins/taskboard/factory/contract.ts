@@ -19,6 +19,7 @@ export const factoryProjectPolicySchema = z.object({
   intake: z.literal('todo').default('todo'),
   maxConcurrent: z.number().int().min(1).max(20).default(1),
   execution: factoryExecutionSchema.nullable().default(null),
+  factoryInstructions: z.string().max(20_000).default(''),
   updatedAt: z.string()
 }).strict();
 export type FactoryProjectPolicy = z.infer<typeof factoryProjectPolicySchema>;
