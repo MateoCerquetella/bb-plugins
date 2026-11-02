@@ -73,6 +73,14 @@ function ProjectSettings({ projectId, provider }: { projectId: string; provider:
       if (mounted.current) setSaving(false);
     }
   }
+  // Wait for policy hydration before mounting host controls. Their initial catalog
+  // callbacks can otherwise dirty the form and suppress the saved policy response.
+  if (!status) return <div className="min-w-0 space-y-2" aria-label="Autonomous factory">
+    <p role={error ? 'alert' : 'status'} className="text-xs text-muted-foreground">
+      {error ?? 'Loading factory settings…'}
+    </p>
+    {error ? <Button type="button" variant="outline" size="sm" onClick={() => void load()}>Retry</Button> : null}
+  </div>;
   const stateLabel = !status ? 'Loading'
     : status.kind === 'running' ? 'Running'
     : status.kind === 'paused' ? 'Paused'
