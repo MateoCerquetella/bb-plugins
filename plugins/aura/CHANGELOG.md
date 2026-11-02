@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.6 - 2026-11-02
+
+- Keep the wallpaper out of BB's top bar by default so the header cannot pick
+  up the background. Add a **Top bar background** checkbox in Settings → Aura
+  to opt the wallpaper back in behind the top bar.
+
 ## 0.2.5 - 2026-10-30
 
 - Keep pixel dithering continuous when the panel size is not a multiple of four

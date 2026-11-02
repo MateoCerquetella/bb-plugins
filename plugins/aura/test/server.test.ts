@@ -43,7 +43,7 @@ test("invalid image or slot rejects the entire apply without partially changing 
       await assert.rejects(host.harness.callRpc("apply", { settings: { ...defaults, enabled: false }, image: { ...replace, dataUrl }, saveSlot: { slot: 1, name: "Wrong" } }));
     }
     for (const slot of [0, 7, 1.5]) await assert.rejects(host.harness.callRpc("apply", { settings: defaults, image: keep, saveSlot: { slot, name: "Invalid" } }));
-    for (const patch of [{ intensity: 2 }, { imageOpacity: 1.1 }, { fit: "cover; color:red" }, { fps: 45 }, { quality: "ultra" }, { pattern: "plaid" }, { dither: "16x16" }, { photoMotion: "spin" }, { enabled: "true" }]) await assert.rejects(host.harness.callRpc("apply", { settings: { ...defaults, ...patch }, image: keep }));
+    for (const patch of [{ intensity: 2 }, { imageOpacity: 1.1 }, { fit: "cover; color:red" }, { fps: 45 }, { quality: "ultra" }, { pattern: "plaid" }, { dither: "16x16" }, { photoMotion: "spin" }, { enabled: "true" }, { topbarBackground: "true" }]) await assert.rejects(host.harness.callRpc("apply", { settings: { ...defaults, ...patch }, image: keep }));
     assert.deepEqual(await host.harness.callRpc("get", null), before);
     await assert.rejects(host.harness.callRpc("activateSlot", { slot: 2 }), /empty/);
   } finally { await host.harness.dispose(); }
@@ -72,13 +72,14 @@ test("image type must match bytes; legacy settings get new defaults", async () =
   assert.equal(decodeImage(png).mime, "image/png"); assert.throws(() => decodeImage(png.replace("image/png", "image/jpeg")));
   const host = createFakePluginHost(); plugin(host.bb);
   try {
-    const { newThreadOnly, fps, quality, activityOverview, pattern, dither, photoMotion, ...legacy } = defaults;
+    const { newThreadOnly, fps, quality, activityOverview, topbarBackground, pattern, dither, photoMotion, ...legacy } = defaults;
     host.bb.storage.database().prepare("UPDATE background SET settings = ? WHERE id = 1").run(JSON.stringify(legacy));
     const settings = (await host.harness.callRpc("get", null) as Snapshot).settings;
     assert.equal(settings.newThreadOnly, false);
     assert.equal(settings.fps, 15);
     assert.equal(settings.quality, "balanced");
     assert.equal(settings.activityOverview, false);
+    assert.equal(settings.topbarBackground, false);
     assert.equal(settings.pattern, "noise");
     assert.equal(settings.dither, "8x8");
     assert.equal(settings.photoMotion, "wave");
@@ -121,6 +122,28 @@ test("overview is default-off and stays global across slots/reset/reload without
     assert.equal(JSON.parse(off.stdout!).settings.activityOverview, false);
     assert.equal((await host.harness.runCli(["overview", "maybe"])).exitCode, 1);
     await assert.rejects(host.harness.callRpc("activity", { period: "year", repository: "repo:evil injected" }));
+  } finally { await host.harness.dispose(); }
+});
+
+test("top bar background is default-off and stays global across slots/reset/reload", async () => {
+  let host = createFakePluginHost({ pluginId: "aura" }); plugin(host.bb);
+  try {
+    const initial = await host.harness.callRpc("get", null) as Snapshot;
+    assert.equal(initial.settings.topbarBackground, false);
+    const saved = await host.harness.callRpc("apply", { settings: { ...defaults, topbarBackground: true }, image: replace, saveSlot: { slot: 1, name: "Lake" } }) as Snapshot;
+    assert.equal(saved.settings.topbarBackground, true);
+    const off = await host.harness.callRpc("apply", { settings: { ...defaults, topbarBackground: false }, image: keep }) as Snapshot;
+    assert.equal(off.settings.topbarBackground, false);
+    assert.equal(off.activeSlot, 1);
+    // The global preference wins over the value stored in a slot.
+    const switched = await host.harness.callRpc("activateSlot", { slot: 1 }) as Snapshot;
+    assert.equal(switched.settings.topbarBackground, false);
+    await host.harness.callRpc("apply", { settings: { ...defaults, topbarBackground: true }, image: keep });
+    host = await host.harness.reload(plugin);
+    assert.equal((await host.harness.callRpc("get", null) as Snapshot).settings.topbarBackground, true);
+    const reset = await host.harness.callRpc("reset", null) as Snapshot;
+    assert.equal(reset.settings.topbarBackground, true);
+    assert.equal(reset.slots.length, 1);
   } finally { await host.harness.dispose(); }
 });
 

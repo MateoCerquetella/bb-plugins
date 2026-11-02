@@ -6,6 +6,12 @@ export const TARGETS = ':is([id="thread-detail-timeline-panel"], [id="root-compo
 export const NEW_THREAD_TARGET = '[id="root-compose-main-panel"]';
 export function targetsFor(snapshot: Snapshot): string { return snapshot.settings.newThreadOnly ? NEW_THREAD_TARGET : TARGETS; }
 export function backgroundRules(selector: string): string { return `${selector}{position:relative;isolation:isolate;}`; }
+// BB's page header sits inside the decorated panel and uses a translucent scrim.
+// Keep the wallpaper below that chrome band unless the user opts in, so the top
+// bar cannot pick up the background by default.
+export function topbarBackgroundRule(selector: string, show: boolean): string {
+  return `${selector} .aura-capy-layer{top:${show ? "0" : "var(--bb-app-chrome-row-height, 48px)"};}`;
+}
 
 // Center only the full New thread compose layout. Auto margins collapse when
 // the draft grows taller than the viewport, keeping it reachable by scrolling.
@@ -178,7 +184,7 @@ export function mountBackground(signal: AbortSignal): () => void {
   function apply(snapshot: Snapshot): void {
     current = snapshot;
     const target = targetsFor(snapshot);
-    const css = snapshot.settings.enabled ? `${backgroundRules(target)}\n${CAPY_CSS}\n${COMPOSE_LAYOUT}\n${snapshot.settings.newThreadOnly ? "" : READING_SURFACE}` : COMPOSE_CENTER;
+    const css = snapshot.settings.enabled ? `${backgroundRules(target)}\n${topbarBackgroundRule(target, snapshot.settings.topbarBackground)}\n${CAPY_CSS}\n${COMPOSE_LAYOUT}\n${snapshot.settings.newThreadOnly ? "" : READING_SURFACE}` : COMPOSE_CENTER;
     if (css !== lastCss) { style.textContent = css; lastCss = css; }
     reconcile();
   }

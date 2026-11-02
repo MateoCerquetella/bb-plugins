@@ -148,6 +148,7 @@ export function BackgroundEditor() {
           <legend className="aura-sr-only">Background controls</legend>
           <label className="aura-scope"><input type="checkbox" aria-label="New thread screen only" aria-describedby={`${id}-scope-help`} checked={draft.newThreadOnly} onChange={e => change("newThreadOnly", e.target.checked)} /><span><strong>New thread screen only</strong><small id={`${id}-scope-help`}>Hide Aura inside existing conversations.</small></span></label>
           <label className="aura-scope"><input type="checkbox" aria-label="Half wallpaper on New thread" checked={draft.dimmerEnabled} onChange={e => change("dimmerEnabled", e.target.checked)} /><span><strong>Half wallpaper on New thread</strong><small>On: wallpaper fades out halfway down. Off: full wallpaper. Chats always use full wallpaper.</small></span></label>
+          <label className="aura-scope"><input type="checkbox" aria-label="Top bar background" checked={draft.topbarBackground} onChange={e => change("topbarBackground", e.target.checked)} /><span><strong>Top bar background</strong><small>On: the wallpaper continues behind BB's top bar. Off: the top bar stays clean.</small></span></label>
           <div className="aura-field">
             <span className="aura-field-title">Your image <span>optional</span></span>
             <button type="button" className="aura-upload" onClick={() => fileInput.current?.click()} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); void choose(e.dataTransfer.files[0]); }}>

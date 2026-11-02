@@ -47,7 +47,7 @@ export default function aura(bb: BbPluginApi): void {
         info = JSON.stringify({ version: randomBytes(12).toString("hex"), name: value.image.name, mime: decoded.mime, bytes: bytes.length });
       }
       const settings = JSON.stringify(value.settings);
-      const appearance = ({ enabled, newThreadOnly, dimmerEnabled, activityOverview, ...rest }: Snapshot["settings"]) => JSON.stringify(rest);
+      const appearance = ({ enabled, newThreadOnly, dimmerEnabled, topbarBackground, activityOverview, ...rest }: Snapshot["settings"]) => JSON.stringify(rest);
       const sameAppearance = value.image.action === "keep" && appearance(settingsSchema.parse(JSON.parse(previous.settings))) === appearance(value.settings);
       const activeSlot = value.saveSlot?.slot ?? (sameAppearance ? previous.active_slot : null);
       db.prepare("UPDATE background SET settings = ?, image_info = ?, image_bytes = ?, active_slot = ? WHERE id = 1")
@@ -62,7 +62,7 @@ export default function aura(bb: BbPluginApi): void {
       const saved = db.prepare("SELECT settings, image_info, image_bytes FROM aura_slots WHERE slot = ?").get(slot) as Stored | undefined;
       if (!saved) throw new Error(`Slot ${slot} is empty.`);
       const current = read().settings;
-      const settings = settingsSchema.parse({ ...JSON.parse(saved.settings), enabled: current.enabled, newThreadOnly: current.newThreadOnly, dimmerEnabled: current.dimmerEnabled, activityOverview: current.activityOverview });
+      const settings = settingsSchema.parse({ ...JSON.parse(saved.settings), enabled: current.enabled, newThreadOnly: current.newThreadOnly, dimmerEnabled: current.dimmerEnabled, topbarBackground: current.topbarBackground, activityOverview: current.activityOverview });
       db.prepare("UPDATE background SET settings = ?, image_info = ?, image_bytes = ?, active_slot = ? WHERE id = 1")
         .run(JSON.stringify(settings), saved.image_info, saved.image_bytes, slot);
     })();
@@ -77,7 +77,7 @@ export default function aura(bb: BbPluginApi): void {
   }
   function reset(): Snapshot {
     const current = read().settings;
-    return apply({ settings: { ...defaults, enabled: current.enabled, newThreadOnly: current.newThreadOnly, dimmerEnabled: current.dimmerEnabled, activityOverview: current.activityOverview }, image: { action: "remove" } });
+    return apply({ settings: { ...defaults, enabled: current.enabled, newThreadOnly: current.newThreadOnly, dimmerEnabled: current.dimmerEnabled, topbarBackground: current.topbarBackground, activityOverview: current.activityOverview }, image: { action: "remove" } });
   }
   bb.rpc.register(rpcContract, { get: read, apply, setDimmer: ({ enabled }) => {
     const current = read().settings;
