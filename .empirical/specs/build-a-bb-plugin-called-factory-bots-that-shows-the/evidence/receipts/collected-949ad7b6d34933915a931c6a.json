@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-949ad7b6d34933915a931c6a",
+  "criteria": [
+    "AC-1",
+    "AC-10",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8",
+    "AC-9"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-11-02T21:45:51.986Z",
+  "completedAt": "2026-11-02T21:45:51.986Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "build-a-bb-plugin-called-factory-bots-that-shows-the",
+    "specRevision": 2,
+    "specDigest": "sha256:7812a5465d38bfed2d475ada192fd5470c8ec6ff0d783602242897f844e9a806",
+    "treeDigest": "sha256:ea2047dff9719a6ced64abbdb867d1b5b1bce9f3bbc0cb67af9a350d171ae3a2",
+    "policyDigest": "sha256:07fa3ecd6d3ba9e43162e49acdd9ccca9c33a017008cc35def3013d8ddf29d50"
+  },
+  "digest": "sha256:6fbac14a2bed7e13aa7fc01b64322bf6550544df14bfe0937407ab837bf11a32",
+  "kind": "collected",
+  "collector": "empirical-review:fresh-context reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/build-a-bb-plugin-called-factory-bots-that-shows-the/reviews/ebd56830bb2c70d25af2a39d.json",
+      "mediaType": "application/json",
+      "bytes": 6126,
+      "digest": "sha256:8d00df12489c8515ef40f547e997386db8167fa5fffd718b34fb6c9c0f84e5f1"
+    },
+    {
+      "path": ".empirical/specs/build-a-bb-plugin-called-factory-bots-that-shows-the/reviews/ebd56830bb2c70d25af2a39d.md",
+      "mediaType": "text/markdown",
+      "bytes": 2744,
+      "digest": "sha256:3c3e6631a08fbc9db97fbdbdb6fd84ecb7749c04c2fb2254a35b6380c16612de"
+    }
+  ]
+}

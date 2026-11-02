@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-179a63f7c2eb7a26f67b9aea",
+  "criteria": [
+    "AC-1",
+    "AC-10",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8",
+    "AC-9"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Focused Factory Bots check: tsc --noEmit, 52 node tests, and bb plugin build.",
+  "passed": true,
+  "startedAt": "2026-11-02T21:46:46.308Z",
+  "completedAt": "2026-11-02T21:46:51.010Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "build-a-bb-plugin-called-factory-bots-that-shows-the",
+    "specRevision": 2,
+    "specDigest": "sha256:7812a5465d38bfed2d475ada192fd5470c8ec6ff0d783602242897f844e9a806",
+    "treeDigest": "sha256:ea2047dff9719a6ced64abbdb867d1b5b1bce9f3bbc0cb67af9a350d171ae3a2",
+    "policyDigest": "sha256:07fa3ecd6d3ba9e43162e49acdd9ccca9c33a017008cc35def3013d8ddf29d50",
+    "workflowRevision": 7,
+    "gitCommit": "9cbbfe3bab5ca2e0ced3e1b7c4affd5881a87547",
+    "scope": [
+      "plugins/factory-bots"
+    ],
+    "scopeDigest": "sha256:238f94ee991257e628a1e194bab0e45375d9a34291db267a90570154c654a8d5",
+    "textTreeDigest": "sha256:ea2047dff9719a6ced64abbdb867d1b5b1bce9f3bbc0cb67af9a350d171ae3a2"
+  },
+  "digest": "sha256:40e656d79735fb52d695d3a3aac2fbc8e7966f3d2df9ec4fe680c407ef16c880",
+  "kind": "qa",
+  "matrixDigest": "sha256:9376febfba6daefb91cc9196729f139243fc5502b944fd54756f2cdb20e9729a",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Focused Factory Bots check: tsc --noEmit, 52 node tests, and bb plugin build.",
+      "startedAt": "2026-11-02T21:46:46.308Z",
+      "completedAt": "2026-11-02T21:46:51.010Z",
+      "durationMs": 4702,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:3102e0660c5a28fb09072a92af73601c0704a8badb5519082e7545d1f876aa50",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-factory-bots"
+        ],
+        "cwd": ".",
+        "timeoutMs": 180000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:0f5fd576194d00ab44f89e03cbafe0762501439b84c337292f305135832bccad",
+        "stderrDigest": "sha256:ba55acf89191f6191b7080f5249de21f4d4b372e625578a146d87e2c9c3cc981",
+        "stdoutTail": "onfig beside or above the module\n  ---\n  duration_ms: 0.354195\n  type: 'test'\n  ...\n# Subtest: reports a missing config as an unavailable setup\nok 8 - reports a missing config as an unavailable setup\n  ---\n  duration_ms: 0.311327\n  type: 'test'\n  ...\n# Subtest: reports invalid JSON with the file path\nok 9 - reports invalid JSON with the file path\n  ---\n  duration_ms: 1.663694\n  type: 'test'\n  ...\n# Subtest: keeps the documented order but only for agents status returned\nok 10 - keeps the documented order but only for agents status returned\n  ---\n  duration_ms: 1.230473\n  type: 'test'\n  ...\n# Subtest: an absent agent is never invented\nok 11 - an absent agent is never invented\n  ---\n  duration_ms: 1.484747\n  type: 'test'\n  ...\n# Subtest: cards carry name, conversation, documented column, and held ticket count\nok 12 - cards carry name, conversation, documented column, and held ticket count\n  ---\n  duration_ms: 0.354136\n  type: 'test'\n  ...\n# Subtest: a ticket stopReason blocks its agent verbatim and outranks working\nok 13 - a ticket stopReason blocks its agent verbatim and outranks working\n  ---\n  duration_ms: 0.253923\n  type: 'test'\n  ...\n# Subtest: a task conversation names the agent as working and shows its ticket\nok 14 - a task conversation names the agent as working and shows its ticket\n  ---\n  duration_ms: 0.164109\n  type: 'test'\n  ...\n# Subtest: a blocked task reason wins over working and stays verbatim\nok 15 - a blocked task reason wins over working and stays verbatim\n  ---\n  duration_ms: 0.269822\n  type: 'test'\n  ...\n# Subtest: a task owner naming the agent is a match\nok 16 - a task owner naming the agent is a match\n  ---\n  duration_ms: 0.238535\n  type: 'test'\n  ...\n# Subtest: a nested task follows its owner task's conversation\nok 17 - a nested task follows its owner task's conversation\n  ---\n  duration_ms: 0.184607\n  type: 'test'\n  ...\n# Subtest: the root bot conversation also matches a task\nok 18 - the root bot conversation also matches a task\n  ---\n  duration_ms: 0.36213\n  type: 'test'\n  ...\n# Subtest: ticket counts only include tickets whose bot names the agent\nok 19 - ticket counts only include tickets whose bot names the agent\n  ---\n  duration_ms: 0.470168\n  type: 'test'\n  ...\n# Subtest: snapshot counts agents and orders stages with labels\nok 20 - snapshot counts agents and orders stages with labels\n  ---\n  duration_ms: 0.399198\n  type: 'test'\n  ...\n# Subtest: stage counts fall back to the ticket list when byStage is absent\nok 21 - stage counts fall back to the ticket list when byStage is absent\n  ---\n  duration_ms: 0.181561\n  type: 'test'\n  ...\n# Subtest: no tickets is a normal snapshot with idle agents\nok 22 - no tickets is a normal snapshot with idle agents\n  ---\n  duration_ms: 0.185999\n  type: 'test'\n  ...\n# Subtest: reads model tools and nested calls in order\nok 23 - reads model tools and nested calls in order\n  ---\n  duration_ms: 1.060534\n  type: 'test'\n  ...\n# Subtest: the newest running call is the highlighted one\nok 24 - the newest running call is the highlighted one\n  ---\n  duration_ms: 0.143271\n  type: 'test'\n  ...\n# Subtest: without a running call the newest pending one is highlighted\nok 25 - without a running call the newest pending one is highlighted\n  ---\n  duration_ms: 0.141088\n  type: 'test'\n  ...\n# Subtest: an empty or malformed live document is safe\nok 26 - an empty or malformed live document is safe\n  ---\n  duration_ms: 0.110161\n  type: 'test'\n  ...\n# Subtest: generation is detected before a tool starts\nok 27 - generation is detected before a tool starts\n  ---\n  duration_ms: 0.156616\n  type: 'test'\n  ...\n# Subtest: speaks the MCP handshake and reads the status tool\nok 28 - speaks the MCP handshake and reads the status tool\n  ---\n  duration_ms: 40.212489\n  type: 'test'\n  ...\n# Subtest: passes tool arguments and returns ticket JSON\nok 29 - passes tool arguments and returns ticket JSON\n  ---\n  duration_ms: 43.857526\n  type: 'test'\n  ...\n# Subtest: surfaces fetch failed as an error answer, not a throw\nok 30 - surfaces fetch failed as an error answer, not a throw\n  ---\n  duration_ms: 30.950974\n  type: 'test'\n  ...\n# Subtest: surfaces an unknown tool as an error answer\nok 31 - surfaces an unknown tool as an error answer\n  ---\n  duration_ms: 31.603482\n  type: 'test'\n  ...\n# Subtest: concurrent first calls wait for the initialize handshake\nok 32 - concurrent first calls wait for the initialize handshake\n  ---\n  duration_ms: 285.736045\n  type: 'test'\n  ...\n# Subtest: a timeout replaces the child and the next call recovers\nok 33 - a timeout replaces the child and the next call recovers\n  ---\n  duration_ms: 389.887725\n  type: 'test'\n  ...\n# Subtest: an exited child is replaced on the next call\nok 34 - an exited child is replaced on the next call\n  ---\n  duration_ms: 107.242096\n  type: 'test'\n  ...\n# Subtest: dispose rejects later calls and clears the child\nok 35 - dispose rejects later calls and clears the child\n  ---\n  duration_ms: 64.577635\n  type: 'test'\n  ...\n# Subtest: dispose rejects a call that is still in flight\nok 36 - dispose rejects a call that is still in flight\n  ---\n  duration_ms: 154.518525\n  type: 'test'\n  ...\n# Subtest: the empty sub-path is the board\nok 37 - the empty sub-path is the board\n  ---\n  duration_ms: 1.289532\n  type: 'test'\n  ...\n# Subtest: an agent route keeps the factory's name\nok 38 - an agent route keeps the factory's name\n  ---\n  duration_ms: 0.15939\n  type: 'test'\n  ...\n# Subtest: a ticket route keeps both ids\nok 39 - a ticket route keeps both ids\n  ---\n  duration_ms: 0.123315\n  type: 'test'\n  ...\n# Subtest: routes are encoded and decoded symmetrically\nok 40 - routes are encoded and decoded symmetrically\n  ---\n  duration_ms: 0.24692\n  type: 'test'\n  ...\n# Subtest: a malformed escape does not throw\nok 41 - a malformed escape does not throw\n  ---\n  duration_ms: 0.186631\n  type: 'test'\n  ...\n# Subtest: a missing ticket id falls back to the agent\nok 42 - a missing ticket id falls back to the agent\n  ---\n  duration_ms: 0.12055\n  type: 'test'\n  ...\n# Subtest: the board is built only from the five read-only tools\nok 43 - the board is built only from the five read-only tools\n  ---\n  duration_ms: 7.632176\n  type: 'test'\n  ...\n# Subtest: a failed ticket detail read fails the board instead of clearing blocked state\nok 44 - a failed ticket detail read fails the board instead of clearing blocked state\n  ---\n  duration_ms: 0.775503\n  type: 'test'\n  ...\n# Subtest: fetch failed is a normal not-running board with the start command\nok 45 - fetch failed is a normal not-running board with the start command\n  ---\n  duration_ms: 0.146176\n  type: 'test'\n  ...\n# Subtest: a thrown fetch error is also classified as not-running\nok 46 - a thrown fetch error is also classified as not-running\n  ---\n  duration_ms: 0.224589\n  type: 'test'\n  ...\n# Subtest: non-JSON and wrong shapes become bounded unavailable states\nok 47 - non-JSON and wrong shapes become bounded unavailable states\n  ---\n  duration_ms: 0.748535\n  type: 'test'\n  ...\n# Subtest: no tickets keeps all seven agents visible and idle\nok 48 - no tickets keeps all seven agents visible and idle\n  ---\n  duration_ms: 0.410639\n  type: 'test'\n  ...\n# Subtest: a missing config reports unavailable instead of crashing\nok 49 - a missing config reports unavailable instead of crashing\n  ---\n  duration_ms: 0.188513\n  type: 'test'\n  ...\n# Subtest: the transcript is refetched only after a stage or conversation change\nok 50 - the transcript is refetched only after a stage or conversation change\n  ---\n  duration_ms: 1.035308\n  type: 'test'\n  ...\n# Subtest: a ticket still renders when its transcript alone fails\nok 51 - a ticket still renders when its transcript alone fails\n  ---\n  duration_ms: 0.584996\n  type: 'test'\n  ...\n# Subtest: a ticket read while the factory is down is not-running\nok 52 - a ticket read while the factory is down is not-running\n  ---\n  duration_ms: 0.403015\n  type: 'test'\n  ...\n1..52\n# tests 52\n# suites 0\n# pass 52\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 1287.551202\n\n> bb-plugin-factory-bots@0.1.0 build\n> env -u BB_CLI bb plugin build .\n\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\n",
+        "stderrTail": "This plugin pins @get-bb/plugin-sdk 0.4.29; this bb's SDK is 0.4.21 — `bb plugin types` updates the pin.\n",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:ea2047dff9719a6ced64abbdb867d1b5b1bce9f3bbc0cb67af9a350d171ae3a2",
+      "sourceTreeAfter": "sha256:ea2047dff9719a6ced64abbdb867d1b5b1bce9f3bbc0cb67af9a350d171ae3a2",
+      "artifacts": [
+        {
+          "path": "plugins/factory-bots/assets/screenshots/board.png",
+          "mediaType": "image/png",
+          "bytes": 128722,
+          "digest": "sha256:620361bc9c2a4779e24189736d6c6b5ac184ab0a727a3d9df25fe376f53f6c74"
+        },
+        {
+          "path": "plugins/factory-bots/assets/screenshots/not-running.png",
+          "mediaType": "image/png",
+          "bytes": 97180,
+          "digest": "sha256:5209631ed6713e3172adfa5925bbf34fe74e90df43481053200ae2a462daf032"
+        },
+        {
+          "path": "plugins/factory-bots/assets/screenshots/ticket.png",
+          "mediaType": "image/png",
+          "bytes": 471491,
+          "digest": "sha256:b935475fea874ad084fd14ce6a70efdd915106d878619614a155ccf2a800ad15"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}

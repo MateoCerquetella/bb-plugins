@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-2ac1a2ac3b81543ccea98baf",
+  "criteria": [
+    "AC-1",
+    "AC-10",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8",
+    "AC-9"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "Fresh-context browser QA against the installed panel: seven cards, live factory stages, blocked reasons verbatim, ticket drill-down with stopReason/decisions/transcript, live-tool highlight, 5s refresh, and the not-running start command.",
+  "passed": true,
+  "startedAt": "2026-11-02T21:47:00.123Z",
+  "completedAt": "2026-11-02T21:47:00.123Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "build-a-bb-plugin-called-factory-bots-that-shows-the",
+    "specRevision": 2,
+    "specDigest": "sha256:7812a5465d38bfed2d475ada192fd5470c8ec6ff0d783602242897f844e9a806",
+    "treeDigest": "sha256:ea2047dff9719a6ced64abbdb867d1b5b1bce9f3bbc0cb67af9a350d171ae3a2",
+    "policyDigest": "sha256:07fa3ecd6d3ba9e43162e49acdd9ccca9c33a017008cc35def3013d8ddf29d50",
+    "workflowRevision": 7,
+    "gitCommit": "9cbbfe3bab5ca2e0ced3e1b7c4affd5881a87547",
+    "scope": [
+      "plugins/factory-bots"
+    ],
+    "scopeDigest": "sha256:238f94ee991257e628a1e194bab0e45375d9a34291db267a90570154c654a8d5",
+    "textTreeDigest": "sha256:ea2047dff9719a6ced64abbdb867d1b5b1bce9f3bbc0cb67af9a350d171ae3a2"
+  },
+  "digest": "sha256:b08591295f7c8f969d823575a2fd698e42f2fef3cc6bd1719411667722f236fb",
+  "kind": "qa",
+  "matrixDigest": "sha256:9376febfba6daefb91cc9196729f139243fc5502b944fd54756f2cdb20e9729a",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Fresh-context browser QA against the installed panel: seven cards, live factory stages, blocked reasons verbatim, ticket drill-down with stopReason/decisions/transcript, live-tool highlight, 5s refresh, and the not-running start command.",
+      "startedAt": "2026-11-02T21:47:00.123Z",
+      "completedAt": "2026-11-02T21:47:00.123Z",
+      "durationMs": 0,
+      "collector": "fresh-context browser QA (Playwright against BB; reviewer thread thr_cb8nhb2jdh supplied an independent outcome read)",
+      "command": null,
+      "result": null,
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:ea2047dff9719a6ced64abbdb867d1b5b1bce9f3bbc0cb67af9a350d171ae3a2",
+      "sourceTreeAfter": "sha256:ea2047dff9719a6ced64abbdb867d1b5b1bce9f3bbc0cb67af9a350d171ae3a2",
+      "artifacts": [
+        {
+          "path": "plugins/factory-bots/assets/screenshots/board.png",
+          "mediaType": "image/png",
+          "bytes": 128722,
+          "digest": "sha256:620361bc9c2a4779e24189736d6c6b5ac184ab0a727a3d9df25fe376f53f6c74"
+        },
+        {
+          "path": "plugins/factory-bots/assets/screenshots/not-running.png",
+          "mediaType": "image/png",
+          "bytes": 97180,
+          "digest": "sha256:5209631ed6713e3172adfa5925bbf34fe74e90df43481053200ae2a462daf032"
+        },
+        {
+          "path": "plugins/factory-bots/assets/screenshots/ticket.png",
+          "mediaType": "image/png",
+          "bytes": 471491,
+          "digest": "sha256:b935475fea874ad084fd14ce6a70efdd915106d878619614a155ccf2a800ad15"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}

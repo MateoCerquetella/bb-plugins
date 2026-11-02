@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "id": "executed-780b6add8e31d6ba97f3706b",
+  "criteria": [
+    "AC-1",
+    "AC-10",
+    "AC-2",
+    "AC-3",
+    "AC-5",
+    "AC-8"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Deterministic browser run of the installed panel: seven cards, working/blocked status, ticket drill-down with a highlighted live tool, 5-second board and ticket refresh, and the not-running start command.",
+  "passed": true,
+  "startedAt": "2026-11-02T21:47:12.665Z",
+  "completedAt": "2026-11-02T21:47:27.919Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "build-a-bb-plugin-called-factory-bots-that-shows-the",
+    "specRevision": 2,
+    "specDigest": "sha256:7812a5465d38bfed2d475ada192fd5470c8ec6ff0d783602242897f844e9a806",
+    "treeDigest": "sha256:ea2047dff9719a6ced64abbdb867d1b5b1bce9f3bbc0cb67af9a350d171ae3a2",
+    "policyDigest": "sha256:07fa3ecd6d3ba9e43162e49acdd9ccca9c33a017008cc35def3013d8ddf29d50"
+  },
+  "digest": "sha256:139965d4ca3a15b2774ec8d499b9ee052ed3123a0d0ecf968c1716160bf9a549",
+  "kind": "executed",
+  "command": {
+    "argv": [
+      "node",
+      ".empirical/specs/build-a-bb-plugin-called-factory-bots-that-shows-the/qa/browser.mjs"
+    ],
+    "cwd": ".",
+    "timeoutMs": 120000,
+    "maxOutputBytes": 262144,
+    "environmentKeys": [
+      "PATH"
+    ]
+  },
+  "result": {
+    "exitCode": 0,
+    "signal": null,
+    "timedOut": false,
+    "stdoutDigest": "sha256:05a23463c946f0c293950f0600ff79777240d762f87107c8e4fe1e36aa252c20",
+    "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdoutTail": "factory-bots browser evidence written to /home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_9x565sqvfq-1/bb-plugins/.empirical/specs/build-a-bb-plugin-called-factory-bots-that-shows-the/qa/artifacts/\n",
+    "stderrTail": "",
+    "stdoutTruncated": false,
+    "stderrTruncated": false
+  }
+}

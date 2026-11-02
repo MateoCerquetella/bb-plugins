@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "page": ".empirical/context/design-language.md",
+  "head": "9cbbfe3bab5ca2e0ced3e1b7c4affd5881a87547",
+  "units": [
+    "plugins/action-topbar",
+    "plugins/factory-bots",
+    "plugins/steel-browser",
+    "plugins/taskboard"
+  ],
+  "pending": {}
+}

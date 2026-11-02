@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-f8aca5c87d00551d5ba353aa",
+  "criteria": [
+    "AC-10",
+    "AC-5"
+  ],
+  "evidenceKinds": [
+    "screenshot"
+  ],
+  "summary": "Screenshots of the installed Factory Bots panel: live board with seven agents and blocked reasons, ticket detail with fields and transcript, and the not-running state with its start command.",
+  "passed": true,
+  "startedAt": "2026-11-02T21:48:14.938Z",
+  "completedAt": "2026-11-02T21:48:14.938Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "build-a-bb-plugin-called-factory-bots-that-shows-the",
+    "specRevision": 2,
+    "specDigest": "sha256:7812a5465d38bfed2d475ada192fd5470c8ec6ff0d783602242897f844e9a806",
+    "treeDigest": "sha256:ea2047dff9719a6ced64abbdb867d1b5b1bce9f3bbc0cb67af9a350d171ae3a2",
+    "policyDigest": "sha256:07fa3ecd6d3ba9e43162e49acdd9ccca9c33a017008cc35def3013d8ddf29d50"
+  },
+  "digest": "sha256:375aa16636a9dd6bd70c3a3e718f67cae98a306c573599a065fe9697e650fdcd",
+  "kind": "collected",
+  "collector": "Playwright against the running BB panel",
+  "artifacts": [
+    {
+      "path": "plugins/factory-bots/assets/screenshots/board.png",
+      "mediaType": "image/png",
+      "bytes": 128722,
+      "digest": "sha256:620361bc9c2a4779e24189736d6c6b5ac184ab0a727a3d9df25fe376f53f6c74"
+    },
+    {
+      "path": "plugins/factory-bots/assets/screenshots/not-running.png",
+      "mediaType": "image/png",
+      "bytes": 97180,
+      "digest": "sha256:5209631ed6713e3172adfa5925bbf34fe74e90df43481053200ae2a462daf032"
+    },
+    {
+      "path": "plugins/factory-bots/assets/screenshots/ticket.png",
+      "mediaType": "image/png",
+      "bytes": 471491,
+      "digest": "sha256:b935475fea874ad084fd14ce6a70efdd915106d878619614a155ccf2a800ad15"
+    }
+  ]
+}
