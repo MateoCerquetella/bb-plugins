@@ -13,6 +13,7 @@ declare global {
     factoryStartDelay?: number;
     factoryProjectState?: 'running' | 'paused' | 'awaiting_scan' | 'unconfigured' | 'provider_error';
     factoryProjectDelay?: number;
+    factoryPickerInitialNormalization?: boolean;
     factoryProjectReads?: number;
     factoryPreviewProject: (projectId: string) => void;
     empiricalStatus: Record<string, unknown>;
@@ -29,6 +30,13 @@ const previewModels: Record<string, { providerId: string; model: string; label: 
   'codex:gpt-5': { providerId: 'codex', model: 'gpt-5', label: 'Codex · GPT-5', reasoning: 'medium' }
 };
 export function experimental_ProviderModelPicker({ value, onChange, disabled }: any) {
+  useEffect(() => {
+    // The native picker may report its initial catalog default even while disabled.
+    // This is a host callback, not a user edit, and must not dirty the settings.
+    if (window.factoryPickerInitialNormalization && (!value.providerId || !value.model)) {
+      onChange({ providerId: 'codex', model: 'gpt-5', reasoningLevel: 'medium', serviceTier: 'default' });
+    }
+  }, [value.providerId, value.model]);
   const key = `${value.providerId}:${value.model}`;
   return <div className="flex min-w-0 items-center gap-2">
     <img src={previewLogo} alt="" aria-hidden className="size-4 shrink-0 rounded-sm" />
