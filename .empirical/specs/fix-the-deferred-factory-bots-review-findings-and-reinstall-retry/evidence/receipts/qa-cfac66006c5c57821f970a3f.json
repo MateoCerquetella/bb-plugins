@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-cfac66006c5c57821f970a3f",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "Fresh-context install and browser QA after the hardening: the rebuilt plugin is installed and running, 60 tests pass, the board and ticket views render, the not-running state shows the start command, the wrong-owner pane explains the holder, and the single loop keeps one board read in flight.",
+  "passed": true,
+  "startedAt": "2026-11-02T23:49:35.368Z",
+  "completedAt": "2026-11-02T23:49:35.368Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-the-deferred-factory-bots-review-findings-and-reinstall-retry",
+    "specRevision": 8,
+    "specDigest": "sha256:81e6de05f5d4a525acd191f9528d7c9aa03a29803c5e2c3a54f9251558262ce4",
+    "treeDigest": "sha256:0ace82a7cfa47176b626780059dae5f7f108aba60a5b1162f8f1b4f7891539e3",
+    "policyDigest": "sha256:07fa3ecd6d3ba9e43162e49acdd9ccca9c33a017008cc35def3013d8ddf29d50",
+    "workflowRevision": 13,
+    "gitCommit": "2c09c92b295b69a27fc87dd4dca3209ee7d22f22",
+    "scope": [
+      "plugins/factory-bots"
+    ],
+    "scopeDigest": "sha256:53247f837b1d10090796d904061e8588312c44d65d0d8334d8887ff55a231785",
+    "textTreeDigest": "sha256:0ace82a7cfa47176b626780059dae5f7f108aba60a5b1162f8f1b4f7891539e3"
+  },
+  "digest": "sha256:0c1c6098c5b0d34655091bdea5a0506ea4ffe61a2567d6a6f5866b113bf35cc9",
+  "kind": "qa",
+  "matrixDigest": "sha256:68ca19c02e527900669ddd7509be52ce24b0ce3e372f5637facdb9a9bc448fb8",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Fresh-context install and browser QA after the hardening: the rebuilt plugin is installed and running, 60 tests pass, the board and ticket views render, the not-running state shows the start command, the wrong-owner pane explains the holder, and the single loop keeps one board read in flight.",
+      "startedAt": "2026-11-02T23:49:35.368Z",
+      "completedAt": "2026-11-02T23:49:35.368Z",
+      "durationMs": 0,
+      "collector": "fresh-context browser QA (Playwright against the installed BB panel; reviewer thread thr_b4u9t55u6y independently passed all seven criteria)",
+      "command": null,
+      "result": null,
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:0ace82a7cfa47176b626780059dae5f7f108aba60a5b1162f8f1b4f7891539e3",
+      "sourceTreeAfter": "sha256:0ace82a7cfa47176b626780059dae5f7f108aba60a5b1162f8f1b4f7891539e3",
+      "artifacts": [
+        {
+          "path": "plugins/factory-bots/assets/screenshots/board.png",
+          "mediaType": "image/png",
+          "bytes": 128722,
+          "digest": "sha256:620361bc9c2a4779e24189736d6c6b5ac184ab0a727a3d9df25fe376f53f6c74"
+        },
+        {
+          "path": "plugins/factory-bots/assets/screenshots/not-running.png",
+          "mediaType": "image/png",
+          "bytes": 97180,
+          "digest": "sha256:5209631ed6713e3172adfa5925bbf34fe74e90df43481053200ae2a462daf032"
+        },
+        {
+          "path": "plugins/factory-bots/assets/screenshots/ticket.png",
+          "mediaType": "image/png",
+          "bytes": 471491,
+          "digest": "sha256:b935475fea874ad084fd14ce6a70efdd915106d878619614a155ccf2a800ad15"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}

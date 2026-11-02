@@ -49,8 +49,6 @@ start command as if the script existed.
 - **THEN** the panel explains that the script is missing
 - **AND** it names the path and the config override
 
-## ADDED Requirements
-
 ### Requirement: MCP client lifecycle
 
 A stdout or stderr pipe failure SHALL reject pending calls and stop the child.

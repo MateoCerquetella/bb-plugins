@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:76de022323223c313798b822395a47f397302daeed66b2b0a78efd73326186d6",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "4198b79f4639a35e127faa13144eb197367a1cf9",
+  "headCommit": "2c09c92b295b69a27fc87dd4dca3209ee7d22f22",
+  "diffDigest": "sha256:f1c04f80adddea4f44249f3aec4602c23905b2a74182341ba542bf60a301b699",
+  "verdict": "APPROVED",
+  "reviewerActor": "fresh-context reviewer",
+  "reviewerInvocationId": "thr_b4u9t55u6y",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: readDetail retries once; the mixed test keeps the board live (4 detail calls) and the persistent-failure test fails closed (6 calls).\n- PASS AC-2: A non-default FACTORY_URL is shell-quoted and prefixed; the default is omitted; tests cover default, spaced, and credentialed forms.\n- PASS AC-3: The child env is an allowlist plus config env; the sentinel test passes, and stdin/stdout/stderr handlers reject pending calls and replace the child.\n- PASS AC-4: One lifetime loop owns the timer with inFlight/queued; route changes only wake it; QA asserts one in-flight board read and both 5-second refreshes.\n- PASS AC-5: storage is removed from the board snapshot and derivation, with a focused absence test; the header and cards still render.\n- PASS AC-6: A missing script names the resolved path, FACTORY_BOTS_MCP_CONFIG, and a reload hint; the service surfaces it through FailureView.\n- PASS AC-7: Typecheck and 60 tests pass, dist matches HEAD, bb plugin list shows factory-bots running, and the screenshots plus QA assertions are committed.\n\n## Security / correctness\n\nNo critical or high security/correctness defect. The MCP child runs with shell false, an allowlisted environment, and only read tools. Residual edges are non-blocking: the start command for a relative script omits the config cwd (F-1), a failed transcript refetch keeps the old cache entry (F-2), redaction falls back to the raw string on an unparseable URL (F-4), and script validation treats any path-like argument as a script (F-6).\n\n## Design / maintainability\n\nThe split and single-loop wake design are sound. Non-blocking: refs are assigned during render (F-3), the browser QA does not prove an immediate ticket wake and mocks both RPCs (F-5), the shipped factory path is host-specific (F-7), and read-only enforcement lives in the service rather than the client (F-8).",
+  "bodyDigest": "sha256:57e98907c2dfadb38c232f9bac44d3d2a36937b0075e0f62d081ca8e2dc30639",
+  "findings": [
+    {
+      "id": "F-1",
+      "severity": "medium",
+      "category": "correctness",
+      "summary": "The start command for a relative script omits the config cwd, so it only works from that directory.",
+      "path": "plugins/factory-bots/lib/config.ts"
+    },
+    {
+      "id": "F-2",
+      "severity": "low",
+      "category": "correctness",
+      "summary": "A failed transcript refetch leaves the old cache entry, which can be reused for the same stage/conversation.",
+      "path": "plugins/factory-bots/lib/service.ts"
+    },
+    {
+      "id": "F-3",
+      "severity": "low",
+      "category": "design",
+      "summary": "Refs are assigned during render; a discarded concurrent render could point the loop at an uncommitted selection.",
+      "path": "plugins/factory-bots/app.tsx"
+    },
+    {
+      "id": "F-4",
+      "severity": "low",
+      "category": "correctness",
+      "summary": "redactUrl returns the raw string when URL parsing fails, so malformed userinfo can be displayed.",
+      "path": "plugins/factory-bots/lib/config.ts"
+    },
+    {
+      "id": "F-5",
+      "severity": "low",
+      "category": "tests",
+      "summary": "The browser QA does not prove an immediate ticket wake and mocks both RPC responses.",
+      "path": ".empirical/specs/build-a-bb-plugin-called-factory-bots-that-shows-the/qa/browser.mjs"
+    },
+    {
+      "id": "F-6",
+      "severity": "low",
+      "category": "correctness",
+      "summary": "Script validation treats every path-like argument as a required script file.",
+      "path": "plugins/factory-bots/lib/config.ts"
+    },
+    {
+      "id": "F-7",
+      "severity": "low",
+      "category": "maintainability",
+      "summary": "The shipped factory path is developer-specific; a fresh install gets the missing-script error until configured.",
+      "path": "plugins/factory-bots/factory.mcp.json"
+    },
+    {
+      "id": "F-8",
+      "severity": "low",
+      "category": "design",
+      "summary": "callTool accepts any tool name; read-only enforcement lives in the service.",
+      "path": "plugins/factory-bots/lib/mcp-client.ts"
+    }
+  ],
+  "digest": "sha256:de346d1798e96deb586983302969d86a2b064bb8b4a64773306c64571d4caeab"
+}

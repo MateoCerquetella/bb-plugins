@@ -1,42 +1,45 @@
 {
   "schemaVersion": 5,
-  "revision": 6,
+  "revision": 14,
   "activeFeature": "fix-the-deferred-factory-bots-review-findings-and-reinstall-retry",
   "request": "Fix the deferred Factory Bots review findings and reinstall: retry one failed ticket detail read; preserve a non-default FACTORY_URL in the offline start command; pass a minimal environment to the MCP child and fail pending calls on stdout/stderr errors; keep one poll loop across route changes; remove the unused storage path from the board snapshot; make a missing MCP script an actionable config error; add focused regression tests; rebuild, install, and reload the plugin.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "review",
+  "phase": "integrate",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Implemented the Factory Bots hardening: detail retry, FACTORY_URL in the start command, minimal child env with stdout/stderr guards, one lifetime poll loop, storage removal, missing-script config error, 56 tests, rebuild and reinstall.",
+  "message": "Verify: security advisory, focused 60-test/typecheck/build receipt, fresh-context install/browser QA, and the approved re-review cover all seven criteria.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:81e6de05f5d4a525acd191f9528d7c9aa03a29803c5e2c3a54f9251558262ce4",
-  "approvedSpecRevision": 2,
+  "approvedSpecRevision": 8,
   "capabilityArchiveRequired": true,
-  "capabilityDeltaDigest": "sha256:a798498436129bd1b9fc2dbb59f0d27552d3da9802b974eceac61aab597c65b9",
+  "capabilityDeltaDigest": "sha256:de0021152375e1ba7dde657ee4ea5a060dd94bd0098ce2a052f4a5ba4ab360e0",
   "impactDigest": "sha256:34c5233d891b30a93adc95c3390e5e5e086f792b5a9ae21de15cdadc9563057c",
   "capabilityClaimId": "fix-the-deferred-factory-bots-review-findings-and-reinstall-retry-f033b5b21ed3",
   "authorizationDigest": null,
   "evidence": [],
-  "evidenceReceiptIds": [],
+  "evidenceReceiptIds": [
+    "collected-8f413466af11140b678ac42a",
+    "qa-f15e0e8e2af4a22bfa48c0c2",
+    "qa-cfac66006c5c57821f970a3f"
+  ],
   "legacyEvidenceCount": 0,
   "completion": {
     "implemented": true,
-    "verified": false,
+    "verified": true,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "implemented",
+    "highest": "verified",
     "reasons": {
-      "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-11-02T23:18:35.244Z",
+  "updatedAt": "2026-11-02T23:50:23.935Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "fix-the-deferred-factory-bots-review-findings-and-reinstall-retry-f033b5b21ed3",
@@ -75,5 +78,21 @@
     "actor": "agent",
     "revision": 2
   },
-  "reviewFirst": true
+  "trackerGeneration": 1,
+  "lifecycle": {
+    "stage": "consolidation",
+    "iteration": 1,
+    "awaitingFeedback": false,
+    "contractRevision": 6,
+    "riskRequest": "The MCP child receives only a minimal base environment plus the config's `env`; a sentinel secret in the BB process is not visible to the child. A stdout or stderr pipe error rejects in-flight calls and stops the child instead of becoming an unhandled rejection."
+  },
+  "reviewFirst": true,
+  "verificationCoverage": {
+    "kind": "review-derived",
+    "checkId": "qa-fresh-context",
+    "receiptId": "collected-8f413466af11140b678ac42a",
+    "matrixDigest": "sha256:68ca19c02e527900669ddd7509be52ce24b0ce3e372f5637facdb9a9bc448fb8",
+    "specDigest": "sha256:81e6de05f5d4a525acd191f9528d7c9aa03a29803c5e2c3a54f9251558262ce4",
+    "revision": 14
+  }
 }

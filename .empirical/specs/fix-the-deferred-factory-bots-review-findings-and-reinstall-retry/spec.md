@@ -30,9 +30,10 @@ plugin from this checkout.
 - [ ] [AC-6] If the configured MCP script path does not exist, the panel shows
   an actionable config error naming the missing path and
   `FACTORY_BOTS_MCP_CONFIG`, not a generic unavailable wall.
-- [ ] [AC-7] Focused typecheck, tests, and `bb plugin build` pass. The post-fix
-  install, reload, browser QA, and screenshot evidence are recorded during
-  Verify.
+- [ ] [AC-7] Focused typecheck, tests, and `bb plugin build` pass; the committed
+  browser QA still passes its 5-second refresh assertions; the plugin is
+  rebuilt, installed via `bb plugin install ./plugins/factory-bots`, reloaded,
+  and the live panel is opened in BB.
 
 ## Scope
 
@@ -54,7 +55,7 @@ plugin from this checkout.
 - Focused tests for retry, start-command env, minimal environment, storage
   removal, and missing-script config errors.
 - `node .empirical/specs/build-a-bb-plugin-called-factory-bots-that-shows-the/qa/browser.mjs`
-  for the UI refresh, ownership, and state checks.
+  for the UI refresh and state checks.
 - Reinstall and reload, then open the panel.
 
 ## Capability Deltas

@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "sequence": 11,
+  "previousDigest": "sha256:323b611ebbab07c18f65954bde90bec53b17b852683c348e9f9ad363f82410f4",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Implemented and installed the hardening: retry, URL-preserving start command, allowlisted env/pipe guards, lifetime loop, storage removal, missing-script config, 60 tests, rebuilt and reloaded.",
+  "createdAt": "2026-11-02T23:41:36.980Z",
+  "stateBeforeDigest": "sha256:d1fa32316299b8e0eaef8caac2ddc0910fee38fb9fb0e9710e30d2b4232d9425",
+  "stateAfterDigest": "sha256:97899166062de9e67a7cd0d3fd67976aab1c750852cc1404548bb7d090ab3e14",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 11,
+    "activeFeature": "fix-the-deferred-factory-bots-review-findings-and-reinstall-retry",
+    "request": "Fix the deferred Factory Bots review findings and reinstall: retry one failed ticket detail read; preserve a non-default FACTORY_URL in the offline start command; pass a minimal environment to the MCP child and fail pending calls on stdout/stderr errors; keep one poll loop across route changes; remove the unused storage path from the board snapshot; make a missing MCP script an actionable config error; add focused regression tests; rebuild, install, and reload the plugin.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Implemented and installed the hardening: retry, URL-preserving start command, allowlisted env/pipe guards, lifetime loop, storage removal, missing-script config, 60 tests, rebuilt and reloaded.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:81e6de05f5d4a525acd191f9528d7c9aa03a29803c5e2c3a54f9251558262ce4",
+    "approvedSpecRevision": 8,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:de0021152375e1ba7dde657ee4ea5a060dd94bd0098ce2a052f4a5ba4ab360e0",
+    "impactDigest": "sha256:34c5233d891b30a93adc95c3390e5e5e086f792b5a9ae21de15cdadc9563057c",
+    "capabilityClaimId": "fix-the-deferred-factory-bots-review-findings-and-reinstall-retry-f033b5b21ed3",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-11-02T23:41:36.980Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "fix-the-deferred-factory-bots-review-findings-and-reinstall-retry-f033b5b21ed3",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "fix-the-deferred-factory-bots-review-findings-and-reinstall-retry",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_9x565sqvfq-1/bb-plugins",
+      "worktreeId": "sha256:c3f077c9e71135f09fa5352691cb2b07ded160fa6422e1b4d4ad3f62685a671d",
+      "baseCommit": "e2a6e0633af3e48c3cb48db7c7b1e9edd75bc38e",
+      "baseTree": "86e0246a600d43b025176d931472433f5a69306a",
+      "bases": {
+        "factory-bots-board": {
+          "capability": "factory-bots-board",
+          "digest": "sha256:6f44867961fbf96e89c33525b6e7a28206a3c5340caf0a787ea977e8f3c5cb39",
+          "requirements": {
+            "read-only factory board": "sha256:df88ac70b6ce578b87ee29cdfb92d7a2b05f85c5f74845140923a3e436af66ba",
+            "derived agent status": "sha256:18860b8aae0eb7654a8f69d299cb9df266ef48005de8762fbf4a546a5cc3b3a5",
+            "normal offline and empty states": "sha256:3040866be5b2e2e11ce936fe95d68faa699623d657ad6276eb7341ff62846076",
+            "mcp client lifecycle": null
+          }
+        }
+      },
+      "capabilities": [
+        "factory-bots-board"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-11-02T23:12:58.528Z",
+      "heartbeatAt": "2026-11-02T23:12:58.528Z",
+      "digest": "sha256:97efd016103e53dc00a622c15d50d20529967109ddf348b961bcd13d3a39b0c2"
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 7,
+      "capabilities": 1,
+      "reason": "The seven criteria are one hardening pass over the same service, MCP client, and panel; each slice alone would leave the verified board with a known review finding. Keep it one feature.",
+      "actor": "agent",
+      "revision": 2
+    },
+    "trackerGeneration": 1,
+    "lifecycle": {
+      "stage": "iteration",
+      "iteration": 1,
+      "awaitingFeedback": true,
+      "contractRevision": 6,
+      "riskRequest": "The MCP child receives only a minimal base environment plus the config's `env`; a sentinel secret in the BB process is not visible to the child. A stdout or stderr pipe error rejects in-flight calls and stops the child instead of becoming an unhandled rejection."
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:6693700e949823c02257e2819ab871bd3b7a29e336726003cf6ec1d6307a1aeb"
+}

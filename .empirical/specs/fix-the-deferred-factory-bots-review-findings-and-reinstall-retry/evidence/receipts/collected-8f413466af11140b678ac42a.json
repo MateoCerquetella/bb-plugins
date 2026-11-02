@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-8f413466af11140b678ac42a",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-11-02T23:48:39.629Z",
+  "completedAt": "2026-11-02T23:48:39.629Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-the-deferred-factory-bots-review-findings-and-reinstall-retry",
+    "specRevision": 8,
+    "specDigest": "sha256:81e6de05f5d4a525acd191f9528d7c9aa03a29803c5e2c3a54f9251558262ce4",
+    "treeDigest": "sha256:0ace82a7cfa47176b626780059dae5f7f108aba60a5b1162f8f1b4f7891539e3",
+    "policyDigest": "sha256:07fa3ecd6d3ba9e43162e49acdd9ccca9c33a017008cc35def3013d8ddf29d50"
+  },
+  "digest": "sha256:75c7c7a6c8ba296278fa9ff61c3dfb106a4e7c49162563b5303b3dee7dc4ed53",
+  "kind": "collected",
+  "collector": "empirical-review:fresh-context reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/fix-the-deferred-factory-bots-review-findings-and-reinstall-retry/reviews/de346d1798e96deb58698330.json",
+      "mediaType": "application/json",
+      "bytes": 4723,
+      "digest": "sha256:0e7306717a935a0b310fd9a94556cad652d7c4ab36ea140acf46da0ea584bc2b"
+    },
+    {
+      "path": ".empirical/specs/fix-the-deferred-factory-bots-review-findings-and-reinstall-retry/reviews/de346d1798e96deb58698330.md",
+      "mediaType": "text/markdown",
+      "bytes": 1880,
+      "digest": "sha256:827a4656c3b37a87fe568e0bd551011d5cdc894d371a897f14ee2f697cc1e82f"
+    }
+  ]
+}

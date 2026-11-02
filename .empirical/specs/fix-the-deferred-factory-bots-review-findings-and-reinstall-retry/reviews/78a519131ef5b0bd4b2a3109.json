@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:1fffa2d80204146d10feca703041e43a1336b245b7f7185b3bcc3bcd826ad0ab",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "4198b79f4639a35e127faa13144eb197367a1cf9",
+  "headCommit": "2c09c92b295b69a27fc87dd4dca3209ee7d22f22",
+  "diffDigest": "sha256:f1c04f80adddea4f44249f3aec4602c23905b2a74182341ba542bf60a301b699",
+  "verdict": "APPROVED",
+  "reviewerActor": "fresh-context reviewer",
+  "reviewerInvocationId": "thr_bvhd92xj2e",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: readDetail retries once; the mixed case keeps the board live and the double-failure case still fails closed, with call counts asserted.\n- PASS AC-2: A non-default FACTORY_URL is shell-quoted and prefixed; the default is omitted; config tests cover both and the redacted form.\n- PASS AC-3: The child env is an allowlist plus config env; a sentinel parent secret is absent, and stdin/stdout/stderr handlers reject pending calls and replace the child.\n- PASS AC-4: One lifetime loop with linearIdRef, wakeRef, inFlight, and queued; the route effect only resets and wakes, and browser QA asserts max one board read.\n- PASS AC-5: storage is gone from BoardSnapshotSchema and deriveSnapshot, with a focused absence assertion; the header still renders bots/tickets/byStage.\n- PASS AC-6: A missing script returns the resolved path, FACTORY_BOTS_MCP_CONFIG, and a reload hint; the panel renders that message.\n- PASS AC-7: Typecheck and 60 tests pass and the built artifacts contain the repair code; install/reload/browser evidence is correctly deferred to Verify.\n\n## Security / correctness\n\nNo security defect. Read-only MCP use, status derivation, blocked precedence, and transcript caching are unchanged and tested. Non-blocking: the script scanner treats any path-like argument, including scoped package names or URL values, as a required file (F-1); the displayed command cannot reproduce a credentialed or relative-script invocation exactly (F-5, F-6).\n\n## Design / maintainability\n\nThe split and the lifetime loop are clean and well-commented. Non-blocking: the capability archive currently holds only the hardening delta and lost the original read-only/agent/offline scenarios (F-2); the stdout pipe test passes via child exit rather than a parent-side pipe error (F-3); the browser concurrency assertion is timing-sensitive (F-4); the recorded test count is stale (F-7).",
+  "bodyDigest": "sha256:f062d51282b3997b65038be3cae2e6645dcb0f0f53ceecbdfbc7df6f0e909563",
+  "findings": [
+    {
+      "id": "F-1",
+      "severity": "medium",
+      "category": "correctness",
+      "summary": "The script scanner treats scoped package names and URL arguments as required script files, rejecting valid non-file configs.",
+      "path": "plugins/factory-bots/lib/config.ts"
+    },
+    {
+      "id": "F-2",
+      "severity": "medium",
+      "category": "docs",
+      "summary": "The capability delta replaced the original requirements instead of extending them, losing the read-only and agent/offline scenarios.",
+      "path": ".empirical/capabilities/factory-bots-board/spec.md"
+    },
+    {
+      "id": "F-3",
+      "severity": "low",
+      "category": "tests",
+      "summary": "The stdout pipe test passes through child exit and does not exercise a parent-side stdout error; stderr is untested.",
+      "path": "plugins/factory-bots/test/mcp-client.test.ts"
+    },
+    {
+      "id": "F-4",
+      "severity": "low",
+      "category": "tests",
+      "summary": "The browser board-concurrency assertion depends on the click landing inside the delayed read window.",
+      "path": ".empirical/specs/build-a-bb-plugin-called-factory-bots-that-shows-the/qa/browser.mjs"
+    },
+    {
+      "id": "F-5",
+      "severity": "low",
+      "category": "design",
+      "summary": "URL redaction prints a different URL than the child uses and leaves non-URL credential strings untouched.",
+      "path": "plugins/factory-bots/lib/config.ts"
+    },
+    {
+      "id": "F-6",
+      "severity": "low",
+      "category": "design",
+      "summary": "A relative script spawns with the config directory as cwd but the printed command keeps the relative path.",
+      "path": "plugins/factory-bots/lib/config.ts"
+    },
+    {
+      "id": "F-7",
+      "severity": "low",
+      "category": "docs",
+      "summary": "The recorded evidence says 56 tests while HEAD has 60.",
+      "path": ".empirical/specs/fix-the-deferred-factory-bots-review-findings-and-reinstall-retry/state.json"
+    }
+  ],
+  "digest": "sha256:78a519131ef5b0bd4b2a31093643a6edae31a60405393e0ee93ed457dc7d2a07"
+}
