@@ -26,12 +26,27 @@ try {
   await ai(workers).selectOption('codex:gpt-5');
   await reasoning(workers).selectOption('low');
   await save();
+  // Reproduce native initial normalization before a delayed policy response.
+  await page.evaluate(() => {
+    window.factoryPickerInitialNormalization = true;
+    window.factoryProjectDelay = 200;
+  });
   // Remount the settings to prove they are read back through the RPC boundary.
   await page.evaluate(() => window.factoryPreviewProject('proj_other'));
-  await page.waitForTimeout(100);
+  await page.waitForFunction(projectId => {
+    const form = document.querySelector('form[aria-label="Autonomous factory"]');
+    return document.querySelector('#preview-factory-settings')?.dataset.projectId === projectId && form && !form.querySelector('button[type="submit"]').disabled &&
+      !form.textContent.includes('Reading the current AI selection');
+  }, 'proj_other');
+  assert.equal(await settings.getByText('Unsaved', { exact: true }).count(), 0);
   assert.equal(await ai(orchestrator).inputValue(), 'codex:gpt-5');
   await page.evaluate(() => window.factoryPreviewProject('proj_test'));
-  await page.waitForTimeout(100);
+  await page.waitForFunction(projectId => {
+    const form = document.querySelector('form[aria-label="Autonomous factory"]');
+    return document.querySelector('#preview-factory-settings')?.dataset.projectId === projectId && form && !form.querySelector('button[type="submit"]').disabled &&
+      !form.textContent.includes('Reading the current AI selection');
+  }, 'proj_test');
+  assert.equal(await settings.getByText('Unsaved', { exact: true }).count(), 0);
   assert.equal(await ai(orchestrator).inputValue(), 'claude:claude-sonnet');
   assert.equal(await reasoning(orchestrator).inputValue(), 'high');
   assert.equal(await ai(workers).inputValue(), 'codex:gpt-5');
