@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 12,
+  "revision": 13,
   "activeFeature": "fix-all-plugin-and-marketplace-icons-to-violet-remove-the",
   "request": "Fix all plugin and marketplace icons to violet, remove the Agent Canvas plugin, and update the BB Surf marketplace entry.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "integrate",
-  "status": "waiting",
+  "phase": "done",
+  "status": "done",
   "repairAttempts": 0,
-  "message": "Final focused Aura verification passed after the icon style fix.",
+  "message": "Closed as merged-externally: Merged in pull request #105 as 9abccba194bf5b435086cba8403d017d1cbf9336 into main; closed when the merge was observed.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:5fdb098c8bc7d8a860b673f90101df78305400ab73b4464a4c2821160a566f35",
@@ -28,17 +28,16 @@
   "completion": {
     "implemented": true,
     "verified": true,
-    "integrated": false,
+    "integrated": true,
     "delivered": false,
     "published": false,
-    "highest": "verified",
+    "highest": "integrated",
     "reasons": {
-      "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-10-24T18:45:50.026Z",
+  "updatedAt": "2026-11-02T20:51:27.420Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "fix-all-plugin-and-marketplace-icons-to-violet-remove-the-eb00f77155eb",
@@ -82,7 +81,6 @@
     "iteration": 1,
     "awaitingFeedback": false
   },
-  "reviewFirst": true,
   "verificationCoverage": {
     "kind": "review-derived",
     "checkId": "qa-fresh-context",
@@ -90,5 +88,40 @@
     "matrixDigest": "sha256:4feef68e40fc79bcb6e88b909c37bb4d71301432185dc6b9a95b42dfc29b96e3",
     "specDigest": "sha256:5fdb098c8bc7d8a860b673f90101df78305400ab73b4464a4c2821160a566f35",
     "revision": 12
+  },
+  "reviewFirst": true,
+  "closure": {
+    "schemaVersion": 1,
+    "outcome": "merged-externally",
+    "reason": "Merged in pull request #105 as 9abccba194bf5b435086cba8403d017d1cbf9336 into main; closed when the merge was observed.",
+    "actor": "empirical",
+    "confirmation": "merge-observed",
+    "closedAtPhase": "integrate",
+    "completionAtClosure": "integrated",
+    "externalMerge": {
+      "pullRequest": 105,
+      "url": "https://github.com/MateoCerquetella/bb-plugins/pull/105",
+      "state": "MERGED",
+      "mergeCommit": "9abccba194bf5b435086cba8403d017d1cbf9336",
+      "targetBranch": "main",
+      "ancestorOfTarget": true,
+      "observedAt": "2026-11-02T20:51:14.642Z"
+    },
+    "closedAt": "2026-11-02T20:51:27.117Z",
+    "digest": "sha256:66a94925c44824515cfb1dd55021e39807b15e4771977fd73332e19c209c1bca"
+  },
+  "completionRecord": {
+    "schemaVersion": 1,
+    "implementedBy": "agent",
+    "completedBy": "empirical",
+    "decisionBy": null,
+    "method": "merged-externally",
+    "reason": "Merged in pull request #105 as 9abccba194bf5b435086cba8403d017d1cbf9336 into main; closed when the merge was observed.",
+    "at": "2026-11-02T20:51:27.420Z",
+    "revision": 13,
+    "completion": "integrated",
+    "sourceTreeDigest": "sha256:2bf60616d601cb4653846c52af8c74f3a11c15255f8856a714f068a31ddb596a",
+    "artifactTreeDigest": "sha256:6ddd2be3797c3c2fcc93a5e0a723e726e080c674c2e7daf913fc401f4c09d77e",
+    "digest": "sha256:5ad6260d3e8d4cebbff6cc11697a9d466600589a3ab11cd535a1a3845c454e94"
   }
 }
