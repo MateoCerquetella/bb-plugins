@@ -25,10 +25,9 @@ view uses only `factory_souls`, `factory_soul_set`, `factory_soul_audit`, and
 Every row carries a live Dood from [do.computer](https://do.computer), grown
 from the agent's name. It is a real animated creature; where WebGL is unavailable
 it falls back to the same seed's static blob. Open a thread to see its ticket:
-the Linear description (collapsible), stage, attempts, stop reason, decisions,
-worktree, and a thread-style transcript with the live tool call highlighted. The
-compact ticket header keeps the agent's Dood even when the full agent page is
-folded away. Answers and the tool results that belong
+the collapsible Linear description, a compact owner/attempts line, and a
+thread-style transcript with the live tool call highlighted. The ticket header
+keeps the agent's small Dood; the heavier agent controls stay on the agent page. Answers and the tool results that belong
 to them are grouped into one turn, and tool payloads are folded away. The
 transcript has a steer composer that sends the person's words through the
 Orchestrator, the only write path; the steering messages stay with the ticket.
@@ -51,7 +50,7 @@ write path.
 
 ![Factory Bots board](assets/screenshots/board.png)
 
-![An agent's ticket with stage, attempts, decisions, worktree, and transcript](assets/screenshots/ticket.png)
+![An agent's ticket with its Linear description and transcript](assets/screenshots/ticket.png)
 
 ## Data source
 
@@ -122,9 +121,8 @@ may use do not attribute usage per agent, so showing a number would be invented.
 
 ![The Orchestrator chat answering a live factory message](assets/screenshots/chat.png)
 
-The Orchestrator chat is always in the right rail; the **Orchestrator chat**
-button focuses it when you want the whole panel. Type a request from either
-place. The chat keeps the conversation across navigation and reloads, shows the
+The Orchestrator chat is always in the right rail. Type a request there; the
+chat keeps the conversation across navigation and reloads, shows the
 Orchestrator's answer, and links the tickets it created in the thread and in the
 rail. A model turn can take minutes; the message box stays disabled with a
 working state until the answer arrives.

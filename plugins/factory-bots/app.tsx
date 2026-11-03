@@ -43,11 +43,6 @@ import {
   saveChatEntries,
 } from "./lib/chat-store";
 import { WardrobeDialog } from "./lib/wardrobe-dialog";
-import {
-  appendSteer,
-  loadSteerLog,
-  type StoredSteerEntry,
-} from "./lib/steer-store";
 import { Pixels } from "./lib/pixels";
 import { DoodAvatar, avatarLook } from "./lib/dood";
 import {
@@ -347,14 +342,12 @@ function BoardHeader({
   fetchedAt,
   failure,
   transportError,
-  onChat,
   onSouls,
 }: {
   snapshot: BoardSnapshot | null;
   fetchedAt: number | null;
   failure: { reason: "not-running" | "unavailable" } | null;
   transportError: boolean;
-  onChat: () => void;
   onSouls: () => void;
 }) {
   const health =
@@ -380,9 +373,6 @@ function BoardHeader({
         <div className="fb-title-row">
           <h1>Factory Bots</h1>
           <HealthPill tone={health.tone} label={health.label} />
-          <button type="button" className="fb-chat-link" onClick={onChat}>
-            Orchestrator chat
-          </button>
           <button type="button" className="fb-chat-link" onClick={onSouls}>
             Souls
           </button>
@@ -675,7 +665,6 @@ function BoardView({
   onTab,
   onOpenAgent,
   onOpenTicket,
-  onChat,
   onSouls,
 }: {
   board: Polled<BoardResult>;
@@ -683,7 +672,6 @@ function BoardView({
   onTab: (tab: BoardTab) => void;
   onOpenAgent: (name: string) => void;
   onOpenTicket: (ticket: TicketSummary) => void;
-  onChat: () => void;
   onSouls: () => void;
 }) {
   const data = board.data;
@@ -697,7 +685,6 @@ function BoardView({
         fetchedAt={fetchedAt}
         failure={data?.ok === false ? data : null}
         transportError={board.error !== null}
-        onChat={onChat}
         onSouls={onSouls}
       />
       {board.error !== null ? (
@@ -937,23 +924,6 @@ function TicketRow({
   );
 }
 
-function Field({
-  label,
-  children,
-  tone,
-}: {
-  label: string;
-  children: ReactNode;
-  tone?: "danger" | "muted" | "mono";
-}) {
-  return (
-    <div className="fb-field">
-      <dt>{label}</dt>
-      <dd className={tone === undefined ? undefined : `fb-${tone}`}>{children}</dd>
-    </div>
-  );
-}
-
 /** A tool result that is JSON is easier to scan as a tree than as one long line. */
 function parseJsonText(text: string): unknown | null {
   const trimmed = text.trim();
@@ -1165,19 +1135,7 @@ function TicketDetailView({
   const [steerText, setSteerText] = useState("");
   const [steering, setSteering] = useState(false);
   const [steerError, setSteerError] = useState<string | null>(null);
-  const [steerLog, setSteerLog] = useState<StoredSteerEntry[]>(() =>
-    loadSteerLog(ticket.linearId),
-  );
-
-  useEffect(() => {
-    setSteerLog(loadSteerLog(ticket.linearId));
-  }, [ticket.linearId]);
-
-  const rememberSteer = (
-    entry: Omit<StoredSteerEntry, "at">,
-  ): void => {
-    setSteerLog(appendSteer(ticket.linearId, entry));
-  };
+  const [descriptionOpen, setDescriptionOpen] = useState(true);
 
   const steer = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
@@ -1185,26 +1143,15 @@ function TicketDetailView({
     if (message === "" || steering) return;
     setSteering(true);
     setSteerError(null);
-    rememberSteer({ role: "user", text: message });
     try {
       const result = await onSteer(ticket, message);
       if (result.ok) {
         setSteerText("");
-        rememberSteer({
-          role: "orchestrator",
-          text:
-            result.answer.trim() === ""
-              ? "Sent to the Orchestrator. The transcript refreshes as it works."
-              : result.answer,
-        });
       } else {
         setSteerError(result.message);
-        rememberSteer({ role: "error", text: result.message });
       }
     } catch (cause) {
-      const messageText = errorText(cause);
-      setSteerError(messageText);
-      rememberSteer({ role: "error", text: messageText });
+      setSteerError(errorText(cause));
     } finally {
       setSteering(false);
     }
@@ -1223,68 +1170,44 @@ function TicketDetailView({
           <StageTag stage={ticket.stage} />
         </div>
         <h2>{ticket.title}</h2>
-        <p className="fb-muted">
-          Held by <span className="fb-strong">{ticket.bot}</span> · conversation{" "}
-          <span className="fb-mono">#{ticket.conversationId}</span>
-        </p>
+        <div className="fb-ticket-meta-line">
+          <span className="fb-ticket-holder">
+            <span className="fb-ticket-holder-dood" aria-hidden="true">
+              <DoodAvatar agentId={ticket.bot} />
+            </span>
+            {ticket.bot}
+          </span>
+          <span aria-hidden="true">·</span>
+          <span>{ticket.attempts} attempts</span>
+          {ticket.worktree === null ? null : (
+            <>
+              <span aria-hidden="true">·</span>
+              <span>worktree ready</span>
+            </>
+          )}
+        </div>
       </header>
 
-      <details className="fb-ticket-description" open>
-        <summary>
-          <span>Linear description</span>
-          <span className="fb-ticket-description-hint">Minimize</span>
-        </summary>
-        {ticket.description === undefined || ticket.description === null || ticket.description.trim() === "" ? (
-          <p className="fb-muted fb-ticket-description-empty">
-            No description on this Linear ticket.
-          </p>
-        ) : (
-          <div className="fb-ticket-description-body">
-            <Markdown content={ticket.description} />
-          </div>
-        )}
-      </details>
-
-      <details className="fb-ticket-details">
-        <summary>
-          <span>Ticket details</span>
-          <StageTag stage={ticket.stage} />
-        </summary>
-        <dl className="fb-fields">
-          <Field label="Stage">{ticket.stage}</Field>
-          <Field label="Attempts">
-            {ticket.attempts} total · {ticket.stageAttempts} this stage
-          </Field>
-          <Field
-            label="Stop reason"
-            tone={ticket.stopReason === null ? "muted" : "danger"}
+      {ticket.description === undefined || ticket.description === null || ticket.description.trim() === "" ? (
+        <p className="fb-ticket-no-description">No Linear issue description.</p>
+      ) : (
+        <section className={`fb-ticket-description${descriptionOpen ? " is-open" : ""}`}>
+          <button
+            type="button"
+            className="fb-ticket-description-toggle"
+            aria-expanded={descriptionOpen}
+            onClick={() => setDescriptionOpen((open) => !open)}
           >
-            {ticket.stopReason ?? "None"}
-          </Field>
-          <Field label="Worktree" tone="mono">
-            {ticket.worktree ?? "Not created"}
-          </Field>
-          <Field label="Feature" tone={ticket.feature === null ? "muted" : undefined}>
-            {ticket.feature ?? "None"}
-          </Field>
-          <Field label="Labels" tone={ticket.labels.length === 0 ? "muted" : undefined}>
-            {ticket.labels.length === 0 ? "None" : ticket.labels.join(", ")}
-          </Field>
-        </dl>
-
-        <section className="fb-decisions" aria-label="Decisions">
-          <h3>Decisions</h3>
-          {ticket.decisions.length === 0 ? (
-            <p className="fb-muted">No decisions recorded.</p>
-          ) : (
-            <ul>
-              {ticket.decisions.map((decision, index) => (
-                <li key={`${index}-${decision}`}>{decision}</li>
-              ))}
-            </ul>
-          )}
+            <span>Linear issue description</span>
+            <span>{descriptionOpen ? "Hide" : "Show"}</span>
+          </button>
+          {descriptionOpen ? (
+            <div className="fb-ticket-description-body">
+              <Markdown content={ticket.description} />
+            </div>
+          ) : null}
         </section>
-      </details>
+      )}
 
       {transcriptError !== null ? (
         <p className="fb-inline-error">Transcript unavailable: {transcriptError}</p>
@@ -1299,48 +1222,25 @@ function TicketDetailView({
         <TranscriptView transcript={transcript} />
       )}
 
-      {steerLog.length === 0 ? null : (
-        <ol className="fb-steer-log" aria-label="Steering messages">
-          {steerLog.map((entry, index) => (
-            <li key={`${index}-${entry.role}`} data-role={entry.role}>
-              <span>
-                {entry.role === "user"
-                  ? "You · via Orchestrator"
-                  : entry.role === "orchestrator"
-                    ? "Orchestrator"
-                    : "Steering error"}
-              </span>
-              <p>{entry.text}</p>
-            </li>
-          ))}
-        </ol>
-      )}
       <form className="fb-steer" onSubmit={(event) => void steer(event)}>
-        <div className="fb-steer-head">
-          <h3>Steer this thread</h3>
-          <span>via Orchestrator</span>
-        </div>
-        <textarea
-          value={steerText}
-          onChange={(event) => setSteerText(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" && !event.shiftKey) {
-              event.preventDefault();
-              event.currentTarget.form?.requestSubmit();
-            }
-          }}
-          rows={2}
-          maxLength={3_000}
-          placeholder="Tell the agent what to change or check…"
-          disabled={steering}
-          aria-label="Steer this ticket"
-        />
-        <div className="fb-steer-foot">
-          <span className="fb-muted">
-            The Orchestrator is the only write path. The board stays read-only.
-          </span>
+        <div className="fb-steer-row">
+          <textarea
+            value={steerText}
+            onChange={(event) => setSteerText(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                event.currentTarget.form?.requestSubmit();
+              }
+            }}
+            rows={1}
+            maxLength={3_000}
+            placeholder="Steer this ticket through the Orchestrator…"
+            disabled={steering}
+            aria-label="Steer this ticket"
+          />
           <button type="submit" disabled={steering || steerText.trim() === ""}>
-            {steering ? "Steering…" : "Send steer"}
+            {steering ? "Steering…" : "Steer"}
           </button>
         </div>
         {steerError === null ? null : (
@@ -1507,36 +1407,33 @@ function AgentView({
       className="fb-agent-view"
       data-selected={selectedId === null ? "false" : "true"}
     >
-      <AgentHeader
-        key={agent.name}
-        agent={agent}
-        onBack={onBack}
-        compact={selectedId !== null}
-      />
       {selectedId === null ? (
-        <aside className="fb-ticket-list fb-ticket-list--full" aria-label={`${agent.displayName} tickets`}>
-          <div className="fb-section-head">
-            <h3>Tickets</h3>
-            <span className="fb-count-pill">{tickets.length}</span>
-          </div>
-          {tickets.length === 0 ? (
-            <p className="fb-muted">
-              No tickets held. This agent is idle until the factory routes one
-              to it.
-            </p>
-          ) : (
-            <div className="fb-ticket-rows">
-              {tickets.map((entry) => (
-                <TicketRow
-                  key={entry.linearId}
-                  ticket={entry}
-                  selected={false}
-                  onSelect={() => onSelectTicket(entry.linearId)}
-                />
-              ))}
+        <>
+          <AgentHeader key={agent.name} agent={agent} onBack={onBack} />
+          <aside className="fb-ticket-list fb-ticket-list--full" aria-label={`${agent.displayName} tickets`}>
+            <div className="fb-section-head">
+              <h3>Tickets</h3>
+              <span className="fb-count-pill">{tickets.length}</span>
             </div>
-          )}
-        </aside>
+            {tickets.length === 0 ? (
+              <p className="fb-muted">
+                No tickets held. This agent is idle until the factory routes one
+                to it.
+              </p>
+            ) : (
+              <div className="fb-ticket-rows">
+                {tickets.map((entry) => (
+                  <TicketRow
+                    key={entry.linearId}
+                    ticket={entry}
+                    selected={false}
+                    onSelect={() => onSelectTicket(entry.linearId)}
+                  />
+                ))}
+              </div>
+            )}
+          </aside>
+        </>
       ) : (
         <div className="fb-ticket-pane fb-ticket-pane--full">
           <TicketPane
@@ -1557,16 +1454,12 @@ type ChatEntry = ReturnType<typeof loadChatEntries>[number];
 function ChatView({
   rpc,
   active,
-  focused,
   orchestrator,
-  onBack,
   onOpenTicket,
 }: {
   rpc: RpcClient;
   active: boolean;
-  focused: boolean;
   orchestrator: AgentCard | undefined;
-  onBack: () => void;
   onOpenTicket: (linearId: string) => void;
 }) {
   const [entries, setEntries] = useState<ChatEntry[]>(loadChatEntries);
@@ -1679,13 +1572,7 @@ function ChatView({
               <h3>Talk to the factory</h3>
             </div>
           </div>
-          {focused ? (
-            <button type="button" className="fb-back fb-chat-back" onClick={onBack}>
-              ← Board
-            </button>
-          ) : (
-            <span className="fb-chat-tag">Always on</span>
-          )}
+          <span className="fb-chat-tag">Always on</span>
         </div>
         {filed.length === 0 ? null : (
           <div className="fb-chat-filed fb-chat-filed--dock">
@@ -1889,9 +1776,7 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
     <div className="fb-root" ref={rootRef} tabIndex={-1}>
       <div
         ref={shellRef}
-        className={`fb-shell${route.view === "chat" ? " is-chat-focus" : ""}${
-          resizingChat ? " is-resizing" : ""
-        }`}
+        className={`fb-shell${resizingChat ? " is-resizing" : ""}`}
         style={{ "--fb-chat-width": `${chatWidth}px` } as CSSProperties}
       >
         <main className="fb-main">
@@ -1906,7 +1791,6 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
           onTab={setBoardTab}
           onOpenAgent={(name) => go(agentRoute(name))}
           onOpenTicket={(ticket) => go(ticketRoute(ticket.bot, ticket.linearId))}
-          onChat={() => go("chat")}
           onSouls={() => go("souls")}
         />
       ) : route.view === "agent" || route.view === "ticket" ? (
@@ -1973,9 +1857,7 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
           <ChatView
             rpc={rpc}
             active
-            focused={route.view === "chat"}
             orchestrator={orchestrator}
-            onBack={() => go("")}
             onOpenTicket={openChatTicket}
           />
         </aside>
