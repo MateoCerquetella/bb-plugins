@@ -59,6 +59,7 @@ import {
 } from "./lib/dood-state";
 import { WEAR_ITEMS } from "./lib/wear-items";
 import { activeLiveTool, isGenerating, readLiveTools } from "./lib/live";
+import { SoulsView } from "./lib/souls-view";
 import { stageLabel } from "./lib/derive";
 import { agentRoute, parsePanelRoute, ticketRoute } from "./lib/route";
 
@@ -347,12 +348,14 @@ function BoardHeader({
   failure,
   transportError,
   onChat,
+  onSouls,
 }: {
   snapshot: BoardSnapshot | null;
   fetchedAt: number | null;
   failure: { reason: "not-running" | "unavailable" } | null;
   transportError: boolean;
   onChat: () => void;
+  onSouls: () => void;
 }) {
   const health =
     failure?.reason === "not-running"
@@ -379,6 +382,9 @@ function BoardHeader({
           <HealthPill tone={health.tone} label={health.label} />
           <button type="button" className="fb-chat-link" onClick={onChat}>
             Orchestrator chat
+          </button>
+          <button type="button" className="fb-chat-link" onClick={onSouls}>
+            Souls
           </button>
         </div>
         <p className="fb-subtitle">
@@ -670,6 +676,7 @@ function BoardView({
   onOpenAgent,
   onOpenTicket,
   onChat,
+  onSouls,
 }: {
   board: Polled<BoardResult>;
   tab: BoardTab;
@@ -677,6 +684,7 @@ function BoardView({
   onOpenAgent: (name: string) => void;
   onOpenTicket: (ticket: TicketSummary) => void;
   onChat: () => void;
+  onSouls: () => void;
 }) {
   const data = board.data;
   const snapshot = data?.ok === true ? data.snapshot : null;
@@ -690,6 +698,7 @@ function BoardView({
         failure={data?.ok === false ? data : null}
         transportError={board.error !== null}
         onChat={onChat}
+        onSouls={onSouls}
       />
       {board.error !== null ? (
         <RpcError message={board.error} />
@@ -1886,7 +1895,11 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
         style={{ "--fb-chat-width": `${chatWidth}px` } as CSSProperties}
       >
         <main className="fb-main">
-      {route.view === "board" ? (
+      {route.view === "souls" ? (
+        <div className="fb-souls-embed">
+          <SoulsView onBack={() => go("")} />
+        </div>
+      ) : route.view === "board" ? (
         <BoardView
           board={board}
           tab={boardTab}
@@ -1894,6 +1907,7 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
           onOpenAgent={(name) => go(agentRoute(name))}
           onOpenTicket={(ticket) => go(ticketRoute(ticket.bot, ticket.linearId))}
           onChat={() => go("chat")}
+          onSouls={() => go("souls")}
         />
       ) : route.view === "agent" || route.view === "ticket" ? (
         <AgentView

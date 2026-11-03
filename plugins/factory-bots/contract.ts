@@ -1,6 +1,15 @@
 import { defineRpcContract } from "@get-bb/plugin-sdk";
 import { z } from "zod";
 
+import {
+  AuditResultSchema,
+  BotNameSchema,
+  SaveResultSchema,
+  SaveSoulInputSchema,
+  SoulsResultSchema,
+  StatusResultSchema,
+} from "./lib/soul-contract.js";
+
 /**
  * Factory MCP payloads. The factory's read API is the only source, so these
  * schemas mirror the exact fields the five permitted tools return; unknown
@@ -202,5 +211,21 @@ export const rpcContract = defineRpcContract({
       })
       .strict(),
     output: ChatResultSchema,
+  },
+  getSouls: {
+    input: z.null(),
+    output: SoulsResultSchema,
+  },
+  getStatus: {
+    input: z.null(),
+    output: StatusResultSchema,
+  },
+  getAudit: {
+    input: z.null(),
+    output: AuditResultSchema,
+  },
+  saveSoul: {
+    input: SaveSoulInputSchema,
+    output: SaveResultSchema,
   },
 });

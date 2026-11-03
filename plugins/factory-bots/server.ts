@@ -4,10 +4,12 @@ import { rpcContract } from "./contract.js";
 import { loadMcpConfig, startCommand } from "./lib/config.js";
 import { FactoryMcpClient } from "./lib/mcp-client.js";
 import { FactoryService } from "./lib/service.js";
+import { SoulService } from "./lib/soul-service.js";
 
 /**
- * Factory Bots is an observer. Its backend owns one Factory MCP child process,
- * exposes two read-only RPCs, and never writes to the factory.
+ * Factory Bots owns one Factory MCP child. The board and chat use the read
+ * tools plus the single Orchestrator write; the Souls view has its own
+ * four-tool allowlist and writes only through factory_soul_set.
  */
 export default async function plugin(bb: BbPluginApi): Promise<void> {
   const loaded = await loadMcpConfig({ moduleUrl: import.meta.url });
@@ -18,9 +20,15 @@ export default async function plugin(bb: BbPluginApi): Promise<void> {
           onStderr: (line) => bb.log.debug(`factory mcp: ${line}`),
         });
 
+  const start = loaded.config === null ? null : startCommand(loaded.config);
   const service = new FactoryService({
     caller: client,
-    startCommand: loaded.config === null ? null : startCommand(loaded.config),
+    startCommand: start,
+    configError: loaded.error,
+  });
+  const souls = new SoulService({
+    caller: client,
+    startCommand: start,
     configError: loaded.error,
   });
 
@@ -29,6 +37,10 @@ export default async function plugin(bb: BbPluginApi): Promise<void> {
     getTicket: ({ linearId }) => service.getTicket(linearId),
     sendMessage: ({ message, provider, model, reasoningLevel }) =>
       service.sendMessage(message, { provider, model, reasoningLevel }),
+    getSouls: () => souls.getSouls(),
+    getStatus: () => souls.getStatus(),
+    getAudit: () => souls.getAudit(),
+    saveSoul: ({ bot, soul, author }) => souls.saveSoul(bot, soul, author),
   });
 
   bb.onDispose(() => {

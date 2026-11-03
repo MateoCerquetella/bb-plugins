@@ -1,6 +1,6 @@
 # Factory Bots
 
-A live board of an Empirical Factory inside BB, plus one Orchestrator chat.
+A live board of an Empirical Factory inside BB, plus one Orchestrator chat and a soul editor.
 
 Factory Bots shows the factory as a list, in the shape of a thread inbox. The
 board opens on **Threads**: every ticket is one thread, grouped into In motion,
@@ -14,6 +14,13 @@ The board is a workspace: threads occupy the main column while the
 rail's left edge to resize it; the width is remembered. Selecting a thread
 replaces the thread list with its transcript, so the bots (in BB's Bots
 sidebar), the threads, and the Orchestrator remain one glance away.
+
+**Souls** in the board header opens the bot soul editor in the same workspace.
+The list carries each bot's Dood; the detail shows the full prose beside its
+live Dood, the read-only tool list from `factory_status` when reported, the
+latest audit row, and the authored double-confirmation save flow. The Souls
+view uses only `factory_souls`, `factory_soul_set`, `factory_soul_audit`, and
+`factory_status`; it never calls ticket or message tools.
 
 Every row carries a live Dood from [do.computer](https://do.computer), grown
 from the agent's name. It is a real animated creature; where WebGL is unavailable

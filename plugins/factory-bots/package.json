@@ -51,6 +51,7 @@
     "server.ts",
     "app.tsx",
     "app.css",
+    "souls.css",
     "contract.ts",
     "lib/",
     "THIRD_PARTY_NOTICES.md"
