@@ -35,7 +35,13 @@ import { GiftDialog } from "./lib/gift-dialog";
 import { WardrobeDialog } from "./lib/wardrobe-dialog";
 import { Pixels } from "./lib/pixels";
 import { avatarLook } from "./lib/dood";
-import { loadAgentDood, saveAgentDood, type AgentDood } from "./lib/dood-state";
+import {
+  boxCountdown,
+  grantGift,
+  loadAgentDood,
+  saveAgentDood,
+  type AgentDood,
+} from "./lib/dood-state";
 import { WEAR_ITEMS } from "./lib/wear-items";
 import { activeLiveTool, isGenerating, readLiveTools } from "./lib/live";
 import { stageLabel } from "./lib/derive";
@@ -698,10 +704,17 @@ function AgentHeader({
   const [dood, setDood] = useState<AgentDood>(() => loadAgentDood(agent.name));
   const [giftOpen, setGiftOpen] = useState(false);
   const [wardrobeOpen, setWardrobeOpen] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
+  const gift = boxCountdown(dood, now);
 
   useEffect(() => {
     saveAgentDood(agent.name, dood);
   }, [agent.name, dood]);
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <div className="fb-agent-head">
@@ -754,11 +767,20 @@ function AgentHeader({
             </button>
             <button
               type="button"
-              onClick={() => setGiftOpen(true)}
-              title="Give it a gift"
+              onClick={() => {
+                if (!gift.ready) return;
+                if (dood.boxes === 0 && gift.due !== dood) setDood(gift.due);
+                setGiftOpen(true);
+              }}
+              disabled={!gift.ready}
+              title={
+                gift.ready
+                  ? "A gift box is waiting"
+                  : `Next gift in ${gift.label}`
+              }
             >
               <Pixels art="box" className="fb-care-art" />
-              <span>Gift{dood.owned.length > 0 ? ` · ${dood.owned.length}` : ""}</span>
+              <span>Gift{gift.ready ? "" : ` · ${gift.label}`}</span>
             </button>
             <button
               type="button"
@@ -789,17 +811,7 @@ function AgentHeader({
           agentId={agent.name}
           color={avatarLook(null, agent.name).color}
           owned={dood.owned}
-          onGrant={(item, wear) =>
-            setDood((value) => ({
-              ...value,
-              owned: value.owned.includes(item.id)
-                ? value.owned
-                : [...value.owned, item.id],
-              outfit: wear
-                ? { ...value.outfit, [item.slot]: item.id }
-                : value.outfit,
-            }))
-          }
+          onGrant={(item, wear) => setDood((value) => grantGift(value, item, wear))}
           onClose={() => setGiftOpen(false)}
         />
       ) : null}
@@ -848,6 +860,13 @@ function Field({
       <dd className={tone === undefined ? undefined : `fb-${tone}`}>{children}</dd>
     </div>
   );
+}
+
+function transcriptRole(kind: string): "user" | "assistant" | "tool" {
+  const normalized = kind.toLowerCase();
+  if (/user|human|person/.test(normalized)) return "user";
+  if (/assistant|model|agent|bot/.test(normalized)) return "assistant";
+  return "tool";
 }
 
 function TranscriptView({ transcript }: { transcript: Transcript }) {
@@ -899,7 +918,11 @@ function TranscriptView({ transcript }: { transcript: Transcript }) {
       ) : (
         <ol className="fb-entries">
           {transcript.entries.map((entry, index) => (
-            <li key={`${index}-${entry.kind}`} className="fb-entry">
+            <li
+              key={`${index}-${entry.kind}`}
+              className="fb-entry"
+              data-role={transcriptRole(entry.kind)}
+            >
               <span className="fb-entry-kind">{entry.kind}</span>
               <span className="fb-entry-text">{entry.text}</span>
             </li>
@@ -915,12 +938,45 @@ function TicketDetailView({
   transcript,
   transcriptError,
   onBack,
+  onSteer,
 }: {
   ticket: TicketDetail;
   transcript: Transcript | null;
   transcriptError: string | null;
   onBack: () => void;
+  onSteer: (ticket: TicketDetail, message: string) => Promise<ChatResult>;
 }) {
+  const [steerText, setSteerText] = useState("");
+  const [steering, setSteering] = useState(false);
+  const [steerNote, setSteerNote] = useState<string | null>(null);
+  const [steerError, setSteerError] = useState<string | null>(null);
+
+  const steer = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
+    event.preventDefault();
+    const message = steerText.trim();
+    if (message === "" || steering) return;
+    setSteering(true);
+    setSteerNote(null);
+    setSteerError(null);
+    try {
+      const result = await onSteer(ticket, message);
+      if (result.ok) {
+        setSteerText("");
+        setSteerNote(
+          result.answer.trim() === ""
+            ? "Sent to the Orchestrator. The transcript refreshes as it works."
+            : result.answer,
+        );
+      } else {
+        setSteerError(result.message);
+      }
+    } catch (cause) {
+      setSteerError(errorText(cause));
+    } finally {
+      setSteering(false);
+    }
+  };
+
   return (
     <article className="fb-ticket">
       <div className="fb-ticket-back">
@@ -987,6 +1043,42 @@ function TicketDetailView({
       ) : (
         <TranscriptView transcript={transcript} />
       )}
+
+      <form className="fb-steer" onSubmit={(event) => void steer(event)}>
+        <div className="fb-steer-head">
+          <h3>Steer this thread</h3>
+          <span>via Orchestrator</span>
+        </div>
+        <textarea
+          value={steerText}
+          onChange={(event) => setSteerText(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+              event.preventDefault();
+              event.currentTarget.form?.requestSubmit();
+            }
+          }}
+          rows={2}
+          maxLength={3_000}
+          placeholder="Tell the agent what to change or check…"
+          disabled={steering}
+          aria-label="Steer this ticket"
+        />
+        <div className="fb-steer-foot">
+          <span className="fb-muted">
+            The Orchestrator is the only write path. The board stays read-only.
+          </span>
+          <button type="submit" disabled={steering || steerText.trim() === ""}>
+            {steering ? "Steering…" : "Send steer"}
+          </button>
+        </div>
+        {steerNote === null ? null : (
+          <p className="fb-steer-note" role="status">{steerNote}</p>
+        )}
+        {steerError === null ? null : (
+          <p className="fb-steer-error" role="alert">{steerError}</p>
+        )}
+      </form>
     </article>
   );
 }
@@ -996,11 +1088,13 @@ function TicketPane({
   agentName,
   ticket,
   onBack,
+  onSteer,
 }: {
   selectedId: string | null;
   agentName: string;
   ticket: Polled<TicketResult>;
   onBack: () => void;
+  onSteer: (ticket: TicketDetail, message: string) => Promise<ChatResult>;
 }) {
   if (selectedId === null) {
     return (
@@ -1067,6 +1161,7 @@ function TicketPane({
       transcript={ticket.data.transcript}
       transcriptError={ticket.data.transcriptError}
       onBack={onBack}
+      onSteer={onSteer}
     />
   );
 }
@@ -1079,6 +1174,7 @@ function AgentView({
   onBack,
   onSelectTicket,
   onBackToTickets,
+  onSteer,
 }: {
   board: Polled<BoardResult>;
   agentName: string;
@@ -1087,6 +1183,7 @@ function AgentView({
   onBack: () => void;
   onSelectTicket: (linearId: string) => void;
   onBackToTickets: () => void;
+  onSteer: (ticket: TicketDetail, message: string) => Promise<ChatResult>;
 }) {
   if (board.error !== null) {
     return (
@@ -1173,6 +1270,7 @@ function AgentView({
             agentName={agent.name}
             ticket={ticket}
             onBack={onBackToTickets}
+            onSteer={onSteer}
           />
         </div>
       </div>
@@ -1267,8 +1365,8 @@ function ChatView({
   };
 
   return (
-    <div className="fb-chat">
-      <div className="fb-chat-head">
+    <div className="fb-chat-layout">
+      <aside className="fb-chat-rail">
         <button type="button" className="fb-back" onClick={onBack}>
           ← Board
         </button>
@@ -1281,9 +1379,22 @@ function ChatView({
           Sieve → Helm → Lens → Warden. This is the only write path; the board
           stays read-only.
         </p>
-      </div>
+        <p className="fb-chat-rail-note">
+          The thread on the right is the one conversation that can change the
+          factory. The board beside it stays read-only.
+        </p>
+      </aside>
 
-      <div className="fb-chat-log" aria-live="polite">
+      <section className="fb-chat-thread">
+        <div className="fb-chat-thread-head">
+          <div>
+            <span className="fb-chat-thread-kicker">Orchestrator</span>
+            <h3>Thread</h3>
+          </div>
+          <span className="fb-chat-tag">Single chat</span>
+        </div>
+
+        <div className="fb-chat-log" aria-live="polite">
         {entries.length === 0 && !sending ? (
           <div className="fb-chat-empty">
             <p>Tell the Orchestrator what to build, fix, or investigate.</p>
@@ -1372,6 +1483,7 @@ function ChatView({
           </button>
         </div>
       </form>
+      </section>
     </div>
   );
 }
@@ -1422,6 +1534,15 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
           onBack={() => go("")}
           onSelectTicket={(linearId) => go(ticketRoute(route.agent, linearId))}
           onBackToTickets={() => go(agentRoute(route.agent))}
+          onSteer={async (selected, message) => {
+            const prompt = [
+              `Steer ticket ${selected.linearId} ("${selected.title}") while it works.`,
+              "The person says:",
+              message,
+              "Use the existing ticket; do not create a duplicate.",
+            ].join("\n");
+            return (await rpc.call("sendMessage", { message: prompt })) as ChatResult;
+          }}
         />
       )}
     </div>

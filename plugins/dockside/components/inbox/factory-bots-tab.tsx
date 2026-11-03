@@ -6,10 +6,15 @@ import type { FactoryAgent } from "@/lib/factory-bots";
 import type { FactoryBotsState } from "@/hooks/use-factory-bots";
 import { DoodOrb, type DoodOrbHandle } from "@/lib/dood-orb";
 import {
+  boxCountdown,
+  grantGift,
   loadAgentDood,
   saveAgentDood,
   type AgentDood,
 } from "@/lib/dood-state";
+import { GiftDialog } from "@/lib/gift-dialog";
+import { Pixels } from "@/lib/pixels";
+import { avatarLook } from "@/lib/dood";
 import {
   WEAR_ITEMS,
   WEAR_SLOTS,
@@ -241,13 +246,26 @@ function FactoryBotRow({
   const orb = useRef<DoodOrbHandle>(null);
   const [dood, setDood] = useState<AgentDood>(() => loadAgentDood(agent.name));
   const [wardrobeOpen, setWardrobeOpen] = useState(false);
+  const [giftOpen, setGiftOpen] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
+  const gift = boxCountdown(dood, now);
+  const giftShort = gift.label
+    .replace(" hours", "h")
+    .replace(" hour", "h")
+    .replace(" minutes", "m")
+    .replace(" minute", "m");
   const work =
     agent.statusReason ?? agent.currentWork ?? STATUS_LABEL[agent.status];
 
   useEffect(() => {
     saveAgentDood(agent.name, dood);
   }, [agent.name, dood]);
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(timer);
+  }, []);
 
   const feed = (): void => {
     orb.current?.feed();
@@ -361,6 +379,30 @@ function FactoryBotRow({
           </button>
           <button
             type="button"
+            onClick={() => {
+              if (!gift.ready) return;
+              if (dood.boxes === 0 && gift.due !== dood) setDood(gift.due);
+              setGiftOpen(true);
+            }}
+            disabled={!gift.ready}
+            title={gift.ready ? "A gift box is waiting" : `Next gift in ${gift.label}`}
+            aria-label={
+              gift.ready
+                ? `Open ${agent.displayName}'s gift`
+                : `Next gift for ${agent.displayName} in ${gift.label}`
+            }
+            className="flex size-5 items-center justify-center rounded text-muted-foreground hover:bg-sidebar-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-40 disabled:hover:bg-transparent"
+          >
+            {gift.ready ? (
+              <Pixels art="box" className="size-3.5" />
+            ) : (
+              <span className="text-[8px] font-medium tabular-nums">
+                {giftShort}
+              </span>
+            )}
+          </button>
+          <button
+            type="button"
             onClick={() => setWardrobeOpen(true)}
             title="Change outfit"
             aria-label={`Change ${agent.displayName}'s outfit`}
@@ -370,6 +412,17 @@ function FactoryBotRow({
           </button>
         </span>
       </div>
+      {giftOpen ? (
+        <GiftDialog
+          agentId={agent.name}
+          color={avatarLook(null, agent.name).color}
+          owned={dood.owned}
+          onGrant={(item, wear) =>
+            setDood((value) => grantGift(value, item, wear))
+          }
+          onClose={() => setGiftOpen(false)}
+        />
+      ) : null}
       {wardrobeOpen ? (
         <WardrobeDialog
           agent={agent}

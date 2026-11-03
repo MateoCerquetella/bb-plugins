@@ -1,7 +1,15 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, test } from "node:test";
 
-import { loadAgentDood, saveAgentDood } from "../lib/dood-state";
+import {
+  BOX_EVERY_MS,
+  boxCountdown,
+  grantGift,
+  loadAgentDood,
+  openAgentBox,
+  saveAgentDood,
+} from "../lib/dood-state";
+import { wearItem } from "../lib/wear-items";
 
 const original = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
 const store = new Map<string, string>();
@@ -38,7 +46,12 @@ afterEach(() => {
 });
 
 test("an agent starts with nothing until it is given something", () => {
-  assert.deepEqual(loadAgentDood("sieve"), { fed: 0, owned: [], outfit: {} });
+  assert.deepEqual(loadAgentDood("sieve"), {
+    fed: 0,
+    owned: [],
+    outfit: {},
+    boxes: 1,
+  });
 });
 
 test("a treat and a gift survive the next visit", () => {
@@ -46,11 +59,13 @@ test("a treat and a gift survive the next visit", () => {
     fed: 3,
     owned: ["party", "round"],
     outfit: { hat: "party", glasses: "round" },
+    boxes: 2,
   });
   assert.deepEqual(loadAgentDood("sieve"), {
     fed: 3,
     owned: ["party", "round"],
     outfit: { hat: "party", glasses: "round" },
+    boxes: 2,
   });
 });
 
@@ -67,8 +82,54 @@ test("stale or hand-edited storage cannot give it a thing that does not exist", 
     fed: 0,
     owned: ["party"],
     outfit: { hat: "party" },
+    boxes: 1,
   });
 
   store.set("factory-bots:dood:sieve", "{not json");
-  assert.deepEqual(loadAgentDood("sieve"), { fed: 0, owned: [], outfit: {} });
+  assert.deepEqual(loadAgentDood("sieve"), {
+    fed: 0,
+    owned: [],
+    outfit: {},
+    boxes: 1,
+  });
+});
+
+test("a new creature starts with one gift waiting", () => {
+  const dood = loadAgentDood("sieve");
+  assert.equal(dood.boxes, 1);
+  assert.equal(boxCountdown(dood, 1_000).ready, true);
+});
+
+test("opening the box starts the six-hour wait, then a new one turns up", () => {
+  const start = 10_000;
+  const opened = openAgentBox(
+    { fed: 0, owned: [], outfit: {}, boxes: 1 },
+    start,
+    () => 0,
+  );
+  assert.ok(opened);
+  assert.equal(opened.dood.boxes, 0);
+  assert.equal(opened.dood.nextBoxAt, start + BOX_EVERY_MS);
+  assert.deepEqual(opened.dood.owned, [opened.item.id]);
+  assert.equal(boxCountdown(opened.dood, start + 1_000).ready, false);
+
+  const due = boxCountdown(opened.dood, start + BOX_EVERY_MS);
+  assert.equal(due.ready, true);
+  assert.equal(due.due.boxes, 1);
+  assert.equal(due.due.nextBoxAt, undefined);
+});
+
+test("a found gift consumes a box and can be worn", () => {
+  const item = wearItem("party");
+  assert.ok(item);
+  const next = grantGift(
+    { fed: 0, owned: [], outfit: {}, boxes: 1 },
+    item,
+    true,
+    50_000,
+  );
+  assert.equal(next.boxes, 0);
+  assert.equal(next.nextBoxAt, 50_000 + BOX_EVERY_MS);
+  assert.deepEqual(next.owned, ["party"]);
+  assert.deepEqual(next.outfit, { hat: "party" });
 });

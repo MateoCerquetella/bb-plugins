@@ -12,14 +12,17 @@ blocked, grouped into In motion, Needs a person, and On call.
 Every row carries a live Dood from [do.computer](https://do.computer), grown
 from the agent's name. It is a real animated creature; where WebGL is unavailable
 it falls back to the same seed's static blob. Open a thread to see its ticket:
-stage, attempts, stop reason, decisions, worktree, and transcript with the live
-tool call highlighted. Open a bot to see its tickets.
+stage, attempts, stop reason, decisions, worktree, and a thread-style transcript
+with the live tool call highlighted. The transcript has a steer composer that
+sends the person's words through the Orchestrator, the only write path. Open a
+bot to see its tickets.
 
 The agent view gives the Dood room to grow: a larger live creature with a treat
-and a gift box. Treats are counted. A gift opens a real box holding one thing the
-creature does not have yet, and what it finds can be worn right there. The
-Wardrobe button re-wears anything it has already found; each agent's treats,
-gifts, and outfit are kept on this machine.
+and a gift box. Treats are counted. A gift box arrives six hours after the last
+one is opened, and one waits at most, the same rhythm as do.computer. Opening it
+finds one thing the creature does not have yet, and what it finds can be worn
+right there. The Wardrobe button re-wears anything it has already found; each
+agent's treats, gifts, and outfit are kept on this machine.
 
 **Orchestrator chat** is the single entry point for work: it sends one message
 to the factory's Orchestrator, which files a ticket and drives it through
