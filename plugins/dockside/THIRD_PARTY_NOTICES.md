@@ -99,10 +99,10 @@ silhouette rather than in brand color.
 
 ## do.computer mascot
 
-The still creature drawn by `components/inbox/factory-bot-avatar.tsx` is the
-Agent Dood from [do.computer](https://github.com/SawyerHood/do-computer), MIT
-licensed, Copyright Sawyer Hood. Factory Bots uses the live renderer; Dockside
-draws the same seed as a small still in its optional Factory bots section.
+The Agent Dood rendered by `lib/dood.tsx`, `lib/dood-orb.tsx` and
+`vendor/mascot/` is from [do.computer](https://github.com/SawyerHood/do-computer),
+MIT licensed, Copyright Sawyer Hood. Dockside uses the same live renderer and
+wardrobe as Factory Bots so the Bots tab shows the same customized face.
 
 ---
 

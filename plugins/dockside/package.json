@@ -58,6 +58,8 @@
     "server.ts",
     "app.tsx",
     "lib/",
+    "vendor/",
+    "types/",
     "components/",
     "hooks/"
   ],
@@ -68,7 +70,8 @@
     "@radix-ui/react-select": "^2.3.3",
     "clsx": "^2.1.1",
     "tailwind-merge": "^3.4.0",
-    "zod": "^4.3.6"
+    "zod": "^4.3.6",
+    "three": "0.128.0"
   },
   "devDependencies": {
     "@get-bb/plugin-sdk": "0.4.21",

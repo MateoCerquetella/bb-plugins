@@ -394,7 +394,12 @@ function BotRow({
       }, ${agent.status}${agent.statusReason === null ? "" : `: ${agent.statusReason}`}`}
     >
       <span className="fb-avatar-wrap fb-list-avatar">
-        <DoodOrb agentId={agent.name} status={agent.status} size={40} />
+        <DoodOrb
+          agentId={agent.name}
+          status={agent.status}
+          size={40}
+          outfit={loadAgentDood(agent.name).outfit}
+        />
         <StatusDot status={agent.status} />
       </span>
       <span className="fb-list-body">
@@ -506,7 +511,12 @@ function ThreadRow({
             {botName.slice(0, 1).toUpperCase()}
           </span>
         ) : (
-          <DoodOrb agentId={agent.name} status={agent.status} size={40} />
+          <DoodOrb
+          agentId={agent.name}
+          status={agent.status}
+          size={40}
+          outfit={loadAgentDood(agent.name).outfit}
+        />
         )}
         {agent === undefined ? null : <StatusDot status={agent.status} />}
       </span>

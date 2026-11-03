@@ -190,8 +190,9 @@ below is exactly as Dockside draws it.
 
 ![The optional Bots tab](docs/media/factory-bots.png)
 
-Each factory agent gets its Dood, live work or blocked reason, owned column, and
-ticket count, grouped into In motion, Needs a person, and On call. Clicking an
+Each factory agent gets the same live, customized Dood used inside Factory Bots,
+with its work or blocked reason, owned column, and ticket count, grouped into
+In motion, Needs a person, and On call. Clicking an
 agent opens the Factory Bots panel at that agent. The tab polls the Factory Bots
 read API while it is enabled.
 

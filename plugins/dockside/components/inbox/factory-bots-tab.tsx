@@ -2,7 +2,8 @@ import { Icon } from "@/components/ui/icon";
 import { cn } from "@/lib/utils";
 import type { FactoryAgent } from "@/lib/factory-bots";
 import type { FactoryBotsState } from "@/hooks/use-factory-bots";
-import { FactoryBotAvatar } from "./factory-bot-avatar";
+import { DoodOrb } from "@/lib/dood-orb";
+import { loadAgentDood } from "@/lib/dood-state";
 
 const STATUS_LABEL: Record<FactoryAgent["status"], string> = {
   idle: "Idle",
@@ -77,7 +78,12 @@ function FactoryBotRow({
         className="flex w-full items-center gap-2.5 px-2.5 py-2.5 text-left transition-colors hover:bg-sidebar-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
       >
         <span className="relative size-9 shrink-0">
-          <FactoryBotAvatar agentId={agent.name} />
+          <DoodOrb
+            agentId={agent.name}
+            status={agent.status}
+            size={36}
+            outfit={loadAgentDood(agent.name).outfit}
+          />
           <span
             className={cn(
               "absolute -bottom-0.5 -right-0.5 size-2 rounded-full border-2 border-sidebar",

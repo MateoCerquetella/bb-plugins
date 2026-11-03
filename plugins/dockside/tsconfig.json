@@ -27,6 +27,7 @@
     "components",
     "hooks",
     "lib",
-    "test"
+    "test",
+    "types"
   ]
 }
