@@ -2,6 +2,7 @@ import "./app.css";
 
 import {
   useEffect,
+  useMemo,
   useRef,
   useState,
   type FormEvent,
@@ -33,6 +34,7 @@ import type {
 } from "./contract";
 import { DoodOrb, type DoodOrbHandle } from "./lib/dood-orb";
 import { GiftDialog } from "./lib/gift-dialog";
+import { drawing } from "./lib/orb";
 import { WardrobeDialog } from "./lib/wardrobe-dialog";
 import { Pixels } from "./lib/pixels";
 import { avatarLook } from "./lib/dood";
@@ -198,7 +200,11 @@ function StatusTag({ status }: { status: AgentStatus }) {
 }
 
 function StageTag({ stage }: { stage: string }) {
-  return <span className="fb-stage">{stage}</span>;
+  return (
+    <span className="fb-stage" data-stage={stage}>
+      {stage}
+    </span>
+  );
 }
 
 function HealthPill({
@@ -705,8 +711,24 @@ function AgentHeader({
   const [dood, setDood] = useState<AgentDood>(() => loadAgentDood(agent.name));
   const [giftOpen, setGiftOpen] = useState(false);
   const [wardrobeOpen, setWardrobeOpen] = useState(false);
+  const [treatOver, setTreatOver] = useState(false);
   const [now, setNow] = useState(() => Date.now());
   const gift = boxCountdown(dood, now);
+  const coreTraits = useMemo(() => {
+    try {
+      const core = drawing();
+      const genome = core?.makeGenome(agent.name);
+      return core !== null && core !== undefined && genome !== undefined
+        ? core.describeGenome(genome, true)
+        : [];
+    } catch {
+      return [];
+    }
+  }, [agent.name]);
+  const feed = (): void => {
+    orb.current?.feed();
+    setDood((value) => ({ ...value, fed: value.fed + 1 }));
+  };
 
   useEffect(() => {
     saveAgentDood(agent.name, dood);
@@ -723,12 +745,34 @@ function AgentHeader({
         ← All agents
       </button>
       <div className="fb-agent-hero">
-        <div className="fb-avatar-wrap fb-avatar-wrap--hero">
+        <div
+          className={`fb-avatar-wrap fb-avatar-wrap--hero${
+            treatOver ? " is-treat-target" : ""
+          }`}
+          onDragOver={(event) => {
+            if (event.dataTransfer.types.includes("text/factory-treat")) {
+              event.preventDefault();
+              event.dataTransfer.dropEffect = "copy";
+              setTreatOver(true);
+            }
+          }}
+          onDragLeave={(event) => {
+            if (event.currentTarget.contains(event.relatedTarget as Node | null)) {
+              return;
+            }
+            setTreatOver(false);
+          }}
+          onDrop={(event) => {
+            event.preventDefault();
+            setTreatOver(false);
+            if (event.dataTransfer.getData("text/factory-treat") !== "") feed();
+          }}
+        >
           <DoodOrb
             ref={orb}
             agentId={agent.name}
             status={agent.status}
-            size={128}
+            size={160}
             outfit={dood.outfit}
           />
           <StatusDot status={agent.status} />
@@ -757,14 +801,19 @@ function AgentHeader({
           <div className="fb-agent-care">
             <button
               type="button"
-              onClick={() => {
-                orb.current?.feed();
-                setDood((value) => ({ ...value, fed: value.fed + 1 }));
+              draggable
+              onClick={feed}
+              onDragStart={(event) => {
+                event.dataTransfer.setData("text/factory-treat", "cookie");
+                event.dataTransfer.effectAllowed = "copy";
               }}
-              title="Give it a treat"
+              onDragEnd={() => setTreatOver(false)}
+              title="Drag this cookie onto the Dood, or click to feed"
+              aria-label="Drag a cookie onto the Dood to feed it"
+              className="fb-treat-button"
             >
-              <Pixels art="cookie" className="fb-care-art" />
-              <span>Treat{dood.fed > 0 ? ` · ${dood.fed}` : ""}</span>
+              <Pixels art="cookie" className="fb-treat-art" />
+              <span>Cookie</span>
             </button>
             <button
               type="button"
@@ -797,11 +846,31 @@ function AgentHeader({
                 : `${dood.owned.length} of ${WEAR_ITEMS.length} found.`}
             </span>
           </div>
+          {coreTraits.length === 0 ? null : (
+            <details className="fb-core">
+              <summary>
+                Core
+                {coreTraits.find(([label]) => label.toLowerCase().includes("temper"))?.[1]
+                  ? ` · ${coreTraits.find(([label]) => label.toLowerCase().includes("temper"))![1]}`
+                  : ""}
+              </summary>
+              <dl>
+                {coreTraits.map(([label, value]) => (
+                  <div key={label}>
+                    <dt>{label}</dt>
+                    <dd>{value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </details>
+          )}
         </div>
       </div>
       {wardrobeOpen ? (
         <WardrobeDialog
+          agentId={agent.name}
           agentName={agent.displayName}
+          status={agent.status}
           dood={dood}
           onDood={setDood}
           onClose={() => setWardrobeOpen(false)}
@@ -834,6 +903,7 @@ function TicketRow({
       type="button"
       className="fb-ticket-row"
       data-selected={selected ? "true" : "false"}
+      data-stage={ticket.stage}
       onClick={onSelect}
       aria-current={selected ? "true" : undefined}
     >
@@ -918,16 +988,25 @@ function TranscriptView({ transcript }: { transcript: Transcript }) {
         <p className="fb-muted">No transcript entries yet.</p>
       ) : (
         <ol className="fb-entries">
-          {transcript.entries.map((entry, index) => (
-            <li
-              key={`${index}-${entry.kind}`}
-              className="fb-entry"
-              data-role={transcriptRole(entry.kind)}
-            >
-              <span className="fb-entry-kind">{entry.kind}</span>
-              <Markdown content={entry.text} className="fb-entry-text" />
-            </li>
-          ))}
+          {transcript.entries.map((entry, index) => {
+            const role = transcriptRole(entry.kind);
+            return (
+              <li
+                key={`${index}-${entry.kind}`}
+                className="fb-entry"
+                data-role={role}
+              >
+                <span className="fb-entry-kind">
+                  {role === "assistant"
+                    ? "Assistant"
+                    : role === "user"
+                      ? "You"
+                      : "Tool result"}
+                </span>
+                <Markdown content={entry.text} className="fb-entry-text" />
+              </li>
+            );
+          })}
         </ol>
       )}
     </section>
@@ -979,7 +1058,7 @@ function TicketDetailView({
   };
 
   return (
-    <article className="fb-ticket">
+    <article className="fb-ticket" data-stage={ticket.stage}>
       <div className="fb-ticket-back">
         <button type="button" className="fb-back" onClick={onBack}>
           ← Tickets

@@ -18,11 +18,14 @@ sends the person's words through the Orchestrator, the only write path. Open a
 bot to see its tickets.
 
 The agent view gives the Dood room to grow: a larger live creature with a treat
-and a gift box. Treats are counted. A gift box arrives six hours after the last
-one is opened, and one waits at most, the same rhythm as do.computer. Opening it
-finds one thing the creature does not have yet, and what it finds can be worn
-right there. The Wardrobe button re-wears anything it has already found; each
-agent's treats, gifts, and outfit are kept on this machine.
+and a gift box. Drag the cookie onto the Dood to feed it, or click it. A gift box
+arrives six hours after the last one is opened, and one waits at most, the same
+rhythm as do.computer. Opening it finds one thing the creature does not have
+yet, and what it finds can be worn right there. Wardrobe is a full dressing page
+with a large live Dood and every slot; each agent's treats, gifts, and outfit are
+kept on this machine. The Core disclosure shows the seed traits behind the face.
+
+![The large wardrobe page](assets/screenshots/wardrobe.png)
 
 **Orchestrator chat** is the single entry point for work: it sends one message
 to the factory's Orchestrator, which files a ticket and drives it through

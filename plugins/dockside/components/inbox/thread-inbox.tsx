@@ -663,9 +663,9 @@ export function ThreadInbox({
   const openFactoryBots = (subPath: string): void => {
     onNavigate();
     const suffix = subPath === "" ? "" : `/${subPath}`;
-    window.location.assign(
-      `/plugins/${FACTORY_BOTS_PLUGIN_ID}/${FACTORY_BOTS_PANEL_PATH}${suffix}`,
-    );
+    const url = `/plugins/${FACTORY_BOTS_PLUGIN_ID}/${FACTORY_BOTS_PANEL_PATH}${suffix}`;
+    window.history.pushState({}, "", url);
+    window.dispatchEvent(new PopStateEvent("popstate"));
   };
 
   return (

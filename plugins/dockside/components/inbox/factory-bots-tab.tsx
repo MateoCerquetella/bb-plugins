@@ -75,11 +75,11 @@ function FactoryBotRow({
         title={`${agent.displayName} · ${STATUS_LABEL[agent.status]} · ${work}`}
         className="flex w-full items-center gap-2.5 px-2.5 py-2.5 text-left transition-colors hover:bg-sidebar-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
       >
-        <span className="relative size-9 shrink-0">
+        <span className="relative size-11 shrink-0">
           <DoodOrb
             agentId={agent.name}
             status={agent.status}
-            size={36}
+            size={44}
             outfit={loadAgentDood(agent.name).outfit}
           />
           <span

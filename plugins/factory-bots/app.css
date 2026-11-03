@@ -848,13 +848,13 @@
 }
 
 .fb-avatar-wrap--hero {
-  width: 128px;
-  height: 128px;
+  width: 160px;
+  height: 160px;
 }
 
 .fb-avatar-wrap--hero .fb-dot {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-width: 2px;
 }
 
@@ -2153,4 +2153,514 @@
   margin: 6px 0 0;
   overflow-x: auto;
   font-size: 11px;
+}
+
+.fb-avatar-wrap--hero.is-treat-target {
+  border-radius: 24px;
+  outline: 2px dashed color-mix(in srgb, var(--primary) 65%, transparent);
+  outline-offset: 5px;
+  background: color-mix(in srgb, var(--primary) 7%, transparent);
+}
+
+.fb-treat-button {
+  border-color: color-mix(in srgb, #c98a4b 35%, var(--border)) !important;
+  background: color-mix(in srgb, #c98a4b 8%, var(--card)) !important;
+  cursor: grab;
+}
+
+.fb-treat-button:active {
+  cursor: grabbing;
+}
+
+.fb-treat-art {
+  width: 24px;
+  height: 24px;
+}
+
+/* The seed's own core: what makes this Dood look and move like itself. */
+.fb-core {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+
+.fb-core > summary {
+  width: fit-content;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.fb-core dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 18px;
+  margin: 9px 0 0;
+}
+
+.fb-core dt {
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.fb-core dd {
+  margin: 1px 0 0;
+  font-size: 11px;
+  color: var(--foreground);
+}
+
+/* The wardrobe page: the same shape as do.computer's, with this Dood in it. */
+.fb-wardrobe-page {
+  display: flex;
+  width: min(940px, calc(100vw - 32px));
+  height: min(650px, calc(100vh - 32px));
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--card);
+  box-shadow: 0 28px 80px #0006;
+}
+
+.fb-wardrobe-preview {
+  display: flex;
+  width: 300px;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 22px 20px;
+  border-right: 1px solid var(--border);
+  background: color-mix(in srgb, var(--foreground) 3%, var(--background));
+  text-align: center;
+}
+
+.fb-wardrobe-preview-dood {
+  width: 200px;
+  height: 200px;
+  margin: -8px 0 4px;
+}
+
+.fb-wardrobe-preview h2 {
+  margin: 4px 0 0;
+  font-size: 18px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.fb-wardrobe-preview > p {
+  margin: 4px 0 0;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+
+.fb-wardrobe-preview ul {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 5px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fb-wardrobe-preview li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-size: 10.5px;
+  text-align: left;
+}
+
+.fb-wardrobe-preview li span:first-child {
+  color: var(--muted-foreground);
+}
+
+.fb-wardrobe-preview li span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fb-wardrobe-note {
+  margin-top: auto !important;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-size: 10px !important;
+  line-height: 1.45;
+  color: var(--muted-foreground);
+}
+
+.fb-wardrobe-body {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  padding: 22px 24px;
+}
+
+.fb-wardrobe-body > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.fb-wardrobe-kicker {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.fb-wardrobe-body h2 {
+  margin: 2px 0 0;
+  font-size: 18px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.fb-wardrobe-body > header button {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted-foreground);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.fb-wardrobe-body > header button:hover {
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+.fb-wardrobe-tabs {
+  display: flex;
+  flex: none;
+  gap: 2px;
+  margin-top: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.fb-wardrobe-tabs button {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 8px 12px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--muted-foreground);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fb-wardrobe-tabs button span {
+  font-size: 9px;
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+.fb-wardrobe-tabs button[aria-selected="true"] {
+  border-bottom-color: var(--primary);
+  color: var(--foreground);
+}
+
+.fb-wardrobe-grid {
+  display: grid;
+  min-height: 0;
+  flex: 1;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  align-content: start;
+  gap: 8px;
+  overflow-y: auto;
+  padding: 14px 2px 4px;
+}
+
+.fb-wardrobe-tile {
+  position: relative;
+  display: flex;
+  min-height: 94px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  overflow: hidden;
+  padding: 8px 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--foreground) 2%, var(--card));
+  color: var(--muted-foreground);
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+
+.fb-wardrobe-tile[data-owned="true"]:hover {
+  border-color: color-mix(in srgb, var(--foreground) 35%, var(--border));
+  color: var(--foreground);
+}
+
+.fb-wardrobe-tile[data-wearing="true"] {
+  border-color: var(--foreground);
+  box-shadow: inset 0 0 0 1px var(--foreground);
+  color: var(--foreground);
+}
+
+.fb-wardrobe-tile:disabled {
+  cursor: default;
+  opacity: 0.58;
+}
+
+.fb-wardrobe-tile-art {
+  font-size: 18px;
+  font-weight: 650;
+  color: var(--tier);
+}
+
+.fb-wardrobe-tile-name {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 10px;
+  line-height: 1.25;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.fb-wardrobe-tile-rarity {
+  position: absolute;
+  right: 8px;
+  bottom: 0;
+  left: 8px;
+  height: 2px;
+  background: var(--tier);
+}
+
+@media (max-width: 760px) {
+  .fb-wardrobe-page {
+    height: calc(100vh - 24px);
+    flex-direction: column;
+  }
+
+  .fb-wardrobe-preview {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+
+  .fb-wardrobe-preview-dood {
+    width: 96px;
+    height: 96px;
+    flex: none;
+    margin: 0;
+  }
+
+  .fb-wardrobe-preview ul,
+  .fb-wardrobe-note {
+    display: none;
+  }
+
+  .fb-wardrobe-body {
+    padding: 16px;
+  }
+
+  .fb-wardrobe-tabs {
+    overflow-x: auto;
+  }
+
+  .fb-wardrobe-grid {
+    grid-template-columns: repeat(auto-fill, minmax(82px, 1fr));
+  }
+}
+
+/* Stage colors: a quick read of where a ticket is without another label. */
+.fb-stage[data-stage="triage"],
+.fb-ticket-row[data-stage="triage"],
+.fb-ticket[data-stage="triage"] {
+  --stage: #b7791f;
+}
+
+.fb-stage[data-stage="specification"],
+.fb-ticket-row[data-stage="specification"],
+.fb-ticket[data-stage="specification"] {
+  --stage: #2b6cb0;
+}
+
+.fb-stage[data-stage="todo"],
+.fb-ticket-row[data-stage="todo"],
+.fb-ticket[data-stage="todo"] {
+  --stage: #64748b;
+}
+
+.fb-stage[data-stage="implement"],
+.fb-ticket-row[data-stage="implement"],
+.fb-ticket[data-stage="implement"] {
+  --stage: #7c3aed;
+}
+
+.fb-stage[data-stage="verify"],
+.fb-ticket-row[data-stage="verify"],
+.fb-ticket[data-stage="verify"] {
+  --stage: #0d9488;
+}
+
+.fb-stage[data-stage="integrate"],
+.fb-ticket-row[data-stage="integrate"],
+.fb-ticket[data-stage="integrate"] {
+  --stage: #0891b2;
+}
+
+.fb-stage[data-stage="review"],
+.fb-ticket-row[data-stage="review"],
+.fb-ticket[data-stage="review"] {
+  --stage: #db2777;
+}
+
+.fb-stage[data-stage="staging"],
+.fb-ticket-row[data-stage="staging"],
+.fb-ticket[data-stage="staging"] {
+  --stage: #ea580c;
+}
+
+.fb-stage[data-stage="production"],
+.fb-stage[data-stage="done"],
+.fb-ticket-row[data-stage="production"],
+.fb-ticket-row[data-stage="done"],
+.fb-ticket[data-stage="production"],
+.fb-ticket[data-stage="done"] {
+  --stage: #16a34a;
+}
+
+.fb-stage {
+  border-color: color-mix(in srgb, var(--stage, var(--border)) 38%, var(--border));
+  background: color-mix(in srgb, var(--stage, transparent) 8%, transparent);
+  color: var(--stage, var(--muted-foreground));
+}
+
+.fb-ticket-row[data-stage] {
+  border-left-color: color-mix(in srgb, var(--stage) 55%, transparent);
+}
+
+.fb-ticket-row[data-stage]:hover {
+  background: color-mix(in srgb, var(--stage) 5%, transparent);
+}
+
+.fb-ticket[data-stage] {
+  position: relative;
+  overflow: hidden;
+  border-top: 3px solid var(--stage, var(--primary));
+}
+
+.fb-ticket[data-stage] .fb-ticket-head h2 {
+  color: color-mix(in srgb, var(--stage) 38%, var(--foreground));
+}
+
+/* The ticket pane is a thread: its log scrolls, its chat stays at the bottom. */
+.fb-ticket-pane {
+  position: sticky;
+  top: 16px;
+  height: calc(100vh - 330px);
+  min-height: 460px;
+}
+
+.fb-ticket-pane > .fb-ticket {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.fb-ticket-pane .fb-ticket-back,
+.fb-ticket-pane .fb-ticket-head,
+.fb-ticket-pane .fb-ticket-details {
+  flex: none;
+}
+
+.fb-ticket-pane .fb-transcript {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.fb-ticket-pane .fb-transcript .fb-section-head,
+.fb-ticket-pane .fb-live-tools {
+  flex: none;
+}
+
+.fb-ticket-pane .fb-live-tools {
+  max-height: 28vh;
+  overflow-y: auto;
+}
+
+.fb-ticket-pane .fb-entries {
+  min-height: 0;
+  flex: 1;
+  max-height: none;
+  overflow-y: auto;
+}
+
+.fb-ticket-pane .fb-steer {
+  position: static;
+  flex: none;
+  margin-top: 10px;
+}
+
+@media (max-width: 880px) {
+  .fb-ticket-pane {
+    position: static;
+    height: auto;
+    min-height: 0;
+  }
+
+  .fb-ticket-pane > .fb-ticket {
+    height: auto;
+    overflow: visible;
+    padding-bottom: 170px;
+  }
+
+  .fb-ticket-pane .fb-transcript {
+    overflow: visible;
+  }
+
+  .fb-ticket-pane .fb-entries {
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .fb-ticket-pane .fb-steer {
+    position: fixed;
+    right: 16px;
+    bottom: 14px;
+    left: 16px;
+    z-index: 20;
+    margin: 0;
+  }
 }
