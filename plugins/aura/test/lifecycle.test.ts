@@ -1,19 +1,22 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { JSDOM } from "jsdom";
-import { mountBackground, notifyChange, TARGETS, COMPOSE_CENTER } from "../lib/background.ts";
+import { mountBackground, notifyChange, TARGETS, COMPOSE_CENTER, COMPOSE_LAYOUT, MOBILE_RECENTS } from "../lib/background.ts";
 import { defaults } from "../lib/model.ts";
 import { canvasSize, frameIsDue, MAX_IMAGE_FRAMEBUFFER_PIXELS, QUALITY_SCALE } from "../lib/capy-effect.ts";
 
-function mediaScope(css: string): { start: number; end: number } {
-  const start = css.indexOf("@media (min-width:768px)");
+function mediaScopeFor(css: string, query: string): { start: number; end: number } {
+  const start = css.indexOf(`@media (${query})`);
   const open = css.indexOf("{", start);
   let depth = 0;
   for (let index = open; index < css.length; index++) {
     if (css[index] === "{") depth++;
     else if (css[index] === "}" && --depth === 0) return { start, end: index };
   }
-  throw new Error("Unterminated desktop media block");
+  throw new Error(`Unterminated ${query} media block`);
+}
+function mediaScope(css: string): { start: number; end: number } {
+  return mediaScopeFor(css, "min-width:768px");
 }
 
 test("keeps the compact New thread layout native below BB's desktop breakpoint", () => {
@@ -24,6 +27,24 @@ test("keeps the compact New thread layout native below BB's desktop breakpoint",
   assert.match(scoped, /root-compose-compact-composer[^}]*order:\s*-1/);
   assert.match(scoped, /root-compose-compact-bottom-spacer/);
   assert.match(scoped, /root-compose-compact-fade/);
+});
+
+test("renders the mobile Recent list as one card without the host header band", () => {
+  const { start, end } = mediaScopeFor(MOBILE_RECENTS, "max-width:767px");
+  const block = MOBILE_RECENTS.slice(start, end + 1);
+  for (const expected of [
+    "margin:0 10px 8px",
+    "border-radius:16px",
+    "background:color-mix(in oklab,var(--background) 94%,transparent)",
+    "> :first-child::after",
+    "position:static",
+    "data-overflow-fade",
+    "border-top:1px solid",
+    '> [role="status"]',
+    "background:transparent",
+  ]) assert.ok(block.includes(expected), `Mobile Recent card must include ${expected}`);
+  const desktop = COMPOSE_LAYOUT.slice(0, COMPOSE_LAYOUT.indexOf(MOBILE_RECENTS));
+  assert.ok(!desktop.includes("data-root-compose-mobile-recents"), "Desktop media block must not style the mobile-only recents element");
 });
 
 test("render-quality tiers increase drawing-buffer density", () => {
@@ -61,10 +82,7 @@ test("applies scoped backgrounds, disables cleanly and ignores a late fetch afte
     notifyChange({ settings: defaults, image: null, slots: [], activeSlot: null });
     assert.match(document.head.textContent!, /thread-detail-timeline-panel/);
     assert.ok(document.head.textContent!.includes(TARGETS));
-    assert.match(document.head.textContent!, /data-root-compose-mobile-recents.*letter-spacing:\.02em; text-transform:none/s);
-    assert.match(document.head.textContent!, /data-root-compose-mobile-recents.*data-overflow-fade.*display:none/s);
-    assert.match(document.head.textContent!, /:root:not\(\.dark\).*data-root-compose-mobile-recents.*background:color-mix\(in oklab,var\(--background\) 94%,transparent\)/s);
-    assert.match(document.head.textContent!, /\.dark.*data-root-compose-mobile-recents.*background:color-mix\(in oklab,var\(--background\) 30%,transparent\)/s);
+    assert.ok(document.head.textContent!.includes("@media (max-width:767px)"));
     assert.ok(!document.head.textContent!.includes("aside"));
     assert.ok(document.head.textContent!.includes(".aura-capy-layer{top:var(--bb-app-chrome-row-height, 48px);}"));
     const emitted = document.head.textContent!;

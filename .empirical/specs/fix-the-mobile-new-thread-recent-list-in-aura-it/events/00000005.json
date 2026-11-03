@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "sequence": 5,
+  "previousDigest": "sha256:777ac8e5efc3173e2c27d99ac7d5680c70097658d220b615c56cb72279ddc6fa",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Planned the mobile recents card CSS move, unit/browser assertions for the card and dividers, version 0.2.8, and the PR + tag release.",
+  "createdAt": "2026-11-03T01:53:56.513Z",
+  "stateBeforeDigest": "sha256:9f3987b673710abf36b5b37c3f1956b6fb132398fa319deccc14a6ec792ce874",
+  "stateAfterDigest": "sha256:97e8b17133135c96597aee4438da78b8e49cfd30787f609bf47539fb15d87881",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 5,
+    "activeFeature": "fix-the-mobile-new-thread-recent-list-in-aura-it",
+    "request": "Fix the mobile New thread Recent list in Aura: it currently sits directly on the wallpaper with an opaque sticky header band and rows with no separation, which the user dislikes. Render it as an intentional themed card below the wallpaper (rounded surface, bordered, readable in light and dark), with the Recent heading above a hairline rule and hairline dividers between rows instead of the solid band; keep the scroll behavior, keep desktop unchanged, bump Aura to 0.2.8, then release the new version with a PR, merge it, and push the aura/v0.2.8 tag.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Planned the mobile recents card CSS move, unit/browser assertions for the card and dividers, version 0.2.8, and the PR + tag release.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:3fffeecd060db2a37ee3dd3afde6476d162eef757a153edc9ded18a84cc6dba1",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:f952b6fc6ae2bf0adb55783c0439ba5fb77a2998799d0c16d480628d099bf3be",
+    "impactDigest": "sha256:3116b87f21a9f0ec9966858149360e07dbcef6b53744e392ce4bbcaf201db62a",
+    "capabilityClaimId": "fix-the-mobile-new-thread-recent-list-in-aura-it-cc68f5a839ef",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-11-03T01:53:56.513Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "fix-the-mobile-new-thread-recent-list-in-aura-it-cc68f5a839ef",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "fix-the-mobile-new-thread-recent-list-in-aura-it",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_ewg9qvzf3u-1/bb-plugins",
+      "worktreeId": "sha256:df5c7cec4aefc3a67685510252a591b7a787534d21472dde30d3ce59760e5ab6",
+      "baseCommit": "1ee17f364b978b32938f5b591484c7c2b46ee6ca",
+      "baseTree": "034099ec5d5765beec7c489f11503dfb288ce654",
+      "bases": {
+        "aura-background-surface": {
+          "capability": "aura-background-surface",
+          "digest": "sha256:d8b9223bf56691850f3c481a3e5afc743c1d2270998ae19ce62b915d063be832",
+          "requirements": {
+            "mobile recent list surface": null
+          }
+        }
+      },
+      "capabilities": [
+        "aura-background-surface"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-11-03T01:53:33.233Z",
+      "heartbeatAt": "2026-11-03T01:53:33.233Z",
+      "digest": "sha256:1d225919ecc2ee520d4c63039d09feee235a7d6bbf1cc8c3e4615c5dc79e465b"
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 8,
+      "capabilities": 1,
+      "reason": "One CSS surface change in one constant plus its tests; a split would leave the mobile list half-styled and the release tag waits on the same visual change.",
+      "actor": "agent",
+      "revision": 2
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:5cb0186327c273b06effaea30b73dc93aac079c40471052be93d7bc476f190e5"
+}
