@@ -24,6 +24,10 @@ const projectColorsHook = await readFile(
   new URL("../hooks/use-project-colors.ts", import.meta.url),
   "utf8",
 );
+const factoryTab = await readFile(
+  new URL("../components/inbox/factory-bots-tab.tsx", import.meta.url),
+  "utf8",
+);
 
 describe("Dockside settings contract", () => {
   it("declares every palette and behavior setting with safe defaults", () => {
@@ -63,6 +67,11 @@ describe("Dockside settings contract", () => {
     assert.match(server, /default: "Expanded"/);
     assert.match(server, /factoryBots:/);
     assert.match(server, /callRpc\(/);
+    assert.match(inbox, /FactoryBotsTabs/);
+    assert.match(inbox, /FactoryBotsPage/);
+    assert.match(factoryTab, /role="tablist"/);
+    assert.match(factoryTab, /label="In motion"/);
+    assert.match(factoryTab, /label="On call"/);
   });
 
   it("registers one settings preview and reads live settings", () => {

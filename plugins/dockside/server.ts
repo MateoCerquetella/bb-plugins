@@ -380,8 +380,8 @@ export default function plugin(bb: BbPluginApi) {
     },
     showFactoryBots: {
       type: "boolean",
-      label: "Show Factory bots section",
-      description: "Adds the Empirical Factory agents above Chats in the sidebar.",
+      label: "Show Factory bots tab",
+      description: "Adds a Bots tab beside Threads; the native thread list stays untouched.",
       default: false,
     },
   });

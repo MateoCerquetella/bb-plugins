@@ -81,7 +81,7 @@ import {
 } from "@/lib/project-order";
 import { familyIsPinned, groupFamiliesByStatus } from "@/lib/status-groups";
 import { groupSidebarFamilies } from "@/lib/sidebar-sections";
-import { FactoryBotSection } from "@/components/inbox/factory-bot-section";
+import { FactoryBotsPage, FactoryBotsTabs } from "@/components/inbox/factory-bots-tab";
 
 const EMPTY_STATE_CLASS = "px-2 py-6 text-center text-xs text-muted-foreground";
 
@@ -160,6 +160,7 @@ export function ThreadInbox({
   const [bulkOutcomes, setBulkOutcomes] = useState<
     Array<{ id: string; message: string; failed: boolean }>
   >([]);
+  const [sidebarTab, setSidebarTab] = useState<"threads" | "bots">("threads");
 
   const providerInfoById = useMemo<
     ReadonlyMap<string, ProviderGlyphInfo>
@@ -660,20 +661,20 @@ export function ThreadInbox({
       style={docksidePreferenceStyle(preferences) as CSSProperties}
       className="flex min-h-0 flex-1 flex-col"
     >
-      <output className="sr-only" aria-live="polite" aria-atomic="true">
-        {reorderAnnouncement}
-      </output>
-      <div className="shrink-0">
-        {preferences.showFactoryBots ? (
-          <FactoryBotSection
-            state={factoryBots}
-            onOpen={(agent) =>
-              openFactoryBots(`agent/${encodeURIComponent(agent.name)}`)
-            }
-            onOpenPanel={() => openFactoryBots("")}
-          />
-        ) : null}
-        <div className="flex h-8 items-center gap-2 px-2.5 pb-1 text-muted-foreground">
+      {preferences.showFactoryBots ? (
+        <FactoryBotsTabs tab={sidebarTab} onChange={setSidebarTab} />
+      ) : null}
+      <div
+        className={cn(
+          "flex min-h-0 flex-1 flex-col",
+          preferences.showFactoryBots && sidebarTab === "bots" && "hidden",
+        )}
+      >
+        <output className="sr-only" aria-live="polite" aria-atomic="true">
+          {reorderAnnouncement}
+        </output>
+        <div className="shrink-0">
+          <div className="flex h-8 items-center gap-2 px-2.5 pb-1 text-muted-foreground">
           <Icon name="Folder" className="size-3.5" aria-hidden />
           <span className="text-2xs font-semibold uppercase tracking-wider">
             Chats
@@ -892,13 +893,23 @@ export function ThreadInbox({
         )}
       </div>
 
-      <BulkDeleteDialog
-        open={bulkPreview !== null}
-        preview={bulkPreview}
-        busy={bulkBusy}
-        onCancel={() => setBulkPreview(null)}
-        onConfirm={() => void confirmSelectedDeletion()}
-      />
+        <BulkDeleteDialog
+          open={bulkPreview !== null}
+          preview={bulkPreview}
+          busy={bulkBusy}
+          onCancel={() => setBulkPreview(null)}
+          onConfirm={() => void confirmSelectedDeletion()}
+        />
+      </div>
+      {preferences.showFactoryBots && sidebarTab === "bots" ? (
+        <FactoryBotsPage
+          state={factoryBots}
+          onOpen={(agent) =>
+            openFactoryBots(`agent/${encodeURIComponent(agent.name)}`)
+          }
+          onOpenPanel={() => openFactoryBots("")}
+        />
+      ) : null}
     </div>
   );
 }
