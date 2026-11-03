@@ -76,69 +76,6 @@ export function FactoryBotsTabs({
   );
 }
 
-/** The default Threads view: blocked tickets are visible without opening Bots. */
-export function FactoryAttentionInbox({
-  agents,
-  onOpen,
-}: {
-  agents: FactoryAgent[];
-  onOpen: (agent: FactoryAgent) => void;
-}) {
-  if (agents.length === 0) return null;
-  return (
-    <section
-      aria-label="Factory tickets needing a person"
-      className="mx-3 mt-2 shrink-0 overflow-hidden rounded-md border border-destructive/30 bg-destructive/5 sm:mx-2.5"
-    >
-      <div className="flex items-center gap-1.5 px-2.5 py-1.5 text-2xs font-medium text-destructive">
-        <Icon name="CircleQuestion" className="size-3.5" aria-hidden />
-        <span>Needs a person</span>
-        <span className="ml-auto tabular-nums text-destructive/70">
-          {agents.length}
-        </span>
-      </div>
-      <ul className="border-t border-destructive/15">
-        {agents.map((agent) => (
-          <li key={agent.name} className="border-b border-destructive/15 last:border-b-0">
-            <button
-              type="button"
-              onClick={() => onOpen(agent)}
-              title={`${agent.displayName} · ${agent.ticketId ?? "ticket unknown"} · ${agent.statusReason ?? ""}`}
-              aria-label={`Answer ${agent.displayName}'s ${agent.ticketId ?? "ticket"}: ${agent.statusReason ?? "needs a person"}`}
-              className="flex w-full items-center gap-2 px-2.5 py-2 text-left transition-colors hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            >
-              <span className="size-7 shrink-0">
-                <DoodOrb
-                  agentId={agent.name}
-                  status={agent.status}
-                  size={28}
-                  outfit={loadAgentDood(agent.name).outfit}
-                />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="flex min-w-0 items-baseline gap-1.5">
-                  <span className="truncate text-2xs font-medium text-foreground">
-                    {agent.displayName}
-                  </span>
-                  <span className="shrink-0 text-[10px] font-semibold text-destructive">
-                    {agent.ticketId ?? "ticket unknown"}
-                  </span>
-                </span>
-                <span className="mt-0.5 block truncate text-[10.5px] text-muted-foreground">
-                  {agent.statusReason ?? agent.ticketTitle ?? "Needs a person"}
-                </span>
-              </span>
-              <span className="shrink-0 rounded-[5px] border border-destructive/45 px-1.5 py-0.5 text-[10px] font-semibold text-destructive">
-                Answer
-              </span>
-            </button>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
 function FactoryBotRow({
   agent,
   onOpen,
