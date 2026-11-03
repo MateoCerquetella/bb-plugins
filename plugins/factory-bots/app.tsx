@@ -2,7 +2,6 @@ import "./app.css";
 
 import {
   useEffect,
-  useMemo,
   useRef,
   useState,
   type FormEvent,
@@ -34,7 +33,6 @@ import type {
 } from "./contract";
 import { DoodOrb, type DoodOrbHandle } from "./lib/dood-orb";
 import { GiftDialog } from "./lib/gift-dialog";
-import { drawing } from "./lib/orb";
 import { WardrobeDialog } from "./lib/wardrobe-dialog";
 import { Pixels } from "./lib/pixels";
 import { avatarLook } from "./lib/dood";
@@ -714,17 +712,6 @@ function AgentHeader({
   const [treatOver, setTreatOver] = useState(false);
   const [now, setNow] = useState(() => Date.now());
   const gift = boxCountdown(dood, now);
-  const coreTraits = useMemo(() => {
-    try {
-      const core = drawing();
-      const genome = core?.makeGenome(agent.name);
-      return core !== null && core !== undefined && genome !== undefined
-        ? core.describeGenome(genome, true)
-        : [];
-    } catch {
-      return [];
-    }
-  }, [agent.name]);
   const feed = (): void => {
     orb.current?.feed();
     setDood((value) => ({ ...value, fed: value.fed + 1 }));
@@ -846,24 +833,6 @@ function AgentHeader({
                 : `${dood.owned.length} of ${WEAR_ITEMS.length} found.`}
             </span>
           </div>
-          {coreTraits.length === 0 ? null : (
-            <details className="fb-core">
-              <summary>
-                Core
-                {coreTraits.find(([label]) => label.toLowerCase().includes("temper"))?.[1]
-                  ? ` · ${coreTraits.find(([label]) => label.toLowerCase().includes("temper"))![1]}`
-                  : ""}
-              </summary>
-              <dl>
-                {coreTraits.map(([label, value]) => (
-                  <div key={label}>
-                    <dt>{label}</dt>
-                    <dd>{value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </details>
-          )}
         </div>
       </div>
       {wardrobeOpen ? (
@@ -929,6 +898,71 @@ function Field({
     <div className="fb-field">
       <dt>{label}</dt>
       <dd className={tone === undefined ? undefined : `fb-${tone}`}>{children}</dd>
+    </div>
+  );
+}
+
+/** A tool result that is JSON is easier to scan as a tree than as one long line. */
+function parseJsonText(text: string): unknown | null {
+  const trimmed = text.trim();
+  if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) return null;
+  try {
+    return JSON.parse(trimmed) as unknown;
+  } catch {
+    return null;
+  }
+}
+
+function JsonValueView({ value, depth = 0 }: { value: unknown; depth?: number }) {
+  if (value === null) return <span className="fb-json-null">null</span>;
+  if (typeof value === "string") {
+    return <span className="fb-json-string">"{value}"</span>;
+  }
+  if (typeof value === "number") {
+    return <span className="fb-json-number">{String(value)}</span>;
+  }
+  if (typeof value === "boolean") {
+    return <span className="fb-json-boolean">{String(value)}</span>;
+  }
+  if (Array.isArray(value)) {
+    if (value.length === 0) return <span className="fb-json-muted">[]</span>;
+    return (
+      <span className="fb-json-tree">
+        <span className="fb-json-muted">[</span>
+        {value.map((entry, index) => (
+          <span className="fb-json-row" key={index} style={{ paddingLeft: 12 + depth * 10 }}>
+            <span className="fb-json-index">{index}</span>
+            <JsonValueView value={entry} depth={depth + 1} />
+          </span>
+        ))}
+        <span className="fb-json-muted">]</span>
+      </span>
+    );
+  }
+  if (typeof value === "object") {
+    const entries = Object.entries(value as Record<string, unknown>);
+    if (entries.length === 0) return <span className="fb-json-muted">{"{}"}</span>;
+    return (
+      <span className="fb-json-tree">
+        <span className="fb-json-muted">{"{"}</span>
+        {entries.map(([key, entry]) => (
+          <span className="fb-json-row" key={key} style={{ paddingLeft: 12 + depth * 10 }}>
+            <span className="fb-json-key">{key}</span>
+            <span className="fb-json-muted">:</span>
+            <JsonValueView value={entry} depth={depth + 1} />
+          </span>
+        ))}
+        <span className="fb-json-muted">{"}"}</span>
+      </span>
+    );
+  }
+  return <span className="fb-json-muted">{String(value)}</span>;
+}
+
+function JsonBlock({ value }: { value: unknown }) {
+  return (
+    <div className="fb-json" role="region" aria-label="JSON result">
+      <JsonValueView value={value} />
     </div>
   );
 }
@@ -1003,7 +1037,11 @@ function TranscriptView({ transcript }: { transcript: Transcript }) {
                       ? "You"
                       : "Tool result"}
                 </span>
-                <Markdown content={entry.text} className="fb-entry-text" />
+                {parseJsonText(entry.text) === null ? (
+                  <Markdown content={entry.text} className="fb-entry-text" />
+                ) : (
+                  <JsonBlock value={parseJsonText(entry.text)} />
+                )}
               </li>
             );
           })}

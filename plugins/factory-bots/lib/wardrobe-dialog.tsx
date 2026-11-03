@@ -12,6 +12,45 @@ import {
   type WearSlot,
 } from "./wear-items";
 
+
+/** A small mark for what a tile is: a hat, glasses, a face, or a neck thing. */
+function SlotIcon({ slot }: { slot: WearSlot }) {
+  if (slot === "hat") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 10.5 8.3 4h7.4L17 10.5" fill="currentColor" opacity=".9" />
+        <path d="M5.5 10.5h13a1.5 1.5 0 0 1 0 3h-13a1.5 1.5 0 0 1 0-3Z" fill="currentColor" />
+        <path d="M8.3 18.5h7.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" opacity=".55" />
+      </svg>
+    );
+  }
+  if (slot === "glasses") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <circle cx="7" cy="13" r="3.2" />
+        <circle cx="17" cy="13" r="3.2" />
+        <path d="M10.2 12.2h3.6M4.1 11.2 2.8 8M19.9 11.2l1.3-3.2" strokeLinecap="round" />
+      </svg>
+    );
+  }
+  if (slot === "face") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.7">
+        <circle cx="12" cy="12" r="8.5" />
+        <circle cx="9" cy="10" r=".9" fill="currentColor" />
+        <circle cx="15" cy="10" r=".9" fill="currentColor" />
+        <path d="M8.8 14.2c1.8 1.8 4.6 1.8 6.4 0" strokeLinecap="round" />
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M4 8.5 9 6l3 3 3-3 5 2.5-2 4.5H6L4 8.5Z" fill="currentColor" opacity=".85" />
+      <path d="M7 13.5 6 20l4-2 2 2 2-2 4 2-1-6.5" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 const SLOT_LABEL: Record<WearSlot, string> = {
   hat: "Hats",
   glasses: "Glasses",
@@ -153,7 +192,16 @@ export function WardrobeDialog({
                   style={{ "--tier": rarity.color } as React.CSSProperties}
                 >
                   <span className="fb-wardrobe-tile-art">
-                    {has ? item.name.slice(0, 1).toUpperCase() : "?"}
+                    {has ? (
+                      <DoodOrb
+                        agentId={agentId}
+                        status={status}
+                        size={40}
+                        outfit={{ [item.slot]: item.id }}
+                      />
+                    ) : (
+                      <SlotIcon slot={item.slot} />
+                    )}
                   </span>
                   <span className="fb-wardrobe-tile-name">
                     {has ? item.name : rarity.label}

@@ -2664,3 +2664,76 @@
     margin: 0;
   }
 }
+
+.fb-wardrobe-tile-art svg {
+  width: 24px;
+  height: 24px;
+  color: var(--tier);
+}
+
+.fb-wardrobe-tile[data-owned="false"] .fb-wardrobe-tile-art svg {
+  opacity: 0.55;
+}
+
+/* Tool results that are JSON get a readable tree, not a wall of text. */
+.fb-json {
+  max-height: 320px;
+  overflow: auto;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--foreground) 2.5%, transparent);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  line-height: 1.55;
+  text-align: left;
+}
+
+.fb-json-tree,
+.fb-json-row {
+  display: block;
+}
+
+.fb-json-row {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding-left: 12px;
+}
+
+.fb-json-key {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.fb-json-string {
+  color: var(--fb-working);
+  overflow-wrap: anywhere;
+}
+
+.fb-json-number {
+  color: #2563eb;
+}
+
+.fb-json-boolean {
+  color: #b45309;
+}
+
+.fb-json-index,
+.fb-json-null,
+.fb-json-muted {
+  color: var(--muted-foreground);
+}
+
+.fb-wardrobe-tile-art {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+}
+
+.fb-wardrobe-tile-art .fb-orb {
+  width: 40px;
+  height: 40px;
+}

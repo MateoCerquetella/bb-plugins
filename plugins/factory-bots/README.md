@@ -23,7 +23,7 @@ arrives six hours after the last one is opened, and one waits at most, the same
 rhythm as do.computer. Opening it finds one thing the creature does not have
 yet, and what it finds can be worn right there. Wardrobe is a full dressing page
 with a large live Dood and every slot; each agent's treats, gifts, and outfit are
-kept on this machine. The Core disclosure shows the seed traits behind the face.
+kept on this machine.
 
 ![The large wardrobe page](assets/screenshots/wardrobe.png)
 
