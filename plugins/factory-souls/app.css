@@ -916,3 +916,58 @@
     flex-direction: column;
   }
 }
+
+/* The Dood is the visible side of the soul, beside its prose. */
+.fs-row-identity {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
+}
+
+.fs-row-dood {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  flex: none;
+}
+
+.fs-row-dood .fb-dood {
+  width: 100%;
+  height: 100%;
+}
+
+.fs-detail-title {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+}
+
+.fs-detail-dood {
+  display: inline-flex;
+  width: 88px;
+  height: 88px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--primary) 5%, var(--background));
+}
+
+.fs-detail-dood .fb-orb {
+  display: block;
+}
+
+@media (max-width: 620px) {
+  .fs-detail-dood {
+    width: 68px;
+    height: 68px;
+  }
+
+  .fs-detail-dood canvas {
+    width: 68px !important;
+    height: 68px !important;
+  }
+}

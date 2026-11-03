@@ -51,10 +51,13 @@
     "app.tsx",
     "app.css",
     "contract.ts",
-    "lib/"
+    "lib/",
+    "vendor/",
+    "THIRD_PARTY_NOTICES.md"
   ],
   "dependencies": {
-    "zod": "^4.3.6"
+    "zod": "^4.3.6",
+    "three": "0.128.0"
   },
   "devDependencies": {
     "@get-bb/plugin-sdk": "0.4.29",

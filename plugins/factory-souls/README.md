@@ -4,10 +4,11 @@ Read and deliberately edit the prose each [Empirical
 Factory](https://github.com/GoEmpirical/empirical-factory) bot is told.
 
 Factory Souls is a standalone BB plugin. It lists the Factory bots in their
-fixed order, shows each soul in a monospace editor, and can replace one soul
-through the Factory MCP. A change needs a diff review first, then a second
-dialog where you type the bot name exactly and acknowledge that its next turn
-uses the new text. The person making the change is recorded as the author.
+fixed order with each seed-grown Dood, shows each soul beside its live Dood in
+a monospace editor, and can replace one soul through the Factory MCP. A change
+needs a diff review first, then a second dialog where you type the bot name
+exactly and acknowledge that its next turn uses the new text. The person making
+the change is recorded as the author.
 
 ## Install
 

@@ -22,6 +22,8 @@ import {
   type StatusResult,
   type rpcContract,
 } from "./contract";
+import { DoodAvatar } from "./lib/dood";
+import { DoodOrb } from "./lib/dood-orb";
 import {
   draftIsUnsaved,
   readAuthor,
@@ -229,7 +231,12 @@ function SoulList({
                   onClick={() => onSelect(entry.bot as BotName)}
                 >
                   <span className="fs-row-top">
-                    <span className="fs-row-name">{botTitle(entry.bot)}</span>
+                    <span className="fs-row-identity">
+                      <span className="fs-row-dood" aria-hidden="true">
+                        <DoodAvatar agentId={entry.bot} />
+                      </span>
+                      <span className="fs-row-name">{botTitle(entry.bot)}</span>
+                    </span>
                     {unsaved ? <Badge tone="warn">Unsaved</Badge> : null}
                   </span>
                   <span className="fs-row-summary">{soulSummary(entry.soul)}</span>
@@ -584,9 +591,14 @@ function SoulDetail({
         ← All souls
       </button>
       <div className="fs-detail-head">
-        <div>
-          <span className="fs-kicker">Soul</span>
-          <h2 id="fs-detail-title">{botTitle(bot)}</h2>
+        <div className="fs-detail-title">
+          <span className="fs-detail-dood" aria-hidden="true">
+            <DoodOrb agentId={bot} status="idle" size={88} />
+          </span>
+          <div>
+            <span className="fs-kicker">Soul</span>
+            <h2 id="fs-detail-title">{botTitle(bot)}</h2>
+          </div>
         </div>
         <div className="fs-detail-badges">
           {verified ? <Badge tone="good">Verified saved</Badge> : null}
