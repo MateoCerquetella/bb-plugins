@@ -1,9 +1,30 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { JSDOM } from "jsdom";
-import { mountBackground, notifyChange, TARGETS } from "../lib/background.ts";
+import { mountBackground, notifyChange, TARGETS, COMPOSE_CENTER } from "../lib/background.ts";
 import { defaults } from "../lib/model.ts";
 import { canvasSize, frameIsDue, MAX_IMAGE_FRAMEBUFFER_PIXELS, QUALITY_SCALE } from "../lib/capy-effect.ts";
+
+function mediaScope(css: string): { start: number; end: number } {
+  const start = css.indexOf("@media (min-width:768px)");
+  const open = css.indexOf("{", start);
+  let depth = 0;
+  for (let index = open; index < css.length; index++) {
+    if (css[index] === "{") depth++;
+    else if (css[index] === "}" && --depth === 0) return { start, end: index };
+  }
+  throw new Error("Unterminated desktop media block");
+}
+
+test("keeps the compact New thread layout native below BB's desktop breakpoint", () => {
+  const { start, end } = mediaScope(COMPOSE_CENTER);
+  const outside = COMPOSE_CENTER.slice(0, start) + COMPOSE_CENTER.slice(end + 1);
+  assert.equal(outside.trim(), "", "No compact-layout override may be emitted outside the desktop media block");
+  const scoped = COMPOSE_CENTER.slice(start, end + 1);
+  assert.match(scoped, /root-compose-compact-composer[^}]*order:\s*-1/);
+  assert.match(scoped, /root-compose-compact-bottom-spacer/);
+  assert.match(scoped, /root-compose-compact-fade/);
+});
 
 test("render-quality tiers increase drawing-buffer density", () => {
   assert.equal(QUALITY_SCALE.performance, 1 / 4);
@@ -46,6 +67,13 @@ test("applies scoped backgrounds, disables cleanly and ignores a late fetch afte
     assert.match(document.head.textContent!, /\.dark.*data-root-compose-mobile-recents.*background:color-mix\(in oklab,var\(--background\) 30%,transparent\)/s);
     assert.ok(!document.head.textContent!.includes("aside"));
     assert.ok(document.head.textContent!.includes(".aura-capy-layer{top:var(--bb-app-chrome-row-height, 48px);}"));
+    const emitted = document.head.textContent!;
+    const composeScope = mediaScope(emitted);
+    const firstCompact = emitted.indexOf("root-compose-compact");
+    const composerRule = emitted.indexOf("root-compose-compact-composer");
+    assert.ok(firstCompact > composeScope.start && firstCompact < composeScope.end, "No compact-layout selector may precede the desktop media block");
+    assert.ok(composerRule > composeScope.start && composerRule < composeScope.end, "Composer override must live inside the desktop media block");
+    assert.match(emitted.slice(composerRule, composerRule + 200), /order:-1/);
     notifyChange({ settings: { ...defaults, topbarBackground: true }, image: null, slots: [], activeSlot: null });
     assert.ok(document.head.textContent!.includes(".aura-capy-layer{top:0;}"));
     notifyChange({ settings: defaults, image: null, slots: [], activeSlot: null });
@@ -73,6 +101,7 @@ test("applies scoped backgrounds, disables cleanly and ignores a late fetch afte
 
     notifyChange({ settings: { ...defaults, enabled: false }, image: null, slots: [], activeSlot: null });
     assert.match(document.head.textContent!, /root-compose-main-panel/);
+    assert.match(document.head.textContent!, /^\s*@media \(min-width:768px\)/);
     assert.ok(!document.head.textContent!.includes("aura-capy-layer"));
     assert.equal(document.querySelectorAll('.aura-capy-layer').length, 0);
     controller.abort();

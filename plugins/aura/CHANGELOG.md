@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.7 - 2026-11-02
+
+- Keep BB's native compact New thread composer pinned to the bottom of the
+  screen on phones. Aura's centered composition now applies only at 768px and
+  wider, so mobile recents scroll above a thumb-reachable composer while the
+  wallpaper and half-wallpaper modes still render.
+
 ## 0.2.6 - 2026-11-02
 
 - Keep the wallpaper out of BB's top bar by default so the header cannot pick
