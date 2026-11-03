@@ -92,6 +92,13 @@ const detail = {
   transcriptRefetched: true,
 };
 
+const chat = {
+  ok: true,
+  answer: "Filed FB-9 and handed it to Sieve.",
+  created: ["FB-9"],
+  fetchedAt: Date.now(),
+};
+
 const offline = {
   ok: false,
   reason: "not-running",
@@ -155,6 +162,23 @@ try {
   await page.waitForTimeout(6_000);
   assert(boardHits.count >= 2, "the board did not refresh after 5s");
   await page.locator(".fb-root").screenshot({ path: `${ARTIFACTS}board.png` });
+
+  await mock(page, "sendMessage", chat, { count: 0 });
+  await page.getByRole("button", { name: "Orchestrator chat" }).click();
+  await page.locator(".fb-chat textarea").fill("Make the export button red");
+  await page.getByRole("button", { name: "Send", exact: true }).click();
+  await page.locator(".fb-msg--orchestrator").waitFor();
+  assert(
+    (await page.locator(".fb-msg--orchestrator").innerText()).includes("Filed FB-9"),
+    "the Orchestrator answer did not render",
+  );
+  assert(
+    (await page.getByRole("button", { name: "Open FB-9" }).count()) === 1,
+    "the created ticket link is missing",
+  );
+  await page.getByRole("button", { name: /Board/ }).click();
+  await page.locator(".fb-grid").waitFor();
+
   const ticketHits = { count: 0 };
   await mock(page, "getTicket", detail, ticketHits);
   await page.getByRole("button", { name: /^Helm,/ }).click();

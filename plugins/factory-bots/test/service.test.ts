@@ -429,6 +429,41 @@ test("a ticket still renders when its transcript alone fails", async () => {
   assert.equal(transcriptAttempts, 2);
 });
 
+test("sends a message to the Orchestrator through factory_message", async () => {
+  const caller = new StubCaller((name) => {
+    if (name === "factory_message") return { answer: "Filed it.", created: ["FB-9"] };
+    return new Error(`unexpected tool ${name}`);
+  });
+  const service = new FactoryService({ caller, startCommand: null, now: () => 7 });
+  const result = await service.sendMessage("make the export button red");
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.answer, "Filed it.");
+  assert.deepEqual(result.created, ["FB-9"]);
+  assert.deepEqual(caller.calls[0], {
+    name: "factory_message",
+    args: { message: "make the export button red" },
+  });
+});
+
+test("an MCP without factory_message is an actionable unavailable state", async () => {
+  const service = new FactoryService({
+    caller: {
+      async callTool() {
+        return { isError: true, text: "Unknown tool factory_message." };
+      },
+    },
+    startCommand: null,
+    now: () => 1,
+  });
+  const result = await service.sendMessage("hello");
+  assert.equal(result.ok, false);
+  if (result.ok) return;
+  assert.equal(result.reason, "unavailable");
+  assert.match(result.message, /factory_message/);
+  assert.match(result.message, /Rebuild and restart/);
+});
+
 test("a ticket read while the factory is down is not-running", async () => {
   const service = new FactoryService({
     caller: {

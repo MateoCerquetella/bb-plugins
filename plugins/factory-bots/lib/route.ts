@@ -2,6 +2,7 @@
 
 export type PanelRoute =
   | { view: "board" }
+  | { view: "chat" }
   | { view: "agent"; agent: string }
   | { view: "ticket"; agent: string; linearId: string };
 
@@ -10,6 +11,8 @@ export function parsePanelRoute(subPath: string): PanelRoute {
     .split("/")
     .filter((part) => part !== "")
     .map((part) => safeDecode(part));
+
+  if (parts[0] === "chat") return { view: "chat" };
 
   if (parts[0] === "agent" && parts.length >= 2 && parts[1] !== "") {
     if (parts[2] === "ticket" && parts[3] !== undefined && parts[3] !== "") {

@@ -1,6 +1,6 @@
 # Factory Bots
 
-A live, read-only board of an Empirical Factory inside BB.
+A live board of an Empirical Factory inside BB, plus one Orchestrator chat.
 
 Factory Bots shows the agents `factory_status` returns (up to seven) as one
 card each: the column it owns, its conversation, how many tickets it holds, and
@@ -8,20 +8,30 @@ whether it is idle, working, or blocked. Click an agent to see its tickets; clic
 its stage, attempts, stop reason, decisions, worktree, and transcript with the
 live tool call highlighted.
 
+**Orchestrator chat** is the single entry point for work: it sends one message
+to the factory's Orchestrator, which files a ticket and drives it through
+Sieve → Helm → Lens → Warden. The board stays read-only; the chat is the only
+write path.
+
 ![Factory Bots board](assets/screenshots/board.png)
 
 ![An agent's ticket with stage, attempts, decisions, worktree, and transcript](assets/screenshots/ticket.png)
 
 ## Data source
 
-Factory Bots reads through the Factory MCP server, never the factory database
-and never a write endpoint. It calls only:
+Factory Bots reads through the Factory MCP server and never opens the factory
+database. The board calls the five read tools:
 
 - `factory_status`
 - `factory_tickets`
 - `factory_ticket`
 - `factory_tasks`
 - `factory_transcript`
+
+The Orchestrator chat calls one more tool, `factory_message`. It is the only
+write tool: it forwards one message to the Orchestrator and returns its answer
+and the tickets it created. The plugin never creates a ticket, moves a stage,
+or calls a factory HTTP write endpoint itself.
 
 The connection lives in [`factory.mcp.json`](./factory.mcp.json):
 
@@ -47,8 +57,12 @@ POSIX shell syntax.
 The MCP child gets only a small runtime environment (paths, locale, timezone)
 plus the config's `env`; it does not inherit BB's provider credentials.
 
-The plugin never starts, stops, or drives the factory. There is no POST, no
-ticket creation, no stage change, and no database access anywhere in it.
+The plugin never starts or stops the factory, never creates or advances a
+ticket itself, and never opens the database. The chat's one write tool is the
+only path that can change factory state, and the Orchestrator owns it.
+
+If the MCP does not expose `factory_message`, the chat shows an actionable
+message; rebuild and restart the factory so the tool is present.
 
 ## Status rules
 
@@ -67,6 +81,19 @@ shows `No column`.
 
 Per-agent tokens and cost are intentionally omitted: the read tools this plugin
 may use do not attribute usage per agent, so showing a number would be invented.
+
+## Talk to the Orchestrator
+
+![The Orchestrator chat answering a live factory message](assets/screenshots/chat.png)
+
+Open **Orchestrator chat** from the board header and type a request. The chat
+keeps the conversation in the panel, shows the Orchestrator's answer, and links
+the tickets it created. A model turn can take minutes; the message box stays
+disabled with a working state until the answer arrives.
+
+The Orchestrator decides whether a request is agent-implementable. It can file
+a ticket and hand it to the stage that owns it; the board then shows the normal
+stage, task, and transcript updates.
 
 ## Refresh and transcripts
 

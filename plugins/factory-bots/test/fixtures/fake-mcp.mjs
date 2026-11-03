@@ -185,6 +185,8 @@ function payloadFor(name, args) {
       return { tickets };
     case "factory_tasks":
       return { tasks };
+    case "factory_message":
+      return { answer: `Filed: ${args.message}`, created: ["FB-9"] };
     case "debug_env":
       return {
         sentinel: process.env.FACTORY_TEST_SENTINEL ?? null,

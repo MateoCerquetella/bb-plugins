@@ -147,8 +147,24 @@ export const TicketResultSchema = z.discriminatedUnion("ok", [
   FailureSchema,
 ]);
 
+export const ChatPayloadSchema = z.object({
+  answer: z.string(),
+  created: z.array(z.string()),
+});
+
+export const ChatResultSchema = z.discriminatedUnion("ok", [
+  z.object({
+    ok: z.literal(true),
+    fetchedAt: z.number(),
+    answer: z.string(),
+    created: z.array(z.string()),
+  }),
+  FailureSchema,
+]);
+
 export type AgentCard = z.infer<typeof AgentCardSchema>;
 export type AgentStatus = z.infer<typeof AgentStatusSchema>;
+export type ChatResult = z.infer<typeof ChatResultSchema>;
 export type BoardFailure = z.infer<typeof FailureSchema>;
 export type BoardOnline = z.infer<typeof BoardOnlineSchema>;
 export type BoardResult = z.infer<typeof BoardResultSchema>;
@@ -171,5 +187,9 @@ export const rpcContract = defineRpcContract({
   getTicket: {
     input: z.object({ linearId: z.string().min(1) }).strict(),
     output: TicketResultSchema,
+  },
+  sendMessage: {
+    input: z.object({ message: z.string().trim().min(1).max(4_000) }).strict(),
+    output: ChatResultSchema,
   },
 });

@@ -60,6 +60,19 @@ test("passes tool arguments and returns ticket JSON", async () => {
   }
 });
 
+test("sends a factory_message and reads the Orchestrator answer", async () => {
+  const mcp = client();
+  try {
+    const result = await mcp.callTool("factory_message", { message: "build it" });
+    assert.equal(result.isError, false);
+    const payload = parse(result.text) as { answer: string; created: string[] };
+    assert.equal(payload.answer, "Filed: build it");
+    assert.deepEqual(payload.created, ["FB-9"]);
+  } finally {
+    mcp.dispose();
+  }
+});
+
 test("surfaces fetch failed as an error answer, not a throw", async () => {
   const mcp = client("not-running");
   try {

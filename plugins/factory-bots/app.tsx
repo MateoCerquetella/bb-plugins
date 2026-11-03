@@ -1,6 +1,12 @@
 import "./app.css";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import {
   definePluginApp,
   useBbNavigate,
@@ -13,6 +19,7 @@ import type {
   AgentStatus,
   BoardResult,
   BoardSnapshot,
+  ChatResult,
   TicketDetail,
   TicketResult,
   TicketSummary,
@@ -275,11 +282,13 @@ function BoardHeader({
   fetchedAt,
   failure,
   transportError,
+  onChat,
 }: {
   snapshot: BoardSnapshot | null;
   fetchedAt: number | null;
   failure: { reason: "not-running" | "unavailable" } | null;
   transportError: boolean;
+  onChat: () => void;
 }) {
   const health =
     failure?.reason === "not-running"
@@ -304,6 +313,9 @@ function BoardHeader({
         <div className="fb-title-row">
           <h1>Factory Bots</h1>
           <HealthPill tone={health.tone} label={health.label} />
+          <button type="button" className="fb-chat-link" onClick={onChat}>
+            Orchestrator chat
+          </button>
         </div>
         <p className="fb-subtitle">
           Read-only view through the Factory MCP
@@ -394,9 +406,11 @@ function AgentCardView({
 function BoardView({
   board,
   onOpenAgent,
+  onChat,
 }: {
   board: Polled<BoardResult>;
   onOpenAgent: (name: string) => void;
+  onChat: () => void;
 }) {
   const data = board.data;
   const snapshot = data?.ok === true ? data.snapshot : null;
@@ -409,6 +423,7 @@ function BoardView({
         fetchedAt={fetchedAt}
         failure={data?.ok === false ? data : null}
         transportError={board.error !== null}
+        onChat={onChat}
       />
       {board.error !== null ? (
         <RpcError message={board.error} />
@@ -842,6 +857,146 @@ function AgentView({
   );
 }
 
+interface ChatEntry {
+  id: number;
+  role: "user" | "orchestrator" | "error";
+  text: string;
+  created: string[];
+}
+
+function ChatView({
+  rpc,
+  onBack,
+  onOpenTicket,
+}: {
+  rpc: RpcClient;
+  onBack: () => void;
+  onOpenTicket: (linearId: string) => void;
+}) {
+  const [entries, setEntries] = useState<ChatEntry[]>([]);
+  const [input, setInput] = useState("");
+  const [sending, setSending] = useState(false);
+  const nextId = useRef(1);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ block: "nearest" });
+  }, [entries, sending]);
+
+  const push = (
+    role: ChatEntry["role"],
+    text: string,
+    created: string[] = [],
+  ): void => {
+    setEntries((current) => [
+      ...current,
+      { id: nextId.current++, role, text, created },
+    ]);
+  };
+
+  const send = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
+    event.preventDefault();
+    const text = input.trim();
+    if (text === "" || sending) return;
+    setInput("");
+    push("user", text);
+    setSending(true);
+    try {
+      const result = (await rpc.call("sendMessage", { message: text })) as ChatResult;
+      if (result.ok) push("orchestrator", result.answer, result.created);
+      else push("error", result.message);
+    } catch (cause) {
+      push("error", errorText(cause));
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <div className="fb-chat">
+      <div className="fb-chat-head">
+        <button type="button" className="fb-back" onClick={onBack}>
+          ← Board
+        </button>
+        <div className="fb-chat-title">
+          <h2>Orchestrator</h2>
+          <span className="fb-chat-tag">Single chat</span>
+        </div>
+        <p className="fb-chat-sub">
+          Ask for work. The Orchestrator files a ticket and drives it through
+          Sieve → Helm → Lens → Warden. This is the only write path; the board
+          stays read-only.
+        </p>
+      </div>
+
+      <div className="fb-chat-log" aria-live="polite">
+        {entries.length === 0 && !sending ? (
+          <div className="fb-chat-empty">
+            <p>Tell the Orchestrator what to build, fix, or investigate.</p>
+            <p className="fb-muted">
+              It decides whether the ticket is agent-implementable, files it,
+              and hands it to the stage that owns it.
+            </p>
+          </div>
+        ) : null}
+        {entries.map((entry) => (
+          <div key={entry.id} className={`fb-msg fb-msg--${entry.role}`}>
+            <span className="fb-msg-role">
+              {entry.role === "user"
+                ? "You"
+                : entry.role === "orchestrator"
+                  ? "Orchestrator"
+                  : "Error"}
+            </span>
+            <p>{entry.text}</p>
+            {entry.created.length > 0 ? (
+              <div className="fb-msg-tickets">
+                {entry.created.map((linearId) => (
+                  <button
+                    key={linearId}
+                    type="button"
+                    onClick={() => onOpenTicket(linearId)}
+                  >
+                    Open {linearId}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        ))}
+        {sending ? (
+          <div className="fb-msg fb-msg--orchestrator fb-msg--pending">
+            <span className="fb-msg-role">Orchestrator</span>
+            <p>Working through the factory…</p>
+          </div>
+        ) : null}
+        <div ref={bottomRef} />
+      </div>
+
+      <form className="fb-chat-form" onSubmit={(event) => void send(event)}>
+        <textarea
+          value={input}
+          onChange={(event) => setInput(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+              event.preventDefault();
+              event.currentTarget.form?.requestSubmit();
+            }
+          }}
+          maxLength={4_000}
+          rows={2}
+          placeholder="Ask the Orchestrator for work…"
+          aria-label="Message the Orchestrator"
+          disabled={sending}
+        />
+        <button type="submit" disabled={sending || input.trim() === ""}>
+          {sending ? "Working…" : "Send"}
+        </button>
+      </form>
+    </div>
+  );
+}
+
 function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
   const route = parsePanelRoute(subPath);
   const rpc = useRpc<typeof rpcContract>();
@@ -864,7 +1019,17 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
   return (
     <div className="fb-root" ref={rootRef} tabIndex={-1}>
       {route.view === "board" ? (
-        <BoardView board={board} onOpenAgent={(name) => go(agentRoute(name))} />
+        <BoardView
+          board={board}
+          onOpenAgent={(name) => go(agentRoute(name))}
+          onChat={() => go("chat")}
+        />
+      ) : route.view === "chat" ? (
+        <ChatView
+          rpc={rpc}
+          onBack={() => go("")}
+          onOpenTicket={(linearId) => go(ticketRoute("sieve", linearId))}
+        />
       ) : (
         <AgentView
           board={board}

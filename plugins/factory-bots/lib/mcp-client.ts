@@ -88,12 +88,14 @@ export class FactoryMcpClient {
   async callTool(
     name: string,
     args: Record<string, unknown> = {},
+    options: { timeoutMs?: number } = {},
   ): Promise<ToolResult> {
     await this.ensureStarted();
     const response = await this.request(
       "tools/call",
       { name, arguments: args },
       `tool ${name}`,
+      options.timeoutMs,
     );
     const result = asRecord(response.result);
     if (result === null) {
@@ -206,6 +208,7 @@ export class FactoryMcpClient {
     method: string,
     params: unknown,
     label = method,
+    timeoutMs = this.timeoutMs,
   ): Promise<JsonRpcMessage> {
     if (this.disposed) {
       return Promise.reject(new Error("Factory MCP client is disposed."));
@@ -220,13 +223,13 @@ export class FactoryMcpClient {
         this.pending.delete(id);
         reject(
           new Error(
-            `Factory MCP did not answer ${label} within ${this.timeoutMs}ms.`,
+            `Factory MCP did not answer ${label} within ${timeoutMs}ms.`,
           ),
         );
         // A wedged request must not hold the next 5s refresh; replace the
         // process and let the next call start a clean handshake.
         this.stopChild();
-      }, this.timeoutMs);
+      }, timeoutMs);
 
       this.pending.set(id, { resolve, reject, timer });
       try {

@@ -13,6 +13,10 @@ test("the empty sub-path is the board", () => {
   assert.deepEqual(parsePanelRoute("unknown/thing"), { view: "board" });
 });
 
+test("the chat route is its own view", () => {
+  assert.deepEqual(parsePanelRoute("chat"), { view: "chat" });
+});
+
 test("an agent route keeps the factory's name", () => {
   assert.deepEqual(parsePanelRoute("agent/sieve"), {
     view: "agent",

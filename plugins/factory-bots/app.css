@@ -62,6 +62,28 @@
   letter-spacing: -0.03em;
 }
 
+.fb-chat-link {
+  margin-left: 4px;
+  padding: 4px 9px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--card);
+  color: var(--foreground);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.fb-chat-link:hover {
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+  background: color-mix(in srgb, var(--primary) 7%, var(--card));
+}
+
+.fb-chat-link:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 .fb-subtitle {
   margin: 6px 0 0;
   font-size: 12px;
@@ -894,6 +916,182 @@
   background: color-mix(in srgb, var(--fb-blocked) 7%, transparent);
   font-size: 12px;
   line-height: 1.5;
+}
+
+.fb-chat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-width: 920px;
+  min-height: 0;
+  margin: 0 auto;
+}
+
+.fb-chat-head {
+  flex: none;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.fb-chat-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.fb-chat-title h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+}
+
+.fb-chat-tag {
+  padding: 2px 7px;
+  border: 1px solid color-mix(in srgb, var(--primary) 28%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary) 7%, transparent);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.fb-chat-sub {
+  max-width: 680px;
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+
+.fb-chat-log {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 120px;
+  padding: 16px 2px;
+  overflow-y: auto;
+}
+
+.fb-chat-empty {
+  margin: auto;
+  max-width: 440px;
+  padding: 24px;
+  text-align: center;
+}
+
+.fb-chat-empty p {
+  margin: 0 0 6px;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.fb-msg {
+  max-width: 82%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--card);
+}
+
+.fb-msg--user {
+  align-self: flex-end;
+  border-color: color-mix(in srgb, var(--primary) 24%, var(--border));
+  background: color-mix(in srgb, var(--primary) 7%, var(--card));
+}
+
+.fb-msg--error {
+  border-color: color-mix(in srgb, var(--destructive) 32%, var(--border));
+  background: color-mix(in srgb, var(--destructive) 6%, var(--card));
+}
+
+.fb-msg--pending {
+  opacity: 0.7;
+}
+
+.fb-msg-role {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.fb-msg p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.fb-msg-tickets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.fb-msg-tickets button {
+  padding: 3px 8px;
+  border: 1px solid color-mix(in srgb, var(--primary) 30%, var(--border));
+  border-radius: 5px;
+  background: var(--card);
+  color: var(--foreground);
+  font: inherit;
+  font-size: 10.5px;
+  cursor: pointer;
+}
+
+.fb-chat-form {
+  display: flex;
+  flex: none;
+  align-items: flex-end;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.fb-chat-form textarea {
+  flex: 1;
+  min-height: 48px;
+  max-height: 180px;
+  padding: 9px 10px;
+  resize: vertical;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--background);
+  color: var(--foreground);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.fb-chat-form textarea:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.fb-chat-form button {
+  padding: 9px 14px;
+  border: 1px solid color-mix(in srgb, var(--primary) 40%, var(--border));
+  border-radius: 8px;
+  background: var(--primary);
+  color: var(--primary-foreground, #fff);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fb-chat-form button:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .fb-wrong-holder {

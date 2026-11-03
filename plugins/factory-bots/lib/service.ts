@@ -1,4 +1,5 @@
 import {
+  ChatPayloadSchema,
   FactoryStatusPayloadSchema,
   FactoryTicketsPayloadSchema,
   FactoryTasksPayloadSchema,
@@ -6,6 +7,7 @@ import {
   TranscriptSchema,
   type BoardFailure,
   type BoardResult,
+  type ChatResult,
   type TicketResult,
   type Transcript,
 } from "../contract.js";
@@ -15,6 +17,7 @@ export interface ToolCaller {
   callTool(
     name: string,
     args?: Record<string, unknown>,
+    options?: { timeoutMs?: number },
   ): Promise<{ isError: boolean; text: string }>;
 }
 
@@ -226,6 +229,43 @@ export class FactoryService {
    * One transient detail failure should not blank the board; a second failure
    * still fails closed so a blocked ticket can never silently disappear.
    */
+  /**
+   * The one write path: send a person's words to the Orchestrator. A model
+   * turn can take minutes, so this call has its own long timeout.
+   */
+  async sendMessage(message: string): Promise<ChatResult> {
+    const fetchedAt = this.now();
+    const read = await this.readTool(
+      "factory_message",
+      { message },
+      15 * 60_000,
+    );
+    if (!read.ok) {
+      if (read.message.includes("Unknown tool factory_message")) {
+        return this.failure(
+          "unavailable",
+          "This Factory MCP does not expose factory_message yet. Rebuild and restart the factory.",
+          fetchedAt,
+        );
+      }
+      return this.failure(read.reason, read.message, fetchedAt);
+    }
+    const parsed = ChatPayloadSchema.safeParse(read.value);
+    if (!parsed.success) {
+      return this.failure(
+        "unavailable",
+        `Orchestrator answer did not match the expected shape (${describe(parsed.error)}).`,
+        fetchedAt,
+      );
+    }
+    return {
+      ok: true,
+      fetchedAt,
+      answer: parsed.data.answer,
+      created: parsed.data.created,
+    };
+  }
+
   private async readDetail(linearId: string): Promise<ToolRead> {
     const first = await this.readTool("factory_ticket", { linearId });
     if (first.ok) return first;
@@ -235,6 +275,7 @@ export class FactoryService {
   private async readTool(
     name: string,
     args: Record<string, unknown> = {},
+    timeoutMs?: number,
   ): Promise<ToolRead> {
     if (this.caller === null) {
       return {
@@ -246,7 +287,11 @@ export class FactoryService {
 
     let response: { isError: boolean; text: string };
     try {
-      response = await this.caller.callTool(name, args);
+      response = await this.caller.callTool(
+        name,
+        args,
+        timeoutMs === undefined ? undefined : { timeoutMs },
+      );
     } catch (cause) {
       const message = cause instanceof Error ? cause.message : String(cause);
       return {
