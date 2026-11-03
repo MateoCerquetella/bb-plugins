@@ -56,12 +56,13 @@ import {
 } from "./lib/dood-state";
 import { activeLiveTool, isGenerating, readLiveTools } from "./lib/live";
 import { SoulsView } from "./lib/souls-view";
-import { stageLabel } from "./lib/derive";
+import { attentionTicketMap, stageLabel } from "./lib/derive";
 import { agentRoute, parsePanelRoute, ticketRoute } from "./lib/route";
 
 const PANEL_PATH = "factory-bots";
 const REFRESH_MS = 5_000;
 const CHAT_WIDTH_KEY = "factory-bots:chat-width:v1";
+const CHAT_OPEN_KEY = "factory-bots:chat-open:v1";
 const MIN_CHAT_WIDTH = 300;
 const MAX_CHAT_WIDTH = 560;
 const DEFAULT_CHAT_WIDTH = 360;
@@ -78,6 +79,14 @@ function readChatWidth(): number {
       : DEFAULT_CHAT_WIDTH;
   } catch {
     return DEFAULT_CHAT_WIDTH;
+  }
+}
+
+function readChatOpen(): boolean {
+  try {
+    return localStorage.getItem(CHAT_OPEN_KEY) !== "false";
+  } catch {
+    return true;
   }
 }
 
@@ -538,10 +547,12 @@ function BotList({
 function ThreadRow({
   ticket,
   agent,
+  attention,
   onOpen,
 }: {
   ticket: TicketSummary;
   agent: AgentCard | undefined;
+  attention: string | null;
   onOpen: (ticket: TicketSummary) => void;
 }) {
   const botName = agent?.displayName ?? ticket.bot;
@@ -549,11 +560,11 @@ function ThreadRow({
   return (
     <button
       type="button"
-      className="fb-list-row"
+      className={`fb-list-row${attention === null ? "" : " fb-list-row--attention"}`}
       onClick={() => onOpen(ticket)}
       aria-label={`${ticket.title}, ${ticket.linearId}, ${stageLabel(
         ticket.stage,
-      )}, ${botName}`}
+      )}, ${botName}${attention === null ? "" : `, ${attention} needs an answer`}`}
     >
       <span className="fb-avatar-wrap fb-list-avatar">
         {agent === undefined ? (
@@ -579,6 +590,11 @@ function ThreadRow({
         </span>
         <span className="fb-list-meta">
           <span className="fb-model-pill">{botName}</span>
+          {attention === null ? null : (
+            <span className="fb-attention-pill" title={`${attention} needs an answer`}>
+              Needs answer
+            </span>
+          )}
           {ticket.feature === null ? null : (
             <span className="fb-list-feature" title={ticket.feature}>
               {ticket.feature}
@@ -604,10 +620,12 @@ function ThreadRow({
 function ThreadList({
   tickets,
   agents,
+  attentionByTicket,
   onOpen,
 }: {
   tickets: readonly TicketSummary[];
   agents: readonly AgentCard[];
+  attentionByTicket: ReadonlyMap<string, string>;
   onOpen: (ticket: TicketSummary) => void;
 }) {
   const sections = [
@@ -651,6 +669,7 @@ function ThreadList({
               key={ticket.linearId}
               ticket={ticket}
               agent={agents.find((agent) => agent.name === ticket.bot)}
+              attention={attentionByTicket.get(ticket.linearId) ?? null}
               onOpen={onOpen}
             />
           ))}
@@ -678,6 +697,10 @@ function BoardView({
   const data = board.data;
   const snapshot = data?.ok === true ? data.snapshot : null;
   const fetchedAt = data?.fetchedAt ?? null;
+  const attentionByTicket =
+    data?.ok === true
+      ? attentionTicketMap(data.agents, data.tickets)
+      : new Map<string, string>();
 
   return (
     <>
@@ -705,6 +728,11 @@ function BoardView({
                 onClick={() => onTab("threads")}
               >
                 Threads
+                {attentionByTicket.size === 0 ? null : (
+                  <span className="fb-tab-attention">
+                    {attentionByTicket.size}
+                  </span>
+                )}
               </button>
               <button
                 type="button"
@@ -725,6 +753,7 @@ function BoardView({
             <ThreadList
               tickets={data.tickets}
               agents={data.agents}
+              attentionByTicket={attentionByTicket}
               onOpen={onOpenTicket}
             />
           ) : (
@@ -899,24 +928,32 @@ function AgentHeader({
 function TicketRow({
   ticket,
   selected,
+  attention,
   onSelect,
 }: {
   ticket: TicketSummary;
   selected: boolean;
+  attention: string | null;
   onSelect: () => void;
 }) {
   return (
     <button
       type="button"
-      className="fb-ticket-row"
+      className={`fb-ticket-row${attention === null ? "" : " fb-ticket-row--attention"}`}
       data-selected={selected ? "true" : "false"}
       data-stage={ticket.stage}
       onClick={onSelect}
       aria-current={selected ? "true" : undefined}
+      aria-label={`${ticket.linearId}, ${ticket.title}${attention === null ? "" : `, ${attention} needs an answer`}`}
     >
       <span className="fb-ticket-row-top">
         <span className="fb-ticket-id">{ticket.linearId}</span>
-        <StageTag stage={ticket.stage} />
+        <span className="fb-ticket-row-flags">
+          {attention === null ? null : (
+            <span className="fb-attention-pill">Needs answer</span>
+          )}
+          <StageTag stage={ticket.stage} />
+        </span>
       </span>
       <span className="fb-ticket-title">{ticket.title}</span>
     </button>
@@ -1025,6 +1062,63 @@ function TranscriptEntryContent({ entry }: { entry: TranscriptEntry }) {
   ) : (
     <JsonBlock value={parsed} />
   );
+}
+
+function latestAssistantMessage(transcript: Transcript | null): string | null {
+  if (transcript === null) return null;
+  for (let index = transcript.entries.length - 1; index >= 0; index -= 1) {
+    const entry = transcript.entries[index];
+    if (entry === undefined) continue;
+    if (transcriptRole(entry.kind) === "assistant" && entry.text.trim() !== "") {
+      return entry.text.trim();
+    }
+  }
+  return null;
+}
+
+/** Pull the actual decision out of the blocker, not just the generic status. */
+function answerQuestion(
+  transcript: Transcript | null,
+  fallback: string | null,
+): string | null {
+  const latest = latestAssistantMessage(transcript);
+  if (latest === null) return fallback;
+  const normalized = latest.replace(/\s+/gu, " ").trim();
+  const markers = [
+    /i need (?:a person|you|someone) to (?:answer|decide|confirm|choose)/iu,
+    /(?:a person|someone|you) (?:must|need(?:s)? to) (?:answer|decide|confirm|choose)/iu,
+    /please (?:answer|confirm|decide|choose)/iu,
+    /i need (?:one|a) (?:sentence|decision) from you/iu,
+  ];
+  for (const marker of markers) {
+    const match = marker.exec(normalized);
+    if (match?.index !== undefined) return normalized.slice(match.index).trim();
+  }
+  const questions = normalized.match(/[^?]+\?/gu);
+  if (questions !== null && questions.length > 0) {
+    return questions.join(" ").trim();
+  }
+  return normalized.length <= 520 ? normalized : fallback;
+}
+
+function answerPoints(question: string | null): string[] {
+  if (question === null) return [];
+  const parts = question.split(
+    /\s*,\s*(?:and\s+)?(?=whether\b|which\b|what\b|who\b|when\b|where\b|how\b|if\b)/iu,
+  );
+  const points = parts.length > 1 ? parts : [question];
+  return points
+    .map((point, index) => {
+      const cleaned =
+        index === 0
+          ? point.replace(/^.*?\b(?:answer|decide|confirm|choose)\s+/iu, "")
+          : point;
+      const trimmed = cleaned.trim();
+      return trimmed === ""
+        ? trimmed
+        : trimmed[0]!.toUpperCase() + trimmed.slice(1);
+    })
+    .filter((point) => point !== "");
 }
 
 function TranscriptView({ transcript }: { transcript: Transcript }) {
@@ -1279,6 +1373,11 @@ function TicketDetailView({
     ticket.description !== null &&
     ticket.description.trim() !== "";
 
+  const question = isBlocked
+    ? answerQuestion(transcript, agent.statusReason)
+    : null;
+  const questionPoints = answerPoints(question);
+
   useEffect(() => {
     setSteerText("");
     setSteerError(null);
@@ -1347,11 +1446,26 @@ function TicketDetailView({
             ? `${agent.displayName} needs your answer`
             : `Reply to ${agent.displayName}`}
         </h3>
-        <p className="fb-answer-reason">
-          {isBlocked
-            ? agent.statusReason ?? "This ticket is blocked on a person."
-            : "Send a message through the Orchestrator. This ticket stays the same."}
-        </p>
+        {isBlocked && question !== null ? (
+          <div className="fb-answer-question">
+            <span className="fb-answer-question-label">What to answer</span>
+            {questionPoints.length > 1 ? (
+              <ul className="fb-answer-points">
+                {questionPoints.map((point, index) => (
+                  <li key={index}>{point}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="fb-answer-reason">{question}</p>
+            )}
+          </div>
+        ) : (
+          <p className="fb-answer-reason">
+            {isBlocked
+              ? agent.statusReason ?? "This ticket is blocked on a person."
+              : "Send a message through the Orchestrator. This ticket stays the same."}
+          </p>
+        )}
         <form className="fb-answer-form" onSubmit={(event) => void steer(event)}>
           <textarea
             id="ticket-answer"
@@ -1598,6 +1712,7 @@ function AgentView({
   }
 
   const tickets = board.data.tickets.filter((entry) => entry.bot === agent.name);
+  const attentionByTicket = attentionTicketMap(board.data.agents, board.data.tickets);
 
   return (
     <div
@@ -1624,6 +1739,7 @@ function AgentView({
                     key={entry.linearId}
                     ticket={entry}
                     selected={false}
+                    attention={attentionByTicket.get(entry.linearId) ?? null}
                     onSelect={() => onSelectTicket(entry.linearId)}
                   />
                 ))}
@@ -1655,12 +1771,14 @@ function ChatView({
   orchestrator,
   onOpenTicket,
   showComposer = true,
+  onHide,
 }: {
   rpc: RpcClient;
   active: boolean;
   orchestrator: AgentCard | undefined;
   onOpenTicket: (linearId: string) => void;
   showComposer?: boolean;
+  onHide?: () => void;
 }) {
   const [entries, setEntries] = useState<ChatEntry[]>(loadChatEntries);
   const [input, setInput] = useState("");
@@ -1791,7 +1909,20 @@ function ChatView({
             <span className="fb-chat-thread-kicker">Orchestrator</span>
             <h3>Talk to the factory</h3>
           </div>
-          <span className="fb-chat-tag">Always on</span>
+          <div className="fb-chat-head-actions">
+            <span className="fb-chat-tag">Always on</span>
+            {onHide === undefined ? null : (
+              <button
+                type="button"
+                className="fb-chat-hide"
+                onClick={onHide}
+                aria-label="Hide Orchestrator"
+                title="Hide Orchestrator"
+              >
+                Hide
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="fb-chat-care">
@@ -2019,6 +2150,7 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
   const navigate = useBbNavigate();
   const [boardTab, setBoardTab] = useState<BoardTab>("threads");
   const [chatWidth, setChatWidth] = useState(readChatWidth);
+  const [chatOpen, setChatOpen] = useState(readChatOpen);
   const [resizingChat, setResizingChat] = useState(false);
   const ticketId = route.view === "ticket" ? route.linearId : null;
   const { board, ticket } = useFactoryPoll(rpc, ticketId);
@@ -2039,6 +2171,14 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
       // The panel still works when storage is unavailable.
     }
   }, [chatWidth]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(CHAT_OPEN_KEY, String(chatOpen));
+    } catch {
+      // The panel still works when storage is unavailable.
+    }
+  }, [chatOpen]);
 
   const go = (next: string): void => {
     navigate.toPluginPanel(PANEL_PATH, { subPath: next });
@@ -2094,7 +2234,9 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
     <div className="fb-root" ref={rootRef} tabIndex={-1}>
       <div
         ref={shellRef}
-        className={`fb-shell${resizingChat ? " is-resizing" : ""}`}
+        className={`fb-shell${resizingChat ? " is-resizing" : ""}${
+          chatOpen ? "" : " is-chat-closed"
+        }`}
         style={{ "--fb-chat-width": `${chatWidth}px` } as CSSProperties}
       >
         <main className="fb-main">
@@ -2161,6 +2303,7 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
         />
       ) : null}
         </main>
+        {chatOpen ? (
         <aside className="fb-chat-dock" aria-label="Orchestrator chat">
           <div
             className="fb-chat-resize"
@@ -2181,8 +2324,26 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
             orchestrator={orchestrator}
             onOpenTicket={openChatTicket}
             showComposer={route.view !== "ticket"}
+            onHide={() => setChatOpen(false)}
           />
         </aside>
+        ) : (
+          <aside
+            className="fb-chat-dock fb-chat-dock--collapsed"
+            aria-label="Orchestrator chat collapsed"
+          >
+            <button
+              type="button"
+              className="fb-chat-expand"
+              onClick={() => setChatOpen(true)}
+              aria-expanded={false}
+              title="Show Orchestrator"
+              aria-label="Show Orchestrator"
+            >
+              Orchestrator
+            </button>
+          </aside>
+        )}
       </div>
     </div>
   );

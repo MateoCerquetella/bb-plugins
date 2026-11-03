@@ -3908,3 +3908,166 @@
     padding-bottom: 0;
   }
 }
+
+/* A blocked ticket announces itself in the thread list, not only in Bots. */
+.fb-attention-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 5px;
+  border: 1px solid color-mix(in srgb, var(--fb-blocked) 52%, var(--border));
+  border-radius: 4px;
+  color: var(--fb-blocked);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.fb-tab-attention {
+  padding: 0 5px;
+  border: 1px solid color-mix(in srgb, var(--fb-blocked) 52%, var(--border));
+  border-radius: 999px;
+  color: var(--fb-blocked);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.fb-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.fb-tabs button[aria-selected="true"] .fb-tab-attention {
+  border-color: color-mix(in srgb, var(--background) 55%, transparent);
+  color: var(--background);
+}
+
+.fb-list-row--attention {
+  box-shadow: inset 3px 0 var(--fb-blocked);
+  background: color-mix(in srgb, var(--fb-blocked) 4%, transparent);
+}
+
+.fb-ticket-row-flags {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 5px;
+}
+
+.fb-ticket-row.fb-ticket-row--attention {
+  border-left-color: var(--fb-blocked);
+  background: color-mix(in srgb, var(--fb-blocked) 5%, transparent);
+}
+
+/* The Orchestrator rail collapses to a slim tab so the agent gets the width. */
+.fb-chat-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fb-chat-hide {
+  padding: 3px 7px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--card);
+  color: var(--muted-foreground);
+  font: inherit;
+  font-size: 9.5px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.fb-chat-hide:hover {
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+  background: color-mix(in srgb, var(--primary) 6%, var(--card));
+  color: var(--foreground);
+}
+
+.fb-shell.is-chat-closed {
+  grid-template-columns: minmax(0, 1fr) 44px;
+  gap: 10px;
+}
+
+.fb-chat-dock--collapsed {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 12px;
+}
+
+.fb-chat-expand {
+  height: 172px;
+  padding: 10px 6px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--muted-foreground);
+  font: inherit;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+  cursor: pointer;
+}
+
+.fb-chat-expand:hover {
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+  color: var(--foreground);
+}
+
+@media (max-width: 1150px) {
+  .fb-shell.is-chat-closed {
+    display: block;
+  }
+
+  .fb-chat-dock--collapsed {
+    height: auto;
+    margin-top: 12px;
+    padding: 0;
+  }
+
+  .fb-chat-expand {
+    width: 100%;
+    height: auto;
+    padding: 9px 10px;
+    writing-mode: horizontal-tb;
+  }
+}
+
+.fb-answer-question {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.fb-answer-question-label {
+  color: var(--fb-blocked);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.fb-answer-points {
+  display: flex;
+  margin: 0;
+  padding-left: 16px;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+.fb-answer-points li {
+  padding-left: 1px;
+}
+
+.fb-answer-points li::marker {
+  color: var(--fb-blocked);
+}

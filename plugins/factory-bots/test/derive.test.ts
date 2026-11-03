@@ -11,7 +11,9 @@ import {
 } from "../contract.js";
 import {
   AGENT_ORDER,
+  agentAttentionTicket,
   agentColumn,
+  attentionTicketMap,
   deriveAgents,
   deriveSnapshot,
   displayAgentName,
@@ -321,4 +323,34 @@ test("no tickets is a normal snapshot with idle agents", () => {
   assert.equal(cards.length, 7);
   assert.equal(cards.every((card) => card.status === "idle"), true);
   assert.equal(cards.every((card) => card.ticketCount === 0), true);
+});
+
+test("attention points at the ticket named in the blocked reason", () => {
+  const tickets: TicketSummary[] = [
+    ...TICKETS,
+    {
+      linearId: "FB-179",
+      title: "Blocked ticket",
+      stage: "specification",
+      bot: "sieve",
+      feature: "empirical-sdd-sdd-179",
+      conversationId: "101",
+      labels: [],
+    },
+  ];
+  const agent = {
+    name: "sieve",
+    displayName: "Sieve",
+    conversationId: "101",
+    column: "In Specification",
+    ticketCount: 2,
+    status: "blocked" as const,
+    statusReason:
+      "No feature is selected in /home/dyaus/projects/empirical-sdd-sdd-179.",
+    statusReasonCount: 1,
+    currentWork: null,
+    taskCount: 0,
+  };
+  assert.equal(agentAttentionTicket(agent, tickets)?.linearId, "FB-179");
+  assert.deepEqual([...attentionTicketMap([agent], tickets)], [["FB-179", "Sieve"]]);
 });

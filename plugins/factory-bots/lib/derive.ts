@@ -208,3 +208,50 @@ function unique(values: readonly string[]): string[] {
   }
   return out;
 }
+
+function escapeAttentionToken(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+}
+
+function reasonMentions(reason: string, token: string): boolean {
+  if (token === "") return false;
+  return new RegExp(
+    `(^|[^a-z0-9])${escapeAttentionToken(token)}(?=$|[^a-z0-9])`,
+    "iu",
+  ).test(reason);
+}
+
+/**
+ * The ticket a blocked agent names in its status reason. The reason carries
+ * the feature path, for example `empirical-sdd-sdd-170`; matching that path is
+ * the difference between a useful alert and opening the agent's first ticket.
+ */
+export function agentAttentionTicket(
+  agent: AgentCard,
+  tickets: readonly TicketSummary[],
+): TicketSummary | null {
+  if (agent.status !== "blocked" || agent.statusReason === null) return null;
+  const owned = tickets.filter((ticket) => ticket.bot === agent.name);
+  const reason = agent.statusReason;
+  return (
+    owned.find((ticket) => reasonMentions(reason, ticket.linearId)) ??
+    owned.find(
+      (ticket) =>
+        ticket.feature !== null && reasonMentions(reason, ticket.feature),
+    ) ??
+    null
+  );
+}
+
+/** Ticket id → agent display name, for per-thread attention badges. */
+export function attentionTicketMap(
+  agents: readonly AgentCard[],
+  tickets: readonly TicketSummary[],
+): Map<string, string> {
+  const map = new Map<string, string>();
+  for (const agent of agents) {
+    const ticket = agentAttentionTicket(agent, tickets);
+    if (ticket !== null) map.set(ticket.linearId, agent.displayName);
+  }
+  return map;
+}
