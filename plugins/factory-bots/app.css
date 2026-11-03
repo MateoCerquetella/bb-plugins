@@ -2090,3 +2090,67 @@
 .fb-steer-error {
   color: var(--fb-blocked);
 }
+
+/* Ticket details fold away so the thread stays the main surface. */
+.fb-ticket-details {
+  margin: 0 0 4px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--foreground) 2%, transparent);
+}
+
+.fb-ticket-details > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 11px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--muted-foreground);
+  list-style: none;
+}
+
+.fb-ticket-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.fb-ticket-details > summary::before {
+  content: "›";
+  display: inline-block;
+  font-size: 14px;
+  line-height: 1;
+  transform: rotate(0deg);
+  transition: transform 120ms ease;
+}
+
+.fb-ticket-details[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.fb-ticket-details .fb-fields {
+  margin: 0;
+  padding: 0 11px 10px;
+}
+
+.fb-ticket-details .fb-decisions {
+  margin: 0;
+  padding: 0 11px 12px;
+}
+
+.fb-msg-body p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.fb-entry-text p {
+  margin: 0;
+}
+
+.fb-entry-text pre {
+  margin: 6px 0 0;
+  overflow-x: auto;
+  font-size: 11px;
+}

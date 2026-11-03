@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import {
+  Markdown,
   definePluginApp,
   experimental_ProviderModelPicker as ProviderModelPicker,
   useBbNavigate,
@@ -924,7 +925,7 @@ function TranscriptView({ transcript }: { transcript: Transcript }) {
               data-role={transcriptRole(entry.kind)}
             >
               <span className="fb-entry-kind">{entry.kind}</span>
-              <span className="fb-entry-text">{entry.text}</span>
+              <Markdown content={entry.text} className="fb-entry-text" />
             </li>
           ))}
         </ol>
@@ -996,40 +997,46 @@ function TicketDetailView({
         </p>
       </header>
 
-      <dl className="fb-fields">
-        <Field label="Stage">{ticket.stage}</Field>
-        <Field label="Attempts">
-          {ticket.attempts} total · {ticket.stageAttempts} this stage
-        </Field>
-        <Field
-          label="Stop reason"
-          tone={ticket.stopReason === null ? "muted" : "danger"}
-        >
-          {ticket.stopReason ?? "None"}
-        </Field>
-        <Field label="Worktree" tone="mono">
-          {ticket.worktree ?? "Not created"}
-        </Field>
-        <Field label="Feature" tone={ticket.feature === null ? "muted" : undefined}>
-          {ticket.feature ?? "None"}
-        </Field>
-        <Field label="Labels" tone={ticket.labels.length === 0 ? "muted" : undefined}>
-          {ticket.labels.length === 0 ? "None" : ticket.labels.join(", ")}
-        </Field>
-      </dl>
+      <details className="fb-ticket-details">
+        <summary>
+          <span>Ticket details</span>
+          <StageTag stage={ticket.stage} />
+        </summary>
+        <dl className="fb-fields">
+          <Field label="Stage">{ticket.stage}</Field>
+          <Field label="Attempts">
+            {ticket.attempts} total · {ticket.stageAttempts} this stage
+          </Field>
+          <Field
+            label="Stop reason"
+            tone={ticket.stopReason === null ? "muted" : "danger"}
+          >
+            {ticket.stopReason ?? "None"}
+          </Field>
+          <Field label="Worktree" tone="mono">
+            {ticket.worktree ?? "Not created"}
+          </Field>
+          <Field label="Feature" tone={ticket.feature === null ? "muted" : undefined}>
+            {ticket.feature ?? "None"}
+          </Field>
+          <Field label="Labels" tone={ticket.labels.length === 0 ? "muted" : undefined}>
+            {ticket.labels.length === 0 ? "None" : ticket.labels.join(", ")}
+          </Field>
+        </dl>
 
-      <section className="fb-decisions" aria-label="Decisions">
-        <h3>Decisions</h3>
-        {ticket.decisions.length === 0 ? (
-          <p className="fb-muted">No decisions recorded.</p>
-        ) : (
-          <ul>
-            {ticket.decisions.map((decision, index) => (
-              <li key={`${index}-${decision}`}>{decision}</li>
-            ))}
-          </ul>
-        )}
-      </section>
+        <section className="fb-decisions" aria-label="Decisions">
+          <h3>Decisions</h3>
+          {ticket.decisions.length === 0 ? (
+            <p className="fb-muted">No decisions recorded.</p>
+          ) : (
+            <ul>
+              {ticket.decisions.map((decision, index) => (
+                <li key={`${index}-${decision}`}>{decision}</li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </details>
 
       {transcriptError !== null ? (
         <p className="fb-inline-error">Transcript unavailable: {transcriptError}</p>
@@ -1413,7 +1420,7 @@ function ChatView({
                   ? "Orchestrator"
                   : "Error"}
             </span>
-            <p>{entry.text}</p>
+            <Markdown content={entry.text} className="fb-msg-body" />
             {entry.created.length > 0 ? (
               <div className="fb-msg-tickets">
                 {entry.created.map((linearId) => (

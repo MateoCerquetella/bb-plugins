@@ -192,12 +192,11 @@ below is exactly as Dockside draws it.
 
 Each factory agent gets the same live, customized Dood used inside Factory Bots,
 with its work or blocked reason, owned column, and ticket count, grouped into
-In motion, Needs a person, and On call. The cookie on a row can be dragged onto
-the Dood or clicked to feed it; the gift box is ready once every six hours; the
-pencil opens its wardrobe. Clicking an agent
-opens the Factory Bots panel at that agent and selects its first ticket, so the
-live transcript sits beside the sidebar. The tab polls the Factory Bots read API
-while it is enabled.
+In motion, Needs a person, and On call. Clicking an agent opens the Factory Bots
+panel at that agent and selects its first ticket, so the live transcript sits
+beside the sidebar. Feeding, gifts, and the wardrobe live on the Factory Bots
+agent page, not in the sidebar. The tab polls the Factory Bots read API while it
+is enabled.
 
 ### The rest
 
