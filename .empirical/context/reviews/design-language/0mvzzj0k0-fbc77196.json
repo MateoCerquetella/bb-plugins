@@ -1,13 +1,12 @@
 {
   "schemaVersion": 1,
   "page": ".empirical/context/design-language.md",
-  "head": "54125c08b60173d54c05cddc37a45cebbb01120c",
+  "head": "11279e71ded37ceb97b8dcb20fe2ec5db1718048",
   "units": [
-    "plugins/agent-canvas",
+    "plugins/action-topbar",
     "plugins/aura",
     "plugins/steel-browser",
-    "plugins/taskboard",
-    "plugins/usage-tracker"
+    "plugins/taskboard"
   ],
   "pending": {}
 }

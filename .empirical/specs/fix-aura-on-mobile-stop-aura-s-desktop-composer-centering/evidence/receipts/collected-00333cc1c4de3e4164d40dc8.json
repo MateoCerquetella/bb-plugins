@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-00333cc1c4de3e4164d40dc8",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-11-03T01:10:33.105Z",
+  "completedAt": "2026-11-03T01:10:33.105Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-aura-on-mobile-stop-aura-s-desktop-composer-centering",
+    "specRevision": 2,
+    "specDigest": "sha256:8de0d5479e774a23a91e052a011c11dac2a8c8b442076be77e49227f366bfecc",
+    "treeDigest": "sha256:cb6c46081e25ff4c5d3bbf774cf7147450a13302744342c0679ddb1e44f1f2d4",
+    "policyDigest": "sha256:6ebe58cbdef84ea3073f41581b4274f7b15a38527b5a354221da1191ec5de596"
+  },
+  "digest": "sha256:ac23d897ea33d9776aff7d571b79cac23f2c5c14dcf11fc4422ad60b2465b8c0",
+  "kind": "collected",
+  "collector": "empirical-review:isolated-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/fix-aura-on-mobile-stop-aura-s-desktop-composer-centering/reviews/ac14c71899bdfdbdec002d96.json",
+      "mediaType": "application/json",
+      "bytes": 3917,
+      "digest": "sha256:5a7055226173ee1f4b7a43f30c836d322cf759bf20c14fbb1256f7e7ac21febf"
+    },
+    {
+      "path": ".empirical/specs/fix-aura-on-mobile-stop-aura-s-desktop-composer-centering/reviews/ac14c71899bdfdbdec002d96.md",
+      "mediaType": "text/markdown",
+      "bytes": 2864,
+      "digest": "sha256:1a37ffe696990ab47d73da2f00c042ffc201e13c1f81025fbf8a1e52d177561e"
+    }
+  ]
+}
