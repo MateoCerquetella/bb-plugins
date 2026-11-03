@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-9ea284f43b4a2607ce613dbf",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-11-03T02:00:39.136Z",
+  "completedAt": "2026-11-03T02:00:39.136Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-the-mobile-new-thread-recent-list-in-aura-it",
+    "specRevision": 2,
+    "specDigest": "sha256:3fffeecd060db2a37ee3dd3afde6476d162eef757a153edc9ded18a84cc6dba1",
+    "treeDigest": "sha256:6be93b7878ce42af180e22d57a84fc99e1877e2e7afc8c385befd9b0ca49cee6",
+    "policyDigest": "sha256:6ebe58cbdef84ea3073f41581b4274f7b15a38527b5a354221da1191ec5de596"
+  },
+  "digest": "sha256:30d7d21e378971cfefabd084b1a9244c608b4a295715b03224e0c22daa47c12c",
+  "kind": "collected",
+  "collector": "empirical-review:isolated-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/fix-the-mobile-new-thread-recent-list-in-aura-it/reviews/2ef22bf415380e150b20c85f.json",
+      "mediaType": "application/json",
+      "bytes": 4197,
+      "digest": "sha256:137a89fa3184acb04ab622f9525a023d9ca3bbbc0c0a4bb4db9015a8004d5fa8"
+    },
+    {
+      "path": ".empirical/specs/fix-the-mobile-new-thread-recent-list-in-aura-it/reviews/2ef22bf415380e150b20c85f.md",
+      "mediaType": "text/markdown",
+      "bytes": 2840,
+      "digest": "sha256:a5b788fe5f56444c312b476139f608e83227f1473be007b139f3df3dfc6209bf"
+    }
+  ]
+}

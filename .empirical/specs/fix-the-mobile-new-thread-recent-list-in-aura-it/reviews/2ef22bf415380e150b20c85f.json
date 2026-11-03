@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:2b1a9222bdb82c8feb1d16b04c3f13e5fcacacf6d5b8649be244e7d9ad4238c3",
+  "mode": "fresh-context",
+  "baseRef": "origin/main",
+  "baseCommit": "1ee17f364b978b32938f5b591484c7c2b46ee6ca",
+  "headCommit": "a3959c592976a8677e2dfc57ab51d7bd236753c0",
+  "diffDigest": "sha256:62a4d311c0cada59013979acab5160874d29f5e28b3b4c787090aa661a5b8834",
+  "verdict": "APPROVED",
+  "reviewerActor": "isolated-reviewer",
+  "reviewerInvocationId": "review-mobile-recents-1",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: MOBILE_RECENTS sets margin 0 10px 8px, 16px radius, 1px --border outline, 94% --background surface, blur(16px) and a soft shadow; the near-opaque themed surface keeps text readable in both themes.\n- PASS AC-UI-1: Host header div is forced to position:static with transparent background, and its fade div is hidden by [data-overflow-fade]{display:none}; the h2 plus ::after hairline sits in normal flow, so nothing sticky paints across the wallpaper.\n- PASS AC-UI-2: Rows and the role=status row reset border/background/box-shadow to transparent; li+li gets a 1px --border top divider (overriding host space-y-px), and hover/.bg-surface-selected get a 5% foreground wash with 8px radius, no row cards.\n- PASS AC-UI-3: Card is inset 10px via margins only, so wallpaper shows above and around it; no width/height overrides, and every color derives from --background/--foreground/--border, which flip with the .dark class. Browser checks unverified here.\n- PASS AC-2: All recents rules now live in one @media (max-width:767px) block; the min-width:768px block keeps only composer chrome, and the host section is md:hidden, so 1440px is unchanged. Removed desktop recents rules targeted that hidden element.\n- PASS AC-3: apply() emits only COMPOSE_CENTER when settings.enabled is false; MOBILE_RECENTS is reachable only through COMPOSE_LAYOUT. COMPOSE_CENTER is untouched and the lifecycle test still asserts disabled CSS starts with the 768px block.\n- PASS AC-4: lifecycle.test.ts adds max-width:767px scoping plus card/header/row assertions; mobile-composer.browser.mjs measures surface/header/rows at 390x844 and 1440x1000 with a dark pass. I reran the unit suite: 36/36 pass. Browser run/screenshots unverified.\n- PASS AC-5: package.json and root lock are at 0.2.8, with a 0.2.8 CHANGELOG entry and README note. Push, PR, merge and annotated aura/v0.2.8 tag are not observable at this head (no such tag on origin) - unverified, not failed.\n\n## Security / correctness\n\nCSS/string-only change with no auth, network, persistence, or user-data surface; no new HTML interpolation and no host text is hidden except the overflow fade. The browser harness only routes the local Aura RPC with a fixture inside tests and exposes no credentials. No security or correctness concerns found.\n\n## Design / maintainability\n\nReuses Aura's existing theme tokens and the stranded recents chrome, keeps every rule in one mobile-only media block, and leaves the desktop block composer-only, so the new behavior is easy to reason about. Coupling is to the stable data attribute plus structural children, so host markup changes fail loudly in the browser check. Minor: the header hairline renders as a trailing rule beside the label rather than a full-width underline, and the broad first-child div hide (F-1) is worth narrowing.",
+  "bodyDigest": "sha256:c979de7709402c9966c39a4cdc52668a2b7c931590a38640fb88873fcbbf28f6",
+  "findings": [
+    {
+      "id": "F-1",
+      "severity": "low",
+      "category": "maintainability",
+      "summary": "`[data-root-compose-mobile-recents] > :first-child > div { display:none }` is broader than the fade it targets (already hidden by [data-overflow-fade]) and would silently hide any future host header div."
+    },
+    {
+      "id": "F-2",
+      "severity": "low",
+      "category": "tests",
+      "summary": "New browser assertions index recentsRows[1] and rows[0] link from ambient BB data, so the check throws on an instance with fewer than two Recent threads instead of seeding fixtures."
+    }
+  ],
+  "digest": "sha256:2ef22bf415380e150b20c85fc4a2ce49795e25bd49aba55c699de3136fe69d2a"
+}
