@@ -29,7 +29,8 @@ from the agent's name. It is a real animated creature; where WebGL is unavailabl
 it falls back to the same seed's static blob. Open a thread to see its ticket:
 the collapsible Linear description, a compact owner/attempts line, and a
 thread-style transcript with the live tool call highlighted. The ticket header
-keeps the agent's small Dood; the heavier agent controls stay on the agent page. Answers and the tool results that belong
+shows the owning bot in an Owner card with its live Dood and status; the heavier
+agent controls stay on the agent page. Answers and the tool results that belong
 to them are grouped into one turn, and tool payloads are folded away. The
 transcript has a steer composer that sends the person's words through the
 Orchestrator, the only write path; the steering messages stay with the ticket.

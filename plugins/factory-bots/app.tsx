@@ -1121,14 +1121,38 @@ function TranscriptView({ transcript }: { transcript: Transcript }) {
   );
 }
 
+function TicketOwner({ agent }: { agent: AgentCard }) {
+  const [dood] = useState(() => loadAgentDood(agent.name));
+  return (
+    <div className="fb-ticket-owner" aria-label={`Owned by ${agent.displayName}`}>
+      <span className="fb-avatar-wrap fb-ticket-owner-dood">
+        <DoodOrb
+          agentId={agent.name}
+          status={agent.status}
+          size={64}
+          outfit={dood.outfit}
+        />
+        <StatusDot status={agent.status} />
+      </span>
+      <span className="fb-ticket-owner-copy">
+        <span className="fb-ticket-owner-label">Owner</span>
+        <strong className="fb-ticket-owner-name">{agent.displayName}</strong>
+        <StatusTag status={agent.status} />
+      </span>
+    </div>
+  );
+}
+
 function TicketDetailView({
   ticket,
+  agent,
   transcript,
   transcriptError,
   onBack,
   onSteer,
 }: {
   ticket: TicketDetail;
+  agent: AgentCard;
   transcript: Transcript | null;
   transcriptError: string | null;
   onBack: () => void;
@@ -1167,27 +1191,23 @@ function TicketDetailView({
         </button>
       </div>
       <header className="fb-ticket-head">
-        <div className="fb-ticket-head-top">
-          <span className="fb-ticket-id">{ticket.linearId}</span>
-          <StageTag stage={ticket.stage} />
+        <div className="fb-ticket-head-main">
+          <div className="fb-ticket-head-top">
+            <span className="fb-ticket-id">{ticket.linearId}</span>
+            <StageTag stage={ticket.stage} />
+          </div>
+          <h2>{ticket.title}</h2>
+          <div className="fb-ticket-meta-line">
+            <span>{ticket.attempts} attempts</span>
+            {ticket.worktree === null ? null : (
+              <>
+                <span aria-hidden="true">·</span>
+                <span>worktree ready</span>
+              </>
+            )}
+          </div>
         </div>
-        <h2>{ticket.title}</h2>
-        <div className="fb-ticket-meta-line">
-          <span className="fb-ticket-holder">
-            <span className="fb-ticket-holder-dood" aria-hidden="true">
-              <DoodAvatar agentId={ticket.bot} />
-            </span>
-            {ticket.bot}
-          </span>
-          <span aria-hidden="true">·</span>
-          <span>{ticket.attempts} attempts</span>
-          {ticket.worktree === null ? null : (
-            <>
-              <span aria-hidden="true">·</span>
-              <span>worktree ready</span>
-            </>
-          )}
-        </div>
+        <TicketOwner agent={agent} />
       </header>
 
       {ticket.description === undefined || ticket.description === null || ticket.description.trim() === "" ? (
@@ -1256,12 +1276,14 @@ function TicketDetailView({
 function TicketPane({
   selectedId,
   agentName,
+  agent,
   ticket,
   onBack,
   onSteer,
 }: {
   selectedId: string | null;
   agentName: string;
+  agent: AgentCard;
   ticket: Polled<TicketResult>;
   onBack: () => void;
   onSteer: (ticket: TicketDetail, message: string) => Promise<ChatResult>;
@@ -1328,6 +1350,7 @@ function TicketPane({
   return (
     <TicketDetailView
       ticket={ticket.data.ticket}
+      agent={agent}
       transcript={ticket.data.transcript}
       transcriptError={ticket.data.transcriptError}
       onBack={onBack}
@@ -1441,6 +1464,7 @@ function AgentView({
           <TicketPane
             selectedId={selectedId}
             agentName={agent.name}
+            agent={agent}
             ticket={ticket}
             onBack={onBackToTickets}
             onSteer={onSteer}

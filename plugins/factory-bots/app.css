@@ -3408,3 +3408,68 @@
     flex: none;
   }
 }
+
+/* Who owns this ticket, with the same live Dood as the agent page. */
+.fb-ticket-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.fb-ticket-head-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.fb-ticket-owner {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 9px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--foreground) 2%, var(--card));
+}
+
+.fb-ticket-owner-dood {
+  width: 64px;
+  height: 64px;
+}
+
+.fb-ticket-owner-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fb-ticket-owner-label {
+  color: var(--muted-foreground);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.fb-ticket-owner-name {
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.1;
+}
+
+.fb-ticket-owner .fb-status {
+  width: fit-content;
+  margin-top: 1px;
+}
+
+@media (max-width: 620px) {
+  .fb-ticket-head {
+    flex-direction: column;
+  }
+
+  .fb-ticket-owner {
+    width: 100%;
+  }
+}
