@@ -124,15 +124,8 @@ function FactoryBotRow({
           />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="flex min-w-0 items-center gap-1">
-            <span className="truncate text-[13px] font-medium text-foreground">
-              {agent.displayName}
-            </span>
-            {agent.status === "blocked" ? (
-              <span className="shrink-0 rounded-full bg-destructive/10 px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wide text-destructive">
-                Needs you
-              </span>
-            ) : null}
+          <span className="block truncate text-[13px] font-medium text-foreground">
+            {agent.displayName}
           </span>
           {blockedTicket === null ? null : (
             <span className="mt-0.5 flex min-w-0 items-center gap-1 text-2xs">
@@ -164,7 +157,7 @@ function FactoryBotRow({
         </span>
         <span className="flex shrink-0 flex-col items-end gap-1 border-l border-sidebar-border/60 pl-2">
           {agent.status === "blocked" ? (
-            <span className="rounded-full bg-destructive px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-destructive-foreground">
+            <span className="rounded-[5px] border border-destructive/45 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-destructive">
               Answer
             </span>
           ) : null}
