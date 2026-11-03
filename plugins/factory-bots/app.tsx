@@ -1140,8 +1140,15 @@ function answerPoints(question: string | null): string[] {
     .filter((point) => point !== "");
 }
 
-function TranscriptView({ transcript }: { transcript: Transcript }) {
+function TranscriptView({
+  transcript,
+  defaultCollapsed = false,
+}: {
+  transcript: Transcript;
+  defaultCollapsed?: boolean;
+}) {
   const [expanded, setExpanded] = useState(false);
+  const [collapsed, setCollapsed] = useState(defaultCollapsed);
   const tools = readLiveTools(transcript.live);
   const active = activeLiveTool(tools);
   const generating = isGenerating(transcript.live);
@@ -1151,7 +1158,8 @@ function TranscriptView({ transcript }: { transcript: Transcript }) {
 
   useEffect(() => {
     setExpanded(false);
-  }, [transcript.linearId]);
+    setCollapsed(defaultCollapsed);
+  }, [defaultCollapsed, transcript.linearId]);
 
   return (
     <section className="fb-transcript" aria-label="Conversation">
@@ -1166,7 +1174,18 @@ function TranscriptView({ transcript }: { transcript: Transcript }) {
           ) : generating ? (
             <span className="fb-live-pill fb-live-pill--quiet">Generating</span>
           ) : null}
-          {turns.length > 1 ? (
+          <button
+            type="button"
+            className="fb-line-button fb-line-button--small"
+            onClick={() => setCollapsed((value) => !value)}
+          >
+            {collapsed
+              ? turns.length === 0
+                ? "Show conversation"
+                : `Show conversation (${turns.length})`
+              : "Hide conversation"}
+          </button>
+          {!collapsed && turns.length > 1 ? (
             <button
               type="button"
               className="fb-line-button fb-line-button--small"
@@ -1180,6 +1199,8 @@ function TranscriptView({ transcript }: { transcript: Transcript }) {
         </div>
       </div>
 
+      {collapsed ? null : (
+        <>
       {visibleTools.length > 0 ? (
         <div className="fb-live-tools">
           {visibleTools.map((tool) => (
@@ -1246,6 +1267,8 @@ function TranscriptView({ transcript }: { transcript: Transcript }) {
             </li>
           ))}
         </ol>
+      )}
+        </>
       )}
     </section>
   );
@@ -1762,7 +1785,7 @@ function TicketDetailView({
               </p>
             </section>
           ) : (
-            <TranscriptView transcript={transcript} />
+            <TranscriptView transcript={transcript} defaultCollapsed />
           )}
         </div>
       </div>

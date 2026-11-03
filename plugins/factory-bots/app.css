@@ -3831,8 +3831,9 @@
 }
 
 .fb-answer.is-blocked {
-  border-color: color-mix(in srgb, var(--fb-blocked) 38%, var(--border));
-  background: color-mix(in srgb, var(--fb-blocked) 4%, var(--card));
+  border-color: var(--border);
+  border-left: 2px solid var(--fb-blocked);
+  background: var(--card);
 }
 
 .fb-answer-kicker {
@@ -4432,4 +4433,19 @@
 .fb-ticket-meta-line > span + span {
   padding-left: 10px;
   border-left: 1px solid var(--border);
+}
+
+/* A focused ticket ends after its content instead of framing a blank well. */
+.fb-ticket-pane--full > .fb-ticket {
+  height: auto;
+}
+
+.fb-ticket-pane--full .fb-ticket-body,
+.fb-ticket-pane--full .fb-ticket-thread,
+.fb-ticket-pane--full .fb-ticket-thread .fb-transcript {
+  flex: none;
+}
+
+.fb-ticket-pane--full .fb-ticket-thread .fb-entries {
+  max-height: min(54vh, 620px);
 }

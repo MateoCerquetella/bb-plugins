@@ -25,43 +25,41 @@ const BOT_COPY: Record<
     label: "Orchestrator",
     role: "Chat and routing",
     consequence:
-      "The Orchestrator chat and routing will be unavailable. Existing tickets keep their current state.",
+      "The Orchestrator chat answers 503; comments on unknown issues are only logged.",
   },
   sieve: {
     label: "Sieve",
     role: "Specification",
     consequence:
-      "Specification tickets will stop with “capability disabled: sieve” instead of being specified.",
+      "Intake stops; the factory will not move work into specification.",
   },
   helm: {
     label: "Helm",
     role: "Implementation",
     consequence:
-      "Implementation and integration tickets will stop with “capability disabled: helm”.",
+      "Implementation stops; the factory will not move work through implementation or integration.",
   },
   lens: {
     label: "Lens",
     role: "Review",
     consequence:
-      "The factory will not review. A canonical review recorded while the ticket is waiting can still close the gate, so the team’s review is the only review.",
+      "The factory will not review; no reviewer turn is made. A canonical recorded review can still close the stage.",
   },
   warden: {
     label: "Warden",
     role: "Post-merge lifecycle",
     consequence:
-      "No Warden loop, post-merge lifecycle work, or stall paging will run.",
+      "The loop keeps ticking but does no work; merged tickets stop moving.",
   },
   audit: {
     label: "Audit",
     role: "Production-error intake",
-    consequence:
-      "Production-error intake will be unavailable. Existing tickets are unchanged.",
+    consequence: "The production-error scan refuses and exits.",
   },
   lookback: {
     label: "Lookback",
     role: "Weekly retrospective",
-    consequence:
-      "The weekly Lookback retrospective will be unavailable.",
+    consequence: "The weekly Lookback proposal refuses and exits.",
   },
 };
 
@@ -136,7 +134,10 @@ function AuditList({ entries }: { entries: readonly CapabilityAuditEntry[] }) {
         <li key={`${entry.at}:${entry.bot}:${entry.digest}`}>
           <span className="cap-audit-main">
             <strong>{BOT_COPY[entry.bot].label}</strong>
-            <span>{entry.enabled ? "enabled" : "disabled"}</span>
+            <span>
+              {entry.enabled ? "enabled" : "disabled"} (was{" "}
+              {entry.previous ? "enabled" : "disabled"})
+            </span>
           </span>
           <span className="cap-audit-meta">
             {timeLabel(entry.at)}
@@ -199,6 +200,23 @@ export function CapabilitiesView({ onBack }: { onBack: () => void }) {
     setBusy(true);
     setNotice(null);
     try {
+      // Steward rule: read immediately before every write.
+      const before = await rpc.call("getCapabilities", null);
+      if (!before.ok) {
+        setFailure(before);
+        return;
+      }
+      const current =
+        before.capabilities.bots.find((entry) => entry.bot === pending.bot)?.enabled ??
+        before.capabilities.enabled.includes(pending.bot);
+      if (current === pending.next) {
+        setCapabilities(before.capabilities);
+        setNotice(
+          `${BOT_COPY[pending.bot].label} is already ${current ? "enabled" : "disabled"}. No change was written.`,
+        );
+        setPending(null);
+        return;
+      }
       const result = await rpc.call("setCapability", {
         bot: pending.bot,
         enabled: pending.next,
@@ -207,23 +225,41 @@ export function CapabilitiesView({ onBack }: { onBack: () => void }) {
         setFailure(result);
         return;
       }
-      const nextCapabilities: CapabilitiesPayload = {
-        bots: BOT_ORDER.map((bot) => ({
-          bot,
-          enabled: result.capabilities.enabled.includes(bot),
-        })),
-        enabled: result.capabilities.enabled,
-        disabled: result.capabilities.disabled,
-      };
-      setCapabilities(nextCapabilities);
+      // Steward rule: read after the write and report the state the factory confirms.
+      const after = await rpc.call("getCapabilities", null);
+      if (!after.ok) {
+        setFailure(after);
+        setNotice(
+          `${BOT_COPY[result.bot].label} change returned, but the fresh capability read failed.`,
+        );
+        return;
+      }
+      const next =
+        after.capabilities.bots.find((entry) => entry.bot === pending.bot)?.enabled ??
+        after.capabilities.enabled.includes(pending.bot);
+      if (next !== pending.next) {
+        setCapabilities(after.capabilities);
+        setFailure({
+          ok: false,
+          reason: "unavailable",
+          message: "The capability change did not take; the factory still reports the previous state.",
+          startCommand: null,
+          fetchedAt: Date.now(),
+        });
+        return;
+      }
+      setCapabilities(after.capabilities);
+      const audit = await rpc.call("getCapabilityAudit", null);
+      if (audit.ok) setEntries(audit.entries);
+      const latest = audit.ok ? audit.entries[0] : undefined;
       setNotice(
-        `${BOT_COPY[result.bot].label} ${result.enabled ? "enabled" : "disabled"} · recorded by ${result.author}`,
+        `${BOT_COPY[result.bot].label} is now ${next ? "enabled" : "disabled"}. Previous: ${current ? "enabled" : "disabled"}. Author: ${result.author}.${
+          latest === undefined
+            ? ""
+            : ` Audit: ${timeLabel(latest.at)}.`
+        }`,
       );
       setPending(null);
-      // Refresh the audit without blocking the switch on a second MCP read.
-      void rpc.call("getCapabilityAudit", null).then((audit) => {
-        if (audit.ok) setEntries(audit.entries);
-      }).catch(() => undefined);
     } catch (cause) {
       setFailure({
         ok: false,
