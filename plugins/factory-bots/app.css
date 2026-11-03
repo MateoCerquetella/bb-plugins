@@ -2870,3 +2870,211 @@
   padding-top: 8px;
   border-top: 1px solid var(--border);
 }
+
+/* The workspace: threads on the left of the panel, Orchestrator always beside them. */
+.fb-shell {
+  display: grid;
+  max-width: 1600px;
+  min-width: 0;
+  margin: 0 auto;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 360px);
+  gap: 18px;
+  align-items: start;
+}
+
+.fb-main {
+  min-width: 0;
+}
+
+.fb-chat-dock {
+  position: sticky;
+  top: 0;
+  height: calc(100vh - 72px);
+  min-height: 560px;
+  min-width: 0;
+}
+
+.fb-chat-layout--dock {
+  display: flex;
+  height: 100%;
+  max-width: none;
+  margin: 0;
+  flex-direction: column;
+  gap: 0;
+}
+
+.fb-chat-layout--dock .fb-chat-thread {
+  height: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--card);
+}
+
+.fb-chat-thread-head--dock {
+  align-items: center;
+}
+
+.fb-chat-heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+}
+
+.fb-chat-heading h3 {
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fb-avatar-wrap--chat {
+  width: 46px;
+  height: 46px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--primary) 6%, var(--background));
+}
+
+.fb-avatar-wrap--chat .fb-dot {
+  right: -2px;
+  bottom: -2px;
+}
+
+.fb-chat-back {
+  flex: none;
+  margin: 0;
+}
+
+.fb-chat-filed--dock {
+  flex: none;
+  margin: 8px 0 0;
+  padding: 6px 0 8px;
+  border-top: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.fb-chat-layout--dock .fb-chat-log {
+  padding: 12px 2px;
+}
+
+.fb-msg-head {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 3px;
+}
+
+.fb-msg-dood {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+.fb-msg-dood .fb-dood {
+  width: 18px;
+  height: 18px;
+}
+
+.fb-msg-head .fb-msg-role {
+  margin-bottom: 0;
+}
+
+/* A compact agent header leaves room for the inner chat while keeping the Dood. */
+.fb-agent-head--compact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0 14px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+}
+
+.fb-agent-head--compact .fb-back {
+  flex-basis: 100%;
+  margin-bottom: 4px;
+}
+
+.fb-agent-head--compact .fb-agent-hero {
+  align-items: center;
+  gap: 12px;
+}
+
+.fb-agent-head--compact .fb-avatar-wrap--hero {
+  width: 64px;
+  height: 64px;
+}
+
+.fb-agent-head--compact .fb-agent-copy h2 {
+  font-size: 17px;
+}
+
+.fb-agent-head--compact .fb-agent-sub {
+  margin-top: 2px;
+  font-size: 11px;
+}
+
+.fb-agent-head--compact .fb-agent-work,
+.fb-agent-head--compact .fb-agent-care {
+  display: none;
+}
+
+.fb-ticket-list--full {
+  width: 100%;
+}
+
+.fb-ticket-pane--full {
+  width: 100%;
+  height: calc(100vh - 270px);
+  min-height: 520px;
+}
+
+.fb-ticket-pane--full .fb-ticket-back {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.fb-ticket-pane--full .fb-ticket-back .fb-back {
+  margin-bottom: 0;
+}
+
+.fb-shell.is-chat-focus {
+  display: block;
+  max-width: 1240px;
+}
+
+.fb-shell.is-chat-focus .fb-main {
+  display: none;
+}
+
+.fb-shell.is-chat-focus .fb-chat-dock {
+  position: static;
+  height: calc(100vh - 56px);
+  min-height: 560px;
+}
+
+@media (max-width: 1150px) {
+  .fb-shell {
+    display: block;
+  }
+
+  .fb-chat-dock {
+    position: static;
+    height: min(70vh, 680px);
+    margin-top: 18px;
+  }
+
+  .fb-shell.is-chat-focus .fb-chat-dock {
+    height: calc(100vh - 48px);
+    margin-top: 0;
+  }
+
+  .fb-ticket-pane--full {
+    height: auto;
+    min-height: 0;
+  }
+}

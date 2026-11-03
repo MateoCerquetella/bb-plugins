@@ -46,7 +46,7 @@ import {
   type StoredSteerEntry,
 } from "./lib/steer-store";
 import { Pixels } from "./lib/pixels";
-import { avatarLook } from "./lib/dood";
+import { DoodAvatar, avatarLook } from "./lib/dood";
 import {
   boxCountdown,
   grantGift,
@@ -76,6 +76,14 @@ interface FactoryPoll {
 
 function errorText(cause: unknown): string {
   return cause instanceof Error ? cause.message : String(cause);
+}
+
+function chatFailureText(result: ChatResult): string {
+  if (result.ok) return "";
+  if (result.reason !== "not-running" || result.startCommand === null) {
+    return result.message;
+  }
+  return `${result.message}\n\nStart it with:\n${result.startCommand}`;
 }
 
 function statusLabel(status: AgentStatus): string {
@@ -712,9 +720,11 @@ function BoardView({
 function AgentHeader({
   agent,
   onBack,
+  compact = false,
 }: {
   agent: AgentCard;
   onBack: () => void;
+  compact?: boolean;
 }) {
   const orb = useRef<DoodOrbHandle>(null);
   const [dood, setDood] = useState<AgentDood>(() => loadAgentDood(agent.name));
@@ -738,7 +748,7 @@ function AgentHeader({
   }, []);
 
   return (
-    <div className="fb-agent-head">
+    <div className={`fb-agent-head${compact ? " fb-agent-head--compact" : ""}`}>
       <button type="button" className="fb-back" onClick={onBack}>
         ← All agents
       </button>
@@ -770,7 +780,7 @@ function AgentHeader({
             ref={orb}
             agentId={agent.name}
             status={agent.status}
-            size={160}
+            size={compact ? 64 : 160}
             outfit={dood.outfit}
           />
           <StatusDot status={agent.status} />
@@ -1450,9 +1460,14 @@ function AgentView({
       className="fb-agent-view"
       data-selected={selectedId === null ? "false" : "true"}
     >
-      <AgentHeader key={agent.name} agent={agent} onBack={onBack} />
-      <div className="fb-split">
-        <aside className="fb-ticket-list" aria-label={`${agent.displayName} tickets`}>
+      <AgentHeader
+        key={agent.name}
+        agent={agent}
+        onBack={onBack}
+        compact={selectedId !== null}
+      />
+      {selectedId === null ? (
+        <aside className="fb-ticket-list fb-ticket-list--full" aria-label={`${agent.displayName} tickets`}>
           <div className="fb-section-head">
             <h3>Tickets</h3>
             <span className="fb-count-pill">{tickets.length}</span>
@@ -1468,14 +1483,15 @@ function AgentView({
                 <TicketRow
                   key={entry.linearId}
                   ticket={entry}
-                  selected={entry.linearId === selectedId}
+                  selected={false}
                   onSelect={() => onSelectTicket(entry.linearId)}
                 />
               ))}
             </div>
           )}
         </aside>
-        <div className="fb-ticket-pane">
+      ) : (
+        <div className="fb-ticket-pane fb-ticket-pane--full">
           <TicketPane
             selectedId={selectedId}
             agentName={agent.name}
@@ -1484,7 +1500,7 @@ function AgentView({
             onSteer={onSteer}
           />
         </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -1494,11 +1510,15 @@ type ChatEntry = ReturnType<typeof loadChatEntries>[number];
 function ChatView({
   rpc,
   active,
+  focused,
+  orchestrator,
   onBack,
   onOpenTicket,
 }: {
   rpc: RpcClient;
   active: boolean;
+  focused: boolean;
+  orchestrator: AgentCard | undefined;
   onBack: () => void;
   onOpenTicket: (linearId: string) => void;
 }) {
@@ -1511,6 +1531,8 @@ function ChatView({
     reasoningLevel: "medium",
   });
   const [usePickedModel, setUsePickedModel] = useState(false);
+  const [chatDood] = useState(() => loadAgentDood("orchestrator"));
+  const chatStatus = orchestrator?.status ?? "idle";
   const nextId = useRef((loadChatEntries().at(-1)?.id ?? 0) + 1);
   const bottomRef = useRef<HTMLDivElement>(null);
   const filed = [...new Set(entries.flatMap((entry) => entry.created))];
@@ -1583,7 +1605,7 @@ function ChatView({
         ...selection,
       })) as ChatResult;
       if (result.ok) push("orchestrator", result.answer, result.created);
-      else push("error", result.message);
+      else push("error", chatFailureText(result));
     } catch (cause) {
       push("error", errorText(cause));
     } finally {
@@ -1592,26 +1614,34 @@ function ChatView({
   };
 
   return (
-    <div className="fb-chat-layout">
-      <aside className="fb-chat-rail">
-        <button type="button" className="fb-back" onClick={onBack}>
-          ← Board
-        </button>
-        <div className="fb-chat-title">
-          <h2>Orchestrator</h2>
-          <span className="fb-chat-tag">Single chat</span>
+    <div className="fb-chat-layout fb-chat-layout--dock">
+      <section className="fb-chat-thread">
+        <div className="fb-chat-thread-head fb-chat-thread-head--dock">
+          <div className="fb-chat-heading">
+            <span className="fb-avatar-wrap fb-avatar-wrap--chat">
+              <DoodOrb
+                agentId="orchestrator"
+                status={chatStatus}
+                size={46}
+                outfit={chatDood.outfit}
+              />
+              <StatusDot status={chatStatus} />
+            </span>
+            <div>
+              <span className="fb-chat-thread-kicker">Orchestrator</span>
+              <h3>Talk to the factory</h3>
+            </div>
+          </div>
+          {focused ? (
+            <button type="button" className="fb-back fb-chat-back" onClick={onBack}>
+              ← Board
+            </button>
+          ) : (
+            <span className="fb-chat-tag">Always on</span>
+          )}
         </div>
-        <p className="fb-chat-sub">
-          Ask for work. The Orchestrator files a ticket and drives it through
-          Sieve → Helm → Lens → Warden. This is the only write path; the board
-          stays read-only.
-        </p>
-        <p className="fb-chat-rail-note">
-          The thread on the right is the one conversation that can change the
-          factory. The board beside it stays read-only.
-        </p>
         {filed.length === 0 ? null : (
-          <div className="fb-chat-filed">
+          <div className="fb-chat-filed fb-chat-filed--dock">
             <span>Filed tickets</span>
             {filed.map((linearId) => (
               <button
@@ -1624,16 +1654,6 @@ function ChatView({
             ))}
           </div>
         )}
-      </aside>
-
-      <section className="fb-chat-thread">
-        <div className="fb-chat-thread-head">
-          <div>
-            <span className="fb-chat-thread-kicker">Orchestrator</span>
-            <h3>Thread</h3>
-          </div>
-          <span className="fb-chat-tag">Single chat</span>
-        </div>
 
         <div className="fb-chat-log" aria-live="polite">
         {entries.length === 0 && !sending ? (
@@ -1647,13 +1667,20 @@ function ChatView({
         ) : null}
         {entries.map((entry) => (
           <div key={entry.id} className={`fb-msg fb-msg--${entry.role}`}>
-            <span className="fb-msg-role">
-              {entry.role === "user"
-                ? "You"
-                : entry.role === "orchestrator"
-                  ? "Orchestrator"
-                  : "Error"}
-            </span>
+            <div className="fb-msg-head">
+              {entry.role === "orchestrator" ? (
+                <span className="fb-msg-dood" aria-hidden="true">
+                  <DoodAvatar agentId="orchestrator" />
+                </span>
+              ) : null}
+              <span className="fb-msg-role">
+                {entry.role === "user"
+                  ? "You"
+                  : entry.role === "orchestrator"
+                    ? "Orchestrator"
+                    : "Error"}
+              </span>
+            </div>
             <Markdown content={entry.text} className="fb-msg-body" />
             {entry.created.length > 0 ? (
               <div className="fb-msg-tickets">
@@ -1672,7 +1699,12 @@ function ChatView({
         ))}
         {sending ? (
           <div className="fb-msg fb-msg--orchestrator fb-msg--pending">
-            <span className="fb-msg-role">Orchestrator</span>
+            <div className="fb-msg-head">
+              <span className="fb-msg-dood" aria-hidden="true">
+                <DoodAvatar agentId="orchestrator" />
+              </span>
+              <span className="fb-msg-role">Orchestrator</span>
+            </div>
             <p>Working through the factory…</p>
           </div>
         ) : null}
@@ -1749,22 +1781,21 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
     navigate.toPluginPanel(PANEL_PATH, { subPath: next });
   };
 
+  const orchestrator = board.data?.ok === true
+    ? board.data.agents.find((agent) => agent.name === "orchestrator")
+    : undefined;
+  const openChatTicket = (linearId: string): void => {
+    const created = board.data?.ok === true
+      ? board.data.tickets.find((entry) => entry.linearId === linearId)
+      : undefined;
+    if (created === undefined) go("");
+    else go(ticketRoute(created.bot, linearId));
+  };
+
   return (
     <div className="fb-root" ref={rootRef} tabIndex={-1}>
-      <div hidden={route.view !== "chat"}>
-        <ChatView
-          rpc={rpc}
-          active={route.view === "chat"}
-          onBack={() => go("")}
-          onOpenTicket={(linearId) => {
-            const created = board.data?.ok === true
-              ? board.data.tickets.find((entry) => entry.linearId === linearId)
-              : undefined;
-            if (created === undefined) go("");
-            else go(ticketRoute(created.bot, linearId));
-          }}
-        />
-      </div>
+      <div className={`fb-shell${route.view === "chat" ? " is-chat-focus" : ""}`}>
+        <main className="fb-main">
       {route.view === "board" ? (
         <BoardView
           board={board}
@@ -1820,6 +1851,18 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
           }}
         />
       ) : null}
+        </main>
+        <aside className="fb-chat-dock" aria-label="Orchestrator chat">
+          <ChatView
+            rpc={rpc}
+            active
+            focused={route.view === "chat"}
+            orchestrator={orchestrator}
+            onBack={() => go("")}
+            onOpenTicket={openChatTicket}
+          />
+        </aside>
+      </div>
     </div>
   );
 }
