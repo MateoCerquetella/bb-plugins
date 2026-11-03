@@ -1028,28 +1028,48 @@ function TranscriptEntryContent({ entry }: { entry: TranscriptEntry }) {
 }
 
 function TranscriptView({ transcript }: { transcript: Transcript }) {
+  const [expanded, setExpanded] = useState(false);
   const tools = readLiveTools(transcript.live);
   const active = activeLiveTool(tools);
   const generating = isGenerating(transcript.live);
   const turns = groupTranscript(transcript.entries);
+  const visibleTurns = expanded ? turns : turns.slice(-1);
+  const visibleTools = expanded ? tools : active === null ? [] : [active];
+
+  useEffect(() => {
+    setExpanded(false);
+  }, [transcript.linearId]);
 
   return (
-    <section className="fb-transcript" aria-label="Transcript">
+    <section className="fb-transcript" aria-label="Conversation">
       <div className="fb-section-head">
-        <h3>Transcript</h3>
-        {active !== null ? (
-          <span className="fb-live-pill">
-            <span className="fb-live-dot" aria-hidden="true" />
-            Live tool
-          </span>
-        ) : generating ? (
-          <span className="fb-live-pill fb-live-pill--quiet">Generating</span>
-        ) : null}
+        <h3>Conversation</h3>
+        <div className="fb-transcript-actions">
+          {active !== null ? (
+            <span className="fb-live-pill">
+              <span className="fb-live-dot" aria-hidden="true" />
+              Live tool
+            </span>
+          ) : generating ? (
+            <span className="fb-live-pill fb-live-pill--quiet">Generating</span>
+          ) : null}
+          {turns.length > 1 ? (
+            <button
+              type="button"
+              className="fb-line-button fb-line-button--small"
+              onClick={() => setExpanded((value) => !value)}
+            >
+              {expanded
+                ? "Show latest turn"
+                : `Show all ${turns.length} turns`}
+            </button>
+          ) : null}
+        </div>
       </div>
 
-      {tools.length > 0 ? (
+      {visibleTools.length > 0 ? (
         <div className="fb-live-tools">
-          {tools.map((tool) => (
+          {visibleTools.map((tool) => (
             <div
               key={`${tool.callId}-${tool.nested ? "nested" : "tool"}`}
               className={`fb-tool${tool === active ? " is-active" : ""}`}
@@ -1073,10 +1093,10 @@ function TranscriptView({ transcript }: { transcript: Transcript }) {
       ) : null}
 
       {turns.length === 0 ? (
-        <p className="fb-muted">No transcript entries yet.</p>
+        <p className="fb-muted">No conversation entries yet.</p>
       ) : (
         <ol className="fb-entries">
-          {turns.map((turn, index) => (
+          {visibleTurns.map((turn, index) => (
             <li
               key={`${index}-${turn.role}-${turn.entries[0]?.kind ?? "tool"}`}
               className={`fb-turn fb-turn--${turn.role}`}
@@ -1251,11 +1271,20 @@ function TicketDetailView({
   const [steerText, setSteerText] = useState("");
   const [steering, setSteering] = useState(false);
   const [steerError, setSteerError] = useState<string | null>(null);
-  const [descriptionOpen, setDescriptionOpen] = useState(true);
+  const [steerNotice, setSteerNotice] = useState<string | null>(null);
+  const [descriptionOpen, setDescriptionOpen] = useState(false);
+  const isBlocked = agent.status === "blocked";
   const hasDescription =
     ticket.description !== undefined &&
     ticket.description !== null &&
     ticket.description.trim() !== "";
+
+  useEffect(() => {
+    setSteerText("");
+    setSteerError(null);
+    setSteerNotice(null);
+    setDescriptionOpen(false);
+  }, [ticket.linearId]);
 
   const steer = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
@@ -1263,10 +1292,12 @@ function TicketDetailView({
     if (message === "" || steering) return;
     setSteering(true);
     setSteerError(null);
+    setSteerNotice(null);
     try {
       const result = await onSteer(ticket, message);
       if (result.ok) {
         setSteerText("");
+        setSteerNotice(`Sent to ${agent.displayName} through the Orchestrator.`);
       } else {
         setSteerError(result.message);
       }
@@ -1304,21 +1335,84 @@ function TicketDetailView({
         </div>
       </header>
 
-      <div
-        className={`fb-ticket-body${
-          hasDescription ? "" : " fb-ticket-body--no-description"
-        }${hasDescription && !descriptionOpen ? " fb-ticket-body--description-closed" : ""}`}
+      <section
+        className={`fb-answer${isBlocked ? " is-blocked" : ""}`}
+        aria-labelledby="ticket-answer-title"
       >
+        <span className="fb-answer-kicker">
+          {isBlocked ? "Needs your answer" : "Ticket reply"}
+        </span>
+        <h3 id="ticket-answer-title">
+          {isBlocked
+            ? `${agent.displayName} needs your answer`
+            : `Reply to ${agent.displayName}`}
+        </h3>
+        <p className="fb-answer-reason">
+          {isBlocked
+            ? agent.statusReason ?? "This ticket is blocked on a person."
+            : "Send a message through the Orchestrator. This ticket stays the same."}
+        </p>
+        <form className="fb-answer-form" onSubmit={(event) => void steer(event)}>
+          <textarea
+            id="ticket-answer"
+            value={steerText}
+            onChange={(event) => {
+              setSteerText(event.target.value);
+              setSteerError(null);
+              setSteerNotice(null);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                event.currentTarget.form?.requestSubmit();
+              }
+            }}
+            rows={2}
+            maxLength={3_000}
+            placeholder={`Type your answer to ${agent.displayName}…`}
+            disabled={steering}
+            aria-label={`Answer ${agent.displayName}`}
+          />
+          <button
+            type="submit"
+            className="fb-line-button fb-line-button--accent"
+            disabled={steering || steerText.trim() === ""}
+          >
+            {steering
+              ? "Sending…"
+              : isBlocked
+                ? "Send answer"
+                : "Send reply"}
+          </button>
+        </form>
+        {steerError === null ? null : (
+          <p className="fb-answer-feedback fb-answer-feedback--error" role="alert">
+            {steerError}
+          </p>
+        )}
+        {steerNotice === null ? null : (
+          <p className="fb-answer-feedback" role="status">
+            {steerNotice}
+          </p>
+        )}
+        <p className="fb-answer-note">
+          Goes through the Orchestrator. It won’t create a new ticket.
+        </p>
+      </section>
+
+      <div className="fb-ticket-body">
         {hasDescription ? (
-          <section className={`fb-ticket-description${descriptionOpen ? " is-open" : ""}`}>
+          <section
+            className={`fb-ticket-description${descriptionOpen ? " is-open" : ""}`}
+          >
             <button
               type="button"
               className="fb-ticket-description-toggle"
               aria-expanded={descriptionOpen}
               onClick={() => setDescriptionOpen((open) => !open)}
             >
-              <span>Description</span>
-              <span>{descriptionOpen ? "Hide" : "Show"}</span>
+              <span>Issue description</span>
+              <span>{descriptionOpen ? "Hide" : "Read"}</span>
             </button>
             {descriptionOpen ? (
               <div className="fb-ticket-description-body">
@@ -1330,43 +1424,21 @@ function TicketDetailView({
 
         <div className="fb-ticket-thread">
           {transcriptError !== null ? (
-            <p className="fb-inline-error">Transcript unavailable: {transcriptError}</p>
+            <p className="fb-inline-error">
+              Conversation unavailable: {transcriptError}
+            </p>
           ) : transcript === null ? (
             <section className="fb-transcript">
               <div className="fb-section-head">
-                <h3>Transcript</h3>
+                <h3>Conversation</h3>
               </div>
-              <p className="fb-muted">No transcript has been read for this ticket yet.</p>
+              <p className="fb-muted">
+                No conversation has been read for this ticket yet.
+              </p>
             </section>
           ) : (
             <TranscriptView transcript={transcript} />
           )}
-
-          <form className="fb-steer" onSubmit={(event) => void steer(event)}>
-            <div className="fb-steer-row">
-              <textarea
-                value={steerText}
-                onChange={(event) => setSteerText(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" && !event.shiftKey) {
-                    event.preventDefault();
-                    event.currentTarget.form?.requestSubmit();
-                  }
-                }}
-                rows={1}
-                maxLength={3_000}
-                placeholder="Steer this ticket through the Orchestrator…"
-                disabled={steering}
-                aria-label="Steer this ticket"
-              />
-              <button type="submit" disabled={steering || steerText.trim() === ""}>
-                {steering ? "Steering…" : "Steer"}
-              </button>
-            </div>
-            {steerError === null ? null : (
-              <p className="fb-steer-error" role="alert">{steerError}</p>
-            )}
-          </form>
         </div>
       </div>
     </article>
@@ -1582,11 +1654,13 @@ function ChatView({
   active,
   orchestrator,
   onOpenTicket,
+  showComposer = true,
 }: {
   rpc: RpcClient;
   active: boolean;
   orchestrator: AgentCard | undefined;
   onOpenTicket: (linearId: string) => void;
+  showComposer?: boolean;
 }) {
   const [entries, setEntries] = useState<ChatEntry[]>(loadChatEntries);
   const [input, setInput] = useState("");
@@ -1858,51 +1932,61 @@ function ChatView({
         <div ref={bottomRef} />
       </div>
 
-      <form className="fb-chat-form" onSubmit={(event) => void send(event)}>
-        <div className="fb-chat-controls">
-          <ProviderModelPicker
-            value={picked}
-            onChange={setPicked}
-            align="start"
-            className="fb-chat-model"
-            disabled={chatBusy}
-          />
-          <label className="fb-chat-use-model">
-            <input
-              type="checkbox"
-              checked={usePickedModel}
-              onChange={(event) => setUsePickedModel(event.target.checked)}
+      {showComposer ? (
+        <form className="fb-chat-form" onSubmit={(event) => void send(event)}>
+          <div className="fb-chat-controls">
+            <ProviderModelPicker
+              value={picked}
+              onChange={setPicked}
+              align="start"
+              className="fb-chat-model"
               disabled={chatBusy}
             />
-            Use this model
-          </label>
-          <span className="fb-chat-model-hint">
-            {usePickedModel && picked.providerId !== "" && picked.model !== ""
-              ? "The Orchestrator will use this model if the factory has it"
-              : "Factory default model unless enabled"}
-          </span>
+            <label className="fb-chat-use-model">
+              <input
+                type="checkbox"
+                checked={usePickedModel}
+                onChange={(event) => setUsePickedModel(event.target.checked)}
+                disabled={chatBusy}
+              />
+              Use this model
+            </label>
+            <span className="fb-chat-model-hint">
+              {usePickedModel && picked.providerId !== "" && picked.model !== ""
+                ? "The Orchestrator will use this model if the factory has it"
+                : "Factory default model unless enabled"}
+            </span>
+          </div>
+          <div className="fb-chat-row">
+            <textarea
+              value={input}
+              onChange={(event) => setInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && !event.shiftKey) {
+                  event.preventDefault();
+                  event.currentTarget.form?.requestSubmit();
+                }
+              }}
+              maxLength={4_000}
+              rows={2}
+              placeholder="Ask the Orchestrator for work…"
+              aria-label="Message the Orchestrator"
+              disabled={chatBusy}
+            />
+            <button type="submit" disabled={chatBusy || input.trim() === ""}>
+              {chatBusy ? "Working…" : "Send"}
+            </button>
+          </div>
+        </form>
+      ) : (
+        <div className="fb-chat-ticket-note">
+          <strong>Answering this ticket?</strong>
+          <p>
+            Use the reply box on the ticket. The Orchestrator’s response still
+            appears here, and the conversation stays in sync.
+          </p>
         </div>
-        <div className="fb-chat-row">
-          <textarea
-            value={input}
-            onChange={(event) => setInput(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                event.currentTarget.form?.requestSubmit();
-              }
-            }}
-            maxLength={4_000}
-            rows={2}
-            placeholder="Ask the Orchestrator for work…"
-            aria-label="Message the Orchestrator"
-            disabled={chatBusy}
-          />
-          <button type="submit" disabled={chatBusy || input.trim() === ""}>
-            {chatBusy ? "Working…" : "Send"}
-          </button>
-        </div>
-      </form>
+      )}
       {giftOpen ? (
         <GiftDialog
           agentId="orchestrator"
@@ -2096,6 +2180,7 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
             active
             orchestrator={orchestrator}
             onOpenTicket={openChatTicket}
+            showComposer={route.view !== "ticket"}
           />
         </aside>
       </div>

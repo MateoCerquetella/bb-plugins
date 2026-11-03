@@ -3696,3 +3696,215 @@
     min-height: 0;
   }
 }
+
+/* One quiet column: answer first, description optional, latest turn by default. */
+.fb-ticket-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fb-ticket-body .fb-ticket-description {
+  height: auto;
+  min-height: 0;
+  flex: none;
+  margin: 0;
+}
+
+.fb-ticket-body .fb-ticket-description-body {
+  max-height: 18vh;
+  flex: none;
+}
+
+.fb-ticket-thread {
+  min-height: 0;
+  flex: 1;
+}
+
+.fb-line-button {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card);
+  color: var(--foreground);
+  font: inherit;
+  font-size: 10.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.fb-line-button:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+  background: color-mix(in srgb, var(--primary) 6%, var(--card));
+}
+
+.fb-line-button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.fb-line-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.fb-line-button--accent {
+  border-color: color-mix(in srgb, var(--primary) 55%, var(--border));
+  background: var(--card);
+  color: var(--foreground);
+}
+
+.fb-line-button--small {
+  min-height: 24px;
+  padding: 3px 7px;
+  font-size: 9.5px;
+}
+
+/* The one answer surface on a ticket, styled like the Dood care controls. */
+.fb-answer {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 6px;
+  margin: 2px 0 4px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+}
+
+.fb-answer.is-blocked {
+  border-color: color-mix(in srgb, var(--fb-blocked) 38%, var(--border));
+  background: color-mix(in srgb, var(--fb-blocked) 4%, var(--card));
+}
+
+.fb-answer-kicker {
+  color: var(--muted-foreground);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.fb-answer.is-blocked .fb-answer-kicker {
+  color: var(--fb-blocked);
+}
+
+.fb-answer h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.fb-answer-reason {
+  margin: 0;
+  color: var(--foreground);
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+.fb-answer-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.fb-answer-form textarea {
+  width: 100%;
+  min-height: 42px;
+  max-height: 110px;
+  flex: 1;
+  resize: vertical;
+  padding: 8px 9px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--background);
+  color: var(--foreground);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.fb-answer-form textarea:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.fb-answer-form textarea:disabled {
+  opacity: 0.65;
+}
+
+.fb-answer-form button {
+  flex: none;
+}
+
+.fb-answer-feedback,
+.fb-answer-note {
+  margin: 0;
+  font-size: 9.5px;
+  line-height: 1.4;
+}
+
+.fb-answer-feedback {
+  color: var(--muted-foreground);
+}
+
+.fb-answer-feedback--error {
+  color: var(--fb-blocked);
+}
+
+.fb-answer-note {
+  color: var(--muted-foreground);
+}
+
+.fb-transcript-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.fb-chat-ticket-note {
+  flex: none;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  color: var(--muted-foreground);
+  font-size: 10.5px;
+  line-height: 1.45;
+}
+
+.fb-chat-ticket-note strong {
+  color: var(--foreground);
+  font-weight: 650;
+}
+
+.fb-chat-ticket-note p {
+  margin: 3px 0 0;
+}
+
+@media (max-width: 620px) {
+  .fb-answer-form {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .fb-answer-form button {
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 880px) {
+  .fb-ticket-pane > .fb-ticket {
+    padding-bottom: 0;
+  }
+}
