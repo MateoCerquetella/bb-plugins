@@ -26,6 +26,7 @@ import type {
   Transcript,
   rpcContract,
 } from "./contract";
+import { DoodAvatar } from "./lib/dood";
 import { activeLiveTool, isGenerating, readLiveTools } from "./lib/live";
 import { agentRoute, parsePanelRoute, ticketRoute } from "./lib/route";
 
@@ -378,7 +379,10 @@ function AgentCardView({
       }, ${agent.status}${agent.statusReason === null ? "" : `: ${agent.statusReason}`}`}
     >
       <span className="fb-card-top">
-        <StatusDot status={agent.status} />
+        <span className="fb-avatar-wrap">
+          <DoodAvatar agentId={agent.name} />
+          <StatusDot status={agent.status} />
+        </span>
         <span className="fb-card-name">{agent.displayName}</span>
         <span className="fb-card-conv">#{agent.conversationId}</span>
       </span>
@@ -463,7 +467,10 @@ function AgentHeader({
         ← All agents
       </button>
       <div className="fb-agent-title">
-        <StatusDot status={agent.status} />
+        <span className="fb-avatar-wrap fb-avatar-wrap--lg">
+          <DoodAvatar agentId={agent.name} />
+          <StatusDot status={agent.status} />
+        </span>
         <h2>{agent.displayName}</h2>
         <StatusTag status={agent.status} />
       </div>
