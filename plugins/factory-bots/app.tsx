@@ -37,6 +37,7 @@ import { avatarLook } from "./lib/dood";
 import { loadAgentDood, saveAgentDood, type AgentDood } from "./lib/dood-state";
 import { WEAR_ITEMS } from "./lib/wear-items";
 import { activeLiveTool, isGenerating, readLiveTools } from "./lib/live";
+import { stageLabel } from "./lib/derive";
 import { agentRoute, parsePanelRoute, ticketRoute } from "./lib/route";
 
 const PANEL_PATH = "factory-bots";
@@ -359,26 +360,31 @@ function BoardHeader({
   );
 }
 
-function AgentCardView({
+type BoardTab = "bots" | "threads";
+
+function ListHead({ label, count }: { label: string; count: number }) {
+  return (
+    <div className="fb-list-head">
+      <h2>{label}</h2>
+      <span>{count}</span>
+    </div>
+  );
+}
+
+function BotRow({
   agent,
   onOpen,
 }: {
   agent: AgentCard;
   onOpen: (name: string) => void;
 }) {
-  const work =
-    agent.status === "blocked"
-      ? agent.statusReason
-      : agent.currentWork;
-  const full =
-    agent.statusReason !== null
-      ? agent.statusReason
-      : (agent.currentWork ?? "No active task");
+  const work = agent.statusReason ?? agent.currentWork;
+  const full = work ?? "No active task";
 
   return (
     <button
       type="button"
-      className="fb-card"
+      className="fb-list-row"
       data-status={agent.status}
       onClick={() => onOpen(agent.name)}
       aria-label={`${agent.displayName}, ${agent.column}, conversation ${
@@ -387,42 +393,226 @@ function AgentCardView({
         agent.ticketCount === 1 ? "ticket" : "tickets"
       }, ${agent.status}${agent.statusReason === null ? "" : `: ${agent.statusReason}`}`}
     >
-      <span className="fb-card-top">
-        <span className="fb-avatar-wrap">
-          <DoodOrb agentId={agent.name} status={agent.status} size={40} />
-          <StatusDot status={agent.status} />
-        </span>
-        <span className="fb-card-name">{agent.displayName}</span>
-        <span className="fb-card-conv">#{agent.conversationId}</span>
+      <span className="fb-avatar-wrap fb-list-avatar">
+        <DoodOrb agentId={agent.name} status={agent.status} size={40} />
+        <StatusDot status={agent.status} />
       </span>
-      <span className="fb-card-role">{agent.column}</span>
-      <span className="fb-card-meta">
-        <span className="fb-card-count">{agent.ticketCount}</span>
-        <span className="fb-card-count-label">
-          {agent.ticketCount === 1 ? "ticket" : "tickets"}
+      <span className="fb-list-body">
+        <span className="fb-list-title">{agent.displayName}</span>
+        <span
+          className={`fb-list-sub${
+            agent.status === "blocked" ? " fb-list-sub--blocked" : ""
+          }`}
+          title={full}
+        >
+          {work === null || work === "" ? "No active task" : work}
+          {agent.status === "blocked" && agent.statusReasonCount > 1 ? (
+            <span className="fb-more"> +{agent.statusReasonCount - 1} more</span>
+          ) : null}
         </span>
-        <StatusTag status={agent.status} />
+        <span className="fb-list-meta">
+          <StatusTag status={agent.status} />
+          <span className="fb-list-column" title={agent.column}>
+            {agent.column}
+          </span>
+          <span className="fb-list-conv">#{agent.conversationId}</span>
+        </span>
       </span>
-      <span
-        className={`fb-card-work${agent.status === "blocked" ? " fb-card-work--blocked" : ""}`}
-        title={full}
-      >
-        {work === null || work === "" ? "No active task" : work}
-        {agent.status === "blocked" && agent.statusReasonCount > 1 ? (
-          <span className="fb-more"> +{agent.statusReasonCount - 1} more</span>
-        ) : null}
+      <span className="fb-list-side">
+        {agent.ticketCount === 0 ? null : (
+          <span className="fb-list-stat">
+            <b>{agent.ticketCount}</b>
+            <span>{agent.ticketCount === 1 ? "ticket" : "tickets"}</span>
+          </span>
+        )}
+        <span className="fb-list-chevron" aria-hidden="true">
+          ›
+        </span>
       </span>
     </button>
   );
 }
 
+function BotList({
+  agents,
+  onOpen,
+}: {
+  agents: readonly AgentCard[];
+  onOpen: (name: string) => void;
+}) {
+  const sections = [
+    {
+      key: "working",
+      label: "In motion",
+      agents: agents.filter((agent) => agent.status === "working"),
+    },
+    {
+      key: "blocked",
+      label: "Needs a person",
+      agents: agents.filter((agent) => agent.status === "blocked"),
+    },
+    {
+      key: "idle",
+      label: "On call",
+      agents: agents.filter((agent) => agent.status === "idle"),
+    },
+  ].filter((section) => section.agents.length > 0);
+
+  if (sections.length === 0) {
+    return (
+      <p className="fb-list-empty">
+        The factory did not return any agents. Nothing is invented here.
+      </p>
+    );
+  }
+
+  return (
+    <section className="fb-list" aria-label="Factory bots">
+      {sections.map((section) => (
+        <div className="fb-list-section" key={section.key}>
+          <ListHead label={section.label} count={section.agents.length} />
+          {section.agents.map((agent) => (
+            <BotRow key={agent.name} agent={agent} onOpen={onOpen} />
+          ))}
+        </div>
+      ))}
+    </section>
+  );
+}
+
+function ThreadRow({
+  ticket,
+  agent,
+  onOpen,
+}: {
+  ticket: TicketSummary;
+  agent: AgentCard | undefined;
+  onOpen: (ticket: TicketSummary) => void;
+}) {
+  const botName = agent?.displayName ?? ticket.bot;
+
+  return (
+    <button
+      type="button"
+      className="fb-list-row"
+      onClick={() => onOpen(ticket)}
+      aria-label={`${ticket.title}, ${ticket.linearId}, ${stageLabel(
+        ticket.stage,
+      )}, ${botName}`}
+    >
+      <span className="fb-avatar-wrap fb-list-avatar">
+        {agent === undefined ? (
+          <span className="fb-bot-mark" aria-hidden="true">
+            {botName.slice(0, 1).toUpperCase()}
+          </span>
+        ) : (
+          <DoodOrb agentId={agent.name} status={agent.status} size={40} />
+        )}
+        {agent === undefined ? null : <StatusDot status={agent.status} />}
+      </span>
+      <span className="fb-list-body">
+        <span className="fb-list-title">{ticket.title}</span>
+        <span className="fb-list-sub">
+          {ticket.linearId}
+          <span className="fb-sep">·</span>
+          {botName}
+        </span>
+        <span className="fb-list-meta">
+          <span className="fb-model-pill">{botName}</span>
+          {ticket.feature === null ? null : (
+            <span className="fb-list-feature" title={ticket.feature}>
+              {ticket.feature}
+            </span>
+          )}
+          {ticket.labels.slice(0, 2).map((label) => (
+            <span className="fb-label-pill" key={label}>
+              {label}
+            </span>
+          ))}
+        </span>
+      </span>
+      <span className="fb-list-side">
+        <StageTag stage={ticket.stage} />
+        <span className="fb-list-chevron" aria-hidden="true">
+          ›
+        </span>
+      </span>
+    </button>
+  );
+}
+
+function ThreadList({
+  tickets,
+  agents,
+  onOpen,
+}: {
+  tickets: readonly TicketSummary[];
+  agents: readonly AgentCard[];
+  onOpen: (ticket: TicketSummary) => void;
+}) {
+  const sections = [
+    {
+      key: "motion",
+      label: "In motion",
+      tickets: tickets.filter(
+        (ticket) =>
+          !["staging", "production", "done"].includes(ticket.stage),
+      ),
+    },
+    {
+      key: "on-call",
+      label: "On call",
+      tickets: tickets.filter((ticket) =>
+        ["staging", "production"].includes(ticket.stage),
+      ),
+    },
+    {
+      key: "settled",
+      label: "Settled",
+      tickets: tickets.filter((ticket) => ticket.stage === "done"),
+    },
+  ].filter((section) => section.tickets.length > 0);
+
+  if (sections.length === 0) {
+    return (
+      <p className="fb-list-empty">
+        No threads yet. The factory will list one here when a request arrives.
+      </p>
+    );
+  }
+
+  return (
+    <section className="fb-list" aria-label="Factory threads">
+      {sections.map((section) => (
+        <div className="fb-list-section" key={section.key}>
+          <ListHead label={section.label} count={section.tickets.length} />
+          {section.tickets.map((ticket) => (
+            <ThreadRow
+              key={ticket.linearId}
+              ticket={ticket}
+              agent={agents.find((agent) => agent.name === ticket.bot)}
+              onOpen={onOpen}
+            />
+          ))}
+        </div>
+      ))}
+    </section>
+  );
+}
+
 function BoardView({
   board,
+  tab,
+  onTab,
   onOpenAgent,
+  onOpenTicket,
   onChat,
 }: {
   board: Polled<BoardResult>;
+  tab: BoardTab;
+  onTab: (tab: BoardTab) => void;
   onOpenAgent: (name: string) => void;
+  onOpenTicket: (ticket: TicketSummary) => void;
   onChat: () => void;
 }) {
   const data = board.data;
@@ -446,17 +636,40 @@ function BoardView({
         <FailureView failure={data} />
       ) : (
         <>
-          {data.snapshot.tickets === 0 ? (
-            <p className="fb-empty-note">
-              No tickets yet. The factory will list one here when a request
-              arrives.
-            </p>
-          ) : null}
-          <section className="fb-grid" aria-label="Factory agents">
-            {data.agents.map((agent) => (
-              <AgentCardView key={agent.name} agent={agent} onOpen={onOpenAgent} />
-            ))}
-          </section>
+          <div className="fb-viewbar">
+            <div className="fb-tabs" role="tablist" aria-label="Bots and threads">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={tab === "bots"}
+                onClick={() => onTab("bots")}
+              >
+                Bots
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={tab === "threads"}
+                onClick={() => onTab("threads")}
+              >
+                Threads
+              </button>
+            </div>
+            <span className="fb-view-note">
+              {tab === "threads"
+                ? "Every ticket is a thread; open one to see its live work."
+                : "The agents that carry the threads."}
+            </span>
+          </div>
+          {tab === "threads" ? (
+            <ThreadList
+              tickets={data.tickets}
+              agents={data.agents}
+              onOpen={onOpenTicket}
+            />
+          ) : (
+            <BotList agents={data.agents} onOpen={onOpenAgent} />
+          )}
         </>
       )}
     </>
@@ -1136,6 +1349,7 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
   const route = parsePanelRoute(subPath);
   const rpc = useRpc<typeof rpcContract>();
   const navigate = useBbNavigate();
+  const [boardTab, setBoardTab] = useState<BoardTab>("threads");
   const ticketId = route.view === "ticket" ? route.linearId : null;
   const { board, ticket } = useFactoryPoll(rpc, ticketId);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -1156,7 +1370,10 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
       {route.view === "board" ? (
         <BoardView
           board={board}
+          tab={boardTab}
+          onTab={setBoardTab}
           onOpenAgent={(name) => go(agentRoute(name))}
+          onOpenTicket={(ticket) => go(ticketRoute(ticket.bot, ticket.linearId))}
           onChat={() => go("chat")}
         />
       ) : route.view === "chat" ? (

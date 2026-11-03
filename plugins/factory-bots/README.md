@@ -2,14 +2,18 @@
 
 A live board of an Empirical Factory inside BB, plus one Orchestrator chat.
 
-Factory Bots shows the agents `factory_status` returns (up to seven) as one
-card each: the column it owns, its conversation, how many tickets it holds, and
-whether it is idle, working, or blocked. Each card carries a live Dood from
-[do.computer](https://do.computer), grown from the agent's name. It is a real
-animated creature; where WebGL is unavailable it falls back to the same seed's
-static blob. Click an agent to see its tickets; click a ticket to see
-its stage, attempts, stop reason, decisions, worktree, and transcript with the
-live tool call highlighted.
+Factory Bots shows the factory as a list, in the shape of a thread inbox. The
+board opens on **Threads**: every ticket is one thread, grouped into In motion,
+On call, and Settled, with its owner's live Dood, stage, and a way into its
+ticket. **Bots** is one tab away: each agent is a row with the column it owns,
+its conversation, how many tickets it holds, and whether it is idle, working, or
+blocked, grouped into In motion, Needs a person, and On call.
+
+Every row carries a live Dood from [do.computer](https://do.computer), grown
+from the agent's name. It is a real animated creature; where WebGL is unavailable
+it falls back to the same seed's static blob. Open a thread to see its ticket:
+stage, attempts, stop reason, decisions, worktree, and transcript with the live
+tool call highlighted. Open a bot to see its tickets.
 
 The agent view gives the Dood room to grow: a larger live creature with a treat
 and a gift box. Treats are counted. A gift opens a real box holding one thing the
@@ -82,7 +86,7 @@ message; rebuild and restart the factory so the tool is present.
   held tickets' conversations.
 - **Idle** otherwise.
 
-Cards are built only from the `bots` map that `factory_status` returns. If the
+Rows are built only from the `bots` map that `factory_status` returns. If the
 factory does not return an agent, the board does not show one. The columns come
 from the factory's documented ownership table; an unrecognized returned agent
 shows `No column`.
@@ -129,7 +133,8 @@ or conversation id changed, and an unchanged ticket reuses the held transcript.
   factory and the board reconnects on its own.
 
   ![The not-running state with the start command](assets/screenshots/not-running.png)
-- A factory with no tickets shows zero health and seven idle cards. That is a
+- A factory with no tickets shows zero health and seven idle bots under **Bots**;
+  **Threads** shows its empty state. That is a
   normal starting state, not an error.
 - Malformed payloads, a missing config, or a timeout show one bounded
   unavailable message; the panel keeps retrying.
