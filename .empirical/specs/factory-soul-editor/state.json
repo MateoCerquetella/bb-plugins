@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 6,
+  "revision": 7,
   "activeFeature": "factory-soul-editor",
   "request": "Build a dedicated Factory Souls BB panel that lists every Empirical Factory bot's soul, opens one in an editable monospace view, shows the bot's read-only tool list from factory_status, and saves only after a diff confirmation and a typed bot-name plus acknowledgment confirmation with an author. Use the Factory MCP stdio tools factory_souls, factory_soul_set (requires author), factory_soul_audit, and factory_status only; never factory_ticket, factory_message, board, ticket, message, or storage access. After save, re-read souls and audit and show the newest audit row. Keep a local unsaved draft across navigation, label it unsaved, and handle Factory not running with the start command.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "review",
+  "phase": "verify",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Implemented the standalone Factory Souls plugin with the four-tool MCP boundary, list/detail panel, draft persistence, diff and typed-name confirmations, author attribution, save re-read verification, audit proof, offline state, and 30 focused tests. Installed and reloaded the plugin; browser evidence covers live list, diff, confirmation gating, mock successful and partial saves, offline, and narrow layout.",
+  "message": "Fresh-context isolated reviewer approved all 14 acceptance criteria: only-allowed MCP tools, list/detail, explicit missing-tools state, diff and second confirmation gating, author attribution, verified save/audit proof, drafts, offline state, responsive accessibility, and test coverage. Two low non-blocking maintainability findings remain.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:95042249976c8ed213b4b04f71ce3737d4fa3d552b0e82a895a2d831305b8a63",
@@ -20,7 +20,9 @@
   "capabilityClaimId": "factory-soul-editor-53b80fcb9fd5",
   "authorizationDigest": null,
   "evidence": [],
-  "evidenceReceiptIds": [],
+  "evidenceReceiptIds": [
+    "collected-f8a37e19e7e54a20aae4d242"
+  ],
   "legacyEvidenceCount": 0,
   "completion": {
     "implemented": true,
@@ -36,7 +38,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-11-03T15:13:53.334Z",
+  "updatedAt": "2026-11-03T15:20:38.727Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "factory-soul-editor-53b80fcb9fd5",

@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-f8a37e19e7e54a20aae4d242",
+  "criteria": [
+    "AC-1",
+    "AC-10",
+    "AC-11",
+    "AC-2",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8",
+    "AC-9",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3",
+    "AC-UI-4"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-11-03T15:19:54.593Z",
+  "completedAt": "2026-11-03T15:19:54.593Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "factory-soul-editor",
+    "specRevision": 2,
+    "specDigest": "sha256:95042249976c8ed213b4b04f71ce3737d4fa3d552b0e82a895a2d831305b8a63",
+    "treeDigest": "sha256:500498032af57c6f03cc1c04a5193ca03ad188ba9053f8a3cbb97e2d7dbc96a1",
+    "policyDigest": "sha256:6ebe58cbdef84ea3073f41581b4274f7b15a38527b5a354221da1191ec5de596"
+  },
+  "digest": "sha256:fc0dd3d5148478765d5597a826c6d6d581f25624a2f565772dda21a73cdb8118",
+  "kind": "collected",
+  "collector": "empirical-review:isolated-reviewer-factory-soul-editor",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/factory-soul-editor/reviews/6d55ac3e7db10022f77f4ec1.json",
+      "mediaType": "application/json",
+      "bytes": 6861,
+      "digest": "sha256:1a14be56c4a28a615fe88f5ce7ac426407f03f23b101a596c30fad5ec9f2a6f1"
+    },
+    {
+      "path": ".empirical/specs/factory-soul-editor/reviews/6d55ac3e7db10022f77f4ec1.md",
+      "mediaType": "text/markdown",
+      "bytes": 5215,
+      "digest": "sha256:39148be2eea778a5936db71749ea334eaea699617f66c7db03220325a287b49a"
+    }
+  ]
+}
