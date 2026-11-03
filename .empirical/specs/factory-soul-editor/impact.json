@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "factory-soul-editor"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:3bfa1b93629081ddca0919dcd7af9ce294ebbc72c1bc76395080cc3043bed6f0"
+}

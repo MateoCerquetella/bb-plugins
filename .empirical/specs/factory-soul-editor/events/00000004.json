@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "sequence": 4,
+  "previousDigest": "sha256:c9db047496fb65068c8ae7b165376e72828bd2491cbb7554fe2d59c38fd274cd",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Designed the standalone Factory Souls plugin: MCP-only service boundary, list/detail state, draft persistence, diff review, double confirmation, author, save verification, audit proof, offline states, accessibility, and test plan.",
+  "createdAt": "2026-11-03T14:57:02.319Z",
+  "stateBeforeDigest": "sha256:6ce23fe3a405ff888691fb974feb3fcec6763ed74d8374ed6a6db5e9902f1f64",
+  "stateAfterDigest": "sha256:27292757885780f46adb135cddb59a0d14641ab4428775ca35f22ab3211eae04",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 4,
+    "activeFeature": "factory-soul-editor",
+    "request": "Build a dedicated Factory Souls BB panel that lists every Empirical Factory bot's soul, opens one in an editable monospace view, shows the bot's read-only tool list from factory_status, and saves only after a diff confirmation and a typed bot-name plus acknowledgment confirmation with an author. Use the Factory MCP stdio tools factory_souls, factory_soul_set (requires author), factory_soul_audit, and factory_status only; never factory_ticket, factory_message, board, ticket, message, or storage access. After save, re-read souls and audit and show the newest audit row. Keep a local unsaved draft across navigation, label it unsaved, and handle Factory not running with the start command.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "plan",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Designed the standalone Factory Souls plugin: MCP-only service boundary, list/detail state, draft persistence, diff review, double confirmation, author, save verification, audit proof, offline states, accessibility, and test plan.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:95042249976c8ed213b4b04f71ce3737d4fa3d552b0e82a895a2d831305b8a63",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:3ce69a6983a62c6dcce2d4dcf230ae0cdd345202780174f20d3f5cf377290396",
+    "impactDigest": "sha256:3bfa1b93629081ddca0919dcd7af9ce294ebbc72c1bc76395080cc3043bed6f0",
+    "capabilityClaimId": "factory-soul-editor-53b80fcb9fd5",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-11-03T14:57:02.319Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "factory-soul-editor-53b80fcb9fd5",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "factory-soul-editor",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_9x565sqvfq-1/bb-plugins-factory-soul-editor",
+      "worktreeId": "sha256:f21ab55b52fb54971be5a002bcaf52cbfa91f79b4a60616ec317b24bc08028ac",
+      "baseCommit": "a34ac7f71dc0c219fe53ab5d82658beb6cc17287",
+      "baseTree": "5def6b4895f0cc01267befcc09aa542d58ff5571",
+      "bases": {
+        "factory-soul-editor": {
+          "capability": "factory-soul-editor",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "dedicated factory mcp soul panel": null,
+            "read-only soul inspection": null,
+            "two-step confirmed soul replacement": null,
+            "save verification and audit proof": null,
+            "draft and offline continuity": null
+          }
+        }
+      },
+      "capabilities": [
+        "factory-soul-editor"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-11-03T14:56:10.667Z",
+      "heartbeatAt": "2026-11-03T14:56:10.667Z",
+      "digest": "sha256:7b2b9ffec46cfdf1396722b02d1b3867326616fab24c9cb6304a9377dfd2379b"
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 14,
+      "capabilities": 1,
+      "reason": "The list, editor, draft, confirmation, save verification, and audit proof share one MCP boundary, one panel state machine, and one test harness. Shipping only part would leave a data-loss or unverified-write surface; keep one cohesive plugin.",
+      "actor": "agent",
+      "revision": 2
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:705281c440ed71cba28a21ee1a9dd9fac57aec21c62a2d8d17ab7867151f2475"
+}

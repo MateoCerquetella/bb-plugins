@@ -1,0 +1,73 @@
+{
+  "name": "bb-plugin-factory-souls",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Read and safely edit the souls of Empirical Factory bots through the Factory MCP.",
+  "license": "MIT",
+  "author": "Mateo Cerquetella",
+  "homepage": "https://github.com/MateoCerquetella/bb-plugins/tree/main/plugins/factory-souls#readme",
+  "bugs": {
+    "url": "https://github.com/MateoCerquetella/bb-plugins/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MateoCerquetella/bb-plugins.git",
+    "directory": "plugins/factory-souls"
+  },
+  "keywords": [
+    "bb",
+    "bb-plugin",
+    "factory-souls",
+    "empirical-factory",
+    "prompts",
+    "agents"
+  ],
+  "type": "module",
+  "engines": {
+    "bb": ">=0.40",
+    "bbPluginSdk": ">=0.4.29"
+  },
+  "bb": {
+    "name": "Factory Souls",
+    "description": "Read and safely edit the prose each Empirical Factory bot is told.",
+    "branding": {
+      "icon": "./assets/icon.svg"
+    },
+    "server": "./server.ts",
+    "app": "./app.tsx",
+    "skills": []
+  },
+  "files": [
+    "dist/server.js",
+    "dist/server.meta.json",
+    "dist/app.js",
+    "dist/app.meta.json",
+    "dist/app.css",
+    "assets/",
+    "factory.mcp.json",
+    "README.md",
+    "LICENSE",
+    "server.ts",
+    "app.tsx",
+    "app.css",
+    "contract.ts",
+    "lib/"
+  ],
+  "dependencies": {
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@get-bb/plugin-sdk": "0.4.29",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tsx": "^4.23.12",
+    "typescript": "^7.0.0"
+  },
+  "scripts": {
+    "build": "env -u BB_CLI bb plugin build .",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test test/*.test.ts",
+    "check": "npm run typecheck && npm test && npm run build"
+  }
+}
