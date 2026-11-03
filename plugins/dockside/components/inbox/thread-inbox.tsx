@@ -31,6 +31,7 @@ import { useFactoryBots } from "@/hooks/use-factory-bots";
 import {
   FACTORY_BOTS_PANEL_PATH,
   FACTORY_BOTS_PLUGIN_ID,
+  factoryNeedsPerson,
 } from "@/lib/factory-bots";
 import { useSettledThreads } from "@/hooks/use-settled-threads";
 import { useProjectColors } from "@/hooks/use-project-colors";
@@ -677,7 +678,11 @@ export function ThreadInbox({
       className="flex min-h-0 flex-1 flex-col"
     >
       {preferences.showFactoryBots ? (
-        <FactoryBotsTabs tab={sidebarTab} onChange={setSidebarTab} />
+        <FactoryBotsTabs
+          tab={sidebarTab}
+          needsPerson={factoryNeedsPerson(factoryBots.agents).length}
+          onChange={setSidebarTab}
+        />
       ) : null}
       <div
         className={cn(

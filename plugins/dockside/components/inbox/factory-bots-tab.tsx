@@ -14,9 +14,11 @@ const STATUS_LABEL: Record<FactoryAgent["status"], string> = {
 /** The optional Bots/Threads switch at the top of Dockside. */
 export function FactoryBotsTabs({
   tab,
+  needsPerson,
   onChange,
 }: {
   tab: "threads" | "bots";
+  needsPerson: number;
   onChange: (tab: "threads" | "bots") => void;
 }) {
   return (
@@ -43,15 +45,29 @@ export function FactoryBotsTabs({
         type="button"
         role="tab"
         aria-selected={tab === "bots"}
+        aria-label={
+          needsPerson > 0
+            ? `Bots, ${needsPerson} ${needsPerson === 1 ? "needs" : "need"} a person`
+            : "Bots"
+        }
         onClick={() => onChange("bots")}
         className={cn(
-          "h-6 flex-1 rounded text-2xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+          "h-6 flex-1 items-center justify-center gap-1 rounded text-2xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+          "flex",
           tab === "bots"
             ? "bg-foreground text-background"
             : "text-muted-foreground hover:text-foreground",
         )}
       >
-        Bots
+        <span>Bots</span>
+        {needsPerson > 0 ? (
+          <span
+            className="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[9px] font-semibold leading-none text-destructive-foreground"
+            aria-hidden
+          >
+            {needsPerson > 99 ? "99+" : needsPerson}
+          </span>
+        ) : null}
       </button>
     </div>
   );

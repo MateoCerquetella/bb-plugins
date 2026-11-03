@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { factoryBoardSchema } from "../lib/factory-bots.ts";
+import {
+  factoryAttentionKey,
+  factoryBoardSchema,
+  factoryNeedsPerson,
+  type FactoryAgent,
+} from "../lib/factory-bots.ts";
 
 describe("Factory Bots read shape", () => {
   it("keeps the agent fields Dockside draws and drops board-only fields", () => {
@@ -54,5 +59,42 @@ describe("Factory Bots read shape", () => {
     if (board.ok) return;
     assert.equal(board.reason, "not-running");
     assert.equal(board.message, "Factory is not running.");
+  });
+});
+
+describe("Factory Bots attention", () => {
+  const blocked: FactoryAgent = {
+    name: "sieve",
+    displayName: "Sieve",
+    conversationId: "7",
+    column: "In Specification, Todo",
+    ticketCount: 1,
+    status: "blocked",
+    statusReason: "No feature is selected.",
+    currentWork: null,
+    ticketId: "SDD-1",
+  };
+
+  it("counts only agents blocked on a person", () => {
+    assert.deepEqual(
+      factoryNeedsPerson([
+        blocked,
+        { ...blocked, name: "helm", status: "working" },
+        { ...blocked, name: "lens", status: "idle" },
+      ]).map((agent) => agent.name),
+      ["sieve"],
+    );
+  });
+
+  it("treats a changed reason or ticket as a new attention event", () => {
+    assert.equal(factoryAttentionKey(blocked), factoryAttentionKey(blocked));
+    assert.notEqual(
+      factoryAttentionKey(blocked),
+      factoryAttentionKey({ ...blocked, statusReason: "Different answer" }),
+    );
+    assert.notEqual(
+      factoryAttentionKey(blocked),
+      factoryAttentionKey({ ...blocked, ticketId: "SDD-2" }),
+    );
   });
 });

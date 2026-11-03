@@ -38,7 +38,10 @@ import {
 import {
   FACTORY_BOTS_PLUGIN_ID,
   factoryAgentSchema,
+  factoryAttentionKey,
   factoryBoardSchema,
+  factoryNeedsPerson,
+  type FactoryAgent,
 } from "./lib/factory-bots.ts";
 
 const migrations = [
@@ -280,7 +283,7 @@ export const LIFECYCLE_CHANNEL = "lifecycle";
 export const PROJECT_COLOR_CHANNEL = "project-colors";
 
 export default function plugin(bb: BbPluginApi) {
-  bb.settings.define({
+  const settings = bb.settings.define({
     palettePreset: {
       type: "select",
       label: "Palette preset",
@@ -381,7 +384,8 @@ export default function plugin(bb: BbPluginApi) {
     showFactoryBots: {
       type: "boolean",
       label: "Show Factory bots tab",
-      description: "Adds a Bots tab beside Threads; the native thread list stays untouched.",
+      description:
+        "Adds a Bots tab beside Threads and alerts when an agent needs a person. The native thread list stays untouched.",
       default: false,
     },
   });
@@ -644,6 +648,51 @@ export default function plugin(bb: BbPluginApi) {
     },
   });
 
+  async function readFactoryBots(
+    logFailure = true,
+  ): Promise<{
+    ok: boolean;
+    agents: FactoryAgent[];
+    message: string | null;
+  }> {
+    try {
+      const board = await bb.sdk.plugins.callRpc({
+        pluginId: FACTORY_BOTS_PLUGIN_ID,
+        method: "getBoard",
+        input: null,
+        outputSchema: factoryBoardSchema,
+      });
+      if (!board.ok) {
+        return {
+          ok: false,
+          agents: [],
+          message:
+            board.reason === "not-running"
+              ? "Factory is not running."
+              : board.message,
+        };
+      }
+      const ticketByBot = new Map(
+        board.tickets.map((ticket) => [ticket.bot, ticket.linearId]),
+      );
+      return {
+        ok: true,
+        agents: board.agents.map((agent) => ({
+          ...agent,
+          ticketId: ticketByBot.get(agent.name) ?? null,
+        })),
+        message: null,
+      };
+    } catch (error) {
+      if (logFailure) bb.log.warn(`factory bots read failed: ${String(error)}`);
+      return {
+        ok: false,
+        agents: [],
+        message: "Factory Bots is unavailable.",
+      };
+    }
+  }
+
   bb.rpc.register(docksideRpcContract, {
     async listProjectColors() {
       return { colors: projectColors.list() };
@@ -663,42 +712,7 @@ export default function plugin(bb: BbPluginApi) {
     // A custom ACP provider already carries its own brand mark, so the sidebar
     // reads it from the host rather than hard-coding a second glyph per agent.
     async factoryBots() {
-      try {
-        const board = await bb.sdk.plugins.callRpc({
-          pluginId: FACTORY_BOTS_PLUGIN_ID,
-          method: "getBoard",
-          input: null,
-          outputSchema: factoryBoardSchema,
-        });
-        if (!board.ok) {
-          return {
-            ok: false,
-            agents: [],
-            message:
-              board.reason === "not-running"
-                ? "Factory is not running."
-                : board.message,
-          };
-        }
-        const ticketByBot = new Map(
-          board.tickets.map((ticket) => [ticket.bot, ticket.linearId]),
-        );
-        return {
-          ok: true,
-          agents: board.agents.map((agent) => ({
-            ...agent,
-            ticketId: ticketByBot.get(agent.name) ?? null,
-          })),
-          message: null,
-        };
-      } catch (error) {
-        bb.log.warn(`factory bots read failed: ${String(error)}`);
-        return {
-          ok: false,
-          agents: [],
-          message: "Factory Bots is unavailable.",
-        };
-      }
+      return readFactoryBots();
     },
     async listProviders() {
       const providers = await bb.sdk.providers.list();
@@ -863,6 +877,91 @@ export default function plugin(bb: BbPluginApi) {
   bb.events.on("thread.active", republishIfSettled);
   bb.events.on("thread.idle", republishIfSettled);
   bb.events.on("thread.failed", republishIfSettled);
+
+  // Factory agents blocked on a person are not BB threads, so BB's own
+  // notification plugins cannot see them. Poll the existing Factory Bots RPC
+  // and route new blocked states through the built-in push-notifications
+  // plugin; the badge in the Bots tab is the always-visible fallback.
+  const attentionSeen = new Map<string, string>();
+  let attentionInitialized = false;
+  const attentionWait = (ms: number, signal: AbortSignal): Promise<void> =>
+    new Promise((resolve) => {
+      if (signal.aborted) {
+        resolve();
+        return;
+      }
+      const timer = setTimeout(done, ms);
+      function done() {
+        clearTimeout(timer);
+        signal.removeEventListener("abort", done);
+        resolve();
+      }
+      signal.addEventListener("abort", done, { once: true });
+    });
+
+  const notifyFactoryAttention = async (agent: FactoryAgent): Promise<void> => {
+    const reason =
+      agent.statusReason ??
+      agent.currentWork ??
+      "Needs a person to answer and unblock it.";
+    const ticket = agent.ticketId === null ? "" : `${agent.ticketId} · `;
+    try {
+      await bb.sdk.plugins.callRpc({
+        pluginId: "push-notifications",
+        method: "notifications.send",
+        input: {
+          title: `Factory · ${agent.displayName}`.slice(0, 80),
+          body: `${ticket}${reason}`.slice(0, 180),
+        },
+        outputSchema: z.object({
+          ok: z.literal(true),
+          channels: z.array(z.string()),
+        }),
+      });
+    } catch (error) {
+      // The badge still reports the need when notifications are unavailable.
+      bb.log.debug(`factory attention notification skipped: ${String(error)}`);
+    }
+  };
+
+  bb.background.service("factory-attention", {
+    async start(signal) {
+      while (!signal.aborted) {
+        try {
+          const current = await settings.get();
+          if (!current.showFactoryBots) {
+            attentionSeen.clear();
+            attentionInitialized = false;
+          } else {
+            const read = await readFactoryBots(false);
+            if (read.ok) {
+              const blocked = factoryNeedsPerson(read.agents);
+              const activeNames = new Set(blocked.map((agent) => agent.name));
+              if (!attentionInitialized) {
+                for (const agent of blocked) {
+                  attentionSeen.set(agent.name, factoryAttentionKey(agent));
+                }
+                attentionInitialized = true;
+              } else {
+                for (const agent of blocked) {
+                  const key = factoryAttentionKey(agent);
+                  if (attentionSeen.get(agent.name) === key) continue;
+                  attentionSeen.set(agent.name, key);
+                  await notifyFactoryAttention(agent);
+                }
+              }
+              for (const name of [...attentionSeen.keys()]) {
+                if (!activeNames.has(name)) attentionSeen.delete(name);
+              }
+            }
+          }
+        } catch (error) {
+          bb.log.warn(`factory attention poll failed: ${String(error)}`);
+        }
+        await attentionWait(10_000, signal);
+      }
+    },
+  });
 }
 
 function colorSetting(label: string, defaultColor: string) {

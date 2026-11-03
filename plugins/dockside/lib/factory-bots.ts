@@ -38,3 +38,18 @@ export const factoryBoardSchema = z.discriminatedUnion("ok", [
 
 export const FACTORY_BOTS_PLUGIN_ID = "factory-bots";
 export const FACTORY_BOTS_PANEL_PATH = "factory-bots";
+
+/** Stable key for one blocked need; a changed reason or ticket is a new alert. */
+export function factoryAttentionKey(
+  agent: Pick<FactoryAgent, "name" | "statusReason" | "currentWork" | "ticketId">,
+): string {
+  return [
+    agent.name,
+    agent.statusReason ?? agent.currentWork ?? "",
+    agent.ticketId ?? "",
+  ].join("\u0000");
+}
+
+export function factoryNeedsPerson(agents: readonly FactoryAgent[]): FactoryAgent[] {
+  return agents.filter((agent) => agent.status === "blocked");
+}
