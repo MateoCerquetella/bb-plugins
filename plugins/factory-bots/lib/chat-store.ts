@@ -69,3 +69,12 @@ export function appendChatEntry(
   notifyChatChanged();
   return next;
 }
+
+export const CHAT_PENDING = "factory-bots:chat-pending";
+
+/** A ticket steer uses the same Orchestrator chat; show it working there too. */
+export function setChatPending(pending: boolean): void {
+  window.dispatchEvent(
+    new CustomEvent<boolean>(CHAT_PENDING, { detail: pending }),
+  );
+}

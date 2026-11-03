@@ -38,9 +38,11 @@ import { DoodOrb, type DoodOrbHandle } from "./lib/dood-orb";
 import { GiftDialog } from "./lib/gift-dialog";
 import {
   CHAT_CHANGED,
+  CHAT_PENDING,
   appendChatEntry,
   loadChatEntries,
   saveChatEntries,
+  setChatPending,
 } from "./lib/chat-store";
 import { WardrobeDialog } from "./lib/wardrobe-dialog";
 import { Pixels } from "./lib/pixels";
@@ -1471,8 +1473,16 @@ function ChatView({
     reasoningLevel: "medium",
   });
   const [usePickedModel, setUsePickedModel] = useState(false);
-  const [chatDood] = useState(() => loadAgentDood("orchestrator"));
+  const [chatDood, setChatDood] = useState(() => loadAgentDood("orchestrator"));
+  const [externalPending, setExternalPending] = useState(false);
+  const [giftOpen, setGiftOpen] = useState(false);
+  const [wardrobeOpen, setWardrobeOpen] = useState(false);
+  const [treatOver, setTreatOver] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
+  const chatOrb = useRef<DoodOrbHandle>(null);
   const chatStatus = orchestrator?.status ?? "idle";
+  const chatGift = boxCountdown(chatDood, now);
+  const chatBusy = sending || externalPending;
   const nextId = useRef((loadChatEntries().at(-1)?.id ?? 0) + 1);
   const bottomRef = useRef<HTMLDivElement>(null);
   const filed = [...new Set(entries.flatMap((entry) => entry.created))];
@@ -1480,6 +1490,23 @@ function ChatView({
   useEffect(() => {
     saveChatEntries(entries);
   }, [entries]);
+
+  useEffect(() => {
+    saveAgentDood("orchestrator", chatDood);
+  }, [chatDood]);
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const onPending = (event: Event) => {
+      setExternalPending((event as CustomEvent<boolean>).detail === true);
+    };
+    window.addEventListener(CHAT_PENDING, onPending);
+    return () => window.removeEventListener(CHAT_PENDING, onPending);
+  }, []);
 
   useEffect(() => {
     const reload = () => {
@@ -1497,7 +1524,7 @@ function ChatView({
   useEffect(() => {
     if (!active) return;
     bottomRef.current?.scrollIntoView({ block: "nearest" });
-  }, [active, entries, sending]);
+  }, [active, entries, chatBusy]);
 
   const push = (
     role: ChatEntry["role"],
@@ -1513,7 +1540,7 @@ function ChatView({
   const send = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     const text = input.trim();
-    if (text === "" || sending) return;
+    if (text === "" || chatBusy) return;
     setInput("");
     push("user", text);
     setSending(true);
@@ -1553,26 +1580,99 @@ function ChatView({
     }
   };
 
+  const feedChatDood = (): void => {
+    chatOrb.current?.feed();
+    setChatDood((value) => ({ ...value, fed: value.fed + 1 }));
+  };
+
   return (
     <div className="fb-chat-layout fb-chat-layout--dock">
       <section className="fb-chat-thread">
         <div className="fb-chat-thread-head fb-chat-thread-head--dock">
-          <div className="fb-chat-heading">
-            <span className="fb-avatar-wrap fb-avatar-wrap--chat">
-              <DoodOrb
-                agentId="orchestrator"
-                status={chatStatus}
-                size={46}
-                outfit={chatDood.outfit}
-              />
-              <StatusDot status={chatStatus} />
-            </span>
-            <div>
-              <span className="fb-chat-thread-kicker">Orchestrator</span>
-              <h3>Talk to the factory</h3>
-            </div>
+          <div>
+            <span className="fb-chat-thread-kicker">Orchestrator</span>
+            <h3>Talk to the factory</h3>
           </div>
           <span className="fb-chat-tag">Always on</span>
+        </div>
+
+        <div className="fb-chat-care">
+          <div
+            className={`fb-avatar-wrap fb-avatar-wrap--chat-care${
+              treatOver ? " is-treat-target" : ""
+            }`}
+            onDragOver={(event) => {
+              if (event.dataTransfer.types.includes("text/factory-treat")) {
+                event.preventDefault();
+                event.dataTransfer.dropEffect = "copy";
+                setTreatOver(true);
+              }
+            }}
+            onDragLeave={(event) => {
+              if (event.currentTarget.contains(event.relatedTarget as Node | null)) return;
+              setTreatOver(false);
+            }}
+            onDrop={(event) => {
+              event.preventDefault();
+              setTreatOver(false);
+              if (event.dataTransfer.getData("text/factory-treat") !== "") feedChatDood();
+            }}
+          >
+            <DoodOrb
+              ref={chatOrb}
+              agentId="orchestrator"
+              status={chatStatus}
+              size={92}
+              outfit={chatDood.outfit}
+            />
+            <StatusDot status={chatStatus} />
+          </div>
+          <div className="fb-chat-care-copy">
+            <div className="fb-chat-care-title">
+              <strong>Orchestrator</strong>
+              <StatusTag status={chatStatus} />
+            </div>
+            <div className="fb-chat-care-actions">
+              <button
+                type="button"
+                draggable
+                onClick={feedChatDood}
+                onDragStart={(event) => {
+                  event.dataTransfer.setData("text/factory-treat", "cookie");
+                  event.dataTransfer.effectAllowed = "copy";
+                }}
+                onDragEnd={() => setTreatOver(false)}
+                title="Drag this cookie onto the Dood, or click to feed"
+                aria-label="Drag a cookie onto the Dood to feed it"
+                className="fb-treat-button"
+              >
+                <Pixels art="cookie" className="fb-treat-art" />
+                <span>Cookie</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!chatGift.ready) return;
+                  if (chatDood.boxes === 0 && chatGift.due !== chatDood) setChatDood(chatGift.due);
+                  setGiftOpen(true);
+                }}
+                disabled={!chatGift.ready}
+                title={chatGift.ready ? "A gift box is waiting" : `Next gift in ${chatGift.label}`}
+              >
+                <Pixels art="box" className="fb-care-art" />
+                <span>Gift{chatGift.ready ? "" : ` · ${chatGift.label}`}</span>
+              </button>
+              <button type="button" onClick={() => setWardrobeOpen(true)} title="Change the Orchestrator's outfit">
+                <Pixels art="spark" className="fb-care-art" />
+                <span>Wardrobe</span>
+              </button>
+            </div>
+            <p className="fb-chat-care-note">
+              {chatDood.owned.length === 0
+                ? "It has not found anything yet."
+                : `${chatDood.owned.length} of ${WEAR_ITEMS.length} found.`}
+            </p>
+          </div>
         </div>
         {filed.length === 0 ? null : (
           <div className="fb-chat-filed fb-chat-filed--dock">
@@ -1590,7 +1690,7 @@ function ChatView({
         )}
 
         <div className="fb-chat-log" aria-live="polite">
-        {entries.length === 0 && !sending ? (
+        {entries.length === 0 && !chatBusy ? (
           <div className="fb-chat-empty">
             <p>Tell the Orchestrator what to build, fix, or investigate.</p>
             <p className="fb-muted">
@@ -1631,7 +1731,7 @@ function ChatView({
             ) : null}
           </div>
         ))}
-        {sending ? (
+        {chatBusy ? (
           <div className="fb-msg fb-msg--orchestrator fb-msg--pending">
             <div className="fb-msg-head">
               <span className="fb-msg-dood" aria-hidden="true">
@@ -1652,14 +1752,14 @@ function ChatView({
             onChange={setPicked}
             align="start"
             className="fb-chat-model"
-            disabled={sending}
+            disabled={chatBusy}
           />
           <label className="fb-chat-use-model">
             <input
               type="checkbox"
               checked={usePickedModel}
               onChange={(event) => setUsePickedModel(event.target.checked)}
-              disabled={sending}
+              disabled={chatBusy}
             />
             Use this model
           </label>
@@ -1683,13 +1783,34 @@ function ChatView({
             rows={2}
             placeholder="Ask the Orchestrator for work…"
             aria-label="Message the Orchestrator"
-            disabled={sending}
+            disabled={chatBusy}
           />
-          <button type="submit" disabled={sending || input.trim() === ""}>
-            {sending ? "Working…" : "Send"}
+          <button type="submit" disabled={chatBusy || input.trim() === ""}>
+            {chatBusy ? "Working…" : "Send"}
           </button>
         </div>
       </form>
+      {giftOpen ? (
+        <GiftDialog
+          agentId="orchestrator"
+          color={avatarLook(null, "orchestrator").color}
+          owned={chatDood.owned}
+          onGrant={(item, wear) =>
+            setChatDood((value) => grantGift(value, item, wear))
+          }
+          onClose={() => setGiftOpen(false)}
+        />
+      ) : null}
+      {wardrobeOpen ? (
+        <WardrobeDialog
+          agentId="orchestrator"
+          agentName="Orchestrator"
+          status={chatStatus}
+          dood={chatDood}
+          onDood={setChatDood}
+          onClose={() => setWardrobeOpen(false)}
+        />
+      ) : null}
       </section>
     </div>
   );
@@ -1814,6 +1935,7 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
               text: `Steering ${selected.linearId}: ${message}`,
               created: [],
             });
+            setChatPending(true);
             try {
               const result = (await rpc.call("sendMessage", {
                 message: prompt,
@@ -1835,6 +1957,8 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
                 created: [],
               });
               throw cause;
+            } finally {
+              setChatPending(false);
             }
           }}
         />

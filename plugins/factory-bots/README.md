@@ -11,7 +11,9 @@ blocked, grouped into In motion, Needs a person, and On call.
 
 The board is a workspace: threads occupy the main column while the
 **Orchestrator chat** stays in the right rail, with its own live Dood. Drag the
-rail's left edge to resize it; the width is remembered. Selecting a thread
+rail's left edge to resize it; the width is remembered. The right Dood has the
+same do.computer care loop as an agent page: drag or click the cookie, open the
+timed gift, and use the full wardrobe. Selecting a thread
 replaces the thread list with its transcript, so the bots (in BB's Bots
 sidebar), the threads, and the Orchestrator remain one glance away.
 
