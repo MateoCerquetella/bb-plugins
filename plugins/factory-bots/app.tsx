@@ -1382,12 +1382,23 @@ function TicketDetailView({
     ticket.description.trim() !== "";
 
   const blocker = agent.statusReason ?? ticket.stopReason;
+  const worktreeConflict =
+    blocker === null
+      ? null
+      : blocker.match(
+          /checkout selected ([^,\s]+), but ticket (SDD-\d+) owns ([^.\s]+)\. A person must choose which ticket owns this worktree\./iu,
+        );
   const suggestions =
-    isBlocked &&
-    blocker !== null &&
-    /whether to start or attach/i.test(blocker)
-      ? ["Start the work", "Attach to the existing feature"]
-      : [];
+    !isBlocked || blocker === null
+      ? []
+      : /whether to start or attach/i.test(blocker)
+        ? ["Start the work", "Attach to the existing feature"]
+        : worktreeConflict !== null
+          ? [
+              `Keep ${worktreeConflict[2]} as the worktree owner.`,
+              "Use the selected checkout for this worktree.",
+            ]
+          : [];
 
   useEffect(() => {
     setSteerText("");
@@ -1459,7 +1470,23 @@ function TicketDetailView({
         {isBlocked ? (
           <div className="fb-answer-brief">
             <span>Factory blocker</span>
-            <p>{blocker ?? "This ticket is blocked on a person."}</p>
+            {worktreeConflict === null ? (
+              <p>{blocker ?? "This ticket is blocked on a person."}</p>
+            ) : (
+              <div className="fb-answer-conflict">
+                <strong>Which ticket owns this worktree?</strong>
+                <dl>
+                  <div>
+                    <dt>Checkout selected</dt>
+                    <dd><code>{worktreeConflict[1]}</code></dd>
+                  </div>
+                  <div>
+                    <dt>{worktreeConflict[2]} owns</dt>
+                    <dd><code>{worktreeConflict[3]}</code></dd>
+                  </div>
+                </dl>
+              </div>
+            )}
             {suggestions.length === 0 ? null : (
               <div className="fb-answer-suggestions">
                 {suggestions.map((suggestion) => (

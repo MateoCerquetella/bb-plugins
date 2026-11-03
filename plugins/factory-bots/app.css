@@ -4555,3 +4555,44 @@
 .fb-answer-form > button {
   align-self: flex-start;
 }
+
+.fb-answer-conflict {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fb-answer-conflict strong {
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.fb-answer-conflict dl {
+  display: grid;
+  margin: 0;
+  gap: 4px;
+}
+
+.fb-answer-conflict dl > div {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 8px;
+  align-items: baseline;
+}
+
+.fb-answer-conflict dt {
+  color: var(--muted-foreground);
+  font-size: 10px;
+}
+
+.fb-answer-conflict dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 10.5px;
+}
+
+.fb-answer-conflict code {
+  font-family: var(--fb-font-mono);
+  font-size: 10px;
+}
