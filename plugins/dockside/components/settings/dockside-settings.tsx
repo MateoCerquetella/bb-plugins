@@ -97,7 +97,8 @@ export function DocksideSettingsSection() {
         children {preferences.defaultChildrenExpanded ? "expanded" : "collapsed"} ·
         providers {preferences.showProviderIcons ? "shown" : "hidden"} · PR metadata{" "}
         {preferences.showPullRequestMetadata ? "shown" : "hidden"} · times{" "}
-        {preferences.showRelativeTime ? "shown" : "hidden"}
+        {preferences.showRelativeTime ? "shown" : "hidden"} · factory bots{" "}
+        {preferences.showFactoryBots ? "shown" : "hidden"}
       </p>
     </section>
   );

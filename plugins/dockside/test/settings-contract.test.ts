@@ -54,12 +54,15 @@ describe("Dockside settings contract", () => {
       "showProviderIcons",
       "showPullRequestMetadata",
       "showRelativeTime",
+      "showFactoryBots",
     ]) {
       assert.match(server, new RegExp(`${key}:`));
     }
     assert.match(server, /default: "Default"/);
     assert.match(server, /default: "Comfortable"/);
     assert.match(server, /default: "Expanded"/);
+    assert.match(server, /factoryBots:/);
+    assert.match(server, /callRpc\(/);
   });
 
   it("registers one settings preview and reads live settings", () => {

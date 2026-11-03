@@ -16,6 +16,7 @@ describe("resolveDocksidePreferences", () => {
     assert.equal(loading.showProviderIcons, true);
     assert.equal(loading.showPullRequestMetadata, true);
     assert.equal(loading.showRelativeTime, true);
+    assert.equal(loading.showFactoryBots, false);
     assert.equal(loading.colors.working, "#D99B00");
     assert.equal(loading.colors.goal, "#D94B4B");
     assert.equal(loading.colors.waiting, "#F58220");
@@ -89,6 +90,7 @@ describe("resolveDocksidePreferences", () => {
       showProviderIcons: false,
       showPullRequestMetadata: false,
       showRelativeTime: false,
+      showFactoryBots: true,
     });
 
     assert.equal(preferences.density, "compact");
@@ -96,6 +98,7 @@ describe("resolveDocksidePreferences", () => {
     assert.equal(preferences.showProviderIcons, false);
     assert.equal(preferences.showPullRequestMetadata, false);
     assert.equal(preferences.showRelativeTime, false);
+    assert.equal(preferences.showFactoryBots, true);
   });
 });
 

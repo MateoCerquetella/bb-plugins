@@ -97,6 +97,15 @@ silhouette rather than in brand color.
 
 ---
 
+## do.computer mascot
+
+The still creature drawn by `components/inbox/factory-bot-avatar.tsx` is the
+Agent Dood from [do.computer](https://github.com/SawyerHood/do-computer), MIT
+licensed, Copyright Sawyer Hood. Factory Bots uses the live renderer; Dockside
+draws the same seed as a small still in its optional Factory bots section.
+
+---
+
 ## MIT License
 
 The following text applies to every entry above, together with that entry's own

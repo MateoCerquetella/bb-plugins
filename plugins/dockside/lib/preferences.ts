@@ -47,6 +47,7 @@ export interface DocksidePreferences {
   showProviderIcons: boolean;
   showPullRequestMetadata: boolean;
   showRelativeTime: boolean;
+  showFactoryBots: boolean;
 }
 
 export const CUSTOM_COLOR_DEFAULTS = {
@@ -187,6 +188,7 @@ export function resolveDocksidePreferences(
       true,
     ),
     showRelativeTime: readBoolean(values?.showRelativeTime, true),
+    showFactoryBots: readBoolean(values?.showFactoryBots, false),
   };
 }
 

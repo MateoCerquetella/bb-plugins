@@ -35,6 +35,11 @@ import {
   MAX_PROJECT_COLOR_ROWS,
   MAX_PROJECT_ID_LENGTH,
 } from "./lib/project-colors.ts";
+import {
+  FACTORY_BOTS_PLUGIN_ID,
+  factoryAgentSchema,
+  factoryBoardSchema,
+} from "./lib/factory-bots.ts";
 
 const migrations = [
   `CREATE TABLE IF NOT EXISTS thread_lifecycle (
@@ -152,6 +157,14 @@ export const docksideRpcContract = defineRpcContract({
   resetProjectColor: {
     input: z.object({ projectId: projectIdSchema }),
     output: z.object({ projectId: projectIdSchema, reset: z.boolean() }),
+  },
+  factoryBots: {
+    input: z.object({}),
+    output: z.object({
+      ok: z.boolean(),
+      agents: z.array(factoryAgentSchema),
+      message: z.string().nullable(),
+    }),
   },
   listProviders: {
     input: z.object({}),
@@ -364,6 +377,12 @@ export default function plugin(bb: BbPluginApi) {
       type: "boolean",
       label: "Show relative time",
       default: true,
+    },
+    showFactoryBots: {
+      type: "boolean",
+      label: "Show Factory bots section",
+      description: "Adds the Empirical Factory agents above Chats in the sidebar.",
+      default: false,
     },
   });
 
@@ -643,6 +662,34 @@ export default function plugin(bb: BbPluginApi) {
     },
     // A custom ACP provider already carries its own brand mark, so the sidebar
     // reads it from the host rather than hard-coding a second glyph per agent.
+    async factoryBots() {
+      try {
+        const board = await bb.sdk.plugins.callRpc({
+          pluginId: FACTORY_BOTS_PLUGIN_ID,
+          method: "getBoard",
+          input: null,
+          outputSchema: factoryBoardSchema,
+        });
+        if (!board.ok) {
+          return {
+            ok: false,
+            agents: [],
+            message:
+              board.reason === "not-running"
+                ? "Factory is not running."
+                : board.message,
+          };
+        }
+        return { ok: true, agents: board.agents, message: null };
+      } catch (error) {
+        bb.log.warn(`factory bots read failed: ${String(error)}`);
+        return {
+          ok: false,
+          agents: [],
+          message: "Factory Bots is unavailable.",
+        };
+      }
+    },
     async listProviders() {
       const providers = await bb.sdk.providers.list();
       return {

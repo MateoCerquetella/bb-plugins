@@ -181,6 +181,20 @@ status help. Provider names are announced by the child disclosure without adding
 nested tab stops. A parent chip in the thread header still gives a focused child
 a direct route back up.
 
+### Factory bots
+
+Dockside can show an optional **Factory bots** strip above Chats when the
+[Factory Bots](../factory-bots) plugin is installed. Turn on **Show Factory bots
+section** in Dockside Settings. The strip is additive — the native thread list
+below stays exactly as Dockside draws it.
+
+![The optional Factory bots strip above Chats](docs/media/factory-bots.png)
+
+Each factory agent gets its Dood, live work or blocked reason, owned column, and
+ticket count. Clicking an agent opens the Factory Bots panel at that agent. The
+strip polls the Factory Bots read API while it is enabled, and collapses from its
+header like the other Dockside sections.
+
 ### The rest
 
 - Collapsible project and agent groups.

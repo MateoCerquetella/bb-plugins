@@ -27,6 +27,11 @@ import {
   type BulkDeletePreviewView,
 } from "@/components/inbox/bulk-delete-dialog";
 import { useLifecycle } from "@/hooks/use-lifecycle";
+import { useFactoryBots } from "@/hooks/use-factory-bots";
+import {
+  FACTORY_BOTS_PANEL_PATH,
+  FACTORY_BOTS_PLUGIN_ID,
+} from "@/lib/factory-bots";
 import { useSettledThreads } from "@/hooks/use-settled-threads";
 import { useProjectColors } from "@/hooks/use-project-colors";
 import {
@@ -76,6 +81,7 @@ import {
 } from "@/lib/project-order";
 import { familyIsPinned, groupFamiliesByStatus } from "@/lib/status-groups";
 import { groupSidebarFamilies } from "@/lib/sidebar-sections";
+import { FactoryBotSection } from "@/components/inbox/factory-bot-section";
 
 const EMPTY_STATE_CLASS = "px-2 py-6 text-center text-xs text-muted-foreground";
 
@@ -96,6 +102,7 @@ export function ThreadInbox({
     () => resolveDocksidePreferences(settings.values),
     [settings.values],
   );
+  const factoryBots = useFactoryBots(preferences.showFactoryBots);
   const { overrides: projectColorOverrides } = useProjectColors();
   const inboxRef = useRef<HTMLDivElement>(null);
   const selectionAnchorRootId = useRef<string | null>(null);
@@ -637,6 +644,14 @@ export function ThreadInbox({
     }
   };
 
+  const openFactoryBots = (subPath: string): void => {
+    onNavigate();
+    const suffix = subPath === "" ? "" : `/${subPath}`;
+    window.location.assign(
+      `/plugins/${FACTORY_BOTS_PLUGIN_ID}/${FACTORY_BOTS_PANEL_PATH}${suffix}`,
+    );
+  };
+
   return (
     <div
       ref={inboxRef}
@@ -649,6 +664,15 @@ export function ThreadInbox({
         {reorderAnnouncement}
       </output>
       <div className="shrink-0">
+        {preferences.showFactoryBots ? (
+          <FactoryBotSection
+            state={factoryBots}
+            onOpen={(agent) =>
+              openFactoryBots(`agent/${encodeURIComponent(agent.name)}`)
+            }
+            onOpenPanel={() => openFactoryBots("")}
+          />
+        ) : null}
         <div className="flex h-8 items-center gap-2 px-2.5 pb-1 text-muted-foreground">
           <Icon name="Folder" className="size-3.5" aria-hidden />
           <span className="text-2xs font-semibold uppercase tracking-wider">
