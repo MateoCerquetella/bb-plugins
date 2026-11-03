@@ -3577,3 +3577,106 @@
     text-align: left;
   }
 }
+
+/* A clear left description / right thread split. */
+.fb-ticket-body {
+  display: grid;
+  flex: 1;
+  min-height: 0;
+  grid-template-columns: minmax(210px, 270px) minmax(0, 1fr);
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.fb-ticket-body--no-description {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.fb-ticket-thread {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.fb-ticket-thread .fb-transcript {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.fb-ticket-thread .fb-transcript .fb-section-head,
+.fb-ticket-thread .fb-live-tools {
+  flex: none;
+}
+
+.fb-ticket-thread .fb-entries {
+  min-height: 0;
+  flex: 1;
+  max-height: none;
+  overflow-y: auto;
+}
+
+.fb-ticket-thread .fb-steer {
+  flex: none;
+}
+
+.fb-ticket-body .fb-ticket-description {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  margin: 0;
+}
+
+.fb-ticket-body .fb-ticket-description-body {
+  min-height: 0;
+  flex: 1;
+  max-height: none;
+  overflow-y: auto;
+}
+
+@media (max-width: 900px) {
+  .fb-ticket-body {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+  }
+
+  .fb-ticket-body .fb-ticket-description {
+    height: auto;
+    max-height: 28vh;
+  }
+
+  .fb-ticket-body .fb-ticket-description-body {
+    max-height: 28vh;
+  }
+
+  .fb-ticket-thread {
+    min-height: 420px;
+  }
+}
+
+.fb-ticket-owner {
+  width: 116px;
+}
+
+.fb-ticket-owner-dood {
+  width: 92px;
+  height: 92px;
+}
+
+@media (max-width: 620px) {
+  .fb-ticket-owner {
+    width: 100%;
+  }
+
+  .fb-ticket-owner-dood {
+    width: 92px;
+    height: 92px;
+  }
+}

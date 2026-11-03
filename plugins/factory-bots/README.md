@@ -31,7 +31,8 @@ the collapsible Linear description, a compact attempts/worktree line, and a
 thread-style transcript with the live tool call highlighted. The ticket header
 shows the owning bot on the left with its live Dood and the same icon-only
 cookie, gift, and wardrobe controls as do.computer; no ownership or status text
-label sits beside it. Answers and the tool results that belong
+label sits beside it. The Linear description and the transcript use separate
+columns so neither has to be mistaken for the other. Answers and the tool results that belong
 to them are grouped into one turn, and tool payloads are folded away. The
 transcript has a steer composer that sends the person's words through the
 Orchestrator, the only write path; the steering messages stay with the ticket.

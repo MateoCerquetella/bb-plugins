@@ -54,7 +54,6 @@ import {
   saveAgentDood,
   type AgentDood,
 } from "./lib/dood-state";
-import { WEAR_ITEMS } from "./lib/wear-items";
 import { activeLiveTool, isGenerating, readLiveTools } from "./lib/live";
 import { SoulsView } from "./lib/souls-view";
 import { stageLabel } from "./lib/derive";
@@ -841,7 +840,6 @@ function AgentHeader({
               className="fb-treat-button"
             >
               <Pixels art="cookie" className="fb-treat-art" />
-              <span>Cookie</span>
             </button>
             <button
               type="button"
@@ -856,23 +854,22 @@ function AgentHeader({
                   ? "A gift box is waiting"
                   : `Next gift in ${gift.label}`
               }
+              aria-label={
+                gift.ready
+                  ? "Open the gift"
+                  : `Next gift in ${gift.label}`
+              }
             >
               <Pixels art="box" className="fb-care-art" />
-              <span>Gift{gift.ready ? "" : ` · ${gift.label}`}</span>
             </button>
             <button
               type="button"
               onClick={() => setWardrobeOpen(true)}
               title="Change its outfit"
+              aria-label="Open the wardrobe"
             >
               <Pixels art="spark" className="fb-care-art" />
-              <span>Wardrobe</span>
             </button>
-            <span className="fb-care-note">
-              {dood.owned.length === 0
-                ? "It has not found anything yet."
-                : `${dood.owned.length} of ${WEAR_ITEMS.length} found.`}
-            </span>
           </div>
         </div>
       </div>
@@ -1170,7 +1167,7 @@ function TicketOwner({ agent }: { agent: AgentCard }) {
           ref={orb}
           agentId={agent.name}
           status={agent.status}
-          size={80}
+          size={92}
           outfit={dood.outfit}
         />
         <StatusDot status={agent.status} />
@@ -1255,6 +1252,10 @@ function TicketDetailView({
   const [steering, setSteering] = useState(false);
   const [steerError, setSteerError] = useState<string | null>(null);
   const [descriptionOpen, setDescriptionOpen] = useState(true);
+  const hasDescription =
+    ticket.description !== undefined &&
+    ticket.description !== null &&
+    ticket.description.trim() !== "";
 
   const steer = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
@@ -1303,63 +1304,67 @@ function TicketDetailView({
         </div>
       </header>
 
-      {ticket.description === undefined || ticket.description === null || ticket.description.trim() === "" ? null : (
-        <section className={`fb-ticket-description${descriptionOpen ? " is-open" : ""}`}>
-          <button
-            type="button"
-            className="fb-ticket-description-toggle"
-            aria-expanded={descriptionOpen}
-            onClick={() => setDescriptionOpen((open) => !open)}
-          >
-            <span>Description</span>
-            <span>{descriptionOpen ? "Hide" : "Show"}</span>
-          </button>
-          {descriptionOpen ? (
-            <div className="fb-ticket-description-body">
-              <Markdown content={ticket.description} />
+      <div className={`fb-ticket-body${hasDescription ? "" : " fb-ticket-body--no-description"}`}>
+        {hasDescription ? (
+          <section className={`fb-ticket-description${descriptionOpen ? " is-open" : ""}`}>
+            <button
+              type="button"
+              className="fb-ticket-description-toggle"
+              aria-expanded={descriptionOpen}
+              onClick={() => setDescriptionOpen((open) => !open)}
+            >
+              <span>Description</span>
+              <span>{descriptionOpen ? "Hide" : "Show"}</span>
+            </button>
+            {descriptionOpen ? (
+              <div className="fb-ticket-description-body">
+                <Markdown content={ticket.description ?? ""} />
+              </div>
+            ) : null}
+          </section>
+        ) : null}
+
+        <div className="fb-ticket-thread">
+          {transcriptError !== null ? (
+            <p className="fb-inline-error">Transcript unavailable: {transcriptError}</p>
+          ) : transcript === null ? (
+            <section className="fb-transcript">
+              <div className="fb-section-head">
+                <h3>Transcript</h3>
+              </div>
+              <p className="fb-muted">No transcript has been read for this ticket yet.</p>
+            </section>
+          ) : (
+            <TranscriptView transcript={transcript} />
+          )}
+
+          <form className="fb-steer" onSubmit={(event) => void steer(event)}>
+            <div className="fb-steer-row">
+              <textarea
+                value={steerText}
+                onChange={(event) => setSteerText(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" && !event.shiftKey) {
+                    event.preventDefault();
+                    event.currentTarget.form?.requestSubmit();
+                  }
+                }}
+                rows={1}
+                maxLength={3_000}
+                placeholder="Steer this ticket through the Orchestrator…"
+                disabled={steering}
+                aria-label="Steer this ticket"
+              />
+              <button type="submit" disabled={steering || steerText.trim() === ""}>
+                {steering ? "Steering…" : "Steer"}
+              </button>
             </div>
-          ) : null}
-        </section>
-      )}
-
-      {transcriptError !== null ? (
-        <p className="fb-inline-error">Transcript unavailable: {transcriptError}</p>
-      ) : transcript === null ? (
-        <section className="fb-transcript">
-          <div className="fb-section-head">
-            <h3>Transcript</h3>
-          </div>
-          <p className="fb-muted">No transcript has been read for this ticket yet.</p>
-        </section>
-      ) : (
-        <TranscriptView transcript={transcript} />
-      )}
-
-      <form className="fb-steer" onSubmit={(event) => void steer(event)}>
-        <div className="fb-steer-row">
-          <textarea
-            value={steerText}
-            onChange={(event) => setSteerText(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                event.currentTarget.form?.requestSubmit();
-              }
-            }}
-            rows={1}
-            maxLength={3_000}
-            placeholder="Steer this ticket through the Orchestrator…"
-            disabled={steering}
-            aria-label="Steer this ticket"
-          />
-          <button type="submit" disabled={steering || steerText.trim() === ""}>
-            {steering ? "Steering…" : "Steer"}
-          </button>
+            {steerError === null ? null : (
+              <p className="fb-steer-error" role="alert">{steerError}</p>
+            )}
+          </form>
         </div>
-        {steerError === null ? null : (
-          <p className="fb-steer-error" role="alert">{steerError}</p>
-        )}
-      </form>
+      </div>
     </article>
   );
 }
