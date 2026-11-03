@@ -4501,3 +4501,57 @@
 .fb-chat-link {
   background: transparent;
 }
+
+.fb-answer-brief {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fb-answer-brief > span {
+  color: var(--fb-blocked);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.fb-answer-brief p {
+  max-height: 150px;
+  margin: 0;
+  overflow-y: auto;
+  color: var(--foreground);
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+.fb-answer-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 3px;
+}
+
+.fb-answer-suggestion {
+  margin: 0;
+  padding: 3px 7px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--foreground);
+  font: inherit;
+  font-size: 10.5px;
+  cursor: pointer;
+}
+
+.fb-answer-suggestion:hover {
+  border-color: color-mix(in srgb, var(--primary) 42%, var(--border));
+  background: color-mix(in srgb, var(--primary) 6%, var(--card));
+}
+
+.fb-answer-suggestion:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.fb-answer-form > button {
+  align-self: flex-start;
+}

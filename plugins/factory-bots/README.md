@@ -37,10 +37,11 @@ team's review is the only review.
 Every row carries a live Dood from [do.computer](https://do.computer), grown
 from the agent's name. It is a real animated creature; where WebGL is unavailable
 it falls back to the same seed's static blob. Open a thread to see its ticket:
-one answer form at the top, named for the owning bot, with one decision per
-question and choice buttons when the ask is binary; a collapsed **Linear issue**
-on demand; and the latest conversation turn, with **Show all N turns** for the
-rest. The ticket header shows the owning bot on the left with its live Dood and
+one answer box at the top, named for the owning bot and quoting the factory's
+actual blocker instead of inventing questions; when the blocker says
+“start or attach”, two quick suggestions fill the answer box; a collapsed
+**Linear issue** on demand; and the conversation on demand, with recent turns
+behind **Show conversation**. The ticket header shows the owning bot on the left with its live Dood and
 the same icon-only cookie, gift, and wardrobe controls as do.computer; no
 ownership or status text label sits beside it. On a ticket, the Orchestrator
 rail keeps the conversation but replaces its composer with a pointer to the

@@ -1073,74 +1073,6 @@ function TranscriptEntryContent({ entry }: { entry: TranscriptEntry }) {
   );
 }
 
-function latestAssistantMessage(transcript: Transcript | null): string | null {
-  if (transcript === null) return null;
-  for (let index = transcript.entries.length - 1; index >= 0; index -= 1) {
-    const entry = transcript.entries[index];
-    if (entry === undefined) continue;
-    if (transcriptRole(entry.kind) === "assistant" && entry.text.trim() !== "") {
-      return entry.text.trim();
-    }
-  }
-  return null;
-}
-
-/** Pull the actual decision out of the blocker, not just the generic status. */
-function cleanAnswerMarkup(value: string): string {
-  return value.replace(/\*\*/gu, "").replace(/`/gu, "").trim();
-}
-
-function answerQuestion(
-  transcript: Transcript | null,
-  comments: readonly { body: string }[],
-  fallback: string | null,
-): string | null {
-  // Comments carry the full agent ask; transcript entries can be clipped.
-  const comment = comments.find((entry) =>
-    /\bi need (?:a person|you|someone) to (?:answer|decide|confirm|choose)\b/iu.test(
-      entry.body,
-    ),
-  );
-  const latest = comment?.body ?? latestAssistantMessage(transcript);
-  if (latest === null) return fallback;
-  const normalized = cleanAnswerMarkup(latest).replace(/\s+/gu, " ").trim();
-  const markers = [
-    /\bi need (?:a person|you|someone) to (?:answer|decide|confirm|choose)\b/iu,
-    /\b(?:a person|someone|you) (?:must|need(?:s)? to) (?:answer|decide|confirm|choose)\b/iu,
-    /\bplease (?:answer|confirm|decide|choose)\b/iu,
-    /\bi need (?:one|a) (?:sentence|decision) from you\b/iu,
-  ];
-  for (const marker of markers) {
-    const match = marker.exec(normalized);
-    if (match?.index !== undefined) return normalized.slice(match.index).trim();
-  }
-  const questions = normalized.match(/[^?]+\?/gu);
-  if (questions !== null && questions.length > 0) {
-    return questions.join(" ").trim();
-  }
-  return normalized.length <= 520 ? normalized : fallback;
-}
-
-function answerPoints(question: string | null): string[] {
-  if (question === null) return [];
-  const parts = question.split(
-    /\s*,\s*(?:and\s+)?(?=whether\b|which\b|what\b|who\b|when\b|where\b|how\b|if\b)/iu,
-  );
-  const points = parts.length > 1 ? parts : [question];
-  return points
-    .map((point, index) => {
-      const cleaned =
-        index === 0
-          ? point.replace(/^.*?\b(?:answer|decide|confirm|choose)\s+/iu, "")
-          : point;
-      const trimmed = cleaned.trim();
-      return trimmed === ""
-        ? trimmed
-        : trimmed[0]!.toUpperCase() + trimmed.slice(1);
-    })
-    .filter((point) => point !== "");
-}
-
 function TranscriptView({
   transcript,
   defaultCollapsed = false,
@@ -1420,124 +1352,6 @@ function TicketComments({
   );
 }
 
-function answerChoices(prompt: string): string[] {
-  const parenthetical = prompt.match(/\(([^()]*\bvs\.?\b[^()]*)\)/iu);
-  if (parenthetical !== null) {
-    const choices = parenthetical[1]
-      .split(/\s+vs\.?\s+/iu)
-      .map((choice) => choice.trim())
-      .filter((choice) => choice !== "");
-    if (choices.length > 1) return choices;
-  }
-  const either = prompt.match(/^Whether\s+(.+?)\s+or\s+(.+)$/iu);
-  if (either !== null) return [either[1]!.trim(), either[2]!.trim()];
-  return [];
-}
-
-function displayChoice(choice: string): string {
-  return cleanAnswerMarkup(choice).replace(/[.;,]+$/u, "").trim();
-}
-
-function TicketAnswerForm({
-  questions,
-  agentName,
-  steering,
-  onSubmit,
-}: {
-  questions: readonly string[];
-  agentName: string;
-  steering: boolean;
-  onSubmit: (message: string) => void;
-}) {
-  const [answers, setAnswers] = useState<Record<number, string>>({});
-  const [context, setContext] = useState("");
-  const complete = questions.every((_, index) => (answers[index] ?? "").trim() !== "");
-
-  return (
-    <form
-      className="fb-answer-form"
-      onSubmit={(event) => {
-        event.preventDefault();
-        if (!complete || steering) return;
-        const message = [
-          `Answers to ${agentName}'s questions:`,
-          ...questions.map(
-            (question, index) =>
-              `${index + 1}. ${question}\nAnswer: ${answers[index]!.trim()}`,
-          ),
-          ...(context.trim() === ""
-            ? []
-            : ["", `Additional context: ${context.trim()}`]),
-        ].join("\n\n");
-        onSubmit(message);
-      }}
-    >
-      <div className="fb-answer-form-head">
-        <span className="fb-answer-question-label">What to answer</span>
-        <span>Choose one per question; add anything else below.</span>
-      </div>
-      <ol className="fb-answer-question-list">
-        {questions.map((question, index) => {
-          const choices = answerChoices(question);
-          return (
-            <li className="fb-answer-question-item" key={`${index}:${question}`}>
-              <span className="fb-answer-number">{index + 1}</span>
-              <div className="fb-answer-question-body">
-                <p className="fb-answer-prompt">{question}</p>
-                {choices.length > 1 ? (
-                  <div className="fb-answer-choices">
-                    {choices.map((choice) => (
-                      <button
-                        key={choice}
-                        type="button"
-                        className="fb-answer-choice"
-                        aria-pressed={answers[index] === choice}
-                        onClick={() =>
-                          setAnswers((current) => ({ ...current, [index]: choice }))
-                        }
-                      >
-                        {displayChoice(choice)}
-                      </button>
-                    ))}
-                  </div>
-                ) : (
-                  <textarea
-                    value={answers[index] ?? ""}
-                    onChange={(event) =>
-                      setAnswers((current) => ({
-                        ...current,
-                        [index]: event.target.value,
-                      }))
-                    }
-                    rows={2}
-                    placeholder="Type your answer…"
-                    aria-label={`Answer for question ${index + 1}`}
-                  />
-                )}
-              </div>
-            </li>
-          );
-        })}
-      </ol>
-      <textarea
-        className="fb-answer-context"
-        value={context}
-        onChange={(event) => setContext(event.target.value)}
-        rows={2}
-        placeholder="Anything else the Orchestrator should know? Optional."
-        aria-label="Additional context"
-      />
-      <button
-        type="submit"
-        className="fb-line-button fb-line-button--accent fb-answer-submit"
-        disabled={steering || !complete}
-      >
-        {steering ? "Sending…" : "Send answers"}
-      </button>
-    </form>
-  );
-}
-
 function TicketDetailView({
   ticket,
   agent,
@@ -1567,10 +1381,13 @@ function TicketDetailView({
     ticket.description !== null &&
     ticket.description.trim() !== "";
 
-  const question = isBlocked
-    ? answerQuestion(transcript, ticket.comments, agent.statusReason)
-    : null;
-  const questionPoints = answerPoints(question);
+  const blocker = agent.statusReason ?? ticket.stopReason;
+  const suggestions =
+    isBlocked &&
+    blocker !== null &&
+    /whether to start or attach/i.test(blocker)
+      ? ["Start the work", "Attach to the existing feature"]
+      : [];
 
   useEffect(() => {
     setSteerText("");
@@ -1639,56 +1456,63 @@ function TicketDetailView({
             ? `${agent.displayName} needs your answer`
             : `Reply to ${agent.displayName}`}
         </h3>
-        {isBlocked && questionPoints.length > 0 ? (
-          <TicketAnswerForm
-            key={ticket.linearId}
-            questions={questionPoints}
-            agentName={agent.displayName}
-            steering={steering}
-            onSubmit={(message) => void sendAnswer(message)}
-          />
+        {isBlocked ? (
+          <div className="fb-answer-brief">
+            <span>Factory blocker</span>
+            <p>{blocker ?? "This ticket is blocked on a person."}</p>
+            {suggestions.length === 0 ? null : (
+              <div className="fb-answer-suggestions">
+                {suggestions.map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    type="button"
+                    className="fb-answer-suggestion"
+                    onClick={() => setSteerText(suggestion)}
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         ) : (
-          <>
-            <p className="fb-answer-reason">
-              {isBlocked
-                ? agent.statusReason ?? "This ticket is blocked on a person."
-                : "Send a message through the Orchestrator. This ticket stays the same."}
-            </p>
-            <form className="fb-answer-form" onSubmit={steer}>
-              <textarea
-                id="ticket-answer"
-                value={steerText}
-                onChange={(event) => {
-                  setSteerText(event.target.value);
-                  setSteerError(null);
-                  setSteerNotice(null);
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" && !event.shiftKey) {
-                    event.preventDefault();
-                    event.currentTarget.form?.requestSubmit();
-                  }
-                }}
-                rows={2}
-                maxLength={3_000}
-                placeholder={`Type your answer to ${agent.displayName}…`}
-                disabled={steering}
-                aria-label={`Answer ${agent.displayName}`}
-              />
-              <button
-                type="submit"
-                className="fb-line-button fb-line-button--accent"
-                disabled={steering || steerText.trim() === ""}
-              >
-                {steering
-                  ? "Sending…"
-                  : isBlocked
-                    ? "Send answer"
-                    : "Send reply"}
-              </button>
-            </form>
-          </>
+          <p className="fb-answer-reason">
+            Send a message through the Orchestrator. This ticket stays the same.
+          </p>
         )}
+        <form className="fb-answer-form" onSubmit={steer}>
+          <textarea
+            id="ticket-answer"
+            value={steerText}
+            onChange={(event) => {
+              setSteerText(event.target.value);
+              setSteerError(null);
+              setSteerNotice(null);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                event.currentTarget.form?.requestSubmit();
+              }
+            }}
+            rows={2}
+            maxLength={3_000}
+            placeholder={`Type your answer to ${agent.displayName}…`}
+            disabled={steering}
+            aria-label={`Answer ${agent.displayName}`}
+          />
+          <button
+            type="submit"
+            className="fb-line-button fb-line-button--accent"
+            disabled={steering || steerText.trim() === ""}
+          >
+            {steering
+              ? "Sending…"
+              : isBlocked
+                ? "Send answer"
+                : "Send reply"}
+          </button>
+        </form>
         {steerError === null ? null : (
           <p className="fb-answer-feedback fb-answer-feedback--error" role="alert">
             {steerError}
