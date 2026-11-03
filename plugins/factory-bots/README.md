@@ -10,16 +10,18 @@ its conversation, how many tickets it holds, and whether it is idle, working, or
 blocked, grouped into In motion, Needs a person, and On call.
 
 The board is a workspace: threads occupy the main column while the
-**Orchestrator chat** stays in the right rail, with its own live Dood. Selecting
-a thread replaces the thread list with its transcript, so the bots (in BB's
-Bots sidebar), the threads, and the Orchestrator remain one glance away.
+**Orchestrator chat** stays in the right rail, with its own live Dood. Drag the
+rail's left edge to resize it; the width is remembered. Selecting a thread
+replaces the thread list with its transcript, so the bots (in BB's Bots
+sidebar), the threads, and the Orchestrator remain one glance away.
 
 Every row carries a live Dood from [do.computer](https://do.computer), grown
 from the agent's name. It is a real animated creature; where WebGL is unavailable
 it falls back to the same seed's static blob. Open a thread to see its ticket:
-stage, attempts, stop reason, decisions, worktree, and a thread-style transcript
-with the live tool call highlighted. The compact ticket header keeps the agent's
-Dood even when the full agent page is folded away. Answers and the tool results that belong
+the Linear description (collapsible), stage, attempts, stop reason, decisions,
+worktree, and a thread-style transcript with the live tool call highlighted. The
+compact ticket header keeps the agent's Dood even when the full agent page is
+folded away. Answers and the tool results that belong
 to them are grouped into one turn, and tool payloads are folded away. The
 transcript has a steer composer that sends the person's words through the
 Orchestrator, the only write path; the steering messages stay with the ticket.

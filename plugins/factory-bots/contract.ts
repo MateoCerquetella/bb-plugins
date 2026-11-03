@@ -24,6 +24,8 @@ export const TicketSummarySchema = z.object({
 });
 
 export const TicketDetailSchema = TicketSummarySchema.extend({
+  /** The Linear issue body; absent on older factory builds. */
+  description: z.string().nullable().optional(),
   worktree: z.string().nullable(),
   attempts: z.number().int(),
   stageAttempts: z.number().int(),

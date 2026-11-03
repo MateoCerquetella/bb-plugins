@@ -3078,3 +3078,137 @@
     min-height: 0;
   }
 }
+
+/* The Orchestrator rail can be widened or narrowed with its edge handle. */
+.fb-shell {
+  grid-template-columns: minmax(0, 1fr) var(--fb-chat-width, 360px);
+}
+
+.fb-shell.is-resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+
+.fb-shell.is-resizing * {
+  cursor: col-resize !important;
+}
+
+.fb-chat-resize {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: -10px;
+  z-index: 6;
+  width: 18px;
+  border-radius: 8px;
+  outline: none;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.fb-chat-resize::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  content: "";
+  background: var(--border);
+  transform: translateX(-50%);
+  transition: width 120ms ease, background 120ms ease;
+}
+
+.fb-chat-resize:hover::before,
+.fb-chat-resize:focus-visible::before {
+  width: 2px;
+  background: var(--primary);
+}
+
+.fb-chat-resize:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.fb-shell.is-chat-focus .fb-chat-resize {
+  display: none;
+}
+
+@media (max-width: 1150px) {
+  .fb-chat-resize {
+    display: none;
+  }
+}
+
+/* The Linear issue body, kept visible without crowding the transcript. */
+.fb-ticket-description {
+  margin: 0 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--stage, var(--primary)) 4%, var(--card));
+}
+
+.fb-ticket-description > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 11px;
+  cursor: pointer;
+  list-style: none;
+  color: var(--foreground);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+
+.fb-ticket-description > summary::-webkit-details-marker {
+  display: none;
+}
+
+.fb-ticket-description > summary::before {
+  content: "›";
+  display: inline-block;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--muted-foreground);
+  transition: transform 120ms ease;
+}
+
+.fb-ticket-description[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.fb-ticket-description:not([open]) .fb-ticket-description-hint {
+  display: none;
+}
+
+.fb-ticket-description-hint {
+  margin-left: auto;
+  color: var(--muted-foreground);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fb-ticket-description-body {
+  max-height: 28vh;
+  overflow-y: auto;
+  padding: 0 11px 12px;
+  color: var(--foreground);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.fb-ticket-description-body p {
+  margin: 0 0 8px;
+}
+
+.fb-ticket-description-empty {
+  margin: 0;
+  padding: 0 11px 11px;
+  font-size: 11px;
+}
+
+.fb-ticket-pane .fb-ticket-description {
+  flex: none;
+}

@@ -4,7 +4,10 @@ import {
   useEffect,
   useRef,
   useState,
+  type CSSProperties,
   type FormEvent,
+  type KeyboardEvent,
+  type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from "react";
 import {
@@ -61,6 +64,25 @@ import { agentRoute, parsePanelRoute, ticketRoute } from "./lib/route";
 
 const PANEL_PATH = "factory-bots";
 const REFRESH_MS = 5_000;
+const CHAT_WIDTH_KEY = "factory-bots:chat-width:v1";
+const MIN_CHAT_WIDTH = 300;
+const MAX_CHAT_WIDTH = 560;
+const DEFAULT_CHAT_WIDTH = 360;
+
+function clampChatWidth(value: number): number {
+  return Math.min(MAX_CHAT_WIDTH, Math.max(MIN_CHAT_WIDTH, Math.round(value)));
+}
+
+function readChatWidth(): number {
+  try {
+    const stored = Number(localStorage.getItem(CHAT_WIDTH_KEY));
+    return Number.isFinite(stored) && stored > 0
+      ? clampChatWidth(stored)
+      : DEFAULT_CHAT_WIDTH;
+  } catch {
+    return DEFAULT_CHAT_WIDTH;
+  }
+}
 
 type RpcClient = ReturnType<typeof useRpc<typeof rpcContract>>;
 
@@ -1198,6 +1220,22 @@ function TicketDetailView({
         </p>
       </header>
 
+      <details className="fb-ticket-description" open>
+        <summary>
+          <span>Linear description</span>
+          <span className="fb-ticket-description-hint">Minimize</span>
+        </summary>
+        {ticket.description === undefined || ticket.description === null || ticket.description.trim() === "" ? (
+          <p className="fb-muted fb-ticket-description-empty">
+            No description on this Linear ticket.
+          </p>
+        ) : (
+          <div className="fb-ticket-description-body">
+            <Markdown content={ticket.description} />
+          </div>
+        )}
+      </details>
+
       <details className="fb-ticket-details">
         <summary>
           <span>Ticket details</span>
@@ -1766,9 +1804,12 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
   const rpc = useRpc<typeof rpcContract>();
   const navigate = useBbNavigate();
   const [boardTab, setBoardTab] = useState<BoardTab>("threads");
+  const [chatWidth, setChatWidth] = useState(readChatWidth);
+  const [resizingChat, setResizingChat] = useState(false);
   const ticketId = route.view === "ticket" ? route.linearId : null;
   const { board, ticket } = useFactoryPoll(rpc, ticketId);
   const rootRef = useRef<HTMLDivElement>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
   const previousPath = useRef(subPath);
 
   useEffect(() => {
@@ -1777,8 +1818,51 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
     rootRef.current?.focus({ preventScroll: true });
   }, [subPath]);
 
+  useEffect(() => {
+    try {
+      localStorage.setItem(CHAT_WIDTH_KEY, String(chatWidth));
+    } catch {
+      // The panel still works when storage is unavailable.
+    }
+  }, [chatWidth]);
+
   const go = (next: string): void => {
     navigate.toPluginPanel(PANEL_PATH, { subPath: next });
+  };
+
+  const beginChatResize = (event: ReactPointerEvent<HTMLDivElement>): void => {
+    if (window.matchMedia("(max-width: 1150px)").matches) return;
+    event.preventDefault();
+    const right =
+      shellRef.current?.getBoundingClientRect().right ?? window.innerWidth;
+    setResizingChat(true);
+    const move = (moveEvent: PointerEvent) => {
+      setChatWidth(clampChatWidth(right - moveEvent.clientX));
+    };
+    const stop = () => {
+      setResizingChat(false);
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", stop);
+      window.removeEventListener("pointercancel", stop);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", stop);
+    window.addEventListener("pointercancel", stop);
+  };
+
+  const resizeChatWithKeyboard = (
+    event: KeyboardEvent<HTMLDivElement>,
+  ): void => {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      setChatWidth((value) => clampChatWidth(value + 20));
+    } else if (event.key === "ArrowRight") {
+      event.preventDefault();
+      setChatWidth((value) => clampChatWidth(value - 20));
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      setChatWidth(DEFAULT_CHAT_WIDTH);
+    }
   };
 
   const orchestrator = board.data?.ok === true
@@ -1794,7 +1878,13 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
 
   return (
     <div className="fb-root" ref={rootRef} tabIndex={-1}>
-      <div className={`fb-shell${route.view === "chat" ? " is-chat-focus" : ""}`}>
+      <div
+        ref={shellRef}
+        className={`fb-shell${route.view === "chat" ? " is-chat-focus" : ""}${
+          resizingChat ? " is-resizing" : ""
+        }`}
+        style={{ "--fb-chat-width": `${chatWidth}px` } as CSSProperties}
+      >
         <main className="fb-main">
       {route.view === "board" ? (
         <BoardView
@@ -1853,6 +1943,19 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
       ) : null}
         </main>
         <aside className="fb-chat-dock" aria-label="Orchestrator chat">
+          <div
+            className="fb-chat-resize"
+            role="separator"
+            aria-orientation="vertical"
+            aria-label="Resize Orchestrator chat"
+            aria-valuemin={MIN_CHAT_WIDTH}
+            aria-valuemax={MAX_CHAT_WIDTH}
+            aria-valuenow={chatWidth}
+            tabIndex={0}
+            title="Drag to resize the chat"
+            onPointerDown={beginChatResize}
+            onKeyDown={resizeChatWithKeyboard}
+          />
           <ChatView
             rpc={rpc}
             active
