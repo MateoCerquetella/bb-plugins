@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:2a62f252c29ce4e8efa0e205981786ba8938b0cc47982da4f26a1942d672ad09",
+  "mode": "fresh-context",
+  "baseRef": "origin/main",
+  "baseCommit": "3779ed4eb34990b785c8a16f453abb9c27eb7ddf",
+  "headCommit": "ce0f44997614d8d8bbf30ccafb4aff68bc70e0ee",
+  "diffDigest": "sha256:d6589c249a0e53ca209b8f3da4a5e43dc7eb870b6cb27b70dd70d8640bce8918",
+  "verdict": "APPROVED",
+  "reviewerActor": "isolated-reviewer",
+  "reviewerInvocationId": "review-mobile-aura-2",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: COMPOSE_CENTER is entirely wrapped in @media (min-width:768px) and it holds every compact-layout selector (composer order/min-height, home flex, viewport/content, recents offset/spacer/fade). The lifecycle test asserts nothing survives outside the block; the desktop chrome block was already scoped.\n- PASS AC-UI-1: Ran test/mobile-composer.browser.mjs against installed 0.2.7 at 390x844: composer computed position is absolute, bottom is within 2px of the panel bottom, and top sits below 60% of panel height; the captured screenshot shows the composer pinned at the bottom.\n- PASS AC-UI-2: Same browser run asserts recents start above the composer, the scroll viewport overflows, the native spacer/fade compute to block, and panel/page horizontal overflow is <=1px at 390px; the mobile screenshot shows the Recent list above the composer.\n- PASS AC-UI-3: CAPY_CSS and the half-wallpaper mask are unscoped and unchanged; the browser run asserted the ink layer exists and mask-image contains 50%, and the screenshot shows the wallpaper behind the panel with a readable host composer surface.\n- PASS AC-2: The enclosed COMPOSE_CENTER rules are byte-identical and COMPOSE_LAYOUT's existing 768px chrome block is untouched. The 1440x1000 browser run asserts relative positioning, order:-1, upper-half top, and hidden spacer/fade; the desktop screenshot matches.\n- PASS AC-3: apply() still emits only COMPOSE_CENTER when enabled=false; the lifecycle test asserts that disabled CSS starts with the 768px media block, so mobile stays native. newThreadOnly/READING_SURFACE paths are untouched and their assertions still pass.\n- PASS AC-4: All 35 aura unit tests passed (tsx --test test/*.test.ts) and tsc --noEmit was clean; mobile-composer.browser.mjs passed at 390x844 and 1440x1000 and wrote both screenshots. The full npm run check build was not re-run in this read-only review.\n- PASS AC-5: CHANGELOG 0.2.7, plugins/aura/package.json 0.2.7, and package-lock plugins/aura 0.2.7 agree; README documents the mobile bottom composer and the >=768px centered composition.\n\n## Security / correctness\n\nNo security surface is touched: the diff wraps existing static CSS in a media query, adds tests/docs, and bumps a patch version, with no credential, token, auth, or data-handling logic changed. Behavior is correct at both breakpoints, and the disabled path emits only the desktop-scoped rules, so mobile keeps the host layout.\n\n## Design / maintainability\n\nThe change is the smallest complete fix and matches D-001: the 768px value now duplicates the host's md breakpoint, documented in decisions.md as the single constant to move if BB changes it. The local mediaScope helper keeps the assertion readable and the browser script follows the existing half-wallpaper.browser.mjs pattern; only the unrelated lockfile churn is worth tidying.",
+  "bodyDigest": "sha256:148127aa1d858b0e3f1893f46fcc305ba4ea4f376767029e6d153ea67a0ed7a7",
+  "findings": [
+    {
+      "id": "F-1",
+      "severity": "low",
+      "category": "maintainability",
+      "summary": "package-lock.json carries unrelated churn beyond the 0.2.7 bump: a duplicated @tanstack/query-core + react-query block pair is removed and better-sqlite3 hasInstallScript flags are added."
+    }
+  ],
+  "digest": "sha256:ac14c71899bdfdbdec002d9664e2734a03b10ccc17b9ed18caaa552c438d8f24"
+}

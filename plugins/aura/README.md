@@ -11,7 +11,9 @@ below the native New thread composer. It is off by default and saves immediately
 without applying or discarding your background draft. This preference stays
 global when switching slots or resetting a background. Composer centering stays
 active with the overview or wallpaper disabled; short windows and long drafts
-remain scrollable. The overview is part of AURA, with no extra plugin required.
+remain scrollable. On phones the native composer stays pinned to the bottom of
+the screen, with recent threads scrolling above it and the overview below the
+composer. The overview is part of AURA, with no extra plugin required.
 
 The BB server needs an authenticated [GitHub CLI](https://cli.github.com/): run
 `gh auth login` directly on that server if necessary. AURA invokes `gh api` against
@@ -138,7 +140,10 @@ beside the composer, never directly behind message text.
 Wide Markdown tables get an opaque backing across their entire width, including
 where they extend beyond the normal reading column.
 Half-wallpaper mode applies only to the New thread screen.
-The New thread composer stays centered, with the optional overview below it.
+On screens 768px and wider the New thread composer stays centered, with the
+optional overview below it. Below that breakpoint Aura leaves BB's compact
+layout untouched: the composer stays pinned to the bottom of the screen for
+one-thumb reach and the Recent list scrolls above it.
 Short windows and long drafts remain scrollable. Background styling follows
 Aura's enable/scope settings; composer centering stays independent of them.
 

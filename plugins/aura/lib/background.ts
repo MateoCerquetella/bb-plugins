@@ -15,7 +15,11 @@ export function topbarBackgroundRule(selector: string, show: boolean): string {
 
 // Center only the full New thread compose layout. Auto margins collapse when
 // the draft grows taller than the viewport, keeping it reachable by scrolling.
+// Scope the override to BB's md breakpoint: below it the host already pins the
+// composer to the bottom of the viewport, which is the right reach for phones,
+// so mobile must keep the native compact layout untouched.
 export const COMPOSE_CENTER = `
+@media (min-width:768px) {
 ${NEW_THREAD_TARGET} [class~="@container/page"]:has(> .mx-auto) {
   display:flex; flex-direction:column;
 }
@@ -38,6 +42,7 @@ ${NEW_THREAD_TARGET} [data-testid="root-compose-compact-scroll-content"] {
 }
 ${NEW_THREAD_TARGET} :is([data-testid="root-compose-compact-recents-offset"],[data-testid="root-compose-compact-bottom-spacer"],[data-testid="root-compose-compact-fade"]) {
   display:none;
+}
 }
 `;
 export const COMPOSE_LAYOUT = `${COMPOSE_CENTER}

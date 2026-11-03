@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "sequence": 3,
+  "previousDigest": "sha256:d7f7bfce263df7616eedca1837c27daebfc5953bb44535aa958aec46a0f3c8d1",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Size: keep as one (One behavior change in a single file plus its test and docs; splitting would create a mobile-only slice that cannot ship without the same CSS edit.)",
+  "createdAt": "2026-11-03T00:58:55.557Z",
+  "stateBeforeDigest": "sha256:13c24a09fefce061b5fe63bf821ac168497fb89fd6a12e47e6eb692f7937cc47",
+  "stateAfterDigest": "sha256:155bc232e897c90082e2209cf9b5fca86c059ad9eab0a30b77c782022c1fea88",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 3,
+    "activeFeature": "fix-aura-on-mobile-stop-aura-s-desktop-composer-centering",
+    "request": "Fix Aura on mobile: stop Aura's desktop composer-centering CSS from applying below BB's 768px breakpoint so the native New thread composer stays pinned to the bottom of the viewport for thumb reach, with the recents list scrolling above it. Keep the existing centered composition at 768px and wider, keep the wallpaper and half-wallpaper behavior, and verify the real mobile UI at 390x844 with screenshots plus the existing checks.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "design",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Specified the mobile New thread composer fix: scope Aura's compose override to min-width 768px, keep native bottom composer below it, verify real browser at 390x844 and 1440x1000.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:8de0d5479e774a23a91e052a011c11dac2a8c8b442076be77e49227f366bfecc",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:65caa659ed97a5fcd1f7f90e5b7859cdef3a2407f075f5960dc39edffd5d27ad",
+    "impactDigest": "sha256:3116b87f21a9f0ec9966858149360e07dbcef6b53744e392ce4bbcaf201db62a",
+    "capabilityClaimId": "fix-aura-on-mobile-stop-aura-s-desktop-composer-centering-cc68f5a839ef",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-11-03T00:58:55.557Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "fix-aura-on-mobile-stop-aura-s-desktop-composer-centering-cc68f5a839ef",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "fix-aura-on-mobile-stop-aura-s-desktop-composer-centering",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_ewg9qvzf3u-1/bb-plugins",
+      "worktreeId": "sha256:df5c7cec4aefc3a67685510252a591b7a787534d21472dde30d3ce59760e5ab6",
+      "baseCommit": "3779ed4eb34990b785c8a16f453abb9c27eb7ddf",
+      "baseTree": "af1267d4fedaba42d5e4e0f88a22666d2907d619",
+      "bases": {
+        "aura-background-surface": {
+          "capability": "aura-background-surface",
+          "digest": "sha256:b368a2785d93573de50e088ffbc53dee9680ca7d098653d91f63e5c15971cd43",
+          "requirements": {
+            "mobile new thread composer placement": null
+          }
+        }
+      },
+      "capabilities": [
+        "aura-background-surface"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-11-03T00:58:38.043Z",
+      "heartbeatAt": "2026-11-03T00:58:38.043Z",
+      "digest": "sha256:a7f0ae830358ed5d34387a8d75c0e775b524227e33501474614113131b00e880"
+    },
+    "reviewFirst": true,
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 8,
+      "capabilities": 1,
+      "reason": "One behavior change in a single file plus its test and docs; splitting would create a mobile-only slice that cannot ship without the same CSS edit.",
+      "actor": "agent",
+      "revision": 2
+    }
+  },
+  "digest": "sha256:e85308ab99b05aba9dbe7e222d6008a0561bc3e3b181cdc12fbfade801c8f290"
+}

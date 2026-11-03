@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-000407471c97ae0ea277d608",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Aura typecheck, 35 unit tests and plugin build pass for the 768px compose scope.",
+  "passed": true,
+  "startedAt": "2026-11-03T01:12:46.737Z",
+  "completedAt": "2026-11-03T01:12:52.053Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-aura-on-mobile-stop-aura-s-desktop-composer-centering",
+    "specRevision": 2,
+    "specDigest": "sha256:8de0d5479e774a23a91e052a011c11dac2a8c8b442076be77e49227f366bfecc",
+    "treeDigest": "sha256:cb6c46081e25ff4c5d3bbf774cf7147450a13302744342c0679ddb1e44f1f2d4",
+    "policyDigest": "sha256:6ebe58cbdef84ea3073f41581b4274f7b15a38527b5a354221da1191ec5de596",
+    "workflowRevision": 7,
+    "gitCommit": "ce0f44997614d8d8bbf30ccafb4aff68bc70e0ee",
+    "textTreeDigest": "sha256:cb6c46081e25ff4c5d3bbf774cf7147450a13302744342c0679ddb1e44f1f2d4"
+  },
+  "digest": "sha256:747fec047f95f9cb1a6167dff44c3e9b602394ec591fce8f2b3a58c8839fadce",
+  "kind": "qa",
+  "matrixDigest": "sha256:aa151bea0b3daaa683222f47b0d82fc2dc730564387f2d2f961709aa1c43632c",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Aura typecheck, 35 unit tests and plugin build pass for the 768px compose scope.",
+      "startedAt": "2026-11-03T01:12:46.737Z",
+      "completedAt": "2026-11-03T01:12:52.053Z",
+      "durationMs": 5316,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:3102e0660c5a28fb09072a92af73601c0704a8badb5519082e7545d1f876aa50",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-aura"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:c23252ce979fbf5760d5dc99774d0f3822a3509527a1541bffe1df669a5613f4",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "default-off never requests activity; enabling loads and stale period responses cannot replace newer scope\nok 1 - default-off never requests activity; enabling loads and stale period responses cannot replace newer scope\n  ---\n  duration_ms: 145.981659\n  type: 'test'\n  ...\n# Subtest: failed and unavailable requests omit counts; retry recovers; verified empty differs from error\nok 2 - failed and unavailable requests omit counts; retry recovers; verified empty differs from error\n  ---\n  duration_ms: 76.950216\n  type: 'test'\n  ...\n# Subtest: unmount ignores a late source result and leaves native composer state untouched\nok 3 - unmount ignores a late source result and leaves native composer state untouched\n  ---\n  duration_ms: 9.415148\n  type: 'test'\n  ...\n# Subtest: ranges cover exact inclusive UTC days across leap years and timezone offsets\nok 4 - ranges cover exact inclusive UTC days across leap years and timezone offsets\n  ---\n  duration_ms: 0.973858\n  type: 'test'\n  ...\n# Subtest: calendar validation refuses missing, duplicate and impossible dates instead of filling zero days\nok 5 - calendar validation refuses missing, duplicate and impossible dates instead of filling zero days\n  ---\n  duration_ms: 10.310752\n  type: 'test'\n  ...\n# Subtest: patterns use real consecutive days, yesterday grace, earliest ties and no-activity values\nok 6 - patterns use real consecutive days, yesterday grace, earliest ties and no-activity values\n  ---\n  duration_ms: 0.682489\n  type: 'test'\n  ...\n# Subtest: authenticated counts and dated cells pass through unchanged; explicit viewer login scopes authored searches\nok 7 - authenticated counts and dated cells pass through unchanged; explicit viewer login scopes authored searches\n  ---\n  duration_ms: 6.34242\n  type: 'test'\n  ...\n# Subtest: repository selection scopes actual PR counts and reviews but does not relabel the global calendar\nok 8 - repository selection scopes actual PR counts and reviews but does not relabel the global calendar\n  ---\n  duration_ms: 0.585422\n  type: 'test'\n  ...\n# Subtest: API/authentication failures are sanitized, partial counts stay unconfirmed, and invalid calendars are unavailable\nok 9 - API/authentication failures are sanitized, partial counts stay unconfirmed, and invalid calendars are unavailable\n  ---\n  duration_ms: 1.86787\n  type: 'test'\n  ...\n# Subtest: empty is a complete source response; repository discovery caps never imply missing reviews are zero\nok 10 - empty is a complete source response; repository discovery caps never imply missing reviews are zero\n  ---\n  duration_ms: 1.332068\n  type: 'test'\n  ...\n# Subtest: cache coalesces matching requests, expires after five minutes and does not retain failed counts\nok 11 - cache coalesces matching requests, expires after five minutes and does not retain failed counts\n  ---\n  duration_ms: 3.09133\n  type: 'test'\n  ...\n# Subtest: GIF delays follow browser timing, treating 0–10 ms frames as 100 ms\nok 12 - GIF delays follow browser timing, treating 0–10 ms frames as 100 ms\n  ---\n  duration_ms: 0.649118\n  type: 'test'\n  ...\n# Subtest: frames advance only after their delay, loop, and close what they replace\nok 13 - frames advance only after their delay, loop, and close what they replace\n  ---\n  duration_ms: 5.316339\n  type: 'test'\n  ...\n# Subtest: a single-frame GIF never decodes again and a decode failure keeps the last frame\nok 14 - a single-frame GIF never decodes again and a decode failure keeps the last frame\n  ---\n  duration_ms: 1.186153\n  type: 'test'\n  ...\n# Subtest: a frame decoded after disposal is released immediately\nok 15 - a frame decoded after disposal is released immediately\n  ---\n  duration_ms: 0.73278\n  type: 'test'\n  ...\n# Subtest: every texture option maps to a distinct shader branch\nok 16 - every texture option maps to a distinct shader branch\n  ---\n  duration_ms: 0.630425\n  type: 'test'\n  ...\n# Subtest: texture changes rebuild the shader; a still photo stops the animation loop\nok 17 - texture changes rebuild the shader; a still photo stops the animation loop\n  ---\n  duration_ms: 0.480422\n  type: 'test'\n  ...\n# Subtest: keeps the compact New thread layout native below BB's desktop breakpoint\nok 18 - keeps the compact New thread layout native below BB's desktop breakpoint\n  ---\n  duration_ms: 0.853449\n  type: 'test'\n  ...\n# Subtest: render-quality tiers increase drawing-buffer density\nok 19 - render-quality tiers increase drawing-buffer density\n  ---\n  duration_ms: 0.678371\n  type: 'test'\n  ...\n# Subtest: selected FPS limits the next draw after an immediate frame\nok 20 - selected FPS limits the next draw after an immediate frame\n  ---\n  duration_ms: 0.198951\n  type: 'test'\n  ...\n# Subtest: applies scoped backgrounds, disables cleanly and ignores a late fetch after disposal\nok 21 - applies scoped backgrounds, disables cleanly and ignores a late fetch after disposal\n  ---\n  duration_ms: 116.973332\n  type: 'test'\n  ...\n# Subtest: Settings and the thread-panel action share the Aura editor with the top bar control\nok 22 - Settings and the thread-panel action share the Aura editor with the top bar control\n  ---\n  duration_ms: 12.013784\n  type: 'test'\n  ...\n# Subtest: six independent slots retain images and appearance across switches and reload\nok 23 - six independent slots retain images and appearance across switches and reload\n  ---\n  duration_ms: 30.230034\n  type: 'test'\n  ...\n# Subtest: invalid image or slot rejects the entire apply without partially changing settings\nok 24 - invalid image or slot rejects the entire apply without partially changing settings\n  ---\n  duration_ms: 32.758552\n  type: 'test'\n  ...\n# Subtest: scope stays global across slots; clearing/resetting preserves saved work\nok 25 - scope stays global across slots; clearing/resetting preserves saved work\n  ---\n  duration_ms: 5.30035\n  type: 'test'\n  ...\n# Subtest: image type must match bytes; legacy settings get new defaults\nok 26 - image type must match bytes; legacy settings get new defaults\n  ---\n  duration_ms: 1.458977\n  type: 'test'\n  ...\n# Subtest: settings written by a newer build load instead of rejecting the snapshot\nok 27 - settings written by a newer build load instead of rejecting the snapshot\n  ---\n  duration_ms: 1.864103\n  type: 'test'\n  ...\n# Subtest: overview is default-off and stays global across slots/reset/reload without changing a saved image\nok 28 - overview is default-off and stays global across slots/reset/reload without changing a saved image\n  ---\n  duration_ms: 5.807861\n  type: 'test'\n  ...\n# Subtest: top bar background is default-off and stays global across slots/reset/reload\nok 29 - top bar background is default-off and stays global across slots/reset/reload\n  ---\n  duration_ms: 5.36164\n  type: 'test'\n  ...\n# Subtest: animation speed and quality persist in saved slots\nok 30 - animation speed and quality persist in saved slots\n  ---\n  duration_ms: 2.5786\n  type: 'test'\n  ...\n# Subtest: versioned images use an immutable private browser cache\nok 31 - versioned images use an immutable private browser cache\n  ---\n  duration_ms: 18.599937\n  type: 'test'\n  ...\n# Subtest: New thread dimmer toggles without replacing images or saved slots\nok 32 - New thread dimmer toggles without replacing images or saved slots\n  ---\n  duration_ms: 4.562159\n  type: 'test'\n  ...\n# Subtest: animated GIFs are stored as uploaded, served as GIF and flagged for the animated renderer\nok 33 - animated GIFs are stored as uploaded, served as GIF and flagged for the animated renderer\n  ---\n  duration_ms: 4.476604\n  type: 'test'\n  ...\n# Subtest: GIFs must match their bytes and stay within the GIF budget\nok 34 - GIFs must match their bytes and stay within the GIF budget\n  ---\n  duration_ms: 36.084419\n  type: 'test'\n  ...\n# Subtest: pattern, dither and photo motion persist in saved slots\nok 35 - pattern, dither and photo motion persist in saved slots\n  ---\n  duration_ms: 2.179646\n  type: 'test'\n  ...\n1..35\n# tests 35\n# suites 0\n# pass 35\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 1356.974132\n\n> bb-plugin-aura@0.2.7 build\n> env -u BB_CLI bb plugin build .\n\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:cb6c46081e25ff4c5d3bbf774cf7147450a13302744342c0679ddb1e44f1f2d4",
+      "sourceTreeAfter": "sha256:cb6c46081e25ff4c5d3bbf774cf7147450a13302744342c0679ddb1e44f1f2d4",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}
