@@ -4,6 +4,7 @@ import { rpcContract } from "./contract.js";
 import { loadMcpConfig, startCommand } from "./lib/config.js";
 import { FactoryMcpClient } from "./lib/mcp-client.js";
 import { FactoryService } from "./lib/service.js";
+import { CapabilityService } from "./lib/capability-service.js";
 import { SoulService } from "./lib/soul-service.js";
 
 /**
@@ -31,6 +32,11 @@ export default async function plugin(bb: BbPluginApi): Promise<void> {
     startCommand: start,
     configError: loaded.error,
   });
+  const capabilities = new CapabilityService({
+    caller: client,
+    startCommand: start,
+    configError: loaded.error,
+  });
 
   bb.rpc.register(rpcContract, {
     getBoard: () => service.getBoard(),
@@ -41,6 +47,9 @@ export default async function plugin(bb: BbPluginApi): Promise<void> {
     getStatus: () => souls.getStatus(),
     getAudit: () => souls.getAudit(),
     saveSoul: ({ bot, soul, author }) => souls.saveSoul(bot, soul, author),
+    getCapabilities: () => capabilities.getCapabilities(),
+    getCapabilityAudit: () => capabilities.getCapabilityAudit(),
+    setCapability: ({ bot, enabled }) => capabilities.setCapability(bot, enabled),
   });
 
   bb.onDispose(() => {

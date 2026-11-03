@@ -56,8 +56,14 @@ import {
 } from "./lib/dood-state";
 import { activeLiveTool, isGenerating, readLiveTools } from "./lib/live";
 import { SoulsView } from "./lib/souls-view";
+import { CapabilitiesView } from "./lib/capabilities-view";
 import { attentionTicketMap, stageLabel } from "./lib/derive";
-import { agentRoute, parsePanelRoute, ticketRoute } from "./lib/route";
+import {
+  agentRoute,
+  capabilitiesRoute,
+  parsePanelRoute,
+  ticketRoute,
+} from "./lib/route";
 
 const PANEL_PATH = "factory-bots";
 const REFRESH_MS = 5_000;
@@ -353,12 +359,14 @@ function BoardHeader({
   failure,
   transportError,
   onSouls,
+  onCapabilities,
 }: {
   snapshot: BoardSnapshot | null;
   fetchedAt: number | null;
   failure: { reason: "not-running" | "unavailable" } | null;
   transportError: boolean;
   onSouls: () => void;
+  onCapabilities: () => void;
 }) {
   const health =
     failure?.reason === "not-running"
@@ -384,6 +392,9 @@ function BoardHeader({
           <HealthPill tone={health.tone} label={health.label} />
           <button type="button" className="fb-chat-link" onClick={onSouls}>
             Souls
+          </button>
+          <button type="button" className="fb-chat-link" onClick={onCapabilities}>
+            Capabilities
           </button>
         </div>
         <p className="fb-subtitle">
@@ -682,6 +693,7 @@ function BoardView({
   onOpenAgent,
   onOpenTicket,
   onSouls,
+  onCapabilities,
 }: {
   board: Polled<BoardResult>;
   tab: BoardTab;
@@ -689,6 +701,7 @@ function BoardView({
   onOpenAgent: (name: string) => void;
   onOpenTicket: (ticket: TicketSummary) => void;
   onSouls: () => void;
+  onCapabilities: () => void;
 }) {
   const data = board.data;
   const snapshot = data?.ok === true ? data.snapshot : null;
@@ -706,6 +719,7 @@ function BoardView({
         failure={data?.ok === false ? data : null}
         transportError={board.error !== null}
         onSouls={onSouls}
+        onCapabilities={onCapabilities}
       />
       {board.error !== null ? (
         <RpcError message={board.error} />
@@ -2440,6 +2454,8 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
         <div className="fb-souls-embed">
           <SoulsView onBack={() => go("")} />
         </div>
+      ) : route.view === "capabilities" ? (
+        <CapabilitiesView onBack={() => go("")} />
       ) : route.view === "board" ? (
         <BoardView
           board={board}
@@ -2448,6 +2464,7 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
           onOpenAgent={(name) => go(agentRoute(name))}
           onOpenTicket={(ticket) => go(ticketRoute(ticket.bot, ticket.linearId))}
           onSouls={() => go("souls")}
+          onCapabilities={() => go(capabilitiesRoute())}
         />
       ) : route.view === "agent" || route.view === "ticket" ? (
         <AgentView

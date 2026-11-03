@@ -57,3 +57,7 @@ test("a missing ticket id falls back to the agent", () => {
     agent: "helm",
   });
 });
+
+test("parses the capability route", () => {
+  assert.deepEqual(parsePanelRoute("/capabilities"), { view: "capabilities" });
+});

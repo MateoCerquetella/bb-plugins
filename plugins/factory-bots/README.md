@@ -24,6 +24,16 @@ latest audit row, and the authored double-confirmation save flow. The Souls
 view uses only `factory_souls`, `factory_soul_set`, `factory_soul_audit`, and
 `factory_status`; it never calls ticket or message tools.
 
+**Capabilities** in the board header opens the live toggler. It shows the seven
+bots, whether each is enabled or left to the team, and the newest audit rows.
+Disabling a bot applies on the next drive without a restart; the ticket records
+`capability disabled: <bot>` instead of being silently dropped. The view uses
+`factory_capabilities`, `factory_capability_set`, and
+`factory_capability_audit`, asks for confirmation with the consequence, and
+shows the host identity the factory recorded as the author. Disabling Lens is
+explicit: a canonical recorded review can still close the review gate, so the
+team's review is the only review.
+
 Every row carries a live Dood from [do.computer](https://do.computer), grown
 from the agent's name. It is a real animated creature; where WebGL is unavailable
 it falls back to the same seed's static blob. Open a thread to see its ticket:
@@ -37,8 +47,8 @@ rail keeps the conversation but replaces its composer with a pointer to the
 ticket answer box, so there is exactly one place to reply. Answers and the tool
 results that belong to them are grouped into one turn, and tool payloads are
 folded away. The answer box sends the person's words through the Orchestrator,
-the only write path; the answer and response stay with the ticket and in the
-rail. Open a bot to see its tickets.
+the only ticket-content write path; the answer and response stay with the
+ticket and in the rail. Capability toggles are the separate operator write. Open a bot to see its tickets.
 
 Open **Linear issue** to switch between its **Description** and **Comments**;
 comments are read from the same Linear issue and the card links to the issue in
@@ -60,8 +70,9 @@ kept on this machine.
 
 **Orchestrator chat** is the single entry point for work: it sends one message
 to the factory's Orchestrator, which files a ticket and drives it through
-Sieve → Helm → Lens → Warden. The board stays read-only; the chat is the only
-write path.
+Sieve → Helm → Lens → Warden. Ticket content stays read-only; the chat is the
+only ticket-content write path. Capability toggles write only the live
+capability state and its audit.
 
 ![Factory Bots board](assets/screenshots/board.png)
 
@@ -78,10 +89,12 @@ database. The board calls the five read tools:
 - `factory_tasks`
 - `factory_transcript`
 
-The Orchestrator chat calls one more tool, `factory_message`. It is the only
-write tool: it forwards one message to the Orchestrator and returns its answer
-and the tickets it created. The plugin never creates a ticket, moves a stage,
-or calls a factory HTTP write endpoint itself.
+The Capabilities view calls `factory_capabilities`,
+`factory_capability_audit`, and `factory_capability_set`. The Orchestrator chat
+calls `factory_message`; the capability view calls `factory_capability_set`.
+Those are the only writes: one message through the Orchestrator, and one live
+capability state plus its audit. The plugin never creates a ticket, moves a
+stage, or calls a factory HTTP write endpoint itself.
 
 The connection lives in [`factory.mcp.json`](./factory.mcp.json):
 
@@ -204,7 +217,7 @@ are exercised without a running factory.
 
 ## Layout
 
-- `contract.ts` — zod payload shapes and the two read-only RPCs.
+- `contract.ts` — zod payload shapes and the panel RPCs.
 - `server.ts` — plugin wiring and MCP lifecycle.
 - `lib/config.ts` — `factory.mcp.json` loading and start-command derivation.
 - `lib/mcp-client.ts` — newline-delimited JSON-RPC over stdio.

@@ -9,6 +9,12 @@ import {
   SoulsResultSchema,
   StatusResultSchema,
 } from "./lib/soul-contract.js";
+import {
+  CapabilitiesResultSchema,
+  CapabilityAuditResultSchema,
+  CapabilitySetResultSchema,
+  SetCapabilityInputSchema,
+} from "./lib/capability-contract.js";
 
 /**
  * Factory MCP payloads. The factory's read API is the only source, so these
@@ -237,5 +243,17 @@ export const rpcContract = defineRpcContract({
   saveSoul: {
     input: SaveSoulInputSchema,
     output: SaveResultSchema,
+  },
+  getCapabilities: {
+    input: z.null(),
+    output: CapabilitiesResultSchema,
+  },
+  getCapabilityAudit: {
+    input: z.null(),
+    output: CapabilityAuditResultSchema,
+  },
+  setCapability: {
+    input: SetCapabilityInputSchema,
+    output: CapabilitySetResultSchema,
   },
 });
