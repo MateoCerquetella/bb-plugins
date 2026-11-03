@@ -44,9 +44,9 @@ Open **Linear issue** to switch between its **Description** and **Comments**;
 comments are read from the same Linear issue and the card links to the issue in
 Linear for replying or editing. The exact blocked ticket is marked **Needs
 answer** in its Threads row with a red edge, and the Threads tab carries the same
-count, so the alert is not hidden only behind Bots. **Hide** on the Orchestrator
-rail collapses it to a slim right-edge tab, giving the agent the full width; the
-choice is remembered.
+count, so the alert is not hidden only behind Bots. **Hide** removes the
+Orchestrator rail and leaves a small **Orchestrator** button at the bottom right,
+giving the agent the full width; the choice is remembered.
 
 The agent view gives the Dood room to grow: a larger live creature with a treat
 and a gift box. Drag the cookie onto the Dood to feed it, or click it. A gift box

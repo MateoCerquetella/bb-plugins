@@ -379,7 +379,6 @@ function BoardHeader({
   return (
     <header className="fb-header">
       <div className="fb-title">
-        <span className="fb-eyebrow">Empirical Factory</span>
         <div className="fb-title-row">
           <h1>Factory Bots</h1>
           <HealthPill tone={health.tone} label={health.label} />
@@ -389,7 +388,9 @@ function BoardHeader({
         </div>
         <p className="fb-subtitle">
           Read-only view through the Factory MCP
-          {fetchedAt === null ? "" : ` · updated ${formatTime(fetchedAt)}`}
+          {fetchedAt === null ? null : (
+            <span className="fb-updated">Updated {formatTime(fetchedAt)}</span>
+          )}
         </p>
       </div>
 
@@ -489,9 +490,7 @@ function BotRow({
             <span>{agent.ticketCount === 1 ? "ticket" : "tickets"}</span>
           </span>
         )}
-        <span className="fb-list-chevron" aria-hidden="true">
-          ›
-        </span>
+        <span className="fb-list-chevron" aria-hidden="true" />
       </span>
     </button>
   );
@@ -584,9 +583,8 @@ function ThreadRow({
       <span className="fb-list-body">
         <span className="fb-list-title">{ticket.title}</span>
         <span className="fb-list-sub">
-          {ticket.linearId}
-          <span className="fb-sep">·</span>
-          {botName}
+          <span>{ticket.linearId}</span>
+          <span className="fb-list-bot">{botName}</span>
         </span>
         <span className="fb-list-meta">
           <span className="fb-model-pill">{botName}</span>
@@ -609,9 +607,7 @@ function ThreadRow({
       </span>
       <span className="fb-list-side">
         <StageTag stage={ticket.stage} />
-        <span className="fb-list-chevron" aria-hidden="true">
-          ›
-        </span>
+        <span className="fb-list-chevron" aria-hidden="true" />
       </span>
     </button>
   );
@@ -839,11 +835,9 @@ function AgentHeader({
             <StatusTag status={agent.status} />
           </div>
           <p className="fb-agent-sub">
-            Conversation <span className="fb-mono">#{agent.conversationId}</span>
-            <span className="fb-sep">·</span>
-            {agent.column}
-            <span className="fb-sep">·</span>
-            {agent.ticketCount} {agent.ticketCount === 1 ? "ticket" : "tickets"}
+            <span>Conversation <span className="fb-mono">#{agent.conversationId}</span></span>
+            <span>{agent.column}</span>
+            <span>{agent.ticketCount} {agent.ticketCount === 1 ? "ticket" : "tickets"}</span>
           </p>
           <p
             className={`fb-agent-work${
@@ -1590,12 +1584,7 @@ function TicketDetailView({
           <h2>{ticket.title}</h2>
           <div className="fb-ticket-meta-line">
             <span>{ticket.attempts} attempts</span>
-            {ticket.worktree === null ? null : (
-              <>
-                <span aria-hidden="true">·</span>
-                <span>worktree ready</span>
-              </>
-            )}
+            {ticket.worktree === null ? null : <span>Worktree ready</span>}
           </div>
         </div>
       </header>
@@ -2114,7 +2103,6 @@ function ChatView({
       <section className="fb-chat-thread">
         <div className="fb-chat-thread-head fb-chat-thread-head--dock">
           <div>
-            <span className="fb-chat-thread-kicker">Orchestrator</span>
             <h3>Talk to the factory</h3>
           </div>
           <div className="fb-chat-head-actions">
@@ -2535,24 +2523,20 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
             onHide={() => setChatOpen(false)}
           />
         </aside>
-        ) : (
-          <aside
-            className="fb-chat-dock fb-chat-dock--collapsed"
-            aria-label="Orchestrator chat collapsed"
-          >
-            <button
-              type="button"
-              className="fb-chat-expand"
-              onClick={() => setChatOpen(true)}
-              aria-expanded={false}
-              title="Show Orchestrator"
-              aria-label="Show Orchestrator"
-            >
-              Orchestrator
-            </button>
-          </aside>
-        )}
+        ) : null}
       </div>
+      {chatOpen ? null : (
+        <button
+          type="button"
+          className="fb-chat-reveal"
+          onClick={() => setChatOpen(true)}
+          aria-expanded={false}
+          title="Show Orchestrator"
+          aria-label="Show Orchestrator"
+        >
+          Orchestrator
+        </button>
+      )}
     </div>
   );
 }

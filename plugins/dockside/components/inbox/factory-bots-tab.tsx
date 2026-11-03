@@ -157,7 +157,7 @@ function FactoryBotRow({
         </span>
         <span className="flex shrink-0 flex-col items-end gap-1 border-l border-sidebar-border/60 pl-2">
           {agent.status === "blocked" ? (
-            <span className="rounded-[5px] border border-destructive/45 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-destructive">
+            <span className="rounded-[5px] border border-destructive/45 px-1.5 py-0.5 text-[10px] font-semibold text-destructive">
               Answer
             </span>
           ) : null}
@@ -166,7 +166,7 @@ function FactoryBotRow({
               <span className="text-base font-semibold tabular-nums text-foreground">
                 {agent.ticketCount}
               </span>
-              <span className="text-[9px] font-medium uppercase tracking-wide text-muted-foreground">
+              <span className="text-[10px] font-medium text-muted-foreground">
                 {agent.ticketCount === 1 ? "ticket" : "tickets"}
               </span>
             </span>
