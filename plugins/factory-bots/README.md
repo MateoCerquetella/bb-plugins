@@ -13,9 +13,11 @@ Every row carries a live Dood from [do.computer](https://do.computer), grown
 from the agent's name. It is a real animated creature; where WebGL is unavailable
 it falls back to the same seed's static blob. Open a thread to see its ticket:
 stage, attempts, stop reason, decisions, worktree, and a thread-style transcript
-with the live tool call highlighted. The transcript has a steer composer that
-sends the person's words through the Orchestrator, the only write path. Open a
-bot to see its tickets.
+with the live tool call highlighted. Answers and the tool results that belong
+to them are grouped into one turn, and tool payloads are folded away. The
+transcript has a steer composer that sends the person's words through the
+Orchestrator, the only write path; the steering messages stay with the ticket.
+Open a bot to see its tickets.
 
 The agent view gives the Dood room to grow: a larger live creature with a treat
 and a gift box. Drag the cookie onto the Dood to feed it, or click it. A gift box
@@ -106,9 +108,10 @@ may use do not attribute usage per agent, so showing a number would be invented.
 ![The Orchestrator chat answering a live factory message](assets/screenshots/chat.png)
 
 Open **Orchestrator chat** from the board header and type a request. The chat
-keeps the conversation in the panel, shows the Orchestrator's answer, and links
-the tickets it created. A model turn can take minutes; the message box stays
-disabled with a working state until the answer arrives.
+keeps the conversation across navigation and reloads, shows the Orchestrator's
+answer, and links the tickets it created in the thread and in the rail. A model
+turn can take minutes; the message box stays disabled with a working state until
+the answer arrives.
 
 The composer carries BB's provider and model picker, like the new-thread
 composer. The Orchestrator keeps using the factory's default model until **Use

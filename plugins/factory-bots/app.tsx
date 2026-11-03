@@ -33,7 +33,18 @@ import type {
 } from "./contract";
 import { DoodOrb, type DoodOrbHandle } from "./lib/dood-orb";
 import { GiftDialog } from "./lib/gift-dialog";
+import {
+  CHAT_CHANGED,
+  appendChatEntry,
+  loadChatEntries,
+  saveChatEntries,
+} from "./lib/chat-store";
 import { WardrobeDialog } from "./lib/wardrobe-dialog";
+import {
+  appendSteer,
+  loadSteerLog,
+  type StoredSteerEntry,
+} from "./lib/steer-store";
 import { Pixels } from "./lib/pixels";
 import { avatarLook } from "./lib/dood";
 import {
@@ -974,10 +985,43 @@ function transcriptRole(kind: string): "user" | "assistant" | "tool" {
   return "tool";
 }
 
+type TranscriptEntry = Transcript["entries"][number];
+type TranscriptTurn = {
+  role: "user" | "assistant";
+  entries: TranscriptEntry[];
+  tools: TranscriptEntry[];
+};
+
+/** One assistant answer and every tool result that followed it is one turn. */
+function groupTranscript(entries: readonly TranscriptEntry[]): TranscriptTurn[] {
+  const turns: TranscriptTurn[] = [];
+  for (const entry of entries) {
+    const role = transcriptRole(entry.kind);
+    if (role === "assistant" || role === "user") {
+      turns.push({ role, entries: [entry], tools: [] });
+      continue;
+    }
+    const last = turns.at(-1);
+    if (last !== undefined && last.role === "assistant") last.tools.push(entry);
+    else turns.push({ role: "assistant", entries: [], tools: [entry] });
+  }
+  return turns;
+}
+
+function TranscriptEntryContent({ entry }: { entry: TranscriptEntry }) {
+  const parsed = parseJsonText(entry.text);
+  return parsed === null ? (
+    <Markdown content={entry.text} className="fb-entry-text" />
+  ) : (
+    <JsonBlock value={parsed} />
+  );
+}
+
 function TranscriptView({ transcript }: { transcript: Transcript }) {
   const tools = readLiveTools(transcript.live);
   const active = activeLiveTool(tools);
   const generating = isGenerating(transcript.live);
+  const turns = groupTranscript(transcript.entries);
 
   return (
     <section className="fb-transcript" aria-label="Transcript">
@@ -1018,33 +1062,46 @@ function TranscriptView({ transcript }: { transcript: Transcript }) {
         </div>
       ) : null}
 
-      {transcript.entries.length === 0 ? (
+      {turns.length === 0 ? (
         <p className="fb-muted">No transcript entries yet.</p>
       ) : (
         <ol className="fb-entries">
-          {transcript.entries.map((entry, index) => {
-            const role = transcriptRole(entry.kind);
-            return (
-              <li
-                key={`${index}-${entry.kind}`}
-                className="fb-entry"
-                data-role={role}
-              >
-                <span className="fb-entry-kind">
-                  {role === "assistant"
-                    ? "Assistant"
-                    : role === "user"
-                      ? "You"
-                      : "Tool result"}
-                </span>
-                {parseJsonText(entry.text) === null ? (
-                  <Markdown content={entry.text} className="fb-entry-text" />
-                ) : (
-                  <JsonBlock value={parseJsonText(entry.text)} />
-                )}
-              </li>
-            );
-          })}
+          {turns.map((turn, index) => (
+            <li
+              key={`${index}-${turn.role}-${turn.entries[0]?.kind ?? "tool"}`}
+              className={`fb-turn fb-turn--${turn.role}`}
+            >
+              {turn.entries.map((entry, entryIndex) => (
+                <article
+                  key={`${entryIndex}-${entry.kind}`}
+                  className="fb-entry"
+                  data-role={turn.role}
+                >
+                  <span className="fb-entry-kind">
+                    {turn.role === "user" ? "You" : "Assistant"}
+                  </span>
+                  <TranscriptEntryContent entry={entry} />
+                </article>
+              ))}
+              {turn.tools.length === 0 ? null : (
+                <details className="fb-turn-tools">
+                  <summary>
+                    {turn.tools.length} tool{" "}
+                    {turn.tools.length === 1 ? "result" : "results"}
+                  </summary>
+                  {turn.tools.map((entry, toolIndex) => (
+                    <div
+                      key={`${toolIndex}-${entry.kind}`}
+                      className="fb-turn-tool"
+                    >
+                      <span className="fb-entry-kind">Tool result</span>
+                      <TranscriptEntryContent entry={entry} />
+                    </div>
+                  ))}
+                </details>
+              )}
+            </li>
+          ))}
         </ol>
       )}
     </section>
@@ -1066,30 +1123,47 @@ function TicketDetailView({
 }) {
   const [steerText, setSteerText] = useState("");
   const [steering, setSteering] = useState(false);
-  const [steerNote, setSteerNote] = useState<string | null>(null);
   const [steerError, setSteerError] = useState<string | null>(null);
+  const [steerLog, setSteerLog] = useState<StoredSteerEntry[]>(() =>
+    loadSteerLog(ticket.linearId),
+  );
+
+  useEffect(() => {
+    setSteerLog(loadSteerLog(ticket.linearId));
+  }, [ticket.linearId]);
+
+  const rememberSteer = (
+    entry: Omit<StoredSteerEntry, "at">,
+  ): void => {
+    setSteerLog(appendSteer(ticket.linearId, entry));
+  };
 
   const steer = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     const message = steerText.trim();
     if (message === "" || steering) return;
     setSteering(true);
-    setSteerNote(null);
     setSteerError(null);
+    rememberSteer({ role: "user", text: message });
     try {
       const result = await onSteer(ticket, message);
       if (result.ok) {
         setSteerText("");
-        setSteerNote(
-          result.answer.trim() === ""
-            ? "Sent to the Orchestrator. The transcript refreshes as it works."
-            : result.answer,
-        );
+        rememberSteer({
+          role: "orchestrator",
+          text:
+            result.answer.trim() === ""
+              ? "Sent to the Orchestrator. The transcript refreshes as it works."
+              : result.answer,
+        });
       } else {
         setSteerError(result.message);
+        rememberSteer({ role: "error", text: result.message });
       }
     } catch (cause) {
-      setSteerError(errorText(cause));
+      const messageText = errorText(cause);
+      setSteerError(messageText);
+      rememberSteer({ role: "error", text: messageText });
     } finally {
       setSteering(false);
     }
@@ -1168,6 +1242,22 @@ function TicketDetailView({
         <TranscriptView transcript={transcript} />
       )}
 
+      {steerLog.length === 0 ? null : (
+        <ol className="fb-steer-log" aria-label="Steering messages">
+          {steerLog.map((entry, index) => (
+            <li key={`${index}-${entry.role}`} data-role={entry.role}>
+              <span>
+                {entry.role === "user"
+                  ? "You · via Orchestrator"
+                  : entry.role === "orchestrator"
+                    ? "Orchestrator"
+                    : "Steering error"}
+              </span>
+              <p>{entry.text}</p>
+            </li>
+          ))}
+        </ol>
+      )}
       <form className="fb-steer" onSubmit={(event) => void steer(event)}>
         <div className="fb-steer-head">
           <h3>Steer this thread</h3>
@@ -1196,9 +1286,6 @@ function TicketDetailView({
             {steering ? "Steering…" : "Send steer"}
           </button>
         </div>
-        {steerNote === null ? null : (
-          <p className="fb-steer-note" role="status">{steerNote}</p>
-        )}
         {steerError === null ? null : (
           <p className="fb-steer-error" role="alert">{steerError}</p>
         )}
@@ -1402,23 +1489,20 @@ function AgentView({
   );
 }
 
-interface ChatEntry {
-  id: number;
-  role: "user" | "orchestrator" | "error";
-  text: string;
-  created: string[];
-}
+type ChatEntry = ReturnType<typeof loadChatEntries>[number];
 
 function ChatView({
   rpc,
+  active,
   onBack,
   onOpenTicket,
 }: {
   rpc: RpcClient;
+  active: boolean;
   onBack: () => void;
   onOpenTicket: (linearId: string) => void;
 }) {
-  const [entries, setEntries] = useState<ChatEntry[]>([]);
+  const [entries, setEntries] = useState<ChatEntry[]>(loadChatEntries);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [picked, setPicked] = useState<ExperimentalProviderModelPickerValue>({
@@ -1427,12 +1511,31 @@ function ChatView({
     reasoningLevel: "medium",
   });
   const [usePickedModel, setUsePickedModel] = useState(false);
-  const nextId = useRef(1);
+  const nextId = useRef((loadChatEntries().at(-1)?.id ?? 0) + 1);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const filed = [...new Set(entries.flatMap((entry) => entry.created))];
 
   useEffect(() => {
+    saveChatEntries(entries);
+  }, [entries]);
+
+  useEffect(() => {
+    const reload = () => {
+      const next = loadChatEntries();
+      nextId.current = Math.max(
+        nextId.current,
+        (next.at(-1)?.id ?? 0) + 1,
+      );
+      setEntries(next);
+    };
+    window.addEventListener(CHAT_CHANGED, reload);
+    return () => window.removeEventListener(CHAT_CHANGED, reload);
+  }, []);
+
+  useEffect(() => {
+    if (!active) return;
     bottomRef.current?.scrollIntoView({ block: "nearest" });
-  }, [entries, sending]);
+  }, [active, entries, sending]);
 
   const push = (
     role: ChatEntry["role"],
@@ -1507,6 +1610,20 @@ function ChatView({
           The thread on the right is the one conversation that can change the
           factory. The board beside it stays read-only.
         </p>
+        {filed.length === 0 ? null : (
+          <div className="fb-chat-filed">
+            <span>Filed tickets</span>
+            {filed.map((linearId) => (
+              <button
+                key={linearId}
+                type="button"
+                onClick={() => onOpenTicket(linearId)}
+              >
+                {linearId}
+              </button>
+            ))}
+          </div>
+        )}
       </aside>
 
       <section className="fb-chat-thread">
@@ -1634,6 +1751,20 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
 
   return (
     <div className="fb-root" ref={rootRef} tabIndex={-1}>
+      <div hidden={route.view !== "chat"}>
+        <ChatView
+          rpc={rpc}
+          active={route.view === "chat"}
+          onBack={() => go("")}
+          onOpenTicket={(linearId) => {
+            const created = board.data?.ok === true
+              ? board.data.tickets.find((entry) => entry.linearId === linearId)
+              : undefined;
+            if (created === undefined) go("");
+            else go(ticketRoute(created.bot, linearId));
+          }}
+        />
+      </div>
       {route.view === "board" ? (
         <BoardView
           board={board}
@@ -1643,13 +1774,7 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
           onOpenTicket={(ticket) => go(ticketRoute(ticket.bot, ticket.linearId))}
           onChat={() => go("chat")}
         />
-      ) : route.view === "chat" ? (
-        <ChatView
-          rpc={rpc}
-          onBack={() => go("")}
-          onOpenTicket={(linearId) => go(ticketRoute("sieve", linearId))}
-        />
-      ) : (
+      ) : route.view === "agent" || route.view === "ticket" ? (
         <AgentView
           board={board}
           agentName={route.agent}
@@ -1665,10 +1790,36 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
               message,
               "Use the existing ticket; do not create a duplicate.",
             ].join("\n");
-            return (await rpc.call("sendMessage", { message: prompt })) as ChatResult;
+            appendChatEntry({
+              role: "user",
+              text: `Steering ${selected.linearId}: ${message}`,
+              created: [],
+            });
+            try {
+              const result = (await rpc.call("sendMessage", {
+                message: prompt,
+              })) as ChatResult;
+              appendChatEntry(
+                result.ok
+                  ? {
+                      role: "orchestrator",
+                      text: result.answer,
+                      created: result.created,
+                    }
+                  : { role: "error", text: result.message, created: [] },
+              );
+              return result;
+            } catch (cause) {
+              appendChatEntry({
+                role: "error",
+                text: errorText(cause),
+                created: [],
+              });
+              throw cause;
+            }
           }}
         />
-      )}
+      ) : null}
     </div>
   );
 }

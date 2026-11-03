@@ -2737,3 +2737,136 @@
   width: 40px;
   height: 40px;
 }
+
+/* What was said to steer this ticket, in the thread itself. */
+.fb-steer-log {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: 170px;
+  margin: 10px 0 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.fb-steer-log li {
+  padding: 7px 9px;
+  border: 1px solid color-mix(in srgb, var(--primary) 20%, var(--border));
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
+  font-size: 11px;
+}
+
+.fb-steer-log li[data-role="error"] {
+  border-color: color-mix(in srgb, var(--fb-blocked) 34%, var(--border));
+  background: color-mix(in srgb, var(--fb-blocked) 6%, transparent);
+}
+
+.fb-steer-log li > span {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.fb-steer-log li p {
+  margin: 0;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* One assistant turn: its message, then the tool results that belong to it. */
+.fb-turn {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.fb-turn--user {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.fb-turn--assistant {
+  align-self: flex-start;
+}
+
+.fb-turn .fb-entry {
+  width: 100%;
+  max-width: none;
+}
+
+.fb-turn--user .fb-entry {
+  width: auto;
+  max-width: 88%;
+}
+
+.fb-turn-tools {
+  width: 100%;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--foreground) 2%, transparent);
+}
+
+.fb-turn-tools > summary {
+  padding: 6px 9px;
+  cursor: pointer;
+  font-size: 10px;
+  color: var(--muted-foreground);
+}
+
+.fb-turn-tool {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 7px 9px;
+  border-top: 1px dashed var(--border);
+}
+
+.fb-turn-tool .fb-json {
+  max-height: 260px;
+  border-color: var(--border);
+  background: transparent;
+}
+
+.fb-chat-filed {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.fb-chat-filed > span {
+  width: 100%;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.fb-chat-filed button {
+  padding: 3px 7px;
+  border: 1px solid color-mix(in srgb, var(--primary) 30%, var(--border));
+  border-radius: 5px;
+  background: var(--card);
+  color: var(--foreground);
+  font: inherit;
+  font-size: 10.5px;
+  cursor: pointer;
+}
+
+/* Steering history reads as its own short section under the transcript. */
+.fb-steer-log {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
