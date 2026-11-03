@@ -20,8 +20,6 @@ and a gift box. Treats are counted. A gift opens a real box holding one thing th
 creature does not have yet, and what it finds can be worn right there; each
 agent's treats, gifts, and outfit are kept on this machine.
 
-The same Bots/Threads list can draw BB's sidebar thread list; see [Sidebar](#sidebar).
-
 **Orchestrator chat** is the single entry point for work: it sends one message
 to the factory's Orchestrator, which files a ticket and drives it through
 Sieve → Helm → Lens → Warden. The board stays read-only; the chat is the only
@@ -95,23 +93,6 @@ shows `No column`.
 
 Per-agent tokens and cost are intentionally omitted: the read tools this plugin
 may use do not attribute usage per agent, so showing a number would be invented.
-
-## Sidebar
-
-Factory Bots also draws BB's sidebar thread list as the same Bots/Threads
-inbox. Choose it under **Settings → Appearance → Sidebar thread list → Factory
-Bots sidebar**; the host can keep Dockside or BB's built-in list pinned there
-instead.
-
-![The Factory Bots sidebar on Threads](assets/screenshots/sidebar.png)
-
-The sidebar opens on **Threads** — the real BB threads, grouped **Needs you /
-In motion / On call**. **Bots** is one tab away and lists the factory agents with
-their tickets. Threads open through BB's own thread actions; bots open this
-panel. The New thread button, search, and sidebar footer stay host-owned.
-
-Only one list can draw the sidebar. Selecting **Factory Bots sidebar** replaces
-the Dockside or built-in list; switch back in the same Appearance setting.
 
 ## Talk to the Orchestrator
 
