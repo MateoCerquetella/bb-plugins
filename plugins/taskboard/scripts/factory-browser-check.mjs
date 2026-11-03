@@ -257,10 +257,10 @@ try {
   const factorySettings = page.locator('#preview-factory-settings');
   await factorySettings.getByRole('checkbox', { name: 'Enable automatic intake' }).check();
   await factorySettings.getByRole('spinbutton', { name: 'Automatic concurrency' }).fill('2');
-  await factorySettings.getByRole('combobox', { name: 'AI provider' }).selectOption('claude:claude-sonnet');
+  await factorySettings.getByRole('group', { name: 'Worker AI', exact: true }).getByRole('combobox', { name: 'AI provider' }).selectOption('claude:claude-sonnet');
   await factorySettings.getByRole('button', { name: /^Save (settings|changes)$/ }).click();
   await factorySettings.getByText('Running', { exact: true }).waitFor();
-  assert.equal(await factorySettings.getByRole('combobox', { name: 'AI provider' }).inputValue(), 'claude:claude-sonnet');
+  assert.equal(await factorySettings.getByRole('group', { name: 'Worker AI', exact: true }).getByRole('combobox', { name: 'AI provider' }).inputValue(), 'claude:claude-sonnet');
   for (const width of [1280, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await page.screenshot({ path: resolve(process.env.BB_THREAD_STORAGE, `taskboard-factory-settings-${width}.png`) });
@@ -723,7 +723,7 @@ try {
     await page.getByLabel('Description', { exact: true }).fill('Match the attached screenshot.');
     await page.getByRole('button', { name: 'Create only', exact: true }).waitFor();
     const dialog = page.getByRole('dialog');
-    await dialog.getByText('AI for this task').first().waitFor();
+    await dialog.getByText('Worker AI / override both roles').first().waitFor();
     const aiProvider = dialog.getByRole('combobox', { name: 'AI provider' });
     assert.equal(await aiProvider.inputValue(), 'claude:claude-sonnet');
     await dialog.locator('img[src^="data:image/svg"]').first().waitFor();

@@ -4,7 +4,7 @@ import { formatWorkItemContext, type WorkItem } from '../contract.js';
 import type { FactoryRecord } from './contract.js';
 import { factoryKey } from './state.js';
 import type { createFactoryStore } from './store.js';
-import { dispatchRejection, executionForDispatch, nativeError } from './native-dispatch.js';
+import { dispatchRejection, executionForDispatch, projectRoleExecution, nativeError } from './native-dispatch.js';
 
 export class CoordinatorIntentConflict extends Error {}
 
@@ -53,7 +53,7 @@ export function createCoordinatorLifecycle(
     }
     if (!record.coordinator || record.coordinator.status !== 'pending') return record;
     const policy = store.getProjectPolicy(record.projectId, record.source);
-    const selected = record.execution ?? policy.execution;
+    const selected = projectRoleExecution(policy, 'orchestrator', record.execution);
     const defaults = selected
       ? null : await sdk.projects.defaultExecutionOptions({ projectId: record.projectId });
     const executionArgs = executionForDispatch(selected, defaults);

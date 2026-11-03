@@ -38,3 +38,40 @@ test('registers independent default-on thread header visibility settings', async
     }
   );
 });
+
+test('factory role policy survives RPC reads and CLI enable/pause', async t => {
+  const fake = createFakePluginHost({ pluginId: 'taskboard', sdk: { projects: {
+    list: async () => [{ id: 'proj_test', name: 'Test' }, { id: 'proj_other', name: 'Other' }] as any,
+    defaultExecutionOptions: async () => null
+  } } });
+  t.after(() => fake.harness.lifecycle.dispose());
+  await plugin(fake.bb);
+  const orchestratorExecution = {
+    providerId: 'claude', model: 'smart', permissionMode: 'auto', reasoningLevel: 'high', serviceTier: 'default'
+  };
+  const workerExecution = {
+    providerId: 'codex', model: 'fast', permissionMode: 'accept-edits', reasoningLevel: 'low', serviceTier: 'default'
+  };
+  await fake.harness.behavior.callRpc('factorySaveProject', {
+    projectId: 'proj_test', provider: 'github', enabled: false,
+    orchestratorExecution, workerExecution
+  });
+  for (const role of ['orchestrator', 'worker']) {
+    const options = await fake.harness.behavior.callRpc('factoryExecutionOptions', { projectId: 'proj_test', role }) as any;
+    assert.deepEqual(options.selected, role === 'orchestrator' ? orchestratorExecution : workerExecution);
+  }
+  const saved = await fake.harness.behavior.callRpc('factoryGetProject', { projectId: 'proj_test' }) as any;
+  assert.deepEqual(saved.policy.orchestratorExecution, orchestratorExecution);
+  assert.deepEqual(saved.policy.workerExecution, workerExecution);
+  for (const args of [['factory', 'enable', '2'], ['factory', 'pause']]) {
+    const result = await fake.harness.behavior.runCli([...args, '--project', 'proj_test', '--json']);
+    assert.equal(result.exitCode, 0, result.stderr);
+    const { policy } = JSON.parse(result.stdout);
+    assert.deepEqual(policy.orchestratorExecution, orchestratorExecution);
+    assert.deepEqual(policy.workerExecution, workerExecution);
+  }
+  const other = await fake.harness.behavior.callRpc('factoryGetProject', { projectId: 'proj_other' }) as any;
+  assert.equal(other.policy.orchestratorExecution, null);
+  assert.equal(other.policy.workerExecution, null);
+
+});

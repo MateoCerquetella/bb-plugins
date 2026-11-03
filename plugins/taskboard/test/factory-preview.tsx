@@ -49,7 +49,7 @@ function Preview() {
     <CreateIssueDialog mode="direct" projectId="proj_test" open={creating} onOpenChange={setCreating} />
   </TooltipProvider>;
   return <TooltipProvider><div className="tb-linear">
-    <div id="preview-factory-settings" style={{ padding: 20 }}>
+    <div id="preview-factory-settings" data-project-id={projectId} style={{ padding: 20 }}>
       <FactoryProjectSettings projectId={projectId} provider="github" />
     </div>
     <div id="preview-result" style={{ padding: 20 }}>
