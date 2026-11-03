@@ -32,9 +32,19 @@ export const TicketSummarySchema = z.object({
   labels: z.array(z.string()),
 });
 
+export const TicketCommentSchema = z.object({
+  author: z.string(),
+  body: z.string(),
+  createdAt: z.string(),
+});
+
 export const TicketDetailSchema = TicketSummarySchema.extend({
   /** The Linear issue body; absent on older factory builds. */
   description: z.string().nullable().optional(),
+  /** Newest-first Linear comments; absent on older factory builds. */
+  comments: z.array(TicketCommentSchema).default([]),
+  /** Canonical Linear issue URL, when the factory returns it. */
+  url: z.string().nullable().default(null),
   worktree: z.string().nullable(),
   attempts: z.number().int(),
   stageAttempts: z.number().int(),

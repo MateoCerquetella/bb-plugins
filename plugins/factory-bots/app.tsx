@@ -1077,18 +1077,29 @@ function latestAssistantMessage(transcript: Transcript | null): string | null {
 }
 
 /** Pull the actual decision out of the blocker, not just the generic status. */
+function cleanAnswerMarkup(value: string): string {
+  return value.replace(/\*\*/gu, "").replace(/`/gu, "").trim();
+}
+
 function answerQuestion(
   transcript: Transcript | null,
+  comments: readonly { body: string }[],
   fallback: string | null,
 ): string | null {
-  const latest = latestAssistantMessage(transcript);
+  // Comments carry the full agent ask; transcript entries can be clipped.
+  const comment = comments.find((entry) =>
+    /\bi need (?:a person|you|someone) to (?:answer|decide|confirm|choose)\b/iu.test(
+      entry.body,
+    ),
+  );
+  const latest = comment?.body ?? latestAssistantMessage(transcript);
   if (latest === null) return fallback;
-  const normalized = latest.replace(/\s+/gu, " ").trim();
+  const normalized = cleanAnswerMarkup(latest).replace(/\s+/gu, " ").trim();
   const markers = [
-    /i need (?:a person|you|someone) to (?:answer|decide|confirm|choose)/iu,
-    /(?:a person|someone|you) (?:must|need(?:s)? to) (?:answer|decide|confirm|choose)/iu,
-    /please (?:answer|confirm|decide|choose)/iu,
-    /i need (?:one|a) (?:sentence|decision) from you/iu,
+    /\bi need (?:a person|you|someone) to (?:answer|decide|confirm|choose)\b/iu,
+    /\b(?:a person|someone|you) (?:must|need(?:s)? to) (?:answer|decide|confirm|choose)\b/iu,
+    /\bplease (?:answer|confirm|decide|choose)\b/iu,
+    /\bi need (?:one|a) (?:sentence|decision) from you\b/iu,
   ];
   for (const marker of markers) {
     const match = marker.exec(normalized);
@@ -1347,6 +1358,154 @@ function TicketOwner({ agent }: { agent: AgentCard }) {
   );
 }
 
+function TicketComments({
+  comments,
+}: {
+  comments: TicketDetail["comments"];
+}) {
+  if (comments.length === 0) {
+    return <p className="fb-muted">No Linear comments yet.</p>;
+  }
+  return (
+    <ol className="fb-comment-list">
+      {comments.map((comment, index) => (
+        <li key={`${comment.createdAt}:${index}`} className="fb-comment">
+          <div className="fb-comment-head">
+            <strong>{comment.author}</strong>
+            <time dateTime={comment.createdAt}>
+              {new Date(comment.createdAt).toLocaleDateString(undefined, {
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </time>
+          </div>
+          <Markdown content={comment.body} className="fb-comment-body" />
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function answerChoices(prompt: string): string[] {
+  const parenthetical = prompt.match(/\(([^()]*\bvs\.?\b[^()]*)\)/iu);
+  if (parenthetical !== null) {
+    const choices = parenthetical[1]
+      .split(/\s+vs\.?\s+/iu)
+      .map((choice) => choice.trim())
+      .filter((choice) => choice !== "");
+    if (choices.length > 1) return choices;
+  }
+  const either = prompt.match(/^Whether\s+(.+?)\s+or\s+(.+)$/iu);
+  if (either !== null) return [either[1]!.trim(), either[2]!.trim()];
+  return [];
+}
+
+function displayChoice(choice: string): string {
+  return cleanAnswerMarkup(choice).replace(/[.;,]+$/u, "").trim();
+}
+
+function TicketAnswerForm({
+  questions,
+  agentName,
+  steering,
+  onSubmit,
+}: {
+  questions: readonly string[];
+  agentName: string;
+  steering: boolean;
+  onSubmit: (message: string) => void;
+}) {
+  const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [context, setContext] = useState("");
+  const complete = questions.every((_, index) => (answers[index] ?? "").trim() !== "");
+
+  return (
+    <form
+      className="fb-answer-form"
+      onSubmit={(event) => {
+        event.preventDefault();
+        if (!complete || steering) return;
+        const message = [
+          `Answers to ${agentName}'s questions:`,
+          ...questions.map(
+            (question, index) =>
+              `${index + 1}. ${question}\nAnswer: ${answers[index]!.trim()}`,
+          ),
+          ...(context.trim() === ""
+            ? []
+            : ["", `Additional context: ${context.trim()}`]),
+        ].join("\n\n");
+        onSubmit(message);
+      }}
+    >
+      <div className="fb-answer-form-head">
+        <span className="fb-answer-question-label">What to answer</span>
+        <span>Choose one per question; add anything else below.</span>
+      </div>
+      <ol className="fb-answer-question-list">
+        {questions.map((question, index) => {
+          const choices = answerChoices(question);
+          return (
+            <li className="fb-answer-question-item" key={`${index}:${question}`}>
+              <span className="fb-answer-number">{index + 1}</span>
+              <div className="fb-answer-question-body">
+                <p className="fb-answer-prompt">{question}</p>
+                {choices.length > 1 ? (
+                  <div className="fb-answer-choices">
+                    {choices.map((choice) => (
+                      <button
+                        key={choice}
+                        type="button"
+                        className="fb-answer-choice"
+                        aria-pressed={answers[index] === choice}
+                        onClick={() =>
+                          setAnswers((current) => ({ ...current, [index]: choice }))
+                        }
+                      >
+                        {displayChoice(choice)}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <textarea
+                    value={answers[index] ?? ""}
+                    onChange={(event) =>
+                      setAnswers((current) => ({
+                        ...current,
+                        [index]: event.target.value,
+                      }))
+                    }
+                    rows={2}
+                    placeholder="Type your answer…"
+                    aria-label={`Answer for question ${index + 1}`}
+                  />
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+      <textarea
+        className="fb-answer-context"
+        value={context}
+        onChange={(event) => setContext(event.target.value)}
+        rows={2}
+        placeholder="Anything else the Orchestrator should know? Optional."
+        aria-label="Additional context"
+      />
+      <button
+        type="submit"
+        className="fb-line-button fb-line-button--accent fb-answer-submit"
+        disabled={steering || !complete}
+      >
+        {steering ? "Sending…" : "Send answers"}
+      </button>
+    </form>
+  );
+}
+
 function TicketDetailView({
   ticket,
   agent,
@@ -1367,6 +1526,9 @@ function TicketDetailView({
   const [steerError, setSteerError] = useState<string | null>(null);
   const [steerNotice, setSteerNotice] = useState<string | null>(null);
   const [descriptionOpen, setDescriptionOpen] = useState(false);
+  const [detailTab, setDetailTab] = useState<"description" | "comments">(
+    "description",
+  );
   const isBlocked = agent.status === "blocked";
   const hasDescription =
     ticket.description !== undefined &&
@@ -1374,7 +1536,7 @@ function TicketDetailView({
     ticket.description.trim() !== "";
 
   const question = isBlocked
-    ? answerQuestion(transcript, agent.statusReason)
+    ? answerQuestion(transcript, ticket.comments, agent.statusReason)
     : null;
   const questionPoints = answerPoints(question);
 
@@ -1383,12 +1545,11 @@ function TicketDetailView({
     setSteerError(null);
     setSteerNotice(null);
     setDescriptionOpen(false);
+    setDetailTab("description");
   }, [ticket.linearId]);
 
-  const steer = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
-    event.preventDefault();
-    const message = steerText.trim();
-    if (message === "" || steering) return;
+  const sendAnswer = async (message: string): Promise<void> => {
+    if (message.trim() === "" || steering) return;
     setSteering(true);
     setSteerError(null);
     setSteerNotice(null);
@@ -1405,6 +1566,11 @@ function TicketDetailView({
     } finally {
       setSteering(false);
     }
+  };
+
+  const steer = (event: FormEvent<HTMLFormElement>): void => {
+    event.preventDefault();
+    void sendAnswer(steerText);
   };
 
   return (
@@ -1446,59 +1612,56 @@ function TicketDetailView({
             ? `${agent.displayName} needs your answer`
             : `Reply to ${agent.displayName}`}
         </h3>
-        {isBlocked && question !== null ? (
-          <div className="fb-answer-question">
-            <span className="fb-answer-question-label">What to answer</span>
-            {questionPoints.length > 1 ? (
-              <ul className="fb-answer-points">
-                {questionPoints.map((point, index) => (
-                  <li key={index}>{point}</li>
-                ))}
-              </ul>
-            ) : (
-              <p className="fb-answer-reason">{question}</p>
-            )}
-          </div>
-        ) : (
-          <p className="fb-answer-reason">
-            {isBlocked
-              ? agent.statusReason ?? "This ticket is blocked on a person."
-              : "Send a message through the Orchestrator. This ticket stays the same."}
-          </p>
-        )}
-        <form className="fb-answer-form" onSubmit={(event) => void steer(event)}>
-          <textarea
-            id="ticket-answer"
-            value={steerText}
-            onChange={(event) => {
-              setSteerText(event.target.value);
-              setSteerError(null);
-              setSteerNotice(null);
-            }}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                event.currentTarget.form?.requestSubmit();
-              }
-            }}
-            rows={2}
-            maxLength={3_000}
-            placeholder={`Type your answer to ${agent.displayName}…`}
-            disabled={steering}
-            aria-label={`Answer ${agent.displayName}`}
+        {isBlocked && questionPoints.length > 0 ? (
+          <TicketAnswerForm
+            key={ticket.linearId}
+            questions={questionPoints}
+            agentName={agent.displayName}
+            steering={steering}
+            onSubmit={(message) => void sendAnswer(message)}
           />
-          <button
-            type="submit"
-            className="fb-line-button fb-line-button--accent"
-            disabled={steering || steerText.trim() === ""}
-          >
-            {steering
-              ? "Sending…"
-              : isBlocked
-                ? "Send answer"
-                : "Send reply"}
-          </button>
-        </form>
+        ) : (
+          <>
+            <p className="fb-answer-reason">
+              {isBlocked
+                ? agent.statusReason ?? "This ticket is blocked on a person."
+                : "Send a message through the Orchestrator. This ticket stays the same."}
+            </p>
+            <form className="fb-answer-form" onSubmit={steer}>
+              <textarea
+                id="ticket-answer"
+                value={steerText}
+                onChange={(event) => {
+                  setSteerText(event.target.value);
+                  setSteerError(null);
+                  setSteerNotice(null);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" && !event.shiftKey) {
+                    event.preventDefault();
+                    event.currentTarget.form?.requestSubmit();
+                  }
+                }}
+                rows={2}
+                maxLength={3_000}
+                placeholder={`Type your answer to ${agent.displayName}…`}
+                disabled={steering}
+                aria-label={`Answer ${agent.displayName}`}
+              />
+              <button
+                type="submit"
+                className="fb-line-button fb-line-button--accent"
+                disabled={steering || steerText.trim() === ""}
+              >
+                {steering
+                  ? "Sending…"
+                  : isBlocked
+                    ? "Send answer"
+                    : "Send reply"}
+              </button>
+            </form>
+          </>
+        )}
         {steerError === null ? null : (
           <p className="fb-answer-feedback fb-answer-feedback--error" role="alert">
             {steerError}
@@ -1525,13 +1688,58 @@ function TicketDetailView({
               aria-expanded={descriptionOpen}
               onClick={() => setDescriptionOpen((open) => !open)}
             >
-              <span>Issue description</span>
+              <span>Linear issue</span>
               <span>{descriptionOpen ? "Hide" : "Read"}</span>
             </button>
             {descriptionOpen ? (
-              <div className="fb-ticket-description-body">
-                <Markdown content={ticket.description ?? ""} />
-              </div>
+              <>
+                <div
+                  className="fb-ticket-detail-tabs"
+                  role="tablist"
+                  aria-label="Linear issue"
+                >
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={detailTab === "description"}
+                    onClick={() => setDetailTab("description")}
+                  >
+                    Description
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={detailTab === "comments"}
+                    onClick={() => setDetailTab("comments")}
+                  >
+                    Comments {ticket.comments.length}
+                  </button>
+                  {ticket.url === null ? null : (
+                    <a
+                      className="fb-ticket-open-link"
+                      href={ticket.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      title="Open this issue in Linear to edit it or add a comment"
+                    >
+                      Open in Linear ↗
+                    </a>
+                  )}
+                </div>
+                <div className="fb-ticket-description-body">
+                  {detailTab === "description" ? (
+                    <Markdown content={ticket.description ?? ""} />
+                  ) : (
+                    <TicketComments comments={ticket.comments} />
+                  )}
+                </div>
+                {detailTab === "comments" ? (
+                  <p className="fb-comment-note">
+                    Latest comments from Linear. Open the issue in Linear to
+                    reply.
+                  </p>
+                ) : null}
+              </>
             ) : null}
           </section>
         ) : null}

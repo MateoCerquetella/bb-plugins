@@ -4071,3 +4071,228 @@
 .fb-answer-points li::marker {
   color: var(--fb-blocked);
 }
+
+/* Linear issue: description/comments swap inside the same disclosure. */
+.fb-ticket-detail-tabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 8px 0;
+  border-top: 1px solid var(--border);
+}
+
+.fb-ticket-detail-tabs button {
+  padding: 4px 8px;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  border-radius: 4px 4px 0 0;
+  background: transparent;
+  color: var(--muted-foreground);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.fb-ticket-detail-tabs button[aria-selected="true"] {
+  border-bottom-color: var(--primary);
+  color: var(--foreground);
+}
+
+.fb-ticket-detail-tabs button:hover {
+  color: var(--foreground);
+}
+
+.fb-ticket-open-link {
+  margin-left: auto;
+  color: var(--primary);
+  font-size: 9.5px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.fb-ticket-open-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.fb-comment-list {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+}
+
+.fb-comment {
+  padding: 2px 0 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.fb-comment:last-child {
+  border-bottom: 0;
+}
+
+.fb-comment-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+  color: var(--muted-foreground);
+  font-size: 9.5px;
+}
+
+.fb-comment-head strong {
+  color: var(--foreground);
+  font-size: 10.5px;
+}
+
+.fb-comment-head time {
+  font-variant-numeric: tabular-nums;
+}
+
+.fb-comment-body {
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+.fb-comment-note {
+  margin: 0;
+  padding: 0 8px 8px;
+  color: var(--muted-foreground);
+  font-size: 9px;
+}
+
+/* Answer as a small form: one decision per question, plus context. */
+.fb-answer-form {
+  display: flex;
+  align-items: stretch;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fb-answer-form-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted-foreground);
+  font-size: 9px;
+}
+
+.fb-answer-question-list {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+}
+
+.fb-answer-question-item {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 6px;
+  align-items: start;
+}
+
+.fb-answer-number {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--fb-blocked) 45%, var(--border));
+  border-radius: 4px;
+  color: var(--fb-blocked);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.fb-answer-question-body {
+  min-width: 0;
+}
+
+.fb-answer-prompt {
+  margin: 0;
+  color: var(--foreground);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.fb-answer-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.fb-answer-choice {
+  max-width: 100%;
+  padding: 3px 7px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--card);
+  color: var(--foreground);
+  font: inherit;
+  font-size: 10px;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fb-answer-choice:hover {
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+  background: color-mix(in srgb, var(--primary) 5%, var(--card));
+}
+
+.fb-answer-choice[aria-pressed="true"] {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, var(--card));
+  color: var(--foreground);
+}
+
+.fb-answer-other,
+.fb-answer-context,
+.fb-answer-question-body textarea {
+  width: 100%;
+  min-height: 30px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--background);
+  color: var(--foreground);
+  font: inherit;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.fb-answer-other {
+  flex: 1 0 100%;
+}
+
+.fb-answer-other::placeholder,
+.fb-answer-context::placeholder,
+.fb-answer-question-body textarea::placeholder {
+  color: var(--muted-foreground);
+}
+
+.fb-answer-other:focus-visible,
+.fb-answer-context:focus-visible,
+.fb-answer-question-body textarea:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.fb-answer-context {
+  min-height: 36px;
+  resize: vertical;
+}
+
+.fb-answer-submit {
+  align-self: flex-start;
+}

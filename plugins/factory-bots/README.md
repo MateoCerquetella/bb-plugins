@@ -27,8 +27,8 @@ view uses only `factory_souls`, `factory_soul_set`, `factory_soul_audit`, and
 Every row carries a live Dood from [do.computer](https://do.computer), grown
 from the agent's name. It is a real animated creature; where WebGL is unavailable
 it falls back to the same seed's static blob. Open a thread to see its ticket:
-one answer box at the top, named for the owning bot; a **What to answer** list
-pulled from the blocked agent's latest turn; a collapsed **Issue description**
+one answer form at the top, named for the owning bot, with one decision per
+question and choice buttons when the ask is binary; a collapsed **Linear issue**
 on demand; and the latest conversation turn, with **Show all N turns** for the
 rest. The ticket header shows the owning bot on the left with its live Dood and
 the same icon-only cookie, gift, and wardrobe controls as do.computer; no
@@ -40,10 +40,13 @@ folded away. The answer box sends the person's words through the Orchestrator,
 the only write path; the answer and response stay with the ticket and in the
 rail. Open a bot to see its tickets.
 
-The exact blocked ticket is marked **Needs answer** in its Threads row with a
-red edge, and the Threads tab carries the same count, so the alert is not hidden
-only behind Bots. **Hide** on the Orchestrator rail collapses it to a slim
-right-edge tab, giving the agent the full width; the choice is remembered.
+Open **Linear issue** to switch between its **Description** and **Comments**;
+comments are read from the same Linear issue and the card links to the issue in
+Linear for replying or editing. The exact blocked ticket is marked **Needs
+answer** in its Threads row with a red edge, and the Threads tab carries the same
+count, so the alert is not hidden only behind Bots. **Hide** on the Orchestrator
+rail collapses it to a slim right-edge tab, giving the agent the full width; the
+choice is remembered.
 
 The agent view gives the Dood room to grow: a larger live creature with a treat
 and a gift box. Drag the cookie onto the Dood to feed it, or click it. A gift box
