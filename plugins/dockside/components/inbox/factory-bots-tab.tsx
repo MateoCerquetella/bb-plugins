@@ -28,20 +28,6 @@ export function FactoryBotsTabs({
       <button
         type="button"
         role="tab"
-        aria-selected={tab === "bots"}
-        onClick={() => onChange("bots")}
-        className={cn(
-          "h-6 flex-1 rounded text-2xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-          tab === "bots"
-            ? "bg-foreground text-background"
-            : "text-muted-foreground hover:text-foreground",
-        )}
-      >
-        Bots
-      </button>
-      <button
-        type="button"
-        role="tab"
         aria-selected={tab === "threads"}
         onClick={() => onChange("threads")}
         className={cn(
@@ -52,6 +38,20 @@ export function FactoryBotsTabs({
         )}
       >
         Threads
+      </button>
+      <button
+        type="button"
+        role="tab"
+        aria-selected={tab === "bots"}
+        onClick={() => onChange("bots")}
+        className={cn(
+          "h-6 flex-1 rounded text-2xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+          tab === "bots"
+            ? "bg-foreground text-background"
+            : "text-muted-foreground hover:text-foreground",
+        )}
+      >
+        Bots
       </button>
     </div>
   );

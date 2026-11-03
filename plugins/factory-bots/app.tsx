@@ -651,18 +651,18 @@ function BoardView({
               <button
                 type="button"
                 role="tab"
-                aria-selected={tab === "bots"}
-                onClick={() => onTab("bots")}
-              >
-                Bots
-              </button>
-              <button
-                type="button"
-                role="tab"
                 aria-selected={tab === "threads"}
                 onClick={() => onTab("threads")}
               >
                 Threads
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={tab === "bots"}
+                onClick={() => onTab("bots")}
+              >
+                Bots
               </button>
             </div>
             <span className="fb-view-note">

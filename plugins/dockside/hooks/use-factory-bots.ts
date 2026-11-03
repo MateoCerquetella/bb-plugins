@@ -29,6 +29,12 @@ export function useFactoryBots(enabled: boolean): FactoryBotsState {
       return;
     }
 
+    setState((current) =>
+      current.status === "idle"
+        ? { status: "loading", agents: [], message: null }
+        : current,
+    );
+
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
     let inFlight = false;
