@@ -8,7 +8,7 @@ describe("Factory Bots read shape", () => {
       ok: true,
       fetchedAt: 1,
       snapshot: { bots: 1, tickets: 2, byStage: [], startedAt: null },
-      tickets: [],
+      tickets: [{ linearId: "SDD-1", bot: "sieve", stage: "triage" }],
       tasks: [],
       agents: [
         {
@@ -22,6 +22,7 @@ describe("Factory Bots read shape", () => {
           statusReasonCount: 0,
           currentWork: "Write the spec",
           taskCount: 1,
+          ticketId: "SDD-1",
         },
       ],
     });

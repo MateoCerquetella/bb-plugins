@@ -1048,6 +1048,14 @@
 }
 
 @media (max-width: 640px) {
+  .fb-viewbar {
+    padding-inline: 4px;
+  }
+
+  .fb-tabs button {
+    padding: 6px 12px;
+  }
+
   .fb-agent-hero {
     flex-direction: column;
     align-items: center;
@@ -1741,6 +1749,10 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .fb-agent-view[data-selected="true"] .fb-ticket-list {
+    display: none;
+  }
+
   .fb-ticket-back {
     display: block;
     margin-bottom: 10px;
@@ -1760,4 +1772,78 @@
     animation: none;
     transition: none;
   }
+}
+
+/* Wardrobe: the gifts the Dood has found, by where they go. */
+.fb-wardrobe-dialog {
+  width: 380px;
+  max-width: calc(100vw - 32px);
+  align-items: stretch;
+  text-align: left;
+}
+
+.fb-wardrobe-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 48vh;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.fb-wardrobe-group-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 5px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.fb-wardrobe-off {
+  border: 0;
+  background: transparent;
+  color: var(--muted-foreground);
+  font: inherit;
+  font-size: 10px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.fb-wardrobe-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.fb-wardrobe-item {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted-foreground);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.fb-wardrobe-item:hover {
+  border-color: color-mix(in srgb, var(--foreground) 35%, var(--border));
+  color: var(--foreground);
+}
+
+.fb-wardrobe-item[data-wearing="true"] {
+  border-color: var(--foreground);
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.fb-wardrobe-item:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
 }

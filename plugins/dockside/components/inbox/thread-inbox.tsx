@@ -160,7 +160,22 @@ export function ThreadInbox({
   const [bulkOutcomes, setBulkOutcomes] = useState<
     Array<{ id: string; message: string; failed: boolean }>
   >([]);
-  const [sidebarTab, setSidebarTab] = useState<"threads" | "bots">("threads");
+  const [sidebarTab, setSidebarTab] = useState<"threads" | "bots">(() => {
+    try {
+      return localStorage.getItem("dockside:factory-tab") === "bots"
+        ? "bots"
+        : "threads";
+    } catch {
+      return "threads";
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem("dockside:factory-tab", sidebarTab);
+    } catch {
+      /* The tab still works when storage is unavailable. */
+    }
+  }, [sidebarTab]);
 
   const providerInfoById = useMemo<
     ReadonlyMap<string, ProviderGlyphInfo>
@@ -905,7 +920,11 @@ export function ThreadInbox({
         <FactoryBotsPage
           state={factoryBots}
           onOpen={(agent) =>
-            openFactoryBots(`agent/${encodeURIComponent(agent.name)}`)
+            openFactoryBots(
+              agent.ticketId === null
+                ? `agent/${encodeURIComponent(agent.name)}`
+                : `agent/${encodeURIComponent(agent.name)}/ticket/${encodeURIComponent(agent.ticketId)}`,
+            )
           }
           onOpenPanel={() => openFactoryBots("")}
         />

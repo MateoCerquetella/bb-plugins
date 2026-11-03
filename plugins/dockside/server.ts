@@ -680,7 +680,17 @@ export default function plugin(bb: BbPluginApi) {
                 : board.message,
           };
         }
-        return { ok: true, agents: board.agents, message: null };
+        const ticketByBot = new Map(
+          board.tickets.map((ticket) => [ticket.bot, ticket.linearId]),
+        );
+        return {
+          ok: true,
+          agents: board.agents.map((agent) => ({
+            ...agent,
+            ticketId: ticketByBot.get(agent.name) ?? null,
+          })),
+          message: null,
+        };
       } catch (error) {
         bb.log.warn(`factory bots read failed: ${String(error)}`);
         return {

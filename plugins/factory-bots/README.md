@@ -17,8 +17,9 @@ tool call highlighted. Open a bot to see its tickets.
 
 The agent view gives the Dood room to grow: a larger live creature with a treat
 and a gift box. Treats are counted. A gift opens a real box holding one thing the
-creature does not have yet, and what it finds can be worn right there; each
-agent's treats, gifts, and outfit are kept on this machine.
+creature does not have yet, and what it finds can be worn right there. The
+Wardrobe button re-wears anything it has already found; each agent's treats,
+gifts, and outfit are kept on this machine.
 
 **Orchestrator chat** is the single entry point for work: it sends one message
 to the factory's Orchestrator, which files a ticket and drives it through

@@ -32,6 +32,7 @@ import type {
 } from "./contract";
 import { DoodOrb, type DoodOrbHandle } from "./lib/dood-orb";
 import { GiftDialog } from "./lib/gift-dialog";
+import { WardrobeDialog } from "./lib/wardrobe-dialog";
 import { Pixels } from "./lib/pixels";
 import { avatarLook } from "./lib/dood";
 import { loadAgentDood, saveAgentDood, type AgentDood } from "./lib/dood-state";
@@ -696,6 +697,7 @@ function AgentHeader({
   const orb = useRef<DoodOrbHandle>(null);
   const [dood, setDood] = useState<AgentDood>(() => loadAgentDood(agent.name));
   const [giftOpen, setGiftOpen] = useState(false);
+  const [wardrobeOpen, setWardrobeOpen] = useState(false);
 
   useEffect(() => {
     saveAgentDood(agent.name, dood);
@@ -758,6 +760,14 @@ function AgentHeader({
               <Pixels art="box" className="fb-care-art" />
               <span>Gift{dood.owned.length > 0 ? ` · ${dood.owned.length}` : ""}</span>
             </button>
+            <button
+              type="button"
+              onClick={() => setWardrobeOpen(true)}
+              title="Change its outfit"
+            >
+              <Pixels art="spark" className="fb-care-art" />
+              <span>Wardrobe</span>
+            </button>
             <span className="fb-care-note">
               {dood.owned.length === 0
                 ? "It has not found anything yet."
@@ -766,6 +776,14 @@ function AgentHeader({
           </div>
         </div>
       </div>
+      {wardrobeOpen ? (
+        <WardrobeDialog
+          agentName={agent.displayName}
+          dood={dood}
+          onDood={setDood}
+          onClose={() => setWardrobeOpen(false)}
+        />
+      ) : null}
       {giftOpen ? (
         <GiftDialog
           agentId={agent.name}
@@ -1120,7 +1138,10 @@ function AgentView({
   const tickets = board.data.tickets.filter((entry) => entry.bot === agent.name);
 
   return (
-    <div className="fb-agent-view">
+    <div
+      className="fb-agent-view"
+      data-selected={selectedId === null ? "false" : "true"}
+    >
       <AgentHeader key={agent.name} agent={agent} onBack={onBack} />
       <div className="fb-split">
         <aside className="fb-ticket-list" aria-label={`${agent.displayName} tickets`}>

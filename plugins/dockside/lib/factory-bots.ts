@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-/** The subset of a Factory Bots agent card Dockside draws. */
-export const factoryAgentSchema = z.object({
+/** The raw agent fields the Factory Bots board returns. */
+const boardAgentSchema = z.object({
   name: z.string(),
   displayName: z.string(),
   conversationId: z.string(),
@@ -12,13 +12,22 @@ export const factoryAgentSchema = z.object({
   currentWork: z.string().nullable(),
 });
 
+/** The subset Dockside draws, plus the first ticket for opening live work. */
+export const factoryAgentSchema = boardAgentSchema.extend({
+  /** The first ticket this agent owns, for opening its live work directly. */
+  ticketId: z.string().nullable(),
+});
+
 export type FactoryAgent = z.infer<typeof factoryAgentSchema>;
 
 /** `factory-bots`' board result, narrowed to what this section needs. */
 export const factoryBoardSchema = z.discriminatedUnion("ok", [
   z.object({
     ok: z.literal(true),
-    agents: z.array(factoryAgentSchema),
+    agents: z.array(boardAgentSchema),
+    tickets: z.array(
+      z.object({ linearId: z.string(), bot: z.string() }).passthrough(),
+    ),
   }),
   z.object({
     ok: z.literal(false),
