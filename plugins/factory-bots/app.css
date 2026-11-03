@@ -3473,3 +3473,107 @@
     width: 100%;
   }
 }
+
+/* The ticket owner is a do.computer creature on the left, care icons below. */
+.fb-ticket-owner {
+  width: 104px;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 5px;
+}
+
+.fb-ticket-owner-dood {
+  width: 80px;
+  height: 80px;
+}
+
+.fb-ticket-owner-name {
+  max-width: 94px;
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.1;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fb-ticket-owner-actions {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+
+.fb-ticket-owner-actions button {
+  display: inline-flex;
+  width: 25px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--card);
+  color: var(--foreground);
+  cursor: pointer;
+}
+
+.fb-ticket-owner-actions button:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+  background: color-mix(in srgb, var(--primary) 6%, var(--card));
+}
+
+.fb-ticket-owner-actions button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.fb-ticket-care-art {
+  width: 16px;
+  height: 16px;
+}
+
+.fb-chat-care-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fb-chat-care-name {
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.fb-chat-care-actions button {
+  width: 27px;
+  height: 26px;
+  justify-content: center;
+  padding: 3px;
+}
+
+.fb-chat-care-actions .fb-treat-art,
+.fb-chat-care-actions .fb-care-art {
+  width: 16px;
+  height: 16px;
+}
+
+@media (max-width: 620px) {
+  .fb-ticket-owner {
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+
+  .fb-ticket-owner-dood {
+    width: 64px;
+    height: 64px;
+  }
+
+  .fb-ticket-owner-name {
+    max-width: none;
+    text-align: left;
+  }
+}

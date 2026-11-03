@@ -1122,23 +1122,116 @@ function TranscriptView({ transcript }: { transcript: Transcript }) {
 }
 
 function TicketOwner({ agent }: { agent: AgentCard }) {
-  const [dood] = useState(() => loadAgentDood(agent.name));
+  const orb = useRef<DoodOrbHandle>(null);
+  const [dood, setDood] = useState(() => loadAgentDood(agent.name));
+  const [giftOpen, setGiftOpen] = useState(false);
+  const [wardrobeOpen, setWardrobeOpen] = useState(false);
+  const [treatOver, setTreatOver] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
+  const gift = boxCountdown(dood, now);
+  const feed = (): void => {
+    orb.current?.feed();
+    setDood((value) => ({ ...value, fed: value.fed + 1 }));
+  };
+
+  useEffect(() => {
+    saveAgentDood(agent.name, dood);
+  }, [agent.name, dood]);
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <div className="fb-ticket-owner" aria-label={`Owned by ${agent.displayName}`}>
-      <span className="fb-avatar-wrap fb-ticket-owner-dood">
+      <div
+        className={`fb-avatar-wrap fb-ticket-owner-dood${
+          treatOver ? " is-treat-target" : ""
+        }`}
+        onDragOver={(event) => {
+          if (event.dataTransfer.types.includes("text/factory-treat")) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = "copy";
+            setTreatOver(true);
+          }
+        }}
+        onDragLeave={(event) => {
+          if (event.currentTarget.contains(event.relatedTarget as Node | null)) return;
+          setTreatOver(false);
+        }}
+        onDrop={(event) => {
+          event.preventDefault();
+          setTreatOver(false);
+          if (event.dataTransfer.getData("text/factory-treat") !== "") feed();
+        }}
+      >
         <DoodOrb
+          ref={orb}
           agentId={agent.name}
           status={agent.status}
-          size={64}
+          size={80}
           outfit={dood.outfit}
         />
         <StatusDot status={agent.status} />
-      </span>
-      <span className="fb-ticket-owner-copy">
-        <span className="fb-ticket-owner-label">Owner</span>
-        <strong className="fb-ticket-owner-name">{agent.displayName}</strong>
-        <StatusTag status={agent.status} />
-      </span>
+      </div>
+      <span className="fb-ticket-owner-name">{agent.displayName}</span>
+      <div className="fb-ticket-owner-actions">
+        <button
+          type="button"
+          draggable
+          onClick={feed}
+          onDragStart={(event) => {
+            event.dataTransfer.setData("text/factory-treat", "cookie");
+            event.dataTransfer.effectAllowed = "copy";
+          }}
+          onDragEnd={() => setTreatOver(false)}
+          title="Feed a cookie"
+          aria-label="Feed a cookie"
+        >
+          <Pixels art="cookie" className="fb-ticket-care-art" />
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            if (!gift.ready) return;
+            if (dood.boxes === 0 && gift.due !== dood) setDood(gift.due);
+            setGiftOpen(true);
+          }}
+          disabled={!gift.ready}
+          title={gift.ready ? "Open the gift" : `Next gift in ${gift.label}`}
+          aria-label={gift.ready ? "Open the gift" : `Next gift in ${gift.label}`}
+        >
+          <Pixels art="box" className="fb-ticket-care-art" />
+        </button>
+        <button
+          type="button"
+          onClick={() => setWardrobeOpen(true)}
+          title="Open the wardrobe"
+          aria-label="Open the wardrobe"
+        >
+          <Pixels art="spark" className="fb-ticket-care-art" />
+        </button>
+      </div>
+      {giftOpen ? (
+        <GiftDialog
+          agentId={agent.name}
+          color={avatarLook(null, agent.name).color}
+          owned={dood.owned}
+          onGrant={(item, wear) => setDood((value) => grantGift(value, item, wear))}
+          onClose={() => setGiftOpen(false)}
+        />
+      ) : null}
+      {wardrobeOpen ? (
+        <WardrobeDialog
+          agentId={agent.name}
+          agentName={agent.displayName}
+          status={agent.status}
+          dood={dood}
+          onDood={setDood}
+          onClose={() => setWardrobeOpen(false)}
+        />
+      ) : null}
     </div>
   );
 }
@@ -1191,6 +1284,7 @@ function TicketDetailView({
         </button>
       </div>
       <header className="fb-ticket-head">
+        <TicketOwner agent={agent} />
         <div className="fb-ticket-head-main">
           <div className="fb-ticket-head-top">
             <span className="fb-ticket-id">{ticket.linearId}</span>
@@ -1207,12 +1301,9 @@ function TicketDetailView({
             )}
           </div>
         </div>
-        <TicketOwner agent={agent} />
       </header>
 
-      {ticket.description === undefined || ticket.description === null || ticket.description.trim() === "" ? (
-        <p className="fb-ticket-no-description">No Linear issue description.</p>
-      ) : (
+      {ticket.description === undefined || ticket.description === null || ticket.description.trim() === "" ? null : (
         <section className={`fb-ticket-description${descriptionOpen ? " is-open" : ""}`}>
           <button
             type="button"
@@ -1220,7 +1311,7 @@ function TicketDetailView({
             aria-expanded={descriptionOpen}
             onClick={() => setDescriptionOpen((open) => !open)}
           >
-            <span>Linear issue description</span>
+            <span>Description</span>
             <span>{descriptionOpen ? "Hide" : "Show"}</span>
           </button>
           {descriptionOpen ? (
@@ -1652,10 +1743,7 @@ function ChatView({
             <StatusDot status={chatStatus} />
           </div>
           <div className="fb-chat-care-copy">
-            <div className="fb-chat-care-title">
-              <strong>Orchestrator</strong>
-              <StatusTag status={chatStatus} />
-            </div>
+            <strong className="fb-chat-care-name">Orchestrator</strong>
             <div className="fb-chat-care-actions">
               <button
                 type="button"
@@ -1666,12 +1754,10 @@ function ChatView({
                   event.dataTransfer.effectAllowed = "copy";
                 }}
                 onDragEnd={() => setTreatOver(false)}
-                title="Drag this cookie onto the Dood, or click to feed"
-                aria-label="Drag a cookie onto the Dood to feed it"
-                className="fb-treat-button"
+                title="Feed a cookie"
+                aria-label="Feed a cookie"
               >
                 <Pixels art="cookie" className="fb-treat-art" />
-                <span>Cookie</span>
               </button>
               <button
                 type="button"
@@ -1681,21 +1767,15 @@ function ChatView({
                   setGiftOpen(true);
                 }}
                 disabled={!chatGift.ready}
-                title={chatGift.ready ? "A gift box is waiting" : `Next gift in ${chatGift.label}`}
+                title={chatGift.ready ? "Open the gift" : `Next gift in ${chatGift.label}`}
+                aria-label={chatGift.ready ? "Open the gift" : `Next gift in ${chatGift.label}`}
               >
                 <Pixels art="box" className="fb-care-art" />
-                <span>Gift{chatGift.ready ? "" : ` · ${chatGift.label}`}</span>
               </button>
-              <button type="button" onClick={() => setWardrobeOpen(true)} title="Change the Orchestrator's outfit">
+              <button type="button" onClick={() => setWardrobeOpen(true)} title="Open the wardrobe" aria-label="Open the wardrobe">
                 <Pixels art="spark" className="fb-care-art" />
-                <span>Wardrobe</span>
               </button>
             </div>
-            <p className="fb-chat-care-note">
-              {chatDood.owned.length === 0
-                ? "It has not found anything yet."
-                : `${chatDood.owned.length} of ${WEAR_ITEMS.length} found.`}
-            </p>
           </div>
         </div>
         {filed.length === 0 ? null : (
