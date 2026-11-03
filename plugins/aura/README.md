@@ -143,7 +143,9 @@ Half-wallpaper mode applies only to the New thread screen.
 On screens 768px and wider the New thread composer stays centered, with the
 optional overview below it. Below that breakpoint Aura leaves BB's compact
 layout untouched: the composer stays pinned to the bottom of the screen for
-one-thumb reach and the Recent list scrolls above it.
+one-thumb reach and the Recent list scrolls above it. On phones the Recent list
+sits in its own theme-colored card below the wallpaper, with a quiet heading
+rule and hairline dividers between threads.
 Short windows and long drafts remain scrollable. Background styling follows
 Aura's enable/scope settings; composer centering stays independent of them.
 

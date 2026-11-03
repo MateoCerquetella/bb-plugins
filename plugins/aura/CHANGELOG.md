@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.8 - 2026-11-03
+
+- Show the mobile New thread Recent list as one themed card over the wallpaper
+  instead of loose rows under an opaque sticky band. The heading sits above a
+  hairline rule and threads are separated by hairline dividers, so the list
+  stays readable in light and dark themes while the wallpaper remains visible
+  above and around it.
+
 ## 0.2.7 - 2026-11-02
 
 - Keep BB's native compact New thread composer pinned to the bottom of the

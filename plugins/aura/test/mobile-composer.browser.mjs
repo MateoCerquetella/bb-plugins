@@ -28,10 +28,17 @@ try {
     const composer = panel.querySelector('[data-testid="root-compose-compact-composer"]');
     const viewport = panel.querySelector('[data-testid="root-compose-compact-scroll-viewport"]');
     const recents = panel.querySelector('[data-root-compose-mobile-recents]');
+    const recentsRows = recents ? [...recents.querySelectorAll("ul > li")] : [];
+    const recentsStyle = element => { const cs = getComputedStyle(element); return { display: cs.display, radius: cs.borderTopLeftRadius, border: cs.borderTopWidth, background: cs.backgroundColor, blur: cs.backdropFilter, margin: cs.marginLeft }; };
     const spacer = panel.querySelector('[data-testid="root-compose-compact-bottom-spacer"]');
     const fade = panel.querySelector('[data-testid="root-compose-compact-fade"]');
     return {
       panel: box(panel), composer: box(composer), recents: box(recents),
+      recentsSurface: recents ? recentsStyle(recents) : null,
+      recentsHeader: recents ? { position: getComputedStyle(recents.firstElementChild).position, background: getComputedStyle(recents.firstElementChild).backgroundColor } : null,
+      recentsRows: recentsRows.map(row => ({ background: getComputedStyle(row).backgroundColor, borderTop: getComputedStyle(row).borderTopWidth })),
+      recentsLinkColor: recentsRows[0]?.querySelector("a") ? getComputedStyle(recentsRows[0].querySelector("a")).color : null,
+      bodyColor: getComputedStyle(document.body).backgroundColor,
       composerPosition: getComputedStyle(composer).position,
       composerOrder: getComputedStyle(composer).order,
       spacerDisplay: spacer ? getComputedStyle(spacer).display : "absent",
@@ -55,7 +62,37 @@ try {
   assert.ok(mobile.overflow <= 1 && mobile.pageOverflow <= 1, `No horizontal overflow (panel ${mobile.overflow}, page ${mobile.pageOverflow})`);
   assert.ok(mobile.ink, 'Wallpaper layer must render on mobile');
   assert.ok(mobile.mask.includes('50%'), 'Half wallpaper must still fade at the midpoint');
+  assert.equal(mobile.recentsSurface.radius, '16px', 'Recent list must render as a rounded card');
+  assert.equal(mobile.recentsSurface.border, '1px', 'Recent card must keep its border');
+  assert.equal(mobile.recentsSurface.margin, '10px', 'Recent card must be inset from the screen edge');
+  assert.match(mobile.recentsSurface.background, /0\.9\d\)/, 'Recent card must use an opaque themed surface');
+  assert.ok(mobile.recentsSurface.blur.includes('blur('), 'Recent card must blur the wallpaper behind it');
+  assert.equal(mobile.recentsHeader.position, 'static', 'Recent heading must not paint a sticky band');
+  assert.equal(mobile.recentsHeader.background, 'rgba(0, 0, 0, 0)', 'Recent heading must not paint its own background');
+  assert.equal(mobile.recentsRows[0].background, 'rgba(0, 0, 0, 0)', 'Rows must not be individual cards');
+  assert.equal(mobile.recentsRows[1].borderTop, '1px', 'Adjacent rows must be separated by a hairline');
+  assert.notEqual(mobile.recentsLinkColor, mobile.bodyColor, 'Row text must contrast with the page background');
   await page.screenshot({ path: shots + '/new-thread-mobile.jpg', type: 'jpeg', quality: 88 });
+
+  const darkPage = await browser.newPage({ viewport: { width: 390, height: 844 }, colorScheme: 'dark', reducedMotion: 'reduce' });
+  darkPage.setDefaultTimeout(20000);
+  await darkPage.route('**/api/v1/plugins/aura/rpc/get', route => route.fulfill({ json: { ok: true, result: state } }));
+  await darkPage.goto(base);
+  await darkPage.locator('#root-compose-main-panel .aura-capy-ink[data-half-wallpaper] canvas[data-rendered]').waitFor();
+  await darkPage.waitForTimeout(500);
+  const dark = await darkPage.evaluate(() => {
+    const panel = document.querySelector('#root-compose-main-panel');
+    const recents = panel.querySelector('[data-root-compose-mobile-recents]');
+    const rows = recents ? [...recents.querySelectorAll("ul > li")] : [];
+    const cs = recents ? getComputedStyle(recents) : null;
+    return { background: cs?.backgroundColor ?? null, radius: cs?.borderTopLeftRadius ?? null, rows: rows.length, borderTop: rows[1] ? getComputedStyle(rows[1]).borderTopWidth : null, linkColor: rows[0]?.querySelector("a") ? getComputedStyle(rows[0].querySelector("a")).color : null, bodyColor: getComputedStyle(document.body).backgroundColor };
+  });
+  assert.match(dark.background, /0\.9\d\)/, 'Dark theme must keep the opaque Recent surface');
+  assert.ok(dark.rows >= 2, 'Dark theme must render Recent rows');
+  assert.equal(dark.borderTop, '1px', 'Dark theme must keep the row divider');
+  assert.notEqual(dark.linkColor, dark.bodyColor, 'Dark theme row text must contrast with the page background');
+  await darkPage.screenshot({ path: shots + '/new-thread-mobile-dark.jpg', type: 'jpeg', quality: 88 });
+  await darkPage.close();
 
   const composerTopBefore = mobile.composer.top;
   await page.evaluate(() => {
@@ -72,6 +109,7 @@ try {
   assert.notEqual(desktop.composerPosition, 'absolute', 'Desktop composition must re-center the composer');
   assert.equal(desktop.composerOrder, '-1', 'Desktop composer must be ordered first');
   assert.ok(desktop.composer.top < desktop.panel.top + desktop.panel.height * 0.45, `Desktop composer must sit in the upper half (top ${desktop.composer.top})`);
+  assert.ok(desktop.recentsSurface === null || desktop.recentsSurface.display === 'none', 'Mobile Recent card must stay hidden on desktop');
   assert.ok(['none', 'absent'].includes(desktop.spacerDisplay), 'Desktop composition must hide the compact spacer');
   assert.ok(['none', 'absent'].includes(desktop.fadeDisplay), 'Desktop composition must hide the compact fade');
   assert.ok(desktop.overflow <= 1 && desktop.pageOverflow <= 1, `No horizontal overflow on desktop (panel ${desktop.overflow}, page ${desktop.pageOverflow})`);

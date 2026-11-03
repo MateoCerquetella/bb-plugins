@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-4b8cf5232a975129e67c519d",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Real-browser evidence from an independent checker of installed Aura 0.2.8: at 390x844 light and dark the Recent list renders as one inset 16px themed card (1px border, 0.94 surface, 16px blur) with a static heading over a hairline rule, transparent rows separated by 1px dividers, 11.6:1 text contrast in dark, and no horizontal overflow; at 1440x1000 the mobile recents element is absent and the composer stays centered.",
+  "passed": true,
+  "startedAt": "2026-11-03T02:04:59.146Z",
+  "completedAt": "2026-11-03T02:04:59.146Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-the-mobile-new-thread-recent-list-in-aura-it",
+    "specRevision": 2,
+    "specDigest": "sha256:3fffeecd060db2a37ee3dd3afde6476d162eef757a153edc9ded18a84cc6dba1",
+    "treeDigest": "sha256:6be93b7878ce42af180e22d57a84fc99e1877e2e7afc8c385befd9b0ca49cee6",
+    "policyDigest": "sha256:6ebe58cbdef84ea3073f41581b4274f7b15a38527b5a354221da1191ec5de596"
+  },
+  "digest": "sha256:ce620b5e423e0b5fce9dccc544a19aebddabfc660f65680ff01edfe03208cf81",
+  "kind": "collected",
+  "collector": "isolated-qa-thread thr_6ds5nbxyr9",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/fix-the-mobile-new-thread-recent-list-in-aura-it/qa/mobile-dark-390x844.png",
+      "mediaType": "image/png",
+      "bytes": 84556,
+      "digest": "sha256:9158942fb24b41a45d10d98160ce58c03614b9ef8c97384a2f9c9a1e6d467c85"
+    },
+    {
+      "path": ".empirical/specs/fix-the-mobile-new-thread-recent-list-in-aura-it/qa/mobile-light-390x844.png",
+      "mediaType": "image/png",
+      "bytes": 91509,
+      "digest": "sha256:d3139339426b56c820d185fde8fcbf6b786b85da4b5bc4c008965a1a29e19300"
+    },
+    {
+      "path": ".empirical/specs/fix-the-mobile-new-thread-recent-list-in-aura-it/qa/report.json",
+      "mediaType": "application/json",
+      "bytes": 11752,
+      "digest": "sha256:e83a16153d7543773a46fa61bbfb44e2f855bdf01d076e199e7572bf206e9f28"
+    }
+  ]
+}
