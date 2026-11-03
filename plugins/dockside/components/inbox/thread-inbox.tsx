@@ -82,7 +82,11 @@ import {
 } from "@/lib/project-order";
 import { familyIsPinned, groupFamiliesByStatus } from "@/lib/status-groups";
 import { groupSidebarFamilies } from "@/lib/sidebar-sections";
-import { FactoryBotsPage, FactoryBotsTabs } from "@/components/inbox/factory-bots-tab";
+import {
+  FactoryAttentionInbox,
+  FactoryBotsPage,
+  FactoryBotsTabs,
+} from "@/components/inbox/factory-bots-tab";
 
 const EMPTY_STATE_CLASS = "px-2 py-6 text-center text-xs text-muted-foreground";
 
@@ -688,6 +692,18 @@ export function ThreadInbox({
             )
             .join("; ")}
           onChange={setSidebarTab}
+        />
+      ) : null}
+      {preferences.showFactoryBots && sidebarTab === "threads" ? (
+        <FactoryAttentionInbox
+          agents={factoryNeedsPerson(factoryBots.agents)}
+          onOpen={(agent) =>
+            openFactoryBots(
+              agent.ticketId === null
+                ? `agent/${encodeURIComponent(agent.name)}`
+                : `agent/${encodeURIComponent(agent.name)}/ticket/${encodeURIComponent(agent.ticketId)}`,
+            )
+          }
         />
       ) : null}
       <div

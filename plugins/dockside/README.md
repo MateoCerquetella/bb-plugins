@@ -196,7 +196,9 @@ In motion, Needs a person, and On call. A blocked row names the exact ticket
 from the factory's blocked reason, shows its title, and carries an **Answer**
 marker; clicking it opens that ticket, not the agent's first unrelated ticket.
 The **Bots** tab carries the count and lists the same ticket IDs in its tooltip.
-A new blocked state is sent through BB's **push-notifications** plugin, so the
+The default **Threads** view also shows a **Needs a person** block with the
+exact ticket IDs and an Answer action, so the alert is visible without switching
+to Bots. A new blocked state is sent through BB's **push-notifications** plugin, so the
 alert can arrive while Dockside is out of view; each alert names the agent and
 ticket, and uses the ticket's latest Linear question when it can read it. Existing blocked agents are seeded silently on startup to avoid a burst,
 an ongoing block sends at most one alert even if its reason text changes, and an
