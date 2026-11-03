@@ -12,37 +12,51 @@
     {
       "name": "Live Factory list and read-only detail",
       "status": "passed",
-      "evidence": ["desktop-list.png", "desktop-detail.png"],
+      "evidence": [
+        "../evidence/desktop-list.png",
+        "../evidence/desktop-detail.png"
+      ],
       "notes": "factory_souls returned all seven bots in order; factory_status returned no per-bot tool list, and the detail shows the explicit not-reported state."
     },
     {
       "name": "Diff and second confirmation gating",
       "status": "passed",
-      "evidence": ["desktop-diff.png", "desktop-confirm.png"],
+      "evidence": [
+        "../evidence/desktop-diff.png",
+        "../evidence/desktop-confirm.png"
+      ],
       "notes": "The diff shows current/edited counts and exact character delta. Save stayed disabled with a wrong-case bot name; exact typing and the acknowledgment enable it."
     },
     {
       "name": "Verified save, re-read, and audit proof",
       "status": "passed",
-      "evidence": ["desktop-verified-save.png"],
+      "evidence": [
+        "../evidence/desktop-verified-save.png"
+      ],
       "notes": "Exercised against a temporary mock Factory MCP/API on port 18080. The panel sent factory_soul_set once, re-read factory_souls and factory_soul_audit, showed the stored text, verified badge, author, time, digest, and save receipt. No live soul was changed."
     },
     {
       "name": "Post-write read failure keeps the draft",
       "status": "passed",
-      "evidence": ["desktop-partial-read.png"],
+      "evidence": [
+        "../evidence/desktop-partial-read.png"
+      ],
       "notes": "Exercised against a temporary mock on port 18081 that accepted the write and then failed the verification reads. The dialog closed, no verified badge appeared, the editor kept the draft, and the receipt was shown without claiming verification."
     },
     {
       "name": "Factory offline state",
       "status": "passed",
-      "evidence": ["desktop-offline.png"],
+      "evidence": [
+        "../evidence/desktop-offline.png"
+      ],
       "notes": "Captured after stopping the mock MCP endpoint. The panel showed Factory is not running, the derived start command, and Retry. The real config was restored afterward."
     },
     {
       "name": "Narrow layout and no horizontal page overflow",
       "status": "passed",
-      "evidence": ["mobile-detail.png"],
+      "evidence": [
+        "../evidence/mobile-detail.png"
+      ],
       "notes": "At 390x844 the list gives way to the detail, the Back control is visible, and document scrollWidth equals the viewport."
     }
   ],
