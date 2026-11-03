@@ -4,7 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useRpc } from "@get-bb/plugin-sdk/app";
 
 import { type rpcContract } from "../contract";
-import { DoodAvatar } from "./dood";
+import { DoodOrb } from "./dood-orb";
+import { loadAgentDood } from "./dood-state";
 import {
   BOT_ORDER,
   type BotName,
@@ -64,9 +65,7 @@ const BOT_COPY: Record<
 };
 
 function failureText(failure: Failure): string {
-  return failure.reason === "not-running" && failure.startCommand !== null
-    ? `${failure.message}\n\nStart it with:\n${failure.startCommand}`
-    : failure.message;
+  return failure.message;
 }
 
 function timeLabel(value: string): string {
@@ -98,7 +97,12 @@ function CapabilityRow({
   return (
     <li className={`cap-row${enabled ? "" : " cap-row--off"}${pending ? " cap-row--pending" : ""}`}>
       <span className="cap-avatar" aria-hidden="true">
-        <DoodAvatar agentId={bot} />
+        <DoodOrb
+          agentId={bot}
+          status={enabled ? "idle" : "blocked"}
+          size={40}
+          outfit={loadAgentDood(bot).outfit}
+        />
       </span>
       <span className="cap-copy">
         <span className="cap-name-row">
@@ -361,42 +365,48 @@ export function CapabilitiesView({ onBack }: { onBack: () => void }) {
         </div>
       )}
 
-      <div className="cap-summary" aria-live="polite">
-        <span>
-          <strong>{capabilities?.enabled.length ?? "—"}</strong> enabled
-        </span>
-        <span>
-          <strong>{capabilities?.disabled.length ?? "—"}</strong> left to the team
-        </span>
-        <span className="cap-muted">Changes apply on the next drive, without a restart.</span>
-      </div>
+      {capabilities === null ? (
+        loading ? <p className="cap-muted">Reading capabilities…</p> : null
+      ) : (
+        <>
+          <div className="cap-summary" aria-live="polite">
+            <span>
+              <strong>{capabilities.enabled.length}</strong> enabled
+            </span>
+            <span>
+              <strong>{capabilities.disabled.length}</strong> left to the team
+            </span>
+            <span className="cap-muted">Changes apply on the next drive, without a restart.</span>
+          </div>
 
-      <div className="cap-list-wrap">
-        <ul className="cap-list">
-          {rows.map(({ bot, enabled }) => (
-            <CapabilityRow
-              key={bot}
-              bot={bot}
-              enabled={enabled}
-              pending={pending?.bot === bot}
-              busy={busy}
-              onToggle={() => {
-                setNotice(null);
-                setFailure(null);
-                setPending({ bot, next: !enabled });
-              }}
-            />
-          ))}
-        </ul>
-      </div>
+          <div className="cap-list-wrap">
+            <ul className="cap-list">
+              {rows.map(({ bot, enabled }) => (
+                <CapabilityRow
+                  key={bot}
+                  bot={bot}
+                  enabled={enabled}
+                  pending={pending?.bot === bot}
+                  busy={busy}
+                  onToggle={() => {
+                    setNotice(null);
+                    setFailure(null);
+                    setPending({ bot, next: !enabled });
+                  }}
+                />
+              ))}
+            </ul>
+          </div>
 
-      <section className="cap-audit-wrap" aria-labelledby="cap-audit-title">
-        <div className="cap-section-head">
-          <h2 id="cap-audit-title">Recent changes</h2>
-          <span>{entries.length}</span>
-        </div>
-        <AuditList entries={entries} />
-      </section>
+          <section className="cap-audit-wrap" aria-labelledby="cap-audit-title">
+            <div className="cap-section-head">
+              <h2 id="cap-audit-title">Recent changes</h2>
+              <span>{entries.length}</span>
+            </div>
+            <AuditList entries={entries} />
+          </section>
+        </>
+      )}
     </section>
   );
 }

@@ -40,6 +40,7 @@ import {
   CHAT_CHANGED,
   CHAT_PENDING,
   appendChatEntry,
+  clearChatEntries,
   loadChatEntries,
   saveChatEntries,
   setChatPending,
@@ -2028,6 +2029,7 @@ function ChatView({
   const [giftOpen, setGiftOpen] = useState(false);
   const [wardrobeOpen, setWardrobeOpen] = useState(false);
   const [treatOver, setTreatOver] = useState(false);
+  const [clearOpen, setClearOpen] = useState(false);
   const [now, setNow] = useState(() => Date.now());
   const chatOrb = useRef<DoodOrbHandle>(null);
   const chatStatus = orchestrator?.status ?? "idle";
@@ -2144,6 +2146,16 @@ function ChatView({
           </div>
           <div className="fb-chat-head-actions">
             <span className="fb-chat-tag">Always on</span>
+            <button
+              type="button"
+              className="fb-chat-hide"
+              onClick={() => setClearOpen(true)}
+              disabled={chatBusy || entries.length === 0}
+              aria-label="Clear Orchestrator chat"
+              title="Clear local chat history"
+            >
+              Clear
+            </button>
             {onHide === undefined ? null : (
               <button
                 type="button"
@@ -2157,6 +2169,32 @@ function ChatView({
             )}
           </div>
         </div>
+
+        {clearOpen ? (
+          <div className="fb-chat-clear" role="alertdialog" aria-label="Clear Orchestrator chat">
+            <p>
+              Clear this browser’s Orchestrator history? The factory’s memory
+              and filed tickets stay unchanged.
+            </p>
+            <div className="fb-chat-clear-actions">
+              <button
+                type="button"
+                className="fb-chat-clear-confirm"
+                onClick={() => {
+                  clearChatEntries();
+                  setEntries([]);
+                  nextId.current = 1;
+                  setClearOpen(false);
+                }}
+              >
+                Clear chat
+              </button>
+              <button type="button" onClick={() => setClearOpen(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : null}
 
         <div className="fb-chat-care">
           <div

@@ -57,6 +57,16 @@ export function notifyChatChanged(): void {
   window.dispatchEvent(new CustomEvent(CHAT_CHANGED));
 }
 
+/** Clear only this browser's Orchestrator history; factory memory is untouched. */
+export function clearChatEntries(): void {
+  try {
+    localStorage.removeItem(KEY);
+  } catch {
+    // Clearing a missing store is still a successful local clear.
+  }
+  notifyChatChanged();
+}
+
 export function appendChatEntry(
   entry: Omit<StoredChatEntry, "id">,
 ): StoredChatEntry {

@@ -4449,3 +4449,55 @@
 .fb-ticket-pane--full .fb-ticket-thread .fb-entries {
   max-height: min(54vh, 620px);
 }
+
+.fb-chat-clear {
+  margin: 8px 0;
+  padding: 9px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+}
+
+.fb-chat-clear p {
+  margin: 0 0 7px;
+  color: var(--muted-foreground);
+  font-size: 10.5px;
+  line-height: 1.45;
+}
+
+.fb-chat-clear-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.fb-chat-clear-actions button {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--card);
+  color: var(--foreground);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fb-chat-clear-actions button:hover {
+  border-color: color-mix(in srgb, var(--primary) 42%, var(--border));
+  background: color-mix(in srgb, var(--primary) 6%, var(--card));
+}
+
+.fb-chat-clear-actions .fb-chat-clear-confirm {
+  border-color: color-mix(in srgb, var(--fb-blocked) 42%, var(--border));
+  color: var(--fb-blocked);
+}
+
+.fb-chat-clear-actions button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Header actions are secondary until hovered; one filled action per surface. */
+.fb-chat-link {
+  background: transparent;
+}

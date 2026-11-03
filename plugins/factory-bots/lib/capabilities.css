@@ -127,7 +127,7 @@
 
 .cap-row {
   display: grid;
-  grid-template-columns: 30px minmax(0, 1fr) auto;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
   padding: 12px;
@@ -144,17 +144,18 @@
 
 .cap-avatar {
   display: block;
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--background);
 }
 
-.cap-avatar .fb-dood {
-  width: 100%;
-  height: 100%;
+.cap-avatar .fb-orb {
+  display: block;
+  width: 40px;
+  height: 40px;
 }
 
 .cap-copy {
