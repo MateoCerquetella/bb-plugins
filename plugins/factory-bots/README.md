@@ -11,6 +11,11 @@ static blob. Click an agent to see its tickets; click a ticket to see
 its stage, attempts, stop reason, decisions, worktree, and transcript with the
 live tool call highlighted.
 
+The agent view gives the Dood room to grow: a larger live creature with a treat
+and a gift box. Treats are counted. A gift opens a real box holding one thing the
+creature does not have yet, and what it finds can be worn right there; each
+agent's treats, gifts, and outfit are kept on this machine.
+
 **Orchestrator chat** is the single entry point for work: it sends one message
 to the factory's Orchestrator, which files a ticket and drives it through
 Sieve → Helm → Lens → Warden. The board stays read-only; the chat is the only
@@ -93,6 +98,13 @@ Open **Orchestrator chat** from the board header and type a request. The chat
 keeps the conversation in the panel, shows the Orchestrator's answer, and links
 the tickets it created. A model turn can take minutes; the message box stays
 disabled with a working state until the answer arrives.
+
+The composer carries BB's provider and model picker, like the new-thread
+composer. The Orchestrator keeps using the factory's default model until **Use
+this model** is checked; from then on the selected provider, model, and reasoning
+level are sent with the next message and applied to the Orchestrator
+conversation. The picker is BB's catalog, so choose a provider and model the
+factory itself can reach.
 
 The Orchestrator decides whether a request is agent-implementable. It can file
 a ticket and hand it to the stage that owns it; the board then shows the normal

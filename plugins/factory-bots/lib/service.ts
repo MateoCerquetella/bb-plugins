@@ -233,11 +233,26 @@ export class FactoryService {
    * The one write path: send a person's words to the Orchestrator. A model
    * turn can take minutes, so this call has its own long timeout.
    */
-  async sendMessage(message: string): Promise<ChatResult> {
+  async sendMessage(
+    message: string,
+    selection: {
+      provider?: string;
+      model?: string;
+      reasoningLevel?: string;
+    } = {},
+  ): Promise<ChatResult> {
     const fetchedAt = this.now();
     const read = await this.readTool(
       "factory_message",
-      { message },
+      {
+        message,
+        ...(selection.provider === undefined || selection.model === undefined
+          ? {}
+          : { provider: selection.provider, model: selection.model }),
+        ...(selection.reasoningLevel === undefined
+          ? {}
+          : { reasoningLevel: selection.reasoningLevel }),
+      },
       15 * 60_000,
     );
     if (!read.ok) {

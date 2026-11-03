@@ -27,7 +27,8 @@ export default async function plugin(bb: BbPluginApi): Promise<void> {
   bb.rpc.register(rpcContract, {
     getBoard: () => service.getBoard(),
     getTicket: ({ linearId }) => service.getTicket(linearId),
-    sendMessage: ({ message }) => service.sendMessage(message),
+    sendMessage: ({ message, provider, model, reasoningLevel }) =>
+      service.sendMessage(message, { provider, model, reasoningLevel }),
   });
 
   bb.onDispose(() => {

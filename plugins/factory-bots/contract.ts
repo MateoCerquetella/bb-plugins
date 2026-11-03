@@ -189,7 +189,16 @@ export const rpcContract = defineRpcContract({
     output: TicketResultSchema,
   },
   sendMessage: {
-    input: z.object({ message: z.string().trim().min(1).max(4_000) }).strict(),
+    input: z
+      .object({
+        message: z.string().trim().min(1).max(4_000),
+        provider: z.string().min(1).max(100).optional(),
+        model: z.string().min(1).max(200).optional(),
+        reasoningLevel: z
+          .enum(["none", "low", "medium", "high", "max", "xhigh"])
+          .optional(),
+      })
+      .strict(),
     output: ChatResultSchema,
   },
 });

@@ -446,6 +446,28 @@ test("sends a message to the Orchestrator through factory_message", async () => 
   });
 });
 
+test("sends the selected provider, model, and reasoning with the message", async () => {
+  const caller = new StubCaller((name) => {
+    if (name === "factory_message") return { answer: "On it.", created: [] };
+    return new Error(`unexpected tool ${name}`);
+  });
+  const service = new FactoryService({ caller, startCommand: null, now: () => 8 });
+  await service.sendMessage("use the strong model", {
+    provider: "deepseek",
+    model: "deepseek-v4-pro",
+    reasoningLevel: "high",
+  });
+  assert.deepEqual(caller.calls[0], {
+    name: "factory_message",
+    args: {
+      message: "use the strong model",
+      provider: "deepseek",
+      model: "deepseek-v4-pro",
+      reasoningLevel: "high",
+    },
+  });
+});
+
 test("an MCP without factory_message is an actionable unavailable state", async () => {
   const service = new FactoryService({
     caller: {

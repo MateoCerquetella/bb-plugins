@@ -9,10 +9,14 @@ import {
 } from "react";
 import {
   definePluginApp,
+  experimental_ProviderModelPicker as ProviderModelPicker,
   useBbNavigate,
   useRpc,
 } from "@get-bb/plugin-sdk/app";
-import type { PluginNavPanelProps } from "@get-bb/plugin-sdk/app";
+import type {
+  ExperimentalProviderModelPickerValue,
+  PluginNavPanelProps,
+} from "@get-bb/plugin-sdk/app";
 
 import type {
   AgentCard,
@@ -26,7 +30,12 @@ import type {
   Transcript,
   rpcContract,
 } from "./contract";
-import { DoodOrb } from "./lib/dood-orb";
+import { DoodOrb, type DoodOrbHandle } from "./lib/dood-orb";
+import { GiftDialog } from "./lib/gift-dialog";
+import { Pixels } from "./lib/pixels";
+import { avatarLook } from "./lib/dood";
+import { loadAgentDood, saveAgentDood, type AgentDood } from "./lib/dood-state";
+import { WEAR_ITEMS } from "./lib/wear-items";
 import { activeLiveTool, isGenerating, readLiveTools } from "./lib/live";
 import { agentRoute, parsePanelRoute, ticketRoute } from "./lib/route";
 
@@ -380,7 +389,7 @@ function AgentCardView({
     >
       <span className="fb-card-top">
         <span className="fb-avatar-wrap">
-          <DoodOrb agentId={agent.name} status={agent.status} size={28} />
+          <DoodOrb agentId={agent.name} status={agent.status} size={40} />
           <StatusDot status={agent.status} />
         </span>
         <span className="fb-card-name">{agent.displayName}</span>
@@ -461,35 +470,98 @@ function AgentHeader({
   agent: AgentCard;
   onBack: () => void;
 }) {
+  const orb = useRef<DoodOrbHandle>(null);
+  const [dood, setDood] = useState<AgentDood>(() => loadAgentDood(agent.name));
+  const [giftOpen, setGiftOpen] = useState(false);
+
+  useEffect(() => {
+    saveAgentDood(agent.name, dood);
+  }, [agent.name, dood]);
+
   return (
     <div className="fb-agent-head">
       <button type="button" className="fb-back" onClick={onBack}>
         ← All agents
       </button>
-      <div className="fb-agent-title">
-        <span className="fb-avatar-wrap fb-avatar-wrap--lg">
-          <DoodOrb agentId={agent.name} status={agent.status} size={36} />
+      <div className="fb-agent-hero">
+        <div className="fb-avatar-wrap fb-avatar-wrap--hero">
+          <DoodOrb
+            ref={orb}
+            agentId={agent.name}
+            status={agent.status}
+            size={128}
+            outfit={dood.outfit}
+          />
           <StatusDot status={agent.status} />
-        </span>
-        <h2>{agent.displayName}</h2>
-        <StatusTag status={agent.status} />
+        </div>
+        <div className="fb-agent-copy">
+          <div className="fb-agent-title">
+            <h2>{agent.displayName}</h2>
+            <StatusTag status={agent.status} />
+          </div>
+          <p className="fb-agent-sub">
+            Conversation <span className="fb-mono">#{agent.conversationId}</span>
+            <span className="fb-sep">·</span>
+            {agent.column}
+            <span className="fb-sep">·</span>
+            {agent.ticketCount} {agent.ticketCount === 1 ? "ticket" : "tickets"}
+          </p>
+          <p
+            className={`fb-agent-work${
+              agent.status === "blocked" ? " fb-agent-work--blocked" : ""
+            }`}
+          >
+            {agent.statusReason ??
+              agent.currentWork ??
+              "No active task. This agent is waiting for work."}
+          </p>
+          <div className="fb-agent-care">
+            <button
+              type="button"
+              onClick={() => {
+                orb.current?.feed();
+                setDood((value) => ({ ...value, fed: value.fed + 1 }));
+              }}
+              title="Give it a treat"
+            >
+              <Pixels art="cookie" className="fb-care-art" />
+              <span>Treat{dood.fed > 0 ? ` · ${dood.fed}` : ""}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setGiftOpen(true)}
+              title="Give it a gift"
+            >
+              <Pixels art="box" className="fb-care-art" />
+              <span>Gift{dood.owned.length > 0 ? ` · ${dood.owned.length}` : ""}</span>
+            </button>
+            <span className="fb-care-note">
+              {dood.owned.length === 0
+                ? "It has not found anything yet."
+                : `${dood.owned.length} of ${WEAR_ITEMS.length} found.`}
+            </span>
+          </div>
+        </div>
       </div>
-      <p className="fb-agent-sub">
-        Conversation <span className="fb-mono">#{agent.conversationId}</span>
-        <span className="fb-sep">·</span>
-        {agent.column}
-        <span className="fb-sep">·</span>
-        {agent.ticketCount} {agent.ticketCount === 1 ? "ticket" : "tickets"}
-      </p>
-      <p
-        className={`fb-agent-work${
-          agent.status === "blocked" ? " fb-agent-work--blocked" : ""
-        }`}
-      >
-        {agent.statusReason ??
-          agent.currentWork ??
-          "No active task. This agent is waiting for work."}
-      </p>
+      {giftOpen ? (
+        <GiftDialog
+          agentId={agent.name}
+          color={avatarLook(null, agent.name).color}
+          owned={dood.owned}
+          onGrant={(item, wear) =>
+            setDood((value) => ({
+              ...value,
+              owned: value.owned.includes(item.id)
+                ? value.owned
+                : [...value.owned, item.id],
+              outfit: wear
+                ? { ...value.outfit, [item.slot]: item.id }
+                : value.outfit,
+            }))
+          }
+          onClose={() => setGiftOpen(false)}
+        />
+      ) : null}
     </div>
   );
 }
@@ -826,7 +898,7 @@ function AgentView({
 
   return (
     <div className="fb-agent-view">
-      <AgentHeader agent={agent} onBack={onBack} />
+      <AgentHeader key={agent.name} agent={agent} onBack={onBack} />
       <div className="fb-split">
         <aside className="fb-ticket-list" aria-label={`${agent.displayName} tickets`}>
           <div className="fb-section-head">
@@ -883,6 +955,12 @@ function ChatView({
   const [entries, setEntries] = useState<ChatEntry[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
+  const [picked, setPicked] = useState<ExperimentalProviderModelPickerValue>({
+    providerId: "",
+    model: "",
+    reasoningLevel: "medium",
+  });
+  const [usePickedModel, setUsePickedModel] = useState(false);
   const nextId = useRef(1);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -908,8 +986,33 @@ function ChatView({
     setInput("");
     push("user", text);
     setSending(true);
+    const reasoningLevel: "none" | "low" | "medium" | "high" | "max" | "xhigh" =
+      picked.reasoningLevel === "ultra" || picked.reasoningLevel === "ultracode"
+        ? "max"
+        : picked.reasoningLevel === "xhigh"
+          ? "xhigh"
+          : picked.reasoningLevel === "none"
+            ? "none"
+            : picked.reasoningLevel === "low"
+              ? "low"
+              : picked.reasoningLevel === "high"
+                ? "high"
+                : picked.reasoningLevel === "max"
+                  ? "max"
+                  : "medium";
+    const selection =
+      usePickedModel && picked.providerId !== "" && picked.model !== ""
+        ? {
+            provider: picked.providerId,
+            model: picked.model,
+            reasoningLevel,
+          }
+        : {};
     try {
-      const result = (await rpc.call("sendMessage", { message: text })) as ChatResult;
+      const result = (await rpc.call("sendMessage", {
+        message: text,
+        ...selection,
+      })) as ChatResult;
       if (result.ok) push("orchestrator", result.answer, result.created);
       else push("error", result.message);
     } catch (cause) {
@@ -981,24 +1084,49 @@ function ChatView({
       </div>
 
       <form className="fb-chat-form" onSubmit={(event) => void send(event)}>
-        <textarea
-          value={input}
-          onChange={(event) => setInput(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" && !event.shiftKey) {
-              event.preventDefault();
-              event.currentTarget.form?.requestSubmit();
-            }
-          }}
-          maxLength={4_000}
-          rows={2}
-          placeholder="Ask the Orchestrator for work…"
-          aria-label="Message the Orchestrator"
-          disabled={sending}
-        />
-        <button type="submit" disabled={sending || input.trim() === ""}>
-          {sending ? "Working…" : "Send"}
-        </button>
+        <div className="fb-chat-controls">
+          <ProviderModelPicker
+            value={picked}
+            onChange={setPicked}
+            align="start"
+            className="fb-chat-model"
+            disabled={sending}
+          />
+          <label className="fb-chat-use-model">
+            <input
+              type="checkbox"
+              checked={usePickedModel}
+              onChange={(event) => setUsePickedModel(event.target.checked)}
+              disabled={sending}
+            />
+            Use this model
+          </label>
+          <span className="fb-chat-model-hint">
+            {usePickedModel && picked.providerId !== "" && picked.model !== ""
+              ? "The Orchestrator will use this model if the factory has it"
+              : "Factory default model unless enabled"}
+          </span>
+        </div>
+        <div className="fb-chat-row">
+          <textarea
+            value={input}
+            onChange={(event) => setInput(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                event.currentTarget.form?.requestSubmit();
+              }
+            }}
+            maxLength={4_000}
+            rows={2}
+            placeholder="Ask the Orchestrator for work…"
+            aria-label="Message the Orchestrator"
+            disabled={sending}
+          />
+          <button type="submit" disabled={sending || input.trim() === ""}>
+            {sending ? "Working…" : "Send"}
+          </button>
+        </div>
       </form>
     </div>
   );
