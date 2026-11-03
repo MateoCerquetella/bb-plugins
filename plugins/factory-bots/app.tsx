@@ -1304,7 +1304,11 @@ function TicketDetailView({
         </div>
       </header>
 
-      <div className={`fb-ticket-body${hasDescription ? "" : " fb-ticket-body--no-description"}`}>
+      <div
+        className={`fb-ticket-body${
+          hasDescription ? "" : " fb-ticket-body--no-description"
+        }${hasDescription && !descriptionOpen ? " fb-ticket-body--description-closed" : ""}`}
+      >
         {hasDescription ? (
           <section className={`fb-ticket-description${descriptionOpen ? " is-open" : ""}`}>
             <button

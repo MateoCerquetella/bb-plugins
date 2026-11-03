@@ -3680,3 +3680,19 @@
     height: 92px;
   }
 }
+
+/* A collapsed description must not leave an empty column behind. */
+@media (min-width: 901px) {
+  .fb-ticket-body--description-closed {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .fb-ticket-body--description-closed .fb-ticket-description {
+    height: auto;
+  }
+
+  .fb-ticket-body--description-closed .fb-ticket-thread {
+    min-height: 0;
+  }
+}
