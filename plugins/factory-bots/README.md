@@ -4,8 +4,10 @@ A live board of an Empirical Factory inside BB, plus one Orchestrator chat.
 
 Factory Bots shows the agents `factory_status` returns (up to seven) as one
 card each: the column it owns, its conversation, how many tickets it holds, and
-whether it is idle, working, or blocked. Each card carries a static Dood
-from computer.do, colored from the agent's name. Click an agent to see its tickets; click a ticket to see
+whether it is idle, working, or blocked. Each card carries a live Dood from
+[do.computer](https://do.computer), grown from the agent's name. It is a real
+animated creature; where WebGL is unavailable it falls back to the same seed's
+static blob. Click an agent to see its tickets; click a ticket to see
 its stage, attempts, stop reason, decisions, worktree, and transcript with the
 live tool call highlighted.
 

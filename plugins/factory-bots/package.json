@@ -44,6 +44,7 @@
     "dist/app.meta.json",
     "dist/app.css",
     "assets/",
+    "vendor/",
     "factory.mcp.json",
     "README.md",
     "LICENSE",
@@ -51,9 +52,11 @@
     "app.tsx",
     "app.css",
     "contract.ts",
-    "lib/"
+    "lib/",
+    "THIRD_PARTY_NOTICES.md"
   ],
   "dependencies": {
+    "three": "0.128.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {

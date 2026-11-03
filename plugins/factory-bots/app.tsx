@@ -26,7 +26,7 @@ import type {
   Transcript,
   rpcContract,
 } from "./contract";
-import { DoodAvatar } from "./lib/dood";
+import { DoodOrb } from "./lib/dood-orb";
 import { activeLiveTool, isGenerating, readLiveTools } from "./lib/live";
 import { agentRoute, parsePanelRoute, ticketRoute } from "./lib/route";
 
@@ -380,7 +380,7 @@ function AgentCardView({
     >
       <span className="fb-card-top">
         <span className="fb-avatar-wrap">
-          <DoodAvatar agentId={agent.name} />
+          <DoodOrb agentId={agent.name} status={agent.status} size={28} />
           <StatusDot status={agent.status} />
         </span>
         <span className="fb-card-name">{agent.displayName}</span>
@@ -468,7 +468,7 @@ function AgentHeader({
       </button>
       <div className="fb-agent-title">
         <span className="fb-avatar-wrap fb-avatar-wrap--lg">
-          <DoodAvatar agentId={agent.name} />
+          <DoodOrb agentId={agent.name} status={agent.status} size={36} />
           <StatusDot status={agent.status} />
         </span>
         <h2>{agent.displayName}</h2>
