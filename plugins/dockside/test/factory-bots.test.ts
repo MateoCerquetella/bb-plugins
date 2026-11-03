@@ -4,7 +4,9 @@ import {
   factoryAttentionKey,
   factoryBoardSchema,
   factoryNeedsPerson,
+  factoryTicketForAgent,
   type FactoryAgent,
+  type FactoryBoardTicket,
 } from "../lib/factory-bots.ts";
 
 describe("Factory Bots read shape", () => {
@@ -13,7 +15,14 @@ describe("Factory Bots read shape", () => {
       ok: true,
       fetchedAt: 1,
       snapshot: { bots: 1, tickets: 2, byStage: [], startedAt: null },
-      tickets: [{ linearId: "SDD-1", bot: "sieve", stage: "triage" }],
+      tickets: [
+        {
+          linearId: "SDD-1",
+          title: "Write the spec",
+          bot: "sieve",
+          stage: "triage",
+        },
+      ],
       tasks: [],
       agents: [
         {
@@ -73,6 +82,7 @@ describe("Factory Bots attention", () => {
     statusReason: "No feature is selected.",
     currentWork: null,
     ticketId: "SDD-1",
+    ticketTitle: "Write the spec",
   };
 
   it("counts only agents blocked on a person", () => {
@@ -86,15 +96,57 @@ describe("Factory Bots attention", () => {
     );
   });
 
-  it("treats a changed reason or ticket as a new attention event", () => {
+  it("alerts once per blocked episode even if the reason text changes", () => {
     assert.equal(factoryAttentionKey(blocked), factoryAttentionKey(blocked));
-    assert.notEqual(
+    assert.equal(
       factoryAttentionKey(blocked),
-      factoryAttentionKey({ ...blocked, statusReason: "Different answer" }),
+      factoryAttentionKey({ name: blocked.name }),
     );
-    assert.notEqual(
-      factoryAttentionKey(blocked),
-      factoryAttentionKey({ ...blocked, ticketId: "SDD-2" }),
+  });
+
+  it("opens the ticket named by the blocked reason, not the first ticket", () => {
+    const tickets: FactoryBoardTicket[] = [
+      { linearId: "SDD-21", title: "Find power users", bot: "sieve", feature: null },
+      {
+        linearId: "SDD-179",
+        title: "Release still triggers on merges",
+        bot: "sieve",
+        feature: null,
+      },
+      {
+        linearId: "SDD-89",
+        title: "Speed up the test suite",
+        bot: "helm",
+        feature: "sdd-89",
+      },
+    ];
+    const reason =
+      "No feature is selected in /home/dyaus/projects/empirical-sdd-sdd-179. A person must say whether to start or attach the work.";
+    assert.equal(
+      factoryTicketForAgent(
+        { ...blocked, statusReason: reason },
+        tickets,
+      )?.linearId,
+      "SDD-179",
+    );
+    assert.equal(
+      factoryTicketForAgent(
+        {
+          ...blocked,
+          name: "helm",
+          statusReason:
+            "No feature is selected in /home/dyaus/projects/empirical-sdd-sdd-89.",
+        },
+        tickets,
+      )?.linearId,
+      "SDD-89",
+    );
+    assert.equal(
+      factoryTicketForAgent(
+        { ...blocked, status: "working", statusReason: null },
+        tickets,
+      )?.linearId,
+      "SDD-21",
     );
   });
 });

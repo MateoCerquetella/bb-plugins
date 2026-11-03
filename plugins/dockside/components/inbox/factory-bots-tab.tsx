@@ -15,10 +15,12 @@ const STATUS_LABEL: Record<FactoryAgent["status"], string> = {
 export function FactoryBotsTabs({
   tab,
   needsPerson,
+  needsPersonDetail,
   onChange,
 }: {
   tab: "threads" | "bots";
   needsPerson: number;
+  needsPersonDetail?: string;
   onChange: (tab: "threads" | "bots") => void;
 }) {
   return (
@@ -50,6 +52,7 @@ export function FactoryBotsTabs({
             ? `Bots, ${needsPerson} ${needsPerson === 1 ? "needs" : "need"} a person`
             : "Bots"
         }
+        title={needsPersonDetail === "" ? undefined : needsPersonDetail}
         onClick={() => onChange("bots")}
         className={cn(
           "h-6 flex-1 items-center justify-center gap-1 rounded text-2xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
@@ -82,13 +85,24 @@ function FactoryBotRow({
 }) {
   const work =
     agent.statusReason ?? agent.currentWork ?? STATUS_LABEL[agent.status];
+  const blockedTicket =
+    agent.status === "blocked" && agent.ticketId !== null
+      ? `${agent.ticketId}${agent.ticketTitle === null ? "" : ` · ${agent.ticketTitle}`}`
+      : null;
 
   return (
     <li className="border-b border-sidebar-border/60 last:border-b-0">
       <button
         type="button"
         onClick={() => onOpen(agent)}
-        title={`${agent.displayName} · ${STATUS_LABEL[agent.status]} · ${work}`}
+        aria-label={
+          blockedTicket === null
+            ? `Open ${agent.displayName}: ${work}`
+            : `Answer ${agent.displayName}'s ${blockedTicket}: ${work}`
+        }
+        title={`${agent.displayName} · ${STATUS_LABEL[agent.status]} · ${
+          blockedTicket === null ? work : `${blockedTicket} · ${work}`
+        }`}
         className="flex w-full items-center gap-2.5 px-2.5 py-2.5 text-left transition-colors hover:bg-sidebar-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
       >
         <span className="relative size-11 shrink-0">
@@ -110,12 +124,31 @@ function FactoryBotRow({
           />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-[13px] font-medium text-foreground">
-            {agent.displayName}
+          <span className="flex min-w-0 items-center gap-1">
+            <span className="truncate text-[13px] font-medium text-foreground">
+              {agent.displayName}
+            </span>
+            {agent.status === "blocked" ? (
+              <span className="shrink-0 rounded-full bg-destructive/10 px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wide text-destructive">
+                Needs you
+              </span>
+            ) : null}
           </span>
+          {blockedTicket === null ? null : (
+            <span className="mt-0.5 flex min-w-0 items-center gap-1 text-2xs">
+              <span className="shrink-0 font-semibold text-destructive">
+                {agent.ticketId}
+              </span>
+              {agent.ticketTitle === null ? null : (
+                <span className="truncate text-destructive/90">
+                  {agent.ticketTitle}
+                </span>
+              )}
+            </span>
+          )}
           <span
             className={cn(
-              "block truncate text-2xs",
+              "mt-0.5 block truncate text-2xs",
               agent.status === "blocked"
                 ? "text-destructive"
                 : "text-muted-foreground",
@@ -129,7 +162,12 @@ function FactoryBotRow({
             <span className="shrink-0">#{agent.conversationId}</span>
           </span>
         </span>
-        <span className="flex shrink-0 items-center border-l border-sidebar-border/60 pl-2">
+        <span className="flex shrink-0 flex-col items-end gap-1 border-l border-sidebar-border/60 pl-2">
+          {agent.status === "blocked" ? (
+            <span className="rounded-full bg-destructive px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-destructive-foreground">
+              Answer
+            </span>
+          ) : null}
           {agent.ticketCount > 0 ? (
             <span className="flex flex-col items-end leading-none">
               <span className="text-base font-semibold tabular-nums text-foreground">

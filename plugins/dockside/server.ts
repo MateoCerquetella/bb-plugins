@@ -41,6 +41,7 @@ import {
   factoryAttentionKey,
   factoryBoardSchema,
   factoryNeedsPerson,
+  factoryTicketForAgent,
   type FactoryAgent,
 } from "./lib/factory-bots.ts";
 
@@ -672,15 +673,16 @@ export default function plugin(bb: BbPluginApi) {
               : board.message,
         };
       }
-      const ticketByBot = new Map(
-        board.tickets.map((ticket) => [ticket.bot, ticket.linearId]),
-      );
       return {
         ok: true,
-        agents: board.agents.map((agent) => ({
-          ...agent,
-          ticketId: ticketByBot.get(agent.name) ?? null,
-        })),
+        agents: board.agents.map((agent) => {
+          const ticket = factoryTicketForAgent(agent, board.tickets);
+          return {
+            ...agent,
+            ticketId: ticket?.linearId ?? null,
+            ticketTitle: ticket?.title ?? null,
+          };
+        }),
         message: null,
       };
     } catch (error) {
@@ -883,6 +885,8 @@ export default function plugin(bb: BbPluginApi) {
   // and route new blocked states through the built-in push-notifications
   // plugin; the badge in the Bots tab is the always-visible fallback.
   const attentionSeen = new Map<string, string>();
+  const attentionNotifiedAt = new Map<string, number>();
+  const ATTENTION_COOLDOWN_MS = 10 * 60_000;
   let attentionInitialized = false;
   const attentionWait = (ms: number, signal: AbortSignal): Promise<void> =>
     new Promise((resolve) => {
@@ -904,14 +908,20 @@ export default function plugin(bb: BbPluginApi) {
       agent.statusReason ??
       agent.currentWork ??
       "Needs a person to answer and unblock it.";
-    const ticket = agent.ticketId === null ? "" : `${agent.ticketId} · `;
+    const ticketSuffix =
+      agent.ticketId === null ? "" : ` · ${agent.ticketId}`;
+    const ticketTitle =
+      agent.ticketTitle === null ? "" : `${agent.ticketTitle} — `;
     try {
       await bb.sdk.plugins.callRpc({
         pluginId: "push-notifications",
         method: "notifications.send",
         input: {
-          title: `Factory · ${agent.displayName}`.slice(0, 80),
-          body: `${ticket}${reason}`.slice(0, 180),
+          title: `Factory · ${agent.displayName} needs you${ticketSuffix}`.slice(
+            0,
+            80,
+          ),
+          body: `${ticketTitle}${reason}`.slice(0, 180),
         },
         outputSchema: z.object({
           ok: z.literal(true),
@@ -947,7 +957,15 @@ export default function plugin(bb: BbPluginApi) {
                   const key = factoryAttentionKey(agent);
                   if (attentionSeen.get(agent.name) === key) continue;
                   attentionSeen.set(agent.name, key);
+                  const lastNotified = attentionNotifiedAt.get(agent.name);
+                  if (
+                    lastNotified !== undefined &&
+                    Date.now() - lastNotified < ATTENTION_COOLDOWN_MS
+                  ) {
+                    continue;
+                  }
                   await notifyFactoryAttention(agent);
+                  attentionNotifiedAt.set(agent.name, Date.now());
                 }
               }
               for (const name of [...attentionSeen.keys()]) {

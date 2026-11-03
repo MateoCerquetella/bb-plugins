@@ -192,12 +192,17 @@ below is exactly as Dockside draws it.
 
 Each factory agent gets the same live, customized Dood used inside Factory Bots,
 with its work or blocked reason, owned column, and ticket count, grouped into
-In motion, Needs a person, and On call. The **Bots** tab carries a count of
-agents that need a person, and a new blocked state is sent through BB's
-**push-notifications** plugin, so the alert can arrive while Dockside is out of
-view. Existing blocked agents are seeded silently on startup to avoid a burst;
-the count remains the always-visible fallback. Clicking an agent opens the
-Factory Bots panel at that agent and selects its first ticket, so the live
+In motion, Needs a person, and On call. A blocked row names the exact ticket
+from the factory's blocked reason, shows its title, and carries an **Answer**
+marker; clicking it opens that ticket, not the agent's first unrelated ticket.
+The **Bots** tab carries the count and lists the same ticket IDs in its tooltip.
+A new blocked state is sent through BB's **push-notifications** plugin, so the
+alert can arrive while Dockside is out of view; each alert names the agent and
+ticket. Existing blocked agents are seeded silently on startup to avoid a burst,
+an ongoing block sends at most one alert even if its reason text changes, and an
+agent that re-blocks within ten minutes stays quiet. The count remains the
+always-visible fallback. Clicking an agent opens the
+Factory Bots panel at that agent and selects the actionable ticket, so the live
 transcript sits beside the sidebar. Feeding, gifts, and the wardrobe live on the
 Factory Bots agent page, not in the sidebar. The tab polls the Factory Bots read
 API while it is enabled.

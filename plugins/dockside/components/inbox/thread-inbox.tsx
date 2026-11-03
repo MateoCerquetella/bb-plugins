@@ -681,6 +681,12 @@ export function ThreadInbox({
         <FactoryBotsTabs
           tab={sidebarTab}
           needsPerson={factoryNeedsPerson(factoryBots.agents).length}
+          needsPersonDetail={factoryNeedsPerson(factoryBots.agents)
+            .map(
+              (agent) =>
+                `${agent.displayName} · ${agent.ticketId ?? "ticket unknown"}`,
+            )
+            .join("; ")}
           onChange={setSidebarTab}
         />
       ) : null}
