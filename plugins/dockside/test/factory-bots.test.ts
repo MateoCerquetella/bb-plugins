@@ -4,6 +4,7 @@ import {
   factoryAttentionKey,
   factoryBoardSchema,
   factoryNeedsPerson,
+  factoryQuestionFromComments,
   factoryTicketForAgent,
   type FactoryAgent,
   type FactoryBoardTicket,
@@ -149,4 +150,16 @@ describe("Factory Bots attention", () => {
       "SDD-21",
     );
   });
+});
+
+it("notification text uses the actual Linear question", () => {
+  assert.equal(
+    factoryQuestionFromComments([
+      {
+        body:
+          "**SDD-170 needs a person.** \n\n**I need a person to answer which design ships (diff-based vs document-name), and whether acceptance #2 is deleted.**\n\nMore detail.",
+      },
+    ]),
+    "I need a person to answer which design ships (diff-based vs document-name), and whether acceptance #2 is deleted. More detail.",
+  );
 });

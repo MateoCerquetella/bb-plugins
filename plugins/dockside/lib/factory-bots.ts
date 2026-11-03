@@ -54,6 +54,47 @@ export const factoryBoardSchema = z.discriminatedUnion("ok", [
 export const FACTORY_BOTS_PLUGIN_ID = "factory-bots";
 export const FACTORY_BOTS_PANEL_PATH = "factory-bots";
 
+/** The ticket detail shape used only to enrich an attention notification. */
+export const factoryTicketQuestionSchema = z
+  .object({
+    ok: z.boolean(),
+    ticket: z
+      .object({
+        title: z.string(),
+        comments: z
+          .array(z.object({ body: z.string(), createdAt: z.string() }).passthrough())
+          .default([]),
+      })
+      .passthrough()
+      .optional(),
+    message: z.string().optional(),
+  })
+  .passthrough();
+
+export function factoryQuestionFromComments(
+  comments: readonly { body: string }[],
+): string | null {
+  const comment = comments.find((entry) =>
+    /\bi need (?:a person|you|someone) to (?:answer|decide|confirm|choose)\b/iu.test(
+      entry.body,
+    ),
+  );
+  if (comment === undefined) return null;
+  const normalized = comment.body
+    .replace(/\*\*/gu, "")
+    .replace(/`/gu, "")
+    .replace(/\s+/gu, " ")
+    .trim();
+  const marker =
+    /\bi need (?:a person|you|someone) to (?:answer|decide|confirm|choose)\b/iu.exec(
+      normalized,
+    );
+  return (marker?.index === undefined
+    ? normalized
+    : normalized.slice(marker.index)
+  ).slice(0, 600);
+}
+
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
 }

@@ -41,7 +41,9 @@ import {
   factoryAttentionKey,
   factoryBoardSchema,
   factoryNeedsPerson,
+  factoryQuestionFromComments,
   factoryTicketForAgent,
+  factoryTicketQuestionSchema,
   type FactoryAgent,
 } from "./lib/factory-bots.ts";
 
@@ -904,14 +906,29 @@ export default function plugin(bb: BbPluginApi) {
     });
 
   const notifyFactoryAttention = async (agent: FactoryAgent): Promise<void> => {
-    const reason =
+    let reason =
       agent.statusReason ??
       agent.currentWork ??
       "Needs a person to answer and unblock it.";
+    if (agent.ticketId !== null) {
+      try {
+        const detail = await bb.sdk.plugins.callRpc({
+          pluginId: FACTORY_BOTS_PLUGIN_ID,
+          method: "getTicket",
+          input: { linearId: agent.ticketId },
+          outputSchema: factoryTicketQuestionSchema,
+        });
+        const question =
+          detail.ok && detail.ticket !== undefined
+            ? factoryQuestionFromComments(detail.ticket.comments)
+            : null;
+        if (question !== null && question !== "") reason = question;
+      } catch {
+        // The ticket title and reason still make a useful alert.
+      }
+    }
     const ticketSuffix =
       agent.ticketId === null ? "" : ` · ${agent.ticketId}`;
-    const ticketTitle =
-      agent.ticketTitle === null ? "" : `${agent.ticketTitle} — `;
     try {
       await bb.sdk.plugins.callRpc({
         pluginId: "push-notifications",
@@ -921,7 +938,7 @@ export default function plugin(bb: BbPluginApi) {
             0,
             80,
           ),
-          body: `${ticketTitle}${reason}`.slice(0, 180),
+          body: reason.slice(0, 180),
         },
         outputSchema: z.object({
           ok: z.literal(true),
