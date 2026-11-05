@@ -86,6 +86,9 @@ export function ExecutionPicker({
       }
     : { providerId: '', model: '', reasoningLevel: 'medium' };
   function update(next: ExperimentalProviderModelPickerValue) {
+    // Native controls can emit catalog defaults on mount, including while disabled.
+    // Do not turn that initialization into a user override before policy hydration.
+    if (disabled || loading) return;
     const providerChanged = next.providerId !== effective?.providerId;
     onChange({
       providerId: next.providerId,
@@ -113,17 +116,17 @@ export function ExecutionPicker({
         value={pickerValue}
         onChange={update}
         routing={options?.routing ?? undefined}
-        disabled={disabled}
+        disabled={disabled || loading}
         className="min-w-0"
       />
       <PermissionModePicker
         providerId={effective?.providerId ?? ''}
         value={effective?.permissionMode ?? 'auto'}
         onChange={permissionMode => {
-          if (effective) onChange({ ...effective, permissionMode });
+          if (!disabled && !loading && effective) onChange({ ...effective, permissionMode });
         }}
         routing={options?.routing ?? undefined}
-        disabled={disabled || !effective}
+        disabled={disabled || loading || !effective}
       />
     </div>
     {loading ? <p role="status" className="text-[11px] text-muted-foreground">Reading the current AI selection…</p> : null}

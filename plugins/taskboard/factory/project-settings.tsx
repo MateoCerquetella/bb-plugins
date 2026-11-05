@@ -4,6 +4,7 @@ import type { TaskboardRpcContract, WorkSource } from '../contract.js';
 import type { FactoryExecution, FactoryProjectStatus } from './contract.js';
 import { Button } from '../components/ui/button.js';
 import { Icon } from '../components/ui/icon.js';
+import { Textarea } from '../components/ui/textarea.js';
 import { Input } from '../components/ui/input.js';
 import { ExecutionPicker } from './execution-picker.js';
 
@@ -15,6 +16,7 @@ function ProjectSettings({ projectId, provider }: { projectId: string; provider:
   const rpc = useRpc<TaskboardRpcContract>();
   const [status, setStatus] = useState<FactoryProjectStatus | null>(null);
   const [execution, setExecution] = useState<FactoryExecution | null>(null);
+  const [factoryInstructions, setFactoryInstructions] = useState('');
   const [enabled, setEnabled] = useState(false);
   const [limit, setLimit] = useState(1);
   const [dirty, setDirty] = useState(false);
@@ -33,6 +35,7 @@ function ProjectSettings({ projectId, provider }: { projectId: string; provider:
         setEnabled(result.policy.enabled);
         setLimit(result.policy.maxConcurrent);
         setExecution(result.policy.execution);
+        setFactoryInstructions(result.policy.factoryInstructions);
       }
       setError(null);
     } catch (error) {
@@ -53,13 +56,14 @@ function ProjectSettings({ projectId, provider }: { projectId: string; provider:
     setError(null);
     try {
       const result = await rpc.call('factorySaveProject', {
-        projectId, provider, enabled, maxConcurrent: limit, intake: 'todo', execution
+        projectId, provider, enabled, maxConcurrent: limit, intake: 'todo', execution, factoryInstructions
       });
       if (mounted.current) {
         setStatus(result.status);
         setEnabled(result.policy.enabled);
         setLimit(result.policy.maxConcurrent);
         setExecution(result.policy.execution);
+        setFactoryInstructions(result.policy.factoryInstructions);
         setDirty(false);
         void load();
       }
@@ -69,6 +73,14 @@ function ProjectSettings({ projectId, provider }: { projectId: string; provider:
       if (mounted.current) setSaving(false);
     }
   }
+  // Wait for policy hydration before mounting host controls. Their initial catalog
+  // callbacks can otherwise dirty the form and suppress the saved policy response.
+  if (!status) return <div className="min-w-0 space-y-2" aria-label="Autonomous factory">
+    <p role={error ? 'alert' : 'status'} className="text-xs text-muted-foreground">
+      {error ?? 'Loading factory settings…'}
+    </p>
+    {error ? <Button type="button" variant="outline" size="sm" onClick={() => void load()}>Retry</Button> : null}
+  </div>;
   const stateLabel = !status ? 'Loading'
     : status.kind === 'running' ? 'Running'
     : status.kind === 'paused' ? 'Paused'
@@ -109,6 +121,17 @@ function ProjectSettings({ projectId, provider }: { projectId: string; provider:
         Use project defaults
       </Button>
     </div>
+
+    <label className="block space-y-2 text-xs font-medium">
+      <span>Additional factory instructions</span>
+      <Textarea value={factoryInstructions} rows={5} maxLength={20_000}
+        disabled={saving || !status}
+        placeholder="Project conventions, verification requirements, or other instructions…"
+        onChange={event => { setFactoryInstructions(event.target.value); setDirty(true); }} />
+      <span className="block font-normal text-muted-foreground">
+        Appended to every worker stage prompt, including retries and continuations. Leave empty to use the standard prompt.
+      </span>
+    </label>
 
     <div className="flex flex-wrap items-center justify-between gap-3">
       <label className="flex min-w-0 cursor-pointer items-center gap-2 text-sm">
