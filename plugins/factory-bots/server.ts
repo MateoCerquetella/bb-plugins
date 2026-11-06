@@ -81,7 +81,8 @@ export default async function plugin(bb: BbPluginApi): Promise<void> {
       runtime = createRuntime(bb, loaded);
       pathError = loaded.error;
       previous.client?.dispose();
-      bb.log.info(`Factory connection switched to ${factoryEntryPoint(loaded.config) ?? loaded.path ?? "unknown"}.`);
+      const target = loaded.config === null ? null : factoryEntryPoint(loaded.config);
+      bb.log.info(`Factory connection switched to ${target ?? loaded.path ?? "unknown"}.`);
       publishPathStatus();
     }).catch((cause: unknown) => {
       if (disposed || version !== changeVersion) return;

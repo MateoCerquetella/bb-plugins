@@ -1,4 +1,7 @@
 import assert from "node:assert/strict";
+import { mkdir, mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { test } from "node:test";
 
 import {
@@ -102,6 +105,21 @@ test("uses the configured Factory checkout while preserving MCP args and URL", a
   });
 });
 
+test("rejects a checkout whose entry point is not a readable file", async (t) => {
+  const checkout = await mkdtemp(join(tmpdir(), "factory-bots-config-"));
+  t.after(() => rm(checkout, { recursive: true, force: true }));
+  await mkdir(join(checkout, "dist", "main.js"), { recursive: true });
+
+  const loaded = await loadMcpConfig({
+    moduleUrl: "file:///opt/plugin/server.ts",
+    env: {},
+    factoryCheckoutPath: checkout,
+    readFile: async () => JSON.stringify(VALID),
+  });
+  assert.equal(loaded.config, null);
+  assert.match(loaded.error ?? "", /No readable Factory MCP script/);
+});
+
 test("rejects relative Factory checkout paths", async () => {
   const loaded = await loadMcpConfig({
     moduleUrl: "file:///opt/plugin/server.ts",
@@ -175,7 +193,8 @@ test("reports a missing MCP script as an actionable config error", async () => {
     exists: async () => false,
   });
   assert.equal(loaded.config, null);
-  assert.match(loaded.error ?? "", /Factory MCP script not found at \/opt\/factory\/dist\/main\.js/);
+  assert.match(loaded.error ?? "", /No readable Factory MCP script at \/opt\/factory\/dist\/main\.js/);
+  assert.match(loaded.error ?? "", /Factory checkout path in Settings/);
   assert.match(loaded.error ?? "", /FACTORY_BOTS_MCP_CONFIG/);
   assert.match(loaded.error ?? "", /reload the Factory Bots plugin/);
 });

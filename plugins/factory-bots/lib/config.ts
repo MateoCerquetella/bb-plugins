@@ -1,4 +1,5 @@
-import { access, readFile } from "node:fs/promises";
+import { constants } from "node:fs";
+import { access, readFile, stat } from "node:fs/promises";
 import { dirname, isAbsolute, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -94,6 +95,7 @@ export interface LoadConfigOptions {
   cwd?: string;
   factoryCheckoutPath?: string;
   readFile?: (path: string) => Promise<string>;
+  /** True only for a readable regular file; a directory can never start. */
   exists?: (path: string) => Promise<boolean>;
 }
 
@@ -110,7 +112,9 @@ export async function loadMcpConfig(
     options.exists ??
     (async (path: string) => {
       try {
-        await access(path);
+        const stats = await stat(path);
+        if (!stats.isFile()) return false;
+        await access(path, constants.R_OK);
         return true;
       } catch {
         return false;
@@ -153,7 +157,7 @@ export async function loadMcpConfig(
           return {
             config: null,
             path,
-            error: `Factory MCP script not found at ${script}. Edit ${path} or set FACTORY_BOTS_MCP_CONFIG to a config for this host, then reload the Factory Bots plugin.`,
+            error: `No readable Factory MCP script at ${script}. Set the Factory checkout path in Settings → Factory Bots, edit ${path}, or set FACTORY_BOTS_MCP_CONFIG to a config for this host, then reload the Factory Bots plugin.`,
           };
         }
       }
