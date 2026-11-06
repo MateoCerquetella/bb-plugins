@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-de4de12f3f30df8cde8c1239",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-TEST-1",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "CLI verification passed after install and reload: the Factory checkout path setting is registered with its label and description, stores an absolute checkout, and clears back to the bundled default. The BB settings screen could not be opened in a browser because this BB server binds only to loopback and the Steel browser session cannot reach it, so AC-UI-1 has no browser or screenshot evidence.",
+  "passed": false,
+  "startedAt": "2026-11-06T01:36:08.105Z",
+  "completedAt": "2026-11-06T01:36:08.105Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "configure-factory-bots-path",
+    "specRevision": 2,
+    "specDigest": "sha256:7285ab6cc8cf69ea10991cade1f1e6d92979fb29f32c9b58e13d2f7210cab3b5",
+    "treeDigest": "sha256:d14423fe773a0187a4d19998f9b0f4f2be084e4ae3af56a48587698511f6e987",
+    "policyDigest": "sha256:7c99a8cec79fda73e2c43e7aba7bae418ba42821c7023b1503f06b5fa4c64fa4",
+    "workflowRevision": 7,
+    "gitCommit": "7d45007366869b0f8af9c8f26b3d932aa361171e",
+    "scope": [
+      "plugins/factory-bots"
+    ],
+    "scopeDigest": "sha256:297f66db7e2c752984e1ead9879f6aedb591e5d1fde96e327aa8b0eaa9543ae9",
+    "textTreeDigest": "sha256:d14423fe773a0187a4d19998f9b0f4f2be084e4ae3af56a48587698511f6e987"
+  },
+  "digest": "sha256:1c6403d045a8940c6a264109028e0dfa0e327dcf4baaf5930be5550639402d45",
+  "kind": "qa",
+  "matrixDigest": "sha256:aa3b9d044c0274a3c0fb433831706a51d45c3d8d431d7f5d0586cd315619f792",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "missing-environment",
+      "summary": "CLI verification passed after install and reload: the Factory checkout path setting is registered with its label and description, stores an absolute checkout, and clears back to the bundled default. The BB settings screen could not be opened in a browser because this BB server binds only to loopback and the Steel browser session cannot reach it, so AC-UI-1 has no browser or screenshot evidence.",
+      "startedAt": "2026-11-06T01:36:08.105Z",
+      "completedAt": "2026-11-06T01:36:08.105Z",
+      "durationMs": 0,
+      "collector": "bb-agent-cli",
+      "command": null,
+      "result": null,
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:d14423fe773a0187a4d19998f9b0f4f2be084e4ae3af56a48587698511f6e987",
+      "sourceTreeAfter": "sha256:d14423fe773a0187a4d19998f9b0f4f2be084e4ae3af56a48587698511f6e987",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/configure-factory-bots-path/evidence/artifacts/fresh-context-cli.txt",
+          "mediaType": "text/plain",
+          "bytes": 1211,
+          "digest": "sha256:5fcd95953d869ff1fecdf7ee64bfcf1fd3689347a4279e0c91d25c763316e137"
+        }
+      ]
+    }
+  ],
+  "anomalies": [
+    "outcome-missing-environment"
+  ]
+}

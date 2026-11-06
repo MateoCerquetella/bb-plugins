@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-ac22b94ef38f50de6a022de2",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-TEST-1",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review requested changes to the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-11-06T01:12:38.474Z",
+  "completedAt": "2026-11-06T01:12:38.474Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "configure-factory-bots-path",
+    "specRevision": 2,
+    "specDigest": "sha256:7285ab6cc8cf69ea10991cade1f1e6d92979fb29f32c9b58e13d2f7210cab3b5",
+    "treeDigest": "sha256:656ef3b63d2c435822d1f01ecca16c810029468f62b365e071ee0ca12a8d4d0d",
+    "policyDigest": "sha256:6ebe58cbdef84ea3073f41581b4274f7b15a38527b5a354221da1191ec5de596"
+  },
+  "digest": "sha256:9d455b839a938dddec7d2ba9dd7e654baf5d323854f6c7ae84f9bd110a0d404a",
+  "kind": "collected",
+  "collector": "empirical-review:bb-subthread-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/configure-factory-bots-path/reviews/b724dfc512fc4ebd7de26dd4.json",
+      "mediaType": "application/json",
+      "bytes": 2831,
+      "digest": "sha256:7327d775faee1f1fbd1b518d1df148279fbfec8e350a4e9c4b091f36b466caef"
+    },
+    {
+      "path": ".empirical/specs/configure-factory-bots-path/reviews/b724dfc512fc4ebd7de26dd4.md",
+      "mediaType": "text/markdown",
+      "bytes": 1522,
+      "digest": "sha256:9ae89442c27afc89d37f906a26d6dee4766dadee3141c6f79528fc440f56b204"
+    }
+  ]
+}

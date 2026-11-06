@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "resultPath": ".empirical/specs/configure-factory-bots-path/reviews/6234075218539869fea4c206.json",
+  "resultDigest": "sha256:6234075218539869fea4c206b652a6e40784e1278bff744a4e6ace56f92f463b",
+  "contractDigest": "sha256:2465b75eff868f110a9a0654e35279b56bd2100369eba967b859255ef753a0dd",
+  "carriedDeferred": [
+    {
+      "id": "F-1",
+      "severity": "medium",
+      "category": "correctness",
+      "summary": "config.ts validates the entry point with existence only, so a directory or unreadable file at dist/main.js passes and server.ts then disposes the working client with no reported error."
+    },
+    {
+      "id": "F-2",
+      "severity": "medium",
+      "category": "tests",
+      "summary": "server.test.ts never calls board/ticket/chat after a switch and never asserts old-client disposal, so it can pass without a usable replacement connection."
+    }
+  ]
+}

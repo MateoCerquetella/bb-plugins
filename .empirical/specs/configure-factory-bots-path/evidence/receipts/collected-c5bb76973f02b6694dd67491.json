@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-c5bb76973f02b6694dd67491",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-TEST-1",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "Independent fresh-context re-review of head 7d450073 approved every criterion with no open findings.",
+  "passed": true,
+  "startedAt": "2026-11-06T01:24:09.053Z",
+  "completedAt": "2026-11-06T01:24:09.053Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "configure-factory-bots-path",
+    "specRevision": 2,
+    "specDigest": "sha256:7285ab6cc8cf69ea10991cade1f1e6d92979fb29f32c9b58e13d2f7210cab3b5",
+    "treeDigest": "sha256:d14423fe773a0187a4d19998f9b0f4f2be084e4ae3af56a48587698511f6e987",
+    "policyDigest": "sha256:6ebe58cbdef84ea3073f41581b4274f7b15a38527b5a354221da1191ec5de596"
+  },
+  "digest": "sha256:cb53be918a57e7b26610cd08240935564c3868058b7000cde864dd75eb90d0a1",
+  "kind": "collected",
+  "collector": "bb-subthread-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/configure-factory-bots-path/reviews/6234075218539869fea4c206.json",
+      "mediaType": "application/json",
+      "bytes": 2241,
+      "digest": "sha256:2df7719edb95acb7cdbecdaf905461dcbbf1b68ddc98f29127f545279f38814e"
+    },
+    {
+      "path": ".empirical/specs/configure-factory-bots-path/reviews/6234075218539869fea4c206.md",
+      "mediaType": "text/markdown",
+      "bytes": 1501,
+      "digest": "sha256:6b18425775aec793d1701c3bd2083131a87cf69be9b5da25f091c914d238b426"
+    }
+  ]
+}

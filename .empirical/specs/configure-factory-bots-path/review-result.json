@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:7b13cb9373b5d54d7535a7e9dafd55b2000eba5c60dc2b7ae56e53de90c19f3e",
+  "resultPath": ".empirical/specs/configure-factory-bots-path/reviews/6234075218539869fea4c206.json",
+  "resultDigest": "sha256:6234075218539869fea4c206b652a6e40784e1278bff744a4e6ace56f92f463b",
+  "receiptId": "collected-91558ba40eb05d89a88ee797",
+  "reReview": {
+    "previousResultDigest": "sha256:b724dfc512fc4ebd7de26dd401ab0e37051ee695193f790b3ff453bb525951c6",
+    "previousBaseCommit": "4198b79f4639a35e127faa13144eb197367a1cf9",
+    "previousHeadCommit": "2a70b69cbec3573d1134c5bc1654710edb7dd9d0",
+    "previousVerdict": "CHANGES_REQUESTED",
+    "previousReview": "# Verdict: CHANGES_REQUESTED\n\n- PASS AC-1: server.ts defines the factoryCheckoutPath string setting with label, description, and empty default.\n- PASS AC-2: config.ts maps the checkout to <path>/dist/main.js while preserving command, remaining args, and env; tests assert preservation.\n- FAIL AC-3: Hot replacement works for valid input, but existence-only validation can accept an invalid entry point and dispose the working client (F-1).\n- FAIL AC-4: Empty restores the default and relative/missing paths error, but a directory or unreadable file at dist/main.js passes validation and clears the error (F-1).\n- PASS AC-5: README documents the Settings location, dist/main.js mapping, immediate switching, preserved FACTORY_URL, and clearing to reset.\n- FAIL AC-TEST-1: Tests assert reported status only; no coverage that board/ticket/chat use the replacement client or that the old client is disposed (F-2).\n- PASS AC-UI-1: The native setting supplies the labeled field and description; the settings section renders configured/active paths and alerts. Not browser-verified.\n\n## Security / correctness\n\nNo new security vulnerability found in scope; running an operator-selected local checkout is the accepted design. Correctness changes requested for entry-point validation.\n\n## Design / maintainability\n\nOne runtime bundle with dynamically dereferenced RPC handlers and a version guard is direct and maintainable. Weaknesses: insufficient entry-point validation and tests that prove status rather than runtime behavior.",
+    "openFindings": [],
+    "deferredFindings": [
+      {
+        "id": "F-1",
+        "severity": "medium",
+        "category": "correctness",
+        "summary": "config.ts validates the entry point with existence only, so a directory or unreadable file at dist/main.js passes and server.ts then disposes the working client with no reported error."
+      },
+      {
+        "id": "F-2",
+        "severity": "medium",
+        "category": "tests",
+        "summary": "server.test.ts never calls board/ticket/chat after a switch and never asserts old-client disposal, so it can pass without a usable replacement connection."
+      }
+    ]
+  }
+}

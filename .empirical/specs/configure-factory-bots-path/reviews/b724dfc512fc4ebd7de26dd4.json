@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:5e0c79824ac3f4673b3f4796e68ad70d0fb193476ef47e23527bc1830f46f58b",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "4198b79f4639a35e127faa13144eb197367a1cf9",
+  "headCommit": "2a70b69cbec3573d1134c5bc1654710edb7dd9d0",
+  "diffDigest": "sha256:de664a2063c600b56f33d54cbff261d3672ea50ddd63601a2b675052b7919ac1",
+  "verdict": "CHANGES_REQUESTED",
+  "reviewerActor": "bb-subthread-reviewer",
+  "reviewerInvocationId": "thr_x973x77cxk",
+  "reviewerLogin": null,
+  "body": "# Verdict: CHANGES_REQUESTED\n\n- PASS AC-1: server.ts defines the factoryCheckoutPath string setting with label, description, and empty default.\n- PASS AC-2: config.ts maps the checkout to <path>/dist/main.js while preserving command, remaining args, and env; tests assert preservation.\n- FAIL AC-3: Hot replacement works for valid input, but existence-only validation can accept an invalid entry point and dispose the working client (F-1).\n- FAIL AC-4: Empty restores the default and relative/missing paths error, but a directory or unreadable file at dist/main.js passes validation and clears the error (F-1).\n- PASS AC-5: README documents the Settings location, dist/main.js mapping, immediate switching, preserved FACTORY_URL, and clearing to reset.\n- FAIL AC-TEST-1: Tests assert reported status only; no coverage that board/ticket/chat use the replacement client or that the old client is disposed (F-2).\n- PASS AC-UI-1: The native setting supplies the labeled field and description; the settings section renders configured/active paths and alerts. Not browser-verified.\n\n## Security / correctness\n\nNo new security vulnerability found in scope; running an operator-selected local checkout is the accepted design. Correctness changes requested for entry-point validation.\n\n## Design / maintainability\n\nOne runtime bundle with dynamically dereferenced RPC handlers and a version guard is direct and maintainable. Weaknesses: insufficient entry-point validation and tests that prove status rather than runtime behavior.",
+  "bodyDigest": "sha256:7d62f744ed484afbcd66b16e23f0f1bf9c890f455dab8d2756918d466a7807e8",
+  "findings": [
+    {
+      "id": "F-1",
+      "severity": "medium",
+      "category": "correctness",
+      "summary": "config.ts validates the entry point with existence only, so a directory or unreadable file at dist/main.js passes and server.ts then disposes the working client with no reported error."
+    },
+    {
+      "id": "F-2",
+      "severity": "medium",
+      "category": "tests",
+      "summary": "server.test.ts never calls board/ticket/chat after a switch and never asserts old-client disposal, so it can pass without a usable replacement connection."
+    }
+  ],
+  "digest": "sha256:b724dfc512fc4ebd7de26dd401ab0e37051ee695193f790b3ff453bb525951c6"
+}

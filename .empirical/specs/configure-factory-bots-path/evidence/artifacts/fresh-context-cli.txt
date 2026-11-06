@@ -1,0 +1,16 @@
+$ bb plugin config factory-bots
+factoryCheckoutPath = "/home/dyaus/Developer/projects/GoEmpirical/empirical-factory"  (string)
+  Factory checkout path — Absolute path to the Factory checkout containing dist/main.js. Changes apply immediately; leave empty to use the bundled factory.mcp.json default.
+
+$ bb plugin config factory-bots set factoryCheckoutPath /home/dyaus/Developer/projects/GoEmpirical/empirical-factory
+factoryCheckoutPath = "/home/dyaus/Developer/projects/GoEmpirical/empirical-factory"  (string)
+  Factory checkout path — Absolute path to the Factory checkout containing dist/main.js. Changes apply immediately; leave empty to use the bundled factory.mcp.json default.
+
+$ bb plugin list | grep factory-bots
+factory-bots@0.1.0  running
+  source: path:/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mi8q9vsicp-1/bb-plugins/plugins/factory-bots
+  handlers: 47282 calls / 8612.9s total / 148.5s max
+
+$ bb plugin config factory-bots unset factoryCheckoutPath
+factoryCheckoutPath = ""  (string)
+  Factory checkout path — Absolute path to the Factory checkout containing dist/main.js. Changes apply immediately; leave empty to use the bundled factory.mcp.json default.

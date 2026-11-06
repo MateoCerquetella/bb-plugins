@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 6,
+  "revision": 7,
   "activeFeature": "configure-factory-bots-path",
   "request": "Add a Factory Bots plugin setting that lets me change the software factory installation/path used by the plugin. Update configuration loading, UI, docs, tests, and verify saving and subsequent connection.",
   "profile": "complex",
   "workflow": "complex",
   "mode": "normal",
-  "phase": "review",
+  "phase": "verify",
   "status": "waiting",
   "repairAttempts": 0,
-  "message": "Added the factoryCheckoutPath BB plugin setting, validation and live runtime swap, a Settings connection-status section, README guidance, config tests, and a server test for switching, invalid-path retention, and reset.",
+  "message": "Independent fresh-context re-review of head 7d450073 approved all seven criteria with no open findings; readable-file validation and a behavioral switch test fixed both earlier findings.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:7285ab6cc8cf69ea10991cade1f1e6d92979fb29f32c9b58e13d2f7210cab3b5",
@@ -20,7 +20,9 @@
   "capabilityClaimId": "configure-factory-bots-path-68a0983248d6",
   "authorizationDigest": null,
   "evidence": [],
-  "evidenceReceiptIds": [],
+  "evidenceReceiptIds": [
+    "collected-91558ba40eb05d89a88ee797"
+  ],
   "legacyEvidenceCount": 0,
   "completion": {
     "implemented": true,
@@ -36,7 +38,7 @@
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-11-06T00:47:47.060Z",
+  "updatedAt": "2026-11-06T01:24:57.812Z",
   "capabilityBase": {
     "schemaVersion": 1,
     "id": "configure-factory-bots-path-68a0983248d6",

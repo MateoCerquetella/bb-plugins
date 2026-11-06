@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "packetDigest": "sha256:7b13cb9373b5d54d7535a7e9dafd55b2000eba5c60dc2b7ae56e53de90c19f3e",
+  "mode": "fresh-context",
+  "baseRef": "main",
+  "baseCommit": "4198b79f4639a35e127faa13144eb197367a1cf9",
+  "headCommit": "7d45007366869b0f8af9c8f26b3d932aa361171e",
+  "diffDigest": "sha256:84e27c83fd61e9574753d10ac0dbe0803972892ab5e7c5b6faadbe4055b69fcd",
+  "verdict": "APPROVED",
+  "reviewerActor": "bb-subthread-reviewer",
+  "reviewerInvocationId": "thr_k3w2pw48vn",
+  "reviewerLogin": null,
+  "body": "# Verdict: APPROVED\n\n- PASS AC-1: Carried forward; the delta does not change the labeled Factory checkout path setting.\n- PASS AC-2: Carried forward; checkout resolution and preservation of MCP args and FACTORY_URL are unchanged.\n- PASS AC-3: The integration test proves later getBoard requests use the selected checkout without a restart and observes the previous MCP child stopping.\n- PASS AC-4: Empty input restores the default connection; a missing checkout reports an actionable error while the working connection remains. Validation now requires a readable regular file (F-1 fixed).\n- PASS AC-5: Carried forward; README documentation is unchanged.\n- PASS AC-TEST-1: 18 config and server tests pass, covering resolution, preserved args/URL, default restore, invalid paths, replacement-client responses, and old-child disposal (F-2 fixed). Ticket and chat routing share the same runtime reference but are not separately exercised.\n- PASS AC-UI-1: Carried forward; field and description unchanged, no fresh browser verification.\n\n## Security / correctness\n\nNo blocking issue in the delta. F-1 is resolved by stat().isFile() plus access(R_OK) before replacement, and the behavioral test confirms replacement, retention after invalid input, default restore, and disposal.\n\n## Design / maintainability\n\nThe delta is small and uses standard filesystem validation. The checkout-identifying MCP fixture replaces status-only assertions with observable process behavior and adds no production abstraction.",
+  "bodyDigest": "sha256:39ef894177ef27b9b026c2b3ed5c169bb103c962076c18513e7e261fe27bc73d",
+  "findings": [],
+  "digest": "sha256:6234075218539869fea4c206b652a6e40784e1278bff744a4e6ace56f92f463b"
+}

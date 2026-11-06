@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-224cc4a299527c54e9352b0c",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-TEST-1",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Factory Bots typecheck, tests, and build covering the configurable checkout path.",
+  "passed": true,
+  "startedAt": "2026-11-06T01:26:26.752Z",
+  "completedAt": "2026-11-06T01:26:31.323Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "configure-factory-bots-path",
+    "specRevision": 2,
+    "specDigest": "sha256:7285ab6cc8cf69ea10991cade1f1e6d92979fb29f32c9b58e13d2f7210cab3b5",
+    "treeDigest": "sha256:d14423fe773a0187a4d19998f9b0f4f2be084e4ae3af56a48587698511f6e987",
+    "policyDigest": "sha256:7c99a8cec79fda73e2c43e7aba7bae418ba42821c7023b1503f06b5fa4c64fa4",
+    "workflowRevision": 7,
+    "gitCommit": "7d45007366869b0f8af9c8f26b3d932aa361171e",
+    "scope": [
+      "plugins/factory-bots"
+    ],
+    "scopeDigest": "sha256:297f66db7e2c752984e1ead9879f6aedb591e5d1fde96e327aa8b0eaa9543ae9",
+    "textTreeDigest": "sha256:d14423fe773a0187a4d19998f9b0f4f2be084e4ae3af56a48587698511f6e987"
+  },
+  "digest": "sha256:97bf4311f6ca9f3540384c0e115d34e971594af8858c2f86fa05a6a6266621dd",
+  "kind": "qa",
+  "matrixDigest": "sha256:aa3b9d044c0274a3c0fb433831706a51d45c3d8d431d7f5d0586cd315619f792",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22.23.1",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Factory Bots typecheck, tests, and build covering the configurable checkout path.",
+      "startedAt": "2026-11-06T01:26:26.752Z",
+      "completedAt": "2026-11-06T01:26:31.323Z",
+      "durationMs": 4571,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:3102e0660c5a28fb09072a92af73601c0704a8badb5519082e7545d1f876aa50",
+        "argv": [
+          "npm",
+          "run",
+          "check",
+          "--workspace",
+          "bb-plugin-factory-bots"
+        ],
+        "cwd": ".",
+        "timeoutMs": 300000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:59fadf59d9fcae7bd96e8fc08b3fbc651ff9072721aea2904ac5b0690f41c055",
+        "stderrDigest": "sha256:ba55acf89191f6191b7080f5249de21f4d4b372e625578a146d87e2c9c3cc981",
+        "stdoutTail": " duration_ms: 0.177593\n  type: 'test'\n  ...\n# Subtest: a ticket route keeps both ids\nok 67 - a ticket route keeps both ids\n  ---\n  duration_ms: 0.157778\n  type: 'test'\n  ...\n# Subtest: routes are encoded and decoded symmetrically\nok 68 - routes are encoded and decoded symmetrically\n  ---\n  duration_ms: 0.160533\n  type: 'test'\n  ...\n# Subtest: a malformed escape does not throw\nok 69 - a malformed escape does not throw\n  ---\n  duration_ms: 0.166433\n  type: 'test'\n  ...\n# Subtest: a missing ticket id falls back to the agent\nok 70 - a missing ticket id falls back to the agent\n  ---\n  duration_ms: 0.130328\n  type: 'test'\n  ...\n# Subtest: parses the capability route\nok 71 - parses the capability route\n  ---\n  duration_ms: 0.239226\n  type: 'test'\n  ...\n# Subtest: the Factory checkout setting switches the live connection, keeps it on an invalid path, and resets\nok 72 - the Factory checkout setting switches the live connection, keeps it on an invalid path, and resets\n  ---\n  duration_ms: 164.404681\n  type: 'test'\n  ...\n# Subtest: the board is built only from the five read-only tools\nok 73 - the board is built only from the five read-only tools\n  ---\n  duration_ms: 10.378433\n  type: 'test'\n  ...\n# Subtest: a failed ticket detail read fails the board instead of clearing blocked state\nok 74 - a failed ticket detail read fails the board instead of clearing blocked state\n  ---\n  duration_ms: 1.34941\n  type: 'test'\n  ...\n# Subtest: a first ticket-detail failure is retried once\nok 75 - a first ticket-detail failure is retried once\n  ---\n  duration_ms: 1.122557\n  type: 'test'\n  ...\n# Subtest: fetch failed is a normal not-running board with the start command\nok 76 - fetch failed is a normal not-running board with the start command\n  ---\n  duration_ms: 0.2361\n  type: 'test'\n  ...\n# Subtest: a thrown fetch error is also classified as not-running\nok 77 - a thrown fetch error is also classified as not-running\n  ---\n  duration_ms: 0.458907\n  type: 'test'\n  ...\n# Subtest: non-JSON and wrong shapes become bounded unavailable states\nok 78 - non-JSON and wrong shapes become bounded unavailable states\n  ---\n  duration_ms: 1.050926\n  type: 'test'\n  ...\n# Subtest: no tickets keeps the three supported agents visible and idle\nok 79 - no tickets keeps the three supported agents visible and idle\n  ---\n  duration_ms: 0.715234\n  type: 'test'\n  ...\n# Subtest: a missing config reports unavailable instead of crashing\nok 80 - a missing config reports unavailable instead of crashing\n  ---\n  duration_ms: 0.203351\n  type: 'test'\n  ...\n# Subtest: the transcript is refetched only after a stage or conversation change\nok 81 - the transcript is refetched only after a stage or conversation change\n  ---\n  duration_ms: 2.010075\n  type: 'test'\n  ...\n# Subtest: a ticket still renders when its transcript alone fails\nok 82 - a ticket still renders when its transcript alone fails\n  ---\n  duration_ms: 0.553569\n  type: 'test'\n  ...\n# Subtest: sends a message to the Orchestrator through factory_message\nok 83 - sends a message to the Orchestrator through factory_message\n  ---\n  duration_ms: 0.537751\n  type: 'test'\n  ...\n# Subtest: sends the selected provider, model, and reasoning with the message\nok 84 - sends the selected provider, model, and reasoning with the message\n  ---\n  duration_ms: 0.24112\n  type: 'test'\n  ...\n# Subtest: an MCP without factory_message is an actionable unavailable state\nok 85 - an MCP without factory_message is an actionable unavailable state\n  ---\n  duration_ms: 0.154712\n  type: 'test'\n  ...\n# Subtest: a ticket read while the factory is down is not-running\nok 86 - a ticket read while the factory is down is not-running\n  ---\n  duration_ms: 0.113728\n  type: 'test'\n  ...\n# Subtest: pins the Factory bot order\nok 87 - pins the Factory bot order\n  ---\n  duration_ms: 1.061105\n  type: 'test'\n  ...\n# Subtest: parses souls and audit payloads\nok 88 - parses souls and audit payloads\n  ---\n  duration_ms: 2.146473\n  type: 'test'\n  ...\n# Subtest: accepts status without a tool map and preserves optional tool maps\nok 89 - accepts status without a tool map and preserves optional tool maps\n  ---\n  duration_ms: 0.940114\n  type: 'test'\n  ...\n# Subtest: requires a bot, non-empty soul, and trimmed author for a save\nok 90 - requires a bot, non-empty soul, and trimmed author for a save\n  ---\n  duration_ms: 0.88269\n  type: 'test'\n  ...\n# Subtest: a successful save result needs a digest\nok 91 - a successful save result needs a digest\n  ---\n  duration_ms: 0.857473\n  type: 'test'\n  ...\n# Subtest: has exactly the four allowed Factory MCP tools\nok 92 - has exactly the four allowed Factory MCP tools\n  ---\n  duration_ms: 1.106238\n  type: 'test'\n  ...\n# Subtest: reads souls through factory_souls only\nok 93 - reads souls through factory_souls only\n  ---\n  duration_ms: 1.588827\n  type: 'test'\n  ...\n# Subtest: returns no tools when factory_status does not report them\nok 94 - returns no tools when factory_status does not report them\n  ---\n  duration_ms: 0.993782\n  type: 'test'\n  ...\n# Subtest: reads optional tool maps from factory_status\nok 95 - reads optional tool maps from factory_status\n  ---\n  duration_ms: 1.211749\n  type: 'test'\n  ...\n# Subtest: derives tools only from a reported bots object\nok 96 - derives tools only from a reported bots object\n  ---\n  duration_ms: 0.248673\n  type: 'test'\n  ...\n# Subtest: saves the full soul with a trimmed author and returns the receipt\nok 97 - saves the full soul with a trimmed author and returns the receipt\n  ---\n  duration_ms: 0.713802\n  type: 'test'\n  ...\n# Subtest: rejects an empty author without calling the MCP\nok 98 - rejects an empty author without calling the MCP\n  ---\n  duration_ms: 0.784972\n  type: 'test'\n  ...\n# Subtest: does not retry a failed write and keeps the exact error\nok 99 - does not retry a failed write and keeps the exact error\n  ---\n  duration_ms: 0.324291\n  type: 'test'\n  ...\n# Subtest: reports a factory as not running and carries the start command\nok 100 - reports a factory as not running and carries the start command\n  ---\n  duration_ms: 0.347474\n  type: 'test'\n  ...\n# Subtest: reads the audit trail\nok 101 - reads the audit trail\n  ---\n  duration_ms: 0.918175\n  type: 'test'\n  ...\n# Subtest: returns an explicit shape failure for malformed souls\nok 102 - returns an explicit shape failure for malformed souls\n  ---\n  duration_ms: 0.66309\n  type: 'test'\n  ...\n# Subtest: summarizes the first non-heading prose line\nok 103 - summarizes the first non-heading prose line\n  ---\n  duration_ms: 1.020741\n  type: 'test'\n  ...\n# Subtest: falls back when a soul has no prose\nok 104 - falls back when a soul has no prose\n  ---\n  duration_ms: 0.163849\n  type: 'test'\n  ...\n# Subtest: calculates the exact character delta\nok 105 - calculates the exact character delta\n  ---\n  duration_ms: 0.107476\n  type: 'test'\n  ...\n# Subtest: diffs additions, removals, and unchanged lines\nok 106 - diffs additions, removals, and unchanged lines\n  ---\n  duration_ms: 1.106066\n  type: 'test'\n  ...\n# Subtest: selects the newest audit entry for the selected bot\nok 107 - selects the newest audit entry for the selected bot\n  ---\n  duration_ms: 0.192942\n  type: 'test'\n  ...\n# Subtest: accepts the factory's single trailing newline normalization\nok 108 - accepts the factory's single trailing newline normalization\n  ---\n  duration_ms: 0.121311\n  type: 'test'\n  ...\n# Subtest: orders returned souls and reports missing bots without inventing them\nok 109 - orders returned souls and reports missing bots without inventing them\n  ---\n  duration_ms: 0.241019\n  type: 'test'\n  ...\n# Subtest: verifies a read-back soul and attaches the newest audit row\nok 110 - verifies a read-back soul and attaches the newest audit row\n  ---\n  duration_ms: 0.185148\n  type: 'test'\n  ...\n# Subtest: reads a tool list only for the selected bot\nok 111 - reads a tool list only for the selected bot\n  ---\n  duration_ms: 0.33447\n  type: 'test'\n  ...\n1..111\n# tests 111\n# suites 0\n# pass 111\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 1459.747242\n\n> bb-plugin-factory-bots@0.1.0 build\n> env -u BB_CLI bb plugin build .\n\ndist/server.js\ndist/server.js.map\ndist/server.meta.json\ndist/app.js\ndist/app.css\ndist/app.meta.json\n",
+        "stderrTail": "This plugin pins @get-bb/plugin-sdk 0.4.29; this bb's SDK is 0.4.21 — `bb plugin types` updates the pin.\n",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:d14423fe773a0187a4d19998f9b0f4f2be084e4ae3af56a48587698511f6e987",
+      "sourceTreeAfter": "sha256:d14423fe773a0187a4d19998f9b0f4f2be084e4ae3af56a48587698511f6e987",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}
