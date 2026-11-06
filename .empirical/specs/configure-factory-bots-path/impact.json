@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "factory-bots-configurable-checkout"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:f9f8fc88d7520ab56c76f7f791ae002b6c84147a8d677d7945cd1e742a058ef4"
+}

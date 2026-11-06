@@ -1,0 +1,418 @@
+/* Hallmark · checked: 2026-11-03 · genre: modern-minimal (inferred) · app screen · built: the project */
+
+.cap-root {
+  display: flex;
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--foreground);
+}
+
+.cap-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.cap-header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.cap-header p {
+  max-width: 58ch;
+  margin: 8px 0 0;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.cap-actions {
+  display: flex;
+  flex-wrap: wrap;
+  flex: none;
+  gap: 8px;
+}
+
+.cap-button {
+  min-height: 30px;
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--foreground);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cap-button:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--primary) 42%, var(--border));
+  background: color-mix(in srgb, var(--primary) 6%, var(--card));
+}
+
+.cap-button:focus-visible,
+.cap-switch:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.cap-button:active:not(:disabled),
+.cap-switch:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.cap-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+.cap-button--primary {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.cap-button--primary:hover:not(:disabled) {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 88%, var(--foreground));
+}
+
+.cap-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  color: var(--muted-foreground);
+  font-size: 11px;
+}
+
+.cap-summary strong {
+  color: var(--foreground);
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cap-summary .cap-muted {
+  margin-left: auto;
+}
+
+.cap-muted {
+  color: var(--muted-foreground);
+}
+
+.cap-list-wrap {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+}
+
+.cap-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cap-row {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.cap-row:last-child {
+  border-bottom: 0;
+}
+
+.cap-row--off {
+  background: color-mix(in srgb, var(--foreground) 2%, transparent);
+}
+
+.cap-avatar {
+  display: block;
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--background);
+}
+
+.cap-avatar .fb-orb {
+  display: block;
+  width: 40px;
+  height: 40px;
+}
+
+.cap-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cap-name-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.cap-name-row strong {
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.cap-state {
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--muted-foreground);
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.cap-state.is-on {
+  border-color: color-mix(in srgb, var(--fb-working) 42%, var(--border));
+  color: var(--fb-working);
+}
+
+.cap-role {
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-size: 10.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cap-switch {
+  position: relative;
+  width: 38px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--foreground) 12%, var(--background));
+  cursor: pointer;
+}
+
+.cap-switch span {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--card);
+  box-shadow: 0 1px 2px var(--fb-shadow-dood);
+  transition: transform 120ms ease;
+}
+
+.cap-switch[aria-checked="true"] {
+  border-color: var(--primary);
+  background: var(--primary);
+}
+
+.cap-switch[aria-checked="true"] span {
+  transform: translateX(16px);
+}
+
+.cap-switch:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.cap-confirm {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--fb-pending) 48%, var(--border));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--fb-pending) 5%, var(--card));
+}
+
+.cap-confirm h2 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.cap-confirm p {
+  max-width: 62ch;
+  margin: 4px 0 0;
+  color: var(--foreground);
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+.cap-confirm .cap-muted {
+  font-size: 10.5px;
+}
+
+.cap-confirm-actions {
+  display: flex;
+  flex: none;
+  gap: 8px;
+}
+
+.cap-notice {
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid color-mix(in srgb, var(--fb-working) 36%, var(--border));
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--fb-working) 5%, var(--card));
+  color: var(--foreground);
+  font-size: 11px;
+}
+
+.cap-failure {
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--fb-blocked) 36%, var(--border));
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--fb-blocked) 4%, var(--card));
+}
+
+.cap-failure strong {
+  font-size: 12px;
+}
+
+.cap-failure p {
+  margin: 4px 0 8px;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.cap-command {
+  margin: 0 0 8px;
+  padding: 8px;
+  overflow-x: auto;
+  border-radius: 5px;
+  background: var(--background);
+  font-size: 10px;
+}
+
+.cap-audit-wrap {
+  padding-top: 4px;
+}
+
+.cap-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.cap-section-head h2 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.cap-section-head span {
+  color: var(--muted-foreground);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cap-audit {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--card);
+  list-style: none;
+}
+
+.cap-audit li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 10.5px;
+}
+
+.cap-audit li:last-child {
+  border-bottom: 0;
+}
+
+.cap-audit-main {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.cap-audit-main strong {
+  font-size: 11px;
+}
+
+.cap-audit-main span,
+.cap-audit-meta {
+  color: var(--muted-foreground);
+}
+
+.cap-audit-meta {
+  display: flex;
+  flex: none;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 620px) {
+  .cap-header,
+  .cap-confirm {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cap-header {
+    gap: 12px;
+  }
+
+  .cap-actions {
+    justify-content: flex-start;
+  }
+
+  .cap-summary .cap-muted {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .cap-confirm-actions {
+    justify-content: flex-start;
+  }
+
+  .cap-audit li {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cap-switch span {
+    transition: none;
+  }
+}

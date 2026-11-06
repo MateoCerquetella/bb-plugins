@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "workflow": "fast",
+  "classification": "behavioral",
+  "request": "Bring the Factory Bots plugin into this bb-plugins checkout from refs/remotes/origin/create-factory-bots-dashboard-plugin-thr_9x565sqvfq, remove Lens, Warden, Audit, and Lookback from the plugin roster and all required UI/order/types/tests/docs references, register it as an installable plugin, then build/test and install it locally in BB.",
+  "capabilities": [],
+  "surfaces": [
+    "request-scoped-implementation"
+  ],
+  "canonical": false,
+  "verification": "skipped",
+  "digest": "sha256:c82aaf473a8ea806314a6a49a9351af52d27257955f1755d7c00888d7d671523"
+}

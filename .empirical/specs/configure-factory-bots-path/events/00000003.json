@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "sequence": 3,
+  "previousDigest": "sha256:a71114c9e49c9e5df590ff792f07d47d1e991a086c6df909781ef0c95935d3a7",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Size: keep as one (One localized setting changes one runtime connection; splitting UI, config, and connection lifecycle would make the feature incomplete at every intermediate step.)",
+  "createdAt": "2026-11-06T00:39:05.955Z",
+  "stateBeforeDigest": "sha256:417ed91c5603e536658b55442301f1ab078709743aa1ab33f087bf79e955c88d",
+  "stateAfterDigest": "sha256:c38b540e976ab2e5c2bfcf07b5ec47741a0068fff5e3ce271279e1464748abad",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 3,
+    "activeFeature": "configure-factory-bots-path",
+    "request": "Add a Factory Bots plugin setting that lets me change the software factory installation/path used by the plugin. Update configuration loading, UI, docs, tests, and verify saving and subsequent connection.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "design",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Specified a BB Settings field for an absolute Factory checkout path, live MCP reconnection on change, preservation of the configured URL, invalid-path handling, and restoring the bundled default.",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:7285ab6cc8cf69ea10991cade1f1e6d92979fb29f32c9b58e13d2f7210cab3b5",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:50a42c34b380aeada26b047aebbbd5edefd9ef8509458f39eca69cc10fb49e4a",
+    "impactDigest": "sha256:f9f8fc88d7520ab56c76f7f791ae002b6c84147a8d677d7945cd1e742a058ef4",
+    "capabilityClaimId": "configure-factory-bots-path-68a0983248d6",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-11-06T00:39:05.955Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "configure-factory-bots-path-68a0983248d6",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "configure-factory-bots-path",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mi8q9vsicp-1/bb-plugins",
+      "worktreeId": "sha256:ae7e14f799ec1ae75aa367c93bb0178b1cb3ef4fa30825dc04886fbcaff0b568",
+      "baseCommit": "730da2638a8b8b4b72be315d42f2a784dac4d7ea",
+      "baseTree": "402772b2edb63a7e894c7e2fe0f5bb2d46c7bed0",
+      "bases": {
+        "factory-bots-configurable-checkout": {
+          "capability": "factory-bots-configurable-checkout",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "configure a factory checkout": null
+          }
+        }
+      },
+      "capabilities": [
+        "factory-bots-configurable-checkout"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-11-06T00:38:00.533Z",
+      "heartbeatAt": "2026-11-06T00:38:00.533Z",
+      "digest": "sha256:bafeb7f8a6348a998548c309e89390ff45fdd5f41c1e50f7330def6fa1ef23cb"
+    },
+    "reviewFirst": true,
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 7,
+      "capabilities": 1,
+      "reason": "One localized setting changes one runtime connection; splitting UI, config, and connection lifecycle would make the feature incomplete at every intermediate step.",
+      "actor": "agent",
+      "revision": 2
+    }
+  },
+  "digest": "sha256:06c46f07f305d27f296459e411667b1740a8802f51e12b01b9db0104f968d1d4"
+}

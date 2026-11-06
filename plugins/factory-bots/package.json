@@ -1,0 +1,80 @@
+{
+  "name": "bb-plugin-factory-bots",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Observe an Empirical Factory's agents, tickets, and live transcripts from BB through the read-only Factory MCP.",
+  "license": "MIT",
+  "author": "Mateo Cerquetella",
+  "homepage": "https://github.com/MateoCerquetella/bb-plugins/tree/main/plugins/factory-bots#readme",
+  "bugs": {
+    "url": "https://github.com/MateoCerquetella/bb-plugins/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MateoCerquetella/bb-plugins.git",
+    "directory": "plugins/factory-bots"
+  },
+  "keywords": [
+    "bb",
+    "bb-plugin",
+    "factory-bots",
+    "empirical-factory",
+    "agents",
+    "observability"
+  ],
+  "type": "module",
+  "engines": {
+    "bb": ">=0.40",
+    "bbPluginSdk": ">=0.4.29"
+  },
+  "bb": {
+    "name": "Factory Bots",
+    "description": "A live, read-only board of Empirical Factory agents, tickets, and transcripts.",
+    "branding": {
+      "icon": "./assets/icon.svg"
+    },
+    "server": "./server.ts",
+    "app": "./app.tsx",
+    "skills": []
+  },
+  "files": [
+    "dist/server.js",
+    "dist/server.meta.json",
+    "dist/app.js",
+    "dist/app.meta.json",
+    "dist/app.css",
+    "assets/",
+    "vendor/",
+    "factory.mcp.json",
+    "README.md",
+    "LICENSE",
+    "server.ts",
+    "app.tsx",
+    "app.css",
+    "souls.css",
+    "contract.ts",
+    "lib/",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "dependencies": {
+    "three": "0.128.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@get-bb/plugin-sdk": "0.4.29",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tsx": "^4.23.12",
+    "typescript": "^7.0.0"
+  },
+  "scripts": {
+    "build": "env -u BB_CLI bb plugin build .",
+    "dev": "bb plugin dev .",
+    "typecheck": "tsc --noEmit",
+    "types:check": "env -u BB_CLI bb plugin types --check .",
+    "types:refresh": "env -u BB_CLI bb plugin types .",
+    "test": "node --import tsx --test test/*.test.ts",
+    "check": "npm run typecheck && npm test && npm run build"
+  }
+}
