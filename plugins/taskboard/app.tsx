@@ -20,21 +20,24 @@ import {
 import {
   Markdown,
   definePluginApp,
+  experimental_useAppPanel,
   useBbContext,
   useBbNavigate,
   useComposer,
-  useComposerView,
   useRealtime,
   useRealtimeConnectionState,
   useRpc,
   useSettings,
+  type ExperimentalThreadTabProps,
   type PluginNavPanelProps,
   type PluginNewThreadPanelProps,
   type PluginPendingInteractionProps,
-  type PluginComposerMention,
-  type PluginThreadHeaderActionProps,
-  type PluginThreadPanelProps
+  type PluginComposerMention
 } from '@get-bb/plugin-sdk/app';
+import {
+  registerThreadHeaderAction,
+  type ThreadHeaderActionProps
+} from './lib/thread-header-action.js';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -1614,7 +1617,6 @@ function DirectCreateIssueAction({
 }
 
 function ComposerCreateIssueAction() {
-  const view = useComposerView();
   const composer = useComposer();
   const { projectId: contextProjectId } = useBbContext();
   const [capturedPrompt, setCapturedPrompt] = useState<string | null>(null);
@@ -1622,12 +1624,12 @@ function ComposerCreateIssueAction() {
   const [attachmentWarning, setAttachmentWarning] = useState<string | undefined>();
   const [capturing, setCapturing] = useState(false);
   const projectId =
-    view.scope.kind === 'new-thread'
-      ? (view.scope.projectId ?? contextProjectId)
+    composer.scope.kind === 'new-thread'
+      ? (composer.scope.projectId ?? contextProjectId)
       : contextProjectId;
   const currentProjectRef = useRef(projectId);
   currentProjectRef.current = projectId;
-  const hasPrompt = view.draft.text.trim().length > 0 || view.draft.attachmentCount > 0;
+  const hasPrompt = composer.text.trim().length > 0 || composer.attachmentCount > 0;
   const guidance = !projectId
     ? 'Choose a project to create an issue'
     : !hasPrompt
@@ -1647,7 +1649,7 @@ function ComposerCreateIssueAction() {
                 className="size-7 bg-transparent text-foreground hover:bg-state-hover"
                 aria-label="Create Taskboard issue"
                 data-taskboard-create-button
-                disabled={!projectId || !hasPrompt || view.run.isSubmitting || capturing}
+                disabled={!projectId || !hasPrompt || composer.isSubmitting || capturing}
                 onMouseDown={event => event.preventDefault()}
                 onClick={async () => {
                   if (!projectId) {
@@ -1661,15 +1663,15 @@ function ComposerCreateIssueAction() {
                     composer.focus();
                     return;
                   }
-                  const prompt = view.draft.text;
+                  const prompt = composer.text;
                   setCapturing(true);
                   setCapturedImages([]); setAttachmentWarning(undefined);
                   try {
                     const captured = await clipboardTicketImages();
                     setCapturedImages(captured);
-                    if (view.draft.attachmentCount > captured.length) setAttachmentWarning('BB cannot expose existing composer attachments here. Paste any missing images into this ticket.');
+                    if (composer.attachmentCount > captured.length) setAttachmentWarning('BB cannot expose existing composer attachments here. Paste any missing images into this ticket.');
                   } catch {
-                    if (view.draft.attachmentCount > 0) setAttachmentWarning('Could not read clipboard images. Paste the composer images into this ticket.');
+                    if (composer.attachmentCount > 0) setAttachmentWarning('Could not read clipboard images. Paste the composer images into this ticket.');
                   } finally {
                     if (currentProjectRef.current === projectId) setCapturedPrompt(prompt);
                     setCapturing(false);
@@ -1694,7 +1696,7 @@ function ComposerCreateIssueAction() {
             initialImages={capturedImages}
             attachmentWarning={attachmentWarning}
             onCreated={result => {
-              composer.insertMention(result.mention);
+              composer.insert(result.mention);
               composer.focus();
             }}
           />
@@ -7661,7 +7663,7 @@ function TaskboardRightPanel({
         return;
       }
       setComposerAnnouncement(`Added ${safeMention.label} to chat`);
-      composer.insertMention(safeMention);
+      composer.insert(safeMention);
       composer.focus();
       toast.success(`Added ${safeMention.label} to chat`);
     },
@@ -7888,7 +7890,7 @@ function TaskboardRightPanel({
   );
 }
 
-function TaskboardThreadPanel({ threadId }: PluginThreadPanelProps) {
+function TaskboardThreadPanel({ threadId }: ExperimentalThreadTabProps) {
   const rpc = useRpc<TaskboardRpcContract>();
   const { projectId: contextProjectId, threadId: contextThreadId } =
     useBbContext();
@@ -7925,14 +7927,18 @@ function TaskboardNewThreadPanel({ projectId }: PluginNewThreadPanelProps) {
 
 function TaskboardThreadHeaderAction({
   threadId
-}: PluginThreadHeaderActionProps) {
+}: ThreadHeaderActionProps) {
   const { values } = useSettings();
-  const { openThreadPanel } = useBbNavigate();
+  const panel = experimental_useAppPanel();
   const autoOpenedThreadRef = useRef<string | null>(null);
   const openTaskboard = useCallback(
     (showError: boolean) => {
-      const opened = openThreadPanel({
-        actionId: THREAD_PANEL_ACTION_ID,
+      const opened = panel.openTab({
+        tab: {
+          id: THREAD_PANEL_ACTION_ID,
+          context: { kind: 'thread' },
+          availability: 'action'
+        },
         title: 'Taskboard'
       });
       if (!opened && showError) {
@@ -7940,7 +7946,7 @@ function TaskboardThreadHeaderAction({
       }
       return opened;
     },
-    [openThreadPanel]
+    [panel]
   );
 
   useEffect(() => {
@@ -8267,7 +8273,7 @@ function TaskboardSettingsInfo() {
 export default definePluginApp(app => {
   registerPreparationApp(app);
   app.slots.messageDirective({ id: 'taskboard-result', component: TaskboardResultDirective });
-  app.slots.experimental_threadHeaderAction({
+  registerThreadHeaderAction(app, {
     id: 'taskboard-live-progress',
     title: 'Task progress',
     component: FactoryThreadProgress
@@ -8279,12 +8285,14 @@ export default definePluginApp(app => {
       { id: 'create-issue', component: ComposerCreateIssueAction }
     ]
   });
-  app.slots.threadPanelAction({
+  app.slots.experimental_tab({
     id: THREAD_PANEL_ACTION_ID,
     title: 'Taskboard',
     icon: 'Target',
     component: TaskboardThreadPanel,
-    layout: 'flush'
+    layout: 'flush',
+    context: { kind: 'thread' },
+    availability: 'action'
   });
   app.slots.experimental_newThreadPanelAction({
     id: 'taskboard-new-thread-panel',
@@ -8293,7 +8301,7 @@ export default definePluginApp(app => {
     component: TaskboardNewThreadPanel,
     layout: 'flush'
   });
-  app.slots.experimental_threadHeaderAction({
+  registerThreadHeaderAction(app, {
     id: 'open-taskboard-panel',
     title: 'Taskboard',
     component: TaskboardThreadHeaderAction

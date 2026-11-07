@@ -1,21 +1,32 @@
-import { preparationRequestGate } from './request-gate.js';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  experimental_useAppPanel,
+  experimental_useRpcQuery,
   useBbContext,
   useBbNavigate,
   useComposer,
-  useComposerView,
   useRpc,
+  type ExperimentalThreadTabProps,
   type PluginAppBuilder,
-  type PluginNewThreadPanelProps,
-  type PluginThreadPanelProps,
-  type PluginThreadHeaderActionProps
+  type PluginNewThreadPanelProps
 } from '@get-bb/plugin-sdk/app';
+import {
+  registerThreadHeaderAction,
+  type ThreadHeaderActionProps
+} from '../lib/thread-header-action.js';
 import { preparationRpc, sandboxHtml, type Preparation } from './contract.js';
 import { taskboardRpcContract, type WorkItem } from '../contract.js';
 import { Button } from '../components/ui/button.js';
 import './style.css';
 const actionId = 'prepare-work';
+const prepareTab = {
+  tab: {
+    id: actionId,
+    context: { kind: 'thread' as const },
+    availability: 'action' as const
+  },
+  title: 'Prepare work'
+};
 const errorText = (e: unknown) => (e instanceof Error ? e.message : String(e));
 function download(name: string, content: string, type: string) {
   const url = URL.createObjectURL(new Blob([content], { type }));
@@ -25,65 +36,34 @@ function download(name: string, content: string, type: string) {
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+function newest(current: Preparation | null, next: Preparation | null) {
+  if (!current) return next;
+  if (!next) return current;
+  return current.brief.revision > next.brief.revision ||
+    current.updatedAt > next.updatedAt
+    ? current
+    : next;
+}
 function usePreparation(id: string | null, projectId: string | null) {
-  const rpc = useRpc<typeof preparationRpc>();
-  const [value, setValue] = useState<Preparation | null>(null);
-  const [error, setError] = useState('');
-  const gate = useRef(preparationRequestGate());
+  const query = experimental_useRpcQuery({
+    contract: preparationRpc,
+    method: 'prepareGet',
+    input: { id: id ?? '', projectId: projectId ?? '' },
+    enabled: Boolean(id && projectId)
+  });
+  const [local, setLocal] = useState<Preparation | null>(null);
   const setP = useCallback(
     (next: Preparation) => {
       if (next.id !== id || next.projectId !== projectId) return;
-      gate.current.invalidate(); // In-flight reads must not undo this mutation.
-      setValue((current) =>
-        current?.id === next.id &&
-        (current.brief.revision > next.brief.revision ||
-          current.updatedAt > next.updatedAt)
-          ? current
-          : next
-      );
+      setLocal((current) => newest(current, next));
     },
     [id, projectId]
   );
-  useEffect(() => {
-    let alive = true;
-    let loading = false;
-    setValue(null);
-    setError('');
-    gate.current.invalidate();
-    const refresh = async () => {
-      if (!id || !projectId || loading) return;
-      loading = true;
-      const accept = gate.current.begin({ id, projectId });
-      try {
-        const next = await rpc.call('prepareGet', { id, projectId });
-        if (alive && accept(next)) {
-          setValue((current) =>
-            current?.id === next.id &&
-            (current.brief.revision > next.brief.revision ||
-              current.updatedAt > next.updatedAt)
-              ? current
-              : next
-          );
-          setError('');
-        }
-      } catch (e) {
-        if (alive && accept()) setError(errorText(e));
-      } finally {
-        loading = false;
-      }
-    };
-    void refresh();
-    const timer = setInterval(() => void refresh(), 2500);
-    return () => {
-      alive = false;
-      gate.current.invalidate();
-      clearInterval(timer);
-    };
-  }, [rpc, id, projectId]);
-  // Never render an editor unless its displayed document matches mutation scope,
-  // even during the render before an effect cleanup has run.
-  const p = value?.id === id && value?.projectId === projectId ? value : null;
-  return { p, setP, error };
+  const inScope = (value: Preparation | null | undefined) =>
+    value?.id === id && value?.projectId === projectId ? value : null;
+  // Never render an editor unless its displayed document matches mutation scope.
+  const p = newest(inScope(local), inScope(query.data));
+  return { p, setP, error: query.error?.message ?? '' };
 }
 function ArmPreparation({
   onCreated
@@ -92,11 +72,10 @@ function ArmPreparation({
 }) {
   const rpc = useRpc<typeof preparationRpc>();
   const composer = useComposer();
-  const view = useComposerView();
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState('');
   const projectId =
-    view.scope.kind === 'new-thread' ? view.scope.projectId : null;
+    composer.scope.kind === 'new-thread' ? composer.scope.projectId : null;
   const arm = async () => {
     if (!projectId || !composer.text.trim() || busy) return;
     setBusy(true);
@@ -105,7 +84,7 @@ function ArmPreparation({
         projectId,
         request: composer.text.trim()
       });
-      composer.insertMention({
+      composer.insert({
         provider: 'preparation',
         id: p.id,
         label: 'Prepare work'
@@ -119,14 +98,14 @@ function ArmPreparation({
       setBusy(false);
     }
   };
-  if (view.scope.kind !== 'new-thread') return null;
+  if (composer.scope.kind !== 'new-thread') return null;
   return (
     <span className="prep-arm">
       <Button
         type="button"
         size="sm"
         variant="outline"
-        disabled={busy || !projectId || view.draft.isEmpty}
+        disabled={busy || !projectId || composer.isEmpty}
         onClick={() => void arm()}
       >
         {busy ? 'Attaching…' : 'Prepare work'}
@@ -143,42 +122,16 @@ function PrepareNew(props: PluginNewThreadPanelProps) {
   return <PrepareNewBody key={props.projectId ?? 'no-project'} {...props} />;
 }
 function PrepareNewBody({ projectId }: PluginNewThreadPanelProps) {
-  const rpc = useRpc<typeof preparationRpc>();
   const navigate = useBbNavigate();
-  const [list, setList] = useState<
-    {
-      id: string;
-      title: string;
-      threadId: string | null;
-      ready: boolean;
-      updatedAt: string;
-    }[]
-  >([]);
+  const listQuery = experimental_useRpcQuery({
+    contract: preparationRpc,
+    method: 'prepareList',
+    input: { projectId: projectId ?? '' },
+    enabled: Boolean(projectId)
+  });
+  const list = (projectId && listQuery.data) || [];
+  const error = listQuery.error?.message ?? '';
   const [selected, setSelected] = useState<string | null>(null);
-  const [error, setError] = useState('');
-  useEffect(() => {
-    setSelected(null);
-    if (!projectId) {
-      setList([]);
-      return;
-    }
-    let alive = true;
-    const refresh = () =>
-      rpc
-        .call('prepareList', { projectId })
-        .then((v) => {
-          if (alive) setList(v);
-        })
-        .catch((e) => {
-          if (alive) setError(errorText(e));
-        });
-    void refresh();
-    const t = setInterval(() => void refresh(), 3000);
-    return () => {
-      alive = false;
-      clearInterval(t);
-    };
-  }, [rpc, projectId]);
   return (
     <div className="prep" data-testid="prepare-new">
       <header>
@@ -247,28 +200,14 @@ function PrepareNewBody({ projectId }: PluginNewThreadPanelProps) {
     </div>
   );
 }
-function PrepareThread({ threadId }: PluginThreadPanelProps) {
-  const rpc = useRpc<typeof preparationRpc>();
-  const [p, setP] = useState<Preparation | null>(null);
-  const [error, setError] = useState('');
-  useEffect(() => {
-    let alive = true;
-    const refresh = () =>
-      rpc
-        .call('prepareForThread', { threadId })
-        .then((v) => {
-          if (alive) setP(v);
-        })
-        .catch((e) => {
-          if (alive) setError(errorText(e));
-        });
-    void refresh();
-    const t = setInterval(() => void refresh(), 2500);
-    return () => {
-      alive = false;
-      clearInterval(t);
-    };
-  }, [threadId, rpc]);
+function PrepareThread({ threadId }: ExperimentalThreadTabProps) {
+  const query = experimental_useRpcQuery({
+    contract: preparationRpc,
+    method: 'prepareForThread',
+    input: { threadId }
+  });
+  const p = query.data ?? null;
+  const error = query.error?.message ?? '';
   return p?.threadId === threadId ? (
     <PreparationWorkspace
       key={`${p.projectId}:${p.id}`}
@@ -285,38 +224,25 @@ function PrepareThread({ threadId }: PluginThreadPanelProps) {
     </div>
   );
 }
-function PrepareHeader({ threadId }: PluginThreadHeaderActionProps) {
-  const rpc = useRpc<typeof preparationRpc>();
-  const nav = useBbNavigate();
+function PrepareHeader({ threadId }: ThreadHeaderActionProps) {
+  const panel = experimental_useAppPanel();
   const opened = useRef<string | null>(null);
-  const [visible, setVisible] = useState(false);
+  const query = experimental_useRpcQuery({
+    contract: preparationRpc,
+    method: 'prepareForThread',
+    input: { threadId }
+  });
+  const visible = Boolean(query.data);
   useEffect(() => {
-    let alive = true;
-    const check = () =>
-      rpc
-        .call('prepareForThread', { threadId })
-        .then((p) => {
-          if (!alive) return;
-          setVisible(Boolean(p));
-          if (p && opened.current !== threadId) {
-            if (nav.openThreadPanel({ actionId, title: 'Prepare work' }))
-              opened.current = threadId;
-          }
-        })
-        .catch(() => {});
-    void check();
-    const t = setInterval(() => void check(), 3000);
-    return () => {
-      alive = false;
-      clearInterval(t);
-    };
-  }, [rpc, nav, threadId]);
+    if (!visible || opened.current === threadId) return;
+    if (panel.openTab(prepareTab)) opened.current = threadId;
+  }, [panel, threadId, visible]);
   return visible ? (
     <Button
       type="button"
       variant="ghost"
       size="sm"
-      onClick={() => nav.openThreadPanel({ actionId, title: 'Prepare work' })}
+      onClick={() => panel.openTab(prepareTab)}
     >
       Prepare work
     </Button>
@@ -1068,14 +994,16 @@ export function registerPreparationApp(app: PluginAppBuilder) {
     component: PrepareNew,
     layout: 'flush'
   });
-  app.slots.threadPanelAction({
+  app.slots.experimental_tab({
     id: actionId,
     title: 'Prepare work',
     icon: 'Target',
     component: PrepareThread,
-    layout: 'flush'
+    layout: 'flush',
+    context: { kind: 'thread' },
+    availability: 'action'
   });
-  app.slots.experimental_threadHeaderAction({
+  registerThreadHeaderAction(app, {
     id: 'prepare-work-header',
     title: 'Prepare work',
     component: PrepareHeader
