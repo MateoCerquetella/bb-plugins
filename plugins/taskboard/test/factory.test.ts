@@ -1115,17 +1115,24 @@ test('diff resolves only a recorded path in the linked project workspace', async
   const sdk = {
     threads: { get: async () => ({ projectId: item.bbProjectId, environmentId: 'env_test' }) },
     environments: {
-      get: async () => ({ projectId: item.bbProjectId, path: '/repo', mergeBaseBranch: 'main' }),
-      diffPatch: async (input: unknown) => {
-        requests.push(input);
-        return { outcome: 'available', patches: [{ path: 'src/index.ts', patch: '@@ -1 +1 @@\n-old\n+new', truncated: false }] };
+      get: async () => ({ projectId: item.bbProjectId, path: '/repo', mergeBaseBranch: 'main' })
+    },
+    plugins: {
+      callRpc: async ({ outputSchema, ...request }: { outputSchema: { parse(value: unknown): unknown } }) => {
+        requests.push(request);
+        return outputSchema.parse({
+          outcome: 'available',
+          files: [{ path: 'src/index.ts', revision: 'r1' }],
+          initialPatches: [{ path: 'src/index.ts', patch: '@@ -1 +1 @@\n-old\n+new', truncated: false }]
+        });
       }
     }
   } as unknown as Parameters<typeof createFactoryService>[0];
   const service = createFactoryService(sdk, f.store, () => {});
   assert.match((await service.diff(record, run.id, '/repo/src/index.ts')).patch!, /\+new/);
   assert.deepEqual(requests, [{
-    environmentId: 'env_test', paths: ['src/index.ts'], target: { type: 'all', mergeBaseBranch: 'main' }
+    pluginId: 'bb--git', method: 'files',
+    input: { environmentId: 'env_test', target: { type: 'all', mergeBaseBranch: 'main' }, ignoreWhitespace: false }
   }]);
   await assert.rejects(service.diff(record, run.id, 'unreported.ts'), /not part/);
   await assert.rejects(service.diff(record, 'unknown', '/repo/src/index.ts'), /not part/);
@@ -1143,20 +1150,32 @@ test('diff reports unavailable workspaces and bounds large patches', async () =>
   assert.match((await f.service.diff(record, run.id, 'file.ts')).message!, /no available workspace/);
   const stored = f.store.get(record)!;
   stored.runs[0]!.threadId = 'thr_native'; stored.runs[0]!.environmentId = 'env_test'; f.store.save(stored);
-  let outcome: unknown = { outcome: 'unavailable', failure: { message: 'Host offline' } };
+  let files: unknown = { outcome: 'unavailable', failure: { message: 'Host offline' } };
+  const patchRequests: unknown[] = [];
   const sdk = {
     threads: { get: async () => ({ projectId: item.bbProjectId, environmentId: 'env_test' }) },
     environments: {
-      get: async () => ({ projectId: item.bbProjectId, path: '/repo', mergeBaseBranch: null }),
-      diffPatch: async () => outcome
+      get: async () => ({ projectId: item.bbProjectId, path: '/repo', mergeBaseBranch: null })
+    },
+    plugins: {
+      callRpc: async ({ method, input, outputSchema }: {
+        method: string; input: { keys?: string[] }; outputSchema: { parse(value: unknown): unknown };
+      }) => {
+        if (method === 'files') return outputSchema.parse(files);
+        patchRequests.push(input);
+        return outputSchema.parse(Object.fromEntries((input.keys ?? []).map(key => [key, {
+          outcome: 'available', patch: { path: 'file.ts', patch: 'x'.repeat(200_001), truncated: false }
+        }])));
+      }
     }
   } as unknown as Parameters<typeof createFactoryService>[0];
   const service = createFactoryService(sdk, f.store, () => {});
   assert.equal((await service.diff(record, run.id, 'file.ts')).message, 'Host offline');
-  outcome = { outcome: 'available', patches: [{ path: 'file.ts', patch: 'x'.repeat(200_001), truncated: false }] };
+  files = { outcome: 'available', files: [{ path: 'file.ts', revision: 'r2' }], initialPatches: [] };
   const bounded = await service.diff(record, run.id, 'file.ts');
   assert.equal(bounded.patch?.length, 200_000);
   assert.equal(bounded.truncated, true);
+  assert.deepEqual(patchRequests, [{ keys: [JSON.stringify(['env_test', { type: 'uncommitted' }, false, 'file.ts', 'r2'])] }]);
   f.db.close();
 });
 

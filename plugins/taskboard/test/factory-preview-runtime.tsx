@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import type { FactoryRecord, FactoryScanObservation } from '../factory/contract.js';
 
 declare global {
@@ -296,7 +296,33 @@ export function useRealtime(channel: string, callback: (payload: unknown) => voi
 export function useRealtimeConnectionState() { return 'connected'; }
 export function definePluginApp() {}
 export function useComposer() { return {}; }
-export function useComposerView() { return {}; }
+// Stands in for bb's live reads: the preview's refresh controls play the role
+// of server invalidation.
+export function experimental_useRpcQuery({ method, input, enabled = true }: {
+  method: string; input: unknown; enabled?: boolean;
+}) {
+  const [state, setState] = useState<{ data: unknown; error: Error | null }>({ data: undefined, error: null });
+  const key = JSON.stringify([method, input]);
+  const refetch = useCallback(async () => {
+    try {
+      const data = await (rpc.call as (method: string, input: unknown) => Promise<unknown>)(method, input);
+      setState({ data, error: null });
+    } catch (error) {
+      setState(current => ({ ...current, error: error instanceof Error ? error : new Error(String(error)) }));
+    }
+  }, [key]);
+  useEffect(() => {
+    if (!enabled) return;
+    void refetch();
+    window.addEventListener('taskboard:empirical-refresh', refetch);
+    return () => window.removeEventListener('taskboard:empirical-refresh', refetch);
+  }, [enabled, refetch]);
+  useRealtime('taskboard:factory', refetch);
+  return { data: state.data, error: state.error, isLoading: enabled && state.data === undefined, isFetching: false, refetch };
+}
+export function experimental_useAppPanel() {
+  return { openTab: () => true, toggleTab: () => true, close: () => true };
+}
 export function Markdown({ content }: { content: string }) {
   return <pre style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{content}</pre>;
 }
