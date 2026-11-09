@@ -1,6 +1,7 @@
 import type {
   AgentCard,
   AgentStatus,
+  BoardResult,
   BoardSnapshot,
   FactoryStatusPayload,
   StageCount,
@@ -248,4 +249,37 @@ export function attentionTicketMap(
     if (ticket !== null) map.set(ticket.linearId, agent.displayName);
   }
   return map;
+}
+
+export type FactoryHealth = "live" | "offline" | "unavailable" | "loading";
+
+/** One reading of a factory's board, as the switcher dot and the cards show it. */
+export function boardHealth(data: BoardResult | null, transportError: boolean): FactoryHealth {
+  if (data?.ok === false) return data.reason === "not-running" ? "offline" : "unavailable";
+  if (transportError) return "unavailable";
+  return data === null ? "loading" : "live";
+}
+
+export const HEALTH_LABEL: Record<FactoryHealth, string> = {
+  live: "Live",
+  offline: "Not running",
+  unavailable: "Unavailable",
+  loading: "Reading",
+};
+
+/** Compact uptime from the factory's start to the reading: "3d 4h", "2h 14m", "9m". */
+export function formatUptime(startedAt: string | null, now: number): string | null {
+  const started = startedAt === null ? Number.NaN : Date.parse(startedAt);
+  if (!Number.isFinite(started) || now < started) return null;
+  const minutes = Math.floor((now - started) / 60_000);
+  const days = Math.floor(minutes / 1_440);
+  const hours = Math.floor((minutes % 1_440) / 60);
+  if (days > 0) return `${days}d ${hours}h`;
+  if (hours > 0) return `${hours}h ${minutes % 60}m`;
+  return `${minutes}m`;
+}
+
+/** Bots blocked on a person; the Bots tab groups exactly these. */
+export function blockedAgentCount(agents: readonly AgentCard[]): number {
+  return agents.filter((agent) => agent.status === "blocked").length;
 }

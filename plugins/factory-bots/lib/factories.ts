@@ -12,19 +12,26 @@ export const FactorySchema = z
       .refine((value) => /^https?:\/\//i.test(value), "The Factory URL must be http or https."),
     /** "" uses the bundled factory.mcp.json entry point. */
     checkoutPath: z.string().trim(),
-  })
-  .strict();
+  });
 
 export type Factory = z.infer<typeof FactorySchema>;
 
-export const FactoryListSchema = z.array(FactorySchema);
-
 export const FACTORIES_KEY = "factories:v1";
 
-/** A stored list that no longer parses is treated as absent, never half-read. */
+/**
+ * Entries are read one by one, so a single bad row never costs the others;
+ * null only when nothing usable is stored and the seed should apply.
+ */
 export function parseFactories(value: unknown): Factory[] | null {
-  const parsed = FactoryListSchema.safeParse(value);
-  return parsed.success && parsed.data.length > 0 ? parsed.data : null;
+  if (!Array.isArray(value)) return null;
+  const seen = new Set<string>();
+  const factories = value.flatMap((entry) => {
+    const parsed = FactorySchema.safeParse(entry);
+    if (!parsed.success || seen.has(parsed.data.id)) return [];
+    seen.add(parsed.data.id);
+    return [parsed.data];
+  });
+  return factories.length > 0 ? factories : null;
 }
 
 export function seedFactories(url: string): Factory[] {

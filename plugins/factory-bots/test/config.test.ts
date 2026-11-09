@@ -214,9 +214,9 @@ test("reports a missing MCP script as an actionable config error", async () => {
   });
   assert.equal(loaded.config, null);
   assert.match(loaded.error ?? "", /No readable Factory MCP script at \/opt\/factory\/dist\/main\.js/);
-  assert.match(loaded.error ?? "", /checkout path in Factory Bots/);
+  assert.match(loaded.error ?? "", /checkout path in Foreman → All factories/);
   assert.match(loaded.error ?? "", /FACTORY_BOTS_MCP_CONFIG/);
-  assert.match(loaded.error ?? "", /reload the Factory Bots plugin/);
+  assert.match(loaded.error ?? "", /reload the plugin/);
 });
 
 test("finds the script after a runtime flag and when it is the command", async () => {

@@ -160,7 +160,7 @@ export async function loadMcpConfig(
           return {
             config: null,
             path,
-            error: `No readable Factory MCP script at ${script}. Set this factory's checkout path in Factory Bots, edit ${path}, or set FACTORY_BOTS_MCP_CONFIG to a config for this host, then reload the Factory Bots plugin.`,
+            error: `No readable Factory MCP script at ${script}. Edit this factory's checkout path in Foreman → All factories, or edit ${path} (or set FACTORY_BOTS_MCP_CONFIG) and reload the plugin.`,
           };
         }
       }

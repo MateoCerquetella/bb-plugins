@@ -1,0 +1,642 @@
+/* Foreman shell: the bar every view shares, the board pulse, and the Factories home. */
+
+.fm-bar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 16px;
+  min-height: 52px;
+  padding: 0 clamp(16px, 2vw, 24px);
+  border-bottom: 1px solid var(--border);
+  background: var(--card);
+  font-size: 13px;
+}
+
+.fm-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--fb-font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.fm-mark-glyph {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--fm-radius-sm);
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--primary) 0 4px,
+    var(--background) 4px 7px
+  );
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+.fm-spacer {
+  flex: 1;
+}
+
+.fm-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--muted-foreground);
+}
+
+.fm-dot[data-health="live"] {
+  background: var(--success);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--success) 22%, transparent);
+}
+
+.fm-dot[data-health="unavailable"] {
+  background: var(--destructive);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--destructive) 22%, transparent);
+}
+
+.fm-dot[data-health="loading"] {
+  animation: fm-blink 1.2s ease-in-out infinite;
+}
+
+@keyframes fm-blink {
+  50% { opacity: 0.3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fm-dot[data-health="loading"] { animation: none; }
+}
+
+/* The switcher is a disclosure: native keyboard and focus, no portal. */
+.fm-switch {
+  position: relative;
+}
+
+.fm-switch > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 200px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--fm-radius);
+  background: var(--background);
+  cursor: pointer;
+  list-style: none;
+}
+
+.fm-switch > summary::-webkit-details-marker {
+  display: none;
+}
+
+.fm-switch > summary::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin-left: 2px;
+  border-right: 1.5px solid var(--muted-foreground);
+  border-bottom: 1.5px solid var(--muted-foreground);
+  transform: translateY(-2px) rotate(45deg);
+}
+
+.fm-switch > summary:hover,
+.fm-switch[open] > summary {
+  border-color: color-mix(in srgb, var(--primary) 55%, var(--border));
+}
+
+.fm-switch > summary:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.fm-switch > summary b {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.fm-switch > summary small {
+  margin-left: auto;
+  font-family: var(--fb-font-mono);
+  font-size: 10.5px;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
+
+.fm-switch-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 30;
+  display: grid;
+  min-width: 280px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--fm-radius);
+  background: var(--popover);
+  box-shadow: 0 18px 40px rgb(0 0 0 / 0.5);
+}
+
+.fm-switch-menu button {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: var(--fm-radius-sm);
+  background: none;
+  color: var(--foreground);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fm-switch-menu button:hover,
+.fm-switch-menu button:focus-visible {
+  background: var(--accent);
+  outline: none;
+}
+
+.fm-switch-menu button[aria-checked="true"] {
+  box-shadow: inset 2px 0 0 var(--primary);
+}
+
+.fm-switch-menu code,
+.fm-switch-menu span {
+  font-family: var(--fb-font-mono);
+  font-size: 10.5px;
+  color: var(--muted-foreground);
+}
+
+.fm-switch-menu hr {
+  margin: 6px 0;
+  border: 0;
+  border-top: 1px solid var(--border);
+}
+
+.fm-tabs {
+  display: flex;
+  align-self: stretch;
+  gap: 2px;
+}
+
+.fm-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 12px;
+  border: 0;
+  background: none;
+  color: var(--muted-foreground);
+  font-family: var(--fb-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: inset 0 -2px 0 transparent;
+}
+
+.fm-tabs button:hover {
+  color: var(--foreground);
+}
+
+.fm-tabs button[aria-current="page"] {
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--primary) 9%, transparent);
+  box-shadow: inset 0 -2px 0 var(--primary);
+}
+
+.fm-tabs button:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+.fm-tabs em {
+  min-width: 18px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: var(--destructive);
+  color: #fff;
+  font-style: normal;
+  font-size: 10px;
+  letter-spacing: 0;
+  text-align: center;
+}
+
+.fm-button {
+  padding: 7px 13px;
+  border: 1px solid var(--border);
+  border-radius: var(--fm-radius);
+  background: transparent;
+  color: var(--foreground);
+  font: inherit;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.fm-button:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--foreground) 30%, var(--border));
+}
+
+.fm-button--primary {
+  border-color: transparent;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: 600;
+}
+
+.fm-button--primary:hover:not(:disabled) {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--primary) 88%, #fff);
+}
+
+.fm-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.fm-button:focus-visible,
+.fm-link:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Board pulse: four readings, then the tickets per stage. */
+.fm-pulse {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.fm-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.fm-kpi {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--fm-radius);
+  background: var(--card);
+}
+
+.fm-kpi span,
+.fm-pipeline span,
+.fm-factory-stats span {
+  font-family: var(--fb-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.fm-kpi b {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--fb-font-mono);
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.fm-kpi[data-alert] {
+  border-color: color-mix(in srgb, var(--destructive) 45%, var(--border));
+}
+
+.fm-kpi[data-alert] b {
+  color: var(--destructive);
+}
+
+.fm-pipeline {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--fm-radius);
+  background: var(--card);
+  list-style: none;
+}
+
+.fm-pipeline li {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px 12px;
+  border-right: 1px solid var(--border);
+}
+
+.fm-pipeline li:last-child {
+  border-right: 0;
+}
+
+.fm-pipeline b {
+  display: block;
+  font-family: var(--fb-font-mono);
+  font-size: 18px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.fm-pipeline i {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: var(--primary);
+}
+
+.fm-pipeline-empty {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px dashed var(--border);
+  border-radius: var(--fm-radius);
+  color: var(--muted-foreground);
+}
+
+/* Factories home */
+.fm-overview-body {
+  flex: 1;
+  font-size: 13px;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 24px clamp(16px, 2vw, 28px) 40px;
+}
+
+.fm-page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1240px;
+  margin: 0 auto 20px;
+}
+
+.fm-page-head h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.fm-page-head p {
+  margin: 4px 0 0;
+  color: var(--muted-foreground);
+}
+
+.fm-notice,
+.fm-error {
+  max-width: 1240px;
+  margin: 0 auto 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--fm-radius);
+}
+
+.fm-notice {
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+  background: color-mix(in srgb, var(--primary) 7%, transparent);
+}
+
+.fm-error {
+  border-color: color-mix(in srgb, var(--destructive) 50%, var(--border));
+  color: var(--destructive);
+  overflow-wrap: anywhere;
+}
+
+.fm-form .fm-error {
+  margin: 0;
+}
+
+.fm-factory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  align-items: start;
+  gap: 14px;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.fm-card {
+  border: 1px solid var(--border);
+  border-radius: var(--fm-radius);
+  background: var(--card);
+}
+
+.fm-factory {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.fm-factory[data-health="live"] {
+  box-shadow: inset 0 2px 0 var(--success);
+}
+
+.fm-factory[data-health="unavailable"] {
+  box-shadow: inset 0 2px 0 var(--destructive);
+}
+
+.fm-factory-open {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fm-factory-open:hover {
+  background: color-mix(in srgb, var(--primary) 5%, transparent);
+}
+
+.fm-factory-open:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+.fm-factory-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.fm-factory-head b {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.fm-factory-head small {
+  margin-left: auto;
+  font-family: var(--fb-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.fm-factory-open > code {
+  font-family: var(--fb-font-mono);
+  font-size: 11.5px;
+  color: var(--muted-foreground);
+  overflow-wrap: anywhere;
+}
+
+.fm-factory-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.fm-factory-stats span {
+  display: grid;
+  gap: 2px;
+  font-size: 9.5px;
+}
+
+.fm-factory-stats b {
+  font-size: 18px;
+  text-transform: none;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.fm-factory-stats [data-alert] b {
+  color: var(--destructive);
+}
+
+.fm-factory footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+  padding: 9px 16px;
+  border-top: 1px solid var(--border);
+  background: color-mix(in srgb, var(--background) 45%, transparent);
+}
+
+.fm-factory-path {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--fb-font-mono);
+  font-size: 10.5px;
+  color: var(--muted-foreground);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fm-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted-foreground);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.fm-link:hover {
+  color: var(--foreground);
+}
+
+.fm-link--danger:hover {
+  color: var(--destructive);
+}
+
+.fm-form {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-color: color-mix(in srgb, var(--primary) 50%, var(--border));
+}
+
+.fm-form h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.fm-form label {
+  display: grid;
+  gap: 5px;
+}
+
+.fm-form label > span {
+  font-family: var(--fb-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.fm-form input {
+  padding: 8px 10px;
+  border: 1px solid var(--input);
+  border-radius: var(--fm-radius);
+  background: var(--background);
+  color: var(--foreground);
+  font: inherit;
+}
+
+.fm-form input:focus-visible {
+  border-color: var(--primary);
+  outline: none;
+}
+
+.fm-form small {
+  font-size: 11.5px;
+  color: var(--muted-foreground);
+}
+
+.fm-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+@media (max-width: 900px) {
+  .fm-bar {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-block: 10px;
+  }
+
+  .fm-tabs {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .fm-tabs button {
+    padding: 9px 12px;
+  }
+
+  .fm-switch > summary {
+    min-width: 0;
+  }
+
+  .fm-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fm-pipeline {
+    overflow-x: auto;
+  }
+
+  .fm-pipeline li {
+    min-width: 96px;
+  }
+}

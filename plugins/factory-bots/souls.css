@@ -76,7 +76,7 @@
 .fs-detail-panel {
   min-width: 0;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--fm-radius);
   background: var(--card);
 }
 
@@ -142,7 +142,7 @@
   gap: 4px;
   padding: 9px 10px;
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: var(--fm-radius);
   background: transparent;
   color: inherit;
   font: inherit;
@@ -292,7 +292,7 @@
   margin: 8px 0;
   padding: 8px 10px;
   border: 1px solid color-mix(in srgb, #d97706 28%, var(--border));
-  border-radius: 8px;
+  border-radius: var(--fm-radius);
   background: color-mix(in srgb, #f59e0b 8%, transparent);
   color: color-mix(in srgb, #92400e 80%, var(--foreground));
   font-size: 11.5px;
@@ -357,7 +357,7 @@
   padding: 12px;
   resize: vertical;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--fm-radius);
   outline: none;
   background: var(--background);
   color: var(--foreground);
@@ -378,7 +378,7 @@
   max-width: 340px;
   padding: 7px 9px;
   border: 1px solid var(--border);
-  border-radius: 7px;
+  border-radius: var(--fm-radius);
   outline: none;
   background: var(--background);
   color: var(--foreground);
@@ -417,7 +417,7 @@
   justify-content: center;
   padding: 5px 10px;
   border: 1px solid var(--border);
-  border-radius: 7px;
+  border-radius: var(--fm-radius);
   background: transparent;
   color: var(--foreground);
   font: inherit;
@@ -469,7 +469,7 @@
 .fs-audit {
   padding: 11px;
   border: 1px solid var(--border);
-  border-radius: 9px;
+  border-radius: var(--fm-radius);
   background: color-mix(in srgb, var(--foreground) 2%, transparent);
 }
 
@@ -500,7 +500,7 @@
 .fs-tool-list li {
   padding: 2px 5px;
   border: 1px solid var(--border);
-  border-radius: 5px;
+  border-radius: var(--fm-radius-sm);
   background: var(--card);
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 9.5px;
@@ -555,7 +555,7 @@
   margin: 0 0 12px;
   padding: 8px 10px;
   border: 1px solid color-mix(in srgb, #d97706 30%, var(--border));
-  border-radius: 8px;
+  border-radius: var(--fm-radius);
   background: color-mix(in srgb, #f59e0b 7%, transparent);
   color: var(--foreground);
   font-size: 11px;
@@ -576,7 +576,7 @@
   margin: 0 0 12px;
   padding: 10px;
   border: 1px solid var(--border);
-  border-radius: 9px;
+  border-radius: var(--fm-radius);
   background: var(--background);
   font-size: 11px;
 }
@@ -625,7 +625,7 @@
   max-height: 54vh;
   overflow: auto;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--fm-radius);
   background: var(--background);
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 10.5px;
@@ -702,7 +702,7 @@
   padding: 8px 10px;
   overflow: auto;
   border: 1px solid var(--border);
-  border-radius: 7px;
+  border-radius: var(--fm-radius);
   background: var(--background);
   color: var(--foreground);
   font-size: 10.5px;
@@ -720,7 +720,7 @@
   gap: 5px;
   padding: 24px;
   border: 1px dashed var(--border);
-  border-radius: 12px;
+  border-radius: var(--fm-radius);
   text-align: center;
 }
 
@@ -772,7 +772,7 @@
   overflow: auto;
   padding: 18px;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--fm-radius);
   background: var(--card);
   box-shadow: 0 22px 60px -24px rgb(0 0 0 / 0.7);
 }
@@ -798,7 +798,7 @@
   margin: 0 0 11px;
   padding: 7px 9px;
   border: 1px solid var(--border);
-  border-radius: 7px;
+  border-radius: var(--fm-radius);
   background: var(--background);
   font-size: 11px;
 }
@@ -815,7 +815,7 @@
   width: 100%;
   padding: 8px 9px;
   border: 1px solid var(--border);
-  border-radius: 7px;
+  border-radius: var(--fm-radius);
   outline: none;
   background: var(--background);
   color: var(--foreground);
@@ -952,7 +952,7 @@
   align-items: center;
   justify-content: center;
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--fm-radius);
   background: color-mix(in srgb, var(--primary) 5%, var(--background));
 }
 
@@ -994,10 +994,6 @@
 
 .fb-souls-embed .fs-list-panel {
   position: static;
-}
-
-.fb-souls-embed .fs-back-board {
-  margin-right: auto;
 }
 
 @media (max-width: 760px) {

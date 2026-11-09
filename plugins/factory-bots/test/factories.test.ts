@@ -16,12 +16,20 @@ test("a stored list parses as given", () => {
   assert.deepEqual(parseFactories([LOCAL, bandely]), [LOCAL, bandely]);
 });
 
-test("missing, empty, or malformed lists read as absent", () => {
+test("missing or empty lists read as absent", () => {
   assert.equal(parseFactories(undefined), null);
+  assert.equal(parseFactories({}), null);
   assert.equal(parseFactories([]), null);
   assert.equal(parseFactories([{ ...LOCAL, id: "Not A Slug" }]), null);
-  assert.equal(parseFactories([{ ...LOCAL, url: "ftp://factory" }]), null);
-  assert.equal(parseFactories([{ ...LOCAL, extra: true }]), null);
+});
+
+test("one bad stored row never discards the good ones", () => {
+  const bandely = { id: "bandely", name: "Bandely", url: "http://10.8.0.6:8080", checkoutPath: "" };
+  assert.deepEqual(
+    parseFactories([{ ...LOCAL, url: "ftp://factory" }, bandely, { ...bandely, name: "Duplicate id" }]),
+    [bandely],
+  );
+  assert.deepEqual(parseFactories([{ ...LOCAL, addedLater: true }]), [LOCAL]);
 });
 
 test("ids are readable slugs that never collide", () => {

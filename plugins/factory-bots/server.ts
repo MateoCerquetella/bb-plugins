@@ -15,7 +15,7 @@ import { CapabilityService } from "./lib/capability-service.js";
 import { SoulService } from "./lib/soul-service.js";
 
 /**
- * Factory Bots owns one Factory MCP child per configured factory, started on
+ * Foreman owns one Factory MCP child per configured factory, started on
  * first use. The board and chat use the read tools plus the single
  * Orchestrator write; the Souls view has its own four-tool allowlist and
  * writes only through factory_soul_set.
@@ -90,9 +90,12 @@ export default async function plugin(bb: BbPluginApi): Promise<void> {
     writes = next.catch(() => {});
     return next;
   };
-  const commit = async (next: Factory[]): Promise<void> => {
+  // The list swap and the retirement of the changed factory's child happen
+  // together, so no request can pick up a runtime built from the old entry.
+  const commit = async (next: Factory[], changedId: string): Promise<void> => {
     await bb.storage.kv.set(FACTORIES_KEY, next);
     factories = next;
+    retire(changedId);
     bb.realtime.publish("factory-bots:factories", null);
   };
 
@@ -117,8 +120,8 @@ export default async function plugin(bb: BbPluginApi): Promise<void> {
           input.id === undefined
             ? [...factories, factory]
             : factories.map((entry) => (entry.id === factory.id ? factory : entry)),
+          factory.id,
         );
-        retire(factory.id);
         return { ok: true as const, factory };
       }),
     removeFactory: ({ id }) =>
@@ -127,8 +130,7 @@ export default async function plugin(bb: BbPluginApi): Promise<void> {
         if (factories.length === 1) {
           throw new Error("Keep at least one factory: add another before removing this one.");
         }
-        await commit(factories.filter((entry) => entry.id !== id));
-        retire(id);
+        await commit(factories.filter((entry) => entry.id !== id), id);
         return { factories };
       }),
     getBoard: async ({ factoryId }) => (await runtime(factoryId)).service.getBoard(),
@@ -150,5 +152,5 @@ export default async function plugin(bb: BbPluginApi): Promise<void> {
     for (const id of [...runtimes.keys()]) retire(id);
   });
 
-  bb.log.info(`Factory Bots knows ${factories.length} ${factories.length === 1 ? "factory" : "factories"}.`);
+  bb.log.info(`Foreman knows ${factories.length} ${factories.length === 1 ? "factory" : "factories"}.`);
 }

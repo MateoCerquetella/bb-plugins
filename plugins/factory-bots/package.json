@@ -2,7 +2,7 @@
   "name": "bb-plugin-factory-bots",
   "version": "0.1.0",
   "private": true,
-  "description": "Observe an Empirical Factory's agents, tickets, and live transcripts from BB through the read-only Factory MCP.",
+  "description": "Foreman: run several Empirical software factories from BB. Live boards of agents, tickets, and transcripts through each Factory MCP.",
   "license": "MIT",
   "author": "Mateo Cerquetella",
   "homepage": "https://github.com/MateoCerquetella/bb-plugins/tree/main/plugins/factory-bots#readme",
@@ -28,8 +28,8 @@
     "bbPluginSdk": ">=0.4.29"
   },
   "bb": {
-    "name": "Factory Bots",
-    "description": "A live, read-only board of Empirical Factory agents, tickets, and transcripts.",
+    "name": "Foreman",
+    "description": "A control room for your Empirical software factories: live agents, tickets, transcripts, and the Orchestrator.",
     "branding": {
       "icon": "./assets/icon.svg"
     },

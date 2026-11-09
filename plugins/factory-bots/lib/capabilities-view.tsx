@@ -132,13 +132,7 @@ function AuditList({ entries }: { entries: readonly CapabilityAuditEntry[] }) {
   );
 }
 
-export function CapabilitiesView({
-  factoryId,
-  onBack,
-}: {
-  factoryId: string;
-  onBack: () => void;
-}) {
+export function CapabilitiesView({ factoryId }: { factoryId: string }) {
   const rpc = useRpc<typeof rpcContract>();
   const [capabilities, setCapabilities] = useState<CapabilitiesPayload | null>(null);
   const [entries, setEntries] = useState<CapabilityAuditEntry[]>([]);
@@ -281,9 +275,6 @@ export function CapabilitiesView({
           </p>
         </div>
         <div className="cap-actions">
-          <button type="button" className="cap-button" onClick={onBack}>
-            ← Board
-          </button>
           <button
             type="button"
             className="cap-button"

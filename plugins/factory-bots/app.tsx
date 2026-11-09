@@ -27,7 +27,6 @@ import type {
   AgentCard,
   AgentStatus,
   BoardResult,
-  BoardSnapshot,
   ChatResult,
   TicketDetail,
   TicketResult,
@@ -59,8 +58,10 @@ import {
 import { activeLiveTool, isGenerating, readLiveTools } from "./lib/live";
 import { SoulsView } from "./lib/souls-view";
 import { CapabilitiesView } from "./lib/capabilities-view";
-import { attentionTicketMap, stageLabel } from "./lib/derive";
-import { FactoryRedirect } from "./lib/factory-redirect";
+import { attentionTicketMap, blockedAgentCount, boardHealth, stageLabel } from "./lib/derive";
+import { FactoriesView, useFactories } from "./lib/factories-view";
+import type { Factory } from "./lib/factories";
+import { BoardPulse, FactoryTabs, ForemanBar, type ShellTab } from "./lib/shell";
 import {
   PANEL_PATH,
   agentRoute,
@@ -130,18 +131,6 @@ function statusLabel(status: AgentStatus): string {
   return status === "idle" ? "Idle" : status === "working" ? "Working" : "Blocked";
 }
 
-function formatTime(epoch: number): string {
-  return new Date(epoch).toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  });
-}
-
-/**
- * One chained poll for the board and the selected ticket, so the two reads
- * never overlap and the next 5s tick starts only after both settle.
- */
 function useFactoryPoll(
   rpc: RpcClient,
   factoryId: string,
@@ -266,21 +255,6 @@ function StageTag({ stage }: { stage: string }) {
   );
 }
 
-function HealthPill({
-  tone,
-  label,
-}: {
-  tone: "live" | "offline" | "unavailable" | "loading";
-  label: string;
-}) {
-  return (
-    <span className="fb-health" data-tone={tone}>
-      <span className="fb-health-dot" aria-hidden="true" />
-      {label}
-    </span>
-  );
-}
-
 function CopyCommand({ command }: { command: string }) {
   const [copied, setCopied] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -358,84 +332,6 @@ function RpcError({ message }: { message: string }) {
         <p className="fb-muted">The board retries every 5 seconds.</p>
       </div>
     </div>
-  );
-}
-
-function BoardHeader({
-  snapshot,
-  fetchedAt,
-  failure,
-  transportError,
-  onSouls,
-  onCapabilities,
-}: {
-  snapshot: BoardSnapshot | null;
-  fetchedAt: number | null;
-  failure: { reason: "not-running" | "unavailable" } | null;
-  transportError: boolean;
-  onSouls: () => void;
-  onCapabilities: () => void;
-}) {
-  const health =
-    failure?.reason === "not-running"
-      ? { tone: "offline" as const, label: "Not running" }
-      : failure !== null || transportError
-        ? { tone: "unavailable" as const, label: "Unavailable" }
-        : snapshot === null
-          ? { tone: "loading" as const, label: "Reading" }
-          : { tone: "live" as const, label: "Live" };
-
-  const stageNote =
-    snapshot !== null
-      ? "No tickets in any stage"
-      : failure?.reason === "not-running"
-        ? "Factory is not running"
-        : "No health reading yet";
-
-  return (
-    <header className="fb-header">
-      <div className="fb-title">
-        <div className="fb-title-row">
-          <h1>Factory Bots</h1>
-          <HealthPill tone={health.tone} label={health.label} />
-          <button type="button" className="fb-chat-link" onClick={onSouls}>
-            Souls
-          </button>
-          <button type="button" className="fb-chat-link" onClick={onCapabilities}>
-            Capabilities
-          </button>
-        </div>
-        <p className="fb-subtitle">
-          Read-only view through the Factory MCP
-          {fetchedAt === null ? null : (
-            <span className="fb-updated">Updated {formatTime(fetchedAt)}</span>
-          )}
-        </p>
-      </div>
-
-      <div className="fb-metrics">
-        <div className="fb-metric">
-          <span className="fb-metric-value">{snapshot?.bots ?? "—"}</span>
-          <span className="fb-metric-label">agents</span>
-        </div>
-        <div className="fb-metric">
-          <span className="fb-metric-value">{snapshot?.tickets ?? "—"}</span>
-          <span className="fb-metric-label">tickets</span>
-        </div>
-        <div className="fb-stages">
-          {snapshot === null || snapshot.byStage.length === 0 ? (
-            <span className="fb-muted">{stageNote}</span>
-          ) : (
-            snapshot.byStage.map((stage) => (
-              <span key={stage.stage} className="fb-stage-count">
-                {stage.label}
-                <b>{stage.count}</b>
-              </span>
-            ))
-          )}
-        </div>
-      </div>
-    </header>
   );
 }
 
@@ -697,87 +593,36 @@ function ThreadList({
 function BoardView({
   board,
   tab,
-  onTab,
+  attentionByTicket,
   onOpenAgent,
   onOpenTicket,
-  onSouls,
-  onCapabilities,
 }: {
   board: Polled<BoardResult>;
   tab: BoardTab;
-  onTab: (tab: BoardTab) => void;
+  attentionByTicket: Map<string, string>;
   onOpenAgent: (name: string) => void;
   onOpenTicket: (ticket: TicketSummary) => void;
-  onSouls: () => void;
-  onCapabilities: () => void;
 }) {
   const data = board.data;
-  const snapshot = data?.ok === true ? data.snapshot : null;
-  const fetchedAt = data?.fetchedAt ?? null;
-  const attentionByTicket =
-    data?.ok === true
-      ? attentionTicketMap(data.agents, data.tickets)
-      : new Map<string, string>();
-
+  if (board.error !== null) return <RpcError message={board.error} />;
+  if (data === null) return <p className="fb-placeholder">Reading the factory…</p>;
+  if (!data.ok) return <FailureView failure={data} />;
   return (
     <>
-      <BoardHeader
-        snapshot={snapshot}
-        fetchedAt={fetchedAt}
-        failure={data?.ok === false ? data : null}
-        transportError={board.error !== null}
-        onSouls={onSouls}
-        onCapabilities={onCapabilities}
+      <BoardPulse
+        snapshot={data.snapshot}
+        blocked={blockedAgentCount(data.agents)}
+        fetchedAt={data.fetchedAt}
       />
-      {board.error !== null ? (
-        <RpcError message={board.error} />
-      ) : data === null ? (
-        <p className="fb-placeholder">Reading the factory…</p>
-      ) : !data.ok ? (
-        <FailureView failure={data} />
+      {tab === "threads" ? (
+        <ThreadList
+          tickets={data.tickets}
+          agents={data.agents}
+          attentionByTicket={attentionByTicket}
+          onOpen={onOpenTicket}
+        />
       ) : (
-        <>
-          <div className="fb-viewbar">
-            <div className="fb-tabs" role="tablist" aria-label="Bots and threads">
-              <button
-                type="button"
-                role="tab"
-                aria-selected={tab === "threads"}
-                onClick={() => onTab("threads")}
-              >
-                Threads
-                {attentionByTicket.size === 0 ? null : (
-                  <span className="fb-tab-attention">
-                    {attentionByTicket.size}
-                  </span>
-                )}
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={tab === "bots"}
-                onClick={() => onTab("bots")}
-              >
-                Bots
-              </button>
-            </div>
-            <span className="fb-view-note">
-              {tab === "threads"
-                ? "Every ticket is a thread; open one to see its live work."
-                : "The agents that carry the threads."}
-            </span>
-          </div>
-          {tab === "threads" ? (
-            <ThreadList
-              tickets={data.tickets}
-              agents={data.agents}
-              attentionByTicket={attentionByTicket}
-              onOpen={onOpenTicket}
-            />
-          ) : (
-            <BotList agents={data.agents} onOpen={onOpenAgent} />
-          )}
-        </>
+        <BotList agents={data.agents} onOpen={onOpenAgent} />
       )}
     </>
   );
@@ -2003,10 +1848,9 @@ function ChatView({
       <section className="fb-chat-thread">
         <div className="fb-chat-thread-head fb-chat-thread-head--dock">
           <div>
-            <h3>Talk to the factory</h3>
+            <h3>Dispatch</h3>
           </div>
           <div className="fb-chat-head-actions">
-            <span className="fb-chat-tag">Always on</span>
             <button
               type="button"
               className="fb-chat-hide"
@@ -2141,13 +1985,10 @@ function ChatView({
 
         <div className="fb-chat-log" aria-live="polite">
         {entries.length === 0 && !chatBusy ? (
-          <div className="fb-chat-empty">
-            <p>Tell the Orchestrator what to build, fix, or investigate.</p>
-            <p className="fb-muted">
-              It decides whether the ticket is agent-implementable, files it,
-              and hands it to the stage that owns it.
-            </p>
-          </div>
+          <p className="fb-chat-empty">
+            Tell the Orchestrator what to build, fix, or investigate. It files
+            the ticket and hands it to the stage that owns it.
+          </p>
         ) : null}
         {entries.map((entry) => (
           <div key={entry.id} className={`fb-msg fb-msg--${entry.role}`}>
@@ -2278,20 +2119,56 @@ function ChatView({
 
 function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
   const route = parsePanelRoute(subPath);
-  if (route.view === "factories") return <FactoryRedirect />;
+  const navigate = useBbNavigate();
+  const { factories, error } = useFactories();
+  const open = (id: string) => navigate.toPluginPanel(PANEL_PATH, { subPath: boardRoute(id) });
+  if (factories === null) {
+    return (
+      <div className="fb-root">
+        {error === null ? (
+          <p className="fb-placeholder">Reading factories…</p>
+        ) : (
+          <RpcError message={error} />
+        )}
+      </div>
+    );
+  }
+  const current = route.view === "factories"
+    ? undefined
+    : factories.find((factory) => factory.id === route.factoryId);
+  if (route.view === "factories" || current === undefined) {
+    return (
+      <FactoriesView
+        factories={factories}
+        missing={route.view === "factories" ? null : route.factoryId}
+        onOpen={open}
+      />
+    );
+  }
   // Keyed so polling, chat, and pane state never carry over between factories.
-  return <FactoryPanel key={route.factoryId} subPath={subPath} factoryId={route.factoryId} route={route} />;
+  return (
+    <FactoryPanel
+      key={current.id}
+      subPath={subPath}
+      factory={current}
+      factories={factories}
+      route={route}
+    />
+  );
 }
 
 function FactoryPanel({
   subPath,
-  factoryId,
+  factory,
+  factories,
   route,
 }: {
   subPath: string;
-  factoryId: string;
+  factory: Factory;
+  factories: readonly Factory[];
   route: FactoryView;
 }) {
+  const factoryId = factory.id;
   const rpc = useRpc<typeof rpcContract>();
   const navigate = useBbNavigate();
   const [boardTab, setBoardTab] = useState<BoardTab>("threads");
@@ -2376,8 +2253,47 @@ function FactoryPanel({
     else go(ticketRoute(factoryId, created.bot, linearId));
   };
 
+  const attentionByTicket = board.data?.ok === true
+    ? attentionTicketMap(board.data.agents, board.data.tickets)
+    : new Map<string, string>();
+  const tab: ShellTab =
+    route.view === "board" ? boardTab
+    : route.view === "agent" ? "bots"
+    : route.view === "ticket" ? "threads"
+    : route.view;
+  const openTab = (next: ShellTab): void => {
+    if (next === "souls") go(soulsRoute(factoryId));
+    else if (next === "capabilities") go(capabilitiesRoute(factoryId));
+    else {
+      setBoardTab(next);
+      go(boardRoute(factoryId));
+    }
+  };
+  // New work always lands on the board's composer, the one place work starts.
+  const startNewWork = (): void => {
+    setChatOpen(true);
+    if (route.view === "ticket") go(boardRoute(factoryId));
+    window.setTimeout(() => {
+      rootRef.current?.querySelector<HTMLTextAreaElement>(".fb-chat-dock textarea")?.focus();
+    }, 60);
+  };
+
   return (
     <div className="fb-root" ref={rootRef} tabIndex={-1}>
+      <ForemanBar
+        factories={factories}
+        current={factory}
+        health={boardHealth(board.data, board.error !== null)}
+        onOpenFactory={(id) => navigate.toPluginPanel(PANEL_PATH, { subPath: boardRoute(id) })}
+        onOverview={() => navigate.toPluginPanel(PANEL_PATH, { subPath: "" })}
+      >
+        <FactoryTabs
+          tab={tab}
+          attention={attentionByTicket.size}
+          onTab={openTab}
+          onNewWork={startNewWork}
+        />
+      </ForemanBar>
       <div
         ref={shellRef}
         className={`fb-shell${resizingChat ? " is-resizing" : ""}${
@@ -2388,19 +2304,17 @@ function FactoryPanel({
         <main className="fb-main">
       {route.view === "souls" ? (
         <div className="fb-souls-embed">
-          <SoulsView factoryId={factoryId} onBack={() => go(boardRoute(factoryId))} />
+          <SoulsView factoryId={factoryId} />
         </div>
       ) : route.view === "capabilities" ? (
-        <CapabilitiesView factoryId={factoryId} onBack={() => go(boardRoute(factoryId))} />
+        <CapabilitiesView factoryId={factoryId} />
       ) : route.view === "board" ? (
         <BoardView
           board={board}
           tab={boardTab}
-          onTab={setBoardTab}
+          attentionByTicket={attentionByTicket}
           onOpenAgent={(name) => go(agentRoute(factoryId, name))}
           onOpenTicket={(ticket) => go(ticketRoute(factoryId, ticket.bot, ticket.linearId))}
-          onSouls={() => go(soulsRoute(factoryId))}
-          onCapabilities={() => go(capabilitiesRoute(factoryId))}
         />
       ) : route.view === "agent" || route.view === "ticket" ? (
         <AgentView
@@ -2500,8 +2414,8 @@ function FactoryPanel({
 export default definePluginApp((app) => {
   app.slots.navPanel({
     id: "factory-bots",
-    title: "Factory Bots",
-    icon: "Bot",
+    title: "Foreman",
+    icon: "Factory",
     path: PANEL_PATH,
     component: FactoryBotsPanel,
   });

@@ -86,17 +86,14 @@ function Badge({
 
 function PanelHeader({
   loading,
-  onBack,
   onRefresh,
 }: {
   loading: boolean;
-  onBack: () => void;
   onRefresh: () => void;
 }) {
   return (
     <header className="fs-panel-header">
       <div className="fs-title-block">
-        <span className="fs-kicker">Factory Bots · Factory MCP</span>
         <h1>Souls</h1>
         <p>
           The prose each bot is told. Read it, change it deliberately, and keep
@@ -104,10 +101,6 @@ function PanelHeader({
         </p>
       </div>
       <div className="fs-header-actions">
-        <button type="button" className="fs-link-button fs-back-board" onClick={onBack}>
-          ← Board
-        </button>
-        <Badge tone="primary">Souls only</Badge>
         <button
           type="button"
           className="fs-button"
@@ -782,13 +775,7 @@ function SoulDetail({
   );
 }
 
-export function SoulsView({
-  factoryId,
-  onBack,
-}: {
-  factoryId: string;
-  onBack: () => void;
-}) {
+export function SoulsView({ factoryId }: { factoryId: string }) {
   const rpc = useRpc<typeof rpcContract>();
   const [souls, setSouls] = useState<SoulRecord[]>([]);
   const [status, setStatus] = useState<StatusResult | null>(null);
@@ -1110,7 +1097,7 @@ export function SoulsView({
   if (loading && souls.length === 0) {
     return (
       <div className="fs-app">
-        <PanelHeader loading={loading} onBack={onBack} onRefresh={() => void load("refresh")} />
+        <PanelHeader loading={loading} onRefresh={() => void load("refresh")} />
         <LoadingState />
       </div>
     );
@@ -1121,7 +1108,6 @@ export function SoulsView({
       <div className="fs-app">
         <PanelHeader
           loading={refreshing}
-          onBack={onBack}
           onRefresh={() => void load("refresh")}
         />
         <OfflineState failure={offline} onRetry={() => void load("refresh")} />
@@ -1134,7 +1120,6 @@ export function SoulsView({
       <div className="fs-app">
         <PanelHeader
           loading={refreshing}
-          onBack={onBack}
           onRefresh={() => void load("refresh")}
         />
         <ErrorState
@@ -1147,7 +1132,7 @@ export function SoulsView({
 
   return (
     <div className="fs-app">
-      <PanelHeader loading={loading || refreshing} onBack={onBack} onRefresh={() => void load("refresh")} />
+      <PanelHeader loading={loading || refreshing} onRefresh={() => void load("refresh")} />
       {loadError === null ? null : (
         <p className="fs-warning" role="alert">
           Refresh failed; showing the last known souls. {loadError}

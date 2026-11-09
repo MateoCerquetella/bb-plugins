@@ -1,83 +1,79 @@
-# Factory Bots
+# Foreman
 
 > Personal plugin: not listed in this repository's catalog or published. Install it from a local checkout.
 
-A live board of an Empirical Factory inside BB, plus one Orchestrator chat and a soul editor.
+Foreman is a control room for your Empirical software factories inside BB.
+It reads any number of factories. Each one gets a live board of its bots and
+tickets, the ticket transcripts, a soul editor, the capability toggles, and an
+Orchestrator chat. The plugin id stays `factory-bots`, so the install and
+each Dood's outfit carry over from the Factory Bots name. Orchestrator chat
+history is now kept per factory, so history from before multiple factories is
+not shown.
 
-Factory Bots shows the factory as a list, in the shape of a thread inbox. The
-board opens on **Threads**: every ticket is one thread, grouped into In motion,
-On call, and Settled, with its owner's live Dood, stage, and a way into its
-ticket. **Bots** is one tab away: each agent is a row with the column it owns,
-its conversation, how many tickets it holds, and whether it is idle, working, or
-blocked, grouped into In motion, Needs a person, and On call.
+## Factories
 
-The board is a workspace: threads occupy the main column while the
-**Orchestrator chat** stays in the right rail, with its own live Dood. Drag the
-rail's left edge to resize it; the width is remembered. The right Dood has the
-same do.computer care loop as an agent page: drag or click the cookie, open the
-timed gift, and use the full wardrobe. Selecting a thread
-replaces the thread list with its transcript, so the bots (in BB's Bots
-sidebar), the threads, and the Orchestrator remain one glance away.
+Opening Foreman lands on **Factories**: one card per factory with its health
+(Live, Not running, Unavailable), agents, open tickets, bots that need a
+person, and uptime, refreshed every ten seconds. **Add factory** asks for a
+name, the factory's URL (its `FACTORY_URL`), and an optional checkout path whose
+`dist/main.js` serves MCP; empty uses the bundled checkout. Foreman starts that
+checkout's MCP before saving, so a wrong path is reported and nothing is saved.
+**Edit** restarts that factory's connection; **Remove** stops reading it (the
+factory itself keeps running), and the last factory cannot be removed.
 
-**Souls** in the board header opens the bot soul editor in the same workspace.
-The list carries each bot's Dood; the detail shows the full prose beside its
-live Dood, the read-only tool list from `factory_status` when reported, the
-latest audit row, and the authored double-confirmation save flow. The Souls
-view uses only `factory_souls`, `factory_soul_set`, `factory_soul_audit`, and
-`factory_status`; it never calls ticket or message tools.
+Every factory has its own MCP child, started on first use, and its own
+Orchestrator chat history. A link to a factory that no longer exists lands on
+Factories with a note.
 
-**Capabilities** in the board header opens the live toggler. It shows the
-Orchestrator, Sieve, and Helm, whether each is enabled or left to the team, and
-the newest audit rows.
-Disabling a bot applies on the next drive without a restart; the ticket records
-`capability disabled: <bot>` instead of being silently dropped. The view uses
-`factory_capabilities`, `factory_capability_set`, and
-`factory_capability_audit`, asks for confirmation with the consequence, and
-shows the host identity the factory recorded as the author. The bot roster
+## The floor
+
+Inside a factory, one bar carries the Foreman mark, the factory switcher (every
+factory plus **All factories**), the tabs **Threads**, **Bots**, **Souls**, and
+**Capabilities**, and **New work**, which opens Dispatch and focuses its
+composer. The Threads tab shows a red count when a blocker names an exact
+ticket.
+
+Threads and Bots open on four readings (agents, open tickets, bots that need a
+person, uptime) and a pipeline strip of tickets per stage. **Threads** lists
+every ticket as one thread, grouped into In motion, On call, and Settled, with
+its owner's live Dood; the ticket a blocker names is marked **Needs answer**
+with a red edge. **Bots** lists each agent with the column it owns, its
+conversation, its tickets, and whether it is idle, working, or blocked, grouped
+into In motion, Needs a person, and On call.
+
+**Dispatch**, the Orchestrator chat, sits in the right rail with its own live
+Dood. Drag the rail's left edge to resize it; **Hide** leaves an
+**Orchestrator** button at the bottom right. Both choices are remembered.
+
+Selecting a thread replaces the list with its ticket: one answer box at the
+top, named for the owning bot and quoting the factory's actual blocker; a
+collapsed **Linear issue** with **Description** and **Comments**; and the
+conversation behind **Show conversation**. Answers go through the Orchestrator,
+the only ticket-content write path, so on a ticket the rail points at the
+answer box instead of offering a second composer.
+
+**Souls** shows each bot's prose beside its live Dood, the tools
+`factory_status` reports, the latest audit row, and a double-confirmation save.
+**Capabilities** turns the Orchestrator, Sieve, and Helm on or off with a
+confirmation that states the consequence; a disabled bot applies on the next
+drive and the ticket records `capability disabled: <bot>`. The roster
 intentionally excludes Lens, Warden, Audit, and Lookback.
 
-Every row carries a live Dood from [do.computer](https://do.computer), grown
-from the agent's name. It is a real animated creature; where WebGL is unavailable
-it falls back to the same seed's static blob. Open a thread to see its ticket:
-one answer box at the top, named for the owning bot and quoting the factory's
-actual blocker instead of inventing questions; when the blocker says
-“start or attach”, two quick suggestions fill the answer box; a collapsed
-**Linear issue** on demand; and the conversation on demand, with recent turns
-behind **Show conversation**. The ticket header shows the owning bot on the left with its live Dood and
-the same icon-only cookie, gift, and wardrobe controls as do.computer; no
-ownership or status text label sits beside it. On a ticket, the Orchestrator
-rail keeps the conversation but replaces its composer with a pointer to the
-ticket answer box, so there is exactly one place to reply. Answers and the tool
-results that belong to them are grouped into one turn, and tool payloads are
-folded away. The answer box sends the person's words through the Orchestrator,
-the only ticket-content write path; the answer and response stay with the
-ticket and in the rail. Capability toggles are the separate operator write. Open a bot to see its tickets.
+Every Dood comes from [do.computer](https://do.computer), grown from the
+agent's name, and falls back to a static blob without WebGL. Feed it the
+cookie, open the gift that arrives every six hours, and dress it from the
+wardrobe; each agent's treats, gifts, and outfit are kept on this machine.
 
-Open **Linear issue** to switch between its **Description** and **Comments**;
-comments are read from the same Linear issue and the card links to the issue in
-Linear for replying or editing. The exact blocked ticket is marked **Needs
-answer** in its Threads row with a red edge, and the Threads tab carries the same
-count, so the alert is not hidden only behind Bots. **Hide** removes the
-Orchestrator rail and leaves a small **Orchestrator** button at the bottom right,
-giving the agent the full width; the choice is remembered.
+## Look
 
-The agent view gives the Dood room to grow: a larger live creature with a treat
-and a gift box. Drag the cookie onto the Dood to feed it, or click it. A gift box
-arrives six hours after the last one is opened, and one waits at most, the same
-rhythm as do.computer. Opening it finds one thing the creature does not have
-yet, and what it finds can be worn right there. Wardrobe is a full dressing page
-with a large live Dood and every slot; each agent's treats, gifts, and outfit are
-kept on this machine.
-
-**Orchestrator chat** is the single entry point for work: it sends one message
-to the factory's Orchestrator, which files a ticket and drives it through
-Sieve → Helm. Ticket content stays read-only; the chat is the
-only ticket-content write path. Capability toggles write only the live
-capability state and its audit.
+The Control Room look redefines BB's theme tokens inside the panel: near-black
+surfaces, one amber accent for actions and the active tab, monospace uppercase
+labels and readings, and 4px corners. Green, red, and grey dots carry factory
+health everywhere.
 
 ## Data source
 
-Factory Bots reads through the Factory MCP server and never opens the factory
+Foreman reads through the Factory MCP server and never opens the factory
 database. The board calls the five read tools:
 
 - `factory_status`
@@ -108,7 +104,7 @@ The connection lives in [`factory.mcp.json`](./factory.mcp.json):
 }
 ```
 
-Factory Bots can read several factories. Each factory has a name, a
+Each factory has a name, a
 `FACTORY_URL`, and an optional checkout path; the list is stored in the
 plugin's key-value storage under `factories:v1`. The first load seeds one
 **Local** factory with the bundled config's `FACTORY_URL` and its entry point.
@@ -205,7 +201,7 @@ bb plugin install ./plugins/factory-bots
 bb plugin reload factory-bots
 ```
 
-Then open **Factory Bots** from the BB sidebar.
+Then open **Foreman** from the BB sidebar.
 
 ## Development
 
@@ -229,4 +225,7 @@ are exercised without a running factory.
 - `lib/derive.ts` — pure ordering, counts, and idle/working/blocked rules.
 - `lib/service.ts` — board/ticket reads and the transcript cache.
 - `lib/live.ts`, `lib/route.ts` — live-tool presentation and panel routes.
-- `app.tsx`, `app.css` — the board, agent, and ticket views.
+- `lib/factories.ts` — the stored factory list: schema, seed, and unique ids.
+- `lib/shell.tsx`, `lib/foreman.css` — the Foreman bar, factory switcher, tabs, and board pulse.
+- `lib/factories-view.tsx` — the Factories home: health cards, add, edit, and remove.
+- `app.tsx`, `app.css` — the board, agent, and ticket views, and the Control Room tokens.

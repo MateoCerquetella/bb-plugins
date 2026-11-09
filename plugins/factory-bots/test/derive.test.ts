@@ -11,6 +11,9 @@ import {
 } from "../contract.js";
 import {
   AGENT_ORDER,
+  blockedAgentCount,
+  boardHealth,
+  formatUptime,
   agentAttentionTicket,
   agentColumn,
   attentionTicketMap,
@@ -356,4 +359,34 @@ test("attention points at the ticket named in the blocked reason", () => {
   };
   assert.equal(agentAttentionTicket(agent, tickets)?.linearId, "FB-179");
   assert.deepEqual([...attentionTicketMap([agent], tickets)], [["FB-179", "Sieve"]]);
+});
+
+test("board health reads the factory's own failure before transport state", () => {
+  const failure = (reason: "not-running" | "unavailable") =>
+    ({ ok: false, reason, message: "", startCommand: null, fetchedAt: 0 }) as const;
+  assert.equal(boardHealth(null, false), "loading");
+  assert.equal(boardHealth(null, true), "unavailable");
+  assert.equal(boardHealth(failure("not-running"), true), "offline");
+  assert.equal(boardHealth(failure("unavailable"), false), "unavailable");
+});
+
+test("uptime is compact and never negative", () => {
+  const start = "2026-11-02T20:00:00.000Z";
+  const at = (ms: number) => Date.parse(start) + ms;
+  assert.equal(formatUptime(start, at(9 * 60_000 + 59_000)), "9m");
+  assert.equal(formatUptime(start, at((2 * 60 + 14) * 60_000)), "2h 14m");
+  assert.equal(formatUptime(start, at((3 * 24 + 4) * 3_600_000)), "3d 4h");
+  assert.equal(formatUptime(start, at(-1)), null);
+  assert.equal(formatUptime(null, at(0)), null);
+  assert.equal(formatUptime("not a date", at(0)), null);
+});
+
+test("the needs-a-person count is the blocked bots, whatever their reason names", () => {
+  const agent = (name: string, status: "idle" | "working" | "blocked") => ({
+    name, displayName: name, conversationId: "1", column: "Triage", ticketCount: 0, status,
+    statusReason: status === "blocked" ? "waiting on a credential" : null, statusReasonCount: 0,
+    currentWork: null, taskCount: 0,
+  });
+  assert.equal(blockedAgentCount([agent("sieve", "blocked"), agent("helm", "blocked"), agent("orchestrator", "idle")]), 2);
+  assert.equal(blockedAgentCount([agent("helm", "working")]), 0);
 });
