@@ -46,10 +46,6 @@
     {
       "name": "conversation-space",
       "source": "./plugins/conversation-space"
-    },
-    {
-      "name": "factory-bots",
-      "source": "./plugins/factory-bots"
     }
   ]
 }

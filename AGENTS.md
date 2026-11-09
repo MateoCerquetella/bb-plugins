@@ -29,7 +29,10 @@ README.
 
 - Treat the root as orchestration only; it must not contain a BB plugin
   package manifest. Keep `.bb/plugins.json` aligned with the installable
-  directories under `plugins/`.
+  directories under `plugins/`, except personal plugins.
+- `plugins/factory-bots` is a personal plugin: `private: true`, installed from
+  a local path, and intentionally absent from `.bb/plugins.json` and the root
+  README catalog. Do not list or publish it.
 - Use `bb plugin new <id> --app` when a new plugin needs a frontend, then move
   the scaffold under `plugins/<id>` and add it to the root README catalog.
 - Keep plugin IDs, package names, CLI commands, realtime channels, persisted

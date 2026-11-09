@@ -1,5 +1,7 @@
 # Factory Bots
 
+> Personal plugin: not listed in this repository's catalog or published. Install it from a local checkout.
+
 A live board of an Empirical Factory inside BB, plus one Orchestrator chat and a soul editor.
 
 Factory Bots shows the factory as a list, in the shape of a thread inbox. The
