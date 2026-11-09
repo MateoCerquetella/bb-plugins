@@ -1,3 +1,5 @@
+import type { FactoryExecution, FactoryProjectPolicy } from './contract.js';
+
 export const nativeError = (error: unknown) =>
   (error instanceof Error ? error.message : String(error)).slice(0, 1000);
 
@@ -39,4 +41,13 @@ export function threadExecution(providerId: string, defaults: ThreadDefaults) {
     providerId, model: defaults.model, permissionMode: defaults.permissionMode,
     reasoningLevel: defaults.reasoningLevel, serviceTier: defaults.serviceTier
   };
+}
+
+/** A ticket override applies to both roles; legacy policies keep their shared AI. */
+export function projectRoleExecution(
+  policy: FactoryProjectPolicy, role: 'orchestrator' | 'worker',
+  override: FactoryExecution | null = null
+): FactoryExecution | null {
+  return override ?? (role === 'orchestrator' ? policy.orchestratorExecution : policy.workerExecution)
+    ?? policy.execution;
 }

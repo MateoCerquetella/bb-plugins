@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import type { FactoryRecord, FactoryScanObservation } from '../factory/contract.js';
+import type { FactoryRecord, FactoryScanObservation, FactoryProjectPolicy } from '../factory/contract.js';
 
 declare global {
   interface Window {
@@ -49,6 +49,10 @@ export function experimental_ProviderModelPicker({ value, onChange, disabled }: 
       }}>
       {Object.entries(previewModels).map(([id, model]) => <option key={id} value={id}>{model.label}</option>)}
     </select>
+    <select aria-label="Reasoning level" value={value.reasoningLevel} disabled={disabled}
+      onChange={event => onChange({ ...value, reasoningLevel: event.target.value })}>
+      {['none', 'low', 'medium', 'high', 'xhigh', 'max', 'ultra'].map(level => <option key={level}>{level}</option>)}
+    </select>
   </div>;
 }
 export function experimental_PermissionModePicker({ value, onChange, disabled }: any) {
@@ -66,19 +70,21 @@ export function useRpc() {
 export function useSettings() {
   return { values: {}, isLoading: false };
 }
-let factoryPolicy: {
-  projectId: string; provider: string; enabled: boolean; maxConcurrent: number; intake: 'todo';
-  execution: null | { providerId: string; model: string; permissionMode: string;
-    reasoningLevel: string; serviceTier: string }; updatedAt: string;
-  factoryInstructions: string;
-} = { projectId: 'proj_test', provider: 'github', enabled: false,
-  maxConcurrent: 1, intake: 'todo', execution: null, factoryInstructions: '', updatedAt: new Date().toISOString() };
-const factoryPolicies = new Map<string, typeof factoryPolicy>();
+let factoryPolicy: FactoryProjectPolicy = {
+  projectId: 'proj_test', provider: 'github', enabled: false, maxConcurrent: 1, intake: 'todo',
+  execution: null, orchestratorExecution: null, workerExecution: null,
+  factoryInstructions: '',
+  updatedAt: new Date().toISOString()
+};
+const factoryPolicies = new Map<string, FactoryProjectPolicy>();
 const rpc = {
   async call(method: string, input: { projectId?: string; body?: string; digest?: string; kind?: string; path?: string;
     enabled?: boolean; maxConcurrent?: number; threadId?: string; statusId?: string;
     providerId?: string | null; contextThreadId?: string | null;
     execution?: typeof factoryPolicy.execution;
+    role?: 'orchestrator' | 'worker';
+    orchestratorExecution?: typeof factoryPolicy.execution;
+    workerExecution?: typeof factoryPolicy.execution;
     factoryInstructions?: string;
     mutation?: { field: 'assignee' | 'priority' | 'project'; valueId: string | null } }) {
     const record = window.factoryFixture;
@@ -92,14 +98,16 @@ const rpc = {
               reasoningLevel: 'high', serviceTier: 'default' }
           : { providerId: 'codex', model: 'gpt-5', permissionMode: 'auto',
               reasoningLevel: 'medium', serviceTier: 'default' },
-        selected: projectPolicy.execution,
+        selected: (input.role === 'orchestrator' ? projectPolicy.orchestratorExecution : projectPolicy.workerExecution) ?? projectPolicy.execution,
         routing: { kind: 'environment', environmentId: 'env_test' }
       };
     }
     if (method === 'factoryGetProject' || method === 'factorySaveProject') {
       if (method === 'factorySaveProject') {
         Object.assign(projectPolicy, { enabled: input.enabled ?? false, maxConcurrent: input.maxConcurrent ?? 1,
-          execution: input.execution ?? null, factoryInstructions: input.factoryInstructions ?? '' });
+          execution: input.execution ?? null, orchestratorExecution: input.orchestratorExecution ?? null,
+          workerExecution: input.workerExecution ?? null,
+          factoryInstructions: input.factoryInstructions ?? '' });
         factoryPolicies.set(projectPolicy.projectId, structuredClone(projectPolicy));
       }
       const kind = window.factoryProjectState;

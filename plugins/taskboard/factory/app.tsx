@@ -10,6 +10,7 @@ import { Input } from '../components/ui/input.js';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '../components/ui/dialog.js';
 import { originalTicketPath, requestTaskboardOpen, ticketThreadId } from './navigation.js';
 import { ErrorNotice } from './error-notice.js';
+import { projectRoleExecution } from './native-dispatch.js';
 import { ExecutionPicker } from './execution-picker.js';
 import { FactoryRoom } from './room.js';
 import { consoleState, runStatus, stageLabels as labels } from './console-state.js';
@@ -137,7 +138,7 @@ function FactoryWorkbench({ record, onRecord, actions, plan, item }: {
   function openThread(threadId: string) {
     requestTaskboardOpen(threadId); navigate.toThread(threadId);
   }
-  const policyExecution = projectStatus?.policy.execution ?? null;
+  const policyExecution = projectStatus ? projectRoleExecution(projectStatus.policy, 'worker') : null;
   async function saveExecution(execution: FactoryRecord['execution']) {
     if (aiBusy) return;
     setAiBusy(true);
@@ -150,7 +151,7 @@ function FactoryWorkbench({ record, onRecord, actions, plan, item }: {
         expectedVersion: record.version, execution
       }), 20_000, 'Saving the ticket AI');
       onRecord(result.record);
-      setAiNote(execution ? 'AI saved for this ticket.' : 'Using the project default AI.');
+      setAiNote(execution ? 'AI saved for this ticket.' : 'Using the project role settings.');
     } catch (reason) {
       setAiError(reason instanceof Error ? reason.message : String(reason));
     } finally {
@@ -159,7 +160,7 @@ function FactoryWorkbench({ record, onRecord, actions, plan, item }: {
     }
   }
   const aiNode = <>
-    <span className="tb-room-ai-label">AI for this ticket</span>
+    <span className="tb-room-ai-label">Ticket AI override (both roles)</span>
     <ExecutionPicker
       projectId={record.projectId}
       value={pendingExecution ? pendingExecution.value : record.execution}
@@ -407,7 +408,7 @@ export function StartTaskButton({ item, disabled = false }: {
     <Dialog open={open} onOpenChange={next => { if (!busy) setOpen(next); }}>
       <DialogContent className="max-w-md" onClick={event => event.stopPropagation()}>
         <DialogTitle>Start task</DialogTitle>
-        <DialogDescription>Choose the AI for this task before starting work.</DialogDescription>
+        <DialogDescription>Uses the project’s separate orchestrator and worker AI settings. An explicit choice below overrides both roles for this task.</DialogDescription>
         <ExecutionPicker
           projectId={item.bbProjectId}
           value={execution}
@@ -415,9 +416,9 @@ export function StartTaskButton({ item, disabled = false }: {
           threadId={context.projectId === item.bbProjectId ? context.threadId : null}
           disabled={busy}
           showSummary
-          summaryTitle="AI for this task"
+          summaryTitle="Worker AI / override both roles"
           compact
-          resetLabel="Use factory AI"
+          resetLabel="Use project role settings"
           preferFactoryAI
         />
         {error && <ErrorNotice title="Task needs attention"

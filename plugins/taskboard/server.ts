@@ -83,7 +83,7 @@ import {
   factoryEmpiricalTag, factoryIdentitySchema, factoryProjectPolicySchema, factoryProjectTag, factoryRecordTag,
   factoryThreadTag, type FactoryIdentity, type FactoryRecord, type FactoryStatusTarget
 } from './factory/contract.js';
-import { threadExecution } from './factory/native-dispatch.js';
+import { projectRoleExecution, threadExecution } from './factory/native-dispatch.js';
 import { factoryKey } from './factory/state.js';
 import { createEmpiricalObservationQueue } from './empirical/serial.js';
 import { hostContract } from './preparation/contract.js';
@@ -2197,7 +2197,7 @@ export default async function plugin(bb: BbPluginApi) {
       ]);
       return {
         defaults: threadDefaults ?? projectDefaults ?? null,
-        selected: policy.execution ?? null,
+        selected: projectRoleExecution(policy, input.role ?? 'worker'),
         routing
       };
     },
@@ -2645,6 +2645,8 @@ export default async function plugin(bb: BbPluginApi) {
               projectId: project.id, provider: projectConfig(project.id, true).source,
               enabled: verb === 'enable', intake: 'todo', maxConcurrent: concurrency,
               execution: snapshot.policy.execution ?? null,
+              orchestratorExecution: snapshot.policy.orchestratorExecution ?? null,
+              workerExecution: snapshot.policy.workerExecution ?? null,
               factoryInstructions: snapshot.policy.factoryInstructions ?? ''
             });
           } else if (verb === 'scan' && args.positionals.length <= 1) {

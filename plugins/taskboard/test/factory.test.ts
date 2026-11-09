@@ -22,6 +22,7 @@ const { newRecord, savePlan, approvePlan, startRun } = await import('../factory/
 const { createFactoryStore } = await import('../factory/store.ts');
 const { createFactoryService, applyNativeEvent, factoryPrompt } = await import('../factory/service.ts');
 const { readReviewResult, readBuildResult, readableResultOutput } = await import('../factory/review.ts');
+const { projectRoleExecution } = await import('../factory/native-dispatch.ts');
 const { coordinatorTitle } = await import('../factory/coordinator.ts');
 test('readable reports retain surrounding legacy details and malformed evidence', () => {
   assert.equal(readableResultOutput('## Checks\n680 tests passed.\n<taskboard-review>{"verdict":"blocked","findings":"Missing backfill."}</taskboard-review>\nNo deployment.'),
@@ -318,7 +319,7 @@ function fixture(queue?: Parameters<typeof createFactoryService>[4]) {
   let currentThreadId = 'thr_native';
   let threadProjectId = item.bbProjectId;
   let environmentProjectId = item.bbProjectId;
-  const spawnInputs: { title: string; prompt: string; parentThreadId?: string; providerId?: string; model?: string;
+  const spawnInputs: { title: string; prompt: string; reasoningLevel?: string; parentThreadId?: string; providerId?: string; model?: string;
     executionInputSources?: Record<string, string>; environment: { type: string; environmentId?: string } }[] = [];
   const parents = new Map<string, string | null>();
   const titles = new Map<string, string>();
@@ -2912,6 +2913,123 @@ test('only provider-supported In progress and In review transitions are selected
   assert.equal(reviewStatus([option('work', 'In Progress', 'in_progress')]), undefined);
 });
 
+const orchestratorAI = {
+  providerId: 'claude', model: 'orchestrator-model', permissionMode: 'auto' as const,
+  reasoningLevel: 'high' as const, serviceTier: 'default' as const
+};
+const workerAI = {
+  providerId: 'codex', model: 'worker-model', permissionMode: 'accept-edits' as const,
+  reasoningLevel: 'low' as const, serviceTier: 'default' as const
+};
+
+test('legacy policy JSON preserves shared AI and new fields have safe defaults', () => {
+  const policy = factoryProjectPolicySchema.parse({
+    projectId: item.bbProjectId, provider: item.source, execution: orchestratorAI, updatedAt: ''
+  });
+  assert.equal(policy.orchestratorExecution, null);
+  assert.equal(policy.workerExecution, null);
+  assert.deepEqual(projectRoleExecution(policy, 'orchestrator'), orchestratorAI);
+  assert.deepEqual(projectRoleExecution(policy, 'worker'), orchestratorAI);
+});
+
+test('project roles reach coordinator and every worker stage with independent reasoning', async () => {
+  for (const automatic of [false, true]) {
+    const f = fixture(automatic ? {
+      provider: () => item.source, candidates: async () => [item], liveItem: async () => item
+    } : undefined);
+    try {
+      f.projectDefaults(null);
+      f.store.saveProjectPolicy({
+        ...f.store.getProjectPolicy(item.bbProjectId, item.source), enabled: true,
+        orchestratorExecution: orchestratorAI, workerExecution: workerAI
+      });
+      if (automatic) await f.service.scan(item.bbProjectId);
+      else await f.service.startTask(item, null);
+      f.complete('Investigation findings');
+      await f.service.get(item);
+      f.complete('Implementation plan');
+      await f.service.get(item);
+      f.complete('::taskboard-result{kind="build" verdict="implemented" revision="abc123"}\nImplemented and verified.');
+      await f.service.get(item);
+      assert.equal(f.spawnInputs.length, 5);
+      const [coordinator, ...workers] = f.spawnInputs;
+      assert.equal(coordinator.providerId, orchestratorAI.providerId);
+      assert.equal(coordinator.model, orchestratorAI.model);
+      assert.equal(coordinator.reasoningLevel, 'high');
+      for (const worker of workers) {
+        assert.equal(worker.providerId, workerAI.providerId);
+        assert.equal(worker.model, workerAI.model);
+        assert.equal(worker.reasoningLevel, 'low');
+        assert.equal(worker.executionInputSources?.reasoningLevel, 'explicit');
+      }
+      assert.equal(f.store.getProjectPolicy('proj_other', item.source).workerExecution, null);
+    } finally { f.db.close(); }
+  }
+});
+
+test('task override still overrides both project roles', async () => {
+  const f = fixture();
+  try {
+    f.store.saveProjectPolicy({
+      ...f.store.getProjectPolicy(item.bbProjectId, item.source),
+      orchestratorExecution: orchestratorAI, workerExecution: workerAI
+    });
+    const override = { ...workerAI, model: 'ticket-model', reasoningLevel: 'medium' as const };
+    await f.service.startTask(item, null, override);
+    for (const spawn of f.spawnInputs) {
+      assert.equal(spawn.model, override.model);
+      assert.equal(spawn.reasoningLevel, override.reasoningLevel);
+    }
+  } finally { f.db.close(); }
+});
+
+test('each role falls back independently to BB defaults', async () => {
+  for (const role of ['orchestrator', 'worker'] as const) {
+    const f = fixture();
+    try {
+      f.store.saveProjectPolicy({
+        ...f.store.getProjectPolicy(item.bbProjectId, item.source),
+        orchestratorExecution: role === 'orchestrator' ? orchestratorAI : null,
+        workerExecution: role === 'worker' ? workerAI : null
+      });
+      await f.service.startTask(item, null);
+      assert.equal(f.spawnInputs[0].model, role === 'orchestrator' ? orchestratorAI.model : 'test');
+      assert.equal(f.spawnInputs[1].model, role === 'worker' ? workerAI.model : 'test');
+    } finally { f.db.close(); }
+  }
+});
+
+test('worker policy applies to continued Build turns', async () => {
+  const f = fixture();
+  try {
+    const record = pausedBuild(workerAI);
+    record.execution = null;
+    f.store.save(record);
+    f.store.saveProjectPolicy({
+      ...f.store.getProjectPolicy(item.bbProjectId, item.source),
+      orchestratorExecution: orchestratorAI, workerExecution: workerAI
+    });
+    await f.service.startTask(item, null);
+    assert.equal(f.sends(), 1);
+    assert.equal(f.sent[0].model, workerAI.model);
+    assert.equal(f.sent[0].reasoningLevel, 'low');
+  } finally { f.db.close(); }
+});
+
+test('role changes reject stale admission even with identical timestamps', () => {
+  for (const patch of [
+    { orchestratorExecution: orchestratorAI }, { workerExecution: workerAI }
+  ]) {
+    const db = new Database(':memory:');
+    try {
+      const store = createFactoryStore(db);
+      const before = store.saveProjectPolicy({ ...store.getProjectPolicy(item.bbProjectId, item.source), enabled: true });
+      const changed = store.saveProjectPolicy({ ...before, ...patch });
+      assert.equal(store.admit({ projectId: item.bbProjectId, source: item.source,
+        locator: item.locator, scopeDigest: 'scope' }, { ...before, updatedAt: changed.updatedAt }).kind, 'disabled');
+    } finally { db.close(); }
+  }
+});
 
 test('project factory instructions default empty and validate their size', () => {
   const policy = factoryProjectPolicySchema.parse({ projectId: item.bbProjectId, provider: item.source, updatedAt: '' });

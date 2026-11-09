@@ -16,7 +16,10 @@ export const factoryProjectPolicySchema = z.object({
   provider: z.enum(['github', 'gitlab', 'linear', 'jira', 'gitea']),
   intake: z.literal('todo').default('todo'),
   maxConcurrent: z.number().int().min(1).max(20).default(1),
+  // Shared execution is retained for policies saved before per-role settings.
   execution: factoryExecutionSchema.nullable().default(null),
+  orchestratorExecution: factoryExecutionSchema.nullable().default(null),
+  workerExecution: factoryExecutionSchema.nullable().default(null),
   factoryInstructions: z.string().max(20_000).default(''),
   updatedAt: z.string()
 }).strict();
@@ -179,6 +182,7 @@ export const factoryRpcMethods = {
     input: z.object({
       projectId: z.string().startsWith('proj_'),
       providerId: z.string().min(1).max(200).nullable().default(null),
+      role: z.enum(['orchestrator', 'worker']).default('worker'),
       threadId: z.string().min(1).max(500).nullable().default(null)
     }).strict(),
     output: factoryExecutionOptionsSchema
