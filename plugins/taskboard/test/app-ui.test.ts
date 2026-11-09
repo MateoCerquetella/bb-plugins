@@ -5,7 +5,7 @@ import { test } from 'node:test';
 const app = await readFile(new URL('../app.tsx', import.meta.url), 'utf8');
 
 test('registers Taskboard for existing-thread and New Thread right panels', () => {
-  assert.match(app, /app\.slots\.threadPanelAction\(\{[\s\S]*?id: THREAD_PANEL_ACTION_ID[\s\S]*?icon: 'Target'[\s\S]*?component: TaskboardThreadPanel[\s\S]*?layout: 'flush'/u);
+  assert.match(app, /app\.slots\.experimental_tab\(\{[\s\S]*?id: THREAD_PANEL_ACTION_ID[\s\S]*?icon: 'Target'[\s\S]*?component: TaskboardThreadPanel[\s\S]*?layout: 'flush'[\s\S]*?context: \{ kind: 'thread' \}[\s\S]*?availability: 'action'/u);
   assert.match(app, /app\.slots\.experimental_newThreadPanelAction\(\{[\s\S]*?id: 'taskboard-new-thread-panel'[\s\S]*?icon: 'Target'[\s\S]*?component: TaskboardNewThreadPanel[\s\S]*?layout: 'flush'/u);
   assert.match(app, /function TaskboardNewThreadPanel\(\{ projectId \}[\s\S]*?<TaskboardRightPanel projectId=\{projectId\}/u);
   assert.match(app, /surfaceMode="constrained"/u);
@@ -34,7 +34,7 @@ test('accepts bounded Taskboard drops only on the visible composer textbox', () 
   )?.[0];
   assert.ok(insertion, 'Missing route-bound composer insertion');
   assert.match(insertion, /serializeTaskboardComposerMention/u);
-  assert.match(insertion, /composer\.insertMention\(safeMention\)/u);
+  assert.match(insertion, /composer\.insert\(safeMention\)/u);
   assert.match(insertion, /composer\.focus\(\)/u);
   assert.match(insertion, /setComposerAnnouncement\(`Added/u);
   assert.doesNotMatch(insertion, /toCompose|spawn|submit|send|queue|steer/u);
@@ -269,7 +269,7 @@ test('captures the original composer prompt locally exactly once per open', () =
   assert.ok(contextLoad, 'Missing provider context loading effect');
   assert.doesNotMatch(contextLoad, /setTitle|setDescription/u);
   assert.match(app, /const \[capturedPrompt, setCapturedPrompt\] = useState<string \| null>\(null\)/u);
-  assert.match(app, /const prompt = view\.draft\.text;/u);
+  assert.match(app, /const prompt = composer\.text;/u);
   assert.match(app, /setCapturedPrompt\(prompt\)/u);
   assert.match(app, /initialPrompt=\{capturedPrompt\}/u);
   assert.match(app, /Prompt copied for review/u);

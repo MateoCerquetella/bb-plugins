@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-ba6753b078aa93d5b4fadddd",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-UI-1",
+    "AC-UI-2",
+    "AC-UI-3"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Real-browser evidence from an independent checker of installed Aura 0.2.7: at 390x844 the composer is absolute and pinned to the panel bottom (top 664, bottom 844), recents scroll above it while it stays fixed, and the wallpaper still paints with its half mask; at 1440x1000 the composer is centered (order -1, top 280, compact spacer absent).",
+  "passed": true,
+  "startedAt": "2026-11-03T01:19:22.185Z",
+  "completedAt": "2026-11-03T01:19:22.185Z",
+  "provenance": {
+    "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+    "feature": "fix-aura-on-mobile-stop-aura-s-desktop-composer-centering",
+    "specRevision": 2,
+    "specDigest": "sha256:8de0d5479e774a23a91e052a011c11dac2a8c8b442076be77e49227f366bfecc",
+    "treeDigest": "sha256:cb6c46081e25ff4c5d3bbf774cf7147450a13302744342c0679ddb1e44f1f2d4",
+    "policyDigest": "sha256:6ebe58cbdef84ea3073f41581b4274f7b15a38527b5a354221da1191ec5de596"
+  },
+  "digest": "sha256:92313ca0499a9d3a93e094e348f492f5c11268b24c915e0d735cd641f2a2c581",
+  "kind": "collected",
+  "collector": "isolated-qa-thread thr_3yy3ucyr3y",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/fix-aura-on-mobile-stop-aura-s-desktop-composer-centering/qa/desktop-1440x1000.png",
+      "mediaType": "image/png",
+      "bytes": 260999,
+      "digest": "sha256:015aa72da87026b09234421f942aefa3a96e228b7bbdd9c3f8e51e240f8ae213"
+    },
+    {
+      "path": ".empirical/specs/fix-aura-on-mobile-stop-aura-s-desktop-composer-centering/qa/mobile-390x844.png",
+      "mediaType": "image/png",
+      "bytes": 96307,
+      "digest": "sha256:1939da3dc619915811af168d2f5578403c27c12594d1a1aaaf6e7581a07769fe"
+    },
+    {
+      "path": ".empirical/specs/fix-aura-on-mobile-stop-aura-s-desktop-composer-centering/qa/report.json",
+      "mediaType": "application/json",
+      "bytes": 16555,
+      "digest": "sha256:0c1734960e5046c57982b85ccf4d197eecce8262fea4da4cbc3b9e6ab6a8df79"
+    }
+  ]
+}

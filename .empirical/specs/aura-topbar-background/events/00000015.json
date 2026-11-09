@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "sequence": 15,
+  "previousDigest": "sha256:7add041852c0a776983284206fdf138b3eff46970caeb9d2b9a5b11c92a05be5",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Plan unchanged; one new capability added, no code delta.",
+  "createdAt": "2026-11-02T21:06:25.338Z",
+  "stateBeforeDigest": "sha256:83b24fd0832ce0276f39755d85e8fedadd5da7672387d89fbabe061bf35fae5e",
+  "stateAfterDigest": "sha256:b75726dfad42261d35a1e413564bd8e2ecf02c220d25f07c0101f878ba35c649",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 15,
+    "activeFeature": "aura-topbar-background",
+    "request": "Fix the Aura plugin so BB's top bar no longer picks up the wallpaper by default, add a Settings -> Aura checkbox to opt the top bar background in or out, verify it in the installed UI, bump the Aura version, and open and merge a PR.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "Plan unchanged; one new capability added, no code delta.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:e4b3916524e1c34525922f1ab3f26276cfe683eda2c5c1c60a9693dab0d88923",
+    "approvedSpecRevision": 13,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:f353204a405bf2626785fdf6420b80654f003a47eb607a2e106da4bebe999623",
+    "impactDigest": "sha256:3116b87f21a9f0ec9966858149360e07dbcef6b53744e392ce4bbcaf201db62a",
+    "capabilityClaimId": "aura-topbar-background-2e6152ecb91d",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-11-02T21:06:25.338Z",
+    "capabilityBase": {
+      "schemaVersion": 1,
+      "id": "aura-topbar-background-2e6152ecb91d",
+      "repositoryId": "sha256:703b13956fbeb2dfe9d4cf7c34077de56a5c348c0f42f9ceef5c1cac794fbf42",
+      "feature": "aura-topbar-background",
+      "worktree": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_wsf35bpesn-1/bb-plugins",
+      "worktreeId": "sha256:5791b747d037d16c8e4326518672256b774fd6b3fd7da2c8ca10294f5a7c2d8b",
+      "baseCommit": "3e333355b29548c8e86b4fd563a0e4de3de577d6",
+      "baseTree": "091003128486fdd27335224aedfcc9d630488c20",
+      "bases": {
+        "aura-background-surface": {
+          "capability": "aura-background-surface",
+          "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "requirements": {
+            "opt-in top bar background": null
+          }
+        }
+      },
+      "capabilities": [
+        "aura-background-surface"
+      ],
+      "status": "active",
+      "integrationReceiptDigest": null,
+      "createdAt": "2026-11-02T20:51:36.633Z",
+      "heartbeatAt": "2026-11-02T20:51:36.633Z",
+      "digest": "sha256:684a8b0c8aa2f84b006a0bf55ef04a1e5029c66c9c98ac8b49acb22e8d0d13da"
+    },
+    "sizeDecision": {
+      "choice": "keep",
+      "criteria": 7,
+      "capabilities": 1,
+      "reason": "One small cohesive surface preference: schema, CSS, one checkbox, tests, version, PR. Splitting would separate a setting from the only behavior it controls and add release overhead without reducing risk.",
+      "actor": "agent",
+      "revision": 2
+    },
+    "trackerGeneration": 2,
+    "lifecycle": {
+      "stage": "development",
+      "iteration": 2,
+      "awaitingFeedback": false,
+      "contractRevision": 11
+    },
+    "reviewFirst": true
+  },
+  "digest": "sha256:b22333b0bc9271cc5451a7aab7ec98014daddecd3a33cdb8dd353cd997658417"
+}

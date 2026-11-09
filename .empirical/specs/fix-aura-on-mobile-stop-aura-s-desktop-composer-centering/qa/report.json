@@ -1,0 +1,590 @@
+{
+  "schemaVersion": 1,
+  "spec": "fix-aura-on-mobile-stop-aura-s-desktop-composer-centering",
+  "generatedAt": "2026-11-03T01:15:33.900Z",
+  "url": "http://127.0.0.1:38886",
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "v22.23.1"
+  },
+  "browser": {
+    "engine": "chromium",
+    "executablePath": "/home/dyaus/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",
+    "args": [
+      "--no-sandbox",
+      "--enable-unsafe-swiftshader"
+    ],
+    "deviceScaleFactor": 1
+  },
+  "consoleErrors": [
+    "console: Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "mobile": {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "measurements": {
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "panel": {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "top": 0,
+          "left": 0,
+          "right": 390,
+          "bottom": 844,
+          "width": 390,
+          "height": 844
+        },
+        "display": "block",
+        "visibility": "visible",
+        "position": "relative",
+        "top": "0px",
+        "bottom": "0px",
+        "order": "0",
+        "minHeight": "auto",
+        "overflow": "clip",
+        "overflowY": "clip",
+        "zIndex": "auto",
+        "opacity": "1",
+        "backgroundColor": "rgba(0, 0, 0, 0)"
+      },
+      "composer": {
+        "rect": {
+          "x": 0,
+          "y": 664,
+          "top": 664,
+          "left": 0,
+          "right": 390,
+          "bottom": 844,
+          "width": 390,
+          "height": 180
+        },
+        "display": "block",
+        "visibility": "visible",
+        "position": "absolute",
+        "top": "664px",
+        "bottom": "0px",
+        "order": "0",
+        "minHeight": "0px",
+        "overflow": "visible",
+        "overflowY": "visible",
+        "zIndex": "10",
+        "opacity": "1",
+        "backgroundColor": "rgba(0, 0, 0, 0)"
+      },
+      "recents": {
+        "rect": {
+          "x": 16,
+          "y": 370,
+          "top": 370,
+          "left": 16,
+          "right": 374,
+          "bottom": 1552,
+          "width": 358,
+          "height": 1182
+        },
+        "display": "block",
+        "visibility": "visible",
+        "position": "static",
+        "top": "auto",
+        "bottom": "auto",
+        "order": "0",
+        "minHeight": "0px",
+        "overflow": "visible",
+        "overflowY": "visible",
+        "zIndex": "auto",
+        "opacity": "1",
+        "backgroundColor": "rgba(0, 0, 0, 0)"
+      },
+      "scrollViewport": {
+        "rect": {
+          "x": 0,
+          "y": 56,
+          "top": 56,
+          "left": 0,
+          "right": 390,
+          "bottom": 844,
+          "width": 390,
+          "height": 788
+        },
+        "display": "block",
+        "visibility": "visible",
+        "position": "absolute",
+        "top": "56px",
+        "bottom": "0px",
+        "order": "0",
+        "minHeight": "0px",
+        "overflow": "auto",
+        "overflowY": "auto",
+        "zIndex": "auto",
+        "opacity": "1",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "scroll": {
+          "clientHeight": 788,
+          "scrollHeight": 1676,
+          "clientWidth": 390,
+          "scrollWidth": 390,
+          "scrollTop": 0
+        }
+      },
+      "spacer": {
+        "present": true,
+        "rect": {
+          "x": 0,
+          "y": 1552,
+          "top": 1552,
+          "left": 0,
+          "right": 390,
+          "bottom": 1732,
+          "width": 390,
+          "height": 180
+        },
+        "display": "block",
+        "visibility": "visible",
+        "position": "static",
+        "top": "auto",
+        "bottom": "auto",
+        "order": "0",
+        "minHeight": "auto",
+        "overflow": "visible",
+        "overflowY": "visible",
+        "zIndex": "auto",
+        "opacity": "1",
+        "backgroundColor": "rgba(0, 0, 0, 0)"
+      },
+      "fade": {
+        "present": true,
+        "rect": {
+          "x": 0,
+          "y": 664,
+          "top": 664,
+          "left": 0,
+          "right": 390,
+          "bottom": 664,
+          "width": 390,
+          "height": 0
+        },
+        "display": "block",
+        "visibility": "visible",
+        "position": "static",
+        "top": "auto",
+        "bottom": "auto",
+        "order": "0",
+        "minHeight": "0px",
+        "overflow": "visible",
+        "overflowY": "visible",
+        "zIndex": "auto",
+        "opacity": "1",
+        "backgroundColor": "rgba(0, 0, 0, 0)"
+      },
+      "recentsOffset": {
+        "present": false,
+        "rect": null
+      },
+      "overflow": {
+        "panel": {
+          "clientWidth": 390,
+          "scrollWidth": 390
+        },
+        "page": {
+          "innerWidth": 390,
+          "docClientWidth": 390,
+          "docScrollWidth": 390,
+          "bodyScrollWidth": 390
+        }
+      },
+      "aura": {
+        "inkExists": true,
+        "halfWallpaper": true,
+        "maskImage": "linear-gradient(rgb(0, 0, 0) 0%, rgb(0, 0, 0) 25%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0) 100%)",
+        "maskHas50Percent": true,
+        "canvas": {
+          "rendered": "true",
+          "width": 195,
+          "height": 398,
+          "cssWidth": 390,
+          "cssHeight": 796,
+          "display": "block",
+          "visibility": "visible"
+        }
+      },
+      "scrollTest": {
+        "before": 0,
+        "after": 888,
+        "moved": true,
+        "scrollHeight": 1676,
+        "clientHeight": 788
+      },
+      "composerAfterScroll": {
+        "panelBottom": 844,
+        "composerTop": 664,
+        "composerBottom": 844
+      }
+    },
+    "checks": {
+      "composerPinnedBottom": {
+        "pass": true,
+        "expected": "composer bottom within 2px of panel bottom",
+        "actual": {
+          "composerBottom": 844,
+          "panelBottom": 844,
+          "delta": 0
+        }
+      },
+      "composerTopBelow60Percent": {
+        "pass": true,
+        "expected": "composer top > panel.top + 60% of panel height",
+        "actual": {
+          "composerTop": 664,
+          "threshold": 506.4
+        }
+      },
+      "nativeAbsolutePosition": {
+        "pass": true,
+        "expected": "absolute",
+        "actual": "absolute"
+      },
+      "composerStaysPinnedWhileScrolling": {
+        "pass": true,
+        "expected": "composer bottom stays within 2px of panel bottom after scrolling recents to end",
+        "actual": {
+          "panelBottom": 844,
+          "composerTop": 664,
+          "composerBottom": 844
+        }
+      },
+      "recentsAboveComposer": {
+        "pass": true,
+        "expected": "recents top < composer top",
+        "actual": {
+          "recentsTop": 370,
+          "composerTop": 664
+        }
+      },
+      "recentsScrollable": {
+        "pass": true,
+        "expected": "scroll viewport scrollHeight > clientHeight and scrollTop moves",
+        "actual": {
+          "scroll": {
+            "clientHeight": 788,
+            "scrollHeight": 1676,
+            "clientWidth": 390,
+            "scrollWidth": 390,
+            "scrollTop": 0
+          },
+          "scrollTest": {
+            "before": 0,
+            "after": 888,
+            "moved": true,
+            "scrollHeight": 1676,
+            "clientHeight": 788
+          }
+        }
+      },
+      "spacerPresent": {
+        "pass": true,
+        "expected": "present with display block",
+        "actual": {
+          "present": true,
+          "display": "block"
+        }
+      },
+      "fadePresent": {
+        "pass": true,
+        "expected": "present with display block",
+        "actual": {
+          "present": true,
+          "display": "block",
+          "height": 0
+        }
+      },
+      "noHorizontalOverflow": {
+        "pass": true,
+        "expected": "panel and page horizontal overflow <= 1px",
+        "actual": {
+          "panel": 0,
+          "page": 0
+        }
+      },
+      "wallpaperPaintedHalfMask": {
+        "pass": true,
+        "expected": ".aura-capy-ink exists, half-wallpaper mask fades at 50%, canvas data-rendered with non-zero size and visible",
+        "actual": {
+          "inkExists": true,
+          "halfWallpaper": true,
+          "maskImage": "linear-gradient(rgb(0, 0, 0) 0%, rgb(0, 0, 0) 25%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0) 100%)",
+          "maskHas50Percent": true,
+          "canvas": {
+            "rendered": "true",
+            "width": 195,
+            "height": 398,
+            "cssWidth": 390,
+            "cssHeight": 796,
+            "display": "block",
+            "visibility": "visible"
+          }
+        }
+      }
+    }
+  },
+  "desktop": {
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "measurements": {
+      "viewport": {
+        "width": 1440,
+        "height": 1000,
+        "dpr": 1
+      },
+      "panel": {
+        "rect": {
+          "x": 320,
+          "y": 0,
+          "top": 0,
+          "left": 320,
+          "right": 1440,
+          "bottom": 1000,
+          "width": 1120,
+          "height": 1000
+        },
+        "display": "block",
+        "visibility": "visible",
+        "position": "relative",
+        "top": "0px",
+        "bottom": "0px",
+        "order": "0",
+        "minHeight": "auto",
+        "overflow": "clip",
+        "overflowY": "clip",
+        "zIndex": "auto",
+        "opacity": "1",
+        "backgroundColor": "rgba(0, 0, 0, 0)"
+      },
+      "composer": {
+        "rect": {
+          "x": 516,
+          "y": 280,
+          "top": 280,
+          "left": 516,
+          "right": 1244,
+          "bottom": 720,
+          "width": 728,
+          "height": 440
+        },
+        "display": "flex",
+        "visibility": "visible",
+        "position": "relative",
+        "top": "0px",
+        "bottom": "0px",
+        "order": "-1",
+        "minHeight": "440px",
+        "overflow": "visible",
+        "overflowY": "visible",
+        "zIndex": "auto",
+        "opacity": "1",
+        "backgroundColor": "rgba(0, 0, 0, 0)"
+      },
+      "recents": {
+        "rect": null
+      },
+      "scrollViewport": {
+        "rect": null,
+        "scroll": null
+      },
+      "spacer": {
+        "present": false,
+        "rect": null
+      },
+      "fade": {
+        "present": true,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "top": 0,
+          "left": 0,
+          "right": 0,
+          "bottom": 0,
+          "width": 0,
+          "height": 0
+        },
+        "display": "none",
+        "visibility": "visible",
+        "position": "static",
+        "top": "auto",
+        "bottom": "auto",
+        "order": "0",
+        "minHeight": "0px",
+        "overflow": "visible",
+        "overflowY": "visible",
+        "zIndex": "auto",
+        "opacity": "1",
+        "backgroundColor": "rgba(0, 0, 0, 0)"
+      },
+      "recentsOffset": {
+        "present": false,
+        "rect": null
+      },
+      "overflow": {
+        "panel": {
+          "clientWidth": 1120,
+          "scrollWidth": 1120
+        },
+        "page": {
+          "innerWidth": 1440,
+          "docClientWidth": 1440,
+          "docScrollWidth": 1440,
+          "bodyScrollWidth": 1440
+        }
+      },
+      "aura": {
+        "inkExists": true,
+        "halfWallpaper": true,
+        "maskImage": "linear-gradient(rgb(0, 0, 0) 0%, rgb(0, 0, 0) 25%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0) 100%)",
+        "maskHas50Percent": true,
+        "canvas": {
+          "rendered": "true",
+          "width": 560,
+          "height": 476,
+          "cssWidth": 1120,
+          "cssHeight": 952,
+          "display": "block",
+          "visibility": "visible"
+        }
+      }
+    },
+    "checks": {
+      "composerNotAbsolute": {
+        "pass": true,
+        "expected": "position relative (not absolute)",
+        "actual": "relative"
+      },
+      "composerOrderFirst": {
+        "pass": true,
+        "expected": "order -1",
+        "actual": "-1"
+      },
+      "composerTopUpper45Percent": {
+        "pass": true,
+        "expected": "composer top < panel.top + 45% of panel height",
+        "actual": {
+          "composerTop": 280,
+          "threshold": 450
+        }
+      },
+      "compactSpacerHiddenOrAbsent": {
+        "pass": true,
+        "expected": "hidden or absent",
+        "actual": {
+          "present": false
+        }
+      },
+      "compactFadeHiddenOrAbsent": {
+        "pass": true,
+        "expected": "hidden or absent",
+        "actual": {
+          "present": true,
+          "display": "none"
+        }
+      },
+      "recentsOffsetHiddenOrAbsent": {
+        "pass": true,
+        "expected": "hidden or absent",
+        "actual": {
+          "present": false
+        }
+      },
+      "desktopCenteredComposition": {
+        "pass": true,
+        "expected": "relative, order -1, min-height min(45dvh,440px) resolving to 440px at 1000px height, centered high",
+        "actual": {
+          "position": "relative",
+          "order": "-1",
+          "minHeight": "440px",
+          "top": 280
+        }
+      },
+      "noHorizontalOverflow": {
+        "pass": true,
+        "expected": "panel and page horizontal overflow <= 1px",
+        "actual": {
+          "panel": 0,
+          "page": 0
+        }
+      },
+      "wallpaperPainted": {
+        "pass": true,
+        "expected": "Aura ink canvas rendered with half-wallpaper mask",
+        "actual": {
+          "inkExists": true,
+          "halfWallpaper": true,
+          "maskImage": "linear-gradient(rgb(0, 0, 0) 0%, rgb(0, 0, 0) 25%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0) 100%)",
+          "maskHas50Percent": true,
+          "canvas": {
+            "rendered": "true",
+            "width": 560,
+            "height": 476,
+            "cssWidth": 1120,
+            "cssHeight": 952,
+            "display": "block",
+            "visibility": "visible"
+          }
+        }
+      }
+    }
+  },
+  "visualReview": {
+    "mobile": {
+      "pass": true,
+      "lookedAt": "mobile-390x844.png",
+      "notes": [
+        "Composer card is fully visible and pinned to the bottom edge; \"Ask anything\", the Jev Routing / microphone / send controls, and the project/device/access row are all readable over the host surface.",
+        "The Recent list sits above the composer, is clipped/faded behind it as intended, and the scroll viewport scrolled from scrollTop 0 to 888 (max) while the composer stayed at top 664 / bottom 844.",
+        "Aura wallpaper and its dot pattern fill the upper part of the panel and fade out around the vertical midpoint (mask stops at 50%); the lower half is clean for the native layout.",
+        "No horizontal clipping or sideways scrollbar visible at 390px."
+      ]
+    },
+    "desktop": {
+      "pass": true,
+      "lookedAt": "desktop-1440x1000.png",
+      "notes": [
+        "Composer is centered in the panel (x 516-1244 in a 320-1440 panel) and sits high in the panel (top 280 of 1000) with the 440px min-height desktop composition.",
+        "The compact bottom spacer is absent and the compact fade is display:none; no mobile recents strip is shown at desktop width.",
+        "Aura wallpaper remains painted behind the centered composer.",
+        "No horizontal overflow in the panel or page."
+      ]
+    }
+  },
+  "artifacts": {
+    "mobileScreenshot": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_ewg9qvzf3u-1/bb-plugins/.empirical/specs/fix-aura-on-mobile-stop-aura-s-desktop-composer-centering/qa/mobile-390x844.png",
+    "desktopScreenshot": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_ewg9qvzf3u-1/bb-plugins/.empirical/specs/fix-aura-on-mobile-stop-aura-s-desktop-composer-centering/qa/desktop-1440x1000.png",
+    "report": "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_ewg9qvzf3u-1/bb-plugins/.empirical/specs/fix-aura-on-mobile-stop-aura-s-desktop-composer-centering/qa/report.json"
+  },
+  "verdict": {
+    "overall": "PASS",
+    "a_mobileComposerPinnedBottom": "PASS",
+    "b_recentsAboveComposerAndScrollable": "PASS",
+    "c_wallpaperPaintedOnMobile": "PASS",
+    "d_desktopCompositionUnchanged": "PASS",
+    "artifacts": {
+      "mobile": "mobile-390x844.png",
+      "desktop": "desktop-1440x1000.png",
+      "report": "report.json"
+    }
+  },
+  "consoleErrorsNote": "The only console error is the host status probe http://127.0.0.1:38887/status failing with ERR_CONNECTION_REFUSED; it is unrelated to Aura and did not affect the page, wallpaper, or composer measurements.",
+  "summary": {
+    "mobileChecksPassed": 10,
+    "mobileChecksTotal": 10,
+    "desktopChecksPassed": 9,
+    "desktopChecksTotal": 9
+  }
+}

@@ -19,6 +19,7 @@ export const settingsSchema = z.object({
   enabled: z.boolean(),
   newThreadOnly: z.boolean().default(false),
   dimmerEnabled: z.boolean().default(true),
+  topbarBackground: z.boolean().default(false),
   activityOverview: z.boolean().default(false),
   effect: z.enum(["pixels", "none"]),
   pattern: z.enum(PATTERNS).default("noise"),
@@ -34,7 +35,7 @@ export const settingsSchema = z.object({
 });
 export type BackgroundSettings = z.infer<typeof settingsSchema>;
 export const defaults: BackgroundSettings = {
-  enabled: true, newThreadOnly: false, dimmerEnabled: true, activityOverview: false, effect: "pixels", pattern: "noise", dither: "8x8", photoMotion: "wave", fps: 15, quality: "balanced", tint: "lavender", intensity: 0.5,
+  enabled: true, newThreadOnly: false, dimmerEnabled: true, topbarBackground: false, activityOverview: false, effect: "pixels", pattern: "noise", dither: "8x8", photoMotion: "wave", fps: 15, quality: "balanced", tint: "lavender", intensity: 0.5,
   imageOpacity: 0.7, fit: "cover", fade: 0.35,
 };
 export const imageInfoSchema = z.object({

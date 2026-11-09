@@ -1116,17 +1116,24 @@ test('diff resolves only a recorded path in the linked project workspace', async
   const sdk = {
     threads: { get: async () => ({ projectId: item.bbProjectId, environmentId: 'env_test' }) },
     environments: {
-      get: async () => ({ projectId: item.bbProjectId, path: '/repo', mergeBaseBranch: 'main' }),
-      diffPatch: async (input: unknown) => {
-        requests.push(input);
-        return { outcome: 'available', patches: [{ path: 'src/index.ts', patch: '@@ -1 +1 @@\n-old\n+new', truncated: false }] };
+      get: async () => ({ projectId: item.bbProjectId, path: '/repo', mergeBaseBranch: 'main' })
+    },
+    plugins: {
+      callRpc: async ({ outputSchema, ...request }: { outputSchema: { parse(value: unknown): unknown } }) => {
+        requests.push(request);
+        return outputSchema.parse({
+          outcome: 'available',
+          files: [{ path: 'src/index.ts', revision: 'r1' }],
+          initialPatches: [{ path: 'src/index.ts', patch: '@@ -1 +1 @@\n-old\n+new', truncated: false }]
+        });
       }
     }
   } as unknown as Parameters<typeof createFactoryService>[0];
   const service = createFactoryService(sdk, f.store, () => {});
   assert.match((await service.diff(record, run.id, '/repo/src/index.ts')).patch!, /\+new/);
   assert.deepEqual(requests, [{
-    environmentId: 'env_test', paths: ['src/index.ts'], target: { type: 'all', mergeBaseBranch: 'main' }
+    pluginId: 'bb--git', method: 'files',
+    input: { environmentId: 'env_test', target: { type: 'all', mergeBaseBranch: 'main' }, ignoreWhitespace: false }
   }]);
   await assert.rejects(service.diff(record, run.id, 'unreported.ts'), /not part/);
   await assert.rejects(service.diff(record, 'unknown', '/repo/src/index.ts'), /not part/);
@@ -1144,20 +1151,32 @@ test('diff reports unavailable workspaces and bounds large patches', async () =>
   assert.match((await f.service.diff(record, run.id, 'file.ts')).message!, /no available workspace/);
   const stored = f.store.get(record)!;
   stored.runs[0]!.threadId = 'thr_native'; stored.runs[0]!.environmentId = 'env_test'; f.store.save(stored);
-  let outcome: unknown = { outcome: 'unavailable', failure: { message: 'Host offline' } };
+  let files: unknown = { outcome: 'unavailable', failure: { message: 'Host offline' } };
+  const patchRequests: unknown[] = [];
   const sdk = {
     threads: { get: async () => ({ projectId: item.bbProjectId, environmentId: 'env_test' }) },
     environments: {
-      get: async () => ({ projectId: item.bbProjectId, path: '/repo', mergeBaseBranch: null }),
-      diffPatch: async () => outcome
+      get: async () => ({ projectId: item.bbProjectId, path: '/repo', mergeBaseBranch: null })
+    },
+    plugins: {
+      callRpc: async ({ method, input, outputSchema }: {
+        method: string; input: { keys?: string[] }; outputSchema: { parse(value: unknown): unknown };
+      }) => {
+        if (method === 'files') return outputSchema.parse(files);
+        patchRequests.push(input);
+        return outputSchema.parse(Object.fromEntries((input.keys ?? []).map(key => [key, {
+          outcome: 'available', patch: { path: 'file.ts', patch: 'x'.repeat(200_001), truncated: false }
+        }])));
+      }
     }
   } as unknown as Parameters<typeof createFactoryService>[0];
   const service = createFactoryService(sdk, f.store, () => {});
   assert.equal((await service.diff(record, run.id, 'file.ts')).message, 'Host offline');
-  outcome = { outcome: 'available', patches: [{ path: 'file.ts', patch: 'x'.repeat(200_001), truncated: false }] };
+  files = { outcome: 'available', files: [{ path: 'file.ts', revision: 'r2' }], initialPatches: [] };
   const bounded = await service.diff(record, run.id, 'file.ts');
   assert.equal(bounded.patch?.length, 200_000);
   assert.equal(bounded.truncated, true);
+  assert.deepEqual(patchRequests, [{ keys: [JSON.stringify(['env_test', { type: 'uncommitted' }, false, 'file.ts', 'r2'])] }]);
   f.db.close();
 });
 
@@ -3010,4 +3029,71 @@ test('role changes reject stale admission even with identical timestamps', () =>
         locator: item.locator, scopeDigest: 'scope' }, { ...before, updatedAt: changed.updatedAt }).kind, 'disabled');
     } finally { db.close(); }
   }
+});
+
+test('project factory instructions default empty and validate their size', () => {
+  const policy = factoryProjectPolicySchema.parse({ projectId: item.bbProjectId, provider: item.source, updatedAt: '' });
+  assert.equal(policy.factoryInstructions, '');
+  assert.equal(factoryProjectPolicySchema.safeParse({ ...policy, factoryInstructions: 'a'.repeat(20_000) }).success, true);
+  assert.equal(factoryProjectPolicySchema.safeParse({ ...policy, factoryInstructions: 'a'.repeat(20_001) }).success, false);
+});
+
+test('project instructions reach every worker stage for manual and automatic intake', async () => {
+  for (const automatic of [false, true]) {
+    const f = fixture(automatic ? {
+      provider: () => item.source, candidates: async () => [item], liveItem: async () => item
+    } : undefined);
+    try {
+      const instructions = '  Project conventions\nRun regression checks.\n';
+      f.store.saveProjectPolicy({
+        ...f.store.getProjectPolicy(item.bbProjectId, item.source), enabled: true, factoryInstructions: instructions
+      });
+      if (automatic) await f.service.scan(item.bbProjectId);
+      else await f.service.startTask(item, null);
+      f.complete('Investigation findings');
+      await f.service.get(item);
+      f.complete('Implementation plan');
+      await f.service.get(item);
+      f.complete('::taskboard-result{kind="build" verdict="implemented" revision="abc123"}\nImplemented and verified.');
+      await f.service.get(item);
+      assert.equal(f.spawnInputs.length, 5);
+      assert.ok(!f.spawnInputs[0].prompt.includes(instructions), 'Coordinator acknowledgement is unchanged');
+      for (const worker of f.spawnInputs.slice(1)) {
+        assert.ok(worker.prompt.endsWith('\n\n' + instructions));
+        assert.equal(worker.prompt.split(instructions).length, 2);
+      }
+      assert.equal(f.store.getProjectPolicy('proj_other', item.source).factoryInstructions, '');
+    } finally { f.db.close(); }
+  }
+});
+
+test('current project instructions apply to continued Build turns', async () => {
+  const f = fixture();
+  try {
+    f.store.save(pausedBuild({ providerId: 'codex', model: 'test', permissionMode: 'auto',
+      reasoningLevel: 'medium', serviceTier: 'default' }));
+    f.store.saveProjectPolicy({ ...f.store.getProjectPolicy(item.bbProjectId, item.source),
+      factoryInstructions: 'Continue using project conventions.' });
+    await f.service.startTask(item, null);
+    assert.equal(f.sends(), 1);
+    assert.ok(f.sent[0].input[0].text.endsWith('\n\nContinue using project conventions.'));
+  } finally { f.db.close(); }
+});
+
+test('blank project instructions preserve the standard prompt for every stage', () => {
+  const record = newRecord(item);
+  for (const kind of ['investigate', 'plan', 'build', 'review'] as const) {
+    assert.equal(factoryPrompt(item, record, kind, false, '  \n '), factoryPrompt(item, record, kind));
+  }
+});
+
+test('instruction changes reject stale admission even with identical timestamps', () => {
+  const db = new Database(':memory:');
+  try {
+    const store = createFactoryStore(db);
+    const before = store.saveProjectPolicy({ ...store.getProjectPolicy(item.bbProjectId, item.source), enabled: true });
+    const changed = store.saveProjectPolicy({ ...before, factoryInstructions: 'Project instructions' });
+    assert.equal(store.admit({ projectId: item.bbProjectId, source: item.source,
+      locator: item.locator, scopeDigest: 'scope' }, { ...before, updatedAt: changed.updatedAt }).kind, 'disabled');
+  } finally { db.close(); }
 });

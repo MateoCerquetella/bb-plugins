@@ -116,6 +116,7 @@ export function createFactoryStore(db: ReturnType<BbPluginApi['storage']['databa
           JSON.stringify(stored.execution) !== JSON.stringify(policy.execution) ||
           JSON.stringify(stored.orchestratorExecution) !== JSON.stringify(policy.orchestratorExecution) ||
           JSON.stringify(stored.workerExecution) !== JSON.stringify(policy.workerExecution) ||
+          stored.factoryInstructions !== policy.factoryInstructions ||
           stored.updatedAt !== policy.updatedAt || item.source !== policy.provider ||
           item.projectId !== policy.projectId) return { kind: 'disabled' as const };
         const existing = this.get(item);

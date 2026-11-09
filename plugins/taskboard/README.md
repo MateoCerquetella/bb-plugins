@@ -194,10 +194,18 @@ An explicit ticket AI choice overrides both roles. Otherwise dispatch uses the
 role's project selection, the legacy shared factory selection (if present), then
 native defaults. **Start task** initially displays the worker AI and explains the
 override. **Create new ticket** can also save a ticket-specific choice based on
-the current thread. New project settings apply at subsequent dispatches, not to
+the current thread; **Use thread defaults** clears it. New project settings apply at subsequent dispatches, not to
 already running turns. Build continuations receive the current worker model and
 reasoning; changing provider starts a new session in the same Build worktree.
 CLI **factory enable/pause** preserves both role selections.
+
+**Additional factory instructions** accepts up to 20,000 characters of project
+conventions or verification requirements. Nonblank text is appended unchanged to
+the end of every worker stage prompt, including retries and Build continuations.
+An empty or whitespace-only value leaves the standard prompt unchanged. These
+instructions do not alter the coordinator acknowledgement prompt. The setting
+applies to manual starts and automatic intake, and is preserved by CLI
+**factory enable/pause**.
 
 Each new ticket workflow gets one native coordinator thread. Investigation,
 Plan, Build, and independent Review sessions appear beneath it as stage agents;

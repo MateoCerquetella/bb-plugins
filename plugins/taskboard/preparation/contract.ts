@@ -32,17 +32,8 @@ export const executionSchema = z.object({
   providerId: z.string(),
   model: z.string(),
   permissionMode: z.enum(['full', 'auto', 'accept-edits']),
-  reasoningLevel: z.enum([
-    'none',
-    'low',
-    'medium',
-    'high',
-    'xhigh',
-    'max',
-    'ultra',
-    'ultracode'
-  ]),
-  serviceTier: z.enum(['default', 'fast'])
+  reasoningLevel: z.string(),
+  serviceTier: z.string()
 });
 export const taskRefSchema = z.object({
   projectId: id,
@@ -114,6 +105,9 @@ export type Context = z.infer<typeof contextSchema>;
 export type Brief = z.infer<typeof briefSchema>;
 export type TaskRef = z.infer<typeof taskRefSchema>;
 export const scope = z.object({ id, projectId: id });
+export const preparationTag = (id: string) => `preparation:${id}`;
+export const preparationListTag = (projectId: string) => `preparations:${projectId}`;
+export const preparationThreadTag = (threadId: string) => `preparation-thread:${threadId}`;
 export const preparationRpc = {
   prepareCreate: {
     input: z.object({ projectId: id, request: text.min(1) }),
@@ -129,12 +123,19 @@ export const preparationRpc = {
         ready: z.boolean(),
         updatedAt: z.string()
       })
-    )
+    ),
+    tags: ({ projectId }: { projectId: string }) => [preparationListTag(projectId)]
   },
-  prepareGet: { input: scope, output: preparationSchema },
+  prepareGet: {
+    input: scope,
+    output: preparationSchema,
+    tags: ({ id }: { id: string }) => [preparationTag(id)]
+  },
   prepareForThread: {
     input: z.object({ threadId: id }),
-    output: preparationSchema.nullable()
+    output: preparationSchema.nullable(),
+    tags: ({ threadId }: { threadId: string }, output: Preparation | null) =>
+      output ? [preparationThreadTag(threadId), preparationTag(output.id)] : [preparationThreadTag(threadId)]
   },
   prepareEdit: {
     input: scope.extend({

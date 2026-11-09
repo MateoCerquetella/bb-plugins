@@ -11,7 +11,9 @@ below the native New thread composer. It is off by default and saves immediately
 without applying or discarding your background draft. This preference stays
 global when switching slots or resetting a background. Composer centering stays
 active with the overview or wallpaper disabled; short windows and long drafts
-remain scrollable. The overview is part of AURA, with no extra plugin required.
+remain scrollable. On phones the native composer stays pinned to the bottom of
+the screen, with recent threads scrolling above it and the overview below the
+composer. The overview is part of AURA, with no extra plugin required.
 
 The BB server needs an authenticated [GitHub CLI](https://cli.github.com/): run
 `gh auth login` directly on that server if necessary. AURA invokes `gh api` against
@@ -55,6 +57,10 @@ In **Settings → Aura**, use **Half wallpaper on New thread**:
 
 Select **Apply background** to save the setting.
 
+- **Top bar background** is off by default, so BB's top bar stays clean and the
+  wallpaper starts below it. Turn it on to continue the wallpaper behind the
+  top bar. This preference is global and survives slot switches and reset.
+
 - Choose or drop a PNG/JPG (up to 32 MB). Large images are resized automatically
   to fit the 2 MB stored-image limit. The preview shows the result before saving.
 - Or choose an animated GIF (up to 8 MB and 4,096 px per side). GIFs are stored as uploaded — resizing
@@ -73,7 +79,8 @@ Select **Apply background** to save the setting.
   Occupied slots have an explicit **Replace slot** button. Each slot keeps its
   image and appearance independently; click its card to switch immediately.
 - **New thread screen only** hides Aura inside existing conversations. Apply it
-  to save. This scope and the Enabled preference remain global when switching slots.
+  to save. This scope, the Top bar background preference, and the Enabled
+  preference remain global when switching slots.
 - **Clear** removes a saved slot without removing the currently displayed image.
   **Reset to default** restores the noise effect while keeping your saved slots
   and global scope/enabled preferences.
@@ -97,7 +104,7 @@ bb plugin reload aura
 The published background release can also be installed with:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.2.5 \
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.2.6 \
   --subdirectory plugins/aura --tag-prefix aura/
 ```
 
@@ -133,7 +140,12 @@ beside the composer, never directly behind message text.
 Wide Markdown tables get an opaque backing across their entire width, including
 where they extend beyond the normal reading column.
 Half-wallpaper mode applies only to the New thread screen.
-The New thread composer stays centered, with the optional overview below it.
+On screens 768px and wider the New thread composer stays centered, with the
+optional overview below it. Below that breakpoint Aura leaves BB's compact
+layout untouched: the composer stays pinned to the bottom of the screen for
+one-thumb reach and the Recent list scrolls above it. On phones the Recent list
+sits in its own theme-colored card below the wallpaper, with a quiet heading
+rule and hairline dividers between threads.
 Short windows and long drafts remain scrollable. Background styling follows
 Aura's enable/scope settings; composer centering stays independent of them.
 

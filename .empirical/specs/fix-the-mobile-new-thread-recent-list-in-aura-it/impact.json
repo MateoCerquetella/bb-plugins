@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "classification": "behavioral",
+  "capabilities": [
+    "aura-background-surface"
+  ],
+  "surfaces": [
+    "workflow"
+  ],
+  "regressionRationale": null,
+  "digest": "sha256:3116b87f21a9f0ec9966858149360e07dbcef6b53744e392ce4bbcaf201db62a"
+}

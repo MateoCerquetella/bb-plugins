@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.2.8 - 2026-11-03
+
+- Show the mobile New thread Recent list as one themed card over the wallpaper
+  instead of loose rows under an opaque sticky band. The heading sits above a
+  hairline rule and threads are separated by hairline dividers, so the list
+  stays readable in light and dark themes while the wallpaper remains visible
+  above and around it.
+
+## 0.2.7 - 2026-11-02
+
+- Keep BB's native compact New thread composer pinned to the bottom of the
+  screen on phones. Aura's centered composition now applies only at 768px and
+  wider, so mobile recents scroll above a thumb-reachable composer while the
+  wallpaper and half-wallpaper modes still render.
+
+## 0.2.6 - 2026-11-02
+
+- Keep the wallpaper out of BB's top bar by default so the header cannot pick
+  up the background. Add a **Top bar background** checkbox in Settings → Aura
+  to opt the wallpaper back in behind the top bar.
+
 ## 0.2.5 - 2026-10-30
 
 - Keep pixel dithering continuous when the panel size is not a multiple of four

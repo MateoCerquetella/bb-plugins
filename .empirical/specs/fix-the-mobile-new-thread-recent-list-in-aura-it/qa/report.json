@@ -1,0 +1,350 @@
+{
+  "verdict": {
+    "a": {
+      "result": "PASS",
+      "evidence": "radius 16px, border 1px, inset 10px/10px, blur \"blur(16px) saturate(0.88)\", surface oklab(0.976369 0.00430927 -0.00697905 / 0.94), overflow 0px; screenshot reads as one inset card"
+    },
+    "b": {
+      "result": "PASS",
+      "evidence": "radius 16px, border 1px, inset 10px/10px, blur \"blur(16px) saturate(0.88)\", surface oklab(0.215457 0.00686681 -0.020346 / 0.94), overflow 0px; screenshot reads as one inset dark card"
+    },
+    "c": {
+      "result": "PASS",
+      "evidence": "heading position static, heading bg rgba(0, 0, 0, 0), trailing rule 1px tall \"linear-gradient(to right, oklab(0.306321 0.0142316 -0.0329488 / 0.22), rgba(0, 0, 0, 0))\""
+    },
+    "d": {
+      "result": "PASS",
+      "evidence": "row1 bg rgba(0, 0, 0, 0), row2 bg rgba(0, 0, 0, 0), row2 border-top 1px oklab(0.883949 0.0141101 -0.0212775 / 0.55); dark row2 border-top 1px"
+    },
+    "e": {
+      "result": "PASS",
+      "evidence": "recents present false, composer center offset 0px, position relative, order -1, overflow 0px"
+    }
+  },
+  "generatedAt": "2026-11-03T02:04:23.002Z",
+  "target": "http://127.0.0.1:38886",
+  "auraVersion": "0.2.8",
+  "browser": "/home/dyaus/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",
+  "note": "Independent fresh-context QA against the running app with its real saved Aura wallpaper settings (no RPC fixture).",
+  "viewports": {
+    "mobile": "390x844",
+    "desktop": "1440x1000"
+  },
+  "light": {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "pageBackground": "rgb(248, 246, 252)",
+    "wallpaperCanvasRendered": true,
+    "wallpaperLayerPresent": true,
+    "panel": {
+      "top": 0,
+      "bottom": 844,
+      "left": 0,
+      "right": 390,
+      "width": 390,
+      "height": 844,
+      "centerX": 195
+    },
+    "panelOverflowX": 0,
+    "pageOverflowX": 0,
+    "recentsPresent": true,
+    "recentsDisplay": "block",
+    "recents": {
+      "top": 370,
+      "bottom": 1515,
+      "left": 26,
+      "right": 364,
+      "width": 338,
+      "height": 1145,
+      "centerX": 195
+    },
+    "card": {
+      "borderRadius": "16px",
+      "borderTopWidth": "1px",
+      "borderTopColor": "oklab(0.883949 0.0141101 -0.0212775 / 0.7)",
+      "backgroundColor": "oklab(0.976369 0.00430927 -0.00697905 / 0.94)",
+      "backdropFilter": "blur(16px) saturate(0.88)",
+      "marginLeft": "10px",
+      "marginRight": "10px",
+      "padding": "10px 8px 8px",
+      "boxShadow": "oklab(0.306321 0.0142316 -0.0329488 / 0.08) 0px 10px 30px 0px"
+    },
+    "heading": {
+      "position": "static",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "display": "flex",
+      "height": 22,
+      "label": {
+        "text": "Recent",
+        "fontSize": "12px",
+        "fontWeight": "600",
+        "color": "oklab(0.306321 0.0142316 -0.0329488 / 0.76)"
+      },
+      "rule": {
+        "content": "\"\"",
+        "width": "258.125px",
+        "height": "1px",
+        "backgroundImage": "linear-gradient(to right, oklab(0.306321 0.0142316 -0.0329488 / 0.22), rgba(0, 0, 0, 0))"
+      },
+      "children": [
+        {
+          "tag": "H2",
+          "width": 41.88,
+          "height": 12,
+          "backgroundImage": "none",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "borderTopWidth": "0px",
+          "display": "block"
+        },
+        {
+          "tag": "DIV",
+          "width": 0,
+          "height": 0,
+          "backgroundImage": "linear-gradient(in oklab, rgb(248, 246, 252) 0%, rgba(0, 0, 0, 0) 100%)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "borderTopWidth": "0px",
+          "display": "none"
+        }
+      ]
+    },
+    "rows": [
+      {
+        "tag": "LI",
+        "background": "rgba(0, 0, 0, 0)",
+        "borderTopWidth": "0px",
+        "borderTopColor": "rgb(48, 44, 64)",
+        "color": "rgb(48, 44, 64)",
+        "text": "Create Factory Bots dashboard pluginbb-plugins · create-fact"
+      },
+      {
+        "tag": "LI",
+        "background": "rgba(0, 0, 0, 0)",
+        "borderTopWidth": "1px",
+        "borderTopColor": "oklab(0.883949 0.0141101 -0.0212775 / 0.55)",
+        "color": "rgb(48, 44, 64)",
+        "text": "Review factory-bots plugin follow-upbb-plugins · create-fact"
+      }
+    ],
+    "rowCount": 18,
+    "firstLinkColor": "rgb(48, 44, 64)",
+    "contrast": {
+      "linkVsCard": 12.63,
+      "headingVsCard": 12.71
+    },
+    "composer": {
+      "top": 664,
+      "bottom": 844,
+      "left": 0,
+      "right": 390,
+      "width": 390,
+      "height": 180,
+      "centerX": 195
+    },
+    "composerPosition": "absolute",
+    "composerOrder": "0",
+    "scrollViewportScrollable": true
+  },
+  "dark": {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "pageBackground": "rgb(25, 24, 35)",
+    "wallpaperCanvasRendered": true,
+    "wallpaperLayerPresent": true,
+    "panel": {
+      "top": 0,
+      "bottom": 844,
+      "left": 0,
+      "right": 390,
+      "width": 390,
+      "height": 844,
+      "centerX": 195
+    },
+    "panelOverflowX": 0,
+    "pageOverflowX": 0,
+    "recentsPresent": true,
+    "recentsDisplay": "block",
+    "recents": {
+      "top": 370,
+      "bottom": 1515,
+      "left": 26,
+      "right": 364,
+      "width": 338,
+      "height": 1145,
+      "centerX": 195
+    },
+    "card": {
+      "borderRadius": "16px",
+      "borderTopWidth": "1px",
+      "borderTopColor": "oklab(0.307722 0.0117213 -0.0281094 / 0.7)",
+      "backgroundColor": "oklab(0.215457 0.00686681 -0.020346 / 0.94)",
+      "backdropFilter": "blur(16px) saturate(0.88)",
+      "marginLeft": "10px",
+      "marginRight": "10px",
+      "padding": "10px 8px 8px",
+      "boxShadow": "oklab(0.864944 0.0092586 -0.0244052 / 0.08) 0px 10px 30px 0px"
+    },
+    "heading": {
+      "position": "static",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "display": "flex",
+      "height": 22,
+      "label": {
+        "text": "Recent",
+        "fontSize": "12px",
+        "fontWeight": "600",
+        "color": "oklab(0.864944 0.0092586 -0.0244052 / 0.76)"
+      },
+      "rule": {
+        "content": "\"\"",
+        "width": "258.125px",
+        "height": "1px",
+        "backgroundImage": "linear-gradient(to right, oklab(0.864944 0.0092586 -0.0244052 / 0.22), rgba(0, 0, 0, 0))"
+      },
+      "children": [
+        {
+          "tag": "H2",
+          "width": 41.88,
+          "height": 12,
+          "backgroundImage": "none",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "borderTopWidth": "0px",
+          "display": "block"
+        },
+        {
+          "tag": "DIV",
+          "width": 0,
+          "height": 0,
+          "backgroundImage": "linear-gradient(in oklab, rgb(25, 24, 35) 0%, rgba(0, 0, 0, 0) 100%)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "borderTopWidth": "0px",
+          "display": "none"
+        }
+      ]
+    },
+    "rows": [
+      {
+        "tag": "LI",
+        "background": "rgba(0, 0, 0, 0)",
+        "borderTopWidth": "0px",
+        "borderTopColor": "rgb(210, 208, 227)",
+        "color": "rgb(210, 208, 227)",
+        "text": "Create Factory Bots dashboard pluginbb-plugins · create-fact"
+      },
+      {
+        "tag": "LI",
+        "background": "rgba(0, 0, 0, 0)",
+        "borderTopWidth": "1px",
+        "borderTopColor": "oklab(0.307722 0.0117213 -0.0281094 / 0.55)",
+        "color": "rgb(210, 208, 227)",
+        "text": "Review factory-bots plugin follow-upbb-plugins · create-fact"
+      }
+    ],
+    "rowCount": 18,
+    "firstLinkColor": "rgb(210, 208, 227)",
+    "contrast": {
+      "linkVsCard": 11.6,
+      "headingVsCard": 11.6
+    },
+    "composer": {
+      "top": 664,
+      "bottom": 844,
+      "left": 0,
+      "right": 390,
+      "width": 390,
+      "height": 180,
+      "centerX": 195
+    },
+    "composerPosition": "absolute",
+    "composerOrder": "0",
+    "scrollViewportScrollable": true
+  },
+  "desktop": {
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "panel": {
+      "top": 0,
+      "bottom": 1000,
+      "left": 320,
+      "right": 1440,
+      "width": 1120,
+      "height": 1000,
+      "centerX": 880
+    },
+    "recentsPresent": false,
+    "recentsDisplay": null,
+    "recentsVisible": false,
+    "composer": {
+      "top": 280,
+      "bottom": 720,
+      "left": 516,
+      "right": 1244,
+      "width": 728,
+      "height": 440,
+      "centerX": 880
+    },
+    "composerPosition": "relative",
+    "composerOrder": "-1",
+    "composerCenterOffsetFromPanel": 0,
+    "panelOverflowX": 0,
+    "pageOverflowX": 0,
+    "wallpaperCanvasRendered": true
+  },
+  "checks": {
+    "light-wallpaper-rendered": true,
+    "light-card-rounded-16px": true,
+    "light-card-1px-border": true,
+    "light-card-translucent-themed-surface": true,
+    "light-card-backdrop-blur": true,
+    "light-card-inset-margins": true,
+    "light-heading-static-not-sticky": true,
+    "light-heading-no-opaque-band": true,
+    "light-heading-label-present": true,
+    "light-rows-transparent": true,
+    "light-row-divider-1px": true,
+    "light-no-horizontal-overflow": true,
+    "light-composer-pinned-bottom": true,
+    "light-row-text-contrast-vs-card": true,
+    "dark-wallpaper-rendered": true,
+    "dark-card-rounded-16px": true,
+    "dark-card-1px-border": true,
+    "dark-card-translucent-themed-surface": true,
+    "dark-card-backdrop-blur": true,
+    "dark-card-inset-margins": true,
+    "dark-heading-static-not-sticky": true,
+    "dark-heading-no-opaque-band": true,
+    "dark-heading-label-present": true,
+    "dark-rows-transparent": true,
+    "dark-row-divider-1px": true,
+    "dark-no-horizontal-overflow": true,
+    "dark-composer-pinned-bottom": true,
+    "dark-row-text-contrast-vs-card": true,
+    "themes-distinct": true,
+    "recents-scroll-isolated": true,
+    "desktop-recents-hidden-or-absent": true,
+    "desktop-composer-centered": true,
+    "desktop-no-horizontal-overflow": true,
+    "desktop-wallpaper-rendered": true
+  },
+  "failures": [],
+  "summary": [
+    "(a) PASS radius 16px, border 1px, inset 10px/10px, blur \"blur(16px) saturate(0.88)\", surface oklab(0.976369 0.00430927 -0.00697905 / 0.94), overflow 0px; screenshot reads as one inset card",
+    "(b) PASS radius 16px, border 1px, inset 10px/10px, blur \"blur(16px) saturate(0.88)\", surface oklab(0.215457 0.00686681 -0.020346 / 0.94), overflow 0px; screenshot reads as one inset dark card",
+    "(c) PASS heading position static, heading bg rgba(0, 0, 0, 0), trailing rule 1px tall \"linear-gradient(to right, oklab(0.306321 0.0142316 -0.0329488 / 0.22), rgba(0, 0, 0, 0))\"",
+    "(d) PASS row1 bg rgba(0, 0, 0, 0), row2 bg rgba(0, 0, 0, 0), row2 border-top 1px oklab(0.883949 0.0141101 -0.0212775 / 0.55); dark row2 border-top 1px",
+    "(e) PASS recents present false, composer center offset 0px, position relative, order -1, overflow 0px",
+    "zero failed assertions out of 34",
+    "Visual (light PNG): one inset rounded card under the wallpaper, quiet Recent heading with trailing hairline rule, hairline row dividers, readable dark text, composer pinned bottom.",
+    "Visual (dark PNG): same card reads on the dark wallpaper, light readable text, hairline dividers and heading rule, composer pinned bottom.",
+    "Visual (desktop 1440x1000): composer centered in the main panel, no mobile recents list, wallpaper intact."
+  ],
+  "screenshots": [
+    "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_ewg9qvzf3u-1/bb-plugins/.empirical/specs/fix-the-mobile-new-thread-recent-list-in-aura-it/qa/mobile-light-390x844.png",
+    "/home/dyaus/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_ewg9qvzf3u-1/bb-plugins/.empirical/specs/fix-the-mobile-new-thread-recent-list-in-aura-it/qa/mobile-dark-390x844.png"
+  ]
+}

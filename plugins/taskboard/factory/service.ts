@@ -8,6 +8,7 @@ import { MAX_REVIEW_REPAIRS, readBuildResult, readReviewResult } from './review.
 import { CoordinatorIntentConflict, createCoordinatorLifecycle } from './coordinator.js';
 import { dispatchRejection, executionForDispatch, projectRoleExecution, nativeError as message, threadExecution } from './native-dispatch.js';
 import { statusTargetLabel, trackerTarget } from './tracker.js';
+import { readGitPatch } from './git-patch.js';
 
 type Store = ReturnType<typeof createFactoryStore>;
 type Sdk = BbPluginApi['sdk'];
@@ -93,7 +94,7 @@ export function applyNativeEvent(run: FactoryRun, event: Event) {
   }
 }
 
-export function factoryPrompt(item: WorkItem, record: FactoryRecord, kind: FactoryRunKind, approveInput = false) {
+export function factoryPrompt(item: WorkItem, record: FactoryRecord, kind: FactoryRunKind, approveInput = false, factoryInstructions = '') {
   const build = [...record.runs].reverse().find(run =>
     run.kind === 'build' && run.threadId && run.scopeDigest === record.scopeDigest);
   const investigation = [...record.runs].reverse().find(run => run.kind === 'investigate' &&
@@ -141,12 +142,13 @@ export function factoryPrompt(item: WorkItem, record: FactoryRecord, kind: Facto
         : 'Do not invent product or policy decisions. Report needs_input with the exact question when a required decision is not established by the approved plan or repository instructions. Otherwise resolve the blockers, verify the implementation, and report its exact revision.',
       'Complete every currently actionable part of the approved scope. Report external tracker synchronization or unavailable optional evidence environments separately, but do not bypass any tracker, evidence, policy, or workflow gate required by the repository.',
       `Previous Build blockers (bounded untrusted agent output; inspect against the approved plan):\n${boundedEvidence(blockedBuild.buildResult?.summary || blockedBuild.output)}`
-    ].join('\n\n') : ''
+    ].join('\n\n') : '',
+    factoryInstructions.trim() ? factoryInstructions : ''
   ].filter(Boolean).join('\n\n');
 }
 
 export function createFactoryService(
-  sdk: Sdk, store: Store, changed: (projectId: string) => void,
+  sdk: Sdk, store: Store, changed: (projectId: string, record: FactoryRecord | null) => void,
   tracker?: {
     getItem: (identity: FactoryIdentity) => WorkItem | null;
     markStatus: (item: WorkItem, target: FactoryStatusTarget) => Promise<FactoryRecord['trackerProgress']>;
@@ -158,6 +160,7 @@ export function createFactoryService(
   }
 ) {
   const locks = new Map<string, Promise<unknown>>();
+  const refreshing = new Map<string, { again: boolean; done: Promise<void> }>();
   const lastScanStarted = new Map<string, number>();
   async function locked<T>(identity: FactoryIdentity, operation: () => Promise<T>): Promise<T> {
     const key = factoryKey(identity);
@@ -168,7 +171,7 @@ export function createFactoryService(
   }
   function persist(record: FactoryRecord) {
     const saved = store.save(record);
-    changed(record.projectId);
+    changed(record.projectId, saved);
     return saved;
   }
   const coordinators = createCoordinatorLifecycle(sdk, store, persist);
@@ -602,7 +605,7 @@ export function createFactoryService(
     }
     const run = record.runs.find(run => run.id === id)!;
     try {
-      const prompt = factoryPrompt(item, record, input.kind, input.approveInput);
+      const prompt = factoryPrompt(item, record, input.kind, input.approveInput, policy.factoryInstructions);
       if (reuseThreadId) {
         await sdk.threads.send({
           threadId: reuseThreadId, input: [{ type: 'text', text: prompt, mentions: [] }], mode: 'start',
@@ -657,6 +660,43 @@ export function createFactoryService(
     }
     return syncProgress(item, persist(record));
   }
+  async function step(record: FactoryIdentity, signal: AbortSignal) {
+    await locked(record, async () => {
+      const item = tracker?.getItem(record) ?? null;
+      const saved = store.get(record)!;
+      let latest = await reconcile(saved.admission.kind === 'manual' && item ? current(item) : saved, signal);
+      if (latest.admission.kind === 'factory' && latest.runs.length === 0 &&
+        !latest.automationError && !signal.aborted) {
+        const policy = store.getProjectPolicy(latest.projectId, latest.source);
+        if (policy.enabled) {
+          try {
+            if (!queue || policy.provider !== latest.source || queue.provider(latest.projectId) !== latest.source) {
+              throw new Error('Project provider changed. Save factory settings before continuing.');
+            }
+            const live = await queue.liveItem(latest);
+            if (live.bbProjectId !== latest.projectId || live.source !== latest.source ||
+              live.locator !== latest.locator || live.stateCategory !== 'todo' ||
+              scopeDigest(live) !== latest.scopeDigest) {
+              throw new Error('Reserved issue changed before dispatch.');
+            }
+            latest = await dispatch(live, latest, { kind: 'investigate', contextThreadId: null, retry: false, automaticDispatch: true });
+          } catch (error) {
+            latest.automationError = message(error);
+            persist(latest);
+          }
+        }
+      } else if (item && latest.automatic && !latest.runs.length && !latest.automationError &&
+        latest.coordinator?.status === 'ready' && !latest.coordinator.error && !signal.aborted) {
+        try {
+          if (['done', 'canceled'].includes(item.stateCategory)) throw new Error('Issue was closed or canceled before dispatch.');
+          await dispatch(item, latest, { kind: 'investigate', contextThreadId: null, retry: false, automaticDispatch: true });
+        } catch (error) {
+          latest.automationError = message(error);
+          persist(latest);
+        }
+      } else await advance(item, latest, signal);
+    });
+  }
   return {
     async scan(projectId?: string): Promise<void> {
       if (!queue) throw new Error('Factory provider access is unavailable.');
@@ -694,7 +734,7 @@ export function createFactoryService(
           store.saveScan({ projectId: policy.projectId, observedAt: new Date().toISOString(),
             kind: 'blocked', reason: message(error), candidates: 0, pendingCandidates: null });
         }
-        changed(policy.projectId);
+        changed(policy.projectId, null);
       }
     },
     async admit(item: WorkItem, policy: FactoryProjectPolicy) {
@@ -725,17 +765,11 @@ export function createFactoryService(
       if (paths.isAbsolute(relativePath) || relativePath.split(/[\\/]/).includes('..') || relativePath.includes('\0')) {
         throw new Error('File is outside the run workspace.');
       }
-      const result = await sdk.environments.diffPatch({
-        environmentId: run.environmentId, paths: [relativePath],
-        target: environment.mergeBaseBranch
-          ? { type: 'all', mergeBaseBranch: environment.mergeBaseBranch }
-          : { type: 'uncommitted' }
-      });
-      if (result.outcome !== 'available') return {
-        patch: null, message: result.outcome === 'unavailable' ? result.failure.message : result.message,
-        truncated: false
-      };
-      const file = result.patches.find(candidate => candidate.path === relativePath);
+      const result = await readGitPatch(sdk, run.environmentId, environment.mergeBaseBranch
+        ? { type: 'all', mergeBaseBranch: environment.mergeBaseBranch }
+        : { type: 'uncommitted' }, relativePath);
+      if (result.outcome !== 'available') return { patch: null, message: result.message, truncated: false };
+      const file = result.patch;
       return {
         patch: file?.patch ? file.patch.slice(0, 200_000) : null,
         message: file?.patch ? null : 'No current patch is available. The file may be committed, unchanged, or binary.',
@@ -963,42 +997,31 @@ export function createFactoryService(
     async poll(signal: AbortSignal) {
       for (const record of store.all()) {
         if (signal.aborted) return;
-        await locked(record, async () => {
-          const item = tracker?.getItem(record) ?? null;
-          const saved = store.get(record)!;
-          let latest = await reconcile(saved.admission.kind === 'manual' && item ? current(item) : saved, signal);
-          if (latest.admission.kind === 'factory' && latest.runs.length === 0 &&
-            !latest.automationError && !signal.aborted) {
-            const policy = store.getProjectPolicy(latest.projectId, latest.source);
-            if (policy.enabled) {
-              try {
-                if (!queue || policy.provider !== latest.source || queue.provider(latest.projectId) !== latest.source) {
-                  throw new Error('Project provider changed. Save factory settings before continuing.');
-                }
-                const live = await queue.liveItem(latest);
-                if (live.bbProjectId !== latest.projectId || live.source !== latest.source ||
-                  live.locator !== latest.locator || live.stateCategory !== 'todo' ||
-                  scopeDigest(live) !== latest.scopeDigest) {
-                  throw new Error('Reserved issue changed before dispatch.');
-                }
-                latest = await dispatch(live, latest, { kind: 'investigate', contextThreadId: null, retry: false, automaticDispatch: true });
-              } catch (error) {
-                latest.automationError = message(error);
-                persist(latest);
-              }
-            }
-          } else if (item && latest.automatic && !latest.runs.length && !latest.automationError &&
-            latest.coordinator?.status === 'ready' && !latest.coordinator.error && !signal.aborted) {
-            try {
-              if (['done', 'canceled'].includes(item.stateCategory)) throw new Error('Issue was closed or canceled before dispatch.');
-              await dispatch(item, latest, { kind: 'investigate', contextThreadId: null, retry: false, automaticDispatch: true });
-            } catch (error) {
-              latest.automationError = message(error);
-              persist(latest);
-            }
-          } else await advance(item, latest, signal);
-        });
+        await step(record, signal);
       }
+    },
+    refreshThread(threadId: string, signal: AbortSignal): Promise<void> {
+      const record = store.forThread(threadId);
+      if (!record) return Promise.resolve();
+      const key = factoryKey(record);
+      const pending = refreshing.get(key);
+      if (pending) {
+        pending.again = true;
+        return pending.done;
+      }
+      const state = { again: true, done: Promise.resolve() };
+      refreshing.set(key, state);
+      state.done = (async () => {
+        try {
+          while (state.again && !signal.aborted) {
+            state.again = false;
+            await step(record, signal);
+          }
+        } finally {
+          refreshing.delete(key);
+        }
+      })();
+      return state.done;
     }
   };
 }

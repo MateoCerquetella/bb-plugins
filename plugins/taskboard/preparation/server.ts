@@ -3,6 +3,9 @@ import type { BbPluginApi, PluginRpcHandlers } from '@get-bb/plugin-sdk';
 import { z } from 'zod';
 import {
   preparationRpc,
+  preparationListTag,
+  preparationTag,
+  preparationThreadTag,
   hostContract,
   parseAgentResult,
   id,
@@ -15,16 +18,7 @@ import { preparationStore } from './store.js';
 const now = () => new Date().toISOString();
 const uid = () => randomUUID();
 const errorText = (e: unknown) => (e instanceof Error ? e.message : String(e));
-const pause = (signal: AbortSignal) =>
-  new Promise<void>((resolve) => {
-    const done = () => {
-      clearTimeout(t);
-      signal.removeEventListener('abort', done);
-      resolve();
-    };
-    const t = setTimeout(done, 2000);
-    signal.addEventListener('abort', done, { once: true });
-  });
+const EMPTY_OUTPUT_SETTLE_MS = 15000;
 export function registerPreparation(
   bb: BbPluginApi,
   dependencies: {
@@ -44,12 +38,21 @@ export function registerPreparation(
       throw new Error('Preparation belongs to another project');
     return p;
   };
-  function change(id: string, fn: (p: Preparation) => void) {
-    const p = store.update(id, fn);
+  function changed(p: Preparation) {
+    bb.rpc.experimental_invalidate(
+      p.threadId
+        ? [preparationTag(p.id), preparationListTag(p.projectId), preparationThreadTag(p.threadId)]
+        : [preparationTag(p.id), preparationListTag(p.projectId)]
+    );
     bb.realtime.publish('taskboard:preparation', {
       projectId: p.projectId,
       id: p.id
     });
+  }
+  function change(id: string, fn: (p: Preparation) => void) {
+    const p = store.update(id, fn);
+    changed(p);
+    if (p.jobs.some((j) => j.status === 'queued')) kick();
     return p;
   }
   function revise(
@@ -116,7 +119,7 @@ export function registerPreparation(
     async prepareCreate(input) {
       await dependencies.assertProject(input.projectId);
       const at = now();
-      return store.put({
+      const created = store.put({
         id: uid(),
         projectId: input.projectId,
         request: input.request,
@@ -145,6 +148,8 @@ export function registerPreparation(
         linkedTask: null,
         error: null
       });
+      changed(created);
+      return created;
     },
     async prepareList(input) {
       await dependencies.assertProject(input.projectId);
@@ -531,6 +536,7 @@ export function registerPreparation(
         title: `Prepare: ${j.kind === 'brief' ? 'brief' : j.direction.slice(0, 45)}`,
         prompt: prompt(p, j)
       });
+      jobThreads.add(t.id);
       change(p.id, (current) => {
         const job = current.jobs.find((x) => x.id === j.id)!;
         job.threadId = t.id;
@@ -631,6 +637,62 @@ export function registerPreparation(
       fail(p.id, j.id, errorText(e));
     }
   }
+  let serviceSignal: AbortSignal | null = null;
+  let running: Promise<void> | null = null;
+  let again = false;
+  let jobThreads = new Set<string>();
+  let settleTimer: ReturnType<typeof setTimeout> | null = null;
+  async function pass(signal: AbortSignal) {
+    for (const p of store.pending()) {
+      for (const j of p.jobs) {
+        if (signal.aborted) return;
+        if (j.status === 'queued') await startJob(store.get(p.id), j, signal);
+        else if (j.status === 'running') await reconcile(p, j);
+      }
+    }
+    const threads = new Set<string>();
+    let settleAt = Infinity;
+    for (const p of store.pending())
+      for (const j of p.jobs)
+        if (j.status === 'running' && j.threadId) {
+          threads.add(j.threadId);
+          if (j.emptyOutputAt)
+            settleAt = Math.min(settleAt, Date.parse(j.emptyOutputAt) + EMPTY_OUTPUT_SETTLE_MS);
+        }
+    jobThreads = threads;
+    if (settleTimer) clearTimeout(settleTimer);
+    settleTimer = Number.isFinite(settleAt)
+      ? setTimeout(kick, Math.max(0, settleAt - Date.now()))
+      : null;
+  }
+  function kick() {
+    const signal = serviceSignal;
+    if (!signal || signal.aborted) return;
+    if (running) {
+      again = true;
+      return;
+    }
+    running = Promise.resolve().then(async () => {
+      try {
+        do {
+          again = false;
+          await pass(signal);
+        } while (again && !signal.aborted);
+      } catch (e) {
+        if (!signal.aborted) bb.log.warn('Preparation jobs: ' + errorText(e));
+      } finally {
+        running = null;
+      }
+    });
+  }
+  const jobThreadChanged = ({ thread }: { thread: { id: string } }) => {
+    if (jobThreads.has(thread.id)) kick();
+  };
+  bb.events.on('thread.active', jobThreadChanged);
+  bb.events.on('thread.idle', jobThreadChanged);
+  bb.events.on('thread.failed', jobThreadChanged);
+  bb.events.on('thread.archived', jobThreadChanged);
+  bb.events.on('thread.deleted', jobThreadChanged);
   bb.background.service('preparation-jobs', {
     async start(signal) {
       // A persisted "starting" without a thread id is ambiguous; never automatically duplicate a spawn.
@@ -642,21 +704,15 @@ export function registerPreparation(
               j.id,
               'BB reloaded while starting this job. Check recent Prepare threads before retrying; no duplicate job was launched.'
             );
-      while (!signal.aborted) {
-        try {
-          for (const p of store.pending()) {
-            for (const j of p.jobs) {
-              if (signal.aborted) return;
-              if (j.status === 'queued')
-                await startJob(store.get(p.id), j, signal);
-              else if (j.status === 'running') await reconcile(p, j);
-            }
-          }
-        } catch (e) {
-          if (!signal.aborted) bb.log.warn('Preparation jobs: ' + errorText(e));
-        }
-        await pause(signal);
-      }
+      serviceSignal = signal;
+      kick();
+      await new Promise<void>((resolve) => {
+        if (signal.aborted) resolve();
+        else signal.addEventListener('abort', () => resolve(), { once: true });
+      });
+      if (serviceSignal === signal) serviceSignal = null;
+      if (settleTimer) clearTimeout(settleTimer);
+      settleTimer = null;
     }
   });
   return { store, handlers };

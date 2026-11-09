@@ -4,6 +4,7 @@ import type { TaskboardRpcContract, WorkSource } from '../contract.js';
 import type { FactoryExecution, FactoryProjectStatus } from './contract.js';
 import { Button } from '../components/ui/button.js';
 import { Icon } from '../components/ui/icon.js';
+import { Textarea } from '../components/ui/textarea.js';
 import { Input } from '../components/ui/input.js';
 import { ExecutionPicker } from './execution-picker.js';
 
@@ -16,6 +17,7 @@ function ProjectSettings({ projectId, provider }: { projectId: string; provider:
   const [status, setStatus] = useState<FactoryProjectStatus | null>(null);
   const [orchestratorExecution, setOrchestratorExecution] = useState<FactoryExecution | null>(null);
   const [workerExecution, setWorkerExecution] = useState<FactoryExecution | null>(null);
+  const [factoryInstructions, setFactoryInstructions] = useState('');
   const [enabled, setEnabled] = useState(false);
   const [limit, setLimit] = useState(1);
   const [dirty, setDirty] = useState(false);
@@ -35,6 +37,7 @@ function ProjectSettings({ projectId, provider }: { projectId: string; provider:
         setLimit(result.policy.maxConcurrent);
         setOrchestratorExecution(result.policy.orchestratorExecution ?? result.policy.execution);
         setWorkerExecution(result.policy.workerExecution ?? result.policy.execution);
+        setFactoryInstructions(result.policy.factoryInstructions);
       }
       setError(null);
     } catch (error) {
@@ -56,7 +59,7 @@ function ProjectSettings({ projectId, provider }: { projectId: string; provider:
     try {
       const result = await rpc.call('factorySaveProject', {
         projectId, provider, enabled, maxConcurrent: limit, intake: 'todo', execution: null,
-        orchestratorExecution, workerExecution
+        orchestratorExecution, workerExecution, factoryInstructions
       });
       if (mounted.current) {
         setStatus(result.status);
@@ -64,6 +67,7 @@ function ProjectSettings({ projectId, provider }: { projectId: string; provider:
         setLimit(result.policy.maxConcurrent);
         setOrchestratorExecution(result.policy.orchestratorExecution ?? result.policy.execution);
         setWorkerExecution(result.policy.workerExecution ?? result.policy.execution);
+        setFactoryInstructions(result.policy.factoryInstructions);
         setDirty(false);
         void load();
       }
@@ -122,6 +126,18 @@ function ProjectSettings({ projectId, provider }: { projectId: string; provider:
       Choose a model and reasoning level independently for each role. Applies to new sessions and worker continuations.
       An explicit ticket AI overrides both roles.
     </p>
+
+    <label className="block space-y-2 text-xs font-medium">
+      <span>Additional factory instructions</span>
+      <Textarea value={factoryInstructions} rows={5} maxLength={20_000}
+        disabled={saving || !status}
+        placeholder="Project conventions, verification requirements, or other instructions…"
+        onChange={event => { setFactoryInstructions(event.target.value); setDirty(true); }} />
+      <span className="block font-normal text-muted-foreground">
+        Appended to every worker stage prompt, including retries and continuations. Leave empty to use the standard prompt.
+      </span>
+    </label>
+
     <div className="flex flex-wrap items-center justify-between gap-3">
       <label className="flex min-w-0 cursor-pointer items-center gap-2 text-sm">
         <input type="checkbox" className="mt-0.5 size-4 shrink-0" checked={enabled} disabled={saving || !status}
