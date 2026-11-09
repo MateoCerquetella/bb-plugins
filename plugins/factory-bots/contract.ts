@@ -15,6 +15,9 @@ import {
   CapabilitySetResultSchema,
   SetCapabilityInputSchema,
 } from "./lib/capability-contract.js";
+import { FactorySchema } from "./lib/factories.js";
+
+export type { Factory } from "./lib/factories.js";
 
 /**
  * Factory MCP payloads. The factory's read API is the only source, so these
@@ -206,30 +209,49 @@ export type TicketResult = z.infer<typeof TicketResultSchema>;
 export type TicketSummary = z.infer<typeof TicketSummarySchema>;
 export type Transcript = z.infer<typeof TranscriptSchema>;
 
-export const FactoryPathStatusSchema = z.object({
-  configuredPath: z.string(),
-  entryPoint: z.string().nullable(),
-  error: z.string().nullable(),
-}).strict();
+/** Every factory read or write names the factory it is for. */
+const FactoryScope = { factoryId: z.string().min(1) };
+const FactoryScopedSchema = z.object(FactoryScope).strict();
 
-export type FactoryPathStatus = z.infer<typeof FactoryPathStatusSchema>;
+export const FactoriesResultSchema = z.object({ factories: z.array(FactorySchema) });
+
+export const SaveFactoryInputSchema = FactorySchema.omit({ id: true })
+  .extend({ id: FactorySchema.shape.id.optional() })
+  .strict();
+
+export const SaveFactoryResultSchema = z.discriminatedUnion("ok", [
+  z.object({ ok: z.literal(true), factory: FactorySchema }),
+  z.object({ ok: z.literal(false), message: z.string() }),
+]);
+
+export type SaveFactoryInput = z.infer<typeof SaveFactoryInputSchema>;
+export type SaveFactoryResult = z.infer<typeof SaveFactoryResultSchema>;
 
 export const rpcContract = defineRpcContract({
-  getFactoryPathStatus: {
+  listFactories: {
     input: z.null(),
-    output: FactoryPathStatusSchema,
+    output: FactoriesResultSchema,
+  },
+  saveFactory: {
+    input: SaveFactoryInputSchema,
+    output: SaveFactoryResultSchema,
+  },
+  removeFactory: {
+    input: z.object({ id: z.string().min(1) }).strict(),
+    output: FactoriesResultSchema,
   },
   getBoard: {
-    input: z.null(),
+    input: FactoryScopedSchema,
     output: BoardResultSchema,
   },
   getTicket: {
-    input: z.object({ linearId: z.string().min(1) }).strict(),
+    input: z.object({ ...FactoryScope, linearId: z.string().min(1) }).strict(),
     output: TicketResultSchema,
   },
   sendMessage: {
     input: z
       .object({
+        ...FactoryScope,
         message: z.string().trim().min(1).max(4_000),
         provider: z.string().min(1).max(100).optional(),
         model: z.string().min(1).max(200).optional(),
@@ -241,31 +263,31 @@ export const rpcContract = defineRpcContract({
     output: ChatResultSchema,
   },
   getSouls: {
-    input: z.null(),
+    input: FactoryScopedSchema,
     output: SoulsResultSchema,
   },
   getStatus: {
-    input: z.null(),
+    input: FactoryScopedSchema,
     output: StatusResultSchema,
   },
   getAudit: {
-    input: z.null(),
+    input: FactoryScopedSchema,
     output: AuditResultSchema,
   },
   saveSoul: {
-    input: SaveSoulInputSchema,
+    input: SaveSoulInputSchema.extend(FactoryScope).strict(),
     output: SaveResultSchema,
   },
   getCapabilities: {
-    input: z.null(),
+    input: FactoryScopedSchema,
     output: CapabilitiesResultSchema,
   },
   getCapabilityAudit: {
-    input: z.null(),
+    input: FactoryScopedSchema,
     output: CapabilityAuditResultSchema,
   },
   setCapability: {
-    input: SetCapabilityInputSchema,
+    input: SetCapabilityInputSchema.extend(FactoryScope).strict(),
     output: CapabilitySetResultSchema,
   },
 });

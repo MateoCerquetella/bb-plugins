@@ -1,18 +1,26 @@
-/** The panel's URL shape: board → agent → ticket. */
+/** The panel's URL shape: factories → factory board → agent → ticket. */
 
-export type PanelRoute =
+export const PANEL_PATH = "factory-bots";
+
+export type FactoryView =
   | { view: "board" }
   | { view: "souls" }
   | { view: "capabilities" }
   | { view: "agent"; agent: string }
   | { view: "ticket"; agent: string; linearId: string };
 
+export type PanelRoute = { view: "factories" } | ({ factoryId: string } & FactoryView);
+
 export function parsePanelRoute(subPath: string): PanelRoute {
-  const parts = subPath
+  const [factoryId, ...parts] = subPath
     .split("/")
     .filter((part) => part !== "")
     .map((part) => safeDecode(part));
+  if (factoryId === undefined) return { view: "factories" };
+  return { factoryId, ...parseFactoryView(parts) };
+}
 
+function parseFactoryView(parts: string[]): FactoryView {
   if (parts[0] === "souls") return { view: "souls" };
   if (parts[0] === "capabilities") return { view: "capabilities" };
 
@@ -25,16 +33,24 @@ export function parsePanelRoute(subPath: string): PanelRoute {
   return { view: "board" };
 }
 
-export function capabilitiesRoute(): string {
-  return "capabilities";
+export function boardRoute(factoryId: string): string {
+  return encodeURIComponent(factoryId);
 }
 
-export function agentRoute(agent: string): string {
-  return `agent/${encodeURIComponent(agent)}`;
+export function soulsRoute(factoryId: string): string {
+  return `${boardRoute(factoryId)}/souls`;
 }
 
-export function ticketRoute(agent: string, linearId: string): string {
-  return `${agentRoute(agent)}/ticket/${encodeURIComponent(linearId)}`;
+export function capabilitiesRoute(factoryId: string): string {
+  return `${boardRoute(factoryId)}/capabilities`;
+}
+
+export function agentRoute(factoryId: string, agent: string): string {
+  return `${boardRoute(factoryId)}/agent/${encodeURIComponent(agent)}`;
+}
+
+export function ticketRoute(factoryId: string, agent: string, linearId: string): string {
+  return `${agentRoute(factoryId, agent)}/ticket/${encodeURIComponent(linearId)}`;
 }
 
 function safeDecode(value: string): string {

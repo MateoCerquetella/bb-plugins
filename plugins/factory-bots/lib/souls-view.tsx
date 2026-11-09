@@ -782,7 +782,13 @@ function SoulDetail({
   );
 }
 
-export function SoulsView({ onBack }: { onBack: () => void }) {
+export function SoulsView({
+  factoryId,
+  onBack,
+}: {
+  factoryId: string;
+  onBack: () => void;
+}) {
   const rpc = useRpc<typeof rpcContract>();
   const [souls, setSouls] = useState<SoulRecord[]>([]);
   const [status, setStatus] = useState<StatusResult | null>(null);
@@ -818,9 +824,9 @@ export function SoulsView({ onBack }: { onBack: () => void }) {
       setOffline(null);
       try {
         const [soulsResult, statusResult, auditResult] = await Promise.all([
-          rpc.call("getSouls", null),
-          rpc.call("getStatus", null),
-          rpc.call("getAudit", null),
+          rpc.call("getSouls", { factoryId }),
+          rpc.call("getStatus", { factoryId }),
+          rpc.call("getAudit", { factoryId }),
         ]);
 
         setStatus(statusResult);
@@ -880,7 +886,7 @@ export function SoulsView({ onBack }: { onBack: () => void }) {
         setRefreshing(false);
       }
     },
-    [rpc],
+    [rpc, factoryId],
   );
 
   useEffect(() => {
@@ -1014,6 +1020,7 @@ export function SoulsView({ onBack }: { onBack: () => void }) {
     setSaveError(null);
     try {
       const result = await rpc.call("saveSoul", {
+        factoryId,
         bot,
         soul: editor,
         author: author.trim(),
@@ -1024,8 +1031,8 @@ export function SoulsView({ onBack }: { onBack: () => void }) {
       }
 
       const [freshSouls, freshAudit] = await Promise.all([
-        rpc.call("getSouls", null),
-        rpc.call("getAudit", null),
+        rpc.call("getSouls", { factoryId }),
+        rpc.call("getAudit", { factoryId }),
       ]);
       const showPartial = (failed: Failure) => {
         setConfirmStage("none");

@@ -108,15 +108,21 @@ The connection lives in [`factory.mcp.json`](./factory.mcp.json):
 }
 ```
 
-To use another checkout, open **BB Settings → Factory Bots** and set
-**Factory checkout path** to its absolute directory. Factory Bots launches
-`<checkout>/dist/main.js mcp`, keeps the configured `FACTORY_URL`, validates the
-entry point, and switches connections immediately. Clear the field to return to
-the bundled `factory.mcp.json` default. For a completely different MCP command,
-edit that file or set `FACTORY_BOTS_MCP_CONFIG` to an absolute path to another
-config. The offline state's start command is derived from the same MCP
-configuration (the `mcp` argument becomes `up`); the `VAR=value` prefix is
-POSIX shell syntax.
+Factory Bots can read several factories. Each factory has a name, a
+`FACTORY_URL`, and an optional checkout path; the list is stored in the
+plugin's key-value storage under `factories:v1`. The first load seeds one
+**Local** factory with the bundled config's `FACTORY_URL` and its entry point.
+A factory with a checkout path launches `<checkout>/dist/main.js mcp`; an empty
+path keeps the bundled entry point. Every factory gets its own MCP child,
+started on first use, restarted when the factory is edited, and stopped when it
+is removed. Saving a factory first loads its MCP config, so a checkout without
+a readable `dist/main.js` is reported instead of saved. Panel URLs start with the
+factory id (`local`, `local/souls`, `local/agent/helm/ticket/FB-2`), and each
+factory keeps its own Orchestrator chat history. For a completely different MCP
+command, edit `factory.mcp.json` or set `FACTORY_BOTS_MCP_CONFIG` to an absolute
+path to another config. The offline state's start command is derived from the
+same MCP configuration (the `mcp` argument becomes `up`); the `VAR=value` prefix
+is POSIX shell syntax.
 
 The MCP child gets only a small runtime environment (paths, locale, timezone)
 plus the config's `env`; it does not inherit BB's provider credentials.

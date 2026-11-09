@@ -94,6 +94,8 @@ export interface LoadConfigOptions {
   env?: Record<string, string | undefined>;
   cwd?: string;
   factoryCheckoutPath?: string;
+  /** Replaces the config's FACTORY_URL, so one checkout can read many factories. */
+  factoryUrl?: string;
   readFile?: (path: string) => Promise<string>;
   /** True only for a readable regular file; a directory can never start. */
   exists?: (path: string) => Promise<boolean>;
@@ -146,6 +148,7 @@ export async function loadMcpConfig(
       if (options.factoryCheckoutPath?.trim()) {
         applyFactoryCheckoutPath(config, options.factoryCheckoutPath);
       }
+      if (options.factoryUrl !== undefined) config.env.FACTORY_URL = options.factoryUrl;
       const baseDir = dirname(path);
       const scripts = scriptPaths(config);
       if (scripts.some((script) => !isAbsolute(script))) {
@@ -157,7 +160,7 @@ export async function loadMcpConfig(
           return {
             config: null,
             path,
-            error: `No readable Factory MCP script at ${script}. Set the Factory checkout path in Settings → Factory Bots, edit ${path}, or set FACTORY_BOTS_MCP_CONFIG to a config for this host, then reload the Factory Bots plugin.`,
+            error: `No readable Factory MCP script at ${script}. Set this factory's checkout path in Factory Bots, edit ${path}, or set FACTORY_BOTS_MCP_CONFIG to a config for this host, then reload the Factory Bots plugin.`,
           };
         }
       }

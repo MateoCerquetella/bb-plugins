@@ -1,4 +1,4 @@
-/** The Orchestrator chat survives leaving the page, and remembers what it filed. */
+/** Each factory's Orchestrator chat survives leaving the page, and remembers what it filed. */
 export interface StoredChatEntry {
   id: number;
   role: "user" | "orchestrator" | "error";
@@ -6,11 +6,11 @@ export interface StoredChatEntry {
   created: string[];
 }
 
-const KEY = "factory-bots:orchestrator-chat:v1";
+const key = (factoryId: string): string => `factory-bots:orchestrator-chat:v2:${factoryId}`;
 
-export function loadChatEntries(): StoredChatEntry[] {
+export function loadChatEntries(factoryId: string): StoredChatEntry[] {
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = localStorage.getItem(key(factoryId));
     if (raw === null) return [];
     const parsed: unknown = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
@@ -44,9 +44,9 @@ export function loadChatEntries(): StoredChatEntry[] {
 
 export const CHAT_CHANGED = "factory-bots:chat-changed";
 
-export function saveChatEntries(entries: readonly StoredChatEntry[]): void {
+export function saveChatEntries(factoryId: string, entries: readonly StoredChatEntry[]): void {
   try {
-    localStorage.setItem(KEY, JSON.stringify(entries));
+    localStorage.setItem(key(factoryId), JSON.stringify(entries));
   } catch {
     // The page still works when storage is unavailable.
   }
@@ -58,9 +58,9 @@ export function notifyChatChanged(): void {
 }
 
 /** Clear only this browser's Orchestrator history; factory memory is untouched. */
-export function clearChatEntries(): void {
+export function clearChatEntries(factoryId: string): void {
   try {
-    localStorage.removeItem(KEY);
+    localStorage.removeItem(key(factoryId));
   } catch {
     // Clearing a missing store is still a successful local clear.
   }
@@ -68,14 +68,15 @@ export function clearChatEntries(): void {
 }
 
 export function appendChatEntry(
+  factoryId: string,
   entry: Omit<StoredChatEntry, "id">,
 ): StoredChatEntry {
-  const current = loadChatEntries();
+  const current = loadChatEntries(factoryId);
   const next: StoredChatEntry = {
     ...entry,
     id: (current.at(-1)?.id ?? 0) + 1,
   };
-  saveChatEntries([...current, next]);
+  saveChatEntries(factoryId, [...current, next]);
   notifyChatChanged();
   return next;
 }

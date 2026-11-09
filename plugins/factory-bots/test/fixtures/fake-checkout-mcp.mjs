@@ -1,15 +1,17 @@
 #!/usr/bin/env node
 // A minimal Factory MCP server used to prove which checkout the plugin runs.
 // Its identity is its own checkout directory, so two checkouts answer apart,
-// and it records its lifetime there so a disposed child is observable.
+// and it records its lifetime and each spawn there so a disposed or
+// duplicated child is observable.
 
-import { writeFileSync } from "node:fs";
+import { appendFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const checkout = dirname(dirname(fileURLToPath(import.meta.url)));
 const lifetimeFile = join(checkout, "lifetime.txt");
 writeFileSync(lifetimeFile, "running");
+appendFileSync(join(checkout, "spawns.log"), "spawn\n");
 const stop = () => {
   try {
     writeFileSync(lifetimeFile, "stopped");

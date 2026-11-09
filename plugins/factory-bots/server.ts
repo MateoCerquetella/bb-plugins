@@ -1,120 +1,154 @@
 import type { BbPluginApi } from "@get-bb/plugin-sdk";
 
 import { rpcContract } from "./contract.js";
-import { factoryEntryPoint, loadMcpConfig, startCommand, type LoadedFactoryMcpConfig } from "./lib/config.js";
+import { DEFAULT_FACTORY_URL, loadMcpConfig, startCommand, type LoadedFactoryMcpConfig } from "./lib/config.js";
+import {
+  FACTORIES_KEY,
+  parseFactories,
+  seedFactories,
+  uniqueFactoryId,
+  type Factory,
+} from "./lib/factories.js";
 import { FactoryMcpClient } from "./lib/mcp-client.js";
 import { FactoryService } from "./lib/service.js";
 import { CapabilityService } from "./lib/capability-service.js";
 import { SoulService } from "./lib/soul-service.js";
 
 /**
- * Factory Bots owns one Factory MCP child. The board and chat use the read
- * tools plus the single Orchestrator write; the Souls view has its own
- * four-tool allowlist and writes only through factory_soul_set.
+ * Factory Bots owns one Factory MCP child per configured factory, started on
+ * first use. The board and chat use the read tools plus the single
+ * Orchestrator write; the Souls view has its own four-tool allowlist and
+ * writes only through factory_soul_set.
  */
 interface FactoryRuntime {
-  loaded: LoadedFactoryMcpConfig;
   client: FactoryMcpClient | null;
   service: FactoryService;
   souls: SoulService;
   capabilities: CapabilityService;
 }
 
-function createRuntime(bb: BbPluginApi, loaded: LoadedFactoryMcpConfig): FactoryRuntime {
+function createRuntime(bb: BbPluginApi, factory: Factory, loaded: LoadedFactoryMcpConfig): FactoryRuntime {
   const client = loaded.config === null
     ? null
     : new FactoryMcpClient(loaded.config, {
-        onStderr: (line) => bb.log.debug(`factory mcp: ${line}`),
+        onStderr: (line) => bb.log.debug(`factory mcp [${factory.id}]: ${line}`),
       });
-  const start = loaded.config === null ? null : startCommand(loaded.config);
+  const options = {
+    caller: client,
+    startCommand: loaded.config === null ? null : startCommand(loaded.config),
+    configError: loaded.error,
+  };
   return {
-    loaded,
     client,
-    service: new FactoryService({ caller: client, startCommand: start, configError: loaded.error }),
-    souls: new SoulService({ caller: client, startCommand: start, configError: loaded.error }),
-    capabilities: new CapabilityService({ caller: client, startCommand: start, configError: loaded.error }),
+    service: new FactoryService(options),
+    souls: new SoulService(options),
+    capabilities: new CapabilityService(options),
   };
 }
 
 export default async function plugin(bb: BbPluginApi): Promise<void> {
-  const settings = bb.settings.define({
-    factoryCheckoutPath: {
-      type: "string",
-      label: "Factory checkout path",
-      description:
-        "Absolute path to the Factory checkout containing dist/main.js. Changes apply immediately; leave empty to use the bundled factory.mcp.json default.",
-      default: "",
-    },
-  });
-  let configuredPath = (await settings.get()).factoryCheckoutPath;
-  let runtime = createRuntime(bb, await loadMcpConfig({
-    moduleUrl: import.meta.url,
-    factoryCheckoutPath: configuredPath,
-  }));
-  let pathError = runtime.loaded.config === null ? runtime.loaded.error : null;
-  let changeVersion = 0;
-  let disposed = false;
-
-  const pathStatus = () => ({
-    configuredPath,
-    entryPoint: runtime.loaded.config === null
-      ? null
-      : factoryEntryPoint(runtime.loaded.config),
-    error: pathError,
-  });
-  const publishPathStatus = () => bb.realtime.publish("factory-bots:settings", null);
-
-  settings.onChange((next) => {
-    const version = ++changeVersion;
-    configuredPath = next.factoryCheckoutPath;
-    void loadMcpConfig({
+  const load = (factory: Pick<Factory, "checkoutPath" | "url">) =>
+    loadMcpConfig({
       moduleUrl: import.meta.url,
-      factoryCheckoutPath: configuredPath,
-    }).then((loaded) => {
-      if (disposed || version !== changeVersion) return;
-      if (loaded.config === null && configuredPath.trim() !== "") {
-        pathError = loaded.error ?? "The Factory checkout path could not be loaded.";
-        publishPathStatus();
-        return;
-      }
-      const previous = runtime;
-      runtime = createRuntime(bb, loaded);
-      pathError = loaded.error;
-      previous.client?.dispose();
-      const target = loaded.config === null ? null : factoryEntryPoint(loaded.config);
-      bb.log.info(`Factory connection switched to ${target ?? loaded.path ?? "unknown"}.`);
-      publishPathStatus();
-    }).catch((cause: unknown) => {
-      if (disposed || version !== changeVersion) return;
-      pathError = cause instanceof Error ? cause.message : String(cause);
-      publishPathStatus();
+      factoryCheckoutPath: factory.checkoutPath,
+      factoryUrl: factory.url,
     });
-  });
+
+  let list = parseFactories(await bb.storage.kv.get(FACTORIES_KEY));
+  if (list === null) {
+    const bundled = await loadMcpConfig({ moduleUrl: import.meta.url });
+    list = seedFactories(bundled.config?.env.FACTORY_URL ?? DEFAULT_FACTORY_URL);
+    await bb.storage.kv.set(FACTORIES_KEY, list);
+  }
+  let factories: Factory[] = list;
+
+  const runtimes = new Map<string, Promise<FactoryRuntime>>();
+  const runtime = (factoryId: string): Promise<FactoryRuntime> => {
+    const existing = runtimes.get(factoryId);
+    if (existing !== undefined) return existing;
+    const factory = factories.find((entry) => entry.id === factoryId);
+    if (factory === undefined) return Promise.reject(new Error(`Unknown factory ${factoryId}`));
+    const created = load(factory).then((loaded) => {
+      if (loaded.config === null) {
+        bb.log.warn(`Factory ${factory.id} is not configured: ${loaded.error ?? "unknown error"}`);
+      }
+      return createRuntime(bb, factory, loaded);
+    });
+    runtimes.set(factoryId, created);
+    return created;
+  };
+  const retire = (factoryId: string): void => {
+    const existing = runtimes.get(factoryId);
+    runtimes.delete(factoryId);
+    void existing?.then((value) => value.client?.dispose(), () => {});
+  };
+
+  // Saves and removals replace the whole list; one at a time keeps both.
+  let writes: Promise<unknown> = Promise.resolve();
+  const serialized = <T>(work: () => Promise<T>): Promise<T> => {
+    const next = writes.then(work, work);
+    writes = next.catch(() => {});
+    return next;
+  };
+  const commit = async (next: Factory[]): Promise<void> => {
+    await bb.storage.kv.set(FACTORIES_KEY, next);
+    factories = next;
+    bb.realtime.publish("factory-bots:factories", null);
+  };
 
   bb.rpc.register(rpcContract, {
-    getFactoryPathStatus: () => pathStatus(),
-    getBoard: () => runtime.service.getBoard(),
-    getTicket: ({ linearId }) => runtime.service.getTicket(linearId),
-    sendMessage: ({ message, provider, model, reasoningLevel }) =>
-      runtime.service.sendMessage(message, { provider, model, reasoningLevel }),
-    getSouls: () => runtime.souls.getSouls(),
-    getStatus: () => runtime.souls.getStatus(),
-    getAudit: () => runtime.souls.getAudit(),
-    saveSoul: ({ bot, soul, author }) => runtime.souls.saveSoul(bot, soul, author),
-    getCapabilities: () => runtime.capabilities.getCapabilities(),
-    getCapabilityAudit: () => runtime.capabilities.getCapabilityAudit(),
-    setCapability: ({ bot, enabled }) => runtime.capabilities.setCapability(bot, enabled),
+    listFactories: () => ({ factories }),
+    saveFactory: (input) =>
+      serialized(async () => {
+        if (input.id !== undefined && !factories.some((entry) => entry.id === input.id)) {
+          return { ok: false as const, message: `Unknown factory ${input.id}` };
+        }
+        const loaded = await load(input);
+        if (loaded.config === null) {
+          return { ok: false as const, message: loaded.error ?? "The Factory MCP config could not be loaded." };
+        }
+        const factory: Factory = {
+          id: input.id ?? uniqueFactoryId(input.name, factories.map((entry) => entry.id)),
+          name: input.name,
+          url: input.url,
+          checkoutPath: input.checkoutPath,
+        };
+        await commit(
+          input.id === undefined
+            ? [...factories, factory]
+            : factories.map((entry) => (entry.id === factory.id ? factory : entry)),
+        );
+        retire(factory.id);
+        return { ok: true as const, factory };
+      }),
+    removeFactory: ({ id }) =>
+      serialized(async () => {
+        if (!factories.some((entry) => entry.id === id)) throw new Error(`Unknown factory ${id}`);
+        if (factories.length === 1) {
+          throw new Error("Keep at least one factory: add another before removing this one.");
+        }
+        await commit(factories.filter((entry) => entry.id !== id));
+        retire(id);
+        return { factories };
+      }),
+    getBoard: async ({ factoryId }) => (await runtime(factoryId)).service.getBoard(),
+    getTicket: async ({ factoryId, linearId }) => (await runtime(factoryId)).service.getTicket(linearId),
+    sendMessage: async ({ factoryId, message, provider, model, reasoningLevel }) =>
+      (await runtime(factoryId)).service.sendMessage(message, { provider, model, reasoningLevel }),
+    getSouls: async ({ factoryId }) => (await runtime(factoryId)).souls.getSouls(),
+    getStatus: async ({ factoryId }) => (await runtime(factoryId)).souls.getStatus(),
+    getAudit: async ({ factoryId }) => (await runtime(factoryId)).souls.getAudit(),
+    saveSoul: async ({ factoryId, bot, soul, author }) =>
+      (await runtime(factoryId)).souls.saveSoul(bot, soul, author),
+    getCapabilities: async ({ factoryId }) => (await runtime(factoryId)).capabilities.getCapabilities(),
+    getCapabilityAudit: async ({ factoryId }) => (await runtime(factoryId)).capabilities.getCapabilityAudit(),
+    setCapability: async ({ factoryId, bot, enabled }) =>
+      (await runtime(factoryId)).capabilities.setCapability(bot, enabled),
   });
 
   bb.onDispose(() => {
-    disposed = true;
-    changeVersion++;
-    runtime.client?.dispose();
+    for (const id of [...runtimes.keys()]) retire(id);
   });
 
-  if (runtime.loaded.config === null) {
-    bb.log.warn(`Factory MCP is not configured: ${runtime.loaded.error ?? "unknown error"}`);
-  } else {
-    bb.log.info(`Reading the factory through MCP config ${runtime.loaded.path ?? "unknown"}.`);
-  }
+  bb.log.info(`Factory Bots knows ${factories.length} ${factories.length === 1 ? "factory" : "factories"}.`);
 }

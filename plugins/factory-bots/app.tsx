@@ -16,9 +16,7 @@ import {
   definePluginApp,
   experimental_ProviderModelPicker as ProviderModelPicker,
   useBbNavigate,
-  useRealtime,
   useRpc,
-  useSettings,
 } from "@get-bb/plugin-sdk/app";
 import type {
   ExperimentalProviderModelPickerValue,
@@ -31,7 +29,6 @@ import type {
   BoardResult,
   BoardSnapshot,
   ChatResult,
-  FactoryPathStatus,
   TicketDetail,
   TicketResult,
   TicketSummary,
@@ -63,14 +60,18 @@ import { activeLiveTool, isGenerating, readLiveTools } from "./lib/live";
 import { SoulsView } from "./lib/souls-view";
 import { CapabilitiesView } from "./lib/capabilities-view";
 import { attentionTicketMap, stageLabel } from "./lib/derive";
+import { FactoryRedirect } from "./lib/factory-redirect";
 import {
+  PANEL_PATH,
   agentRoute,
+  boardRoute,
   capabilitiesRoute,
   parsePanelRoute,
+  soulsRoute,
   ticketRoute,
+  type FactoryView,
 } from "./lib/route";
 
-const PANEL_PATH = "factory-bots";
 const REFRESH_MS = 5_000;
 const CHAT_WIDTH_KEY = "factory-bots:chat-width:v1";
 const CHAT_OPEN_KEY = "factory-bots:chat-open:v1";
@@ -143,6 +144,7 @@ function formatTime(epoch: number): string {
  */
 function useFactoryPoll(
   rpc: RpcClient,
+  factoryId: string,
   linearId: string | null,
 ): FactoryPoll {
   const rpcRef = useRef(rpc);
@@ -181,7 +183,7 @@ function useFactoryPoll(
 
       let boardOnline = false;
       try {
-        const data = await rpcRef.current.call("getBoard", null);
+        const data = await rpcRef.current.call("getBoard", { factoryId });
         if (!cancelled) {
           setBoard({ data, error: null });
           boardOnline = data.ok;
@@ -195,6 +197,7 @@ function useFactoryPoll(
         if (boardOnline) {
           try {
             const data = await rpcRef.current.call("getTicket", {
+              factoryId,
               linearId: selected,
             });
             if (!cancelled) setTicket({ data, error: null });
@@ -231,7 +234,7 @@ function useFactoryPoll(
       if (timer !== undefined) clearTimeout(timer);
       wakeRef.current = () => {};
     };
-  }, []);
+  }, [factoryId]);
 
   // A route change resets the pane and wakes the one loop; it never mounts a
   // second loop, and the loop's queued flag prevents overlapping reads.
@@ -1857,6 +1860,7 @@ type ChatEntry = ReturnType<typeof loadChatEntries>[number];
 
 function ChatView({
   rpc,
+  factoryId,
   active,
   orchestrator,
   onOpenTicket,
@@ -1864,13 +1868,14 @@ function ChatView({
   onHide,
 }: {
   rpc: RpcClient;
+  factoryId: string;
   active: boolean;
   orchestrator: AgentCard | undefined;
   onOpenTicket: (linearId: string) => void;
   showComposer?: boolean;
   onHide?: () => void;
 }) {
-  const [entries, setEntries] = useState<ChatEntry[]>(loadChatEntries);
+  const [entries, setEntries] = useState<ChatEntry[]>(() => loadChatEntries(factoryId));
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [picked, setPicked] = useState<ExperimentalProviderModelPickerValue>({
@@ -1890,13 +1895,13 @@ function ChatView({
   const chatStatus = orchestrator?.status ?? "idle";
   const chatGift = boxCountdown(chatDood, now);
   const chatBusy = sending || externalPending;
-  const nextId = useRef((loadChatEntries().at(-1)?.id ?? 0) + 1);
+  const nextId = useRef((loadChatEntries(factoryId).at(-1)?.id ?? 0) + 1);
   const bottomRef = useRef<HTMLDivElement>(null);
   const filed = [...new Set(entries.flatMap((entry) => entry.created))];
 
   useEffect(() => {
-    saveChatEntries(entries);
-  }, [entries]);
+    saveChatEntries(factoryId, entries);
+  }, [factoryId, entries]);
 
   useEffect(() => {
     saveAgentDood("orchestrator", chatDood);
@@ -1917,7 +1922,7 @@ function ChatView({
 
   useEffect(() => {
     const reload = () => {
-      const next = loadChatEntries();
+      const next = loadChatEntries(factoryId);
       nextId.current = Math.max(
         nextId.current,
         (next.at(-1)?.id ?? 0) + 1,
@@ -1926,7 +1931,7 @@ function ChatView({
     };
     window.addEventListener(CHAT_CHANGED, reload);
     return () => window.removeEventListener(CHAT_CHANGED, reload);
-  }, []);
+  }, [factoryId]);
 
   useEffect(() => {
     if (!active) return;
@@ -1975,6 +1980,7 @@ function ChatView({
         : {};
     try {
       const result = (await rpc.call("sendMessage", {
+        factoryId,
         message: text,
         ...selection,
       })) as ChatResult;
@@ -2036,7 +2042,7 @@ function ChatView({
                 type="button"
                 className="fb-chat-clear-confirm"
                 onClick={() => {
-                  clearChatEntries();
+                  clearChatEntries(factoryId);
                   setEntries([]);
                   nextId.current = 1;
                   setClearOpen(false);
@@ -2272,6 +2278,20 @@ function ChatView({
 
 function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
   const route = parsePanelRoute(subPath);
+  if (route.view === "factories") return <FactoryRedirect />;
+  // Keyed so polling, chat, and pane state never carry over between factories.
+  return <FactoryPanel key={route.factoryId} subPath={subPath} factoryId={route.factoryId} route={route} />;
+}
+
+function FactoryPanel({
+  subPath,
+  factoryId,
+  route,
+}: {
+  subPath: string;
+  factoryId: string;
+  route: FactoryView;
+}) {
   const rpc = useRpc<typeof rpcContract>();
   const navigate = useBbNavigate();
   const [boardTab, setBoardTab] = useState<BoardTab>("threads");
@@ -2279,7 +2299,7 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
   const [chatOpen, setChatOpen] = useState(readChatOpen);
   const [resizingChat, setResizingChat] = useState(false);
   const ticketId = route.view === "ticket" ? route.linearId : null;
-  const { board, ticket } = useFactoryPoll(rpc, ticketId);
+  const { board, ticket } = useFactoryPoll(rpc, factoryId, ticketId);
   const rootRef = useRef<HTMLDivElement>(null);
   const shellRef = useRef<HTMLDivElement>(null);
   const previousPath = useRef(subPath);
@@ -2352,8 +2372,8 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
     const created = board.data?.ok === true
       ? board.data.tickets.find((entry) => entry.linearId === linearId)
       : undefined;
-    if (created === undefined) go("");
-    else go(ticketRoute(created.bot, linearId));
+    if (created === undefined) go(boardRoute(factoryId));
+    else go(ticketRoute(factoryId, created.bot, linearId));
   };
 
   return (
@@ -2368,19 +2388,19 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
         <main className="fb-main">
       {route.view === "souls" ? (
         <div className="fb-souls-embed">
-          <SoulsView onBack={() => go("")} />
+          <SoulsView factoryId={factoryId} onBack={() => go(boardRoute(factoryId))} />
         </div>
       ) : route.view === "capabilities" ? (
-        <CapabilitiesView onBack={() => go("")} />
+        <CapabilitiesView factoryId={factoryId} onBack={() => go(boardRoute(factoryId))} />
       ) : route.view === "board" ? (
         <BoardView
           board={board}
           tab={boardTab}
           onTab={setBoardTab}
-          onOpenAgent={(name) => go(agentRoute(name))}
-          onOpenTicket={(ticket) => go(ticketRoute(ticket.bot, ticket.linearId))}
-          onSouls={() => go("souls")}
-          onCapabilities={() => go(capabilitiesRoute())}
+          onOpenAgent={(name) => go(agentRoute(factoryId, name))}
+          onOpenTicket={(ticket) => go(ticketRoute(factoryId, ticket.bot, ticket.linearId))}
+          onSouls={() => go(soulsRoute(factoryId))}
+          onCapabilities={() => go(capabilitiesRoute(factoryId))}
         />
       ) : route.view === "agent" || route.view === "ticket" ? (
         <AgentView
@@ -2388,9 +2408,9 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
           agentName={route.agent}
           selectedId={ticketId}
           ticket={ticket}
-          onBack={() => go("")}
-          onSelectTicket={(linearId) => go(ticketRoute(route.agent, linearId))}
-          onBackToTickets={() => go(agentRoute(route.agent))}
+          onBack={() => go(boardRoute(factoryId))}
+          onSelectTicket={(linearId) => go(ticketRoute(factoryId, route.agent, linearId))}
+          onBackToTickets={() => go(agentRoute(factoryId, route.agent))}
           onSteer={async (selected, message) => {
             const prompt = [
               `Steer ticket ${selected.linearId} ("${selected.title}") while it works.`,
@@ -2398,7 +2418,7 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
               message,
               "Use the existing ticket; do not create a duplicate.",
             ].join("\n");
-            appendChatEntry({
+            appendChatEntry(factoryId, {
               role: "user",
               text: `Steering ${selected.linearId}: ${message}`,
               created: [],
@@ -2406,9 +2426,11 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
             setChatPending(true);
             try {
               const result = (await rpc.call("sendMessage", {
+                factoryId,
                 message: prompt,
               })) as ChatResult;
               appendChatEntry(
+                factoryId,
                 result.ok
                   ? {
                       role: "orchestrator",
@@ -2419,7 +2441,7 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
               );
               return result;
             } catch (cause) {
-              appendChatEntry({
+              appendChatEntry(factoryId, {
                 role: "error",
                 text: errorText(cause),
                 created: [],
@@ -2449,6 +2471,7 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
           />
           <ChatView
             rpc={rpc}
+            factoryId={factoryId}
             active
             orchestrator={orchestrator}
             onOpenTicket={openChatTicket}
@@ -2474,39 +2497,6 @@ function FactoryBotsPanel({ subPath }: PluginNavPanelProps) {
   );
 }
 
-function FactoryBotsSettings() {
-  const rpc = useRpc<typeof rpcContract>();
-  const { values, isLoading } = useSettings();
-  const [status, setStatus] = useState<FactoryPathStatus | null>(null);
-  const [statusError, setStatusError] = useState<string | null>(null);
-  const refresh = useCallback(() => {
-    void rpc.call("getFactoryPathStatus", null)
-      .then((next) => {
-        setStatus(next);
-        setStatusError(null);
-      })
-      .catch((cause: unknown) => setStatusError(errorText(cause)));
-  }, [rpc]);
-
-  useEffect(() => refresh(), [refresh, values?.factoryCheckoutPath]);
-  useRealtime("factory-bots:settings", refresh);
-
-  const configuredPath = String(values?.factoryCheckoutPath ?? "").trim();
-  return (
-    <section className="fb-settings" aria-label="Factory connection status">
-      <p>Point Factory Bots at another local Factory checkout. Leave the path field empty to restore the bundled default.</p>
-      <dl>
-        <dt>Configured checkout</dt>
-        <dd>{isLoading ? "Loading…" : configuredPath || "Bundled default"}</dd>
-        <dt>Active entry point</dt>
-        <dd><code>{status?.entryPoint ?? "Unavailable"}</code></dd>
-      </dl>
-      {statusError ? <p role="alert">Could not read Factory path status: {statusError}</p> : null}
-      {status?.error ? <p role="alert">{status.error}</p> : null}
-    </section>
-  );
-}
-
 export default definePluginApp((app) => {
   app.slots.navPanel({
     id: "factory-bots",
@@ -2514,11 +2504,5 @@ export default definePluginApp((app) => {
     icon: "Bot",
     path: PANEL_PATH,
     component: FactoryBotsPanel,
-  });
-  app.slots.settingsSection({
-    id: "factory-connection",
-    title: "Factory connection",
-    description: "Choose which local Factory checkout Factory Bots connects to.",
-    component: FactoryBotsSettings,
   });
 });

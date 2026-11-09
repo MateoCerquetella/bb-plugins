@@ -132,7 +132,13 @@ function AuditList({ entries }: { entries: readonly CapabilityAuditEntry[] }) {
   );
 }
 
-export function CapabilitiesView({ onBack }: { onBack: () => void }) {
+export function CapabilitiesView({
+  factoryId,
+  onBack,
+}: {
+  factoryId: string;
+  onBack: () => void;
+}) {
   const rpc = useRpc<typeof rpcContract>();
   const [capabilities, setCapabilities] = useState<CapabilitiesPayload | null>(null);
   const [entries, setEntries] = useState<CapabilityAuditEntry[]>([]);
@@ -147,8 +153,8 @@ export function CapabilitiesView({ onBack }: { onBack: () => void }) {
     setFailure(null);
     try {
       const [nextCapabilities, nextAudit] = await Promise.all([
-        rpc.call("getCapabilities", null),
-        rpc.call("getCapabilityAudit", null),
+        rpc.call("getCapabilities", { factoryId }),
+        rpc.call("getCapabilityAudit", { factoryId }),
       ]);
       if (!nextCapabilities.ok) {
         setFailure(nextCapabilities);
@@ -171,7 +177,7 @@ export function CapabilitiesView({ onBack }: { onBack: () => void }) {
     } finally {
       setLoading(false);
     }
-  }, [rpc]);
+  }, [rpc, factoryId]);
 
   useEffect(() => {
     void refresh();
@@ -183,7 +189,7 @@ export function CapabilitiesView({ onBack }: { onBack: () => void }) {
     setNotice(null);
     try {
       // Steward rule: read immediately before every write.
-      const before = await rpc.call("getCapabilities", null);
+      const before = await rpc.call("getCapabilities", { factoryId });
       if (!before.ok) {
         setFailure(before);
         return;
@@ -200,6 +206,7 @@ export function CapabilitiesView({ onBack }: { onBack: () => void }) {
         return;
       }
       const result = await rpc.call("setCapability", {
+        factoryId,
         bot: pending.bot,
         enabled: pending.next,
       });
@@ -208,7 +215,7 @@ export function CapabilitiesView({ onBack }: { onBack: () => void }) {
         return;
       }
       // Steward rule: read after the write and report the state the factory confirms.
-      const after = await rpc.call("getCapabilities", null);
+      const after = await rpc.call("getCapabilities", { factoryId });
       if (!after.ok) {
         setFailure(after);
         setNotice(
@@ -231,7 +238,7 @@ export function CapabilitiesView({ onBack }: { onBack: () => void }) {
         return;
       }
       setCapabilities(after.capabilities);
-      const audit = await rpc.call("getCapabilityAudit", null);
+      const audit = await rpc.call("getCapabilityAudit", { factoryId });
       if (audit.ok) setEntries(audit.entries);
       const latest = audit.ok ? audit.entries[0] : undefined;
       setNotice(

@@ -105,6 +105,26 @@ test("uses the configured Factory checkout while preserving MCP args and URL", a
   });
 });
 
+test("a factory URL replaces the config's FACTORY_URL and keeps the rest", async () => {
+  const loaded = await loadMcpConfig({
+    moduleUrl: "file:///opt/plugin/server.ts",
+    env: {},
+    factoryUrl: "http://10.8.0.6:8080",
+    readFile: async () => JSON.stringify({ ...VALID, env: { FACTORY_URL: "http://127.0.0.1:8080", EXTRA: "kept" } }),
+    exists: async () => true,
+  });
+  assert.equal(loaded.error, null);
+  assert.deepEqual(loaded.config, {
+    command: "node",
+    args: ["/opt/factory/dist/main.js", "mcp"],
+    env: { FACTORY_URL: "http://10.8.0.6:8080", EXTRA: "kept" },
+  });
+  assert.equal(
+    startCommand(loaded.config!),
+    "FACTORY_URL=http://10.8.0.6:8080 node /opt/factory/dist/main.js up",
+  );
+});
+
 test("rejects a checkout whose entry point is not a readable file", async (t) => {
   const checkout = await mkdtemp(join(tmpdir(), "factory-bots-config-"));
   t.after(() => rm(checkout, { recursive: true, force: true }));
@@ -194,7 +214,7 @@ test("reports a missing MCP script as an actionable config error", async () => {
   });
   assert.equal(loaded.config, null);
   assert.match(loaded.error ?? "", /No readable Factory MCP script at \/opt\/factory\/dist\/main\.js/);
-  assert.match(loaded.error ?? "", /Factory checkout path in Settings/);
+  assert.match(loaded.error ?? "", /checkout path in Factory Bots/);
   assert.match(loaded.error ?? "", /FACTORY_BOTS_MCP_CONFIG/);
   assert.match(loaded.error ?? "", /reload the Factory Bots plugin/);
 });
