@@ -5,10 +5,8 @@ export const factoryExecutionSchema = z.object({
   providerId: z.string().min(1).max(200),
   model: z.string().min(1).max(500),
   permissionMode: z.enum(['full', 'auto', 'accept-edits']),
-  reasoningLevel: z.enum([
-    'none', 'low', 'medium', 'high', 'xhigh', 'max', 'ultra', 'ultracode'
-  ]),
-  serviceTier: z.enum(['default', 'fast'])
+  reasoningLevel: z.string().min(1).max(100),
+  serviceTier: z.string().min(1).max(100)
 }).strict();
 export type FactoryExecution = z.infer<typeof factoryExecutionSchema>;
 
@@ -121,7 +119,7 @@ export const factoryCoordinatorSchema = z.discriminatedUnion('status', [
   z.object({ status: z.literal('failed'), ...coordinatorIntent, error: z.string() }).strict(),
   z.object({
     status: z.literal('ready'), ...coordinatorIntent, threadId: z.string().min(1),
-    nativeStatus: z.enum(['active', 'error', 'idle', 'starting', 'stopping']).default('starting'),
+    nativeStatus: z.enum(['active', 'error', 'idle', 'pending', 'starting', 'stopping']).default('starting'),
     error: z.string().nullable().default(null)
   }).strict()
 ]);
@@ -165,10 +163,17 @@ export const factoryExecutionOptionsSchema = z.object({
   routing: factoryPickerRoutingSchema.nullable()
 }).strict();
 export type FactoryExecutionOptions = z.infer<typeof factoryExecutionOptionsSchema>;
+const identityKey = (identity: FactoryIdentity) =>
+  JSON.stringify([identity.projectId, identity.source, identity.locator]);
+export const factoryProjectTag = (projectId: string) => `factory-project:${projectId}`;
+export const factoryRecordTag = (identity: FactoryIdentity) => `factory:${identityKey(identity)}`;
+export const factoryThreadTag = (threadId: string) => `factory-thread:${threadId}`;
+export const factoryEmpiricalTag = (identity: FactoryIdentity) => `factory-empirical:${identityKey(identity)}`;
 export const factoryRpcMethods = {
   factoryGetProject: {
     input: z.object({ projectId: z.string().startsWith('proj_') }).strict(),
-    output: z.object({ policy: factoryProjectPolicySchema, status: factoryProjectStatusSchema }).strict()
+    output: z.object({ policy: factoryProjectPolicySchema, status: factoryProjectStatusSchema }).strict(),
+    tags: ({ projectId }: { projectId: string }) => [factoryProjectTag(projectId)]
   },
   factoryExecutionOptions: {
     input: z.object({
@@ -188,7 +193,8 @@ export const factoryRpcMethods = {
   },
   factoryEmpirical: {
     input: factoryIdentitySchema,
-    output: empiricalObservationSchema
+    output: empiricalObservationSchema,
+    tags: (identity: FactoryIdentity) => [factoryEmpiricalTag(identity)]
   },
   factoryDiff: {
     input: factoryIdentitySchema.extend({
@@ -230,11 +236,14 @@ export const factoryRpcMethods = {
   },
   factoryGet: {
     input: factoryIdentitySchema,
-    output: z.object({ record: factoryRecordSchema.nullable() }).strict()
+    output: z.object({ record: factoryRecordSchema.nullable() }).strict(),
+    tags: (identity: FactoryIdentity) => [factoryRecordTag(identity)]
   },
   factoryForThread: {
     input: z.object({ threadId: z.string().min(1) }).strict(),
-    output: z.object({ record: factoryRecordSchema.nullable() }).strict()
+    output: z.object({ record: factoryRecordSchema.nullable() }).strict(),
+    tags: ({ threadId }: { threadId: string }, { record }: { record: FactoryRecord | null }) =>
+      record ? [factoryThreadTag(threadId), factoryRecordTag(record)] : [factoryThreadTag(threadId)]
   },
   factoryStart: {
     input: factoryVersionInputSchema.extend({

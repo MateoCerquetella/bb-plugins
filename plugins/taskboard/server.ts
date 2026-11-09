@@ -79,7 +79,10 @@ import { createWorkItemStore } from './store.js';
 import { decodeTicketImage } from './ticket-images-server.js';
 import { createFactoryStore } from './factory/store.js';
 import { createFactoryService } from './factory/service.js';
-import { factoryProjectPolicySchema, type FactoryIdentity, type FactoryStatusTarget } from './factory/contract.js';
+import {
+  factoryEmpiricalTag, factoryIdentitySchema, factoryProjectPolicySchema, factoryProjectTag, factoryRecordTag,
+  factoryThreadTag, type FactoryIdentity, type FactoryRecord, type FactoryStatusTarget
+} from './factory/contract.js';
 import { threadExecution } from './factory/native-dispatch.js';
 import { factoryKey } from './factory/state.js';
 import { createEmpiricalObservationQueue } from './empirical/serial.js';
@@ -471,8 +474,18 @@ export default async function plugin(bb: BbPluginApi) {
   const store = createWorkItemStore(bb);
   const factoryStore = createFactoryStore(bb.storage.database());
   const empiricalHost = bb.hosts.experimental_client({ contract: hostContract });
-  const factory = createFactoryService(bb.sdk, factoryStore, projectId =>
-    bb.realtime.publish('taskboard:factory', { projectId }), {
+  function factoryChanged(projectId: string, record: FactoryRecord | null) {
+    const tags = [factoryProjectTag(projectId)];
+    if (record) {
+      tags.push(factoryRecordTag(record), factoryEmpiricalTag(record));
+      const threadIds = record.runs.flatMap(run => run.threadId ? [run.threadId] : []);
+      if (record.coordinator?.status === 'ready') threadIds.push(record.coordinator.threadId);
+      for (const threadId of new Set(threadIds)) tags.push(factoryThreadTag(threadId));
+    }
+    bb.rpc.experimental_invalidate(tags);
+    bb.realtime.publish('taskboard:factory', { projectId });
+  }
+  const factory = createFactoryService(bb.sdk, factoryStore, factoryChanged, {
       getItem: identity => store.get(identity.projectId, identity.source, identity.locator) ?? null,
       async markStatus(item, target: FactoryStatusTarget) {
         const live = await getLiveItem(item.bbProjectId, item.source, item.locator);
@@ -584,45 +597,39 @@ export default async function plugin(bb: BbPluginApi) {
       };
     }
   }
-  const empiricalState = new Map<string, string>();
-  bb.background.service('taskboard-empirical-reconciliation', {
-    async start(signal) {
-      let offset = 0;
-      while (!signal.aborted) {
-        const records = factoryStore.all().filter(record =>
-          record.runs.some(run => run.threadId && run.environmentId));
-        const batch = records.slice(offset, offset + 32);
-        offset = offset + batch.length >= records.length ? 0 : offset + batch.length;
-        for (let index = 0; index < batch.length && !signal.aborted; index += 4) {
-          await Promise.allSettled(batch.slice(index, index + 4).map(async record => {
-            const key = JSON.stringify([record.projectId, record.source, record.locator]);
-            const observed = await observeFactoryEmpirical(record);
-            const fingerprint = JSON.stringify(observed.kind === 'observation'
-              ? [observed.hostId, observed.environmentId, observed.checkoutRoot, observed.status]
-              : [observed.kind, observed.reason]);
-            if (empiricalState.get(key) !== fingerprint) {
-              empiricalState.set(key, fingerprint);
-              bb.realtime.publish('taskboard:factory', { projectId: record.projectId });
-            }
-          }));
-        }
-        await sleep(8000, signal);
-      }
-    }
-  });
+  let factoryProgress: AbortSignal | null = null;
   bb.background.service('taskboard-factory-progress', {
     async start(signal) {
-      await factory.recover();
+      factoryProgress = signal;
+      try {
+        await factory.recover();
+        await factory.poll(signal);
+      } catch (error) {
+        if (!signal.aborted) bb.log.warn(`Factory progress: ${errorMessage(error)}`);
+      }
       while (!signal.aborted) {
-        try {
-          await factory.scan();
-          await factory.poll(signal);
-        }
-        catch (error) { if (!signal.aborted) bb.log.warn(`Factory progress: ${errorMessage(error)}`); }
-        await sleep(2500, signal);
+        try { await factory.scan(); }
+        catch (error) { if (!signal.aborted) bb.log.warn(`Factory intake: ${errorMessage(error)}`); }
+        await sleep(30_000, signal);
       }
     }
   });
+  const refreshFactoryThread = ({ thread }: { thread: { id: string } }) => {
+    const signal = factoryProgress;
+    if (!signal || signal.aborted) return;
+    factory.refreshThread(thread.id, signal).catch(error => {
+      if (!signal.aborted) bb.log.warn(`Factory progress: ${errorMessage(error)}`);
+    });
+  };
+  bb.events.on('thread.active', refreshFactoryThread);
+  bb.events.on('thread.idle', refreshFactoryThread);
+  bb.events.on('thread.failed', refreshFactoryThread);
+  bb.events.on('thread.archived', refreshFactoryThread);
+  bb.events.on('thread.unarchived', refreshFactoryThread);
+  bb.events.on('thread.deleted', refreshFactoryThread);
+  bb.events.on('experimental_thread.events', refreshFactoryThread);
+  bb.events.on('experimental_thread.parentChanged', refreshFactoryThread);
+  const latestEmpirical = new Map<string, Awaited<ReturnType<typeof observeFactoryEmpirical>>>();
   const credentials = createProjectCredentialVault(bb);
 
   let projectRemotesForProbe: Awaited<
@@ -2168,7 +2175,7 @@ export default async function plugin(bb: BbPluginApi) {
       const policy = factoryStore.saveProjectPolicy(factoryProjectPolicySchema.parse({
         ...input, updatedAt: new Date().toISOString()
       }));
-      bb.realtime.publish('taskboard:factory', { projectId: input.projectId });
+      factoryChanged(input.projectId, null);
       return { policy, status: factoryStore.projectStatus(input.projectId, input.provider) };
     },
     async factoryExecutionOptions(input) {
@@ -2217,7 +2224,7 @@ export default async function plugin(bb: BbPluginApi) {
     },
     async factoryEmpirical(input) {
       await assertProjectExists(input.projectId);
-      return observeFactoryEmpirical(input);
+      return latestEmpirical.get(factoryKey(input)) ?? observeFactoryEmpirical(input);
     },
     async factoryStartTask(input) {
       await assertProjectExists(input.projectId);
@@ -2460,6 +2467,26 @@ export default async function plugin(bb: BbPluginApi) {
     }
   };
   bb.rpc.register(taskboardRpcContract, handlers);
+  bb.rpc.experimental_whileWatched('factoryEmpirical', async (read, signal) => {
+    if (!('input' in read)) return;
+    const identity = factoryIdentitySchema.parse(read.input);
+    const key = factoryKey(identity);
+    let fingerprint: string | null = null;
+    try {
+      while (!signal.aborted) {
+        const observed = await observeFactoryEmpirical(identity);
+        latestEmpirical.set(key, observed);
+        const next = JSON.stringify(observed.kind === 'observation'
+          ? [observed.hostId, observed.environmentId, observed.checkoutRoot, observed.status]
+          : [observed.kind, observed.reason]);
+        if (next !== fingerprint) bb.rpc.experimental_invalidate([factoryEmpiricalTag(identity)]);
+        fingerprint = next;
+        await sleep(8000, signal);
+      }
+    } finally {
+      latestEmpirical.delete(key);
+    }
+  });
   const preparation = registerPreparation(bb, {
     assertProject: assertProjectExists,
     async task(projectId, source, locator) {

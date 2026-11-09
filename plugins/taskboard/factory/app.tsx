@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
-import { Markdown, useBbContext, useBbNavigate, useRealtime, useRpc, useSettings } from '@get-bb/plugin-sdk/app';
-import type { TaskboardRpcContract, WorkItem } from '../contract.js';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { Markdown, experimental_useRpcQuery, useBbContext, useBbNavigate, useRpc, useSettings } from '@get-bb/plugin-sdk/app';
+import { taskboardRpcContract, type TaskboardRpcContract, type WorkItem } from '../contract.js';
 import type { FactoryExecution, FactoryProjectStatus, FactoryRecord, FactoryRun, FactoryRunKind } from './contract.js';
 import type { EmpiricalObservation } from '../empirical/contract.js';
 import { Button } from '../components/ui/button.js';
@@ -21,6 +21,10 @@ function tone(run: FactoryRun) {
     run.buildResult?.verdict === 'blocked' || run.buildResult?.verdict === 'needs_input' ||
     (run.kind === 'review' && run.status === 'finished' && run.reviewResult?.verdict !== 'passed')) return 'attention';
   return run.reviewResult?.verdict === 'passed' ? 'success' : 'neutral';
+}
+
+function newerRecord(local: FactoryRecord | null, loaded: FactoryRecord | null) {
+  return local && (!loaded || local.version > loaded.version) ? local : loaded;
 }
 
 function OriginalTicket({ record }: { record: FactoryRecord }) {
@@ -97,31 +101,14 @@ function FactoryWorkbench({ record, onRecord, actions, plan, item }: {
   const [aiError, setAiError] = useState<string | null>(null);
   const [aiNote, setAiNote] = useState<string | null>(null);
   const [pendingExecution, setPendingExecution] = useState<{ value: FactoryRecord['execution'] } | null>(null);
-  const [projectSnapshot, setProjectSnapshot] = useState<{ identity: string; status: FactoryProjectStatus } | null>(null);
-  const [policyError, setPolicyError] = useState<{ identity: string; message: string } | null>(null);
-  const projectRequest = useRef(0);
   const pending = useRef(false);
   const currentIdentity = useRef(identity);
   currentIdentity.current = identity;
-  const loadProjectStatus = useCallback(async () => {
-    const request = ++projectRequest.current;
-    try {
-      const result = await rpc.call('factoryGetProject', { projectId: record.projectId });
-      if (request !== projectRequest.current || currentIdentity.current !== identity) return;
-      setProjectSnapshot({ identity, status: result.status });
-      setPolicyError(null);
-    } catch (reason) {
-      if (request !== projectRequest.current || currentIdentity.current !== identity) return;
-      setPolicyError({ identity, message: reason instanceof Error ? reason.message : String(reason) });
-    }
-  }, [identity, record.projectId, rpc]);
-  useEffect(() => {
-    setError(null);
-    void loadProjectStatus();
-    return () => { projectRequest.current++; };
-  }, [loadProjectStatus]);
-  useRealtime('taskboard:factory', () => void loadProjectStatus());
-  const projectStatus = projectSnapshot?.identity === identity ? projectSnapshot.status : null;
+  const project = experimental_useRpcQuery({
+    contract: taskboardRpcContract, method: 'factoryGetProject', input: { projectId: record.projectId }
+  });
+  useEffect(() => { setError(null); }, [identity]);
+  const projectStatus: FactoryProjectStatus | null = project.data?.status ?? null;
   const coordinator = record.coordinator;
   const current = consoleState(record);
   const policyBlocker = record.admission.kind !== 'factory' ? null
@@ -150,8 +137,7 @@ function FactoryWorkbench({ record, onRecord, actions, plan, item }: {
   function openThread(threadId: string) {
     requestTaskboardOpen(threadId); navigate.toThread(threadId);
   }
-  const policyExecution = projectSnapshot?.identity === identity
-    ? projectSnapshot.status.policy.execution : null;
+  const policyExecution = projectStatus?.policy.execution ?? null;
   async function saveExecution(execution: FactoryRecord['execution']) {
     if (aiBusy) return;
     setAiBusy(true);
@@ -194,8 +180,8 @@ function FactoryWorkbench({ record, onRecord, actions, plan, item }: {
       title={`${labels[current.run.kind]} ${current.run.status === 'uncertain' ? 'needs recovery' : current.run.status === 'failed' ? 'could not finish' : 'progress is unavailable'}`}
       nextStep={current.run.status === 'uncertain' ? 'Confirm the native session before linking it. Do not start duplicate work.' : 'Inspect the current attempt and its recovery action.'}
       detail={current.run.error} />}
-    {policyError?.identity === identity && <ErrorNotice title="Factory policy unavailable"
-      nextStep="Refresh the ticket before relying on its automatic intake state." detail={policyError.message} />}
+    {project.error && <ErrorNotice title="Factory policy unavailable"
+      nextStep="Refresh the ticket before relying on its automatic intake state." detail={project.error.message} />}
   </>;
   const workspaceNode = <>
     {error && <ErrorNotice title="Coordinator action failed" nextStep="Refresh the ticket and inspect its coordinator before trying again." detail={error} />}
@@ -240,62 +226,22 @@ function FactoryWorkbench({ record, onRecord, actions, plan, item }: {
 }
 
 function EmpiricalProgress({ record }: { record: FactoryRecord }) {
-  const rpc = useRpc<TaskboardRpcContract>();
   const navigate = useBbNavigate();
-  const [observation, setObservation] = useState<EmpiricalObservation | null>(null);
+  const query = experimental_useRpcQuery({
+    contract: taskboardRpcContract, method: 'factoryEmpirical',
+    input: { projectId: record.projectId, source: record.source, locator: record.locator }
+  });
+  const observation: EmpiricalObservation | null = query.data ?? null;
   const [lastGood, setLastGood] = useState<Extract<EmpiricalObservation, { kind: 'observation' }> | null>(null);
-  const [failure, setFailure] = useState<string | null>(null);
-  const [clock, setClock] = useState(Date.now());
+  const environmentId = record.runs.at(-1)?.environmentId;
+  useEffect(() => { setLastGood(null); }, [record.projectId, record.source, record.locator, environmentId]);
   useEffect(() => {
-    let canceled = false;
-    let generation = 0;
-    let refreshTimer = 0;
-    setObservation(null); setLastGood(null); setFailure(null);
-    const load = async () => {
-      const request = ++generation;
-      try {
-        const next = await rpc.call('factoryEmpirical', {
-          projectId: record.projectId, source: record.source, locator: record.locator
-        });
-        if (canceled || request !== generation) return;
-        setObservation(next);
-        setClock(Date.now());
-        if (next.kind === 'observation' && next.status.kind !== 'unavailable') {
-          setLastGood(next);
-          setFailure(null);
-        } else {
-          if (next.kind === 'unbound') setLastGood(null);
-          setFailure(next.kind === 'unbound' ? next.reason :
-            next.status.kind === 'unavailable' ? next.status.reason : null);
-        }
-      } catch {
-        if (!canceled && request === generation) {
-          setFailure('Empirical observation could not be refreshed.'); setClock(Date.now());
-        }
-      } finally {
-        if (!canceled && request === generation) refreshTimer = window.setTimeout(() => { void load(); }, 8000);
-      }
-    };
-    void load();
-    const clockInterval = window.setInterval(() => setClock(Date.now()), 1000);
-    const refresh = () => {
-      window.clearTimeout(refreshTimer);
-      void load();
-    };
-    window.addEventListener('taskboard:empirical-refresh', refresh);
-    window.addEventListener('online', refresh);
-    window.addEventListener('focus', refresh);
-    const visible = () => { if (document.visibilityState === 'visible') refresh(); };
-    document.addEventListener('visibilitychange', visible);
-    return () => {
-      canceled = true; window.clearTimeout(refreshTimer); window.clearInterval(clockInterval);
-      window.removeEventListener('taskboard:empirical-refresh', refresh);
-      window.removeEventListener('online', refresh);
-      window.removeEventListener('focus', refresh);
-      document.removeEventListener('visibilitychange', visible);
-    };
-  }, [rpc, record.projectId, record.source, record.locator, record.runs.at(-1)?.environmentId]);
-  useRealtime('taskboard:factory', () => window.dispatchEvent(new Event('taskboard:empirical-refresh')));
+    if (observation?.kind === 'observation' && observation.status.kind !== 'unavailable') setLastGood(observation);
+    else if (observation?.kind === 'unbound') setLastGood(null);
+  }, [observation]);
+  const failure = query.error ? 'Empirical observation could not be refreshed.'
+    : observation?.kind === 'unbound' ? observation.reason
+    : observation?.status.kind === 'unavailable' ? observation.status.reason : null;
   const current = observation?.kind === 'observation' ? observation : null;
   const sameWorkspace = current && lastGood &&
     current.hostId === lastGood.hostId &&
@@ -310,7 +256,7 @@ function EmpiricalProgress({ record }: { record: FactoryRecord }) {
     : sameWorkspace || !current ? lastGood : null;
   const offline = !!failure || current?.status.kind === 'unavailable';
   const displayed = offline ? retained ?? current : current;
-  const stale = offline || !!displayed && clock - displayed.observedAt > 20_000;
+  const stale = offline;
   const state = displayed?.status;
   const title = !observation && !failure ? 'Connecting' :
     state?.kind === 'invalid' ? 'Invalid source' :
@@ -367,23 +313,14 @@ function awaitsApproval(run: FactoryRun | null | undefined) {
 }
 
 function FactoryThreadProgressContent({ threadId, isCompactViewport }: { threadId: string; isCompactViewport: boolean }) {
-  const rpc = useRpc<TaskboardRpcContract>();
-  const [record, setRecord] = useState<FactoryRecord | null>(null);
+  const query = experimental_useRpcQuery({
+    contract: taskboardRpcContract, method: 'factoryForThread', input: { threadId }
+  });
+  const [local, setRecord] = useState<FactoryRecord | null>(null);
   const [open, setOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  useEffect(() => {
-    let canceled = false;
-    setRecord(null); setOpen(false); setError(null);
-    const load = async () => {
-      try {
-        const result = await rpc.call('factoryForThread', { threadId });
-        if (!canceled) { setRecord(current => current && result.record && current.version > result.record.version ? current : result.record); setError(null); }
-      } catch { if (!canceled) setError('Progress could not be refreshed.'); }
-    };
-    void load();
-    const interval = window.setInterval(() => void load(), 3000);
-    return () => { canceled = true; window.clearInterval(interval); };
-  }, [rpc, threadId]);
+  const [actionError, setError] = useState<string | null>(null);
+  const record = newerRecord(local, query.data?.record ?? null);
+  const error = actionError ?? (query.error ? 'Progress could not be refreshed.' : null);
   const run = record?.runs.at(-1);
   if (!record) return null;
   const completed = run?.steps.filter(step => step.status === 'completed').length ?? 0;
@@ -416,7 +353,7 @@ export function FactoryThreadProgress(props: { threadId: string; isCompactViewpo
   const { values } = useSettings();
   return values?.showThreadHeaderProgress === false
     ? null
-    : <FactoryThreadProgressContent {...props} />;
+    : <FactoryThreadProgressContent key={props.threadId} {...props} />;
 }
 
 export function StartTaskButton({ item, disabled = false }: {
@@ -509,8 +446,7 @@ export function FactoryProgress({ item }: { item: WorkItem }) {
   const rpc = useRpc<TaskboardRpcContract>();
   const navigate = useBbNavigate();
   const context = useBbContext();
-  const [record, setRecord] = useState<FactoryRecord | null>(null);
-  const [loaded, setLoaded] = useState(false);
+  const [local, setRecord] = useState<FactoryRecord | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [aiBusy, setAiBusy] = useState(false);
@@ -521,27 +457,19 @@ export function FactoryProgress({ item }: { item: WorkItem }) {
   const [recoveryId, setRecoveryId] = useState('');
   const epoch = useRef(0);
   const identity = { projectId: item.bbProjectId, source: item.source, locator: item.locator };
-  const load = useCallback(async () => {
-    const ticket = epoch.current;
-    try {
-      const result = await rpc.call('factoryGet', {
-        projectId: item.bbProjectId, source: item.source, locator: item.locator
-      });
-      if (ticket !== epoch.current) return;
-      setRecord(current => current && result.record && current.version > result.record.version ? current : result.record);
-      setLoaded(true);
-    } catch (e) {
-      if (ticket === epoch.current) setError(e instanceof Error ? e.message : String(e));
-    }
-  }, [rpc, item.bbProjectId, item.source, item.locator]);
+  const query = experimental_useRpcQuery({ contract: taskboardRpcContract, method: 'factoryGet', input: identity });
   useEffect(() => {
     epoch.current++;
-    setRecord(null); setLoaded(false); setError(null); setEditing(false); setBody(''); setBusy(false);
-    void load();
-    const interval = window.setInterval(() => void load(), 3000);
-    return () => { epoch.current++; window.clearInterval(interval); };
-  }, [load]);
-  useRealtime('taskboard:factory', () => void load());
+    setRecord(null); setError(null); setEditing(false); setBody(''); setBusy(false);
+    return () => { epoch.current++; };
+  }, [item.bbProjectId, item.source, item.locator]);
+  const loaded = query.data !== undefined;
+  const loadedRecord = query.data?.record ?? null;
+  const record = local && loadedRecord && (local.projectId !== loadedRecord.projectId ||
+    local.source !== loadedRecord.source || local.locator !== loadedRecord.locator)
+    ? loadedRecord : newerRecord(local, loadedRecord);
+  const loadError = query.error?.message ?? null;
+  const shownError = error ?? loadError;
   const state = record ? consoleState(record) : null;
   const run = state?.run;
   const plan = state?.plan;
@@ -558,7 +486,7 @@ export function FactoryProgress({ item }: { item: WorkItem }) {
       const threadId = result.record.runs.at(-1)?.threadId;
       if (open && threadId) { requestTaskboardOpen(threadId); navigate.toThread(threadId); }
     } catch (e) {
-      if (ticket === epoch.current) { setError(e instanceof Error ? e.message : String(e)); void load(); }
+      if (ticket === epoch.current) { setError(e instanceof Error ? e.message : String(e)); void query.refetch(); }
     } finally { if (ticket === epoch.current) setBusy(false); }
   }
   const start = (kind: FactoryRunKind, retry = false) => action(() => rpc.call('factoryStart', {
@@ -626,7 +554,7 @@ export function FactoryProgress({ item }: { item: WorkItem }) {
       </details>}
   </>;
   return <section className="tb-agent-progress tb-progress-ui" data-tone={record?.automationError ? 'attention' : run ? tone(run) : 'neutral'} aria-label="Agent progress">
-    {error && error !== run?.error && error !== record?.automationError && <ErrorNotice title="Task action failed" nextStep="Inspect the current progress before trying the action again." detail={error} />}
+    {shownError && shownError !== run?.error && shownError !== record?.automationError && <ErrorNotice title="Task action failed" nextStep="Inspect the current progress before trying the action again." detail={shownError} />}
     {record?.trackerProgress.message && <div className="mb-3 text-xs">
       {record.trackerProgress.status === 'failed'
         ? <ErrorNotice title="Tracker status could not update" nextStep="Retry the status update. This does not restart the agent session." detail={record.trackerProgress.message} />

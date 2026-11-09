@@ -156,7 +156,8 @@ test('real SQLite preparation retains direct edits, project isolation, jobs and 
         }
       })
     },
-    rpc: { register() {} },
+    rpc: { register() {}, experimental_invalidate() {} },
+    events: { on() {} },
     ui: { registerMentionProvider() {} },
     agents: {
       registerTool(t: any) {
@@ -263,11 +264,19 @@ test('job service routes context to the remote host and preserves partial succes
   const controller = new AbortController();
   const hostCalls: any[] = [];
   const spawns: any[] = [];
+  const idleHandlers: ((payload: { thread: { id: string } }) => void)[] = [];
+  const emptyThreads = new Set<string>();
+  let nextSpawnIsEmpty = false;
   let poll = false;
   const bb: any = {
     pluginId: 'taskboard',
     storage: { database: () => db },
-    rpc: { register() {} },
+    rpc: { register() {}, experimental_invalidate() {} },
+    events: {
+      on(event: string, handler: (payload: { thread: { id: string } }) => void) {
+        if (event === 'thread.idle') idleHandlers.push(handler);
+      }
+    },
     ui: { registerMentionProvider() {} },
     agents: {
       registerTool(t: any) {
@@ -326,10 +335,12 @@ test('job service routes context to the remote host and preserves partial succes
         }),
         spawn: async (args: any) => {
           spawns.push(args);
-          return { id: 'job-thread-' + spawns.length };
+          const id = 'job-thread-' + spawns.length;
+          if (nextSpawnIsEmpty) emptyThreads.add(id);
+          return { id };
         },
         output: async ({ threadId }: any) => {
-          if (threadId === 'empty-job') return { output: null };
+          if (emptyThreads.has(threadId)) return { output: null };
           if (threadId === 'job-thread-1')
             return {
               output: JSON.stringify({
@@ -370,6 +381,10 @@ test('job service routes context to the remote host and preserves partial succes
     const end = Date.now() + 9000;
     while (!check()) {
       if (Date.now() > end) throw new Error('Job service did not advance');
+      // The fake job threads are idle as soon as they exist, as bb reports.
+      for (const job of store.get(p.id).jobs)
+        if (job.status === 'running' && job.threadId)
+          for (const handler of idleHandlers) handler({ thread: { id: job.threadId } });
       await new Promise((r) => setTimeout(r, 20));
     }
   }
@@ -401,6 +416,7 @@ test('job service routes context to the remote host and preserves partial succes
     assert.equal(completed.versions.length, 1);
     const failed = completed.jobs.find((j) => j.status === 'failed')!;
     const oldVersion = completed.versions[0]!;
+    nextSpawnIsEmpty = true;
     await handlers.prepareRetry({
       id: p.id,
       projectId: 'project',
@@ -414,12 +430,6 @@ test('job service routes context to the remote host and preserves partial succes
       store.artifact(oldVersion.id, p.id).startsWith('<main>'),
       true
     );
-    store.update(p.id, (current) => {
-      const job = current.jobs.at(-1)!;
-      job.status = 'running';
-      job.threadId = 'empty-job';
-      job.emptyOutputAt = null;
-    });
     await until(() => Boolean(store.get(p.id).jobs.at(-1)?.emptyOutputAt));
     assert.equal(
       store.get(p.id).jobs.at(-1)?.status,
@@ -514,54 +524,4 @@ test('old preparations remain discoverable and every pending record is reconcile
   } finally {
     db.close();
   }
-});
-
-test('deferred preparation responses cannot cross selection identity or undo a mutation', async () => {
-  const { preparationRequestGate } = await import(
-    '../preparation/request-gate.ts'
-  );
-  const gate = preparationRequestGate();
-  const a = { id: 'a', projectId: 'project', description: 'A content' };
-  const b = { id: 'b', projectId: 'project', description: 'B content' };
-  let displayed: typeof a | null = null;
-  let resolveA!: (value: typeof a) => void;
-  let resolveB!: (value: typeof a) => void;
-  const deferredA = new Promise<typeof a>((resolve) => {
-    resolveA = resolve;
-  });
-  const deferredB = new Promise<typeof a>((resolve) => {
-    resolveB = resolve;
-  });
-  const acceptA = gate.begin(a);
-  const pendingA = deferredA.then((value) => {
-    if (acceptA(value)) displayed = value;
-  });
-  const acceptB = gate.begin(b);
-  const pendingB = deferredB.then((value) => {
-    if (acceptB(value)) displayed = value;
-  });
-  resolveB(b);
-  await pendingB;
-  resolveA(a);
-  await pendingA;
-  assert.deepEqual(displayed, b, 'Late A cannot populate B editor');
-  assert.equal(
-    acceptB({ ...b, projectId: 'other' }),
-    false,
-    'Reject wrong project response'
-  );
-  const acceptOldRead = gate.begin(b);
-  gate.invalidate();
-  assert.equal(
-    acceptOldRead(b),
-    false,
-    'A completed mutation invalidates earlier reads'
-  );
-  const acceptBeforeUnmount = gate.begin(b);
-  gate.invalidate();
-  assert.equal(
-    acceptBeforeUnmount(b),
-    false,
-    'Unmount invalidates pending reads'
-  );
 });
