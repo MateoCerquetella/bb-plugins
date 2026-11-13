@@ -1,0 +1,123 @@
+/* Ghostrunner: near-black panels, a hot red edge, cyan and yellow signals.
+   Dark only: Light, Dark and System all render the same palette. */
+
+:root {
+  --font-sans: "JetBrains Mono", "JetBrainsMono Nerd Font", ui-monospace, monospace;
+  --font-mono: "JetBrains Mono", "JetBrainsMono Nerd Font", ui-monospace, monospace;
+  --font-terminal: "JetBrainsMono Nerd Font Mono", "JetBrains Mono", "Symbols Nerd Font Mono", ui-monospace, monospace;
+  --font-display: "Chakra Petch", "JetBrains Mono", ui-monospace, sans-serif;
+}
+
+:root,
+.light {
+  --canvas: #0b0d10;
+  --ink: #c9d1d9;
+  --sidebar: #080a0d;
+  --card: #0f1318;
+  --popover: #0f1318;
+  --secondary: #1e252d;
+  --accent: #231215;
+  --muted: #1e252d;
+  --border: #2a323c;
+  --primary: #ff3b45;
+  --primary-foreground: #0b0d10;
+  --muted-foreground: #9099a5;
+  --subtle-foreground: #8a95a1;
+  --readback-foreground: #9099a5;
+  --sidebar-accent: #321418;
+  --surface-selected: #321418;
+  --surface-raised: #0f1318;
+  --surface-recessed: #05070a;
+  --input: #2a323c;
+  --destructive: #ff3b45;
+  --destructive-foreground: #0b0d10;
+  --destructive-text: #ff3b45;
+  --warning: #e8e03a;
+  --warning-text: #e8e03a;
+  --attention: #ff3b45;
+  --success: #4fc3c9;
+  --diff-added: #4fc3c9;
+  --diff-removed: #ff3b45;
+  --pr-merged: #4fc3c9;
+  --file-accent: #ff3b45;
+  --background: var(--canvas);
+  --foreground: var(--ink);
+  --card-foreground: var(--ink);
+  --popover-foreground: var(--ink);
+  --secondary-foreground: var(--ink);
+  --accent-foreground: #e6edf3;
+  --sidebar-foreground: var(--ink);
+  --sidebar-accent-foreground: #e6edf3;
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-border: var(--border);
+  --border-hairline: var(--border);
+  --border-seam: var(--border);
+  --ring: var(--primary);
+  --sidebar-ring: var(--primary);
+  --surface-selected-border: #792228;
+}
+
+.dark {
+  --canvas: #0b0d10;
+  --ink: #c9d1d9;
+  --sidebar: #080a0d;
+  --card: #0f1318;
+  --popover: #0f1318;
+  --secondary: #1e252d;
+  --accent: #231215;
+  --muted: #1e252d;
+  --border: #2a323c;
+  --primary: #ff3b45;
+  --primary-foreground: #0b0d10;
+  --muted-foreground: #9099a5;
+  --subtle-foreground: #8a95a1;
+  --readback-foreground: #9099a5;
+  --sidebar-accent: #321418;
+  --surface-selected: #321418;
+  --surface-raised: #0f1318;
+  --surface-recessed: #05070a;
+  --input: #2a323c;
+  --destructive: #ff3b45;
+  --destructive-foreground: #0b0d10;
+  --destructive-text: #ff3b45;
+  --warning: #e8e03a;
+  --warning-text: #e8e03a;
+  --attention: #ff3b45;
+  --success: #4fc3c9;
+  --diff-added: #4fc3c9;
+  --diff-removed: #ff3b45;
+  --pr-merged: #4fc3c9;
+  --file-accent: #ff3b45;
+  --background: var(--canvas);
+  --foreground: var(--ink);
+  --card-foreground: var(--ink);
+  --popover-foreground: var(--ink);
+  --secondary-foreground: var(--ink);
+  --accent-foreground: #e6edf3;
+  --sidebar-foreground: var(--ink);
+  --sidebar-accent-foreground: #e6edf3;
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-border: var(--border);
+  --border-hairline: var(--border);
+  --border-seam: var(--border);
+  --ring: var(--primary);
+  --sidebar-ring: var(--primary);
+  --surface-selected-border: #792228;
+}
+
+/* Titles in a squared display face; falls back to JetBrains Mono. */
+h1,
+h2,
+h3,
+[data-slot="dialog-title"],
+[data-slot="sheet-title"] {
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
+}
+
+::selection {
+  background: #e6edf3;
+  color: #0b0d10;
+}

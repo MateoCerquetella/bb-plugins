@@ -1,0 +1,58 @@
+{
+  "name": "bb-plugin-ghostrunner",
+  "version": "0.1.0",
+  "description": "A near-black cyberpunk theme for BB with a hot red edge and cyan signals.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "bb": ">=0.40",
+    "bbPluginSdk": ">=0.4.21"
+  },
+  "bb": {
+    "name": "Ghostrunner",
+    "description": "Near-black panels, a hot red edge, cyan and yellow signals, and monospace type.",
+    "branding": {
+      "icon": "./assets/icon.svg"
+    },
+    "server": "./server.ts",
+    "skills": [],
+    "themes": [
+      {
+        "id": "ghostrunner",
+        "name": "Ghostrunner",
+        "description": "Near-black panels with a hot red edge.",
+        "css": "./themes/ghostrunner.css",
+        "codeTheme": {
+          "dark": "./themes/ghostrunner-code.json",
+          "light": "./themes/ghostrunner-code.json"
+        }
+      }
+    ]
+  },
+  "files": [
+    "dist/",
+    "server.ts",
+    "themes/",
+    "assets/",
+    "README.md",
+    "PLUGIN_OVERVIEW.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "env -u BB_CLI bb plugin build .",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test test/*.test.mjs",
+    "check": "npm run typecheck && npm test && npm run build"
+  },
+  "devDependencies": {
+    "@get-bb/plugin-sdk": "0.4.21",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  },
+  "author": "Mateo Cerquetella",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MateoCerquetella/bb-plugins.git",
+    "directory": "plugins/ghostrunner"
+  }
+}
