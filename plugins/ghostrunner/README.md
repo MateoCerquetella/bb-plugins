@@ -40,7 +40,6 @@ These are mockups with sample projects and threads. The red glow behind the comp
 
 ![Ghostrunner New thread](../../docs/media/ghostrunner/new-thread.png)
 ![Ghostrunner thread with a diff](../../docs/media/ghostrunner/thread.png)
-![Ghostrunner in Settings → Appearance](../../docs/media/ghostrunner/settings.png)
 
 ## Wallpapers
 
