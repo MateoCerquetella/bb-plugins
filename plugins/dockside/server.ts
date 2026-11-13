@@ -84,7 +84,8 @@ interface AuthoritativeThreadRow {
     activeBackgroundAgentCount: number;
     activeBackgroundCommandCount: number;
     activePlanModeCount: number;
-    activeGoalCount: number;
+    /** Absent on bb hosts that predate goal tracking. */
+    activeGoalCount?: number;
   };
   runtime: {
     displayStatus:
@@ -559,7 +560,7 @@ export default function plugin(bb: BbPluginApi) {
       backgroundAgents: thread.activity.activeBackgroundAgentCount,
       backgroundCommands: thread.activity.activeBackgroundCommandCount,
       planMode: thread.activity.activePlanModeCount,
-      goals: thread.activity.activeGoalCount,
+      goals: thread.activity.activeGoalCount ?? 0,
     },
   });
 
@@ -712,7 +713,7 @@ export default function plugin(bb: BbPluginApi) {
               backgroundAgents: thread.activity.activeBackgroundAgentCount,
               backgroundCommands: thread.activity.activeBackgroundCommandCount,
               planMode: thread.activity.activePlanModeCount,
-              goals: thread.activity.activeGoalCount,
+              goals: thread.activity.activeGoalCount ?? 0,
             },
             createdAt: thread.createdAt,
             updatedAt: thread.updatedAt,
