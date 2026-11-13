@@ -33,6 +33,7 @@ All plugins in this repository are independently installable.
 | <img src="./plugins/touchbar/assets/icon.svg" width="128" height="128" alt="" /> | [Touch Bar Agent Monitor](./plugins/touchbar) | [Git release](#touch-bar-agent-monitor-quick-start) | Adds a native persistent Control Strip badge and fullscreen BB agent panel to Touch Bar Macs. Requires BB 0.40+. |
 | <img src="./plugins/usage-tracker/assets/icon.svg" width="128" height="128" alt="" /> | [Usage Tracker](./plugins/usage-tracker) | [Git release](#usage-tracker-quick-start) | Keeps Codex, Claude Code, and other provider limits beside BB's sidebar utility icons, including the DeepSeek API balance. |
 | <img src="./plugins/lavender/assets/icon.svg" width="128" height="128" alt="" /> | [Lavender](./plugins/lavender) | [Git release](./plugins/lavender#install) | Adds coordinated pale-lilac light and charcoal-violet dark palettes for conversations and code. |
+| <img src="./plugins/ghostrunner/assets/icon.svg" width="128" height="128" alt="" /> | [Ghostrunner](./plugins/ghostrunner) | [Git release](./plugins/ghostrunner#install) | Adds a near-black cyberpunk theme with a red accent, cyan and yellow signals, monospace type and matching code colours. Pairs with Aura for wallpapers. |
 
 ## Action Topbar install
 
