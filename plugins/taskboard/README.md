@@ -4,21 +4,32 @@
 
 <h1 align="center">Taskboard</h1>
 
-## Gitea through tea
+## Gitea through gt
 
-Gitea repositories, including self-hosted servers, are supported through
-[tea](https://gitea.com/gitea/tea) 0.16 or newer. Configure a login with
-`tea login add`, then choose **Gitea** in **Taskboard → Manage** and enter
-its login name and repository in `host/owner/repo` form. Non-default ports
-are supported; the repository host must match the selected login's URL.
+Gitea 28 or newer, including self-hosted servers, is supported through
+[gt](https://gitea.com/gitea/cli) 1.x. Install it with `brew install gitea-cli`
+or the official distribution for your platform, then run
+`gt auth login --host https://git.example.com` on the machine running the BB server.
+In **Taskboard → Manage**, choose **Gitea**, enter the authenticated **gt username**
+and the repository in `host/owner/repo` form. Non-default ports and reverse-proxy
+base paths are supported. Exactly one configured gt instance must match that host
+and username; multiple base paths on the same host are rejected as ambiguous.
 Each BB project has one selected tracker and one Gitea repository.
 
-Taskboard invokes `tea api --login <name>` for every authenticated request;
-it never reads a token from tea's config or stores another token. The tea
-login must be configured on the machine running the BB server.
+Taskboard invokes `gt auth status --json=host,user,credential_available` and
+`gt api --host <instance-url> --user <username>` with noninteractive input.
+Authentication stays in gt; Taskboard never reads or stores tokens. Request bodies
+are sent as JSON on stdin. Ambient token and CLI selection overrides are excluded
+from child processes, so the explicitly configured gt account is used.
+
+**Migrating from tea:** gt has its own configuration and does not read tea logins.
+Authenticate with `gt auth login` first. The existing `giteaLogin` setting and
+`--gitea-login` CLI flag are retained, but now accept the **gt username**, not the
+old named tea login. Update the value in Manage or with the command below before
+refreshing. This version requires gt and no longer invokes tea.
 
 ```sh
-bb taskboard config --source gitea --gitea-login my-gitea --gitea-project git.example.com/team/app
+bb taskboard config --source gitea --gitea-login alice --gitea-project git.example.com/team/app
 bb taskboard refresh gitea
 bb taskboard list --source gitea --json
 bb taskboard show gitea 'git.example.com/team/app#7'

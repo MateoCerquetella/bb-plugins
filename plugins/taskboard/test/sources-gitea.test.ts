@@ -13,7 +13,7 @@ registerHooks({ resolve(specifier, context, nextResolve) {
 } });
 
 const { createGiteaAdapter, parseGiteaRef, giteaStatusCategory } = await import('../sources/gitea.ts');
-type TeaRunner = import('../sources/gitea.ts').TeaRunner;
+type GtRunner = import('../sources/gitea.ts').GtRunner;
 const ref = 'git.example.com/team/app';
 const locator = `${ref}#7`;
 const bug = { id: 1, name: 'bug' };
@@ -32,14 +32,14 @@ function fixture(overrides: { host?: string; failPatch?: boolean; badCreate?: bo
   const calls: { args: string[]; stdin?: string }[] = [];
   let current = issue();
   if (overrides.initialLabels) current.labels = overrides.initialLabels;
-  const runner: TeaRunner = async (args, stdin) => {
+  const runner: GtRunner = async (args, stdin) => {
     calls.push({ args, stdin });
-    if (args[0] === 'logins') return JSON.stringify([{ name: 'pilot', url: `https://${overrides.host ?? 'git.example.com'}` }]);
-    assert.equal(args[2], 'pilot');
-    const path = args[5].split('?')[0];
-    const method = args[4];
+    if (args[0] === 'auth') return JSON.stringify([{ user: 'pilot', credential_available: true, host: `https://${overrides.host ?? 'git.example.com'}` }]);
+    assert.equal(args[4], 'pilot');
+    const path = args[7].split('?')[0];
+    const method = args[6];
     const body = stdin ? JSON.parse(stdin) : undefined;
-    if (new URLSearchParams(args[5].split('?')[1]).get('page') === '2') return '[]';
+    if (new URLSearchParams(args[7].split('?')[1]).get('page') === '2') return '[]';
     if (path.endsWith('/comments')) return JSON.stringify([{ user: { login: 'bob' }, body: 'Live comment', created_at: '2026-10-14T12:01:00Z' }]);
     if (path.endsWith('/labels') && method === 'GET') {
       if (overrides.concurrentLabelChange) current.labels = [...current.labels.filter(label => label.id !== bug.id), critical];
@@ -83,7 +83,7 @@ test('rejects malformed repositories and parses custom host ports', () => {
   }
 });
 
-test('foreign issue locators are rejected before even invoking tea', async () => {
+test('foreign issue locators are rejected before even invoking gt', async () => {
   const { adapter, calls } = fixture();
   await assert.rejects(adapter.updateStatus('git.example.com/other/app#7', '3'), /outside/u);
   await assert.rejects(adapter.get(`${ref}#0`), /outside/u);
@@ -94,24 +94,69 @@ test('login host mismatch cannot make an authenticated API request', async () =>
   const { adapter, calls } = fixture({ host: 'foreign.example.com' });
   await assert.rejects(adapter.get(locator), /does not match/u);
   assert.equal(calls.length, 1);
-  assert.equal(calls[0].args[0], 'logins');
+  assert.equal(calls[0].args[0], 'auth');
+});
+
+test('uses gt account JSON fields and explicit host/user for every API request', async () => {
+  const { adapter, calls } = fixture();
+  await adapter.get(locator);
+  assert.deepEqual(calls[0].args, ['auth', 'status', '--json=host,user,credential_available', '--no-input']);
+  for (const { args } of calls.filter(call => call.args[0] === 'api')) {
+    assert.deepEqual(args.slice(0, 7), ['api', '--host', 'https://git.example.com', '--user', 'pilot', '--method', 'GET']);
+    assert.ok(args.includes('--no-input'));
+    assert.ok(!args.includes('--login'));
+  }
+});
+
+for (const [name, accounts, message] of [
+  ['missing account', [], /username does not exist/u],
+  ['old tea alias', [{ user: 'alice', host: 'https://git.example.com', credential_available: true }], /username does not exist/u],
+  ['missing credential', [{ user: 'pilot', host: 'https://git.example.com', credential_available: false }], /credential is unavailable/u],
+  ['ambiguous base paths', ['/one', '/two'].map(path => ({ user: 'pilot', host: `https://git.example.com${path}`, credential_available: true })), /Multiple gt instances/u],
+  ['userinfo URL', [{ user: 'pilot', host: 'https://user:password@git.example.com', credential_available: true }], /does not match/u],
+  ['non-HTTP URL', [{ user: 'pilot', host: 'ftp://git.example.com', credential_available: true }], /does not match/u]
+] as const) {
+  test(`rejects ${name} before making an API request`, async () => {
+    const calls: string[][] = [];
+    const runner: GtRunner = async args => { calls.push(args); return JSON.stringify(accounts); };
+    const adapter = createGiteaAdapter({ enabled: true, login: 'pilot', projectRef: ref, runner });
+    await assert.rejects(adapter.get(locator), message);
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0][0], 'auth');
+  });
+}
+
+test('selects the configured user among hosts and retains the instance base path and port', async () => {
+  const root = 'https://git.example.com:3000/gitea';
+  const runner: GtRunner = async args => {
+    if (args[0] === 'auth') return JSON.stringify([
+      { user: 'other', host: root, credential_available: true },
+      { user: 'pilot', host: 'https://other.example.com', credential_available: true },
+      { user: 'pilot', host: `${root}/`, credential_available: true }
+    ]);
+    assert.equal(args[2], root);
+    assert.equal(args[4], 'pilot');
+    return args[7].includes('/comments') ? '[]' : JSON.stringify({ ...issue(), html_url: `${root}/team/app/issues/7` });
+  };
+  const adapter = createGiteaAdapter({ enabled: true, login: 'pilot', projectRef: 'git.example.com:3000/team/app', runner });
+  assert.equal((await adapter.get('git.example.com:3000/team/app#7')).url, `${root}/team/app/issues/7`);
 });
 
 test('supports reverse-proxy base paths without accepting an unrelated issue URL', async () => {
-  const runner: TeaRunner = async args => args[0] === 'logins'
-    ? JSON.stringify([{ name: 'pilot', url: 'https://git.example.com/gitea/' }])
+  const runner: GtRunner = async args => args[0] === 'auth'
+    ? JSON.stringify([{ user: 'pilot', credential_available: true, host: 'https://git.example.com/gitea/' }])
     : JSON.stringify(issue());
   await assert.rejects(createGiteaAdapter({ enabled: true, login: 'pilot', projectRef: ref, runner }).get(locator), /outside/u);
 });
 
 test('reads all issue pages, filters pull requests and keeps comments live', async () => {
   const calls: string[][] = [];
-  const runner: TeaRunner = async args => {
+  const runner: GtRunner = async args => {
     calls.push(args);
-    if (args[0] === 'logins') return JSON.stringify([{ name: 'pilot', url: 'https://git.example.com' }]);
-    if (args[5].includes('/comments')) return '[]';
-    if (!args[5].includes('?')) return JSON.stringify(issue());
-    const page = Number(new URLSearchParams(args[5].split('?')[1]).get('page'));
+    if (args[0] === 'auth') return JSON.stringify([{ user: 'pilot', credential_available: true, host: 'https://git.example.com' }]);
+    if (args[7].includes('/comments')) return '[]';
+    if (!args[7].includes('?')) return JSON.stringify(issue());
+    const page = Number(new URLSearchParams(args[7].split('?')[1]).get('page'));
     if (page > 2) return '[]';
     if (page === 2) return JSON.stringify([issue(51)]);
     return JSON.stringify(Array.from({ length: 50 }, (_, i) => ({ ...issue(i + 1), ...(i === 1 ? { pull_request: {} } : {}) })));
@@ -121,7 +166,7 @@ test('reads all issue pages, filters pull requests and keeps comments live', asy
   assert.equal(list.length, 50);
   assert.equal(list.at(-1)?.locator, `${ref}#51`);
   assert.ok(list.every(item => !('comments' in item)));
-  assert.ok(calls.filter(args => args[0] === 'api').every(args => args[2] === 'pilot'));
+  assert.ok(calls.filter(args => args[0] === 'api').every(args => args[4] === 'pilot'));
   const live = await adapter.get(locator);
   assert.deepEqual(live.comments, []);
 });
@@ -136,12 +181,22 @@ test('detail includes live comments and native assignee names', async () => {
 
 test('server-capped pages include every issue, comment and creation metadata option', async () => {
   const paths: string[] = [];
-  const runner: TeaRunner = async args => {
-    if (args[0] === 'logins') return JSON.stringify([{ name: 'pilot', url: 'https://git.example.com' }]);
-    const [path, query] = args[5].split('?');
+  const runner: GtRunner = async args => {
+    if (args[0] === 'auth') return JSON.stringify([{ user: 'pilot', credential_available: true, host: 'https://git.example.com' }]);
+    const [path, query] = args[7].split('?');
+    if (path.endsWith('/comments')) {
+      assert.equal(query, undefined);
+      return JSON.stringify(Array.from({ length: 21 }, (_, index) => ({
+        user: { login: `user${index + 1}` }, body: `Comment ${index + 1}`, created_at: '2026-10-14T12:00:00Z'
+      })));
+    }
+    if (path.endsWith('/assignees')) {
+      assert.equal(query, undefined);
+      return JSON.stringify(Array.from({ length: 21 }, (_, index) => ({ login: `user${index + 1}` })));
+    }
     const page = Number(new URLSearchParams(query).get('page'));
     if (!page) return JSON.stringify(issue());
-    paths.push(args[5]);
+    paths.push(args[7]);
     const records = Array.from({ length: 21 }, (_, index) => {
       const id = index + 1;
       if (path.endsWith('/comments')) return { user: { login: `user${id}` }, body: `Comment ${id}`, created_at: '2026-10-14T12:00:00Z' };
@@ -159,13 +214,13 @@ test('server-capped pages include every issue, comment and creation metadata opt
   assert.equal(metadata.labelOptions.at(-1)?.id, '21');
   assert.equal(metadata.assigneeOptions.at(-1)?.id, 'user21');
   assert.equal(metadata.milestoneOptions.at(-1)?.id, '21');
-  assert.equal(paths.length, 15);
+  assert.equal(paths.length, 9);
 });
 
 test('pagination fails explicitly rather than truncating a server that never exhausts', async () => {
   let requests = 0;
-  const runner: TeaRunner = async args => {
-    if (args[0] === 'logins') return JSON.stringify([{ name: 'pilot', url: 'https://git.example.com' }]);
+  const runner: GtRunner = async args => {
+    if (args[0] === 'auth') return JSON.stringify([{ user: 'pilot', credential_available: true, host: 'https://git.example.com' }]);
     requests++;
     return JSON.stringify([issue()]);
   };
@@ -181,7 +236,7 @@ test('terminal and resumed workflow moves preserve unrelated labels', async () =
   const resumed = await adapter.updateStatus(locator, '2');
   assert.equal(resumed.stateCategory, 'in_progress');
   assert.deepEqual(resumed.labels, ['bug', 'status/in-progress']);
-  assert.deepEqual(calls.filter(call => call.args[4] === 'PATCH').map(call => JSON.parse(call.stdin!).state), ['closed', 'open']);
+  assert.deepEqual(calls.filter(call => call.args[6] === 'PATCH').map(call => JSON.parse(call.stdin!).state), ['closed', 'open']);
 });
 
 test('native Open clears workflow labels and retains ordinary labels', async () => {
@@ -196,8 +251,8 @@ test('workflow moves preserve concurrent ordinary label additions and removals',
   const { adapter, calls } = fixture({ concurrentLabelChange: true });
   const result = await adapter.updateStatus(locator, '3');
   assert.deepEqual(result.labels, ['customer-critical', 'status/done']);
-  assert.equal(calls.filter(call => call.args[4] === 'PUT').length, 0);
-  assert.deepEqual(calls.filter(call => call.args[4] === 'DELETE').map(call => call.args[5]), ['repos/team/app/issues/7/labels/2']);
+  assert.equal(calls.filter(call => call.args[6] === 'PUT').length, 0);
+  assert.deepEqual(calls.filter(call => call.args[6] === 'DELETE').map(call => call.args[7]), ['repos/team/app/issues/7/labels/2']);
 });
 
 for (const terminal of [done, canceled]) {
@@ -216,22 +271,22 @@ for (const terminal of [done, canceled]) {
 test('failed label removal stops further writes and reports a partial outcome', async () => {
   const { adapter, calls } = fixture({ failDelete: true });
   await assert.rejects(adapter.updateStatus(locator, '3'), /may be partial/u);
-  assert.deepEqual(calls.filter(call => call.args[0] === 'api' && call.args[4] !== 'GET').map(call => call.args[4]), ['DELETE']);
+  assert.deepEqual(calls.filter(call => call.args[0] === 'api' && call.args[6] !== 'GET').map(call => call.args[6]), ['DELETE']);
 });
 
 test('partial state write is reported without retries', async () => {
   const { adapter, calls } = fixture({ failPatch: true });
   await assert.rejects(adapter.updateStatus(locator, '3'), /may be partial/u);
-  assert.equal(calls.filter(call => call.args[4] === 'DELETE').length, 1);
-  assert.equal(calls.filter(call => call.args[4] === 'POST').length, 1);
-  assert.equal(calls.filter(call => call.args[4] === 'PATCH').length, 1);
+  assert.equal(calls.filter(call => call.args[6] === 'DELETE').length, 1);
+  assert.equal(calls.filter(call => call.args[6] === 'POST').length, 1);
+  assert.equal(calls.filter(call => call.args[6] === 'PATCH').length, 1);
   assert.equal((await adapter.get(locator)).stateCategory, 'todo');
 });
 
 test('unknown status is rejected without any write', async () => {
   const { adapter, calls } = fixture();
   await assert.rejects(adapter.updateStatus(locator, '99'), /current Gitea workflow/u);
-  assert.ok(calls.every(call => call.args[0] !== 'api' || call.args[4] === 'GET'));
+  assert.ok(calls.every(call => call.args[0] !== 'api' || call.args[6] === 'GET'));
 });
 
 const input = { title: 'Fix & test $(not a command)', description: 'Body with commas, quotes and &', destinationId: ref,
@@ -242,8 +297,8 @@ test('creation uses stdin JSON and confirms the requested assignee', async () =>
   const result = await adapter.create(input);
   assert.equal(result.item.title, input.title);
   assert.deepEqual(result.assigneeConfirmation, { confirmed: true, id: 'alice' });
-  const write = calls.find(call => call.args[4] === 'POST')!;
-  assert.ok(write.args.includes('@-'));
+  const write = calls.find(call => call.args[6] === 'POST')!;
+  assert.ok(write.args.includes('--input') && write.args.includes('-'));
   assert.ok(!write.args.includes(input.title));
   const sent = JSON.parse(write.stdin!);
   assert.deepEqual(sent.labels, [1]);
@@ -254,10 +309,10 @@ test('creation uses stdin JSON and confirms the requested assignee', async () =>
 test('ambiguous creation is not retried and uses the shared uncertainty marker', async () => {
   const { adapter, calls } = fixture({ badCreate: true });
   await assert.rejects(adapter.create(input), /TASKBOARD_CREATE_OUTCOME_UNCERTAIN/u);
-  assert.equal(calls.filter(call => call.args[4] === 'POST').length, 1);
+  assert.equal(calls.filter(call => call.args[6] === 'POST').length, 1);
 });
 
-test('metadata and creation reject foreign destinations before invoking tea', async () => {
+test('metadata and creation reject foreign destinations before invoking gt', async () => {
   const { adapter, calls } = fixture();
   await assert.rejects(adapter.createMetadata({ destinationId: 'foreign/repo', issueType: null }), /outside/u);
   await assert.rejects(adapter.create({ ...input, destinationId: 'foreign/repo' }), /outside/u);
