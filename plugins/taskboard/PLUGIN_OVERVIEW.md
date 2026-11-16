@@ -8,8 +8,8 @@ Bring external issues into BB with a project-scoped list or Kanban board. Each B
 
 ## Gitea
 
-Self-hosted Gitea repositories use an existing tea login and an explicit host/owner/repository. Taskboard supports paginated issues, live comments, creation, labels, assignees, milestones and due dates. Native Open/Closed and existing status/* labels provide workflow stages. Status moves preserve unrelated labels and close or reopen the issue as appropriate.
+Self-hosted Gitea repositories use an existing gt account and an explicit host/owner/repository. Taskboard supports paginated issues, live comments, creation, labels, assignees, milestones and due dates. Native Open/Closed and existing status/* labels provide workflow stages. Status moves preserve unrelated labels and close or reopen the issue as appropriate.
 
 ## Requirements
 
-Configure the selected provider for each project. Gitea requires tea 0.16 or newer on the BB server machine and a login with repository access. Authentication remains in tea. GitHub uses BB's GitHub integration; GitLab requires glab; Linear and Jira Cloud require their provider configuration. Gitea creation supports text, and status changes can be partial because label and state updates use separate requests.
+Configure the selected provider for each project. Gitea requires a Gitea 28+ server, gt 1.x on the BB server machine, and an authenticated username with repository access. Authentication remains in gt. Existing tea login names must be replaced with gt usernames after running gt auth login. GitHub uses BB's GitHub integration; GitLab requires glab; Linear and Jira Cloud require their provider configuration. Gitea creation supports text, and status changes can be partial because label and state updates use separate requests.

@@ -21,8 +21,10 @@ const issueSchema = z.object({
   assignees: z.array(userSchema).nullish().transform(value => value ?? []),
   pull_request: z.unknown().optional()
 });
-const loginListSchema = z.array(z.object({ name: z.string(), url: z.string().url() }));
-export type TeaRunner = (args: string[], stdin?: string) => Promise<string>;
+const accountListSchema = z.array(z.object({
+  host: z.string().url(), user: z.string(), credential_available: z.boolean()
+}));
+export type GtRunner = (args: string[], stdin?: string) => Promise<string>;
 
 const ENV_KEYS = new Set([
   'HOME', 'USER', 'LOGNAME', 'USERPROFILE', 'APPDATA', 'LOCALAPPDATA',
@@ -37,23 +39,23 @@ function runFile(file: string, args: string[], stdin?: string, probe = false): P
     value !== undefined && (probe ? ['PATH', 'SYSTEMROOT', 'SystemRoot', 'WINDIR'].includes(key) : ENV_KEYS.has(key))));
   return new Promise((resolve, reject) => {
     const child = execFile(file, args, {
-      env, cwd: tmpdir(), timeout: 30_000, maxBuffer: 8 * 1024 * 1024, windowsHide: true
+      env: { ...env, GITEA_CLI_NO_EXTENSIONS: '1', GITEA_CLI_NO_UPDATE_NOTIFIER: '1' }, cwd: tmpdir(), timeout: 30_000, maxBuffer: 8 * 1024 * 1024, windowsHide: true
     }, (error, stdout) => {
-      if (error) reject(new Error('tea request failed; check the configured login, repository access and connection.'));
+      if (error) reject(new Error('gt request failed; check gt auth status, repository access, connection and Gitea 28+ support.'));
       else resolve(stdout);
     });
     child.stdin?.end(stdin ?? '', 'utf8');
   });
 }
 
-let teaPath: Promise<string> | undefined;
-async function resolveTeaPath(): Promise<string> {
-  if (!teaPath) {
-    teaPath = (async () => {
+let gtPath: Promise<string> | undefined;
+async function resolveGtPath(): Promise<string> {
+  if (!gtPath) {
+    gtPath = (async () => {
       const directories = (process.env.PATH ?? '').split(delimiter).filter(isAbsolute);
       const candidates = [...new Set([
-        '/opt/homebrew/bin/tea', '/usr/local/bin/tea',
-        ...directories.map(directory => join(directory, process.platform === 'win32' ? 'tea.exe' : 'tea'))
+        '/opt/homebrew/bin/gt', '/usr/local/bin/gt',
+        ...directories.map(directory => join(directory, process.platform === 'win32' ? 'gt.exe' : 'gt'))
       ])];
       for (const candidate of candidates) {
         try {
@@ -64,21 +66,21 @@ async function resolveTeaPath(): Promise<string> {
           if (!(await stat(canonical)).isFile()) continue;
           await access(canonical, process.platform === 'win32' ? constants.F_OK : constants.X_OK);
           const version = await runFile(canonical, ['--version'], undefined, true);
-          const match = /Version:\s*(\d+)\.(\d+)\./u.exec(version.replace(/\u001b\[[0-9;]*m/gu, ''));
-          if (!match || !(Number(match[1]) > 0 || Number(match[2]) >= 16)) {
-            throw new Error('Taskboard Gitea requires tea 0.16 or newer with tea api.');
+          const match = /^gt version (\d+)\.(\d+)\.(\d+)(?:[+\s]|$)/u.exec(version.replace(/\u001b\[[0-9;]*m/gu, ''));
+          if (!match || Number(match[1]) !== 1) {
+            throw new Error('Taskboard Gitea requires gt 1.x.');
           }
           return canonical;
         } catch { /* Try the next trusted absolute executable. */ }
       }
-      throw new Error('Install tea 0.16 or newer and configure a Gitea login.');
+      throw new Error('Install gt 1.x (brew install gitea-cli) and run gt auth login for a Gitea 28+ server.');
     })();
-    teaPath.catch(() => { teaPath = undefined; });
+    gtPath.catch(() => { gtPath = undefined; });
   }
-  return teaPath;
+  return gtPath;
 }
 
-export const runTea: TeaRunner = async (args, stdin) => runFile(await resolveTeaPath(), args, stdin);
+export const runGt: GtRunner = async (args, stdin) => runFile(await resolveGtPath(), args, stdin);
 
 export function parseGiteaRef(ref: string): { host: string; owner: string; repo: string } {
   giteaProjectRefSchema.parse(ref);
@@ -97,14 +99,14 @@ export function giteaStatusCategory(name: string): WorkStateCategory {
 }
 
 export function createGiteaAdapter(options: {
-  enabled: boolean; login: string; projectRef: string; runner?: TeaRunner;
+  enabled: boolean; login: string; projectRef: string; runner?: GtRunner;
 }): WorkSourceAdapter {
-  const runner = options.runner ?? runTea;
+  const runner = options.runner ?? runGt;
   const configured = () => options.enabled && Boolean(options.login && options.projectRef);
-  let session: Promise<{ root: string; repository: string }> | undefined;
+  let session: Promise<{ root: string; user: string; repository: string }> | undefined;
 
   function requireRef() {
-    if (!configured()) throw new Error('Choose a tea login and Gitea repository in Manage.');
+    if (!configured()) throw new Error('Choose a gt username and Gitea repository in Manage.');
     return parseGiteaRef(options.projectRef);
   }
 
@@ -123,15 +125,22 @@ export function createGiteaAdapter(options: {
     if (!session) {
       session = (async () => {
         const ref = requireRef();
-        const logins = loginListSchema.parse(JSON.parse(await runner(['logins', 'list', '--output', 'json'])));
-        const login = logins.find(entry => entry.name === options.login);
-        if (!login) throw new Error('The configured tea login does not exist. Run tea login add.');
-        const url = new URL(login.url);
-        if (url.host.toLowerCase() !== ref.host || url.username || url.password || url.search || url.hash ||
-            !['http:', 'https:'].includes(url.protocol)) {
-          throw new Error('The tea login host does not match the configured Gitea repository.');
-        }
-        return { root: `${url.origin}${url.pathname.replace(/\/$/u, '')}`, repository:
+        const accounts = accountListSchema.parse(JSON.parse(await runner([
+          'auth', 'status', '--json=host,user,credential_available', '--no-input'
+        ])));
+        const users = accounts.filter(entry => entry.user.toLowerCase() === options.login.toLowerCase());
+        if (users.length === 0) throw new Error('The configured gt username does not exist. Run gt auth login and update the username in Manage.');
+        const matches = users.filter(entry => {
+          const url = new URL(entry.host);
+          return url.host.toLowerCase() === ref.host && !url.username && !url.password && !url.search && !url.hash &&
+            ['http:', 'https:'].includes(url.protocol);
+        });
+        if (matches.length === 0) throw new Error('The gt account host does not match the configured Gitea repository.');
+        if (matches.length !== 1) throw new Error('Multiple gt instances match this host and username. Configure a unique host and account.');
+        const account = matches[0];
+        if (!account.credential_available) throw new Error('The configured gt credential is unavailable. Run gt auth login on the BB server machine.');
+        const url = new URL(account.host);
+        return { root: `${url.origin}${url.pathname.replace(/\/$/u, '')}`, user: account.user, repository:
           `repos/${encodeURIComponent(ref.owner)}/${encodeURIComponent(ref.repo)}` };
       })();
       session.catch(() => { session = undefined; });
@@ -140,9 +149,9 @@ export function createGiteaAdapter(options: {
   }
 
   async function api(endpoint: string, method = 'GET', body?: unknown): Promise<unknown> {
-    await scopedSession();
-    const args = ['api', '--login', options.login, '--method', method, endpoint];
-    if (body !== undefined) args.push('--data', '@-');
+    const { root, user } = await scopedSession();
+    const args = ['api', '--host', root, '--user', user, '--method', method, endpoint, '--no-input'];
+    if (body !== undefined) args.push('--input', '-');
     const response = await runner(args, body === undefined ? undefined : JSON.stringify(body));
     // Gitea label removal succeeds with HTTP 204 and no response body.
     return method === 'DELETE' && !response.trim() ? undefined : JSON.parse(response);
@@ -154,7 +163,7 @@ export function createGiteaAdapter(options: {
       const values = z.array(z.unknown()).parse(await api(`${endpoint}${endpoint.includes('?') ? '&' : '?'}limit=${PAGE_SIZE}&page=${page}`));
       result.push(...values);
       // The server may cap pages below our requested limit. Only an empty page
-      // proves exhaustion without relying on tea to expose response headers.
+      // proves exhaustion without relying on gt to expose response headers.
       if (values.length === 0) return result;
     }
     throw new Error('Gitea result exceeds the page limit; use a smaller repository.');
@@ -195,9 +204,10 @@ export function createGiteaAdapter(options: {
   async function details(locator: string) {
     const issue = await rawIssue(locator);
     const { repository } = await scopedSession();
+    // Gitea returns all issue comments; this endpoint does not accept page/limit.
     const comments = z.array(z.object({
       user: userSchema, body: z.string(), created_at: z.string()
-    })).parse(await pages(`${repository}/issues/${issue.number}/comments`));
+    })).parse(await api(`${repository}/issues/${issue.number}/comments`));
     return toItem(issue, comments.map(comment => ({ author: comment.user.login, body: comment.body, createdAt: comment.created_at })));
   }
 
@@ -244,7 +254,8 @@ export function createGiteaAdapter(options: {
   async function metadata(): Promise<CreateIssueMetadata> {
     const { repository } = await scopedSession();
     const [repositoryLabels, users, milestones] = await Promise.all([
-      labels(), pages(`${repository}/assignees`), pages(`${repository}/milestones?state=open`)
+      // This endpoint returns every assignee and does not accept page/limit.
+      labels(), api(`${repository}/assignees`), pages(`${repository}/milestones?state=open`)
     ]);
     const members = z.array(userSchema).parse(users);
     const milestoneList = z.array(z.object({ id: z.number().int().positive(), title: z.string() })).parse(milestones);
@@ -261,7 +272,7 @@ export function createGiteaAdapter(options: {
 
   return {
     source: 'gitea', configured,
-    configurationMessage: () => configured() ? null : 'Choose a tea login and Gitea repository (host/owner/repo) in Manage.',
+    configurationMessage: () => configured() ? null : 'Choose a gt username and Gitea repository (host/owner/repo) in Manage.',
     async list() {
       const { repository, root } = await scopedSession();
       const ref = requireRef();

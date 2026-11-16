@@ -427,7 +427,7 @@ function formatProjectConfig(config: ProjectConfigView): string {
     `Jira credential\t${config.jiraCredentialConfigured ? 'configured' : 'not configured'}`,
     `Jira JQL\t${config.jiraJql}`,
     `Gitea repository\t${config.giteaProjectRef || 'not configured'}`,
-    `Gitea tea login\t${config.giteaLogin || 'not configured'}`,
+    `Gitea gt username\t${config.giteaLogin || 'not configured'}`,
     `GitLab project\t${config.gitlabProjectRef || 'not configured'}`,
     `GitLab (glab)\t${config.gitlabConfigured ? 'authenticated' : 'not authenticated'}`
   ].join('\n');
@@ -1054,7 +1054,7 @@ export default async function plugin(bb: BbPluginApi) {
     const destinations = destinationIds.map(id => ({ id, label: id }));
     const missingDestinationMessage =
       config.source === 'gitea' && destinations.length === 0
-        ? 'Choose a tea login and Gitea repository in Manage.'
+        ? 'Choose a gt username and Gitea repository in Manage.'
         : config.source === 'github' && destinations.length === 0
         ? 'Map at least one GitHub repository to this BB project.'
         : config.source === 'linear' && destinations.length === 0

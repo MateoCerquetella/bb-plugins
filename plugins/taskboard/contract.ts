@@ -171,7 +171,7 @@ export const projectConfigMutationSchema = projectSourceConfigSchema
       });
     }
     if (config.source === 'gitea' && (!config.giteaLogin || !config.giteaProjectRef)) {
-      context.addIssue({ code: 'custom', path: ['giteaProjectRef'], message: 'A tea login and Gitea repository are required when Gitea is selected' });
+      context.addIssue({ code: 'custom', path: ['giteaProjectRef'], message: 'A gt username and Gitea repository are required when Gitea is selected' });
     }
   });
 export type ProjectConfigMutation = z.infer<typeof projectConfigMutationSchema>;

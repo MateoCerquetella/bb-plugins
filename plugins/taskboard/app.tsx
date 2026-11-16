@@ -5923,7 +5923,7 @@ function ProjectConfigForm({
       return;
     }
     if (config.source === 'gitea' && (!config.giteaLogin.trim() || !config.giteaProjectRef.trim())) {
-      setError('Add a tea login and Gitea repository (host/owner/repo).');
+      setError('Add a gt username and Gitea repository (host/owner/repo).');
       return;
     }
     if (config.source === 'gitlab') {
@@ -6387,15 +6387,15 @@ function ProjectConfigForm({
             Gitea
           </h3>
           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-            Connect your Gitea server with an existing tea login. Workflow columns
+            Connect your Gitea server with an existing gt username. Workflow columns
             use repository <code>status/&lt;name&gt;</code> labels. Done and canceled
             stages close issues; moving back into work reopens them.
           </p>
           <div className="mt-4 grid gap-3 @lg:grid-cols-2">
             <label className="space-y-1.5 text-xs font-medium">
-              tea login
-              <Input aria-label="Gitea tea login" value={config.giteaLogin}
-                placeholder="my-gitea" className="tb-field" disabled={saving}
+              gt username
+              <Input aria-label="Gitea gt username" value={config.giteaLogin}
+                placeholder="alice" className="tb-field" disabled={saving}
                 onChange={event => { setConfig({ ...config, giteaLogin: event.target.value }); setSaved(false); }} />
             </label>
             <label className="space-y-1.5 text-xs font-medium">
