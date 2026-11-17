@@ -53,6 +53,11 @@ the shared background, one of your saved slots, or **Off** for the plain BB
 theme. It is stored locally, so your Mac can show slot 1 while another machine
 shows slot 3 or no wallpaper at all. Everything else stays shared on the BB server.
 
+**Palette on this device** does the same for BB's palette (Settings → Appearance →
+Palette), which is otherwise one setting for the whole server. Pick **BB default**,
+a custom palette or a plugin palette for this browser or app only; **Shared** follows
+BB again. Light, Dark or System still comes from Settings → Appearance.
+
 In **Settings → Aura**, use **Half wallpaper on New thread**:
 
 - **On:** the wallpaper appears in the upper half and fades out at the midpoint.
