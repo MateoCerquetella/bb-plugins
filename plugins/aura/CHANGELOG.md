@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.10 - 2026-11-17
+
+- Add **Palette on this device** in Settings → Aura. BB keeps one palette for
+  the whole server; this overrides it in one browser or app only: BB default,
+  any custom palette, or any plugin palette. Light, Dark or System still follows
+  Settings → Appearance. Built-in Nord, Dracula, Solarized, Gruvbox and
+  Catppuccin are not offered because BB does not expose their CSS.
+
 ## 0.2.9 - 2026-11-17
 
 - Add **On this device** in Settings → Aura: each browser or app can follow the

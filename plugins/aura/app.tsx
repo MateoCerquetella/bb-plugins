@@ -5,6 +5,7 @@ import { CHANGED, defaults, imageUrl, isAnimatedImage, readDeviceChoice, SLOT_CO
 import { backgroundRules, mountBackground, notifyChange } from "./lib/background.ts";
 import { CAPY_CSS, mountCapyEffect, type CapyEffect } from "./lib/capy-effect.ts";
 import { readImage } from "./lib/upload.ts";
+import { listPalettes, mountDevicePalette, readDevicePalette, writeDevicePalette, type PaletteOption } from "./lib/palette.ts";
 import { ActivityOverview } from "./lib/activity-view.tsx";
 import "./app.css";
 
@@ -27,6 +28,13 @@ export function BackgroundEditor() {
   const [slotNumber, setSlotNumber] = useState(1);
   const [slotName, setSlotName] = useState("My background");
   const [device, setDevice] = useState<DeviceChoice>(readDeviceChoice);
+  const [palette, setPalette] = useState<string>(() => readDevicePalette() ?? "");
+  const [palettes, setPalettes] = useState<PaletteOption[]>([]);
+  useEffect(() => {
+    const controller = new AbortController();
+    listPalettes(controller.signal).then(setPalettes).catch(() => {});
+    return () => controller.abort();
+  }, []);
   const saving = useRef(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -125,6 +133,10 @@ export function BackgroundEditor() {
     if (snapshot) notifyChange(snapshot);
     setStatus(choice === "off" ? "Aura off on this device" : choice === "shared" ? "This device uses the shared background" : `This device uses slot ${choice}`);
   }
+  function choosePalette(id: string) {
+    writeDevicePalette(id || null); setPalette(id);
+    setStatus(id ? `This device uses the ${palettes.find(p => p.id === id)?.name ?? id} palette` : "This device follows BB's palette");
+  }
   const currentImage = upload?.dataUrl ?? (remove ? null : imageUrl(snapshot?.image ?? null));
   const imageName = upload?.name ?? (!remove ? snapshot?.image?.name : null);
   return (
@@ -137,6 +149,7 @@ export function BackgroundEditor() {
       {error && <p className="aura-error" role="alert">{error}</p>}
       <label className="aura-scope aura-overview-setting"><input type="checkbox" aria-label="Activity overview" checked={snapshot?.settings.activityOverview ?? false} disabled={busy || !snapshot} onChange={e => void toggleOverview(e.target.checked)} /><span><strong>Activity overview</strong><small>Show your GitHub activity below the centered New thread composer. Saves immediately; your background draft stays intact.</small></span></label>
       <div className="aura-field aura-device"><label className="aura-field-title" htmlFor={`${id}-device`}>On this device</label><select id={`${id}-device`} value={String(device)} disabled={busy || !snapshot} onChange={e => chooseDevice(e.target.value === "shared" || e.target.value === "off" ? e.target.value : Number(e.target.value))}><option value="shared">Shared background</option>{snapshot?.slots.map(s => <option key={s.slot} value={String(s.slot)}>Slot {s.slot} · {s.name}</option>)}<option value="off">Off (plain BB theme)</option></select><small className="aura-field-help">Saved only in this browser or app, so each machine can show its own slot. Applying a background or switching slots changes the shared one.</small></div>
+      <div className="aura-field aura-device"><label className="aura-field-title" htmlFor={`${id}-palette`}>Palette on this device</label><select id={`${id}-palette`} value={palette} onChange={e => choosePalette(e.target.value)}><option value="">Shared (Settings → Appearance)</option>{palettes.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}{palette && !palettes.some(p => p.id === palette) && <option value={palette}>{palette}</option>}</select><small className="aura-field-help">Overrides BB's palette only in this browser or app. Light, Dark or System still follows Settings → Appearance.</small></div>
       <div className="aura-layout">
         <div className="aura-preview-wrap">
           <div className="aura-preview-scene">
@@ -228,6 +241,7 @@ function SegmentedControl({ id, label, help, value, options, onChange }: { id: s
 }
 export default definePluginApp(app => {
   app.contentScripts.register({ id: "aura-background", mount: ({ signal }) => mountBackground(signal) });
+  app.contentScripts.register({ id: "aura-palette", mount: ({ signal }) => mountDevicePalette(signal) });
   app.slots.settingsSection({ id: "backgrounds", title: "Aura", component: BackgroundEditor });
   app.slots.homepageSection({ id: "activity-overview", title: "Activity overview", component: ActivityOverview });
   app.slots.threadPanelAction({ id: "backgrounds", title: "Aura", icon: "Image", component: BackgroundEditor, layout: "flush" });
