@@ -1,4 +1,4 @@
-import { imageUrl, snapshotSchema, type Snapshot } from "./model.ts";
+import { forDevice, imageUrl, readDeviceChoice, snapshotSchema, type Snapshot } from "./model.ts";
 import { CAPY_CSS, mountCapyEffect, type CapyEffect } from "./capy-effect.ts";
 
 export const LOCAL_CHANGE = "bb:aura:changed";
@@ -182,7 +182,8 @@ export function mountBackground(signal: AbortSignal): () => void {
   });
   observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["id"] });
   const controller = new AbortController();
-  function apply(snapshot: Snapshot): void {
+  function apply(shared: Snapshot): void {
+    const snapshot = forDevice(shared, readDeviceChoice());
     current = snapshot;
     const target = targetsFor(snapshot);
     const css = snapshot.settings.enabled ? `${backgroundRules(target)}\n${CAPY_CSS}\n${topbarBackgroundRule(target, snapshot.settings.topbarBackground)}\n${COMPOSE_LAYOUT}\n${snapshot.settings.newThreadOnly ? "" : READING_SURFACE}` : COMPOSE_CENTER;

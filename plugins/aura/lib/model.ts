@@ -75,3 +75,28 @@ export function imageUrl(image: Snapshot["image"]): string | null {
 export function isAnimatedImage(url: string | null): boolean {
   return url !== null && (url.startsWith("data:image/gif;") || url.endsWith("&type=gif"));
 }
+// Per-device choice, kept in this browser/app's localStorage so each machine
+// can show a different saved slot (or no Aura at all) from the same BB server.
+export type DeviceChoice = "shared" | "off" | number;
+export const DEVICE_KEY = "aura.device-background";
+export function readDeviceChoice(): DeviceChoice {
+  try {
+    const raw = globalThis.localStorage?.getItem(DEVICE_KEY);
+    if (raw === "off") return "off";
+    const slot = slotNumberSchema.safeParse(Number(raw));
+    return raw && slot.success ? slot.data : "shared";
+  } catch { return "shared"; }
+}
+export function writeDeviceChoice(choice: DeviceChoice): void {
+  try {
+    if (choice === "shared") globalThis.localStorage?.removeItem(DEVICE_KEY);
+    else globalThis.localStorage?.setItem(DEVICE_KEY, String(choice));
+  } catch { /* Storage unavailable: stay on the shared background. */ }
+}
+export function forDevice(snapshot: Snapshot, choice: DeviceChoice): Snapshot {
+  if (choice === "off") return { ...snapshot, settings: { ...snapshot.settings, enabled: false } };
+  const saved = choice === "shared" ? undefined : snapshot.slots.find(slot => slot.slot === choice);
+  if (!saved) return snapshot;
+  const { enabled, newThreadOnly, dimmerEnabled, topbarBackground, activityOverview } = snapshot.settings;
+  return { ...snapshot, settings: { ...saved.settings, enabled, newThreadOnly, dimmerEnabled, topbarBackground, activityOverview }, image: saved.image };
+}

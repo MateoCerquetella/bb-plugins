@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Add **On this device** in Settings → Aura: each browser or app can follow the
+  shared background, show a specific saved slot, or turn Aura off and keep the
+  plain BB theme. The choice is saved locally, so it differs per machine.
+
 ## 0.2.8 - 2026-11-03
 
 - Show the mobile New thread Recent list as one themed card over the wallpaper

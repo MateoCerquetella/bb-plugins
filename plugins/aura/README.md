@@ -48,6 +48,11 @@ The heatmap scrolls inside its own keyboard-accessible region on narrow screens.
 
 ## Use Aura
 
+**On this device** (top of Settings → Aura) picks what this browser or app shows:
+the shared background, one of your saved slots, or **Off** for the plain BB
+theme. It is stored locally, so your Mac can show slot 1 while another machine
+shows slot 3 or no wallpaper at all. Everything else stays shared on the BB server.
+
 In **Settings → Aura**, use **Half wallpaper on New thread**:
 
 - **On:** the wallpaper appears in the upper half and fades out at the midpoint.
