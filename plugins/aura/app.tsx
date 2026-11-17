@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { definePluginApp, useRealtime, useRpc } from "@get-bb/plugin-sdk/app";
 import type { rpcContract } from "./server.ts";
-import { CHANGED, defaults, imageUrl, isAnimatedImage, SLOT_COUNT, type BackgroundSettings, type Snapshot } from "./lib/model.ts";
+import { CHANGED, defaults, imageUrl, isAnimatedImage, readDeviceChoice, SLOT_COUNT, writeDeviceChoice, type BackgroundSettings, type DeviceChoice, type Snapshot } from "./lib/model.ts";
 import { backgroundRules, mountBackground, notifyChange } from "./lib/background.ts";
 import { CAPY_CSS, mountCapyEffect, type CapyEffect } from "./lib/capy-effect.ts";
 import { readImage } from "./lib/upload.ts";
@@ -26,6 +26,7 @@ export function BackgroundEditor() {
   const [remove, setRemove] = useState(false);
   const [slotNumber, setSlotNumber] = useState(1);
   const [slotName, setSlotName] = useState("My background");
+  const [device, setDevice] = useState<DeviceChoice>(readDeviceChoice);
   const saving = useRef(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -119,6 +120,11 @@ export function BackgroundEditor() {
     } catch (cause) { if (mounted.current) setError(message(cause)); }
     finally { saving.current = false; if (mounted.current) setBusy(false); }
   }
+  function chooseDevice(choice: DeviceChoice) {
+    writeDeviceChoice(choice); setDevice(choice);
+    if (snapshot) notifyChange(snapshot);
+    setStatus(choice === "off" ? "Aura off on this device" : choice === "shared" ? "This device uses the shared background" : `This device uses slot ${choice}`);
+  }
   const currentImage = upload?.dataUrl ?? (remove ? null : imageUrl(snapshot?.image ?? null));
   const imageName = upload?.name ?? (!remove ? snapshot?.image?.name : null);
   return (
@@ -130,6 +136,7 @@ export function BackgroundEditor() {
       </div>
       {error && <p className="aura-error" role="alert">{error}</p>}
       <label className="aura-scope aura-overview-setting"><input type="checkbox" aria-label="Activity overview" checked={snapshot?.settings.activityOverview ?? false} disabled={busy || !snapshot} onChange={e => void toggleOverview(e.target.checked)} /><span><strong>Activity overview</strong><small>Show your GitHub activity below the centered New thread composer. Saves immediately; your background draft stays intact.</small></span></label>
+      <div className="aura-field aura-device"><label className="aura-field-title" htmlFor={`${id}-device`}>On this device</label><select id={`${id}-device`} value={String(device)} disabled={busy || !snapshot} onChange={e => chooseDevice(e.target.value === "shared" || e.target.value === "off" ? e.target.value : Number(e.target.value))}><option value="shared">Shared background</option>{snapshot?.slots.map(s => <option key={s.slot} value={String(s.slot)}>Slot {s.slot} · {s.name}</option>)}<option value="off">Off (plain BB theme)</option></select><small className="aura-field-help">Saved only in this browser or app, so each machine can show its own slot. Applying a background or switching slots changes the shared one.</small></div>
       <div className="aura-layout">
         <div className="aura-preview-wrap">
           <div className="aura-preview-scene">
