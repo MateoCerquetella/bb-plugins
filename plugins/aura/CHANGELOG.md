@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.9 - 2026-11-17
 
 - Add **On this device** in Settings → Aura: each browser or app can follow the
   shared background, show a specific saved slot, or turn Aura off and keep the
