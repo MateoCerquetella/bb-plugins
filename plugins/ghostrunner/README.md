@@ -1,13 +1,13 @@
 # Ghostrunner
 
-A cyberpunk theme for BB. Near-black panels, a hot red accent, cyan for success and diffs, yellow for warnings, and monospace type throughout. Code previews and diffs use a matching syntax theme.
+A cyberpunk theme for BB with near-black Dark panels and cool-gray Light panels. Both use a red accent, cyan for success and diffs, yellow for warnings, and monospace type. Code previews and diffs match the selected mode.
 
 ## Install
 
 Install the Git release:
 
 ```sh
-bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.0 --subdirectory plugins/ghostrunner --tag-prefix ghostrunner/
+bb plugin install git:https://github.com/MateoCerquetella/bb-plugins.git@^0.1.1 --subdirectory plugins/ghostrunner --tag-prefix ghostrunner/
 ```
 
 Then pick **Ghostrunner** in **Settings → Appearance**, or run:
@@ -30,7 +30,7 @@ To go back to the default palette, run `bb theme reset`, or disable the plugin.
 
 ## What it changes
 
-- **Colours:** native BB colour tokens only. Ghostrunner is dark only, so Light, Dark and System all show the same palette.
+- **Colours:** native BB colour tokens only. Pick Light, Dark, or System in BB Appearance under the same Ghostrunner palette.
 - **Fonts:** JetBrains Mono for text and code, and Chakra Petch for titles. The plugin doesn't bundle fonts. If they aren't installed, BB uses your system monospace font. Both are free: [JetBrains Mono](https://www.jetbrains.com/lp/mono/) and [Chakra Petch](https://fonts.google.com/specimen/Chakra+Petch).
 - **Nothing else:** the plugin includes no wallpapers, makes no network requests and stores no data.
 

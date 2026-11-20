@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1
+
+- Add Light mode and matching syntax colors to the existing Ghostrunner palette.
+
 ## 0.1.0
 
 - Add the Ghostrunner theme: near-black panels, a red accent, cyan and yellow status colours.

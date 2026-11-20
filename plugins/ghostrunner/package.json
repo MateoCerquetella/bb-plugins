@@ -1,7 +1,7 @@
 {
   "name": "bb-plugin-ghostrunner",
-  "version": "0.1.0",
-  "description": "A near-black cyberpunk theme for BB with a hot red edge and cyan signals.",
+  "version": "0.1.1",
+  "description": "A cyberpunk theme for BB with light and dark palettes, a red accent, and cyan signals.",
   "license": "MIT",
   "type": "module",
   "engines": {
@@ -10,7 +10,7 @@
   },
   "bb": {
     "name": "Ghostrunner",
-    "description": "Near-black panels, a hot red edge, cyan and yellow signals, and monospace type.",
+    "description": "Light and dark palettes with a red accent, cyan and yellow signals, and monospace type.",
     "branding": {
       "icon": "./assets/icon.svg"
     },
@@ -20,11 +20,11 @@
       {
         "id": "ghostrunner",
         "name": "Ghostrunner",
-        "description": "Near-black panels with a hot red edge.",
+        "description": "Light and dark cyberpunk palettes with a red accent.",
         "css": "./themes/ghostrunner.css",
         "codeTheme": {
           "dark": "./themes/ghostrunner-code.json",
-          "light": "./themes/ghostrunner-code.json"
+          "light": "./themes/ghostrunner-code-light.json"
         }
       }
     ]

@@ -1,5 +1,4 @@
-/* Ghostrunner: near-black panels, a hot red edge, cyan and yellow signals.
-   Dark only: Light, Dark and System all render the same palette. */
+/* Ghostrunner with light and dark palettes. */
 
 :root {
   --font-sans: "JetBrains Mono", "JetBrainsMono Nerd Font", ui-monospace, monospace;
@@ -8,46 +7,45 @@
   --font-display: "Chakra Petch", "JetBrains Mono", ui-monospace, sans-serif;
 }
 
-:root,
-.light {
-  --canvas: #0b0d10;
-  --ink: #c9d1d9;
-  --sidebar: #080a0d;
-  --card: #0f1318;
-  --popover: #0f1318;
-  --secondary: #1e252d;
-  --accent: #231215;
-  --muted: #1e252d;
-  --border: #2a323c;
-  --primary: #ff3b45;
-  --primary-foreground: #0b0d10;
-  --muted-foreground: #9099a5;
-  --subtle-foreground: #8a95a1;
-  --readback-foreground: #9099a5;
-  --sidebar-accent: #321418;
-  --surface-selected: #321418;
-  --surface-raised: #0f1318;
-  --surface-recessed: #05070a;
-  --input: #2a323c;
-  --destructive: #ff3b45;
-  --destructive-foreground: #0b0d10;
-  --destructive-text: #ff3b45;
-  --warning: #e8e03a;
-  --warning-text: #e8e03a;
-  --attention: #ff3b45;
-  --success: #4fc3c9;
-  --diff-added: #4fc3c9;
-  --diff-removed: #ff3b45;
-  --pr-merged: #4fc3c9;
-  --file-accent: #ff3b45;
+:root {
+  --canvas: #f2f4f7;
+  --ink: #212936;
+  --sidebar: #e9edf2;
+  --card: #fbfcfd;
+  --popover: #fbfcfd;
+  --secondary: #e1e7ee;
+  --accent: #f4e1e5;
+  --muted: #e1e7ee;
+  --border: #c5ceda;
+  --primary: #a71e35;
+  --primary-foreground: #ffffff;
+  --muted-foreground: #4c5869;
+  --subtle-foreground: #566171;
+  --readback-foreground: #4c5869;
+  --sidebar-accent: #f4e1e5;
+  --surface-selected: #f4e1e5;
+  --surface-raised: #fbfcfd;
+  --surface-recessed: #e4e9ef;
+  --input: #8693a5;
+  --destructive: #a71e35;
+  --destructive-foreground: #ffffff;
+  --destructive-text: #a71e35;
+  --warning: #735200;
+  --warning-text: #735200;
+  --attention: #a71e35;
+  --success: #006269;
+  --diff-added: #006269;
+  --diff-removed: #a71e35;
+  --pr-merged: #006269;
+  --file-accent: #a71e35;
   --background: var(--canvas);
   --foreground: var(--ink);
   --card-foreground: var(--ink);
   --popover-foreground: var(--ink);
   --secondary-foreground: var(--ink);
-  --accent-foreground: #e6edf3;
+  --accent-foreground: #651d2b;
   --sidebar-foreground: var(--ink);
-  --sidebar-accent-foreground: #e6edf3;
+  --sidebar-accent-foreground: #651d2b;
   --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: var(--primary-foreground);
   --sidebar-border: var(--border);
@@ -55,10 +53,12 @@
   --border-seam: var(--border);
   --ring: var(--primary);
   --sidebar-ring: var(--primary);
-  --surface-selected-border: #792228;
+  --surface-selected-border: #b95c6c;
+  --ghostrunner-selection: #f2cbd3;
+  --ghostrunner-selection-foreground: #212936;
 }
 
-.dark {
+:root.dark {
   --canvas: #0b0d10;
   --ink: #c9d1d9;
   --sidebar: #080a0d;
@@ -105,6 +105,8 @@
   --ring: var(--primary);
   --sidebar-ring: var(--primary);
   --surface-selected-border: #792228;
+  --ghostrunner-selection: #e6edf3;
+  --ghostrunner-selection-foreground: #0b0d10;
 }
 
 /* Titles in a squared display face; falls back to JetBrains Mono. */
@@ -118,6 +120,6 @@ h3,
 }
 
 ::selection {
-  background: #e6edf3;
-  color: #0b0d10;
+  background: var(--ghostrunner-selection);
+  color: var(--ghostrunner-selection-foreground);
 }
